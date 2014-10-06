@@ -1,0 +1,97 @@
+ISO2	ISO2/3	LERG	CLLI	PS	PSST	Location
+CA	AB	AB	AB	CA	AB	Alberta
+CA	BC	BC	BC	CA	BC	British Columbia
+CA	MB	MB	MB	CA	MB	Manitoba
+CA	NB	NB	NB	CA	NB	New Brunswick
+CA	NL	NF	NF	CA	NL	Newfoundland
+CA	NT	NT	NT	CA	NT	Northwest Territories
+CA	NS	NS	NS	CA	NS	Nova Scotia
+CA	NU	VU	VU	CA	NU	Nunavut Territory
+CA	ON	ON	ON	CA	ON	Ontario
+CA	PE	PE	PE	CA	PE	Prince Edward Island
+CA	QC	PQ	PQ	CA	QC	Quebec
+CA	SK	SK	SK	CA	SK	Saskatchewan
+CA	YT	YT	YT	CA	YT	Yukon Territory
+
+MX	MX	MX	MX	MX	MX	Mexico
+
+AS	AS	AS	AM	US	AS	American Samoa
+AI	AI	AI	AI	AI	AI	Anguilla
+AG	AG	AN	AN	AG	AN	Antigua
+BS	BS	BA	BA	BS	BA	Bahamas
+BB	BB	BD	BD	BB	BD	Barbados
+BM	BM	BM	BM	BM	BM	Bermuda
+VG	VG	BV	BV	VG	BV	British Virgin Islands
+KY	KY	CQ	CQ	KY	CQ	Cayman Islands
+MP	MP	NN	NN	US	MP	CNMI (N. Marianas)
+DM	DM	DM	DM	DM	DM	Dominica
+DO	DO	DR	DR	DO	DR	Dominican Republic
+GD	GD	GN	GN	GD	GN	Grenada
+GU	GU	GU	GU	US	GU	Guam
+JM	JM	JM	JM	JM	JM	Jamaica
+MS	MS	RT	RT	MS	RT	Montserrat
+PR	PR	PR	PR	US	PR	Puerto Rico
+KN	KN	KA	KA	KN	KA	St. Kitts & Nevis
+LC	LC	SA	SA	LC	SA	St. Lucia
+SX	SX	SF	SF	SX	SF	St. Maarten
+VC	VC	ZF	ZF	VC	ZF	St. Vincent
+TT	TT	TR	TR	TT	TR	Trinidad & Tobago
+TC	TC	TC	TC	TC	TC	Turks & Caicos
+VI	VI	VI	VI	US	VI	US Virgin Islands
+
+US	AL	AL	AL	US	AL	Alabama
+US	AK	AK	AK	US	AK	Alaska
+US	AZ	AZ	AZ	US	AZ	Arizona
+US	AR	AR	AR	US	AR	Arkansas
+US	CA	CA	CA	US	CA	California
+US	CO	CO	CO	US	CO	Colorado
+US	CT	CT	CT	US	CT	Connecticut
+US	DE	DE	DE	US	DE	Delaware
+US	FL	FL	FL	US	FL	Florida
+US	GA	GA	GA	US	GA	Georgia
+US	HI	HI	HI	US	HI	Hawaii
+US	ID	ID	ID	US	ID	Idaho
+US	IL	IL	IL	US	IL	Illinois
+US	IN	IN	IN	US	IN	Indiana
+US	IA	IA	IA	US	IA	Iowa
+US	KS	KS	KS	US	KS	Kansas
+US	KY	KY	KY	US	KY	Kentucky
+US	LA	LA	LA	US	LA	Louisiana
+US	ME	ME	ME	US	ME	Maine
+US	MD	MD	MD	US	MD	Maryland
+US	MA	MA	MA	US	MA	Massachusetts
+US	MI	MI	MI	US	MI	Michigan
+US	MN	MN	MN	US	MN	Minnesota
+US	MS	MS	MS	US	MS	Mississippi
+US	MO	MO	MO	US	MO	Missouri
+US	MT	MT	MT	US	MT	Montana
+US	NE	NE	NE	US	NE	Nebraska
+US	NV	NV	NV	US	NV	Nevada
+US	NH	NH	NH	US	NH	New Hampshire
+US	NJ	NJ	NJ	US	NJ	New Jersey
+US	NM	NM	NM	US	NM	New Mexico
+US	NY	NY	NY	US	NY	New York
+US	NC	NC	NC	US	NC	North Carolina
+US	ND	ND	ND	US	ND	North Dakota
+US	OH	OH	OH	US	OH	Ohio
+US	OK	OK	OK	US	OK	Oklahoma
+US	OR	OR	OR	US	OR	Oregon
+US	PA	PA	PA	US	PA	Pennsylvania
+US	RI	RI	RI	US	RI	Rhode Island
+US	SC	SC	SC	US	SC	South Carolina
+US	SD	SD	SD	US	SD	South Dakota
+US	TN	TN	TN	US	TN	Tennessee
+US	TX	TX	TX	US	TX	Texas
+US	UT	UT	UT	US	UT	Utah
+US	VT	VT	VT	US	VT	Vermont
+US	VA	VA	VA	US	VA	Virginia
+US	WA	WA	WA	US	WA	Washington
+US	DC	DC	DC	US	DC	Washington, D.C.
+US	WV	WV	WV	US	WV	West Virginia
+US	WI	WI	WI	US	WI	Wisconsin
+US	WY	WY	WY	US	WY	Wyoming
+
+ZZ	ZZ	XX	XX	ZZ	XX	Nowhere
+US	ZZ	XX	XX	US	XX	US-wide
+CA	ZZ	XX	XX	CA	XX	CA-wide
+

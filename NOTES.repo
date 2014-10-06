@@ -1,0 +1,418 @@
+OpenSS7 -- repository notes.  2011-02-12
+$Id: NOTES.repo,v 1.1.2.2 2011-02-28 19:51:28 brian Exp $
+Copyright (c) 2008-2011  Monavacon Limited. <http://www.monavacon.com/>
+Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
+See the end for copying conditions (for this file).
+
+
+Repositories:
+=============
+
+The easiest way of establishing a repository source for any RPM-based
+system is to create an rpm package that installs the correct repostitory
+source.  Such as
+
+$> where=repos/rpms/centos/5.5/x86_64/RPMS/noarch
+$> what=openss7-repo-1.1.1.20110111.noarch.rpm
+$> sudo rpm -Uhv http://www.openss7.org/$where/$what
+
+It may behoove the process to make the URL parameterized rather than
+absolute so there can be access control scripts run (or we can just
+script the absolute URL, which is probably better).
+
+Access Procedures:
+------------------
+
+For commercial repositories, it will be necessary to authorize access to
+the repository and register it for a specific machine.  This can be
+accomplishe completely transparent to the end-system as follows:
+
+- When the 'openss7-repo' package is installed or updated, require basic
+  authentication for CVS access username and password.  At this point,
+  the host and originating IP address (from the HTTP query) can be
+  registered against the user.  All further accesses from the host and
+  originating IP address can then be authorized automatically.
+
+Organization:
+-------------
+
+We used to place repositories under a single repository branch.  I
+notice that epel and rpmfusion have 3 repositories for each
+distribution: '' '-debug' and '-source'.  They have two distributions:
+'' and '-testing'.  All three repos for each distribution is placed in
+the same .repo file.  The '-debug' and '-source' repos are disabled by
+default.
+
+	[epel]
+		pub/epel/5/$basearch/
+	[epel-debuginfo] (disabled)
+		pub/epel/5/$basearch/debug/
+	[epel-source] (disabled)
+		pub/epel/5/SRPMS/
+	[epel-testing]
+		pub/epel/testing/5/$basearch/
+	[epel-testing-debuginfo] (disabled)
+		pub/epel/testing/5/$basearch/debug/
+	[epel-testing-source] (disabled)
+		pub/epel/testing/5/SRPMS/
+
+	[rpmfusion-free-updates]
+		free/el/updates/5/$basearch/
+	[rpmfusion-free-updates-debuginfo] (disabled)
+		free/el/updates/5/$basearch/debug/
+	[rpmfusion-free-updates-source] (disabled)
+		free/el/updates/5/SRPMS/
+	[rpmfusion-free-updates-testing]
+		free/el/updates/testing/5/$basearch/
+	[rpmfusion-free-updates-testing-debuginfo] (disabled)
+		free/el/updates/testing/5/$basearch/debug/
+	[rpmfusion-free-updates-testing-source] (disabled)
+		free/el/updates/testing/5/SRPMS/
+
+This might be good for us too, because we want careful control over
+debug and source information.
+
+CentOS is set up as follows:
+
+	[base]
+		centos/$releasever/os/$basearch/
+			../SRPMS - source rpms
+			CentOS   - contains rpms
+			           (all arch and noarch)
+			Also contains all of the top level
+			CDROM distribution files.
+	[updates]
+		centos/$releasever/updates/$basearch/
+			../SRPMS - source rpms
+			RPMS     - all rpms
+	[addons]
+		centos/$releasever/addons/$basearch/
+			../SRPMS - source rpms
+			RPMS     - all rpms
+	[extras]
+		centos/$releasever/extras/$basearch/
+			../SRPMS - source rpms
+			RPMS     - all rpms
+	[centosplus] (disabled)
+		centos/$releasever/centosplus/$basearch/
+			../SRPMS - source rpms
+			RPMS     - all rpms
+	[contrib] (disabled)
+		centos/$releasever/contrib/$basearch/
+			../SRPMS - source rpms
+			RPMS     - all rpms
+	[fasttrack] (absent)
+		centos/$releasever/contrib/$basearch/
+			../SRPMS - source rpms
+			RPMS     - all rpms
+
+RHEL is set up as follows:
+
+	[rhel]
+		ftp://ftp.redhat.com/pub/redhat/rhel/$releasever/$basearch/os/
+			Packages  - contains the $basearch and noarch rpms
+			../iso    - contains the ISO images for RPM disks
+			../os     - contains media.repo and various
+			            stuff from the boot directory, gpg
+				    keys, isolinux imagess
+	[rhel-debuginfo]
+		ftp://ftp.redhat.com/pub/redhat/rhel/$releasever/$basearch/debug/
+			../debuginfo - symbolic link to ../debug
+			../debug     - contains all the packages at this
+			               level (including the repodata directory).
+	[rhel-source]
+		ftp://ftp.redhat.com/pub/redhat/rhel/$releasever/source/
+			SRPMS - contains the source rpms
+			iso   - contains ISO images for SRPM disks
+	[rhel-optional]
+		ftp://ftp.redhat.com/pub/redhat/rhel/$releasever/optional/$basearch/os/
+			Packages  - contains the $basearch and noarch rpms
+	[rhel-optional-debuginfo]
+		ftp://ftp.redhat.com/pub/redhat/rhel/$releasever/optional/$basearch/debug/
+			../debuginfo - symbolic link to ../debug
+			../debug     - contains all the packages at this
+			               level (including the repodata directory).
+	[rhel-optional-source]
+		ftp://ftp.redhat.com/pub/redhat/rhel/$releasever/optional/source/
+			SRPMS - contains the source rpms
+
+Some notes about $releasever: for RHEL, RedHat and CentOS, $release ver
+is always only the major number (such as the '5' of '5.5'); however, in
+the repository, the '5' is a symbolic link to the highest of the '5.x'
+subdirectories.
+
+	ftp://ftp.redhat.com/pub/redhat/rhel/
+	    $releasever/ (5, 5.5)
+	    +-> $basearch/ (e.g. x86_64)
+		+-> os/
+		    +-> Packages
+			+-> *.rpm
+		    +-> repodata
+		+-> iso/
+		    +-> *.iso
+		+--> debug/ (debuginfo/)
+		    +-> repodata
+		    +-> *.rpm
+	    +-> source/
+		+-> SRPMS
+		    +-> *.src.rpm
+		    +-> repodata
+		+-> iso/
+		    +-> *.iso
+	    +-> optional/
+		+-> $basearch/ (e.g. x86_64)
+		+-> os/
+		    +-> Packages
+			+-> *.rpm
+		    +-> repodata
+		+-> source
+
+The source directories are rather strange as yum does not support
+installation of srpms.  apt-rpm does.  So does up2date???  Source RPMs
+are all saved in the SRPMS subdirectory under the repository.
+
+Much of this organization has to do with the traditional Red Hat FTP
+archive organization.
+
+
+SLES is set up as follows:
+
+	[nu_novell_com:SLES11-SP1-Pool]
+		repo/$RCE/SLES11-SP1-Pool/sle-11-x86_64
+			rpm/$basearch - contains $basearch RPMs
+			rpm/noarch    - contains noarch RPMs
+	[nu_novell_com:SLES11-SP1-Updates]
+		repo/$RCE/SLES11-SP1-Updates/sle-11-x86_64
+			rpm/$basearch - contains $basearch RPMs
+			rpm/noarch    - contains noarch RPMs
+			rpm/src       - contains source RPMs
+	[nu_novell_com:SLE11-WebYaST-SP1-Pool] (disabled)
+		repo/$RCE/SLE11-WebYaST-SP1-Pool/sle-11-x86_64
+	[nu_novell_com:SLE11-WebYaST-SP1-Updates] (disabled)
+		repo/$RCE/SLE11-WebYaST-SP1-Updates/sle-11-x86_64
+	[nu_novell_com:SLE11-SP1-Debuginfo-Pool] (disabled)
+		repo/$RCE/SLE11-SP1-Debuginfo-Pool/sle-11-x86_64
+	[nu_novell_com:SLE11-SP1-Debuginfo-Updates] (disabled)
+		repo/$RCE/SLE11-SP1-Debuginfo-Updates/sle-11-x86_64
+	[nu_novell_com:SLES11-Extras] (disabled)
+		repo/$RCE/SLES11-Extras/sle-11-x86_64
+
+SLES puts rpms in 'rpm/$arch' subdirectory, and srpms in  the 'rpm/src/'
+subdirectory.  The source rpms are included in SLES11-SP1-Updates.  SLES
+breaks debug information packages into debuginfo and debugsource
+sub-packages that includes debugging information and debugging source
+code respectively.  Source packages are included in the main
+repositories (on media and in updates repos).  Debugging information
+only exists in the on-line repositories.
+
+Debian removes the distribution hierarchy from the directory structure.
+There are named distributions (nicknamed stable, testing, unstable,
+experimental) and then updates, proposed-updates.  Under each repository
+there is main, contrib and non-free.  Sources are included in the same
+hierarchy.
+
+
+Final Organization:
+-------------------
+
+The following organization resulted in the least disruption from
+previous organizations.  The repository directory mounts on
+'https://www.openss7.org/repo/'.  All rpm-based repositories are under
+the subdirectory 'rpms/'.  The organization is as follows:
+
+  https://www.openss7.org/repo/
+  +-> repoindex.html
+  +-> $target_distro/		(e.g.  sle/, rhel/, suse/, centos/)
+      +-> $target_edition/	(e.g. 11.1/,  6.0/, 11.4/,    5.5/)
+          +-> $target_cpu/	(e.g. x86_64/, i686/, ppc64/)
+	      +-> openss7.repo
+	      +-> content
+	      +-> content.asc
+	      +-> content.key
+	      +-> media.1/
+	          +-> media
+	      +-> setup/
+	          +-> desc/
+		      +-> packages
+		      +-> packages.en
+		      +-> packages.DU
+		      +-> packages.FL
+	      +-> BUILD/
+	      +-> RPMS/
+	          +-> noarch/
+		      +-> *.rpm
+		  +-> $target_cpu/
+		      +-> *.rpm
+		  +-> src/ -> ../SRPMS/
+	      +-> SOURCES/
+	      +-> SPECS/
+	      +-> SRPMS/
+	          +-> *.src.rpm
+	      +-> repodata/		(for base)
+	      +-> main/
+	          +-> RPMS/ -> ../RPMS/
+		  +-> repodata/		(for main)
+	      +-> debug/
+	          +-> RPMS/ -> ../RPMS/
+		  +-> repodata/		(for debug)
+	      +-> source/
+		  +-> RPMS/ -> ../RPMS/
+		  +-> repodata/		(for source)
+	      +-> extras/
+		  +-> openss7-extras.repo
+		  +-> content
+		  +-> content.asc
+		  +-> content.key
+		  +-> media.1/
+		      +-> media
+		  +-> setup/
+		      +-> desc/
+			  +-> packages
+			  +-> packages.en
+			  +-> packages.DU
+			  +-> packages.FL
+	          +-> BUILD/
+		  +-> RPMS/
+		      +-> noarch/
+		          +-> *.rpm
+		      +-> $target_cpu/
+		          +-> *.rpm
+		      +-> src/ -> ../SRPMS/
+	          +-> SOURCES/
+	          +-> SPECS/
+	          +-> SRPMS/
+	              +-> *.src.rpm
+	          +-> repodata/		(for extras)
+	          +-> main/
+		      +-> RPMS -> ../RPMS/
+		      +-> repodata/	(for extras-main)
+	          +-> debug/
+		      +-> RPMS -> ../RPMS/
+		      +-> repodata/	(for extras-debug)
+	          +-> source/
+		      +-> RPMS -> ../RPMS/
+		      +-> repodata/	(for extras-source)
+	      +-> updates/
+		  +-> openss7-updates.repo
+		  +-> content
+		  +-> content.asc
+		  +-> content.key
+		  +-> media.1/
+		      +-> media
+		  +-> setup/
+		      +-> desc/
+			  +-> packages
+			  +-> packages.en
+			  +-> packages.DU
+			  +-> packages.FL
+	          +-> BUILD/
+		  +-> RPMS/
+		      +-> noarch/
+		          +-> *.rpm
+		      +-> $target_cpu/
+		          +-> *.rpm
+		      +-> src/ -> ../SRPMS/
+	          +-> SOURCES/
+	          +-> SPECS/
+	          +-> SRPMS/
+	              +-> *.src.rpm
+	          +-> repodata/		(for updates)
+	          +-> main/
+		      +-> RPMS -> ../RPMS/
+		      +-> repodata/	(for updates-main)
+	          +-> debug/
+		      +-> RPMS -> ../RPMS/
+		      +-> repodata/	(for updates-debug)
+	          +-> source/
+		      +-> RPMS -> ../RPMS/
+		      +-> repodata/	(for updates-source)
+	      +-> testing/
+		  +-> openss7-testing.repo
+		  +-> content
+		  +-> content.asc
+		  +-> content.key
+		  +-> media.1/
+		      +-> media
+		  +-> setup/
+		      +-> desc/
+			  +-> packages
+			  +-> packages.en
+			  +-> packages.DU
+			  +-> packages.FL
+	          +-> BUILD/
+		  +-> RPMS/
+		      +-> noarch/
+		          +-> *.rpm
+		      +-> $target_cpu/
+		          +-> *.rpm
+		      +-> src/ -> ../SRPMS/
+	          +-> SOURCES/
+	          +-> SPECS/
+	          +-> SRPMS/
+	              +-> *.src.rpm
+	          +-> repodata/		(for testing)
+	          +-> main/
+		      +-> RPMS -> ../RPMS/
+		      +-> repodata/	(for testing-main)
+	          +-> debug/
+		      +-> RPMS -> ../RPMS/
+		      +-> repodata/	(for testing-debug)
+	          +-> source/
+		      +-> RPMS -> ../RPMS/
+		      +-> repodata/	(for testing-source)
+
+-----
+
+=========================================================================
+
+ Copyright (c) 2008-2011  Monavacon Limited  <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian Bidulock  <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ Permission is granted to make and distribute verbatim copies of this
+ manual provided the copyright notice and this permission notice are
+ preserved on all copies.
+
+ Permission is granted to copy and distribute modified versions of this
+ manual under the conditions for verbatim copying, provided that the
+ entire resulting derived work is distributed under the terms of a
+ permission notice identical to this one
+
+ Since the Linux kernel and libraries are constantly changing, this
+ manual page may be incorrect or out-of-date.  The author(s) assume no
+ responsibility for errors or omissions, or for damages resulting from
+ the use of the information contained herein.  The author(s) may not
+ have taken the same level of care in the production of this manual,
+ which is licensed free of charge, as they might when working
+ professionally.
+
+ Formatted or processed versions of this manual, if unaccompanied by the
+ source, must acknowledge the copyright and authors of this work.
+
+-------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+ on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department
+ of Defense ("DoD"), it is classified as "Commercial Computer Software"
+ under paragraph 252.227-7014 of the DoD Supplement to the Federal
+ Acquisition Regulations ("DFARS") (or any successor regulations) and
+ the Government is acquiring only the license rights granted herein (the
+ license rights customarily provided to non-Government users).  If the
+ Software is supplied to any unit or agency of the Government other than
+ DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19
+ of the Federal Acquisition Regulations ("FAR") (or any successor
+ regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+ NASA Supplement to the FAR (or any successor regulations).
+
+=========================================================================
+
+ Commercial licensing and support of this software is available from
+ OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+
+=========================================================================
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

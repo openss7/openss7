@@ -1,0 +1,190 @@
+<HTML>
+<HEAD>
+<title>
+JTAPI Media Async package
+</title>
+</head>
+<BODY LINK="#0000ff" VLINK="#800080">
+<p>
+Defines asynchronous methods, events and Listeners for the media package.
+</P>
+<h3>
+Package Overview 
+</h3>
+<p>
+The <tt>async</tt> package defines interfaces for asynchronous
+MediaService methods, asynchronous Events, Listener callback interfaces,
+and asynchronous Resource interfaces.
+</p>
+<p>
+The asynchronous MediaService method definitions are derived from
+the synchronous method definitions. 
+<tt>Async.MediaService</tt> defines a method corresponding to each
+synchronous MediaService method.
+For each synchronous <tt>methodName(arglist)</tt>, 
+the corresponding asynchronous methods is named:
+<tt>async_methodName</tt>.
+The async method has exactly the same <tt>arglist</tt> 
+as the synchronous <tt>methodName</tt>.
+The return values are always some <tt>Async.Event</tt>,
+specialized as necessary to contain any return values.
+In all cases, the asynchronous methods have exactly 
+the same argument signature as the synchronous counterpart, 
+and always return an <tt>Async.Event</tt>.
+</p>
+<p>
+The same rules apply to Resource methods.
+Most synchronous Resource methods return some MediaEvent.
+For example <tt>play</tt> returns a <tt>PlayerEvent</tt>.
+The corresponding asynchronous method returns an Async.Event
+named by prepending "Async_".
+For example, <tt>async_play</tt> returns <tt>Async_PlayerEvent</tt>.
+</p>
+<p>
+<h3>Theory of Operation:</h3>
+</P>
+<p>
+All MediaService and Resource methods are internally invoked using
+the async interfaces.  The return value from all async methods is
+some specialization of Async.Event. The synchronous transaction
+methods block waiting until the Async.Event is done.  
+An event <i>is done</i> when the transaction is complete
+and the return values from the operation have been stored in the
+event.  When the event is done, the synchronous MediaService methods
+return the value of interest as extracted from the event 
+(or return void, if there is no interesting value).
+The synchronous Resource method return the event itself;
+the event acts like a multiple-value return structure.
+<p>
+In contrast, the asychronous methods immediately and directly 
+return the Async.Event object. The application has limited access 
+to the fields of the event until the event is done.  Two event 
+accessors are always (or immediately) accessible: the EventID and 
+the Event source (a MediaService). The methods <tt>getEventID()</tt> 
+and <tt>getSource()</tt> (or the equivalent <tt>getMediaService()</tt>)
+return these values.
+The other fields of an event are not accessible until the event
+is done.
+</p><p>
+If a transactional method completes with an error status,
+then the event contains an Exception.  The synchronous API methods
+extract and throw that error (using <tt>throwIfXXXException()</tt>.  
+The asychronous API methods <i>never</i> throw the Exceptions created
+from transactional errors. 
+However, asynchronous methods <i>may</i> throw Exceptions based on 
+analysis at invocation time (precondition errors). 
+The application should check for errors using <tt>getException()</tt>
+or for Resource events one can also use <tt>getError()</tt>.
+</p><p>
+An application can synchronize with an event (wait for it to be done)
+in several ways:
+<ol>
+<li>Invoke the <tt>waitForEventDone()</tt> method directly. 
+    The <tt>waitForEventDone()</tt> method blocks until the event is done, 
+    and then returns.
+    [the invoking Thread is blocks using Thread.wait() and is
+     released by notifyAll() when the event is done.]</li>
+<li>Invoke an event accessor 
+    (other than <tt>getEventID()</tt> or <tt>getMediaService()</tt>).
+    All event accessors internally call <tt>waitForEventDone()</tt> before
+    extracting values from the event.</li>
+<li>Invoke the event method <tt>isDone()</tt> to effect a "polling" test.
+    <tt>isDone()</tt> returns <tt>false</tt> if <tt>waitForEventDone()</tt> 
+    would block.
+    [internally <tt>waitForEventDone()</tt> blocks until <tt>isDone()</tt>
+     returns <tt>true</tt>.]</li>
+<li>Establish a Listener for the event of interest. 
+    The listener callback is invoked when the event is done.</li>
+<li>Invoke the <tt>waitForListenersDone()</tt> method. 
+    The <tt>waitForListenersDone()</tt> method blocks until 
+    the event is done and all Listeners have run, and then returns.
+    This method is used the synchronouse API methods.
+    </li>
+</ol>
+Note that synchronous tranasction methods do generate asynchronous
+events internally, and those events <i>are</i> delivered to listeners.
+Note also that the event objects returned from synchronous Resource
+methods are guarenteed to be <i>done</i> when the method returns.
+Furthermore, the synchronous API guarantees that all listeners
+have been notified before the method returns.
+</p><p>
+As always, the order in which listeners are invoked is indeterminate.
+</p><p>
+
+<H3>Asynchronous Usage Scenarios</H3>
+<P>There are several scenarios in which one may want to use
+the asynchronous methods:
+</P>
+<OL><LI>
+For an event driven application;
+that is, a state-machine implemented in the Listeners.
+This is the classical reason to use asynchronous methods.
+</P><P>
+From within a Listener callback,
+one can initiate <tt>async_doSomething(...)</tt>.
+When that completes, some other Listener method will be invoked.
+<p><b>Note:</b> Do <STRONG>not</STRONG> invoke synchronous methods
+from within a Listener. This will block the Listener thread,
+and may hang the application.
+</p>
+</LI><LI>
+To get several requests going at the same time.
+One example would be to start several play requests with
+<tt>(p_IfBusy = v_Queue)</tt>.
+Another example would be to destroy several Containers in parallel:
+<PRE>
+ev1 = containerService.async_destroy(cont1, null);
+ev2 = containerService.async_destroy(cont2, null);
+ev3 = containerService.async_destroy(cont3, null);
+// All three operations are started.
+// Could do other stuff at this point...
+// Now: wait for them all to finish.
+ev1.waitForListenersDone();
+ev2.waitForListenersDone();
+ev3.waitForListenersDone();
+// Note: the order we wait does not matter
+// We get to this point if/only-if all events are done.
+// and now we can check for errors, or whatever.
+</PRE>
+<P><b>Note:</b> A similar 
+  result could be achieved with multiple threads each calling a synchronous 
+  method, but then you need to join the threads. This method is easier, and 
+  requires less overhead in many cases.
+</P>
+</LI><LI>
+To impose a timeout for event completion:
+<PRE>
+ev = async_doSomething(...);
+ev.waitForEventDone(myTimeout);
+if (!ev.isDone()) {  doSomethingTimedOut(); }
+</PRE>
+</LI><LI>
+To prevent exceptions from being thrown;
+but instead check for them by querying the event object:
+<PRE>
+ev = async_doSomething(...);
+if (!ev.getError().equals(Error_OK)) { processError(...); }
+</PRE>
+or
+<PRE>
+if (ev.getException() != null) { processError(...); }
+</PRE>
+</LI><LI>
+To get the whole event object;
+not the single derived value or void returned by a sync method:
+<PRE>
+ev = async_doSomething(...);
+Dictionary payload = ev.getPayload();
+</PRE>
+</LI></OL>
+<P>
+<b>Note:</b> The synchronous methods are built from the async methods.
+The synchronizing wrapper creates an event and starts to operation,
+blocks on the event, extracts any exception and throws it,
+and may extract and return a particular field of the event.
+As shown above, async methods can be used directly to bypass any or all
+of the wrapper actions.
+</p>
+@since Jtapi-1.4
+</body>
+</html>

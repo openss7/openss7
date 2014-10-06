@@ -1,0 +1,879 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: strlog.9.man,v 1.1.2.2 2011-02-07 02:18:45 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:45 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: strlog.9.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:45  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH STRLOG 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B strlog, vstrlog
+\- pass a message to the \fISTREAMS\fR logger
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/strlog.h>
+.HP
+.BI "int strlog(short " mid ", short " sid ", char " level ", unsigned short " flags ", char *" fmt ", " ... ");
+.PD 0
+.HP
+.BI "int vstrlog(short " mid ", short " sid ", char " level ", unsigned short " flags ", char *" fmt ", va_list " args ");
+.PD
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I mid
+specifies the
+.I STREAMS
+module id
+.PD 0
+.TP
+.I sid
+specifies the
+.I STREAMS
+minor device number associated with the module.
+.TP
+.I level
+specifies a priority level.
+.TP
+.I flags
+log flags specifying the severity and options associated with the
+.I STREAMS
+log.
+.TP
+.I fmt
+provides the
+.BR printf (3)
+style format string.
+.TP
+.I ...
+provides the arguments for the
+.BR printf (3)
+style format string for
+.BR strlog ().
+.TP
+.I args
+provides the arguments for the
+.BR printf (3)
+style format string for
+.BR vstrlog ().
+.PD
+.PP
+.BR vstrlog ()
+is a
+.B va_list
+version of
+.BR strlog ().
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR strlog ()
+is the kernel interface to the
+.I STREAMS
+.BR log (4)
+error and trace logger.
+By default, when the
+.BR log (4)
+driver is not loaded on the system,
+.BR strlog ()
+instead prints messages to the
+.B Linux
+system logs ala
+.BR printk ().
+See
+.RI \(lq NOTICES \(rq,
+below.
+When the
+.BR log (4)
+driver loads, however, it uses the
+.BR register_strlog (9)
+utility to alter the behaviour of
+.BR strlog ().
+When the
+.BR log (4)
+driver is loaded, log messages will be passed to the
+.BR log (4)
+driver as described in
+.BR strlog (4).
+.PP
+.BR strlog ()
+formulates and passes a
+.I STREAMS
+message to the
+.I STREAMS
+logger,
+.BR log (4),
+to be passed to active
+.BR strerr (8)
+and
+.BR strace (8)
+logging processes listening on the
+.BR log (4)
+device.
+.PP
+.BR vstrlog ()
+is a
+.B va_list
+version of
+.BR strlog ()
+that accepts all of the same arguments,
+with the exception of the variable arguments list, which is formatted as the
+.BI va_list " args
+argument.
+.PP
+.I mid
+identifies the
+.I STREAMS
+module id associated with the
+.I STREAMS
+driver or module generating the log.
+.I sid
+is the minor device node within the
+.I STREAMS
+driver or module
+to which the log applies.
+.I level
+indicates the priority level of the log message with respect to other log
+messages in the same class.
+.I flags
+can contain a bitwise OR of zero or more of the following flags:
+.TP \w'SL_NOPUTBUF\(em'u
+.B SL_FATAL
+log with
+.BR syslog (3)
+.I level
+of 
+.BR LOG_CRIT .
+.PD 0
+.TP
+.B SL_ERROR
+log with
+.BR syslog (3)
+.I level
+of 
+.BR LOG_ERR .
+.TP
+.B SL_WARN
+log with
+.BR syslog (3)
+.I level
+of 
+.BR LOG_WARNING .
+.TP
+.B SL_NOTE
+log with
+.BR syslog (3)
+.I level
+of 
+.BR LOG_NOTICE .
+.TP
+.B SL_CONSOLE
+log with
+.BR syslog (3)
+.I level
+of 
+.BR LOG_INFO .
+.TP
+.B SL_TRACE
+log with
+.BR syslog (3)
+.I level
+of 
+.BR LOG_DEBUG .
+.TP
+.B SL_NOTIFY
+indicates that a copy of the log should be mailed to the system administrator.
+.TP
+.B SL_NOPUTBUF
+indicates that the log should not be buffered.
+.PD
+.PP
+These arguments are placed into the corresponding fields of the
+.I STREAMS
+message to be passed to error and trace loggers as described in
+.BR strlog (4).
+.\"
+.\"
+.SH USAGE
+.PP
+.BR strlog ()
+is a high performance alternative to
+.BR cmn_err (9)
+that permits statements to be placed throughout a
+.I STREAMS
+driver or module, yet only generate messages to be logged to
+.BR strerr (8)
+error or
+.BR strace (8)
+trace logging processes when the a process is actually listening for the specific error or trace
+message.
+This allows running
+.I STREAMS
+modules to be traced at the discretion of a user level process.
+.PP
+.BR strlog ()
+impacts driver performance less than
+.BR cmn_err (9)
+in a number of ways:
+.IP 1. \w'0.\(em'u
+.BR strlog ()
+provides the ability to filter messages of interest early making the only cost of discarded messages
+the cost of stacking parameters in the call to
+.BR strlog ().
+In contrast,
+.BR cmn_err (9)
+must format and output every message that it is passed.
+.IP 2.
+.BR strlog ()
+does not incur the penalty of formatting output strings within the
+.BR strlog ()
+call, but, rather quickly packages the format string and parameter pointers and passes them to the
+console, error or trace logger Stream, which then passes them to a user process that formats the
+output string.
+In contrast,
+.BR cmn_err (9)
+must format the message that it was passed before returning.
+.IP 3.
+.BR strlog ()
+provides the ability to specify module identifier, stream instance identifier, logging levels and
+logger flags that otherwise would have to be formatted in an inconsistent fashion by the driver or
+module calling
+.BR cmn_err (9).
+.IP 4.
+.BR strlog ()
+trace (debugging) logs have a more sophisticated filtering mechanism that can filter on module
+identifier, stream identifier level and flags, allowing a user level trace logger (see
+.BR strace (8))
+to chose a narrow range of messages without assistance from the driver.
+In contrast,
+.BR cmn_err (9)
+must deliver every message it is passed, making selection of appopriate debugging messages difficult
+and module specific.
+.PP
+.BR strlog ()
+is one excellent general purpose standard diagnotic tool that is applicable to running systems,
+instead of crashed systems.
+Where possible,
+.I STREAMS
+drivers and module should use
+.BR strlog ()
+and
+.BR vstrlog ()
+in place of
+.BR cmn_err (9)
+and
+.BR vcmn_err (9).
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR strlog ()
+and
+.BR vstrlog ()
+dispatch the log to the logger and return one (1).
+Upon failure,
+.BR strlog ()
+and
+.BR vstrlog ()
+return zero (0).
+.BR strlog ()
+or
+.BR vstrlog ()
+fail whenever the message is not seen by all the readers.
+.PP
+.BR register_strlog ()
+returns the previously registered
+.B vstrlog_t
+function pointer.
+.BR register_strlog ()
+always succeeds.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR strlog ()
+or
+.BR vstrlog ()
+fail, they return zero (0).
+.BR strlog ()
+or
+.BR vstrlog ()
+fail when they cannot dispatch the log message to the logger.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR strlog ()
+or
+.BR vstrlog ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR strlog ()
+is MP-safe, however, the default behaviour takes global spin locks to
+accomplish this.
+See
+.IR \*(lqNOTICES\*(rq ,
+below.
+.\"
+.\"
+.SH NOTICES
+.PP
+By default,
+.BR strlog ()
+and
+.BR vstrlog ()
+always logs with
+.BR syslog (3)
+.I facility
+of
+.BR LOG_KERN .
+.SS Default Logger
+.PP
+.I @PACKAGE_TITLE@
+does not provide a
+.IR STREAMS -based
+logger.  Instead it logs all messages sent to
+.BR strlog ()
+to the kernel logger with
+.BR printk (9).
+Following are additional considerations for this default logger:
+.IP \(em \w'\(em\(em'u
+Because the default logger uses
+.BR printk (9),
+the only conversion specifiers supported are:
+.IR %c ", " %s ", " %p ", " %n ", " %% ", " %o ", " %X ", " %x ", " %d ", " %i " and " %u .
+.IP \(em
+.BR strlog ()
+prefixes the string:
+.BI \*(lqstrlog( xxx )[ yyy , zzz "]: \*(rq"
+onto the beginning of log messages, where:
+.I xxx
+is the
+.I level
+argument,
+.I yyy
+is the
+.I mid
+argument, and
+.I zzz
+is the
+.I sid
+argument.
+.IP \(em
+As
+.B Linux
+does not have a default
+.I STREAMS
+logger, the BSD
+.BR syslog (3)
+facilities apply.
+This default logger takes global spin locks to protect internal static buffers.
+This can be overly consumptive of system resources.
+Therefore, messages are only logged to the system logger when
+.I flags
+contains
+.BR SL_CONSOLE .
+When the default logger is used,
+.BR strlog ()
+always returns success (and is always delivered) when
+.I flags
+contains
+.BR SL_CONSOLE ;
+and always returns failure (and never delivers) when
+.I flags
+does not contain
+.BR SL_CONSOLE .
+.PP
+.B @PACKAGE_TITLE@
+has an implementation of a full
+.I STREAMS
+logger, the
+.BR log (4)
+driver.  This full
+.I STREAMS
+logger filters properly as described under
+.BR strlog (4).
+It is recommended that users of the kernel interfaces
+.BR strlog ()
+or
+.BR vstrlog ()
+use the full
+.BR strlog (4)
+driver in conjunction with
+.BR strace (8)
+and
+.BR strerr (8)
+utilities.
+Following are additional considerations for the full
+.IR STREAMS -based
+logger:
+.IP \(em \w'\(em\(em'u
+The 
+.IR STREAMS -based
+logger only supports the following conversion specifiers:
+.IR %c ", " %s ", " %p ", " %% ", " %o ", " %X ", " %x ", " %d ", " %i " and " %u .
+The only
+.BR printk (9)
+supported conversion specifier that is not supported by the
+.IR STREAMS -based
+logger is
+.IR %n .
+.IP \(em
+Unlike the default logger, the
+.IR STREAMS -based
+logger uses the
+.BR strace (8)
+and
+.BR strerr (8)
+facilities to transfer log events to the system logs.
+.IP \(em
+Unlike the default logger, that always returns success, the
+.IR STREAMS -based
+logger filters trace messages with trace ids requested by the
+.BR strace (8)
+trace logger, and returns failure if no error or trace logger was found to accept the message.
+The
+.IR STREAMS -based
+logger also returns failure when the message band corresponding to the priority of the message is
+flow controlled.
+Because the
+.IR STREAMS -based
+logger filters messages passed from
+.BR strlog (),
+it is more efficient in the utilization of system resources when performing trace debugging of
+.I STREAMS
+modules and drivers.
+.IP \(em
+Unlike the default logger, which formats the message string in the kernel using the calling thread,
+the
+.IR STREAMS -based
+logger passes the format string and arguments to the userspace error or trace logger daemon which then
+formats the message.  This is more efficient in the utilization of system resources.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR printf (3),
+.BR syslog (2),
+.BR syslog (3),
+.BR syslogd (8),
+.BR printk (9),
+.BR cmn_err (9).
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.B SL_NOTIFY
+and
+.B SL_NOPUTBUF
+flags do not always function as described with the default logger.
+See
+.IR \*(lqCOMPATIBILITY\*(rq ,
+below.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR strlog ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and implementations based on
+.I SVR 4
+.[
+svr4dk
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR strlog ()
+supports the following
+.BR printf (3)
+conversion specifiers in the format string:
+.IR %c ", " %s ", " %p ", " %% ", " %o ", " %X ", " %x ", " %d ", " %i " and " %u .
+.BR strlog ()
+does
+.I not
+support the following
+.BR printf (3)
+conversion specifiers in the format string:
+.IR %e ", " %E ", " %f ", " %F ", " %g ", " %G ", " %a ", " %A ", " %n .
+.IR AIX \(rg
+states that conversion specifiers
+.IR %s ", " %f ", " %e ", " %E ", " %g " and " %G
+are not handled in the format string.
+.[
+aixdoc
+.]
+.IR HP-UX \(rg
+states that conversion specifiers
+.IR %x ", " %l ", " %o ", " %u ", " %d ", " %c " and " %s
+are handled in the format string.
+.[
+hpuxdoc
+.]
+.IR IRIX \(rg
+and
+.IR OSF/1 \(rg
+state that conversion specifiers
+.IR %s ", " %e ", " %g " and " %G
+are not allowed in the format string.
+.[
+irixdoc
+.]
+.[
+osfdoc
+.]
+.IR Solaris \(rg
+states that conversion specifiers
+.IR %s ", " %e ", " %E ", " %g " and " %G
+are not handled in the format string in the log(7) manual page, but states that
+.IR %e ", " %g " and " %G
+are not allowed, but
+.I %s
+is supported in the strlog(9F) manual page.
+.[
+soldoc
+.]
+.IR UnixWare \(rg
+states that conversion specifiers
+.IR %s ", " %e ", " %g " and " %G
+are not handled in the format string in the log(7) manual page, but states that
+.IR %s ", " %e ", " %E ", " %g " and " %G
+are not handled in the format string in the strlog(D3str) manual page.
+.[
+uw7doc
+.]
+.IR UXP/V \(rg
+states that conversion specifiers
+.IR %s ", " %e ", " %E ", " %g " and " %G
+are not handled in the format string.
+.[
+uxpdoc
+.]
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will not use
+.IR %s ", " %f ", " %e ", " %E ", " %g " or " %G
+conversion specifiers in the format string.
+.IP \(em
+.IR AIX \(rg
+states that no more than
+.B NLOGARGS
+arguments can be passed, and that
+.B NLOGARGS
+defaults to four (4).
+.[
+aixdoc
+.]
+.IR IRIX \(rg,
+.IR Solaris \(rg
+and
+.IR UnixWare \(rg
+state that no more than
+.B NLOGARGS
+arguments can be passed, and that
+.B NLOGARGS
+defaults to three (3).
+.[
+irixdoc
+.]
+.[
+soldoc
+.]
+.[
+uw7doc
+.]
+.IR UXP/V \(rg
+states that no more than
+.B NLOGARGS
+arguments can be passed, but does not state a default for
+.BR NLOGARGS .
+.[
+uxpdoc
+.]
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will not pass more than
+.B NLOGARGS
+arguments to
+.BR strlog (),
+and will not expect a
+.B NLOGARGS
+value of greater than three (3).
+.IP \(em
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR IRIX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg
+and
+.IR UXP/V \(rg
+do not document the
+.B SL_NOPUTBUF
+flag.
+.[
+aixdoc
+.]
+.[
+hpuxdoc
+.]
+.[
+irixdoc
+.]
+.[
+osfdoc
+.]
+.[
+soldoc
+.]
+.[
+uxpdoc
+.]
+The
+.B SL_NOPUTBUF
+flag is provided for
+.IR UnixWare \(rg
+source compatibility.
+.[
+uw7doc
+.]
+The default
+.BR strlog ()
+ignores this flag.
+The
+.BR log (4)
+driver passes the resulting
+.I STREAMS
+message to the log driver as a
+.BR M_PCPROTO (9)
+message instead of a
+.BR M_PROTO (9)
+message.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will not use the
+.B SL_NOPUTBUF
+flag.
+.IP \(em
+.IR OSF/1 \(rg
+does not document the
+.BR SL_FATAL ", " SL_WARN ", " SL_NOTE ", " SL_NOTIFY " or " SL_NOPUTBUF
+flags.
+.IP \(em
+The
+.B SL_NOTIFY
+flags is supposed to send a copy of the log to the system administrator.  As
+.B Linux
+does not actually have a
+.I STREAMS
+based default logger (although it does use
+.IR \*(lq/dev/log\*(rq ),
+when the default logger is used,
+the
+.BR syslogd (8)
+facilities under
+.B Linux
+should be used instead.
+The default
+.BR strlog (),
+therefore, ignores this flag.
+With the
+.BR log (4)
+driver and the
+.BR strerr (8)
+daemon running, the
+.BR SL_NOTIFY
+flag behaves as described in
+.BR strlog (4).
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will consider that additional configuration may be necessary for messages logged
+with the
+.B SL_NOTIFY
+flag to the system administrator.
+.IP \(em
+The default
+.BR strlog ()
+logger takes a global spin lock to protect generation of the log buffer and
+.BR printk (9)
+does the same.
+Under
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR UnixWare \(rg
+and
+.IR UXP/V \(rg,
+.BR strlog ()
+does not take global locks and can be executed concurrently.  This is one
+thing that normally distinguishes
+.BR strlog ()
+from
+.BR cmn_err (9).
+With the
+.BR log (4)
+driver loaded, no global spin locks are taken.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will use the
+.BR log (4)
+logger instead of the default logger.
+.IP \(em
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR strlog ()
+first appeared in
+.IR "SVR 4.0 STREAMS" .
+.[
+svr4spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

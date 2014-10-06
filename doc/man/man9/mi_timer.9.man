@@ -1,0 +1,653 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: mi_timer.9.man,v 1.1.2.2 2011-02-07 02:18:42 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:42 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: mi_timer.9.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:42  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH MI_TIMER 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B mi_timer
+\- schedule a \fBM_PCSIG\fR(9) \fISTREAMS\fR message for a future time
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _MPS_SOURCE
+.br
+.B #include <sys/stream.h>
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/mpsddi.h>
+.HP
+.BI "void mi_timer(mblk_t *" mp ", ulong " msec );
+.PP
+.B #define _SUN_SOURCE
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/sunddi.h>
+.HP
+.BI "void mi_timer(queue_t *" q ", mblk_t *" mp ", ulong " msec ");
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+a pointer to the
+.I STREAMS
+queue onto which to place the
+.BR M_PCSIG (9)
+message when the timer expires.
+This pointer will be used as the argument to a
+.BR putq (9)
+command when the timer expires.
+In the
+.IR MacOT \(rg
+form of the function, this argument is provided in the previous call to
+.BR mi_timer_alloc (9).
+In the
+.IR Solaris \(rg
+form of the function, this argument is present here, but not in the call to
+.BR mi_timer_alloc (9).
+.TP
+.I mp
+a pointer to the
+.BR M_PCSIG (9)
+message block that was allocated with
+.BR mi_timer_alloc (9).
+This message block can also contain additional user data.
+.TP
+.I msec
+the duration in milliseconds before timer expiry.
+The
+.IR Solaris \(rg
+form of
+.BR mi_timer ()
+accept two special values of
+.I msec
+as follows:
+.RS
+.TP \w'(clock_t)(-1)00'u
+.B (clock_t)(-1)
+the special value (minus one) requests that the timer be cancelled instead of scheduled.
+This is equivalent to calling
+.BR mi_timer_stop (9).
+.TP
+.B (clock_t)(-2)
+the special value (minus two) requests that the timer be moved to a new target queue instead of
+rescheduled.
+This is equivalent to calling
+.BR mi_timer_move (9).
+.RE
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR MPS \(rg-specific
+DDI.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR mi_timer ()
+will schedule the
+.I mp
+message pointer (which must be created using
+.BR mi_timer_alloc (9))
+to be placed on the target
+.I STREAMS
+queue at the specified future time.
+.BR mi_timer_valid (9)
+must be used in the target queue put or service procedure whenever a
+.BR M_PCSIG (9)
+message is dequeued.
+.PP
+If the
+.BR M_PCSIG (9)
+message block is freshly allocated with
+.BR mi_timer_alloc (9)
+then
+.BR mi_timer ()
+schedules a
+.BR timeout (9)
+that, upon expiry, will place the message block on the target queue.
+.PP
+If the message block already has a running timer associated with it,
+.BR mi_timer ()
+will cancel the previous
+.BR timeout (9)
+and reschedule the timer.
+This occurs even if the
+.BR timeout (9)
+has just expired and the message block has already been placed on the target queue.
+In this case
+.BR mi_timer (9)
+marks the message block for rescheduling that will be performed when the message is dequeued and
+examined with
+.BR mi_timer_valid (9)
+the
+.BR timeout (9)
+will be rescheduled.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR mi_timer ()
+is one of a set of timer functions including
+.BR mi_timer (),
+.BR mi_timer_alloc (9),
+.BR mi_timer_cancel (9),
+.BR mi_timer_free (9),
+.BR mi_timer_move (9),
+.BR mi_timer_q_switch (9),
+.BR mi_timer_stop (9),
+.BR mi_timer_valid (9),
+that are used to abstract the kernel timer functions and provide
+synchronization with
+.I STREAMS
+message queues.
+.PP
+Timers are abstracted in the following way:
+.PP
+When a timer is first created, a message block is allocated and associated
+with the timer.  In general, a large amount of information can be associated
+with a timer by placing the information in the message block, see
+.BR mi_timer_alloc (9).
+When the timer is set, see
+.BR mi_timer (),
+normal kernel timeout functions are called.  When the timeout occurs, the
+message block associated with the timer is placed on a specified queue with
+.BR putq (9)
+as a
+.BR M_PCSIG (9)
+message type.
+When the timer is processed by the queue
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure,
+.BR mi_timer_valid (9)
+is called to ensure that the timer is still valid and the timeout action is
+otherwise performed.
+Timers can be freed,
+.BR mi_timer_free (9),
+moved between target queues,
+.BR mi_timer_move (9),
+.BR mi_timer_q_switch (9),
+reset,
+.BR mi_timer (),
+or
+stopped,
+.BR mi_timer_cancel (9),
+.BR mi_timer_stop (9).
+.PP
+One possible reason for this convoluted approach to timers could be that some
+.I STREAMS
+implementations place heavy restrictions upon which
+.I STREAMS
+utilities can be called from without a
+.BR timeout (9)
+callback function.
+.B "@PACKAGE_TITLE@"
+has no such restriction, and
+.I STREAMS
+.BR timeout (9)
+callbacks can even be syncrhonized with queue procedures.
+See
+.BR mp-streams (9)
+for more information.
+.PP
+Therefore, the
+.BR mi_timer ()
+functions are of limited utility on
+.BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.SH RETURN
+.PP
+.BR mi_timer ()
+returns
+.BR void .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR mi_timer ()
+always succeeds.  If
+.BR mi_timer ()
+is passed a
+.B NULL
+or invalid message pointer, or a pointer that points to an invalid structure,
+the kernel may destabilize and a kernel panic may ensue.
+.\"
+.\"
+.SH EXAMPLE
+.PP
+Following is an example using the
+.IR MacOT \(rg
+variants of
+.BR mi_timer ():
+.PP
+.nf
+\fC\s-1
+#define NTIMERS 5
+static caddr_t xxx_list = NULL;
+typedef struct xxx_priv {
+     ulong some_data;
+     mblk_t *timers[NTIMERS];
+} xxx_priv_t;
+#define PRIVSZ (sizeof(xxx_priv_t))
+int
+xxx_open(queue_t *q, dev_t *devp, int flag, int sflag,
+         cred_t *crp)
+{
+     int err;
+     err = mi_open_comm(&xxx_list, PRIVSZ, devp,
+                        flag, sflag, crp);
+     if (err == 0) {
+          xxx_priv_t *p = (typeof(p)) q->q_ptr;
+          int i;
+          for (i = 0; i < NTIMER; i++) {
+               p->timers[i] =
+                   mi_timer_alloc(q, sizeof(int));
+               *(int *) (p->timers[i]->b_rptr) = i;
+          }
+          qprocson(q);
+     }
+     return (err);
+}
+
+int
+xxx_close(queue_t *q, int oflag, cred_t *crp)
+{
+     xxx_priv_t *p = (xxx_priv_t *) q->q_ptr;
+     int i;
+     qprocsoff(q);
+     mi_detach(q, (caddr_t) p);
+     for (i = 0; i < NTIMER; i++)
+          if (p->timers[i])
+               mi_timer_free(p->timers[i]);
+     mi_close_detached(&xxx_list, (caddr_t) p);
+     return (0);
+
+}
+
+int
+xxx_rput(queue_t *q, mblk_t *mp)
+{
+     xxx_priv_t *p = (xxx_priv_t *) q->q_ptr;
+     switch (mp->b_datap->db_type) {
+     case M_DATA:
+          /* ... */
+     case M_PROTO:
+          /* ... */
+     case M_PCSIG:
+          if (mi_timer_valid(mp)) {
+               int i = *(int *) (mp->b_rptr);
+               switch (i) {
+               case 0:
+                    /* timeout action 1 */
+                    mi_timer_cancel(p->timers[4]);
+                    mi_timer(p->timers[3], 2000);
+                    break;
+               case 1:
+                    /* timeout action 2 */
+               case 2:
+                    /* timeout action 3 */
+               case 3:
+                    /* timeout action 4 */
+               case 4:
+                    /* timeout action 5 */
+               }
+          }
+          return (0);
+          /* ... */
+     case M_FLUSH:
+          /* ... */
+     }
+}
+\s+1\fC
+.fi
+.PP
+Following is an example using the
+.IR Solaris \(rg
+variants of
+.BR mi_timer ():
+.PP
+For
+.IR Solaris \(rg,
+in the open procedure we use: (Notice the lack of a
+.I q
+argument to
+.BR mi_timer_alloc (9).)
+.sp
+.nf
+\fC\s-1
+          for (i = 0; i < NTIMER; i++) {
+               p->timers[i] =
+                   mi_timer_alloc(sizeof(int));
+               *(int *) (p->timers[i]->b_rptr) = i;
+          }
+\s+1\fC
+.fi
+.PP
+and in the put procedure we use: (Notice the addition of a
+.I q
+argument to
+.BR mi_timer ().)
+.sp
+.nf
+\fC\s-1
+     case M_PCSIG:
+          if (mi_timer_valid(mp)) {
+               int i = *(int *) (mp->b_rptr);
+               switch (i) {
+               case 0:
+                    /* timeout action 1 */
+                    mi_timer_cancel(p->timers[4]);
+                    mi_timer(q, p->timers[3], 2000);
+                    break;
+               case 1:
+                    /* ... */
+               }
+          }
+\s+1\fC
+.fi
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR mi_timer ()
+must not be called from a priority level higher than a timeout.  On
+.B Linux
+this means that
+.BR mi_timer ()
+must not be called from an interrupt service routine.  To place the call at the same priority level,
+schedule a tasklet to make the call.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR mi_timer ()
+is MP-safe when called from the correct context.  When using the functions in the proscribed
+fashion, the called need not guarantee exclusive access to the passed in message block or queue.
+The
+.IR MacOT \(rg
+flavor of the functions use a double race-breaking state machine to provide MP safety.  The
+.IR Solaris \(rg
+flavor of the functions have a race condition only in
+.BR mi_timer_move (9),
+and this a call to
+.BR mi_timer ()
+with the special
+.I msec
+value of minus two
+.RB ( -2 ).
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR mi_timer ()
+is an
+.IR MPS \(rg-specific
+function with
+.IR MacOT \(rg
+and
+.IR Solaris \(rg
+variants:
+.BR _MPS_SOURCE ,
+.B _SUN_SOURCE
+or
+.B _MAC_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.BR "@PACKAGE_TITLE@"
+must also have been compiled with
+.BR CONFIG_STREAMS_COMPAT_MPS ,
+.BR CONFIG_STREAMS_COMPAT_MPS_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_SUN ,
+.BR CONFIG_STREAMS_COMPAT_SUN_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_MAC
+or
+.B CONFIG_STREAMS_COMPAT_MAC_MODULE
+defined.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+Some versions of
+.BR mi_timer ()
+place the message block onto the target queue, bypassing the queue's put procedure.  These variants
+only work for queues that have service procedures.
+The
+.B @PACKAGE_TITLE@
+implementation of
+.BR mi_timer ()
+also uses
+.BR putq (9)
+to place the message block on the target queue, thus the queue requires a service procedure.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR mi_timer_alloc (9),
+.BR mi_timer_cancel (9),
+.BR mi_timer_free (9),
+.BR mi_timer_valid (9),
+.BR mpscompat (9),
+.BR suncompat (9),
+.BR maccompat (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR mi_timer ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR mi_timer ()
+is
+compatible with
+.IR MPS \(rg,
+.IR MacOT \(rg,
+and
+.IR Solaris \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR mi_timer ()
+is an
+.IR MPS \(rg-specific
+function and should not be used by portable
+.I STREAMS
+drivers and modules.
+The more common
+.BR timeout (9)
+function should be used in its stead.
+.IP \(em
+.BR mi_timer ()
+is provided for source level compatibility with
+.IR MPS \(rg
+for the purpose of porting
+.IR MPS \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.BR "@PACKAGE_TITLE@"
+.[
+@PACKAGE@-@VERSION@
+.]
+differ from that of
+.IR MPS \(rg,
+binaries are incompatible.
+.IP \(em
+.BR mi_timer ()
+only provides functionality comparable to
+.IR MPS \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR mi_timer ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR mpscompat (9),
+.BR suncompat (9),
+.BR maccompat (9),
+and
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR MPS \(rg
+DDI documentation,
+.IR MacOT \(rg
+DDI documentation.
+.[
+macotr
+.]
+.[
+macspg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR mi_timer ()
+first appeared in
+.IR MPS \(rg.
+.BR mi_timer ()
+is a
+Mentat, Inc. function that goes all the way back to the
+.RI pre- OSF/1
+.I Mentat
+implementations.
+.BR mi_timer ()
+appears in
+.IR MacOT \(rg.
+.[
+macspg
+.]
+An undocumented version of
+.BR mi_timer ()
+appears in
+.IR Solaris \(rg.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

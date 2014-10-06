@@ -1,0 +1,476 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: putnextctl.9.man,v 1.1.2.2 2011-02-07 02:18:44 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:44 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: putnextctl.9.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:44  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH PUTNEXTCTL 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B putnextctl
+\- put a control message on the downstream \fISTREAMS\fR message queue
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "int putnextctl(queue_t *" q ", int " type );
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I q
+the queue from which to put the control message.
+.PD 0
+.TP
+.I type
+the type of the control message.
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR putnextctl ()
+creates a zero-length control message of type
+.I type
+and calls
+.BR putnext (9)
+for the queue pointed to by
+.I q
+to place the message on the subsequent queue.
+If
+.I type
+is a data message type
+.RB ( M_DATA "(9), " M_PROTO "(9) or " M_PCPROTO (9))
+and not a control message type,
+.BR putnextctl ()
+will fail.
+Note that
+.BR putnextctl ()
+can succeed for message type
+.BR M_DELAY (9),
+which is normally a data message type according to
+.BR datamsg (9).
+.PP
+.BR putnextctl ()
+allocates the message block for the message with priority
+.BR BPRI_HI ,
+[see
+.BR allocb (9)].
+.BR putnextctl ()
+fails if message block allocation fails.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR putnextctl ()
+is used by
+.I STREAMS
+drivers and modules to pass simple messages that contain a zero-length data buffer [e.g.,
+.BR M_HANGUP (9)]
+along a Stream.  However,
+.BR putnextctl ()
+is not normally used by the Stream head because it will not block awaiting the availability of a
+message block.  For passing messages to a Stream end,
+.BR putctl (9)
+should be used instead.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR putnextctl ()
+returns
+.I true
+.RB ( 1 ).
+Upon failure,
+.BR putnextctl ()
+returns
+.I false
+.RB ( 0 ).
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR putnextctl ()
+fails and returns
+.I false
+.RB ( 0 )
+if the specified
+.I type
+is not a control message type, or if the allocation of the necessary message blocks fails.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR putnextctl ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines;
+however, see the considerations listed under
+.BR putnext (9).
+.PP
+.BR putnextctl ()
+must be called from a
+.I STREAMS
+synchronous context for the Stream containing
+.IR q .
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR putnextctl ()
+is MP-safe when called from the proper context.  However, the caller is responsible for ensuring the
+validity of the passed in queue pointer,
+.IR q .
+See also the considerations listed under
+.BR putnext (9),
+and
+.BR mp-streams (9).
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR putnextctl ()
+can succeed with a
+.I type
+argument of
+.BR M_DELAY (9).
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+Message blocks allocated by
+.BR putnextctl ()
+are allocated with priority
+.BR BPRI_HI ,
+and passed along the Stream with
+.BR putnext (9).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR datamsg (9),
+.BR freezestr (9),
+.BR putnext (9),
+.BR putctl (9),
+.BR putctl1 (9),
+.BR putnextctl1 (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR putnextctl ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR putnextctl ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and implementations based on
+.IR "SVR 4" ,
+.[
+svr4dk
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR AIX \(rg
+and
+.IR UXP/V \(rg
+state that
+.BR putnextctl ()
+will fail if the
+.I type
+argument is
+.BR M_DATA "(9), " M_PROTO "(9), " M_PCPROTO "(9) or " M_DELAY (9).
+.[
+aixdoc
+.]
+.[
+uxpdoc
+.]
+.IR IRIX \(rg,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg
+and
+.IR UnixWare \(rg
+state that
+.BR putnextctl ()
+will fail if the
+.I type
+argument is
+.BR M_DATA "(9), " M_PROTO "(9) or " M_PCPROTO "(9), but  not " M_DELAY (9).
+.[
+irixdoc
+.]
+.[
+soldoc
+.]
+.[
+suxdoc
+.]
+.[
+uw7doc
+.]
+.IR IRIX \(rg,
+.IR Solaris \(rg
+and
+.IR UnixWare \(rg
+even show an example using
+.BR M_DELAY (9).
+.[
+irixdoc
+.]
+.[
+soldoc
+.]
+.[
+uw7doc
+.]
+.IR OSF/1 \(rg
+states that
+.BR putnextctl ()
+will fail if the
+.I type
+argument is
+.BR M_DELAY "(9), " M_PROTO "(9) or " M_PCPROTO "(9), but not " M_DATA (9),
+which is quite peculiar, and then goes on to give an example for
+.BR M_DELAY (9).
+.[
+osfdoc
+.]
+.BR M_DELAY "(9) should probably be " M_DATA (9)
+in the failure list.
+This means that
+.IR AIX \(rg
+and
+.IR UXP/V \(rg
+are the oddballs in the documented behaviour.
+Otherwise,
+.BR putnextctl ()
+is fairly consistent on permitting
+.BR M_DELAY (9)
+messages.
+.B @PACKAGE_TITLE@
+.BR putnextctl ()
+allows a
+.I type
+of
+.BR M_DELAY (9)
+to be specified.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will not pass a type of
+.BR M_DELAY (9)
+to
+.BR putnextctl ().
+.IP \(em
+.IR HP-UX \(rg
+.[
+hpuxspg
+.]
+lists
+.BR putnextctl ()
+as a function that can only be passed a queue in the queue pair currently
+being synchronized within a module procedure.
+.IR HP-UX \(rg
+.[
+hpuxspg
+.]
+also lists
+.BR putnextctl ()
+as a utility that cannot be called from user functions or
+.RI non- STREAMS
+code; that is, contexts asynchronous to the Stream containing
+.IR q .
+.IP ""
+.IR HP-UX \(rg
+compatible drivers and modules will not call
+.BR putnextctl ()
+from outside of a
+.BR qinit (9)
+routine for the queue pair of
+.IR q .
+.IP \(em
+.BR putnextctl ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+do not permit
+.BR putnextctl ()
+to be called on a stream frozen with
+.BR freezestr (9).
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will not call
+.BR putnextctl ()
+on a stream frozen by the caller with
+.BR freezestr (9).
+.IP \(em
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.[
+uslspg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR putnextctl ()
+first appeared in
+.IR "SVR 4.0 MP" " and " "SVR 4.2 MP" .
+.[
+svr4dk
+.]
+.[
+usldk
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,6 @@
+STREAMS_0.0 {
+	__old_streams_*;
+};
+STREAMS_1.0 {
+	__streams_*;
+} STREAMS_0.0;

@@ -1,0 +1,207 @@
+#!/bin/bash
+# @configure_input@
+# =============================================================================
+# 
+# @(#) $RCSfile: openss7-kernel.postinst.in,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-05-15 12:01:18 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2011-05-15 12:01:18 $ by $Author: brian $
+#
+# =============================================================================
+subpkg=kernel
+@openss7_header@
+datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
+#
+# postinst_preloads() - For old modules, ensure that our preloaded modules are in the appropriate
+#   kernel-specific preloads file.  Note that the prerm on upgrade removed the old package's
+#   preloads from the file so we only need to add ours.
+#
+@WITH_KO_MODULES_FALSE@postinst_preloads () {
+@WITH_KO_MODULES_FALSE@    local prel_old prel_tmp prel_new p
+@WITH_KO_MODULES_FALSE@    prel_old=@sysconfdir@/modules-@kversion@
+@WITH_KO_MODULES_FALSE@    prel_tmp=${tmppath:-/var/tmp}/modules-@kversion@.tmp.$$
+@WITH_KO_MODULES_FALSE@    prel_new=${tmppath:-/var/tmp}/modules-@kversion@.new.$$
+@WITH_KO_MODULES_FALSE@    if [ -f $prel_old ]; then cp -f -- $prel_old $prel_new; else touch $prel_new; fi
+@WITH_KO_MODULES_FALSE@    ( cat $prel_new; for p in ${preloads}; do echo "$p"; done ) >$prel_tmp
+@WITH_KO_MODULES_FALSE@    mv -f -- $prel_tmp $prel_new
+@WITH_KO_MODULES_FALSE@    if ! diff $prel_new $prel_old >/dev/null 2>&1; then
+@WITH_KO_MODULES_FALSE@        cp -f -b --suffix=.dpkg-old -- $prel_new $prel_old
+@WITH_KO_MODULES_FALSE@    fi
+@WITH_KO_MODULES_FALSE@    rm -f -- $prel_new
+@WITH_KO_MODULES_FALSE@}
+#
+# postinst_oldmods() - Perform a depmod when the kernel modules installed are for the running
+#   kernel.  This only applies to 2.4 module systems.  The openss7-modules script performs the
+#   comparable actions for 2.6 module systems.
+#
+@WITH_KO_MODULES_FALSE@postinst_oldmods () {
+@WITH_KO_MODULES_FALSE@    local sysmap
+@WITH_KO_MODULES_FALSE@    sysmap=/boot/System.map-@kversion@
+@WITH_KO_MODULES_FALSE@    if [ -x "`which depmod 2>/dev/null`" ]; then
+@WITH_KO_MODULES_FALSE@        if [ "@kversion@" = "`uname -r`" ]; then
+@WITH_KO_MODULES_FALSE@            depmod -a || :
+@WITH_KO_MODULES_FALSE@        elif [ -r $sysmap ]; then
+@WITH_KO_MODULES_FALSE@            UNAME_MACHINE=@target_cpu@ \
+@WITH_KO_MODULES_FALSE@            depmod -ae -F $sysmap @kversion@ || :
+@WITH_KO_MODULES_FALSE@        fi
+@WITH_KO_MODULES_FALSE@    fi
+@WITH_KO_MODULES_FALSE@}
+#
+# postinst_symvers() - Install redhat-like symvers file in the /boot directory.  Debian kernels do
+#   not create a symbol versions file.  This is a bit dangerous because it relies on the symbol
+#   versions not changing when the ABI number in the kernel version does not change.
+#
+@WITH_KO_MODULES_TRUE@postinst_symvers () {
+@WITH_KO_MODULES_TRUE@    local f t
+@WITH_KO_MODULES_TRUE@    f=/usr/src/${name}-@VERSION@-@PACKAGE_DEBRELEASE@/@kversion@/System.symvers
+@WITH_KO_MODULES_TRUE@    t=/boot/symvers-@kversion@.gz
+@WITH_KO_MODULES_TRUE@    if [ ! -r $t -a -r $f ] ; then
+@WITH_KO_MODULES_TRUE@        gzip -c $f >$t || :
+@WITH_KO_MODULES_TRUE@    fi
+@WITH_KO_MODULES_TRUE@    :
+@WITH_KO_MODULES_TRUE@}
+#
+# postinst_weakmods() - Perform weak-updates on modules, perform depmod, and signal init scripts when
+#   a relink is required on shutdown or reboot.  Note that dpkg is way smarter than rpm about
+#   installation order so the weak-updates script from the base package should already be installed.
+#
+@WITH_KO_MODULES_TRUE@postinst_weakmods () {
+@WITH_KO_MODULES_TRUE@    local scripts v
+@WITH_KO_MODULES_TRUE@    if [ -x @sbindir@/${name}-modules ]; then
+@WITH_KO_MODULES_TRUE@        scripts=`echo "$initfiles" | sed -e 's/ /,/g'`
+@WITH_KO_MODULES_TRUE@        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--verbose=1,p'`"
+@WITH_KO_MODULES_TRUE@        if [ -n "$scripts" ] ; then
+@WITH_KO_MODULES_TRUE@            @sbindir@/${name}-modules -- $v -e \
+@WITH_KO_MODULES_TRUE@                --initscripts="$scripts" \
+@WITH_KO_MODULES_TRUE@                --add-modules @kversion@ || :
+@WITH_KO_MODULES_TRUE@        else
+@WITH_KO_MODULES_TRUE@            @sbindir@/${name}-modules -- $v -e \
+@WITH_KO_MODULES_TRUE@                --add-modules @kversion@ || :
+@WITH_KO_MODULES_TRUE@        fi
+@WITH_KO_MODULES_TRUE@    fi
+@WITH_KO_MODULES_TRUE@}
+#
+# postinst_initscripts() - For old modules attempt to start init scripts when they are not already
+#   started and they are supposed to be started in the current run level.
+#
+@WITH_KO_MODULES_FALSE@postinst_initscripts () {
+@WITH_KO_MODULES_FALSE@    local r i start l
+@WITH_KO_MODULES_FALSE@    if [ "@kversion@" = "`uname -r`" ]; then
+@WITH_KO_MODULES_FALSE@        r="`runlevel | awk '{print$2}'`"
+@WITH_KO_MODULES_FALSE@        for i in ${initfiles}; do
+@WITH_KO_MODULES_FALSE@            [ -f @initrddir@/$i ] || continue
+@WITH_KO_MODULES_FALSE@            [ ! -e /var/lock/subsys/$i ] || continue
+@WITH_KO_MODULES_FALSE@            start=no
+@WITH_KO_MODULES_FALSE@            for l in @initrddir@/../rc${r}.d/S[0-9][0-9]$i @initrddir@/rc${r}.d/S[0-9][0-9]$i; do
+@WITH_KO_MODULES_FALSE@                if [ -L $l ]; then start=yes; break; fi
+@WITH_KO_MODULES_FALSE@            done
+@WITH_KO_MODULES_FALSE@            [ $start = yes ] || continue
+@WITH_KO_MODULES_FALSE@            [ -x "`which service     2>/dev/null`" ] && { service     $i start && continue || break; }
+@WITH_KO_MODULES_FALSE@            [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i start && continue || break; }
+@WITH_KO_MODULES_FALSE@            [ -x "@initrddir@/$i"                  ] && { @initrddir@/$i start && continue || break; }
+@WITH_KO_MODULES_FALSE@        done
+@WITH_KO_MODULES_FALSE@    fi
+@WITH_KO_MODULES_FALSE@}
+#
+# postinst_kernel() - For old modules, make sure that the preloads are in the kernel-specific
+#   preloads file, perform a depmod on the kernel modules directory, start init scripts when they
+#   are to be started for the installed kernel modules.  For new modules, add the symvers file when
+#   possible ('cause debian doesn't have one) and invoke the weak-modules update script.  Note that
+#   the script will perform a depmod and start init scripts when necessary.
+#
+postinst_kernel () { :
+@WITH_KO_MODULES_FALSE@    postinst_preloads || :
+@WITH_KO_MODULES_FALSE@    postinst_oldmods || :
+@WITH_KO_MODULES_TRUE@    postinst_symvers || :
+@WITH_KO_MODULES_TRUE@    postinst_weakmods || :
+@WITH_KO_MODULES_FALSE@    postinst_initscripts || :
+}
+# -----------------------------------------------------------------------------
+# Primary functions:
+# -----------------------------------------------------------------------------
+# xxx-postinst configure
+configure_postinst () { :
+    postinst_kernel
+}
+# xxx-postinst configure most-recently-configured-version
+reconfigure_postinst () { :
+    postinst_kernel
+}
+# xxx-postinst triggered triggered-packages
+triggered_postinst () { :
+}
+# old-prerm upgrade new-version ...FAILED
+# new-prerm failed-upgrade new-version ...FAILED
+# old-posinst abort-upgrade new-version
+abort_upgrade_postinst () { :
+    postinst_kernel
+}
+# con-prerm remove 'in-favour' package new-version ...FAILED
+# con-postinst abort-remove 'in-favour' package new-version
+abort_remove_postinst () { :
+    postinst_kernel
+}
+# dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version] ..FAILED
+# dec-postinst abort-deconfigure 'in-favour' package-being-installed-but-failed version ['removing' conflicting-package version]
+abort_deconfigure_postinst () { :
+    postinst_kernel
+}
+@mscript_postinst@
+@mscript_debhelper@
+# =============================================================================
+#
+# $Log: openss7-kernel.postinst.in,v $
+# Revision 1.1.2.2  2011-05-15 12:01:18  brian
+# - many build system refinements
+#
+# Revision 1.1.2.1  2011-05-10 13:45:28  brian
+# - weak modules workup
+#
+# =============================================================================
+# vim: ft=sh sw=4 noet nocin nosi formatoptions+=tcqlorn

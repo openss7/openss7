@@ -1,0 +1,50 @@
+.\" N-CONNECT vim: ft=nroff
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS H
+box center tab(:);
+cbssss
+rb|c|c|c|c
+lb|cb|cb|cb|cb
+lb|c|c|c|c.
+N-CONNECT
+_
+TPI Primitive:\s-1T_CONN_REQ\s+1:\s-1T_CONN_IND\s+1:\s-1T_CONN_RES\s+1:\s-1T_CONN_CON\s+1
+_
+Parameter:Request:Indication:Response:Confirmation
+=
+.TH
+Called address:DEST_*:(implied):\*-:\*-
+Calling address:(implied):SRC_*:\*-:\*-
+Responding address:\*-:\*-:ACCEPTOR_id:RES_*
+QoS parameter set:OPT_*:OPT_*:OPT_*:OPT_*
+Expedited data sel.:OPT_*:[OPT_*]:OPT_*:[OPT_*]
+Importance:OPT_*:[OPT_*]:OPT_*:[OPT_*]
+User data:[M_DATA]:[M_DATA]:[M_DATA]:[M_DATA]
+Connection id.:(implied):SEQ_number:SEQ_number:(implied)
+.TE

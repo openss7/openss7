@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+              |-----handy-ruler------------------------------------------------------|
+openss7-compat: openss7-compat (OpenSS7 compatability libraries)
+openss7-compat:
+openss7-compat: OpenSS7 provides Linux Fast-STREAMS for Slackware Linux.
+openss7-compat:
+openss7-compat: This subpackage contains the 32-bit run-time (shared object libaries)
+openss7-compat: necessary to run 32-bit applications programs and utilities developed
+openss7-compat: for OpenSS7.  Also included are 32-bit test utilities for the OpenSS7
+openss7-compat: package.  Note that these utilities are needed for running the 32-bit
+openss7-compat: validation test suites contained in the openss7-base subpackage.
+openss7-compat:
+openss7-compat:

@@ -1,0 +1,7 @@
+[Unit]
+Description=STREAMS Subsystem
+Documentation=man:streams(4)
+
+[Install]
+WantedBy=multi-user.target
+Also=dev-streams.mount specfs.service streams.service strace.service strerr.service

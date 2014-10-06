@@ -1,0 +1,10 @@
+                                                                                
+                              |                  |                              
+         DL_PROMISCON ----\   |                  |                              
+              request      \->|                  |                              
+                              |                  |                              
+                           /--|                  |                              
+                DL_OK <---/   |                  |                              
+          acknowledge         |                  |                              
+                              |                  |                              
+                                                                                

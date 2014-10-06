@@ -1,0 +1,191 @@
+#!/usr/bin/awk -f
+
+# feed kernel module filenames in on standard input,
+# required kernel sets and symbols on standard output
+
+BEGIN {
+    print "D: Executing: " ARGV[0] " -f find-requires.ksyms" >"/dev/stderr"
+    RPM_BUILD_DIR = ENVIRON[RPM_BUILD_DIR]
+    RPM_PACKAGE_NAME = ENVIRON[RPM_PACKAGE_NAME]
+    RPM_PACKAGE_VERSION = ENVIRON[RPM_PACKAGE_VERSION]
+    RPM_PACKAGE_RELEASE = ENVIRON[RPM_PACKAGE_RELEASE]
+    dir = RPM_BUILD_DIR "/" RPM_PACKAGE_NAME "-" RPM_PACKAGE_VERSION
+    if (ARGC > 1 && ARGV[1]) {
+	dir = ARGV[1]
+    }
+    RPM_BUILD_ROOT = ENVIRON[RPM_BUILD_ROOT]
+    if (ARGC > 2 && ARGV[2]) {
+	RPM_BUILD_ROOT = ARGV[2]
+    }
+    sub(/\/+$/, "", RPM_BUILD_ROOT)
+    for (i=1;ARGC>i;i++) { delete ARGV[i] }
+    find = "find /boot /usr/src/kernels -type f -name 'symsets-*.tar.gz' 2>/dev/null"
+    while ((find | getline file)) {
+	tar = "tar -tzf " file
+	while ((tar | getline set)) {
+	    if (set~/\/$/)
+		continue
+	    kernel = set
+	    sub("^symsets-", "", kernel)
+	    sub(/\/.*/, "", kernel)
+	    # suse kernels need a 'flavor:' prefix in kernel() requires
+	    flavor = kernel
+	    gsub(".*-", "", flavor)
+	    if (flavor~/^(default|xen|ec2|trace)$/) {
+		flavor = flavor ":"
+	    } else {
+		flavor = ""
+	    }
+	    class = set
+	    sub(/^.*\//, "", class)
+	    sub(/\..*/, "", class)
+	    hash = set
+	    sub(/^.*\./, "", hash)
+	    list = "tar -xzOf " file " " set
+	    while ((list | getline)) {
+		sub(/0x0*/, "", $1)
+		ksym = "ksym(" kernel ":" $2 ") = " $1
+		if (ksym in symsets)
+		    continue
+		symsets[ksym] = "kernel(" flavor class ") = " hash
+	    }
+	    close(list)
+	}
+	close(tar)
+    }
+    close(find)
+}
+/\.ko$/ {
+    module = $1
+    modinfo = "/sbin/modinfo -F vermagic " module " 2>/dev/null"
+    if ((modinfo | getline)) {
+	if ($0) {
+	    vermagic = $1
+	    close(modinfo)
+	} else {
+	    close(modinfo)
+	    next
+	}
+    } else {
+	close(modinfo)
+	next
+    }
+    modprobe = "/sbin/modprobe --dump-modversions " module " 2>/dev/null"
+    while ((modprobe | getline)) {
+	if ($0) {
+	    sub(/0x0*/, "", $1)
+	    ksym = "ksym(" vermagic ":" $2 ") = " $1
+	    requires[ksym] = 1
+	}
+    }
+    close(modprobe)
+    command = "objdump -t " module " 2>/dev/null"
+    while ((command | getline) > 0) {
+	if (($3~/\*ABS\*/) && ($5~/^_?__crc_[^[:space:]]+/)) {
+	    sub(/^0*/, "", $1)
+	    sub(/^_?__crc_/, "", $5)
+	    ksym = "ksym(" vermagic ":" $5 ") = " $1
+	    provides[ksym] = 1
+	}
+    }
+    close(command)
+}
+END {
+    j = 1
+    for (ksym in requires) {
+	if (ksym in provides)
+	    continue
+	if (ksym in symsets) {
+	    requiredsets[symsets[ksym]] = 1
+	} else {
+	    sub(/^ksym\(.*:/, "ksym(", ksym)
+	    requiredsyms[ksym] = 1
+	}
+    }
+    for (kset in requiredsets) {
+	indices[j] = kset
+	j++
+    }
+    for (ksym in requiredsyms) {
+	indices[j] = ksym
+	j++
+    }
+    n = asort(indices)
+    for (i = 1; i <= n; i++) {
+	print indices[i]
+    }
+}
+
+# =============================================================================
+#
+# @(#) $RCSfile: find-requires.ksyms,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-05-10 13:45:32 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2011-05-10 13:45:32 $ by $Author: brian $
+#
+# -----------------------------------------------------------------------------
+#
+# $Log: find-requires.ksyms,v $
+# Revision 1.1.2.7  2011-05-10 13:45:32  brian
+# - weak modules workup
+#
+# Revision 1.1.2.6  2011-02-07 04:48:33  brian
+# - updated configure and build scripts
+#
+# Revision 1.1.2.5  2009-07-13 07:13:28  brian
+# - changes for multiple distro build
+#
+# Revision 1.1.2.4  2009-07-05 12:02:24  brian
+# - updated scripts
+#
+# Revision 1.1.2.3  2009-07-04 13:28:10  brian
+# - conversion to pure awk
+#
+# Revision 1.1.2.2  2009-07-04 03:51:33  brian
+# - updates for release
+#
+# =============================================================================
+# vim: ft=awk tw=80 sw=4 nocin nosi fo+=tcqlorn

@@ -1,0 +1,420 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: RW_ALLOC.9.man,v 1.1.2.2 2011-02-07 02:18:35 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:35 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: RW_ALLOC.9.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:35  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH RW_ALLOC 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B RW_ALLOC
+\- allocated an initialize a read/write lock
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _SVR4_SOURCE
+.br
+.B #include <sys/types.h>
+.br
+.B #include <sys/kmem.h>
+.br
+.B #include <sys/ksynch.h>
+.br
+.B #include <sys/ddi.h>
+.HP
+.BI "rwlock_t RW_ALLOC(unsigned char " hierarchy ", pl_t " min_pl ", lkinfo_t *" lkinfop ", int " flag );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'hierarchy\(em'u
+.I hierarchy
+Hierarchy value which asserts the order in which this lock will be acquired
+relative to other basic and read/write locks.
+.TP
+.I min_pl
+Minimum priority level argument that asserts the level that will be passed in
+with any attempt to acquire this lock.  See
+.BR RW_RDLOCK (9)
+and
+.BR RW_WRLOCK (9).
+.TP
+.I lkinfop
+Pointer to a
+.B lkinfo
+structure.
+.TP
+.I flag
+A flag to
+.BR kmem_alloc (9).
+.I flag
+can be one of the following values:
+.RS
+.TP \w'KM_NOSLEEP\(em'u
+.B KM_SLEEP
+The caller can sleep awaiting allocation of the read/write lock.
+.PD 0
+.TP
+.B KM_NOSLEEP
+The caller cannot sleep awaiting allocation of the read/write lock.
+.PD
+.RE
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR RW_ALLOC (),
+.BR RW_DEALLOC (9),
+.BR RW_RDLOCK (9),
+.BR RW_WRLOCK (9),
+.BR RW_TRYRDLOCK (9),
+.BR RW_TRYWRLOCK (9)
+and
+.BR RW_UNLOCK (9)
+are a set of primitive functions for allocating, deallocating, read locking,
+write locking, read lock attempt, write lock attempt and unlocking a
+read/write lock of type
+.BR rwlock_t .
+.PP
+.BR RW_ALLOC ()
+dynamically allocates and initializes a read/write lock structure of type
+.B rwlock_t
+and returns a pointer to the structure.  When
+.B KM_SLEEP
+is set in the
+.I flag
+argument, the call will always be successful.  When
+.B KM_NOSLEEP
+is set in the
+.I flag
+argument, the call will fail if resources for the allocation are not
+immediately available, and
+.BR RW_ALLOC ()
+will return
+.BR NULL .
+.PP
+Read/write locks allocated and initialized with
+.BR RW_ALLOC ()
+can be deallocated with
+.BR RW_DEALLOC (9).
+.\"
+.\"
+.SH USAGE
+.PP
+.BR RW_ALLOC ()
+is used to dynamically allocate read/write locks.
+.\"
+.\"
+.SH RETURN
+.PP
+When
+.BR RW_ALLOC ()
+succeeds, it returns a pointer to the allocated and initialized
+.BR rwlock_t
+structure;
+when it fails, it returns
+.BR NULL .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR RW_ALLOC ()
+fails when 
+.I flag
+is set to
+.B KM_NOSLEEP
+and sufficient resources for the allocation are not immediately available.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR RW_ALLOC ()
+can only be called from user or blocking context only when
+.B KM_SLEEP
+is set in
+.IR flag .
+.BR RW_ALLOC ()
+can be called from any context when
+.B KM_NOSLEEP
+is set in
+.IR flag .
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR RW_ALLOC ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR RW_ALLOC ()
+is a
+.IR "SVR 4.2" -specific
+function:
+.B _SVR4_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B @PACKAGE_TITLE@
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_SVR4
+or
+.B CONFIG_STREAMS_COMPAT_SVR4_MODULE
+defined.
+.PP
+.BR RW_ALLOC ()
+does not perform any of the naming or statistics gathering function described
+in the
+.I SVR 4.2 MP DDI/DKI
+.[
+usldk
+.]
+documentation.  The
+.IR lkinfop ", " hierarchy " and " lkinfop
+arguments are ignored.
+Only the
+.I flag
+argument is honoured.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR RW_ALLOC ()
+is implemented by allocating a
+.B rwlock_t
+structure using
+.BR kmem_alloc (9)
+and initialized with
+.BR rwlock_init (9).
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.\".BR RW_ALLOC (9),
+.BR RW_DEALLOC (9),
+.BR RW_RDLOCK (9),
+.BR RW_TRYRDLOCK (9),
+.BR RW_TRYWRLOCK (9),
+.BR RW_UNLOCK (9),
+.BR RW_WRLOCK (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR RW_ALLOC ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR RW_ALLOC ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI"
+.[
+usldk
+.]
+and systems based on
+.IR "SVR 4.2 MP" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR RW_ALLOC ()
+ignores the
+.I hierarchy
+argument.
+The underlying
+.B Linux
+read/write locks are incapable of tracking lock hierarchies.
+.IP \(em
+.BR RW_ALLOC ()
+ignores the
+.I min_pl
+argument.
+.B Linux
+does not implement interrupt priority levels in the same manner as
+.IR "SVR 4.2 MP" :
+either interrupts are enabled or they are not.
+.IP \(em
+.BR RW_ALLOC ()
+does not perform any of the naming or statistics gathering functions described
+in the
+.I SVR 4.2 MP DDI/DKI
+.[
+usldk
+.]
+documentation.
+.BR RW_ALLOC ()
+ignores the
+.I lkinfop
+argument.
+.B @PACKAGE_TITLE@
+does not support basic, sleep, synchronization or read/write lock statistics or
+debugging in the manner of
+.IR "SVR 4.2 MP" .
+.IP \(em
+.BR RW_ALLOC ()
+is provided for source level compatibility with
+.IR "SVR 4.2"
+for the purpose of porting
+.IR "SVR 4.2"
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE@-@VERSION@
+.]
+differ from that of
+.IR "SVR 4.2"
+binaries are incompatible.
+.IP \(em
+.BR RW_ALLOC ()
+only provides functionality comparable to
+.IR "SVR 4.2"
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR RW_ALLOC ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR STREAMS (9)
+for more compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.[
+uslspg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR RW_ALLOC ()
+first appeared in
+.IR "SVR 4.2" .
+.[
+svr42
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

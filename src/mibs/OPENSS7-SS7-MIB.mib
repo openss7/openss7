@@ -1,0 +1,1155 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4 et
+-- =============================================================================
+-- 
+-- @(#) $RCSfile: OPENSS7-SS7-MIB.mib,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-07-18 19:42:21 $
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- Note well: notwithstanding this AGPL license, you are not permitted to make 
+-- modifications under the OpenSS7 project's enterprise object identifier arc: 
+-- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
+-- identifier arc under your control.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date: 2011-07-18 19:42:21 $ by $Author: brian $
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log: OPENSS7-SS7-MIB.mib,v $
+-- Revision 1.1.2.2  2011-07-18 19:42:21  brian
+-- - added documentation
+--
+-- Revision 1.1.2.1  2009-06-21 11:39:32  brian
+-- - added files to new distro
+--
+-- =============================================================================
+
+OPENSS7-SS7-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    openss7Q751
+        FROM OPENSS7-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+ss7MIB MODULE-IDENTITY
+    LAST-UPDATED "201112101120Z"
+    ORGANIZATION 
+        "The OpenSS7 Project"
+    CONTACT-INFO 
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Crescent
+         Edmonton, Alberta  T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         mailto:biduloock@openss7.org"
+    DESCRIPTION 
+        "Basic SS7 MIB that provides some fundamental SS7 things.
+         
+         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+         
+         All Rights Reserved.
+         
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+         
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+         
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+         
+         Note well: notwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
+    REVISION    "201112101120Z"
+    DESCRIPTION 
+        "Corrections an smilint workup."
+    REVISION    "201106250515Z"
+    DESCRIPTION 
+        "Passes smilint and reformatted using smidump."
+    REVISION    "200812201153Z"
+    DESCRIPTION 
+        "Additional workup."
+    ::= { openss7Q751 0 }
+
+
+-- Ss7LoadShareAlgorithm ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION 
+--         "This is a SS7 load sharing algorithm as identified by the SS7 
+--          MTP GDMOs."
+--     REFERENCE   
+--         "ITU-T Rec. Q.751.1 (1997)"
+--     SYNTAX      OBJECT IDENTIFIER
+
+-- SlsList ::= TEXTUAL-CONVENTION
+--     DISPLAY-HINT "1d,"
+--     STATUS      current
+--     DESCRIPTION 
+--         "This is a way of specifying a list of SLS values.  Because SLS 
+--          values can be 4, 5 or 8 bits, depending on the protocol 
+--          variant, issue year,  and options, one octet is used to 
+--          represent one SLS value.  If 4 bit SLSs apply, each octet is 
+--          set to a value constrained to the range (0..15) and the size of 
+--          the string is constrained to SIZE(0..16); 5-bits, (0..31), 
+--          SIZE(0..32); and 8-bits (0..255), SIZE(0..256).  No SLS value 
+--          can be repeated in the list.  What we really want is a SET OF 
+--          Sls here, but SNMP won't have it."
+--     REFERENCE   
+--         "ITU-T Rec. Q.751.1 (1997) : slsList ATTRIBUTE"
+--     SYNTAX      OCTET STRING (SIZE(0..256))
+
+SlsCodeList ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d,"
+    STATUS      current
+    DESCRIPTION 
+        "Provides a specification of a list of signalling link codes.  
+         Each octet in the string has the value (0..15) for ITU-T based 
+         protocol variants, and (0..31) for ANSI based protocol 
+         variants, and represents one signalling link code in the list.  
+         Values are only allowed to occur once in the list; therefore, 
+         the maximum length of the list is SIZE(0..16) for ITU-T based 
+         protocol variants, and SIZE(0..31) for ANSI based protocol 
+         variants."
+    SYNTAX      OCTET STRING (SIZE(0..31))
+
+-- MtpCongestionLevel ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION 
+--         "This type specifies an SS7 MTP congestion level.  Columnar 
+--          object following this textual convention are used to reflect 
+--          route set or signalling link congestion when multiple 
+--          congestion levels are in effect.
+--          
+--           - none(0), the corresponding route set or signalling link is 
+--             not congested;
+--           - congestionLevel1(1), the corresponding route set or 
+--             signalling link is congested at congestion level 1;
+--           - congestionLevel2(2), the corresponding route set or 
+--             signalling link is congested at congestion level 2;
+--           - congestionLevel3(3), the corresponding route set or 
+--             signalling link is congested at congestion level 3.
+--          
+--          The value may be changed by the managed system and objects 
+--          following this textual convention have a MAX-ACCESS clause of 
+--          read-only.
+--          
+--          When multiple congestion levels are not in effect, the 
+--          congestion state is indicated by a column following the 
+--          MtpCongestedState textual convention and columnar objects 
+--          following this textual convention are not present."
+--     REFERENCE   
+--         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000) : 
+--          MTPDefinedTypesModule.CongestionLevel."
+--     SYNTAX      INTEGER { none(0), congestionLevel1(1), 
+--                     congestionLevel2(2), congestionLevel3(3) }
+
+MtpLinkStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "This type specifes an SS7 MTP Level 2 Link protocol status.
+         
+         The linkTpStatus contains the SS No. 7 functional statuses as 
+         described in Recommendation Q.704. Possible states indicated 
+         are local blocked, remote blocked, local inhibited, remote 
+         inhibited, failed and deactivated.  Attributes following this 
+         textual convention are set-valued and may contain the following 
+         values:
+         
+          - localBlocked(0), the signalling link is locally blocked.  
+            Signalling links are locally blocked when experiencing local 
+            processor outage.
+         
+          - remoteBlocked(1), the signalling link is remotely blocked.  
+            Signalling links are remotely blocked when experiencing 
+            remote processor outage.
+         
+          - localInhibited(2), the signalling link is locally inhibited.  
+            Signalling links are locally inhibited when locally 
+            inhibited by MTP management.
+         
+          - remoteInhibited(3), the signalling link is remotely 
+            inhibited.  Signalling links are remotely inhibited when 
+            inhibited by the remote MTP management.
+         
+          - failed(4), the signalling link is failed.  Signalling links 
+            are failed when they were previously active and are inactive 
+            due to a failure rather than a management action.
+         
+          - deactivated(5), the signalling link is deactivated.  
+            Signalling links are deactivated when inactive due to 
+            management action.
+         
+         Columnar objects following this textual convention have their 
+         value changed by the management system and normally have a 
+         MAX-ACCESS clause of read-only."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000) : 
+         MTPDefinedTypesModule.LinkTpStatus."
+    SYNTAX      BITS { localBlocked(0), remoteBlocked(1), 
+                    localInhibited(2), remoteInhibited(3), failed(4), 
+                    deactivated(5) }
+
+-- MtpNetworkIndicator ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION 
+--         "This type specifies the SS7 MTP network indicator.
+--          
+--          - internationalNetwork1(0), network indicator for the 
+--            international network;
+--          - internationalNetwork2(1), reserved network indicator for the 
+--            international network;
+--          - nationalNetwork1(2), network indicator for the national 
+--            network; and,
+--          - nationalNetwork2(3), reserved network indicator for the 
+--            national network."
+--     REFERENCE   
+--         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000) : 
+--          MTPDefinedTypesModule.NetworkIndicator."
+--     SYNTAX      INTEGER { internationalNetwork1(0), 
+--                     internationalNetwork2(1), nationalNetwork1(2), 
+--                     nationalNetwork2(3) }
+
+SpType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "This textual covention describes the type of signalling point.  
+         One of the of the major reasons for understanding this 
+         information is so that the MTP Restart procedures can be 
+         properly performed against an adjacent signalling point.  When:
+         
+          - sep(0), it indicates that the signalling point is a 
+            signalling end point that is not equipped with the transfer 
+            function; when
+          - step (1), it indicates that the signalling point is both a 
+            signalling end point (it has user parts) and a signalling 
+            transfer point (it has the transfer function); or,
+          - stp(2), the signalling point is has the transfer function 
+            but does not have user parts."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000) : 
+         MTPDefinedTypesModule.SpType."
+    SYNTAX      INTEGER { sep(0), step(1), stp(2) }
+
+-- NetworkPointCode ::= TEXTUAL-CONVENTION
+--     DISPLAY-HINT "1d:1d-"
+--     STATUS      current
+--     DESCRIPTION 
+--         "This is a network referenced signalling point code that 
+--          uniquely identifies both the national or international SS7 
+--          network (point code numbering space) to which the point code 
+--          belongs as well as the point code within the network.  The 
+--          first octet is a network identifier that identifies the larger 
+--          national or international SS7 network; the second octet is the 
+--          'network' portion of the signalling point code as defined in 
+--          Q.704; the third, the 'cluster'; and, the fourth and last, the 
+--          'member'.  This is displayed with a colon separating the 
+--          network number and the normal numbers and dashes notation for 
+--          the signalling point code: e.g. 1:5-1-1.  Note that an ITU-T 
+--          signalling point code is unpacked by network, cluster and 
+--          member into separate octets.  Also note that when the first 
+--          octet is zero (0) it does not specify a global larger network 
+--          and thus the network point code applies only to a locally 
+--          defined network."
+--     SYNTAX      OCTET STRING (SIZE(4))
+
+-- MtpLinkFailureReason ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION 
+--         "This is the detailed reason for a link failure.  It has the 
+--          following enumeration:
+--          
+--           - unspecified(0), the reason for failure is unknown or none of 
+--             the other failure reasons apply;
+--           - contTimeout(1), T6 timeout;
+--           - ackTimeout(2), T7 timeout;
+--           - abnormalBsnr(3), receipt of excessive abnormal BSNs;
+--           - abnormalFibr(4), receipt of excessive abnormal FIBs;
+--           - suermEim(5), error rate monitor exceeded the threshold;
+--           - alignmentNotPossible(6), alignment failed;
+--           - receivedSio(7), an unexpected SIO was received;
+--           - receivedSin(8), an unexpected SIN was received;
+--           - receivedSie(9) an unexpected SIE was received;
+--           - receivedSios(10), the link was shut down by the other side;
+--           - t1Timeout(11), T1 timeout.
+--          
+--          The value is set by the managed system and objects with this 
+--          textual convention in thier SYNTAX clause have a MAX-ACCESS 
+--          clause of read-only."
+--     REFERENCE   
+--         "ITU-T Recommendation Q.703 (1996)"
+--     SYNTAX      INTEGER { unspecified(0), congTimeout(1), ackTimeout(2), 
+--                     abnormalBsnr(3), abnormalFibr(4), suermEim(5), 
+--                     alignmentNotPossible(6), receivedSio(7), 
+--                     receivedSin(8), receivedSie(9), receivedSios(10), 
+--                     t1Timeout(11) }
+
+-- MtpUserPartStatus ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION 
+--         "This textual convention can be used for reporting the 
+--          availability of MTP user parts as well as providing a mechanism 
+--          for controlling the availability of user parts.
+--          
+--           - unknown(0) means that the availabilty of the user part is 
+--             unknown;
+--           - inaccessible(1) means that the user part is present but 
+--             currently inaccessible;
+--           - unequipped(2) means that the user part is not present."
+--     SYNTAX      INTEGER { unknown(0), inaccessible(1), unequipped(2) }
+
+-- MtpUserPart ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION 
+--         "Provides a specification of an MTP user part.  This textual 
+--          convention provides an enumerated user part value that 
+--          corresponds to the MTP SI value for the user part.  SI values 
+--          snmm(0), sntm(1) and snsm(2) are reserved for MTP management 
+--          messages; other values may be assigned to user parts.
+--          
+--           - snmm(0), signalling network management messages;
+--           - sntm(1), signalling network test messages;
+--           - snsm(2), signalling network special test messages;
+--           - sccp(3), signalling connection control part;
+--           - tup(4), telephone user part;
+--           - isup(5), integrated services digital network user part;
+--           - dup1(6), data user part 1;
+--           - dup2(7), data user part 2;
+--           - mtup(8), MTP test user part;
+--           - bisup(9), broadband integrated services digital network user 
+--             part;
+--           - siup(10), user part;
+--           - user11(11), user part 11;
+--           - user12(12), user part 12;
+--           - user13(13), user part 13;
+--           - user14(14), user part 14;
+--           - user15(15), user part 15."
+--     SYNTAX      INTEGER { snmm(0), sntm(1), snsm(2), sccp(3), tup(4), 
+--                     isup(5), dup1(6), dup2(7), mtup(8), bisup(9), 
+--                     siup(10), user11(11), user12(12), user13(13), 
+--                     user14(14), user15(15) }
+
+Ss7ProtocolVariant ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "This textual convetion provides the SS7 protocol variant as an 
+         object identifier.  The object identifiers used as a value for 
+         this convention must be defined with an OBJECT-IDENTITY macro 
+         definition.  The DESCRIPTION of the definition should identify 
+         that the the object identifier is intended for use with this 
+         textual convention.  The OPENSS7-SS7-MIB defines a number of 
+         object for identifying ITU-T, ETSI, ANSI, JTTC and PNOC that 
+         may be used; however, any object identity that is known to the 
+         agent may be used, including private protocol definitions 
+         within enterprise MIBS."
+    SYNTAX      OBJECT IDENTIFIER
+
+MtpAvailabilityStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "This textual convention provides the status of an MTP entity, 
+         such as a route set, route or signalling point.  When:
+         
+          - inactive(0), the route set is inactive and does not carry 
+            user traffic;
+          - blocked(1), configured and able to carry traffic but blocked 
+            by transport;
+          - inhibited(2), management inhibited, but able to carry 
+            traffic;
+          - prohibited(3), prohibited by relay;
+          - restart(4), relay or endpoint restarting;
+          - restricted(5), restricted by relay;
+          - congested(6), endpoint congested;
+          - danger(7), in danger of congestion;
+          - allowed(8), allowed to to destination.
+         
+         Where the MTP managed object whose status is represented 
+         contains other managed objects with an MTP status, the MTP 
+         status of the managed object is the set-union (logical OR) of 
+         the contained managed objects."
+    REFERENCE   
+        "ITU-T Rec. Q.704 (1997), ANSI T1.111.4/2000, ETSI ETS 
+         300 008-1"
+    SYNTAX      BITS { inactive(0), blocked(1), inhibited(2), 
+                    prohibited(3), restart(4), restricted(5), 
+                    congested(6), danger(7), allowed(8) }
+
+MtpOptions ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "This textual convention provides options for use with MTP and 
+         MTP users.  Not all options are applicable to all managed 
+         objects in all circumstances.  Options that are not applicable 
+         are ignored.  The DESCRIPTION clause of the OBJECT-TYPE must 
+         specify which options are applicable.
+         
+          - cluster(0), the MTP signalling point supports cluster 
+            routing, or the route or route set is a cluster route or 
+            route set;
+          - transferFunction(1), the MTP signalling point provides the 
+            transfer function (i.e. mtpSpType is step(1) or stp(2));
+          - adjacent(2), the MTP route set is to an adjacent signalling 
+            point;
+          - security(3), the MTP signalling point has the gateway 
+            screening function;
+            applied;
+          - linkOscillationA(4), the MTP signalling point has signalling 
+            links that support link oscillation procedure A by default;
+          - linkOscillationB(5), the MTP singalling point has signalling 
+            links that support link oscillation procedure B by default.
+         
+         Not all combinations of the options are valid.  Not all valid 
+         combinations of the flags are acceptable to all protocol 
+         variants."
+    SYNTAX      BITS { cluster(0), transferFunction(1), adjacent(2), 
+                    security(3), linkOscillationA(4), 
+                    linkOscillationB(5) }
+
+TransmissionRate ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Describes applicable transmission rate.  This can be 4800, 
+         56000, 64000, 1536000 or 1984000, which corresponds to modem, 
+         ds0a, ds0, t1 or e1."
+    SYNTAX      INTEGER { modem(1), ds0a(2), ds0(3), t1(4), e1(5) }
+
+-- MtpTransmissionRate ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION 
+--         "This type describes an applicable narrowband transmission rate.  
+--          This can be 4800, 56000, 64000, 1536000 or 1984000, which 
+--          corresponds to modem, DS0-A, DS0, T1/J1 or E1.  It also implies 
+--          the transmission type: 56, 64, 1544 and 2048 kbis implies 
+--          digital transmission; 4.8 kbits implies analog transmission.
+--          
+--           - kbits4point8(0), the transmission rate is for modem (4800 baud);
+--           - kbits56(1), the transmission rate is for DS0-A (56kbps);
+--           - kbits64(2), the transmission rate is for DS0 (64kbps);
+--           - kbits1544(3), the transmission rate is for T1 (1536kbps);
+--           - kbits2048(4), the transmission rate is for E1 (1984kbps).
+--          
+--          Objects with this textual convention in thier SYNTAX clause 
+--          normally have a MAX-ACCESS clause of read-write or read-create."
+--     SYNTAX      INTEGER { kbits4point8(0), kbits56(1), kbits64(2), 
+--                     kbits1544(3), kbits2048(4) }
+
+ss7Notifications OBJECT IDENTIFIER
+    ::= { ss7MIB 0 }
+
+ss7Objects OBJECT IDENTIFIER
+    ::= { ss7MIB 1 }
+
+ss7Scalars OBJECT IDENTIFIER
+    ::= { ss7Objects 1 }
+
+ss7Tables OBJECT IDENTIFIER
+    ::= { ss7Objects 2 }
+
+ss7NetworkTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ss7NetworkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is the SS7 Network Table.  This table contains the set of 
+         SS7 signalling networks in which the managed system appears."
+    ::= { ss7Tables 1 }
+
+ss7NetworkEntry OBJECT-TYPE
+    SYNTAX      Ss7NetworkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is an SS7 Network Table entry (row).  Each row in the 
+         table descibes a point code numbering space and implies the 
+         format of the point code.
+         
+         Each entry in this table describes a network in which the 
+         managed system may appear.  Associated with each entry are the 
+         characteristics and attributes associated with this managed 
+         system's appearance within the indexed network.
+         
+         Conceptual rows may be added and deleted by management 
+         stations.  Networks should first be empty of all network 
+         entities before they are deleted.  Modifications to this table 
+         persist over agent reboots."
+    INDEX       { ss7NetworkId }
+    ::= { ss7NetworkTable 1 }
+
+Ss7NetworkEntry ::= SEQUENCE {
+    ss7NetworkId                Integer32,
+    ss7NetworkProtocolVariant   Ss7ProtocolVariant,
+    ss7NetworkProtocolVersion   Unsigned32,
+    ss7NetworkProtocolOptions   OCTET STRING,
+    ss7NetworkRowStatus         RowStatus
+}
+
+ss7NetworkId OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The index identifying row in the SS7 Network Table.  Only 255 
+         rows are permitted because the index needs to be able to be 
+         encoded in th first octet of a NetworkPointCode."
+    ::= { ss7NetworkEntry 1 }
+
+ss7NetworkProtocolVariant OBJECT-TYPE
+    SYNTAX      Ss7ProtocolVariant
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the protocol variant or standard using the set of 
+         autonomous type OIDs provided in this MIB.  These OIDS are for 
+         SS7 standards or protocol variants.  The base standards that 
+         are most widely adopted are ITU-T based or ANSI based.  The 
+         primary distiguishing factor is the point code format of 3-8-3 
+         vs. 8-8-8.  Another distinguishing factor is the number of the 
+         SLS and SLC bits.  Other non-European countries use 8-8-8 such 
+         as Canada, Australia, China, Japan.  Japan, however, implies a 
+         bunch of other variances such as MTP message priority 
+         differences and so the jttc.  The UK PNOC also implies some 
+         wild ISUP variances.
+         
+         The purpose of identifying one of these standards bodies is to 
+         arrive at a popular set of defaults for protocol options."
+    DEFVAL      { ss7ProtocolAnsi2000 }
+    ::= { ss7NetworkEntry 2 }
+
+ss7NetworkProtocolVersion OBJECT-TYPE
+    SYNTAX      Unsigned32 (1984..2008)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The protocol year of the ISO/ITU cycle.  That is, years within 
+         the range of multiples of 4 starting from 1984 (the epoch of 
+         SS7 and OSI) might not be distiguished by the agent."
+    DEFVAL      { 2000 }
+    ::= { ss7NetworkEntry 3 }
+
+ss7NetworkProtocolOptions OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the protocol options as a rather arbitrary OCTET 
+         STRING."
+    ::= { ss7NetworkEntry 4 }
+
+ss7NetworkRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column provides the ability to create a row in the SS7 
+         Network table in accordance with STD 58."
+    REFERENCE   
+        "STD 58, SNMPv2-TC RowStatus."
+    ::= { ss7NetworkEntry 5 }
+
+ss7Notifs OBJECT IDENTIFIER
+    ::= { ss7Objects 3 }
+
+ss7Oids OBJECT IDENTIFIER
+    ::= { ss7Objects 4 }
+
+ss7Protocols OBJECT IDENTIFIER
+    ::= { ss7Oids 1 }
+
+ss7ProtocolItut OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the ITU-T protocol variant or 
+         protocol variants based on ITU-T."
+    ::= { ss7Protocols 1 }
+
+ss7ProtocolItut1980 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the ITU-T 1980 plenary 
+         session."
+    ::= { ss7ProtocolItut 1980 }
+
+ss7ProtocolItut1984 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the ITU-T 1984 plenary 
+         session."
+    ::= { ss7ProtocolItut 1984 }
+
+ss7ProtocolItut1988 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the ITU-T 1988 plenary 
+         session."
+    ::= { ss7ProtocolItut 1988 }
+
+ss7ProtocolItut1992 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the ITU-T 1992 plenary 
+         session."
+    ::= { ss7ProtocolItut 1992 }
+
+ss7ProtocolItut1996 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the ITU-T 1996 plenary 
+         session."
+    ::= { ss7ProtocolItut 1996 }
+
+ss7ProtocolItut2000 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the ITU-T 2000 plenary 
+         session."
+    ::= { ss7ProtocolItut 2000 }
+
+ss7ProtocolItut2004 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the ITU-T 2004 plenary 
+         session."
+    ::= { ss7ProtocolItut 2004 }
+
+ss7ProtocolItut2008 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the ITU-T 2008 plenary 
+         session."
+    ::= { ss7ProtocolItut 2008 }
+
+ss7ProtocolEtsi OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the ETSI protocol variant or 
+         protocol variants based on ETSI."
+    ::= { ss7Protocols 2 }
+
+ss7ProtocolEtsi1980 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the ETSI protocol variants 
+         based on the ITU-T 1980 plenary session."
+    ::= { ss7ProtocolEtsi 1980 }
+
+ss7ProtocolEtsi1984 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the ETSI protocol variants 
+         based on the ITU-T 1984 plenary session."
+    ::= { ss7ProtocolEtsi 1984 }
+
+ss7ProtocolEtsi1988 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the ETSI protocol variants 
+         based on the ITU-T 1988 plenary session."
+    ::= { ss7ProtocolEtsi 1988 }
+
+ss7ProtocolEtsi1992 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the ETSI protocol variants 
+         based on the ITU-T 1992 plenary session."
+    ::= { ss7ProtocolEtsi 1992 }
+
+ss7ProtocolEtsi1996 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the ETSI protocol variants 
+         based on the ITU-T 1996 plenary session."
+    ::= { ss7ProtocolEtsi 1996 }
+
+ss7ProtocolEtsi2000 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the ETSI protocol variants 
+         based on the ITU-T 2000 plenary session."
+    ::= { ss7ProtocolEtsi 2000 }
+
+ss7ProtocolEtsi2004 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the ETSI protocol variants 
+         based on the ITU-T 2004 plenary session."
+    ::= { ss7ProtocolEtsi 2004 }
+
+ss7ProtocolEtsi2008 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the ETSI protocol variants 
+         based on the ITU-T 2008 plenary session."
+    ::= { ss7ProtocolEtsi 2008 }
+
+ss7ProtocolAnsi OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the ANSI protocol variant or 
+         protocol variants based on ANSI."
+    ::= { ss7Protocols 3 }
+
+ss7ProtocolAnsi1980 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the ANSI protocol variants 
+         based on the ITU-T 1980 plenary session."
+    ::= { ss7ProtocolAnsi 1980 }
+
+ss7ProtocolAnsi1984 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the ANSI protocol variants 
+         based on the ITU-T 1984 plenary session."
+    ::= { ss7ProtocolAnsi 1984 }
+
+ss7ProtocolAnsi1988 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the ANSI protocol variants 
+         based on the ITU-T 1988 plenary session."
+    ::= { ss7ProtocolAnsi 1988 }
+
+ss7ProtocolAnsi1992 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the ANSI protocol variants 
+         based on the ITU-T 1992 plenary session."
+    ::= { ss7ProtocolAnsi 1992 }
+
+ss7ProtocolAnsi1996 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the ANSI protocol variants 
+         based on the ITU-T 1996 plenary session."
+    ::= { ss7ProtocolAnsi 1996 }
+
+ss7ProtocolAnsi2000 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the ANSI protocol variants 
+         based on the ITU-T 2000 plenary session."
+    ::= { ss7ProtocolAnsi 2000 }
+
+ss7ProtocolAnsi2004 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the ANSI protocol variants 
+         based on the ITU-T 2004 plenary session."
+    ::= { ss7ProtocolAnsi 2004 }
+
+ss7ProtocolAnsi2008 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the ANSI protocol variants 
+         based on the ITU-T 2008 plenary session."
+    ::= { ss7ProtocolAnsi 2008 }
+
+ss7ProtocolJttc OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the JTTC protocol variant or 
+         protocol variants based on JTTC."
+    ::= { ss7Protocols 4 }
+
+ss7ProtocolJttc1980 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the JTTC protocol variants 
+         based on the ITU-T 1980 plenary session."
+    ::= { ss7ProtocolJttc 1980 }
+
+ss7ProtocolJttc1984 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the JTTC protocol variants 
+         based on the ITU-T 1984 plenary session."
+    ::= { ss7ProtocolJttc 1984 }
+
+ss7ProtocolJttc1988 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the JTTC protocol variants 
+         based on the ITU-T 1988 plenary session."
+    ::= { ss7ProtocolJttc 1988 }
+
+ss7ProtocolJttc1992 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the JTTC protocol variants 
+         based on the ITU-T 1992 plenary session."
+    ::= { ss7ProtocolJttc 1992 }
+
+ss7ProtocolJttc1996 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the JTTC protocol variants 
+         based on the ITU-T 1996 plenary session."
+    ::= { ss7ProtocolJttc 1996 }
+
+ss7ProtocolJttc2000 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the JTTC protocol variants 
+         based on the ITU-T 2000 plenary session."
+    ::= { ss7ProtocolJttc 2000 }
+
+ss7ProtocolJttc2004 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the JTTC protocol variants 
+         based on the ITU-T 2004 plenary session."
+    ::= { ss7ProtocolJttc 2004 }
+
+ss7ProtocolJttc2008 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the JTTC protocol variants 
+         based on the ITU-T 2008 plenary session."
+    ::= { ss7ProtocolJttc 2008 }
+
+ss7ProtocolChin OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the PRC protocol variant or 
+         protocol variants based on ITU-T."
+    ::= { ss7Protocols 5 }
+
+ss7ProtocolChin1980 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the PRC protocol variants 
+         based on the ITU-T 1980 plenary session."
+    ::= { ss7ProtocolChin 1980 }
+
+ss7ProtocolChin1984 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the PRC protocol variants 
+         based on the ITU-T 1984 plenary session."
+    ::= { ss7ProtocolChin 1984 }
+
+ss7ProtocolChin1988 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the PRC protocol variants 
+         based on the ITU-T 1988 plenary session."
+    ::= { ss7ProtocolChin 1988 }
+
+ss7ProtocolChin1992 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the PRC protocol variants 
+         based on the ITU-T 1992 plenary session."
+    ::= { ss7ProtocolChin 1992 }
+
+ss7ProtocolChin1996 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the PRC protocol variants 
+         based on the ITU-T 1996 plenary session."
+    ::= { ss7ProtocolChin 1996 }
+
+ss7ProtocolChin2000 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the PRC protocol variants 
+         based on the ITU-T 2000 plenary session."
+    ::= { ss7ProtocolChin 2000 }
+
+ss7ProtocolChin2004 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the PRC protocol variants 
+         based on the ITU-T 2004 plenary session."
+    ::= { ss7ProtocolChin 2004 }
+
+ss7ProtocolChin2008 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the PRC protocol variants 
+         based on the ITU-T 2008 plenary session."
+    ::= { ss7ProtocolChin 2008 }
+
+ss7ProtocolSing OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the Singapore protocol variant or 
+         protocol variants based on ITU-T."
+    ::= { ss7Protocols 6 }
+
+ss7ProtocolSing1980 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the Singapore protocol variants 
+         based on the ITU-T 1980 plenary session."
+    ::= { ss7ProtocolSing 1980 }
+
+ss7ProtocolSing1984 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the Singapore protocol variants 
+         based on the ITU-T 1984 plenary session."
+    ::= { ss7ProtocolSing 1984 }
+
+ss7ProtocolSing1988 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the Singapore protocol variants 
+         based on the ITU-T 1988 plenary session."
+    ::= { ss7ProtocolSing 1988 }
+
+ss7ProtocolSing1992 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the Singapore protocol variants 
+         based on the ITU-T 1992 plenary session."
+    ::= { ss7ProtocolSing 1992 }
+
+ss7ProtocolSing1996 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the Singapore protocol variants 
+         based on the ITU-T 1996 plenary session."
+    ::= { ss7ProtocolSing 1996 }
+
+ss7ProtocolSing2000 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the Singapore protocol variants 
+         based on the ITU-T 2000 plenary session."
+    ::= { ss7ProtocolSing 2000 }
+
+ss7ProtocolSing2004 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the Singapore protocol variants 
+         based on the ITU-T 2004 plenary session."
+    ::= { ss7ProtocolSing 2004 }
+
+ss7ProtocolSing2008 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the Singapore protocol variants 
+         based on the ITU-T 2008 plenary session."
+    ::= { ss7ProtocolSing 2008 }
+
+ss7ProtocolSpan OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the Spanish protocol variant or 
+         protocol variants based on ETSI."
+    ::= { ss7Protocols 7 }
+
+ss7ProtocolSpan1980 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the Spanish protocol variants 
+         based on the ITU-T 1980 plenary session."
+    ::= { ss7ProtocolSpan 1980 }
+
+ss7ProtocolSpan1984 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the Spanish protocol variants 
+         based on the ITU-T 1984 plenary session."
+    ::= { ss7ProtocolSpan 1984 }
+
+ss7ProtocolSpan1988 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the Spanish protocol variants 
+         based on the ITU-T 1988 plenary session."
+    ::= { ss7ProtocolSpan 1988 }
+
+ss7ProtocolSpan1992 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the Spanish protocol variants 
+         based on the ITU-T 1992 plenary session."
+    ::= { ss7ProtocolSpan 1992 }
+
+ss7ProtocolSpan1996 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the Spanish protocol variants 
+         based on the ITU-T 1996 plenary session."
+    ::= { ss7ProtocolSpan 1996 }
+
+ss7ProtocolSpan2000 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the Spanish protocol variants 
+         based on the ITU-T 2000 plenary session."
+    ::= { ss7ProtocolSpan 2000 }
+
+ss7ProtocolSpan2004 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the Spanish protocol variants 
+         based on the ITU-T 2004 plenary session."
+    ::= { ss7ProtocolSpan 2004 }
+
+ss7ProtocolSpan2008 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the Spanish protocol variants 
+         based on the ITU-T 2008 plenary session."
+    ::= { ss7ProtocolSpan 2008 }
+
+ss7ProtocolPnoc OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the UK BT PNOC protocol variant 
+         or protocol variants based on ETSI."
+    ::= { ss7Protocols 8 }
+
+ss7ProtocolPnoc1980 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the UK BT PNOC protocol 
+         variants based on the ITU-T 1980 plenary session."
+    ::= { ss7ProtocolPnoc 1980 }
+
+ss7ProtocolPnoc1984 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the UK BT PNOC protocol 
+         variants based on the ITU-T 1984 plenary session."
+    ::= { ss7ProtocolPnoc 1984 }
+
+ss7ProtocolPnoc1988 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the UK BT PNOC protocol 
+         variants based on the ITU-T 1988 plenary session."
+    ::= { ss7ProtocolPnoc 1988 }
+
+ss7ProtocolPnoc1992 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the UK BT PNOC protocol 
+         variants based on the ITU-T 1992 plenary session."
+    ::= { ss7ProtocolPnoc 1992 }
+
+ss7ProtocolPnoc1996 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the UK BT PNOC protocol 
+         variants based on the ITU-T 1996 plenary session."
+    ::= { ss7ProtocolPnoc 1996 }
+
+ss7ProtocolPnoc2000 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the UK BT PNOC protocol 
+         variants based on the ITU-T 2000 plenary session."
+    ::= { ss7ProtocolPnoc 2000 }
+
+ss7ProtocolPnoc2004 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the UK BT PNOC protocol 
+         variants based on the ITU-T 2004 plenary session."
+    ::= { ss7ProtocolPnoc 2004 }
+
+ss7ProtocolPnoc2008 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Provides an autonomous type for the UK BT PNOC protocol 
+         variants based on the ITU-T 2008 plenary session."
+    ::= { ss7ProtocolPnoc 2008 }
+
+ss7Conformance OBJECT IDENTIFIER
+    ::= { ss7MIB 2 }
+
+ss7Compliance OBJECT IDENTIFIER
+    ::= { ss7Conformance 1 }
+
+ss7Groups OBJECT IDENTIFIER
+    ::= { ss7Conformance 2 }
+
+ss7Package OBJECT-GROUP
+    OBJECTS     { ss7NetworkProtocolVariant, ss7NetworkProtocolVersion, 
+                  ss7NetworkProtocolOptions, ss7NetworkRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "This provides, for now, a single group containing all 
+         conformance applicable objects."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000)"
+    ::= { ss7Groups 1 }
+
+ss7GeneralCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "This provides general compliance for this module."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { ss7Package }
+
+    ::= { ss7Compliance 1 }
+
+END -- end of module OPENSS7-SS7-MIB.

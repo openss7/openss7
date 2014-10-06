@@ -1,0 +1,1302 @@
+% -*- texinfo -*- vim: ft=texinfo
+% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+% =========================================================================
+%
+% @(#) $Id: tpi_sccp.texi,v 1.1.2.2 2011-02-07 02:21:42 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+%
+% All Rights Reserved.
+%
+% Permission is granted to copy, distribute and/or modify this document
+% under the terms of the GNU Free Documentation License, Version 1.3 or
+% any later version published by the Free Software Foundation; with no
+% Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+% copy of the license is included in the section entitled "GNU Free
+% Documentation License".
+%
+% Permission to use, copy and distribute this documentation without
+% modification, for any purpose and without fee or royalty is hereby
+% granted, provided that both the above copyright notice and this
+% permission notice appears in all copies and that the name of OpenSS7
+% Corporation not be used in advertising or publicity pertaining to
+% distribution of this documentation or its contents without specific,
+% written prior permission.  OpenSS7 Corporation makes no representation
+% about the suitability of this documentation for any purpose.  It is
+% provided "as is" without express or implied warranty.
+% 
+% Permission is granted to process this file through Tex and print the
+% results, provided the printed document carries copying permission
+% notice identical to this one except for the removal of this paragraph
+% (this paragraph not being relevant to the printed manual).
+% 
+% OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+% DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+% FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+% CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+% IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+% PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+% OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+% CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+% USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+% OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+% THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+% THEREOF.
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any successor
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2011-02-07 02:21:42 $ by $Author: brian $
+%
+% =========================================================================
+
+\input texinfo
+@setfilename tpi_sccp.info
+@include ../../../scripts/texi/args.texi
+@set MANUAL_TITLE Transport Provider Interface
+@set MANUAL_TYPE Corrigendum for SCCP Conformance
+@settitle @value{MANUAL_TITLE}
+
+@dircategory OpenSS7
+@direntry
+* TPI-SCCP: (tpi_sccp).			TPI Corrigendum for SCCP
+@end direntry
+
+@include ../../../scripts/texi/args.texi
+@set MANUAL_TITLE Transport Provider Interface
+@set MANUAL_TYPE Corrigendum for SCCP Conformance
+
+@comment The following copyright information goes at the head of each .info file.
+@ifinfo
+This file provides the @value{MANUAL_TYPE} for @value{MANUAL_TITLE}.
+
+This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated @value{PACKAGE_DATE}, of the
+@cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
+Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
+
+Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
+
+All Rights Reserved.
+
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU
+Free Documentation License, Version 1.3 or any later version published by the Free Software
+Foundation; with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of
+the license is included in the section entitled @ref{GNU Free Documentation License}.
+
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of @cite{OpenSS7 Corporation} not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  @cite{OpenSS7 Corporation} makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@ignore
+Permission is granted to process this file through Tex and print the results, provided the printed
+document carries copying permission notice identical to this one except for the removal of this
+paragraph (this paragraph not being relevant to the printed manual).
+
+@end ignore
+OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS DOCUMENTATION INCLUDING ALL IMPLIED
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT
+THE CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN
+NO EVENT SHALL OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL
+DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+@end ifinfo
+
+@include ../../../scripts/texi/args.texi
+@set MANUAL_TITLE Transport Provider Interface
+@set MANUAL_TYPE Corrigendum for SCCP Conformance
+
+@set PART Signalling Connection Control
+@set LONG Signalling Connection Control Part
+@set SHORT SCCP
+@set INTERFACE TPI-SCCP
+
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@titlepage
+@titlefont{@value{MANUAL_TITLE}}
+@sp 0.5
+@title @value{MANUAL_TYPE}
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
+@subtitle Updated @value{PACKAGE_PDATE}
+@sp 0.2
+@subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
+@sp 2
+@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
+@subtitle All Rights Reserved.
+@sp 4
+@quotation
+@chapheading Abstract:
+This document specifies an (unofficial) corrigendum to the Transport Provider Interface (TPI)
+Specification (@pxref{TPI,,TPI}) for SS7 Signalling Connection Control Part (SCCP)
+(@pxref{Q.711,,Q.711}) conformance in support of the SCCP to SCCP User primitive interface
+(@pxref{Q.711,,Q.711}).  it supports the user-level XTI/TLI abstraction (@pxref{XTI,,XTI}) of the
+Signalling Connection Control Part Interface (SCCPI) as well as providing a basis for SCCP User protocols using the
+services of the SS7 Signalling Connection Control Part.
+@end quotation
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
+
+@page
+@vskip 0pt plus 1filll
+
+@chapheading Published by:
+
+@sp 1
+
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+@noindent
+Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
+
+@noindent
+All Rights Reserved.
+
+@sp 1
+
+@noindent
+Unauthorized distribution or duplication is prohibited.
+
+@sp 1
+
+@noindent
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU
+Free Documentation License, Version 1.3 or any later version published by the Free Software
+Foundation; with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of
+the license is included in the section entitled @ref{GNU Free Documentation License}.
+
+@noindent
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of @cite{OpenSS7 Corporation} not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  @cite{OpenSS7 Corporation} makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@chapheading Notice:
+
+@noindent
+@strong{OpenSS7 Corporation disclaims all warranties with regard to this documentation including all
+implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
+that the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.}
+
+@vskip 0pt
+@end titlepage
+@iftex
+@headings off
+@everyheading @thistitle @| @thisfile @| @thischaptername
+@evenheading @thischapter @| @| @thisfile
+@oddheading @thistitle @| @| @thischaptername
+@everyfooting Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL} @| @value{PACKAGE_DATE} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
+@oddfooting @value{PACKAGE_DATE} @| @| @thispage
+@end iftex
+@page
+
+@c Define an index of primitives
+@defcodeindex pr
+@c Define an index of primitive values
+@defcodeindex pv
+@c Define an index of primitive error values
+@defcodeindex pe
+@c Define an index of protocol states
+@defcodeindex st
+@c Define an index of input-output controls
+@defcodeindex ct
+@c Define an index of manual pages.
+@defcodeindex mp
+@c Define an index of MIB objects.
+@defcodeindex mo
+
+@c frags out automake
+@c @ifnottex
+@c @c concatenate indices for text, html and info
+@syncodeindex pr cp
+@syncodeindex pv cp
+@syncodeindex pe cp
+@syncodeindex st cp
+@syncodeindex mp cp
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex ct cp
+@syncodeindex mo cp
+@c @end ifnottex
+
+@include texi/macros.texi
+@include texi/versions.texi
+@include texi/prims.texi
+
+@ifnottex
+@node Top
+@top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@heading About This Manual
+This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated @value{PACKAGE_DATE}, of
+@cite{The @value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version
+@value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL} of the
+@value{PACKAGE_TITLE} package.
+@end ifnottex
+
+@menu
+* Preface::
+* Introduction::
+* TPI-SCCP::
+@c * Addendum for SCCP Conformance::
+* Mapping TPI-SCCP Primitives::
+@c * State/Event Tables::
+@c * Precedence Tables::
+@c * Allowable Sequence of TPI-SCCP Primitives::
+@c * Precedence of TPI-SCCP Primitives::
+@c * Guidelines for Protocol Independent TPI-SCCP Users::
+@c * Required Information for TPI-SCCP Provider-Specific Addenda::
+* TPI-SCCP Header Files::
+* TPI-SCCP Library::
+* TPI-SCCP Drivers and Modules::
+* TPI-SCCP Utilities::
+@c * TPI-SCCP File Formats::
+@c * TPI-SCCP Compatibility and Porting::
+* Glossary::
+* Acronyms::
+* References::
+* Licenses::
+@c @iftex
+@c * Indices::
+@c @end iftex
+@c @ifnottex
+* Index::
+@c @end ifnottex
+@end menu
+
+@iftex
+@c insert list of figures and tables for printed manuals
+@page
+@heading List of Figures
+@listoffloats Figure
+@page
+@heading List of Tables
+@listoffloats Table
+@end iftex
+
+@node Preface
+@unnumbered Preface
+
+@section Notice
+
+Software in this document and related software is released under the AGPL (@pxref{GNU Affero General
+Public License}).  Please note, however, that there are different licensing terms for some of the
+manual package and some of the documentation.  Consult permission notices contained in the
+documentation of those components for more information.
+
+This document is released under the FDL (@pxref{GNU Free Documentation License}) with no invariant
+sections, no front-cover texts and no back-cover texts.
+
+@section Abstract
+
+This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
+the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
+as platform and system applicability of the @value{MANUAL_TITLE}.
+
+@noindent
+This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 Signalling Connection Control Part
+(SCCP) protocol stacks.  It provides abstraction of the Signalling Connection Control interface to these
+components as well as providing a basis for Signalling Connection Control control for other Signalling Connection Control protocols.
+
+@subsection Purpose
+@cpindex STREAMS
+
+The purpose of this document is to provide technical documentation of the @value{MANUAL_TITLE}.
+This document is intended to be included with the OpenSS7 @acronym{STREAMS} software package released
+by @cite{OpenSS7 Corporation}.  It is intended to assist software developers, maintainers and users
+of the @value{MANUAL_TITLE} with understanding the software architecture and technical interfaces
+that are made available in the software package.
+
+@subsection Intent
+
+It is the intent of this document that it act as the primary source of information concerning the
+@value{MANUAL_TITLE}.  This document is intended to provide information for writers of OpenSS7
+@value{MANUAL_TITLE} applications as well as writers of OpenSS7 @value{MANUAL_TITLE} Users.
+
+@subsection Audience
+
+The audience for this document is software developers, maintainers and users and integrators of the
+@value{MANUAL_TITLE}.  The target audience is developers and users of the OpenSS7 SS7 stack.
+
+@section Revision History
+
+Take care that you are working with a current version of this documentation: you will not be
+notified of updates.  To ensure that you are working with a current version, check the
+@uref{http://www.openss7.org/,OpenSS7 Project} website for a current version.
+
+A current version of this specification is normally distributed with the @cite{@value{PACKAGE_TITLE}}
+package, @file{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.openss7.org/repos/tarballs/@value{PACKAGE}-@value{VERSION}.tar.bz2}}
+
+@subsection Version Control
+
+@noindent
+Although the author has attempted to ensure that the information in this document is complete and
+correct, neither the Author nor OpenSS7 Corporation will take any responsibility in it.
+@cite{OpenSS7 Corporation} is making this documentation available as a reference point for the
+industry.  While @cite{OpenSS7 Corporation} believes that these interfaces are well defined in this
+release of the document, minor changes may be made prior to products conforming to the interfaces
+being made available.  @cite{OpenSS7 Corporation} reserves the right to revise this software and
+documentation for any reason, including but not limited to, conformity with standards promulgated by
+various agencies, utilization of advances in the state of the technical arts, or the reflection of
+changes in the design of any techniques, or procedures embodied, described, or referred to herein.
+@cite{OpenSS7 Corporation} is under no obligation to provide any feature listed herein.
+
+@smallexample
+@verbatim
+$Log: tpi_sccp.texi,v $
+Revision 1.1.2.2  2011-02-07 02:21:42  brian
+- updated manuals
+
+Revision 1.1.2.1  2009-06-21 10:56:06  brian
+- added files to new distro
+
+@end verbatim
+@end smallexample
+
+@section ISO 9000 Compliance
+
+Only the @TeX{}, texinfo, or roff source for this maual is controlled.  An opaque (printed,
+postscript or portable document format) version of this manual is a @strong{UNCONTROLLED VERSION}.
+
+@subsection Disclaimer
+
+@noindent
+@strong{@cite{OpenSS7 Corporation} disclaims all warranties with regard to this documentation
+including all implied warranties of merchantability, fitness for a particular purpose,
+non-infrincement, or title; that the contents of the manual are suitable for any purpose, or that
+the implementation of such contents will not infringe on any third party patents, copyrights,
+trademarks or other rights.  In no event shall @cite{OpenSS7 Corporation} be liable for any direct,
+indirect, special or consequential damages or any damages whatsoever resulting from loss of use,
+data or profits, whether in an action or contract, negligence or other tortious action, arising out
+of or in connection with any use of this documentation or the performance or implementation of the
+contents thereof.}
+
+@subsection U.S. Government Restricted Rights
+
+If you are licensing this Software on behalf of the U.S. Government ("Government"), the following
+provisions apply to you.  If the Software is supplied by the Department of Defense ("DoD"), it is
+classified as "Commercial Computer Software" under paragraph 252.227-7014 of the DoD Supplement to
+the Federal Aquisition Regulations ("DFARS") (or any successor regulations) and the Government is
+acquiring only the license rights granded herein (the license rights customarily provided to
+non-Government users).  If the Software is supplied to any unit or agency of the Government other
+than DoD, it is classified as "Restricted Computer Software" and the Government's rights in the
+Software are defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or any
+successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplerment
+to the FAR (or any successor regulations).
+
+@section Acknowledgements
+
+@url{http://www.openss7.org/,The OpenSS7 Project} was funded in part by:
+
+@itemize @bullet
+@item @url{http://www.monavacon.com/,Monavacon Limited}
+@item @url{http://www.openss7.com/,OpenSS7 Corporation}
+@end itemize
+
+Thanks to the subscribers to and sponsors of @url{http://www.openss7.org/, The OpenSS7 Project}.
+Without their support, open software like this would not be possible.
+
+As with most open source projects, this project would not have been possible without the valiant
+efforts and productive software of the @url{http://www.fsf.org/,Free Software Foundation}, the
+@url{http://www.kernel.org/,Linux Kernel Community}, and the open source software movement at large.
+
+@section Related Documentation
+
+@subsection Role
+
+@section Definitions, Acronyms, and Abbreviations
+
+@node TPI-SCCP
+@chapter TPI-SCCP
+
+A document describing using XTI for SCCP has been generated to support the use of the OpenSS7 SCCPI
+(SCCP Interface) using the methods of the X/Open Transport Interface described in XNS 5.2.  This
+document describes a corrigendum to the X/Open TPI Revision 2.0.0 that describes this SCCP transport
+provider that supports SCCP to XTI using the X/Open Transport Provider Interface.  No new primitive
+or semantics have been added to the interface, merely a definition of the protocol-specific and
+provider-specific aspects of SCCP Transport.
+
+SCCP Transport is very close to the XTI XX25 transport specification.  The major difference is that
+SCCP Network Layer Addresses and optoins are used instead of ISO Network Service Access Point
+addresses and options.  Aside from that, SCCP Transport resembles X.213 (NS) ISO/OSI Network.
+
+@section Addressing
+
+TPI-SCCP uses SCCP formatted addresses instead of ISO Network Service Access Point addresses.
+
+@subsection Address Format
+
+The address format for an SCCP address is as follows:
+
+@section Options
+
+Options are formatted according to the @type{t_opthdr} structure decribed in the XTI.  An SCCP
+transport provider compliant to this specification supports none, all, or any subset of the options
+defined here.  An implementation may restrict the use of any of these options by offering them only
+in a privileged or read-only mode.
+
+TPI-SCCP provides options at the @pval{XTI_GENERIC}, @pval{T_SS7_MTP} and @pval{T_SS7_SCCP} option
+levels as described in the subsections that follow.  Of the @pval{T_SS7_MTP} options, none of the
+options are of end-to-end significance.  Of the @pval{T_SS7_SCCP} options, only @pval{T_SCCP_PCLASS}
+and @pval{T_SCCP_CREDIT} are of end-to-end significance.
+
+@menu
+* XTI Level Options::
+* MTP Level Options::
+* SCCP Level Options::
+@end menu
+
+@node XTI Level Options
+@subsection XTI Level Options
+
+Options at this level are specific to the X/Open Transport Interface (XTI/TLI) and are common to all
+transport providers.  For more information, see the XTI specification (@ref{XTI,,XTI}).
+
+The options defined with the option level @pval{XTI_GENERIC} are as follows:
+
+@subsubsection XTI_DEBUG
+
+Sets debugging flags for the Stream.  This option is formatted as an array of @type{t_uscalar_t}.
+Legal values are implementation defined.  For more information see @manref{xti(3)}.
+
+@subsubsection XTI_LINGER
+
+Sets whether, and the amount of time if, the Stream will linger waiting for unsent data to be
+delivered.  This option is formatted as a @type{t_linger} structure defined as follows:
+
+@format
+@verbatim
+struct t_linger {
+        t_scalar_t l_onoff;             /* option on/off */
+        t_scalar_t l_linger;            /* linger time */
+};
+@end verbatim
+@end format
+
+@multitable @columnfractions .2 .8
+@item @member{l_onoff} @tab
+Specifies whether to linger (@pval{T_YES}) or not (@pval{T_NO}).  Legal values are @pval{T_YES} and
+@pval{T_NO}.
+@item @member{l_linger} @tab
+Specifies the amount of time (in seconds) to linger.  Legal values are @pval{T_INFINITE},
+@pval{T_UNSPEC} and all positive numbers including zero.
+@end multitable
+
+For more information, see @manref{xti(3)}.
+
+@subsubsection XTI_RCVBUF
+
+Specifies the size, in bytes, of the receive buffer.  This option is formatted as a
+@type{t_uscalar_t}.  Legal value are all positive, non-zero numbers.  For more information, see
+@manref{xti(3)}.
+
+@subsubsection XTI_RCVLOWAT
+
+Specifies the low water mark above which received data will be indicated and delivered to the user.
+This option is formatted as @type{t_uscalar_t}.  Legal values are all positive, non-zero numbers.
+For more information see @manref{xti(3)}.
+
+@subsubsection XTI_SNDBUF
+
+Specifies the size, in bytes, of the transmit buffer.  This option is formatted as a
+@type{t_uscalar_t}.  Legal values are all positive, non-zero numbers.  For more information see
+@manref{xti(3)}.
+
+@subsubsection XTI_SNDLOWAT
+
+Specifies the low water mark above which queued data will be transmitted to the peer.  This option
+is formatted as a @type{t_uscalar_t}.  Legal values are all positive, non-zero numbers.  For more
+inforamtion see @manref{xti(3)}.
+
+@node MTP Level Options
+@subsection MTP Level Options
+
+@subsubsection T_MTP_SLS
+
+This option sets or gets the @dfn{Signalling Link Selection (SLS)} value assocaited wit a message or
+Stream.  The option argument is one @type{t_uscalar_t} value that represents the value of the SLS.
+When used in the @prim{T_OPTDATA} or @prim{T_UNITDATA} primitives, this option sets or gets the SLS
+value associated with a message.  When used in the @prim{T_INFO} primitives, this option sets or
+gets the SLS value associated with a Stream.
+
+This option is of end-to-end significance.  When the @pval{T_MTP_SLS} value is set on outgoing data,
+with the @prim{T_OPTDATA_REQ} or @prim{T_UNITDATA_REQ}, the same @pval{T_MTP_SLS} value will be
+indicated in the @prim{T_OPTDATA_IND} or @prim{T_UNITDATA_IND} at the transport layer.
+
+@subsubsection T_MTP_MP
+
+This option sets or gets the @dfn{Message Priority (MP)} value associated with a message or Stream.
+The option argument is one @type{t_uscalar_t} value that represents the value of the MP.
+@prim{T_OPTDATA} or @prim{T_UNITDATA} primitives, this option sets or gets the MP value associated
+with a message.  When used in the @prim{T_INFO} primitives, this option sets or gets the MP value
+associated with a Stream.
+
+@node SCCP Level Options
+@subsection SCCP Level Options
+
+@subsubsection T_SCCP_SEQ_CTRL
+
+@subsubsection T_SCCP_PRIORITY
+
+@subsubsection T_SCCP_PCLASS
+
+@itemize
+@item @pval{T_SCCP_PCLASS_0}
+@item @pval{T_SCCP_PCLASS_1}
+@item @pval{T_SCCP_PCLASS_2}
+@item @pval{T_SCCP_PCLASS_3}
+@item @pval{T_SCCP_PCLASS_ALL}
+@end itemize
+
+@subsubsection T_SCCP_IMPORTANCE
+
+@subsubsection T_SCCP_RET_ERROR
+
+@unnumberedsubsubsec SCCP Quality of Service Options
+
+The TCAP interface uses protocol level T_SS7_SCCP for options at the SCCP level.  SCCP QOS
+parameters are communicated to the underlying transport using the option name T_SCCP_QOS.  There are
+three QOS structures that can be used in this fashion are listed in @emph{Table 7} as follows:
+
+@c @center @image{tpi_tabx}
+@c @center Table 7@strong{@emph{.  SCCP QOS Option Values}}
+
+Quality of service structure @code{N_qos_sel_sccp_t} has the following fields:
+
+@table @emph
+@item n_qos_type
+This is the NPI Quality of Service structure type and is always set to
+@code{N_QOS_SEL_SCCP}, @code{N_QOS_OPT_SEL_SCCP}, or @code{N_QOS_RANGE_SCCP}.
+@item protocol_class
+This is the protocol class.  The @emph{protocol_class} field can be one of the following:
+@code{N_QOS_PCLASS_0} (SCCP connectionless protocol class 0),
+@code{N_QOS_PCLASS_1} (for SCCP connectionless protocol class 1),
+@code{N_QOS_PCLASS_2} (for SCCP connection-oriented protocol class 2),
+@code{N_QOS_PCLASS_3} (for SCCP connection-oriented protocol class 3) or
+@code{QOS_UNKNOWN}.
+
+@code{N_QOS_PCLASS_2} and @code{N_QOS_PCLASS_3} are not applicable to TCAP.
+@item option_flags
+If the @emph{options_flags} field has bit @code{N_QOS_OPT_RETERR} set then the SCCP will return the
+PDU on error.
+@item importance
+This is the importance of the message for consideration for SCCP flow control.  This value is not
+normally set by the user.  It can be any integer number from 0 to 7, or QOS_UNKNOWN.
+@item sequence_selection
+This affects the SLS (Signalling Link Selection) value that will be used for protocol classes
+@code{N_QOS_PCLASS_0} and @code{N_QOS_PCLASS_1}.  This value is not normally set by the user and can
+be an integer value or @code{QOS_UNKNOWN}.
+@item message_priority
+This affects the MP (Message Priority) value that will be used for specific messages in all protocol
+classes.  This value is not normally set by the use and can be any integer value from 0 to 3 or the
+value @code{QOS_UNKNOWN}.
+@end table
+
+@section T_INFO_ACK Values
+
+The following discusses the values that may be returned in the T_INFO_ACK
+primitive in response to a T_INFO_REQ primitive.
+
+@table @emph
+@item TSDU_size
+SCCP has effectively no limit to the amount of data that can be sent in a particular transfer of
+user data.  SCCP includes a @dfn{more} bit concept.
+@item ETSDU_size
+SCCP has supports an expedited data service.
+@item CDATA_size
+SCCP can send connectin data (user data) with the initi CR (connect request) or firsst CC (connect
+confirm) packet
+These messages correspond to @dfn{N-CONNECT request} and @dfn{N-CONNECT confirmation} and these
+correspond to @prim{T_CONN_REQ} and @prim{T_CONN_RES}.  Because the underlying SCCP connectionless
+network may support unlimited size NSDUs, this value may be set to T_INFINITE (-1) or may be set to
+the maximum amount of connection data
+that can be sent or received in either packet.  This informs the user as to what size to make
+data buffers associated with connection indications and confirmations (@prim{T_CONN_IND},
+@prim{T_CONN_CON}) and how much data can be sent with connection requests and responses
+(@prim{T_CONN_REQ}, @prim{T_CONN_RES}).
+@item DDATA_size
+SCCP can send disconnect data (user data) with the final (disconnect) packet.  These messages
+correspond to the N-DISCONNECT primitive and the @prim{T_DISCON_REQ} and @prim{T_DISCON_IND}. Again,
+because the underlying SCCP connectionless network may support unlimited size NSDUs, this value may
+be set to T_INFINITE (-1) or may be set to the maximum amount of disconnection data that can be sent
+or received in the disconnect packet.  This informs the user as to what size to make data
+buffers associated with disconnection indications (@prim{T_DISCON_IND}) and how much data can be
+sent with disconnection requests (@prim{T_DISCON_REQ}).
+@item ADDR_size
+This is the maximum SCCP address size that can be communicated across the interface.  This address
+size is the maximum size of the defined SCCP address structure (@code{sizeof sccp_addr_t}) that also
+will include address digits up to a maximum of @code{SCCP_MAX_ADDR_LENGTH} octets of digits.  This
+informs the user as to what size it should reserve for control buffers so as to receive control
+information without buffer truncation.
+@item OPT_size
+This is the maximum size of the options field used in any TPI message and is the sum of the maximum
+option sizes of one of each of the options that can occur together.  This informs the user as to
+what size the user should reserve for control buffers to ensure that received control messages that
+include options can be contained within the buffer without truncation.
+@item TIDU_size
+Although an SCCP provider can support unlimited TSDU size, it cannot normally support unlimited
+TIDU size.  This is because the underlying SCCP NSDU may be limited in size.  The SCCP provider is
+not responsible for segmenting user data sequences offered to the provider from the user in as
+@msg{M_DATA}.  This is the maximum size of the TIDU that corresponds to the maximum size of the
+underlying NSDU.  Because the underlying SCCP provider may have no limit on the NSDU size (i.e., it
+supports segmentation of connectionless NSDUs) this may be more in the manner of an optimal
+recommendation to the user rather than an absolute maximum.  Because of this, a given SCCP provider
+might not reject TIDUs that are larger than this value.
+@item SERV_type
+There are two service types supported by an SCCP provider: T_COTS and T_CLTS.  T_CLTS (SCCP Protocol
+classes 0 and 1) is a connectionless transport servicew with or without error notification.  T_COTS
+(SCCP Protocol classes 2 or 3) is a connection-oriented transport service with or without error
+notification.  The value reflected here is dependent on the setting of option
+T_SCCP_PCLASS.
+@item CURRENT_state
+Provides the current state of the Transport Provider.  SCCP providers use the same states as other
+TPI providers.
+@item PROVIDER_flag
+TPI provider flags that are set are SENDZERO (because SCCP supports the sending of packets without
+user data) and XPG4_1 (to indicate that the transport provider supports the latest TPI semantics).
+@end table
+
+
+@section Supported Services
+
+@subsection Common Transport Services
+
+@subsubsection Information Service
+
+@subsubheading T_INFO_REQ
+
+@subsubheading T_INFO_ACK
+
+@subsubheading T_ADDR_REQ
+
+@subsubheading T_ADDR_ACK
+
+@subsubsection Bind Service
+
+@subsubheading T_BIND_REQ
+
+@subsubheading T_BIND_ACK
+
+@subsubsection Options Management Service
+
+@subsubheading T_OPTMGMT_REQ
+
+@subsubheading T_OPTMGMT_ACK
+
+@subsection Connection-Mode Services
+
+@subsubsection Connection Establishment
+
+@subsubheading T_CONN_REQ
+
+@subsubheading T_CONN_IND
+
+@subsubheading T_CONN_RES
+
+@subsubheading T_CONN_CON
+
+@subsubsection Data Transfer
+
+@subsubheading T_DATA_REQ
+
+@subsubheading T_DATA_IND
+
+@subsubsection Expedited Data Transfer
+
+The expedited data transfer service is only available in SCCP Protocol Class 3.
+
+@subsubheading T_EXDATA_REQ
+
+@subsubheading T_EXDATA_IND
+
+@subsubsection Reset Service
+
+The reset service is only available in SCCP Protocol Class 3.
+
+@subsubheading T_OPTDATA_REQ
+
+@subsubheading T_OPTDATA_IND
+
+@subsubsection Inform Service
+
+@subsubheading T_OPTDATA_REQ
+
+@subsubheading T_OPTDATA_IND
+
+@subsubsection Connection Release
+
+@subsubheading T_DISCON_REQ
+
+@subsubheading T_DISCON_IND
+
+Reason codes for disconnection:
+
+@vtable @var
+
+@end vtable
+
+@subsubheading T_ORDREL_REQ
+
+@subsubheading T_ORDREL_IND
+
+@subsubsection Connection-Less Mode Services
+
+@subsubheading T_UNITDATA_REQ
+
+@subsubheading T_UNITDATA_IND
+
+@subsubheading T_UDERROR_IND
+
+
+@node Mapping TPI-SCCP Primitives
+@appendix Mapping TPI-SCCP Primitives
+
+@menu
+* Mapping TPI Primitives to ITU-T Q.711::
+* Mapping TPI Primitives to ANSI T1.112::
+* Mapping TPI Primitives to ETSI ETS 300 009-1::
+* Mapping TPI Primitives to ITU-T X.213::
+@end menu
+
+@node Mapping TPI Primitives to ITU-T Q.711
+@section Mapping TPI Primitives to ITU-T Q.711
+
+@subsection State Mapping
+
+
+@subsection Primitive Mapping
+
+@menu
+* N-CONNECT::
+* N-DATA::
+* N-EXPEDITED-DATA::
+* N-RESET::
+* N-INFORM::
+* N-DISCONNECT::
+* N-UNIT-DATA::
+* N-NOTICE::
+* N-STATE::
+* N-PCSTATE::
+* N-COORD::
+@end menu
+
+@node N-CONNECT
+@subsubsection N-CONNECT
+
+@tabref{A-1} illustrates the mapping between the ITU-T Recommendation Q.711 @dfn{N-CONNECT}
+primitives and the TPI connection establishment phase primitives.
+
+@c tpi_sccp_taba01.tbl
+@tabfig{tpi_sccp_taba01,A-1,N-CONNECT Primitive Mapping}
+
+@enumerate
+@item The @dfn{calling address} for the @prim{T_CONN_REQ} primitive is assumed to be the address
+that is bound to the Stream upon which the primitive is issued.
+@item The @dfn{called address} for the @prim{T_CONN_IND} primitive is assumed to be the address that
+is bound to the Stream upon which the primitive is issued.
+@item The @dfn{responding address} for the @prim{T_CONN_RES} primitive is assumed to be the address
+to which @parm{ACCEPTOR_id} is bound, or if @parm{ACCEPTOR_id} is not bound, the address to which
+the Stream upon which the primitive is issued is bound.
+@item The @dfn{expedited data selection} and @dfn{importance} are indicated or confirmed as an
+implementation option.
+@item The @dfn{user data} is optional for all connection primitives.
+@item The @dfn{connection identifier} is implied for the @prim{T_CONN_REQ} and @prim{T_CONN_CON}
+primitives.
+@end enumerate
+
+@node N-DATA
+@subsubsection N-DATA
+
+@tabref{A-2} illustrates the mapping between the ITU-T Recommendation Q.711 @dfn{N-DATA}
+primitives and the TPI data transfer phase primitives.
+
+@c tpi_sccp_taba02.tbl
+@tabfig{tpi_sccp_taba02,A-2,N-DATA Primitive Mapping}
+
+@enumerate
+@item When @prim{T_OPTDATA_REQ} is used to transfer normal data, the @dfn{importance} of the data
+can be specified in the @parm{OPT_length} and @parm{OPT_offset} options.  If not specified, the
+default importance selection returned by @prim{T_INFO_ACK} is used.
+@item When @prim{T_DATA_REQ} or @msg{M_DATA} are used to transfer normal data, the @dfn{importance}
+returned by @prim{T_INFO_ACK} and setable by @prim{T_OPTMGMT_REQ} is used.
+@item When @prim{T_OPTDATA_IND} is used to transfer normal data, the @dfn{importance} of the data
+can be indicated in the @parm{OPT_length} and @parm{OPT_offset} options.  Otherwise, the importance
+is discarded.
+@item Note that @msg{M_DATA} used to transfer normal data must be of band zero (@samp{0}).
+@end enumerate
+
+@node N-EXPEDITED-DATA
+@subsubsection N-EXPEDITED-DATA
+
+@tabref{A-3} illustrates the mapping between the ITU-T Recommendation Q.711 @dfn{N-EXPEDITED-DATA}
+primitives and the TPI expedited data transfer phase primitives.
+
+@c tpi_sccp_taba03.tbl
+@tabfig{tpi_sccp_taba03,A-3,N-EXPEDITED-DATA Primitive Mapping}
+
+@enumerate
+@item Note that @msg{M_DATA} used to transfer expedited data must be of band one (@samp{1}).
+@end enumerate
+
+@node N-RESET
+@subsubsection N-RESET
+
+@tabref{A-4} illustrates the mapping between the ITU-T Recommendation Q.711 @dfn{N-RESET}
+primitives and the TPI option data transfer phase primitives.
+
+@c tpi_sccp_taba04.tbl
+@tabfig{tpi_sccp_taba04,A-4,N-RESET Primitive Mapping}
+
+@enumerate
+@end enumerate
+
+@node N-INFORM
+@subsubsection N-INFORM
+
+@tabref{A-5} illustrates the mapping between the ITU-T Recommendation Q.711 @dfn{N-INFORM}
+primitives and the TPI option data transfer phase primitives.
+
+@c tpi_sccp_taba05.tbl
+@tabfig{tpi_sccp_taba05,A-5,N-INFORM Primitive Mapping}
+
+@enumerate
+@end enumerate
+
+@node N-DISCONNECT
+@subsubsection N-DISCONNECT
+
+@tabref{A-6} illustrates the mapping between the ITU-T Recommendation Q.711 @dfn{N-DISCONNECT}
+primitives and the TPI connection release phase primitives.
+
+@c tpi_sccp_taba06.tbl
+@tabfig{tpi_sccp_taba06,A-6,N-DISCONNECT Primitive Mapping}
+
+@enumerate
+@end enumerate
+
+@node N-UNIT-DATA
+@subsubsection N-UNIT-DATA
+
+@tabref{A-7} illustrates the mapping between the ITU-T Recommendation Q.711 @dfn{N-UNIT-DATA}
+primitives and the TPI connectionless data transfer primitives.
+
+@c tpi_sccp_taba07.tbl
+@tabfig{tpi_sccp_taba07,A-7,N-UNIT-DATA Primitive Mapping}
+
+@enumerate
+@end enumerate
+
+@node N-NOTICE
+@subsubsection N-NOTICE
+
+@tabref{A-8} illustrates the mapping between the ITU-T Recommendation Q.711 @dfn{N-NOTICE}
+primitives and the TPI connectionless data transfer error primitives.
+
+@c tpi_sccp_taba08.tbl
+@tabfig{tpi_sccp_taba08,A-8,N-NOTICE Primitive Mapping}
+
+@enumerate
+@end enumerate
+
+@node N-STATE
+@subsubsection N-STATE
+
+@c tpi_sccp_taba09.tbl
+
+@node N-PCSTATE
+@subsubsection N-PCSTATE
+
+@c tpi_sccp_taba10.tbl
+
+@node N-COORD
+@subsubsection N-COORD
+
+@c tpi_sccp_taba11.tbl
+
+@page
+@node Mapping TPI Primitives to ANSI T1.112
+@section Mapping TPI Primitives to ANSI T1.112
+
+@page
+@node Mapping TPI Primitives to ETSI ETS 300 009-1
+@section Mapping TPI Primitives to ETSI ETS 300 009-1
+
+@page
+@node Mapping TPI Primitives to ITU-T X.213
+@section Mapping TPI Primitives to ITU-T X.213
+
+
+@node TPI-SCCP Header Files
+@appendix TPI-SCCP Header Files
+
+@node TPI-SCCP Library
+@appendix TPI-SCCP Library
+
+Because this Corrigendum provides an SCCP interface that conforms to the Transport Provider Interface
+(TPI) Revision 2.0.0, it can use the libraries provided for use by the TPI.  In particular, the
+@manref{libxti(3)} library can be used.
+
+@node TPI-SCCP Drivers and Modules
+@appendix TPI-SCCP Drivers and Modules
+
+@menu
+* SCCP Driver and Module::
+* NPI Conversion Module::
+* TPI Conversion Module::
+@end menu
+
+The Signalling Connection Control Part Interface (SCCPI) is used to provide services to a number of
+@acronym{STREAMS} drivers and modules in addition to user-space applications.
+@cite{@value{PACKAGE_TITLE}} provides a range of @acronym{STREAMS} multiplexing drivers, pseudo-device
+drivers, and pushable modules that complement the SS7 Signalling Connection Control Part
+driver that provides the Signalling Connection Control Part Interface (SCCPI) at it s upper layer.
+
+@node NPI Conversion Module
+@section NPI Conversion Module
+
+The @dfn{NPI Conversion Module} is a specific-purpose pushable @acronym{STREAMS} module that can be
+pushed over any Stream conforming to the Signalling Connection Control Part Interface (SCCPI) and
+converts that Stream to an NPI-SCCP service interface conforming to the NPI-SCCP specification.
+This permits the SCCP Stream to be used by external applications using the NPI API library
+(@manref{libnpiapi(3)}).
+
+A minor device number on the SCCP driver is defined that will @manref{autopush(8)} the @dfn{NPI
+Conversion Module} that is part of this package.
+
+Similarly, a minor device number on the SUA driver is also defined.
+
+@node TPI Conversion Module
+@section TPI Conversion Module
+
+The @dfn{TPI Conversion Module} is a general-purpose pushable @acronym{STREAMS} module that can be
+pushed over any Stream conforming to the Network Provider Interface (NPI) and converts that
+Stream to an XTI-SCCP service interface conforming to the XTI-SCCP specification.  This permits the
+SCCP Stream to be used by external applications using the XTI/TLI Library (@manref{libxnet(3)}).
+
+A minor device number on the SCCP driver is defined that will @manref{autopush(8)} the @dfn{NPI
+Conversion Module} and then push the general-purpose @dfn{TPI Conversion Module} that is part of the
+@file{strxnet} package.  The @dfn{NPI Conversion Module} provides option conversion assistance to
+this module.
+
+Similarly, a minor device number on the TUA driver is so defined.
+
+@node TPI-SCCP Utilities
+@appendix TPI-SCCP Utilities
+
+In general, any of the utilities provided by the underlying SCCP or SUA provider that support
+input-output controls defined in the SCCPI specification can be used on SCCP or SUA Streams upon
+which the @dfn{TPI Conversion Module} has been pushed to conform to this Addendum.  The @dfn{TPI
+Conversion Module} passes input-output controls transparently to the underlying SCCP module.
+
+Therefore, this specification does not define any utilities of its own.
+
+@c @node TPI-SCCP File Formats
+@c @appendix TPI-SCCP File Formats
+@c 
+@c @node TPI-SCCP Compatibility and Porting
+@c @appendix TPI-SCCP Compatibility and Porting
+@c 
+@node Glossary
+@unnumbered Glossary
+
+@table @emph
+@item Signalling Data Link Service Data Unit
+A grouping of SDL user data whose boundaries are preserved from one end of the signalling data link
+connection to the other.
+@item Data transfer
+The phase in connection and connectionless modes that supports the transfer of data between to
+signalling data link users.
+@item SDL provider
+The signalling data link layer protocol that provides the services of the signalling data link
+interface.
+@item SDL user
+The user-level application or user-level or kernel-level protocol that accesses the services of the
+signalling data link layer.
+@item Local management
+The phase in connection and connectionless modes in which a SDL user initializes a stream and
+attaches a PPA address to the stream.  Primitives in this phase generate local operations only.
+@item PPA
+The point at which a system attaches itself to a physical communications medium.
+@item PPA identifier
+An identifier of a particular physical medium over which communication transpires.
+@end table
+
+@node Acronyms
+@unnumbered Acronyms
+
+@multitable @columnfractions 0.15 0.85
+@item @dfn{ANSI} @tab American National Standards Institute
+@item @dfn{CCITT} @tab The International Telegraph and Telephone Consutative Committee, old name for ITU-T
+@item @dfn{CONS} @tab Connection-Oriented Network Service
+@item @dfn{CUD} @tab Call User Data
+@item @dfn{DCE} @tab Data Circuit-terminating Equipment
+@item @dfn{DDN} @tab Defence Data Network
+@item @dfn{DLPI} @tab Data Link Provider Interface
+@item @dfn{DLSAP} @tab Destination Link Service Access Point
+@item @dfn{DNIC} @tab Data Network Identification Code
+@item @dfn{DSAP} @tab Destination Service Access Point
+@item @dfn{DTE} @tab Data Terminal Equipment 
+@item @dfn{ENSDU} @tab Expedited Network Service Data Unit
+@item @dfn{ETSI} @tab European Telecommunications Standards Institute
+@item @dfn{HDLC} @tab High-Level Data Link Control
+@item @dfn{IEEE} @tab Institute of Electrical and Electronics Engineers
+@item @dfn{IP} @tab Internet Protocol
+@item @dfn{ISDNI} @tab ISDN Interface
+@item @dfn{ISDN} @tab Integrated Services Digital Network
+@item @dfn{ISO} @tab International Organization for Standardization
+@item @dfn{ISUPI} @tab ISUP Interface
+@item @dfn{ISUP} @tab ISDN User Part
+@item @dfn{ITU} @tab International Telecommunications Union
+@item @dfn{ITU-T} @tab ITU Telecom Sector
+@item @dfn{LAN} @tab Local Area Network
+@item @dfn{LAPB} @tab Link Access Procedure (Balanced), ISO/IEC 7776
+@item @dfn{LAPD} @tab Link Access Procedure D-Channel, Q.921
+@item @dfn{LAPF} @tab Link Access Procedure Frame Mode, Q.922
+@item @dfn{LAP} @tab Link Access Procedure
+@item @dfn{LCI} @tab Logical Channel Identifier
+@item @dfn{LLC1} @tab Logical Link Control Type 1
+@item @dfn{LLC2} @tab Logical Link Control Type 2
+@item @dfn{LLC3} @tab Logical Link Control Type 3
+@item @dfn{LLC} @tab Logical Link Control
+@item @dfn{LLI} @tab Logical Link Inteface
+@item @dfn{LSAP} @tab Link Service Access Point
+@item @dfn{MAC} @tab Media Access Control
+@item @dfn{MTPI} @tab Message Transfer Part Interface
+@item @dfn{MTP} @tab Message Transfer Part 
+@item @dfn{NLI} @tab Network Layer Interface
+@item @dfn{NPDU} @tab Network Protocol Data Unit
+@item @dfn{NPI} @tab Network Provider Interface
+@item @dfn{NPI} @tab Numbering Plan Indicator
+@item @dfn{NSAP} @tab Network Service Access Point
+@item @dfn{NSDU} @tab Network Service Data Unit
+@item @dfn{NSP} @tab Network Service Provider
+@item @dfn{NS} @tab Network Service
+@item @dfn{NSU} @tab Network Service User
+@item @dfn{NUI} @tab Network User Information
+@item @dfn{PAD} @tab Packet Assembler/Disassembler
+@item @dfn{PDN} @tab Public Data Network
+@item @dfn{PDU} @tab Protocol Data Unit
+@item @dfn{PLP} @tab Packet Layer Protocol
+@item @dfn{PPA} @tab Physical Point of Attachment
+@item @dfn{PSDN} @tab Public Switched Data Network
+@item @dfn{PSTN} @tab Public Switch Telephone Network
+@item @dfn{PVC} @tab Permanent Virtual Circuit
+@item @dfn{QOS} @tab Quality of Service
+@item @dfn{RPOA} @tab Recognized Private Operating Agency
+@item @dfn{SAP} @tab Service Access Point
+@item @dfn{SCCPI} @tab Signalling Connection Control Part Interface
+@item @dfn{SCCP} @tab Signalling Connection Control Part
+@item @dfn{SDLI} @tab Signalling Data Link Interface
+@item @dfn{SDL} @tab Signalling Data Link
+@item @dfn{SDTI} @tab Signalling Data Terminal Interface
+@item @dfn{SDT} @tab Signalling Data Terminal
+@item @dfn{SDU} @tab Service Data Unit
+@item @dfn{SLI} @tab Signalling Link Interface
+@item @dfn{SLSAP} @tab Source Link Service Access Point
+@item @dfn{SL} @tab Signalling Link
+@item @dfn{SNPA} @tab Subnetwork Point of Attachment
+@item @dfn{SSAP} @tab Source Service Access Point
+@item @dfn{SVC} @tab Switched Virtual Circuit
+@item @dfn{TCAP} @tab Transaction Capabilities Application Part
+@item @dfn{TCI} @tab Transaction Component Interface
+@item @dfn{TC} @tab Component Handling Sub-Layer
+@item @dfn{TLI} @tab Transport Layer Interface
+@item @dfn{TOA/NPI} @tab Type of Address/Numbering Plan Indicator
+@item @dfn{TOA} @tab Type of Address
+@item @dfn{TPI} @tab Transport Provider Interface
+@item @dfn{TRI} @tab Transaction Interface
+@item @dfn{TR} @tab Transaction Handling Sub-Layer
+@item @dfn{VC} @tab Virtual Circuit
+@item @dfn{WAN} @tab Wide Area Network
+@item @dfn{X.121} @tab ITU-T Recommendation X.121
+@item @dfn{X.25} @tab ITU-T Recommendation X.25
+@item @dfn{X.28} @tab ITU-T Recommendation X.28
+@item @dfn{X.3} @tab ITU-T Recommendation X.3
+@item @dfn{X.75} @tab ITU-T Recommendation X.75
+@item @dfn{XX25} @tab X.25 Programming Inteface using XTI
+@item @dfn{XXX} @tab X.3, X.28, X.29
+@end multitable
+
+@node References
+@unnumbered References
+@enumerate
+@item ITU-T Recommendation X.210, (Geneva, 1993), ``Information Technology --- Open Systems Interconnection --- Basic reference model: Conventions for the definition of OSI services,'' ISO/IEC 10731:1994.
+@item ITU-T Recommendation X.217, (Geneva, 1995), ``Information Technology --- Open Systems Interconnection --- Service definition for the Association Control Service Element,'' ISO/IEC 8649:1996.
+@item ITU-T Recommendation X.227, (Geneva, 1995), ``Information Technology --- Open Systems Interconnection --- Connection-oriented protocol for the Association Control Service Element: Protocol Specification,'' ISO/IEC 8650-1.
+@item ITU-T Recommendation X.237, (Geneva, 1995), ``Information Technology --- Open Systems Interconnection --- Connectionless protocol for the Association Control Service Element: Protocol Specification,'' ISO/IEC 10035-1 : 1995.
+@item ITU-T Recommendation X.216, (Geneva, 1994), ``Information Technology --- Open Systems Interconnection --- Presentation service definition,'' ISO/IEC 8822:1994.
+@item ITU-T Recommendation X.226, (Geneva, 1994), ``Information Technology --- Open Systems Interconnection --- Connection-oriented presentation protocol: Protocol specification,'' ISO/IEC 8823-1:1994.
+@item ITU-T Recommendation X.236, (Geneva, 1995), ``Information Technology --- Open Systems Interconnection --- Connectionless presentation protocol: Protocol specification,'' ISO/IEC 9576-1:1995.
+@item ITU-T Recommendation X.215, (Geneva, 1995), ``Information Technology --- Open Systems Interconnection --- Session service definition,'' ISO/IEC 8326:1996.
+@item ITU-T Recommendation X.225, (Geneva, 1995), ``Information Technology --- Open Systems Interconnection --- Connection-oriented session protocol: Protocol specification,'' ISO/IEC 8327-1:1996.
+@item ITU-T Recommendation X.235, (Geneva, 1995), ``Information Technology --- Open Systems Interconnection --- Connectionless session protocol: Protocol specification,'' ISO/IEC 9548-1:1995.
+@item ITU-T Recommendation X.214, (Geneva, 1995), ``Information Technology --- Open Systems Interconnection --- Transport service definition,'' ISO/IEC 8072:1996.
+@item ITU-T Recommendation X.224
+@item ITU-T Recommendation Q.700
+@item ITU-T Recommendation Q.701
+@item ITU-T Recommendation Q.702
+@item ITU-T Recommendation Q.703
+@item ITU-T Recommendation Q.704
+@item Geoffrey Gerrien, ``CDI - Application Program Interface Guide,'' Gcom, Inc., March 1999.
+@item ITU-T Recommendation Q.771, (Geneva, 1993), ``Signalling System No. 7 --- Functional description of transaction capabilities,'' (White Book).
+@end enumerate
+
+@node Licenses
+@unnumbered Licenses
+
+All code presented in this manual is licensed under the @ref{GNU Affero General Public License}.
+The text of this manual is licensed under the @ref{GNU Free Documentation License}, with no
+invariant sections, no front-cover texts and no back-cover texts.  Please note, however, that it is
+just plain wrong to modify statements of, or attribute statements to, the Author or @cite{OpenSS7
+Corporation}.
+
+@menu
+* GNU Affero General Public License::
+* GNU Free Documentation License::
+@end menu
+
+@include texi/agpl3.texi
+@page
+@include texi/fdl13.texi
+
+@ifnotplaintext
+@c skip indexes for plain text (regex search works better)
+@c @iftex
+@c @node Indices
+@c @unnumbered Indices
+@c @end iftex
+
+@c @ifnottex
+@c @c concatenate indices for html and info
+@node Index
+@unnumbered Index
+@printindex cp
+@c @end ifnottex
+
+@c @iftex
+@c @menu
+@c * Concept Index::
+@c * Protocol State Index::
+@c * Primitive Index::
+@c * Primitive Structure and Type Index::
+@c * Primitive Structure Field Index::
+@c * Primitive Values Index::
+@c * Primitive Error Values Index::
+@c * Input-Output Control Index::
+@c * MIB Object Index::
+@c * Manual Page Index::
+@c @end menu
+@c 
+@c @node Concept Index
+@c @section Concept Index
+@c @printindex cp
+@c 
+@c @page
+@c @node Protocol State Index
+@c @section Protocol State Index
+@c @printindex st
+@c 
+@c @page
+@c @node Primitive Index
+@c @section Primitive Index
+@c @printindex pr
+@c 
+@c @page
+@c @node Primitive Structure and Type Index
+@c @section Primitive Structure and Type Index
+@c @printindex tp
+@c 
+@c @page
+@c @node Primitive Structure Field Index
+@c @section Primitive Structure Field Index
+@c @printindex vr
+@c 
+@c @page
+@c @node Primitive Values Index
+@c @section Primitive Values Index
+@c @printindex pv
+@c 
+@c @page
+@c @node Primitive Error Values Index
+@c @section Primitive Error Values Index
+@c @printindex pe
+@c 
+@c @page
+@c @node Input-Output Control Index
+@c @section Input-Output Control Index
+@c @printindex ct
+@c 
+@c @page
+@c @node MIB Object Index
+@c @section MIB Object Index
+@c @printindex mo
+@c 
+@c @page
+@c @node Manual Page Index
+@c @section Manual Page Index
+@c @printindex mp
+@c @end iftex
+@end ifnotplaintext
+
+@page
+@shortcontents
+@page
+@contents
+@bye

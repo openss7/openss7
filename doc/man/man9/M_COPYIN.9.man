@@ -1,0 +1,531 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: M_COPYIN.9.man,v 1.1.2.2 2011-02-07 02:18:34 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:34 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: M_COPYIN.9.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:34  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH M_COPYIN 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B M_COPYIN
+\- \fISTREAMS\fP copyin message
+.\"
+.\"
+.SH FORMAT
+.PP
+The
+.B M_COPYIN
+message block is a
+.BR datab (9)
+structure and associated data buffer that contains unstructured data.
+.PP
+An
+.B M_COPYIN
+message is a high priority message that consists of one
+.B M_COPYIN
+message block followed by one or more
+.BR M_DATA (9)
+message blocks.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B M_COPYIN
+is a high priority message
+generated by a driver or module and sent upstream to request that the
+Stream head
+perform a
+.BR copyin (9)
+on behalf of the driver or module.  It is valid only after receiving an
+.BR M_IOCTL (9)
+message and before an
+.BR M_IOCACK (9)
+or
+.BR M_IOCNAK (9),
+for a given ioctl operation identifier,
+.IR ioc_id .
+.PP
+.B M_COPYIN
+is a high priority message that is not subject to flow control within a
+Stream.
+The format of the message is one
+.BR M_COPYIN (9)
+message block containing a
+.BR copyreq (9)
+structure, defined in
+.BR <sys/stream.h> :
+.PP
+.nf
+\fC\s-1\
+struct copyreq {
+    int cq_cmd;         /* ioctl command (from ioc_cmd) */
+    cred_t *cq_cr;      /* full credentials */
+    uint cq_id;         /* ioctl id (from ioc_id) */
+    caddr_t cq_addr;    /* address top copy data to/from */
+    uint cq_size;       /* number of bytes to copy */
+    int cq_flag;        /* SVR 3.2 compatibility */
+    mblk_t *cq_private; /* private state information */
+    long cq_filer[4];   /* reserved for future use */
+};
+\s+1\fP
+.fi
+.PP
+The first three members of the structure correspond to those of the
+.BR iocblk (9)
+structure in the
+.BR M_IOCTL (9)
+message block which allows the same message block to be reused for both structures.  The
+Stream head
+will guarantee that the message block allocated for the
+.BR M_IOCTL (9)
+message is large enough to contain a
+.BR copyreq (9)
+structure.  The
+.I cq_addr
+field contains the user space address from which the data are to be copied.  The
+.I cq_size
+field is the number of bytes to copy from user space.
+.PP
+The
+.I cq_private
+field can be used by a module to point to a message block containing the module's state information
+relating to this
+.BR ioctl (2s).
+The
+Stream head
+will copy (without processing) the contents of this field to the
+.BR M_IOCDATA (9)
+reponse message so that the module can resume the associated state.  If an
+.BR M_COPYIN (9)
+or
+.BR M_COPYOUT (9)
+message is freed,
+.I STREAMS
+will not free any message block pointed to by
+.IR cq_private .
+This is the module's responsibility.
+.PP
+The driver or module responding to a
+.I tranparent
+.BR M_IOCTL (9)
+message issues a
+.B M_COPYIN
+message when it wishes to copy data in from the user.  The message is formulated and issued
+upstream to the
+Stream head.
+When reveived by the
+Stream head,
+the
+Stream head
+will attempt to copy in the requested amount of data of size
+.IR cq_size ,
+from the user address
+.IR cq_addr ,
+using the
+.BR copyin (9)
+utility.
+.PP
+If the
+.BR copyin (9)
+operation succeeds, the
+Stream head
+will reply with an
+.BR M_IOCDATA (9)
+message block whose
+.I cp_rval
+member is set to
+.BR "(caddr_t)(0)" ,
+and with attached
+.BR M_DATA (9)
+message blocks containing the copied in data.
+.PP
+If the
+.BR copyin (9)
+operation fails, the
+Stream head
+will reply with an
+.BR M_IOCDATA (9)
+message block whose
+.I cp_rval
+member is set to
+.BR "(caddr_t)(1)" ,
+to indicate the error, and then aborts the
+.BR ioctl (2s)
+operation and returns
+.RB [ EFAULT ]
+to the user in
+.IR errno (3).
+This provides the driver or module with the opportunity to clean up the
+.I cq_private
+pointer when the
+.BR ioctl (2s)
+operation is aborted.
+.PP
+See
+.BR M_IOCDATA (9),
+for more information.
+.\"
+.B M_COPYIN
+messages cannot be directly generated by a user level process.
+.B M_COPYIN
+messages arriving at a non-multiplexing driver should be discarded (ignored and freed).
+.B M_COPYIN
+messages may be generated by a driver or module that is responding to an
+.BR M_IOCTL (9)
+message.
+.\"
+.\"
+.SH USAGE
+.PP
+The following guidelines represent best practise for processing of the
+.B M_COPYIN
+message by drivers and modules:
+.IP \(bu \w'\(bu\(em'u
+Intermediate modules that do not intend to process this message will not queue the
+.B M_COPYIN
+message upstream.
+In any event, an intermediate module must not flush or discard an
+.B M_COPYIN
+message.
+.IP ""
+As only one
+.BR ioctl (2s)
+operation, and therefore, one
+.B M_COPYIN
+message can be in progress on a Stream, queueing of the message would cause unnecessary delay in
+processing a
+.I transparent
+.BR ioctl (2s).
+Only one high priority message can be outstanding at the
+Stream head,
+so ordering of this message with respect to other high priority messages is not an issue.
+.IP \(bu
+Modules or drivers should only issue a
+.B M_COPYIN
+message as part of a
+.I transparent
+.BR ioctl (2s)
+operation.
+.IP \(bu
+The message should be created by transforming a received
+.BR M_IOCTL (9)
+or
+.BR M_IOCDATA (9)
+message.
+.IP \(bu
+The driver or module issuing this message should attach all state information pertaining to the
+.BR ioctl (2s)
+operation using the
+.I cq_private
+pointer in the
+.BR M_COPYIN
+message block.
+.IP ""
+Issuing drivers or modules will consider in their design that a misbehaving module might flush or
+discard the message.
+.IP \(bu
+The driver or module design can expect that an
+.BR M_IOCDATA (9)
+reply to a
+.B M_COPYIN
+message will arrive reliably.  The queue pair's
+.IR qi_qclose (9)
+procedure will not be invoked until after the
+.B M_IOCDATA (9)
+message has been delivered to the module's
+.IR qi_putp (9)
+procedure.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+The following procedure fragment provides an example of handling of
+.B M_COPYIN
+messages on the read-side of an intermediate module.  Note that at
+.IR "line 16" ,
+.B M_COPYIN
+(and
+.BR M_COPYOUT (9))
+messages are passed upstream without queuing.
+.PP
+.nf
+\fC\s-1\
+   1  int
+   2  xxx_rput(queue_t *q, mblk_t *mp)
+   3  {
+   4      int type;
+   5  
+   6      if ((type = mp->b_datap->db_type) >= QPCTL) {
+   7          switch (type) {
+   8          case M_PCPROTO:
+   9              do_message_processing(q, mp);
+  10              break;
+  11              /* ... */
+  12          case M_FLUSH:
+  13              /* perform canonical flushing */
+  14              /* ... */
+  15              /* fall through */
+  16          default:                /* e.g. M_COPYIN */
+  17              /* unhandled high-priority message */
+  18              putnext(q, mp);
+  19              break;
+  20          }
+  21      } else if (!q->q_first && !q->q_flag & QSVCBUSY
+  22                 && bcanputnext(q, mp->b_band)) {
+  23          switch (type) {
+  24          case M_PROTO:
+  25          case M_DATA:
+  26              do_message_rpocessing(q, mp);
+  27              break;
+  28              /* ... */
+  29          default:
+  30              /* unhandled normal priority message */
+  31              putnext(q, mp);
+  32              break;
+  33          }
+  34      } else {
+  35          putq(q, mp);
+  36      }
+  37      return (0);
+  38  }
+\s+1\fP
+.fi
+.PP
+The following code fragment provides an example of proper issuance of an
+.B M_COPYIN
+message and handling of the response from a driver:
+.PP
+.nf
+\fC\s-1\
+   1  void
+   2  do_ioctl(queue_t *q, mblk_t *mp)
+   3  {
+   4      struct iocblk *ioc;
+   5      struct copyreq *cq;
+   6      struct copyresp *cp;
+   7  
+   8      switch (mp->b_datap->db_type) {
+   9      case M_IOCTL:
+  10          ioc = (typeof(ioc)) mp->b_rptr;
+  11          switch (ioc->ioc_cmd) {
+  12          case KNOWN_IOCTL:
+  13              if (ioc->ioc_count == TRANSPARENT) {
+  14                  cq = (typeof(cq)) mp->b_rptr;
+  15                  cq->cq_addr =
+  16                      *(typeof(cq->cq_addr) *)
+  17                      mp->b_cont->b_rptr;
+  18                  cq->cq_size = KNOWN_IOCTL_SIZE;
+  19                  cq->cq_private = (mblk_t *) (1);
+  20                  mp->b_datap->db_type = M_COPYIN;
+  21                  qreply(q, mp);
+  22                  return;
+  23              }
+  24              /* copied in data is in mp->b_cont for
+  25                 I_STR ioctls */
+  26              break;
+  27          default:
+  28              mp->b_datap->db_type = M_IOCNAK;
+  29              qreply(q, mp);
+  30              return;
+  31          }
+  32          /* fall through */
+  33      case M_IOCDATA:
+  34          cp = (typeof(cq)) mp->b_rptr;
+  35          if (cp->cp_rval) {
+  36              /* copy error, abort */
+  37              cp->cp_private = NULL;
+  38              freemsg(mp);
+  39              return;
+  40          }
+  41          /* data is in mp->b_cont and is cp->cp_size 
+  42             in length */
+  43          /* ... process data ... */
+  44          cp->cp_private = NULL;
+  45          mp->b_datap->db_type = M_IOCACK;
+  46          ioc = (typeof(ioc)) mp->b_rptr;
+  47          ioc->ioc_rval = 0;
+  48          ioc->ioc_error = 0;
+  49          qreply(q, mp);
+  50          return;
+  51      default:
+  52          freemsg(mp);
+  53          return;
+  54      }
+  55  }
+\s+1\fP
+.fi
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR datab (9),
+.BR msgb (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B M_COPYIN
+.I STREAMS
+message is compatible with
+.IR "SVR 4.2 MP STREAMS" ,
+and implementations based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B M_COPYIN
+has a different constant value on
+.IR HP-UX \(rg,
+.[
+hpuxspg
+.]
+.IR MacOT \(rg
+.[
+macspg
+.]
+and
+.IR OSF/1 \(rg.
+.[
+osfspg
+.]
+.IP \(em
+Binary compatiblity is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP STREAMS" .
+.[
+svr42spg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B M_COPYIN
+message first appeared in
+.IR "SVR 3" .
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

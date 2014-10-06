@@ -1,0 +1,311 @@
+bld_cv_pkg_cmd_BIBTEX=${bld_cv_pkg_cmd_BIBTEX='pacman --sync texlive-bin'}
+bld_cv_pkg_cmd_BZIP2_CMD=${bld_cv_pkg_cmd_BZIP2_CMD='pacman --sync bzip2'}
+bld_cv_pkg_cmd_CONVERT=${bld_cv_pkg_cmd_CONVERT='pacman --sync imagemagick'}
+bld_cv_pkg_cmd_C_REHASH=${bld_cv_pkg_cmd_C_REHASH='pacman --sync openssl'}
+bld_cv_pkg_cmd_DOXYGEN=${bld_cv_pkg_cmd_DOXYGEN='pacman --sync doxygen'}
+bld_cv_pkg_cmd_DVI2PS=${bld_cv_pkg_cmd_DVI2PS='pacman --sync texlive-bin'}
+bld_cv_pkg_cmd_DVIPDF=${bld_cv_pkg_cmd_DVIPDF='pacman --sync ghostscript'}
+bld_cv_pkg_cmd_EPSTOPDF=${bld_cv_pkg_cmd_EPSTOPDF='pacman --sync texlive-core'}
+bld_cv_pkg_cmd_EXTERN_H=${bld_cv_pkg_cmd_EXTERN_H='pacman --sync perl'}
+bld_cv_pkg_cmd_FIG2DEV=${bld_cv_pkg_cmd_FIG2DEV='pacman --sync transfig'}
+bld_cv_pkg_cmd_GCJDBTOOL=${bld_cv_pkg_cmd_GCJDBTOOL='pacman --sync gcc-gcj'}
+bld_cv_pkg_cmd_GCJH=${bld_cv_pkg_cmd_GCJH='pacman --sync gcc-gcj'}
+bld_cv_pkg_cmd_GCJ_CNI_H=${bld_cv_pkg_cmd_GCJ_CNI_H='pacman --sync gcc-gcj'}
+bld_cv_pkg_cmd_GNUPLOT=${bld_cv_pkg_cmd_GNUPLOT='pacman --sync gnuplot'}
+bld_cv_pkg_cmd_GPG=${bld_cv_pkg_cmd_GPG='pacman --sync gnupg'}
+bld_cv_pkg_cmd_GROFF=${bld_cv_pkg_cmd_GROFF='pacman --sync groff'}
+bld_cv_pkg_cmd_GZIP_CMD=${bld_cv_pkg_cmd_GZIP_CMD='pacman --sync gzip'}
+bld_cv_pkg_cmd_INITTAB=${bld_cv_pkg_cmd_INITTAB='pacman --sync initscripts'}
+bld_cv_pkg_cmd_JAR=${bld_cv_pkg_cmd_JAR='pacman --sync gcc-gcj'}
+bld_cv_pkg_cmd_JARSIGNER=${bld_cv_pkg_cmd_JARSIGNER='pacman --sync gcc-gcj'}
+bld_cv_pkg_cmd_JAVAC=${bld_cv_pkg_cmd_JAVAC='pacman --sync gcc-gcj'}
+bld_cv_pkg_cmd_JAVADOC=${bld_cv_pkg_cmd_JAVADOC='pacman --sync gjdoc'}
+bld_cv_pkg_cmd_JAVAH=${bld_cv_pkg_cmd_JAVAH='pacman --sync gcc-gcj'}
+bld_cv_pkg_cmd_KEYTOOL=${bld_cv_pkg_cmd_KEYTOOL='pacman --sync gcc-gcj'}
+bld_cv_pkg_cmd_KGENKSYMS=${bld_cv_pkg_cmd_KGENKSYMS='pacman --sync linux-lts-headers'}
+bld_cv_pkg_cmd_LATEX2HTML=${bld_cv_pkg_cmd_LATEX2HTML='pacman --sync latex2html'}
+bld_cv_pkg_cmd_LATEX=${bld_cv_pkg_cmd_LATEX='pacman --sync texlive-bin'}
+bld_cv_pkg_cmd_LDCONFIG=${bld_cv_pkg_cmd_LDCONFIG='pacman --sync glibc'}
+bld_cv_pkg_cmd_LSMOD=${bld_cv_pkg_cmd_LSMOD='pacman --sync kmod'}
+bld_cv_pkg_cmd_LSOF=${bld_cv_pkg_cmd_LSOF='pacman --sync lsof'}
+bld_cv_pkg_cmd_MAKEPKG=${bld_cv_pkg_cmd_MAKEPKG='pacman --sync pacman'}
+bld_cv_pkg_cmd_MAKEWHATIS=${bld_cv_pkg_cmd_MAKEWHATIS='pacman --sync man-db'}
+bld_cv_pkg_cmd_MD5SUM=${bld_cv_pkg_cmd_MD5SUM='pacman --sync coreutils'}
+bld_cv_pkg_cmd_MODULES_DEP=${bld_cv_pkg_cmd_MODULES_DEP='pacman --sync linux-lts'}
+bld_cv_pkg_cmd_MODULE_SYMVERS=${bld_cv_pkg_cmd_MODULE_SYMVERS='pacman --sync linux-lts-headers'}
+bld_cv_pkg_cmd_OPENSSL=${bld_cv_pkg_cmd_OPENSSL='pacman --sync openssl'}
+bld_cv_pkg_cmd_PACMAN=${bld_cv_pkg_cmd_PACMAN='pacman --sync pacman'}
+bld_cv_pkg_cmd_PACMAN_CONF=${bld_cv_pkg_cmd_PACMAN_CONF='pacman --sync pacman'}
+bld_cv_pkg_cmd_PDFLATEX=${bld_cv_pkg_cmd_PDFLATEX='pacman --sync texlive-bin'}
+bld_cv_pkg_cmd_PDFTEX=${bld_cv_pkg_cmd_PDFTEX='pacman --sync texlive-bin'}
+bld_cv_pkg_cmd_PIC=${bld_cv_pkg_cmd_PIC='pacman --sync groff'}
+bld_cv_pkg_cmd_PS2EPSI=${bld_cv_pkg_cmd_PS2EPSI='pacman --sync ghostscript'}
+bld_cv_pkg_cmd_PS2PDF=${bld_cv_pkg_cmd_PS2PDF='pacman --sync ghostscript'}
+bld_cv_pkg_cmd_PSLATEX=${bld_cv_pkg_cmd_PSLATEX='pacman --sync texlive-bin'}
+bld_cv_pkg_cmd_REFER=${bld_cv_pkg_cmd_REFER='pacman --sync groff'}
+bld_cv_pkg_cmd_REPO_ADD=${bld_cv_pkg_cmd_REPO_ADD='pacman --sync pacman'}
+bld_cv_pkg_cmd_REPO_REMOVE=${bld_cv_pkg_cmd_REPO_REMOVE='pacman --sync pacman'}
+bld_cv_pkg_cmd_SHA1SUM=${bld_cv_pkg_cmd_SHA1SUM='pacman --sync coreutils'}
+bld_cv_pkg_cmd_SHA256SUM=${bld_cv_pkg_cmd_SHA256SUM='pacman --sync coreutils'}
+bld_cv_pkg_cmd_SOELIM=${bld_cv_pkg_cmd_SOELIM='pacman --sync groff'}
+bld_cv_pkg_cmd_SYSTEMCTL=${bld_cv_pkg_cmd_SYSTEMCTL='pacman --sync systemd'}
+bld_cv_pkg_cmd_TBL=${bld_cv_pkg_cmd_TBL='pacman --sync groff'}
+bld_cv_pkg_cmd_TCL_H=${bld_cv_pkg_cmd_TCL_H='pacman --sync tcl'}
+bld_cv_pkg_cmd_TEX=${bld_cv_pkg_cmd_TEX='pacman --sync texlive-bin'}
+bld_cv_pkg_cmd_UCC=${bld_cv_pkg_cmd_UCC='pacman --sync ca-certificates'}
+bld_cv_pkg_cmd_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_cmd_UCD_SNMP_UCD_SNMP_CONFIG_H='pacman --sync net-snmp'}
+bld_cv_pkg_cmd_VMLINUX=${bld_cv_pkg_cmd_VMLINUX='pacman --sync linux-lts'}
+bld_cv_pkg_cmd_ZIP=${bld_cv_pkg_cmd_ZIP='pacman --sync zip'}
+bld_cv_pkg_cmd__CONFIG=${bld_cv_pkg_cmd__CONFIG='pacman --sync linux-lts-headers'}
+bld_cv_pkg_cmd__LIB_MODULES_3_0_57_1_LTS_BUILD=${bld_cv_pkg_cmd__LIB_MODULES_3_0_57_1_LTS_BUILD='pacman --sync linux-lts-headers'}
+bld_cv_pkg_cmd__LIB_MODULES_3_0_58_1_LTS_BUILD=${bld_cv_pkg_cmd__LIB_MODULES_3_0_58_1_LTS_BUILD='pacman --sync linux-lts-headers'}
+bld_cv_pkg_cmd__LIB_MODULES_3_0_59_1_LTS_BUILD=${bld_cv_pkg_cmd__LIB_MODULES_3_0_59_1_LTS_BUILD='pacman --sync linux-lts-headers'}
+bld_cv_pkg_cmd__LIB_MODULES_3_0_60_1_LTS_BUILD=${bld_cv_pkg_cmd__LIB_MODULES_3_0_60_1_LTS_BUILD='pacman --sync linux-lts-headers'}
+bld_cv_pkg_name_ARCH_RELEASE=${bld_cv_pkg_name_ARCH_RELEASE=filesystem}
+bld_cv_pkg_name_BIBTEX=${bld_cv_pkg_name_BIBTEX=texlive-bin}
+bld_cv_pkg_name_BZIP2_CMD=${bld_cv_pkg_name_BZIP2_CMD=bzip2}
+bld_cv_pkg_name_CONVERT=${bld_cv_pkg_name_CONVERT=imagemagick}
+bld_cv_pkg_name_C_REHASH=${bld_cv_pkg_name_C_REHASH=openssl}
+bld_cv_pkg_name_DOXYGEN=${bld_cv_pkg_name_DOXYGEN=doxygen}
+bld_cv_pkg_name_DVI2PS=${bld_cv_pkg_name_DVI2PS=texlive-bin}
+bld_cv_pkg_name_DVIPDF=${bld_cv_pkg_name_DVIPDF=ghostscript}
+bld_cv_pkg_name_EPSTOPDF=${bld_cv_pkg_name_EPSTOPDF=texlive-core}
+bld_cv_pkg_name_EXTERN_H=${bld_cv_pkg_name_EXTERN_H=perl}
+bld_cv_pkg_name_FIG2DEV=${bld_cv_pkg_name_FIG2DEV=transfig}
+bld_cv_pkg_name_GCJDBTOOL=${bld_cv_pkg_name_GCJDBTOOL=gcc-gcj}
+bld_cv_pkg_name_GCJH=${bld_cv_pkg_name_GCJH=gcc-gcj}
+bld_cv_pkg_name_GCJ_CNI_H=${bld_cv_pkg_name_GCJ_CNI_H=gcc-gcj}
+bld_cv_pkg_name_GNUPLOT=${bld_cv_pkg_name_GNUPLOT=gnuplot}
+bld_cv_pkg_name_GPG=${bld_cv_pkg_name_GPG=gnupg}
+bld_cv_pkg_name_GROFF=${bld_cv_pkg_name_GROFF=groff}
+bld_cv_pkg_name_GZIP_CMD=${bld_cv_pkg_name_GZIP_CMD=gzip}
+bld_cv_pkg_name_INITTAB=${bld_cv_pkg_name_INITTAB=initscripts}
+bld_cv_pkg_name_ISSUE=${bld_cv_pkg_name_ISSUE=filesystem}
+bld_cv_pkg_name_JAR=${bld_cv_pkg_name_JAR=gcc-gcj}
+bld_cv_pkg_name_JARSIGNER=${bld_cv_pkg_name_JARSIGNER=gcc-gcj}
+bld_cv_pkg_name_JAVAC=${bld_cv_pkg_name_JAVAC=gcc-gcj}
+bld_cv_pkg_name_JAVADOC=${bld_cv_pkg_name_JAVADOC=gjdoc}
+bld_cv_pkg_name_JAVAH=${bld_cv_pkg_name_JAVAH=gcc-gcj}
+bld_cv_pkg_name_KEYTOOL=${bld_cv_pkg_name_KEYTOOL=gcc-gcj}
+bld_cv_pkg_name_KGENKSYMS=${bld_cv_pkg_name_KGENKSYMS=linux-lts-headers}
+bld_cv_pkg_name_LATEX2HTML=${bld_cv_pkg_name_LATEX2HTML=latex2html}
+bld_cv_pkg_name_LATEX=${bld_cv_pkg_name_LATEX=texlive-bin}
+bld_cv_pkg_name_LDCONFIG=${bld_cv_pkg_name_LDCONFIG=glibc}
+bld_cv_pkg_name_LSB_RELEASE=${bld_cv_pkg_name_LSB_RELEASE=lsb-release}
+bld_cv_pkg_name_LSMOD=${bld_cv_pkg_name_LSMOD=kmod}
+bld_cv_pkg_name_LSOF=${bld_cv_pkg_name_LSOF=lsof}
+bld_cv_pkg_name_MAKEPKG=${bld_cv_pkg_name_MAKEPKG=pacman}
+bld_cv_pkg_name_MAKEWHATIS=${bld_cv_pkg_name_MAKEWHATIS=man-db}
+bld_cv_pkg_name_MD5SUM=${bld_cv_pkg_name_MD5SUM=coreutils}
+bld_cv_pkg_name_MODULES_DEP=${bld_cv_pkg_name_MODULES_DEP=linux-lts}
+bld_cv_pkg_name_MODULE_SYMVERS=${bld_cv_pkg_name_MODULE_SYMVERS=linux-lts-headers}
+bld_cv_pkg_name_OPENSSL=${bld_cv_pkg_name_OPENSSL=openssl}
+bld_cv_pkg_name_PACMAN=${bld_cv_pkg_name_PACMAN=pacman}
+bld_cv_pkg_name_PACMAN_CONF=${bld_cv_pkg_name_PACMAN_CONF=pacman}
+bld_cv_pkg_name_PDFLATEX=${bld_cv_pkg_name_PDFLATEX=texlive-bin}
+bld_cv_pkg_name_PDFTEX=${bld_cv_pkg_name_PDFTEX=texlive-bin}
+bld_cv_pkg_name_PIC=${bld_cv_pkg_name_PIC=groff}
+bld_cv_pkg_name_PS2EPSI=${bld_cv_pkg_name_PS2EPSI=ghostscript}
+bld_cv_pkg_name_PS2PDF=${bld_cv_pkg_name_PS2PDF=ghostscript}
+bld_cv_pkg_name_PSLATEX=${bld_cv_pkg_name_PSLATEX=texlive-bin}
+bld_cv_pkg_name_REFER=${bld_cv_pkg_name_REFER=groff}
+bld_cv_pkg_name_REPO_ADD=${bld_cv_pkg_name_REPO_ADD=pacman}
+bld_cv_pkg_name_REPO_REMOVE=${bld_cv_pkg_name_REPO_REMOVE=pacman}
+bld_cv_pkg_name_SHA1SUM=${bld_cv_pkg_name_SHA1SUM=coreutils}
+bld_cv_pkg_name_SHA256SUM=${bld_cv_pkg_name_SHA256SUM=coreutils}
+bld_cv_pkg_name_SOELIM=${bld_cv_pkg_name_SOELIM=groff}
+bld_cv_pkg_name_SYSTEMCTL=${bld_cv_pkg_name_SYSTEMCTL=systemd}
+bld_cv_pkg_name_TBL=${bld_cv_pkg_name_TBL=groff}
+bld_cv_pkg_name_TCL_H=${bld_cv_pkg_name_TCL_H=tcl}
+bld_cv_pkg_name_TEX=${bld_cv_pkg_name_TEX=texlive-bin}
+bld_cv_pkg_name_UCC=${bld_cv_pkg_name_UCC=ca-certificates}
+bld_cv_pkg_name_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_name_UCD_SNMP_UCD_SNMP_CONFIG_H=net-snmp}
+bld_cv_pkg_name_VMLINUX=${bld_cv_pkg_name_VMLINUX=linux-lts}
+bld_cv_pkg_name_ZIP=${bld_cv_pkg_name_ZIP=zip}
+bld_cv_pkg_name__CONFIG=${bld_cv_pkg_name__CONFIG=linux-lts-headers}
+bld_cv_pkg_name__LIB_MODULES_3_0_36_1_LTS_BUILD=${bld_cv_pkg_name__LIB_MODULES_3_0_36_1_LTS_BUILD=linux-lts-headers}
+bld_cv_pkg_name__LIB_MODULES_3_0_36_2_LTS_BUILD=${bld_cv_pkg_name__LIB_MODULES_3_0_36_2_LTS_BUILD=linux-lts-headers}
+bld_cv_pkg_name__LIB_MODULES_3_0_38_1_LTS_BUILD=${bld_cv_pkg_name__LIB_MODULES_3_0_38_1_LTS_BUILD=linux-lts-headers}
+bld_cv_pkg_name__LIB_MODULES_3_0_57_1_LTS_BUILD=${bld_cv_pkg_name__LIB_MODULES_3_0_57_1_LTS_BUILD=linux-lts-headers}
+bld_cv_pkg_name__LIB_MODULES_3_0_58_1_LTS_BUILD=${bld_cv_pkg_name__LIB_MODULES_3_0_58_1_LTS_BUILD=linux-lts-headers}
+bld_cv_pkg_name__LIB_MODULES_3_0_59_1_LTS_BUILD=${bld_cv_pkg_name__LIB_MODULES_3_0_59_1_LTS_BUILD=linux-lts-headers}
+bld_cv_pkg_name__LIB_MODULES_3_0_60_1_LTS_BUILD=${bld_cv_pkg_name__LIB_MODULES_3_0_60_1_LTS_BUILD=linux-lts-headers}
+bld_cv_pkg_path_ARCH_RELEASE=${bld_cv_pkg_path_ARCH_RELEASE=/etc/arch-release}
+bld_cv_pkg_path_EXTERN_H=${bld_cv_pkg_path_EXTERN_H=/usr/lib/perl5/core_perl/CORE/EXTERN.h}
+bld_cv_pkg_path_GCJ_CNI_H=${bld_cv_pkg_path_GCJ_CNI_H=/usr/include/c++/4.7.2/gcj/cni.h}
+bld_cv_pkg_path_INITTAB=${bld_cv_pkg_path_INITTAB=/etc/inittab}
+bld_cv_pkg_path_ISSUE=${bld_cv_pkg_path_ISSUE=/etc/issue}
+bld_cv_pkg_path_LSB_RELEASE=${bld_cv_pkg_path_LSB_RELEASE=/etc/lsb-release}
+bld_cv_pkg_path_MODULES_DEP=${bld_cv_pkg_path_MODULES_DEP=/lib/modules/3.0.60-1-lts/modules.dep}
+bld_cv_pkg_path_MODULE_SYMVERS=${bld_cv_pkg_path_MODULE_SYMVERS=/lib/modules/3.0.60-1-lts/build/Module.symvers}
+bld_cv_pkg_path_PACMAN_CONF=${bld_cv_pkg_path_PACMAN_CONF=/etc/pacman.conf}
+bld_cv_pkg_path_SYMVERS_3_0_36_1_LTS_GZ=${bld_cv_pkg_path_SYMVERS_3_0_36_1_LTS_GZ=/boot/symvers-3.0.36-1-lts.gz}
+bld_cv_pkg_path_TCL_H=${bld_cv_pkg_path_TCL_H=/usr/include/tcl.h}
+bld_cv_pkg_path_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_path_UCD_SNMP_UCD_SNMP_CONFIG_H=/usr/include/ucd-snmp/ucd-snmp-config.h}
+bld_cv_pkg_path_VMLINUX=${bld_cv_pkg_path_VMLINUX=/lib/modules/3.0.60-1-lts/build/vmlinux}
+bld_cv_pkg_path__CONFIG=${bld_cv_pkg_path__CONFIG=/lib/modules/3.0.60-1-lts/build/.config}
+bld_cv_pkg_path__ETC_CONF_D=${bld_cv_pkg_path__ETC_CONF_D=/etc/conf.d}
+bld_cv_pkg_path__ETC_KERNEL=${bld_cv_pkg_path__ETC_KERNEL=/etc/kernel}
+bld_cv_pkg_path__ETC_PACMAN_D=${bld_cv_pkg_path__ETC_PACMAN_D=/etc/pacman.d}
+bld_cv_pkg_path__ETC_RC_D=${bld_cv_pkg_path__ETC_RC_D=/etc/rc.d}
+bld_cv_pkg_path__ETC_SSL=${bld_cv_pkg_path__ETC_SSL=/etc/ssl}
+bld_cv_pkg_path__LIB_MODULES_3_0_36_1_LTS=${bld_cv_pkg_path__LIB_MODULES_3_0_36_1_LTS=/lib/modules/3.0.36-1-lts}
+bld_cv_pkg_path__LIB_MODULES_3_0_36_1_LTS_BUILD=${bld_cv_pkg_path__LIB_MODULES_3_0_36_1_LTS_BUILD=/lib/modules/3.0.36-1-lts/build}
+bld_cv_pkg_path__LIB_MODULES_3_0_36_1_LTS_BUILD_ARCH=${bld_cv_pkg_path__LIB_MODULES_3_0_36_1_LTS_BUILD_ARCH=/lib/modules/3.0.36-1-lts/build/arch}
+bld_cv_pkg_path__LIB_MODULES_3_0_36_1_LTS_BUILD_ARCH_X86=${bld_cv_pkg_path__LIB_MODULES_3_0_36_1_LTS_BUILD_ARCH_X86=/lib/modules/3.0.36-1-lts/build/arch/x86}
+bld_cv_pkg_path__LIB_MODULES_3_0_36_2_LTS=${bld_cv_pkg_path__LIB_MODULES_3_0_36_2_LTS=/lib/modules/3.0.36-2-lts}
+bld_cv_pkg_path__LIB_MODULES_3_0_36_2_LTS_BUILD=${bld_cv_pkg_path__LIB_MODULES_3_0_36_2_LTS_BUILD=/lib/modules/3.0.36-2-lts/build}
+bld_cv_pkg_path__LIB_MODULES_3_0_36_2_LTS_BUILD_ARCH=${bld_cv_pkg_path__LIB_MODULES_3_0_36_2_LTS_BUILD_ARCH=/lib/modules/3.0.36-2-lts/build/arch}
+bld_cv_pkg_path__LIB_MODULES_3_0_36_2_LTS_BUILD_ARCH_X86=${bld_cv_pkg_path__LIB_MODULES_3_0_36_2_LTS_BUILD_ARCH_X86=/lib/modules/3.0.36-2-lts/build/arch/x86}
+bld_cv_pkg_path__LIB_MODULES_3_0_38_1_LTS=${bld_cv_pkg_path__LIB_MODULES_3_0_38_1_LTS=/lib/modules/3.0.38-1-lts}
+bld_cv_pkg_path__LIB_MODULES_3_0_38_1_LTS_BUILD=${bld_cv_pkg_path__LIB_MODULES_3_0_38_1_LTS_BUILD=/lib/modules/3.0.38-1-lts/build}
+bld_cv_pkg_path__LIB_MODULES_3_0_38_1_LTS_BUILD_ARCH=${bld_cv_pkg_path__LIB_MODULES_3_0_38_1_LTS_BUILD_ARCH=/lib/modules/3.0.38-1-lts/build/arch}
+bld_cv_pkg_path__LIB_MODULES_3_0_38_1_LTS_BUILD_ARCH_X86=${bld_cv_pkg_path__LIB_MODULES_3_0_38_1_LTS_BUILD_ARCH_X86=/lib/modules/3.0.38-1-lts/build/arch/x86}
+bld_cv_pkg_path__LIB_MODULES_3_0_57_1_LTS=${bld_cv_pkg_path__LIB_MODULES_3_0_57_1_LTS=/lib/modules/3.0.57-1-lts}
+bld_cv_pkg_path__LIB_MODULES_3_0_57_1_LTS_BUILD=${bld_cv_pkg_path__LIB_MODULES_3_0_57_1_LTS_BUILD=/lib/modules/3.0.57-1-lts/build}
+bld_cv_pkg_path__LIB_MODULES_3_0_57_1_LTS_BUILD_ARCH=${bld_cv_pkg_path__LIB_MODULES_3_0_57_1_LTS_BUILD_ARCH=/lib/modules/3.0.57-1-lts/build/arch}
+bld_cv_pkg_path__LIB_MODULES_3_0_57_1_LTS_BUILD_ARCH_X86=${bld_cv_pkg_path__LIB_MODULES_3_0_57_1_LTS_BUILD_ARCH_X86=/lib/modules/3.0.57-1-lts/build/arch/x86}
+bld_cv_pkg_path__LIB_MODULES_3_0_58_1_LTS=${bld_cv_pkg_path__LIB_MODULES_3_0_58_1_LTS=/lib/modules/3.0.58-1-lts}
+bld_cv_pkg_path__LIB_MODULES_3_0_58_1_LTS_BUILD=${bld_cv_pkg_path__LIB_MODULES_3_0_58_1_LTS_BUILD=/lib/modules/3.0.58-1-lts/build}
+bld_cv_pkg_path__LIB_MODULES_3_0_58_1_LTS_BUILD_ARCH=${bld_cv_pkg_path__LIB_MODULES_3_0_58_1_LTS_BUILD_ARCH=/lib/modules/3.0.58-1-lts/build/arch}
+bld_cv_pkg_path__LIB_MODULES_3_0_58_1_LTS_BUILD_ARCH_X86=${bld_cv_pkg_path__LIB_MODULES_3_0_58_1_LTS_BUILD_ARCH_X86=/lib/modules/3.0.58-1-lts/build/arch/x86}
+bld_cv_pkg_path__LIB_MODULES_3_0_59_1_LTS=${bld_cv_pkg_path__LIB_MODULES_3_0_59_1_LTS=/lib/modules/3.0.59-1-lts}
+bld_cv_pkg_path__LIB_MODULES_3_0_59_1_LTS_BUILD=${bld_cv_pkg_path__LIB_MODULES_3_0_59_1_LTS_BUILD=/lib/modules/3.0.59-1-lts/build}
+bld_cv_pkg_path__LIB_MODULES_3_0_59_1_LTS_BUILD_ARCH=${bld_cv_pkg_path__LIB_MODULES_3_0_59_1_LTS_BUILD_ARCH=/lib/modules/3.0.59-1-lts/build/arch}
+bld_cv_pkg_path__LIB_MODULES_3_0_59_1_LTS_BUILD_ARCH_X86=${bld_cv_pkg_path__LIB_MODULES_3_0_59_1_LTS_BUILD_ARCH_X86=/lib/modules/3.0.59-1-lts/build/arch/x86}
+bld_cv_pkg_path__LIB_MODULES_3_0_60_1_LTS=${bld_cv_pkg_path__LIB_MODULES_3_0_60_1_LTS=/lib/modules/3.0.60-1-lts}
+bld_cv_pkg_path__LIB_MODULES_3_0_60_1_LTS_BUILD=${bld_cv_pkg_path__LIB_MODULES_3_0_60_1_LTS_BUILD=/lib/modules/3.0.60-1-lts/build}
+bld_cv_pkg_path__LIB_MODULES_3_0_60_1_LTS_BUILD_ARCH=${bld_cv_pkg_path__LIB_MODULES_3_0_60_1_LTS_BUILD_ARCH=/lib/modules/3.0.60-1-lts/build/arch}
+bld_cv_pkg_path__LIB_MODULES_3_0_60_1_LTS_BUILD_ARCH_X86=${bld_cv_pkg_path__LIB_MODULES_3_0_60_1_LTS_BUILD_ARCH_X86=/lib/modules/3.0.60-1-lts/build/arch/x86}
+bld_cv_pkg_path__LIB_MODULES_LOAD_D=${bld_cv_pkg_path__LIB_MODULES_LOAD_D=/lib/modules-load.d}
+bld_cv_pkg_path__LIB_SYSCTL_D=${bld_cv_pkg_path__LIB_SYSCTL_D=/lib/sysctl.d}
+bld_cv_pkg_path__USR_LIB_MODPROBE_D=${bld_cv_pkg_path__USR_LIB_MODPROBE_D=/usr/lib/modprobe.d}
+bld_cv_pkg_path__USR_LIB_MODULES_LOAD_D=${bld_cv_pkg_path__USR_LIB_MODULES_LOAD_D=/usr/lib/modules-load.d}
+bld_cv_pkg_path__USR_LIB_SYSCTL_D=${bld_cv_pkg_path__USR_LIB_SYSCTL_D=/usr/lib/sysctl.d}
+bld_cv_pkg_path__USR_LIB_SYSTEMD=${bld_cv_pkg_path__USR_LIB_SYSTEMD=/usr/lib/systemd}
+bld_cv_pkg_path__USR_SHARE_CA_CERTIFICATES=${bld_cv_pkg_path__USR_SHARE_CA_CERTIFICATES=/usr/share/ca-certificates}
+bld_cv_pkg_path__USR_SHARE_PACMAN_KEYRINGS=${bld_cv_pkg_path__USR_SHARE_PACMAN_KEYRINGS=/usr/share/pacman/keyrings}
+bld_cv_pkg_prog_AUTOM4TE=${bld_cv_pkg_prog_AUTOM4TE=autom4te}
+bld_cv_pkg_prog_BIBTEX=${bld_cv_pkg_prog_BIBTEX=bibtex}
+bld_cv_pkg_prog_BZIP2_CMD=${bld_cv_pkg_prog_BZIP2_CMD=bzip2}
+bld_cv_pkg_prog_CONVERT=${bld_cv_pkg_prog_CONVERT=convert}
+bld_cv_pkg_prog_C_REHASH=${bld_cv_pkg_prog_C_REHASH=c_rehash}
+bld_cv_pkg_prog_DEPMOD=${bld_cv_pkg_prog_DEPMOD=kmod}
+bld_cv_pkg_prog_DOXYGEN=${bld_cv_pkg_prog_DOXYGEN=doxygen}
+bld_cv_pkg_prog_DVI2PS=${bld_cv_pkg_prog_DVI2PS=dvips}
+bld_cv_pkg_prog_DVIPDF=${bld_cv_pkg_prog_DVIPDF=dvipdf}
+bld_cv_pkg_prog_EPSTOPDF=${bld_cv_pkg_prog_EPSTOPDF=epstopdf.pl}
+bld_cv_pkg_prog_FIG2DEV=${bld_cv_pkg_prog_FIG2DEV=fig2dev}
+bld_cv_pkg_prog_GCJDBTOOL=${bld_cv_pkg_prog_GCJDBTOOL=gcj-dbtool}
+bld_cv_pkg_prog_GCJH=${bld_cv_pkg_prog_GCJH=gcjh}
+bld_cv_pkg_prog_GNUPLOT=${bld_cv_pkg_prog_GNUPLOT=gnuplot}
+bld_cv_pkg_prog_GPG=${bld_cv_pkg_prog_GPG=gpg2}
+bld_cv_pkg_prog_GROFF=${bld_cv_pkg_prog_GROFF=groff}
+bld_cv_pkg_prog_GZIP_CMD=${bld_cv_pkg_prog_GZIP_CMD=gzip}
+bld_cv_pkg_prog_JAR=${bld_cv_pkg_prog_JAR=gjar}
+bld_cv_pkg_prog_JARSIGNER=${bld_cv_pkg_prog_JARSIGNER=gjarsigner}
+bld_cv_pkg_prog_JAVAC=${bld_cv_pkg_prog_JAVAC=gcj}
+bld_cv_pkg_prog_JAVADOC=${bld_cv_pkg_prog_JAVADOC=gjdoc}
+bld_cv_pkg_prog_JAVAH=${bld_cv_pkg_prog_JAVAH=gcjh}
+bld_cv_pkg_prog_KEYTOOL=${bld_cv_pkg_prog_KEYTOOL=gkeytool}
+bld_cv_pkg_prog_KGENKSYMS=${bld_cv_pkg_prog_KGENKSYMS=genksyms}
+bld_cv_pkg_prog_LATEX2HTML=${bld_cv_pkg_prog_LATEX2HTML=latex2html}
+bld_cv_pkg_prog_LATEX=${bld_cv_pkg_prog_LATEX=pdftex}
+bld_cv_pkg_prog_LDCONFIG=${bld_cv_pkg_prog_LDCONFIG=ldconfig}
+bld_cv_pkg_prog_LSMOD=${bld_cv_pkg_prog_LSMOD=kmod}
+bld_cv_pkg_prog_LSOF=${bld_cv_pkg_prog_LSOF=lsof}
+bld_cv_pkg_prog_LZMA_CMD=${bld_cv_pkg_prog_LZMA_CMD=xz}
+bld_cv_pkg_prog_MAKEPKG=${bld_cv_pkg_prog_MAKEPKG=makepkg}
+bld_cv_pkg_prog_MAKEWHATIS=${bld_cv_pkg_prog_MAKEWHATIS=mandb}
+bld_cv_pkg_prog_MD5SUM=${bld_cv_pkg_prog_MD5SUM=md5sum}
+bld_cv_pkg_prog_MODPROBE=${bld_cv_pkg_prog_MODPROBE=kmod}
+bld_cv_pkg_prog_OPENSSL=${bld_cv_pkg_prog_OPENSSL=openssl}
+bld_cv_pkg_prog_PACMAN=${bld_cv_pkg_prog_PACMAN=pacman}
+bld_cv_pkg_prog_PDFLATEX=${bld_cv_pkg_prog_PDFLATEX=pdftex}
+bld_cv_pkg_prog_PDFTEX=${bld_cv_pkg_prog_PDFTEX=pdftex}
+bld_cv_pkg_prog_PIC=${bld_cv_pkg_prog_PIC=pic}
+bld_cv_pkg_prog_PS2EPSI=${bld_cv_pkg_prog_PS2EPSI=ps2epsi}
+bld_cv_pkg_prog_PS2PDF=${bld_cv_pkg_prog_PS2PDF=ps2pdf12}
+bld_cv_pkg_prog_PSLATEX=${bld_cv_pkg_prog_PSLATEX=pslatex}
+bld_cv_pkg_prog_REFER=${bld_cv_pkg_prog_REFER=refer}
+bld_cv_pkg_prog_REPO_ADD=${bld_cv_pkg_prog_REPO_ADD=repo-add}
+bld_cv_pkg_prog_REPO_REMOVE=${bld_cv_pkg_prog_REPO_REMOVE=repo-add}
+bld_cv_pkg_prog_SHA1SUM=${bld_cv_pkg_prog_SHA1SUM=sha1sum}
+bld_cv_pkg_prog_SHA256SUM=${bld_cv_pkg_prog_SHA256SUM=sha256sum}
+bld_cv_pkg_prog_SOELIM=${bld_cv_pkg_prog_SOELIM=soelim}
+bld_cv_pkg_prog_SWIG=${bld_cv_pkg_prog_SWIG=swig}
+bld_cv_pkg_prog_SYSTEMCTL=${bld_cv_pkg_prog_SYSTEMCTL=systemctl}
+bld_cv_pkg_prog_TBL=${bld_cv_pkg_prog_TBL=tbl}
+bld_cv_pkg_prog_TEX=${bld_cv_pkg_prog_TEX=pdftex}
+bld_cv_pkg_prog_UCC=${bld_cv_pkg_prog_UCC=update-ca-certificates}
+bld_cv_pkg_prog_XZ_CMD=${bld_cv_pkg_prog_XZ_CMD=xz}
+bld_cv_pkg_prog_ZIP=${bld_cv_pkg_prog_ZIP=zip}
+bld_cv_pkg_ver_ARCH_RELEASE=${bld_cv_pkg_ver_ARCH_RELEASE=2012.12-1}
+bld_cv_pkg_ver_BIBTEX=${bld_cv_pkg_ver_BIBTEX=2012.0-7}
+bld_cv_pkg_ver_BZIP2_CMD=${bld_cv_pkg_ver_BZIP2_CMD=1.0.6-4}
+bld_cv_pkg_ver_CONVERT=${bld_cv_pkg_ver_CONVERT=6.8.1.9-1}
+bld_cv_pkg_ver_C_REHASH=${bld_cv_pkg_ver_C_REHASH=1.0.1.c-1}
+bld_cv_pkg_ver_DOXYGEN=${bld_cv_pkg_ver_DOXYGEN=1.8.3.1-1}
+bld_cv_pkg_ver_DVI2PS=${bld_cv_pkg_ver_DVI2PS=2012.0-7}
+bld_cv_pkg_ver_DVIPDF=${bld_cv_pkg_ver_DVIPDF=9.06-1}
+bld_cv_pkg_ver_EPSTOPDF=${bld_cv_pkg_ver_EPSTOPDF=2012.28273-1}
+bld_cv_pkg_ver_EXTERN_H=${bld_cv_pkg_ver_EXTERN_H=5.16.2-2}
+bld_cv_pkg_ver_FIG2DEV=${bld_cv_pkg_ver_FIG2DEV=3.2.5d-1}
+bld_cv_pkg_ver_GCJDBTOOL=${bld_cv_pkg_ver_GCJDBTOOL=4.7.2-2}
+bld_cv_pkg_ver_GCJH=${bld_cv_pkg_ver_GCJH=4.7.2-2}
+bld_cv_pkg_ver_GCJ_CNI_H=${bld_cv_pkg_ver_GCJ_CNI_H=4.7.2-2}
+bld_cv_pkg_ver_GNUPLOT=${bld_cv_pkg_ver_GNUPLOT=4.6.1-2}
+bld_cv_pkg_ver_GPG=${bld_cv_pkg_ver_GPG=2.0.19-4}
+bld_cv_pkg_ver_GROFF=${bld_cv_pkg_ver_GROFF=1.21-2}
+bld_cv_pkg_ver_GZIP_CMD=${bld_cv_pkg_ver_GZIP_CMD=1.5-1}
+bld_cv_pkg_ver_INITTAB=${bld_cv_pkg_ver_INITTAB=2012.10.1-1}
+bld_cv_pkg_ver_ISSUE=${bld_cv_pkg_ver_ISSUE=2012.12-1}
+bld_cv_pkg_ver_JAR=${bld_cv_pkg_ver_JAR=4.7.2-2}
+bld_cv_pkg_ver_JARSIGNER=${bld_cv_pkg_ver_JARSIGNER=4.7.2-2}
+bld_cv_pkg_ver_JAVAC=${bld_cv_pkg_ver_JAVAC=4.7.2-2}
+bld_cv_pkg_ver_JAVADOC=${bld_cv_pkg_ver_JAVADOC=0.7.9-1}
+bld_cv_pkg_ver_JAVAH=${bld_cv_pkg_ver_JAVAH=4.7.2-2}
+bld_cv_pkg_ver_KEYTOOL=${bld_cv_pkg_ver_KEYTOOL=4.7.2-2}
+bld_cv_pkg_ver_KGENKSYMS=${bld_cv_pkg_ver_KGENKSYMS=3.0.60-1}
+bld_cv_pkg_ver_LATEX2HTML=${bld_cv_pkg_ver_LATEX2HTML=2008-2}
+bld_cv_pkg_ver_LATEX=${bld_cv_pkg_ver_LATEX=2012.0-7}
+bld_cv_pkg_ver_LDCONFIG=${bld_cv_pkg_ver_LDCONFIG=2.17-1}
+bld_cv_pkg_ver_LSB_RELEASE=${bld_cv_pkg_ver_LSB_RELEASE=1.4-13}
+bld_cv_pkg_ver_LSMOD=${bld_cv_pkg_ver_LSMOD=12-1}
+bld_cv_pkg_ver_LSOF=${bld_cv_pkg_ver_LSOF=4.86-1}
+bld_cv_pkg_ver_MAKEPKG=${bld_cv_pkg_ver_MAKEPKG=4.0.3-5}
+bld_cv_pkg_ver_MAKEWHATIS=${bld_cv_pkg_ver_MAKEWHATIS=2.6.3-1}
+bld_cv_pkg_ver_MD5SUM=${bld_cv_pkg_ver_MD5SUM=8.20-1}
+bld_cv_pkg_ver_MODULES_DEP=${bld_cv_pkg_ver_MODULES_DEP=3.0.60-1}
+bld_cv_pkg_ver_MODULE_SYMVERS=${bld_cv_pkg_ver_MODULE_SYMVERS=3.0.60-1}
+bld_cv_pkg_ver_OPENSSL=${bld_cv_pkg_ver_OPENSSL=1.0.1.c-1}
+bld_cv_pkg_ver_PACMAN=${bld_cv_pkg_ver_PACMAN=4.0.3-5}
+bld_cv_pkg_ver_PACMAN_CONF=${bld_cv_pkg_ver_PACMAN_CONF=4.0.3-5}
+bld_cv_pkg_ver_PDFLATEX=${bld_cv_pkg_ver_PDFLATEX=2012.0-7}
+bld_cv_pkg_ver_PDFTEX=${bld_cv_pkg_ver_PDFTEX=2012.0-7}
+bld_cv_pkg_ver_PIC=${bld_cv_pkg_ver_PIC=1.21-2}
+bld_cv_pkg_ver_PS2EPSI=${bld_cv_pkg_ver_PS2EPSI=9.06-1}
+bld_cv_pkg_ver_PS2PDF=${bld_cv_pkg_ver_PS2PDF=9.06-1}
+bld_cv_pkg_ver_PSLATEX=${bld_cv_pkg_ver_PSLATEX=2012.0-7}
+bld_cv_pkg_ver_REFER=${bld_cv_pkg_ver_REFER=1.21-2}
+bld_cv_pkg_ver_REPO_ADD=${bld_cv_pkg_ver_REPO_ADD=4.0.3-5}
+bld_cv_pkg_ver_REPO_REMOVE=${bld_cv_pkg_ver_REPO_REMOVE=4.0.3-5}
+bld_cv_pkg_ver_SHA1SUM=${bld_cv_pkg_ver_SHA1SUM=8.20-1}
+bld_cv_pkg_ver_SHA256SUM=${bld_cv_pkg_ver_SHA256SUM=8.20-1}
+bld_cv_pkg_ver_SOELIM=${bld_cv_pkg_ver_SOELIM=1.21-2}
+bld_cv_pkg_ver_SYSTEMCTL=${bld_cv_pkg_ver_SYSTEMCTL=197-4}
+bld_cv_pkg_ver_TBL=${bld_cv_pkg_ver_TBL=1.21-2}
+bld_cv_pkg_ver_TCL_H=${bld_cv_pkg_ver_TCL_H=8.6.0-3}
+bld_cv_pkg_ver_TEX=${bld_cv_pkg_ver_TEX=2012.0-7}
+bld_cv_pkg_ver_UCC=${bld_cv_pkg_ver_UCC=20130119-1}
+bld_cv_pkg_ver_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_ver_UCD_SNMP_UCD_SNMP_CONFIG_H=5.7.2-1}
+bld_cv_pkg_ver_VMLINUX=${bld_cv_pkg_ver_VMLINUX=3.0.60-1}
+bld_cv_pkg_ver_ZIP=${bld_cv_pkg_ver_ZIP=3.0-3}
+bld_cv_pkg_ver__CONFIG=${bld_cv_pkg_ver__CONFIG=3.0.60-1}
+bld_cv_pkg_ver__LIB_MODULES_3_0_36_1_LTS_BUILD=${bld_cv_pkg_ver__LIB_MODULES_3_0_36_1_LTS_BUILD=3.0.36-1}
+bld_cv_pkg_ver__LIB_MODULES_3_0_36_2_LTS_BUILD=${bld_cv_pkg_ver__LIB_MODULES_3_0_36_2_LTS_BUILD=3.0.36-2}
+bld_cv_pkg_ver__LIB_MODULES_3_0_38_1_LTS_BUILD=${bld_cv_pkg_ver__LIB_MODULES_3_0_38_1_LTS_BUILD=3.0.38-1}
+bld_cv_pkg_ver__LIB_MODULES_3_0_57_1_LTS_BUILD=${bld_cv_pkg_ver__LIB_MODULES_3_0_57_1_LTS_BUILD=3.0.57-1}
+bld_cv_pkg_ver__LIB_MODULES_3_0_58_1_LTS_BUILD=${bld_cv_pkg_ver__LIB_MODULES_3_0_58_1_LTS_BUILD=3.0.58-1}
+bld_cv_pkg_ver__LIB_MODULES_3_0_59_1_LTS_BUILD=${bld_cv_pkg_ver__LIB_MODULES_3_0_59_1_LTS_BUILD=3.0.59-1}
+bld_cv_pkg_ver__LIB_MODULES_3_0_60_1_LTS_BUILD=${bld_cv_pkg_ver__LIB_MODULES_3_0_60_1_LTS_BUILD=3.0.60-1}

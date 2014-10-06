@@ -1,0 +1,449 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: mi_open_detached.9.man,v 1.1.2.2 2011-02-07 02:18:41 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:41 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: mi_open_detached.9.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:41  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH MI_OPEN_DETACHED 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B mi_open_detached, mi_open_detached_cache
+\- \fISTREAMS\fP create detached instance data
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _MPS_SOURCE
+.br
+.B #include <sys/stream.h>
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/mpsddi.h>
+.HP
+.BI "caddr_t mi_open_detached(caddr_t *" mi_head ", size_t " size ", dev_t *" devp ");
+.HP
+.BI "caddr_t mi_open_detached_cache(caddr_t *" mi_head ", kmem_cachep_t " cachep ", dev_t *" devp ");
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'\fImi_head\fR\(em'u
+.I mi_head
+an opaque pointer to the head of the private structure list.
+.PD 0
+.TP
+.I size
+the size of the private structure to allocate.
+.TP
+.I cachep
+the pointer to a private structure cache with appropriately sized objects (see
+.BR mi_open_size (9)).
+.TP
+.I devp
+a pointer to the device number associated with the Stream.
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR MPS \(rg-specific
+DDI.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR mi_open_detached ()
+creates an instance data structure and chains it into the list of driver or module instances.
+In contrast to
+.BR mi_open_comm (9),
+.BR mi_open_detached ()
+does not require an existing stream or module instance (queue) with which to associate the instance
+data.
+.PP
+.BR mi_open_detached_cache ()
+peforms the same functions as
+.BR mi_open_detached (),
+but allocates the private instance data from a predefined memory cache
+instead of using
+.BR kmem_alloc (9).
+.\"
+.\"
+.SH USAGE
+.PP
+.BR mi_open_detached ()
+is typically called by drivers or modules that need to access a driver or module's instance data
+before the stream is created.  When the driver or module's
+.IR qi_qopen (9)
+procedure is later called, this instance can be used as the new queue's instance data by associating
+it with the queue using
+.BR mi_attach (9).
+.PP
+Typically, however,
+.BR mi_open_detached ()
+is not used, and the higher level
+.BR mi_open_comm (9)
+housekeeping function is used in its stead.
+.\"
+.\"
+.SH RETURN
+.PP
+When
+.BR mi_open_detached ()
+and
+.BR mi_open_detached_cache ()
+succeed, they returns a pointer to the newly created driver or module instance data;
+when they fail, they return
+.BR NULL .
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR mi_open_detached ()
+and
+.BR mi_open_detached_cache ()
+fail, they return
+.BR NULL .
+.BR mi_open_detached ()
+and
+.BR mi_open_detached_cache ()
+fail when they cannot allocate memory for driver or module instance data, or
+the device number is already allocated to another instance.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR mi_open_detached ()
+and
+.BR mi_open_detached_cache ()
+can be called from any blocking context, however, it is intended to be called
+from a
+.I STREAMS
+driver's
+.RI qi_qopen (9)
+routine.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR mi_open_detached ()
+and
+.BR mi_open_detached_cache ()
+are MP-safe.  The caller, however, is responsible for acquiring the necessary
+locks before attempting to access the contents of the private instance data.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR mi_open_detached ()
+and
+.BR mi_open_detached_cache ()
+are
+.IR MPS \(rg-specific
+functions:
+.BR _MPS_SOURCE ,
+.B _AIX_SOURCE
+or
+.B _MAC_SOURCE
+must be defined before including DDI/DKI include files to expose these symbols.
+.BR "@PACKAGE_TITLE@"
+must also have been compiled with
+.BR CONFIG_STREAMS_COMPAT_MPS ,
+.BR CONFIG_STREAMS_COMPAT_MPS_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_AIX ,
+.BR CONFIG_STREAMS_COMPAT_AIX_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_MAC
+or
+.B CONFIG_STREAMS_COMPAT_MAC_MODULE
+defined.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR mi_open_detached ()
+simply calls
+.BR mi_open_alloc_sleep (9)
+to allocate a private structure of size,
+.IR size ,
+and calls
+.BR mi_open_link (9)
+with the device pointer.
+.BR mi_open_link (9)
+is called with zero
+.I oflag
+argument and a
+.B NULL
+.I crp
+argument.
+.PP
+.BR mi_open_detached_cache ()
+simply calls
+.BR mi_open_alloc_cache (9)
+to allocate a private structure from cache,
+.IR cachep ,
+and calls
+.BR mi_open_link (9)
+with the device pointer.
+.BR mi_open_link (9)
+is called with zero
+.I oflag
+argument and a
+.B NULL
+.I crp
+argument.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR mi_open_comm (9),
+.IR qi_qopen (9),
+.BR mi_attach (9),
+.BR mi_open_alloc_sleep (9),
+.BR mi_open_alloc_cache (9),
+.BR mi_open_link (9),
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR mi_open_detached ()
+and
+.BR mi_open_detached_cache ()
+have no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR mi_open_detached ()
+is
+compatible with
+.IR MPS \(rg,
+.IR AIX \(rg,
+.IR MacOT \(rg,
+and
+.IR Solaris \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR mi_open_detached ()
+is an
+.IR MPS \(rg-specific
+function and should not be used by portable
+.I STREAMS
+drivers and modules.
+The more common memory allocation functions
+should be used in its stead.
+.IP \(em
+.BR mi_open_detached ()
+is provided for source level compatibility with
+.IR MPS \(rg
+for the purpose of porting
+.IR MPS \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.BR "@PACKAGE_TITLE@"
+.[
+@PACKAGE@-@VERSION@
+.]
+differ from that of
+.IR MPS \(rg,
+binaries are incompatible.
+.IP \(em
+.BR mi_open_detached ()
+only provides functionality comparable to
+.IR MPS \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR mi_open_detached ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
+and
+.BR STREAMS (9)
+for additional compatibility considerations.
+.PP
+.BR mi_open_detached_cache ()
+is an
+.I OpenSS7 Project
+specific implementation of
+.BR mi_open_detached ()
+that is inherently non-portable.  While it is fairly straightforward to
+implement these in any Mentat implementation present on modern day UNIX
+systems, it requires exposing internals to the MPS implementation that might
+not be desirable.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR MPS \(rg
+DDI documentation,
+.IR MacOT \(rg
+DDI documentation,
+.[
+macotr
+.]
+.[
+macspg
+.]
+.IR AIX \(rg
+documentation,
+.[
+aixcpc
+.]
+.IR "The OpenSS7 Project" .
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR mi_open_detached ()
+first appeared in
+.IR MPS \(rg.
+.BR mi_open_detached ()
+is a
+Mentat, Inc. function that goes all the way back to the
+.RI pre- OSF/1
+.I Mentat
+implementations.
+.BR mi_open_detached ()
+appears in
+.IR MacOT \(rg
+.[
+macspg
+.]
+and
+.IR AIX \(rg.
+.[
+aixcpc
+.]
+An undocumented version of
+.BR mi_open_detached ()
+appears in
+.IR Solaris \(rg.
+.PP
+.BR mi_open_detached_cache ()
+is an
+.I OpenSS7 Project
+function based loosely on the
+.BR mi_open_detached ()
+Mentat function.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

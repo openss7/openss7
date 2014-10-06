@@ -1,0 +1,21 @@
+                                                                                
+                                    C-Links                                     
+                                 to associated                                  
+                                     pair                                       
+                         _                                                      
+                    1-T1  O_           |           _                            
+                            L_         O         _O 1-T1    B/D-Links           
+                              L_       |       _/           to nodes            
+                                L_   __|__   _/               G,H               
+      A-Links                     L |    /| /                                   
+     to nodes     1-T1 -O----------X| STP |X---------O- 1-T1                    
+       A,B,C                     _/ |/____| L_                                  
+                               _/      ||     L_                                
+                             _/        L7       L_                              
+                           _/          ||         O_ 1-T1                       
+                    1-T1 _O            ||                                       
+                                       ||          E-Links                      
+                        Administrative ||         to node H                     
+                                   LAN L7                                       
+                                       ||                                       
+                                                                                

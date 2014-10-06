@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<product type="add-on">
+  <vendor>OpenSS7 Corporation</vendor>
+  <name>@PACKAGE_UCNAME@</name>
+  <arch>@host_cpu@</arch>
+  <version epoch="@PACKAGE_RPMEPOCH@" ver="@VERSION@" rel="@PACKAGE_RPMRELEASE@@PACKAGE_RPMEXTRA@" />
+  <displayname>@PACKAGE_TITLE@</displayname>
+  <shortname>@PACKAGE_SHORTTITLE@</shortname>
+  <distibution-name>@host_distro@</distribution-name>
+  <distibution-edition>@host_edition@</distribution-edition>
+  <description>@PACKAGE_TITLE@ includes kernel modules, STREAMS drivers, modules,
+libraries, utilities, test programs, daemons, and development
+environment for the development and execution of Linux
+Fast-STREAMS drivers, components and applications for the
+STREAMS environment.
+</description>
+  <release-notes-url>@reposerv@://@repobase@/codefiles/@PACKAGE@-@VERSION@/NEWS/</release-notes-url>
+  <rpm:provides>
+    <rpm:entry name="product:openss7" />
+  </rpm:provides>
+</product>

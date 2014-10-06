@@ -1,0 +1,176 @@
+#!/bin/bash
+# @configure_input@
+# =============================================================================
+# 
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date$ by $Author$
+#
+# =============================================================================
+@openss7_header@
+datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
+#
+# preinst_jnilibs() - On a fresh installation, look for an remove any non-deb or
+#   old tarball release libraries.  On reinstallations this step can (and
+#   should) be skipped.  Unfortunately, non-autoconf releases of LiS placed
+#   libraries all over the place.  On an initial installation, this checks for
+#   other libraries with the same name and deletes them.
+#
+preinst_jnilibs () { :
+    local lib l
+    if [ -x "`which ldconfig 2>/dev/null`" ]; then
+	for lib in $jnilibs; do
+	    ( ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null | \
+	    while read l; do
+		echo "$script: warning: Deleting old non-deb library, $l" >&2
+		rm -f -- $l || :
+	    done
+	done
+    fi
+}
+#
+# preinst_gcjmap() - On fresh install, look for non-deb libraries and remove
+#   them.  This is not necessary as the gcj map will simply be rebuilt once the
+#   new libraries have been installed.
+#
+preinst_gcjmaps () { :
+}
+#
+# preinst_jarfiles() - On fresh install, look for non-deb jarfiles and remove
+#   them.  This is not necessary as the jar repository will simply be rebuild
+#   once the new files have been installed.
+#
+preinst_jarfiles () { :
+}
+#
+# preinst_java() - On fresh install, go looking for conflicting things and
+#   removing them.  Currently this is only some libraries with the same name.
+#   This is only done on fresh install.  If this operation breaks some package,
+#   it can be reinstalled after the first installation of this package.
+#
+preinst_java () { :
+    preinst_jnilibs || :
+    preinst_gcjmaps || :
+    preinst_jarfiles || :
+}
+
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
+#
+# postinst_jnilibs() - After a fresh installation, upgrade or reinstall, do a
+#   ldconfig.
+#
+postinst_jnilibs () {
+    if   [ -x "`which libtool  2>/dev/null`" ] ; then
+	libtool --mode=finish @jnidir@ || :
+    elif [ -x "`which ldconfig 2>/dev/null`" ] ; then
+	ldconfig -n @jnidir@ || :
+    fi
+}
+postinst_gcjlibs () {
+    if   [ -x "`which libtool  2>/dev/null`" ] ; then
+	libtool --mode=finish @libdir@/gcj/@PACKAGE@ || :
+    elif [ -x "`which ldconfig 2>/dev/null`" ] ; then
+	ldconfig -n @libdir@/gcj/@PACKAGE@ || :
+    fi
+}
+#
+# postinst_gcjmaps() - After installation, rebuild the gcj map database.  Note
+#   that there is currently no debhelper nor trigger for this.
+#
+postinst_gcjmaps () { :
+    local d db
+    if [ -x "`which rebuild-gcj-db 2>/dev/null`" ] ; then
+        rebuild-gcj-db || :
+    else
+	if [ -x "`which gcj-dbtool 2>/dev/null`" ] ; then
+	    for base in /usr/lib* ; do
+		d=$base/gcj
+		[ -d $d ] || continue
+		db=`gcj-dbtool -p $base`
+		[ -n "$db" ] || continue
+		dirname $db | xargs mkdir -p
+		gcj-dbtool -n $db.tmp 64
+		find $d -follow -name '*.db' -print0 | \
+		    xargs -0 gcj-dbtool -m $db.tmp $db.tmp
+		mv -f -- $db.tmp $db
+	    done
+	fi
+    fi
+}
+#
+# postinst_jarfiles() - After installation, rebuild the jar repository.  Note
+#   that there is currently no debhelper nor trigger for this.
+#
+postinst_jarfiles () { :
+    if [ -x "`which rebuild-jar-repository 2>/dev/null`" ] ; then
+        rebuild-jar-repository @javadir@ || :
+    fi
+}
+#
+# postinst_java() - After installation, rebuild the ldconfig caches, GCJ map
+#   database and jar repository.
+#
+postinst_java () { :
+    postinst_jnilibs
+    postinst_gcjlibs
+    postinst_gcjmaps
+    postinst_jarfiles
+}
+
+preinst_java
+postinst_java
+
+# =============================================================================
+#
+# $Log$
+# =============================================================================
+# vim: ft=sh sw=4 noet nocin nosi formatoptions+=tcqlorn

@@ -1,0 +1,1797 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- =============================================================================
+-- 
+-- @(#) $RCSfile: OPENSS7-CLNS-MIB.mib,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-07-18 19:42:17 $
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- Note well: notwithstanding this AGPL license, you are not permitted to make 
+-- modifications under the OpenSS7 project's enterprise object identifier arc: 
+-- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
+-- identifier arc under your control.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date: 2011-07-18 19:42:17 $ by $Author: brian $
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log: OPENSS7-CLNS-MIB.mib,v $
+-- Revision 1.1.2.2  2011-07-18 19:42:17  brian
+-- - added documentation
+--
+-- Revision 1.1.2.1  2009-06-21 11:39:30  brian
+-- - added files to new distro
+--
+-- =============================================================================
+
+OPENSS7-CLNS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-IDENTITY, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, RowStatus, RowPointer
+		FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP
+		FROM SNMPv2-CONF
+	CommonLanguageName
+		FROM OPENSS7-TC
+	AdministrativeState, OperationalState, UsageState, SimpleNameType
+		FROM OPENSS7-SMI-MIB
+		openss7Modules
+		FROM OPENSS7-SMI;
+
+cLNS-MIB MODULE-IDENTITY
+	LAST-UPDATED
+		"200711270218Z"
+	ORGANIZATION
+		"The OpenSS7 Project"
+	CONTACT-INFO
+		"Brian Bidulock
+		 OpenSS7 Corporation
+		 1469 Jefferys Crescent
+		 Edmonton, ALberta T6L 6T1
+		 CANADA
+		 Tel: +1 780 490 1141
+		 Fax: +1 780 490 1241
+		 Mob: +1 780 953 0557
+		 mailto:bidulock@openss7.org"
+	DESCRIPTION
+	"This MIB provides configuration and status information 
+	 of an OSI CLNS subsystem, where the CLNS is in 
+	 accordance with ITU-T Rec. X.233 | ISO/IEC 8473-1, 
+	 ISO/IEC 8473-2, ITU-T Rec. X.622 | ISO/IEC 8473-3, 
+	 ITU-T Rec. X.623 | ISO/IEC 8473-4 and also ES-IS in 
+	 accordance with ISO/IEC 9542, IS-IS in accordance with 
+	 ISO/IEC 10589 and IDRP in accordance with ISO/IEC 
+	 10747.  Accordingly, the CLNS can be provided by an 
+	 IEEE 802.2 subnetwork, X.25 PLP, or an OSI datalink.
+
+         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+
+         All Rights Reserved.
+
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+         Note well: notwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
+	REVISION
+		"200711270218Z"
+	 DESCRIPTION "First release of this module."
+	::= { openss7Modules 31 }
+
+ -- top level organization of the MIB
+
+cLNSNotifications	 OBJECT IDENTIFIER ::= { cLNS-MIB	 0 }
+cLNSObjects		 OBJECT IDENTIFIER ::= { cLNS-MIB	 1 }
+cLNSConformance		 OBJECT IDENTIFIER ::= { cLNS-MIB	 2 }
+
+cLNSTables		 OBJECT IDENTIFIER ::= { cLNSObjects	 1 }
+cLNSScalars		 OBJECT IDENTIFIER ::= { cLNSObjects	 2 }
+cLNSNotifs		 OBJECT IDENTIFIER ::= { cLNSObjects	 3 }
+cLNSOids		 OBJECT IDENTIFIER ::= { cLNSObjects	 4 }
+
+cLNSCompliances		 OBJECT IDENTIFIER ::= { cLNSConformance 1 }
+cLNSGroups		 OBJECT IDENTIFIER ::= { cLNSConformance 2 }
+
+cLNSNetworkEntity	 OBJECT IDENTIFIER ::= { cLNSTables	 1 }
+cLNSNetworkEntityTitles	 OBJECT IDENTIFIER ::= { cLNSTables	 2 }
+cLNSProtocolMachine	 OBJECT IDENTIFIER ::= { cLNSTables	 3 }
+cLNSNSAP		 OBJECT IDENTIFIER ::= { cLNSTables	 4 1 }
+cLNSNSAPSap2Addresses	 OBJECT IDENTIFIER ::= { cLNSTables	 4 2 }
+cLNSNSAPUserEntities	 OBJECT IDENTIFIER ::= { cLNSTables	 4 3 }
+cLNSNSAPProviderEntities OBJECT IDENTIFIER ::= { cLNSTables	 4 4 }
+cLNSLinkage		 OBJECT IDENTIFIER ::= { cLNSTables	 5 }
+
+-- =====================================================================
+
+NEntitySystemTypes ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		""
+	SYNTAX		BITS { eS(0), iS(1) }
+
+NEntitySystemType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		""
+	SYNTAX		INTEGER { eS(0), iS(1) }
+
+NSAPAddress ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		""
+	SYNTAX		OCTET STRING(SIZE(0..20))
+
+NSAPServiceState ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"This textual convention provides the state of the NSAP 
+		 in accordance with the NPI (Network Provider 
+		 Interface)."
+	SYNTAX		INTEGER {
+				uNBOUND(0),	-- unbound
+				iDLE(1),	-- Idle
+				oUTCON(2),	-- Outgoing connection pending
+				iNCON(3),	-- Incoming connection pending
+				dATAXFER(4),	-- Data Transfer Ready
+				uRESET(10),	-- NS user invoked reset pending
+				pRESET(11)	-- NS provider invoked reset pending
+			}
+
+-- =====================================================================
+
+pDUDiscard OBJECT IDENTIFIER ::= { cLNSOids 1 }
+--	::= { joint-iso-ccitt(2) network-layer(13) management(0) nLM(2) standardSpecificExtensions(0) specificProblems(3) pDUDiscard(1) }
+
+pDUDiscardReasonNotSpecified OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"SpecificProblem."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 107333 
+		 pDUDiscardReasonNotSpecified."
+	::= { pDUDiscard reasonNotSpecified(0) }
+
+pDUDiscardProtocolProcedureError OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"SpecificProblem."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 107333 
+		 pDUDiscardReasonNotSpecified."
+	::= { pDUDiscard protocolProcedureError(1) }
+
+pDUDiscardIncorrectChecksum OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"SpecificProblem."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 107333 
+		 pDUDiscardReasonNotSpecified."
+	::= { pDUDiscard incorrectChecksum(2) }
+
+pDUDiscardHeaderSyntaxError OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"SpecificProblem."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 107333 
+		 pDUDiscardReasonNotSpecified."
+	::= { pDUDiscard headerSyntaxError(4) }
+
+pDUDiscardSegmentationNeededButNotPermitted OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"SpecificProblem."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 107333 
+		 pDUDiscardReasonNotSpecified."
+	::= { pDUDiscard segmentationNeededButNotPermitted(5) }
+
+pDUDiscardIncompletePDUReceived OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"SpecificProblem."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 107333 
+		 pDUDiscardReasonNotSpecified."
+	::= { pDUDiscard incompletePDUReceived(6) }
+
+pDUDiscardDuplicateOption OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"SpecificProblem."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 107333 
+		 pDUDiscardReasonNotSpecified."
+	::= { pDUDiscard duplicateOption(7) }
+
+pDUDiscardDestinationAddressUnreachable OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"SpecificProblem."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 107333 
+		 pDUDiscardReasonNotSpecified."
+	::= { pDUDiscard destinationAddressUnreachable(128) }
+
+pDUDiscardDestinationAddressUnknown OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"SpecificProblem."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 107333 
+		 pDUDiscardReasonNotSpecified."
+	::= { pDUDiscard destinationAddressUnknown(129) }
+
+pDUDiscardUnspecifiedSourceRouteingError OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"SpecificProblem."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 107333 
+		 pDUDiscardReasonNotSpecified."
+	::= { pDUDiscard unspecifiedSourceRouteingError(144) }
+
+pDUDiscardSyntaxErrorInSourceRouteingField OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"SpecificProblem."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 107333 
+		 pDUDiscardReasonNotSpecified."
+	::= { pDUDiscard syntaxErrorInSourceRouteingField(145) }
+
+pDUDiscardUnknownAddressInSourceRouteingField OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"SpecificProblem."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 107333 
+		 pDUDiscardReasonNotSpecified."
+	::= { pDUDiscard unknownAddressInSourceRouteingField(146) }
+
+pDUDiscardPathNotAcceptable OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"SpecificProblem."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 107333 
+		 pDUDiscardReasonNotSpecified."
+	::= { pDUDiscard pathNotAcceptable(147) }
+
+pDUDiscardLifetimeExpiredWhileDataUnitInTransit OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"SpecificProblem."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 107333 
+		 pDUDiscardReasonNotSpecified."
+	::= { pDUDiscard lifetimeExpiredWhileDataUnitInTransit(160) }
+
+pDUDiscardLifetimeExpiredDuringReassembly OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"SpecificProblem."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 107333 
+		 pDUDiscardReasonNotSpecified."
+	::= { pDUDiscard lifetimeExpiredDuringReassembly(161) }
+
+pDUDiscardUnsupportedOptionNotSpecified OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"SpecificProblem."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 107333 
+		 pDUDiscardReasonNotSpecified."
+	::= { pDUDiscard unsupportedOptionNotSpecified(176) }
+
+pDUDiscardUnsupportedProtocolVersion OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"SpecificProblem."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 107333 
+		 pDUDiscardReasonNotSpecified."
+	::= { pDUDiscard unsupportedProtocolVersion(177) }
+
+pDUDiscardUnsupportedSecurityOption OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"SpecificProblem."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 107333 
+		 pDUDiscardReasonNotSpecified."
+	::= { pDUDiscard unsupportedSecurityOption(178) }
+
+pDUDiscardUnsupportedSourceRouteingOption OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"SpecificProblem."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 107333 
+		 pDUDiscardReasonNotSpecified."
+	::= { pDUDiscard unsupportedSourceRouteingOption(179) }
+
+pDUDiscardUnsupportedRecordingOfRouteOption OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"SpecificProblem."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 107333 
+		 pDUDiscardReasonNotSpecified."
+	::= { pDUDiscard unsupportedRecordingOfRouteOption(180) }
+
+pDUDiscardReassemblyInterference OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"SpecificProblem."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 107333 
+		 pDUDiscardReasonNotSpecified."
+	::= { pDUDiscard reassemblyInterference(181) }
+
+-- iSO9542PDUDiscard OBJECT IDENTIFIER ::= { sseoi specificProblems(3) iSO9542PDUDiscard(2) }
+
+-- for communication information notification
+informationType OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"SpecificProblem."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 107333 
+		 pDUDiscardReasonNotSpecified."
+	::= { joint-iso-ccitt(2) network-layer(13) management(0) nLM(2) 
+		standardSpecificExtensions(0) informationtype(4) }
+
+iSReachabilityChange OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"SpecificProblem."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 107333 
+		 pDUDiscardReasonNotSpecified."
+	::= { informationType iSReachabilityChange(1) }
+
+eSReachabilityChange OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"SpecificProblem."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 107333 
+		 pDUDiscardReasonNotSpecified."
+	::= { informationType eSReachabilityChange(2) }
+
+successfulConnectionEstablishment OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"SpecificProblem."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 107333 
+		 pDUDiscardReasonNotSpecified."
+	::= { informationType successfulConnectionEstablishment(3) }
+
+-- for SNPAAddress type
+sNPAAddressType OBJECT IDENTIFIER
+	::= { joint-iso-ccitt(2) network-layer(13) management(0) nLM(2) 
+		standardSpecificExtensions(0) sNPAAddressType(5) }
+
+sNPADTEAddress OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"sNPAAddressType."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 107333 
+		 pDUDiscardReasonNotSpecified."
+	::= { sNPAAddressType dTEAddress(1) }
+
+sNPAMACAddress OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"sNPAAddressType."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 107333 
+		 pDUDiscardReasonNotSpecified."
+	::= { sNPAAddressType mACAddress(2) }
+
+
+-- =====================================================================
+
+cLNSNetworkEntityTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF CLNSNetworkEntityEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"There may be multiple entries in this table, each 
+		 representing a network entity managed object within a 
+		 network subsystem.  The table definition permits 
+		 entries to be created and deleted by management 
+		 stations, or automatically as part of system 
+		 operations."
+	REFERENCE
+		"ITU-T Rec. X.238 | ISO/IEC 10733 networkEntity."
+	::= { cLNSNetworkEntity 1 }
+
+cLNSNetworkEntityEntry OBJECT-TYPE
+	SYNTAX		CLNSNetworkEntityEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Each entry in the table corresponds to a network entity 
+		 managed object.  There may be multiple entries in the 
+		 table, each representing an independent network entity.  
+		 Each network entity in the table also has zero or more 
+		 entries in a side-table providing network entity 
+		 titles.
+		 
+		 This table includes its own index."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10733 networkEntity."
+	INDEX		{ cLNSNetworkEntityId }
+	::= { cLNSNetworkEntityTable 1 }
+
+CLNSNetworkEntityEntry ::=
+	SEQUENCE {
+		cLNSNetworkEntityId
+			CommonLanguageName,	-- index
+		cLNSNetworkEntitySystemTypes
+			NEntitySystemTypes
+	}
+
+cLNSNetworkEntityId OBJECT-TYPE
+	SYNTAX		CommonLanguageName
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The name of the network entity using the 
+		 CommonLanguageName textual convention from the 
+		 OPENSS7-TC module.  Common language names are ASCII 
+		 display strings of 0..32 characters.  The name must be 
+		 unique and is used to identify the network entity and 
+		 thus acts as an index into this and other tables that 
+		 are indexed by network entity."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10733 networkEntityId."
+	::= { cLNSNetworkEntityEntry 1 }
+
+cLNSNetworkEntitySystemTypes OBJECT-TYPE
+	SYNTAX		NEntitySystemTypes
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the System Types that are supported by this 
+		 network entity.  Which system types that are supported 
+		 by the network entity depends upon the support 
+		 available from the underlying implementation.  When it 
+		 contains eS(0), an End System type is supported; when 
+		 it contains iS(1), an Intermediate System type is 
+		 supported.  It may contain one or both, but not none of 
+		 these values: i.e., at least one system type must be 
+		 supported."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10733 systemTypes, ISO/IEC 
+		 9542 ES-IS."
+	::= { cLNSNetworkEntityEntry 2 }
+
+-- =====================================================================
+
+cLNSNetworkEntityTitleTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF CLNSNetworkEntityTitleEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. X.238 | ISO/IEC 10733 networkEntity."
+	::= { cLNSNetworkEntityTitles 1 }
+
+cLNSNetworkEntityTitleEntry OBJECT-TYPE
+	SYNTAX		CLNSNetworkEntityTitleEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The indices include a shared network entity identifier 
+		 index and a network entity title index.  This table 
+		 implements the network entity tile index.  The indices 
+		 represent the relationship between a network entity and 
+		 a network entity title.  The index network entity owns 
+		 the indexed network entity title."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10733 networkEntity."
+	INDEX	{
+			cLNSNetworkEntityId, -- shared index
+			cLNSNetworkEntityTitle
+		}
+	::= { cLNSNetworkEntityTitleTable 1 }
+
+CLNSNetworkEntityTitleEntry ::=
+	SEQUENCE {
+		cLNSNetworkEntityTitle
+			NSAPAddress, -- index
+		cLNSNetworkEntityTitleRowStatus
+			RowStatus
+	}
+
+cLNSNetworkEntityTitle OBJECT-TYPE
+	SYNTAX		NSAPAddress
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10733 networkEntityTitles."
+	::= { cLNSNetworkEntityTitleEntry 1 }
+
+cLNSNetworkEntityTitleRowStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides a mechansm whereby management stations may 
+		 create or delete entries in this table.  When creating 
+		 entries, the indexed network entity title is added to 
+		 the indexed network entity.  When deleting entries, 
+		 the inexed network title is removed from the indexed 
+		 network entity.  When creating entries, the agent must 
+		 permit only one entry for a given corresponding network 
+		 entity title index regardless of the network entity 
+		 index."
+	REFERENCE
+		"STD 58, SNMPv2-TC"
+	::= { cLNSNetworkEntityTitleEntry 2 }
+
+-- =====================================================================
+
+cLNSProtocolMachineTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF CLNSProtocolMachineEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. X.238 | ISO/IEC 10733 networkEntity."
+	::= { cLNSProtocolMachine 1 }
+
+cLNSProtocolMachineEntry OBJECT-TYPE
+	SYNTAX		CLNSProtocolMachineEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. X.238 | ISO/IEC 10733 networkEntity."
+	INDEX	{
+			cLNSNetworkEntityId	-- shared index
+		}
+	::= { cLNSProtocolMachineTable 1 }
+
+CLNSProtocolMachineEntry ::=
+	SEQUENCE {
+		cLNSProtocolMachineId
+			SimpleNameType
+	}
+
+cLNSProtocolMachineId OBJECT-TYPE
+	SYNTAX SimpleNameType
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		""
+	::= { cLNSProtocolMachineEntry 1 }
+
+
+-- =====================================================================
+
+cLNSNSAPTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF CLNSNSAPEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. X.238 | ISO/IEC 10733 networkEntity."
+	::= { cLNSNSAP 1 }
+
+cLNSNSAPEntry OBJECT-TYPE
+	SYNTAX		CLNSNSAPEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"
+		 Entries in this table cannot be created nor deleted by 
+		 management stations, but are created and deleted 
+		 automatically by system operations."
+	REFERENCE
+		"ITU-T Rec. X.238 | ISO/IEC 10733 networkEntity."
+	INDEX	{
+			cLNSNetworkEntityId, -- shared index
+			cLNSNSAPSapId -- index
+		}
+	::= { cLNSNSAPTable 1 }
+
+CLNSNSAPEntry ::=
+	SEQUENCE {
+		cLNSNSAPSapId
+			Unsigned32,	-- index
+		cLNSNSAPServiceState
+			INTEGER
+	}
+
+cLNSNSAPSapId OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Indicates the SAP identifier for this NSAP.  The value 
+		 of this attribute is of purely local concern.  For the 
+		 STREAMS implementation of CLNS, this is the device 
+		 number of the Stream opened on the CLNS driver which 
+		 acts as an NSAP."
+	REFERENCE
+		"ITU-T Rec. X.723 | ISO/IEC 10165-3 sapId."
+	::= { cLNSNSAPEntry 1 }
+
+cLNSNSAPServiceState OBJECT-TYPE
+	SYNTAX		NSAPServiceState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the service state of the NSAP following the 
+		 NSAPServiceState textual convention.  The NSAP service 
+		 state is a single valued attribute that provides the 
+		 state of the service primitive interface provided by 
+		 the NSAP.  This attribute is read-only and is altered 
+		 automatically by system operations."
+	REFERENCE
+		"ITU-T Rec. X.213 | ISO/IEC 8348 Figure 4 and 20."
+	::= { cLNSNSAPEntry 2 }
+
+-- =====================================================================
+
+cLNSNSAPSap2AddressTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF CLNSNSAPSap2AddressEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. X.723 | ISO/IEC 10165-3 sap2Address."
+	::= { cLNSNSAPSap2Addresses 1 }
+
+cLNSNSAPSap2AddressEntry OBJECT-TYPE
+	SYNTAX		CLNSNSAPSap2AddressEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"When the NSAP is in the uNBOUND(0) service state, there 
+		 are no NSAP addresses bound to the NSAP and there will 
+		 be no entries in this table for the cLNSNSAPSapId that 
+		 corresponds to the NSAP instance.  In all other 
+		 services states, zero or more NSAP addresses may be 
+		 associated with the NSAP having a given cLNSNSAPSapId 
+		 as entries in this side-table."
+	REFERENCE
+		"ITU-T Rec. X.723 | ISO/IEC 10165-3 sap2Address."
+	INDEX	{
+			cLNSNSAPSapId, -- shared index
+			cLNSNSAPSap2Address -- index
+		}
+	::= { cLNSNSAPSap2AddressTable 1 }
+
+CLNSNSAPSap2AddressEntry ::=
+	SEQUENCE {
+		cLNSNSAPSap2Address
+			NSAPAddress -- index
+	}
+
+cLNSNSAPSap2Address OBJECT-TYPE
+	SYNTAX		NSAPAddress
+	MAX-ACCESS	read-only -- only accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides an network address associated with the indexed 
+		 NSAP."
+	REFERENCE
+		"ITU-T Rec. X.723 | ISO/IEC 10165-3 sap2Address."
+	::= { cLNSNSAPSap2AddressEntry 1 }
+
+-- =====================================================================
+
+cLNSNSAPUserEntityTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF CLNSNSAPUserEntityEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This is a user entity name side table that provides the 
+		 user entity names of the managed objects that are users 
+		 of the NSAP corresponding to the cLNSNSAPId associated 
+		 with the column."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10733 userEntityNames."
+	::= { cLNSNSAPUserEntities 1 }
+
+cLNSNSAPUserEntityEntry OBJECT-TYPE
+	SYNTAX		CLNSNSAPUserEntityEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Each entry with an index corresponding to a gvien value 
+		 of the cLNSNSAPSapId provides one provider entity name 
+		 associated with the NSAP in the cLNSNSAPTable with the 
+		 same value of the cLNSNSAPSapId index."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10733 userEntityNames."
+	INDEX	{
+			cLNSNSAPSapId,	-- shared index
+			cLNSNSAPUserEntity -- index
+		}
+	::= { cLNSNSAPUserEntityTable 1 }
+
+CLNSNSAPUserEntityEntry ::=
+	SEQUENCE {
+		cLNSNSAPUserEntity
+			RowPointer	-- index
+	}
+
+cLNSNSAPUserEntity OBJECT-TYPE
+	SYNTAX		RowPointer
+	MAX-ACCESS	read-only -- only accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides a pointer to the conceptual row in the 
+		 conceptual table representing a user entity which is 
+		 being provided service by this NSAP.  The user entity 
+		 is typically a transport entity."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10733 userEntityNames."
+	::= { cLNSNSAPUserEntityEntry 1 }
+
+-- =====================================================================
+
+cLNSNSAPProviderEntityTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF CLNSNSAPProviderEntityEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This is a provider entity name side table that provides 
+		 the provider entity names of the managed objects that 
+		 are users of the NSAP correspond to the cLNSNSAPId 
+		 associated with the column."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10733 providerEntityNames."
+	::= { cLNSNSAPProviderEntities 1 }
+
+cLNSNSAPProviderEntityEntry OBJECT-TYPE
+	SYNTAX		CLNSNSAPProviderEntityEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Each entry with an index corresponding to a given value 
+		 of the cLNSNSAPSapId provides one provider entity name 
+		 associated with the NSAP in the cLNSNSAPTable with the 
+		 same value of the cLNSNSAPSapId index."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10733 providerEntityNames."
+	INDEX	{
+			cLNSNSAPSapId, -- shared index
+			cLNSNSAPProviderEntity -- index
+		}
+	::= { cLNSNSAPProviderEntityTable 1 }
+
+
+CLNSNSAPProviderEntityEntry ::=
+	SEQUENCE {
+		cLNSNSAPProviderEntity
+			RowPointer -- index
+	}
+
+cLNSNSAPProviderEntity OBJECT-TYPE
+	SYNTAX		RowPointer
+	MAX-ACCESS	read-only -- only accessible
+	STATUS		current
+	DESCRIPTION
+		"Provides a pointer to the conceptual row in the 
+		 conceptual table representing a provider entity which 
+		 is providing service to this NSAP.  The provider entity 
+		 is typically a data link entity."
+	REFERENCE
+		"ITU-T Rec. X.283 | ISO/IEC 10733 userEntityNames."
+	::= { cLNSNSAPProviderEntityEntry 1 }
+
+-- =====================================================================
+
+DummySyntax ::= OCTET STRING (SIZE(0..256))
+
+cLNSLinkageTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF CLNSLinkageEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"There is one entry in this table associated with each 
+		 separate provision of the underlying service to the 
+		 superior protocol machin.  When the linkage is 
+		 operable, the operationalState shall have the value 
+		 'enabled'; otherwise it shall have the value 
+		 'disabled'.  Transitions of operationalState shall be 
+		 reported using the stateChange notification.  A linkage 
+		 entry may be created in the 'enabled' operational 
+		 state."
+	REFERENCE
+		"ITU-T Rec. X.238 | ISO/IEC 10733 networkEntity."
+	::= { cLNSLinkage 1 }
+
+cLNSLinkageEntry OBJECT-TYPE
+	SYNTAX		CLNSLinkageEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Each entry in the linkage table corresponds to an 
+		 association between a cLNSProtocolMachine and 
+		 cLNSNetworkEntity via the cLNSNetworkEntityId shared 
+		 index and an underlying subnetwork access as identified 
+		 by the cLNSLinkagSN-ServiceProvider and 
+		 cLNSLinkageSN-SA-P attributes.
+
+		 The cLNSLinkageSN-ServiceProvider is the distinguished 
+		 name of the subnetwork (SN) service provider managed 
+		 object.  The attribute identifies the subnetwork entity 
+		 to be used to support the linkage, when enabled.  The 
+		 subnetwork service provider may be in the datalink 
+		 layer, or it may be in the network layer (for example 
+		 when operating ISO 8473 over ISO 8208 SNDCF).  In this 
+		 later case, the provider will be an x25PLE object.  In 
+		 other cases the provider will be either a lLCDLE or 
+		 lAPBDLE object.
+
+		 There are a wide range of functionalities that each 
+		 subnetwork access can provide to the cLNS, and the 
+		 number of attributes associated with the linkage is 
+		 broad.  Not all apply to all cLNSNetworkEntity system 
+		 types.  Not all are necessarily supported by an 
+		 specific implementation."
+	REFERENCE
+		"ITU-T Rec. X.238 | ISO/IEC 10733 networkEntity."
+	INDEX	{
+			cLNSNetworkEntityId,	-- shared index
+			cLNSLinkageId -- index
+		}
+	::= { cLNSLinkageTable 1 }
+
+CLNSLinkageEntry ::=
+	SEQUENCE {
+		cLNSLinkageId
+			INTEGER,	-- index
+		cLNSLinkageOperationalState
+			OperationalState,
+		cLNSLinkageAdministrativeState
+			AdministrativeState,
+		cLNSLinkageSN-ServiceProvider
+			DummySyntax,
+		cLNSLinkageSN-SA-P
+			DummySyntax,
+		cLNSLinkageOperationalProtocols
+			DummySyntax,
+		cLNSLinkageISO9542OperationalSubsets
+			DummySyntax,
+		-- IS package follows
+		cLNSLinkageISHoldingTimerMultiplier
+			DummySyntax,
+		cLNSLinkageISConfigurationTime
+			DummySyntax,
+		cLNSLinkageSuggestedESConfigurationTimer
+			DummySyntax,
+		cLNSLinkageRedirectHoldingTime
+			DummySyntax,
+		cLNSLinkageESReachabilityChanges
+			DummySyntax,
+		cLNSLinkageESInvalid9542PDUs
+			DummySyntax,
+		-- ES package follows
+		cLNSLinkageESHoldingTimerMultiplier
+			DummySyntax,
+		cLNSLinkageManualISSNPAAddress
+			DummySyntax,
+		cLNSLinkageDefaultESConfigTimer
+			DummySyntax,
+		cLNSLinkageActiveESConfigTimer
+			DummySyntax,
+		cLNSLinkageISReachabilityChanges
+			DummySyntax,
+		cLNSLinkageISInvalid9542PDUs
+			DummySyntax,
+		-- initial minimum timer option
+		cLNSLinkageInitialMinimumTimer
+			DummySyntax,
+		-- reserve timer option
+		cLNSLinkageReserveTimer
+			DummySyntax,
+		-- idle timer option
+		cLNSLinkageIdleTimer
+			DummySyntax,
+		-- ISO8473-4 over ISO8208 SNDCF option
+		cLNSLinkage8208CallsPlaced
+			DummySyntax,
+		cLNSLinkage8208CallsFailed
+			DummySyntax,
+		-- ISO8473-3 CO Datalink option
+		cLNSLinkageCODLCallsPlaced
+			DummySyntax,
+		cLNSLinkageCODLCallsFailed
+			DummySyntax,
+		-- IS-IS ISO10589 basic option
+		cLNSLinkageType
+			DummySyntax,
+		cLNSLinkageISISHelloTimer
+			DummySyntax,
+		cLNSLinkageL1DefaultMetric
+			DummySyntax,
+		cLNSLinkageL1DelayMetric
+			DummySyntax,
+		cLNSLinkageL1ExpenseMetric
+			DummySyntax,
+		cLNSLinkageL1ErrorMetric
+			DummySyntax,
+		cLNSLinkageExternalDomain
+			DummySyntax,
+		cLNSLinkageChangesInAdjacencyState
+			DummySyntax,
+		cLNSLinkageInitializationFailures
+			DummySyntax,
+		cLNSLinkageRejectedAdjacencies
+			DummySyntax,
+		cLNSLinkageISISControlPDUsSent
+			DummySyntax,
+		cLNSLinkageISISControlPDUsReceived
+			DummySyntax,
+		cLNSLinkageIDFieldLengthMismatches
+			DummySyntax,
+		cLNSLinkageMaximumAreaAddressesMismatches
+			DummySyntax,
+		-- IS-IS ISO10589 authentication package
+		cLNSLinkageCircuitTransmitPassword
+			DummySyntax,
+		cLNSLinkageCircuitReceivePasswords
+			DummySyntax,
+		cLNSLinkageAuthenticationFailures
+			DummySyntax,
+		-- IS-IS ISO10589 broadcast linkage package
+		cLNSLinkageL1IntermediateSystemPriority
+			DummySyntax,
+		cLNSLinkageL1CircuitID
+			DummySyntax,
+		cLNSLinkageL1DesignatedIntermediateSystem
+			DummySyntax,
+		cLNSLinkageLanL1DesignatedIntermediateSystemChanges
+			DummySyntax,
+		-- IS-IS call establishment metric increment linkage package
+		cLNSLinkageCallEstablishmentDefaultMetricIncrement
+			DummySyntax,
+		cLNSLinkageCallEstablishmentDelayMetricIncrement
+			DummySyntax,
+		cLNSLinkageCallEstablishmentExpenseMetricIncrement
+			DummySyntax,
+		cLNSLinkageCallEstablishmentErrorMetricIncrement
+			DummySyntax,
+		-- IS-IS point-to-point linkage package
+		cLNSLinkagePtPtCiruitId
+			DummySyntax,
+		-- IS-IS static linkage package
+		cLNSLinkageOutgoingCallIVMO
+			DummySyntax,
+		cLNSLinkagePtPtCircuitID
+			DummySyntax,
+		cLNSLinkageNeighbourSNPAAddres
+			DummySyntax,
+		-- IS-IS level 2 linkage package
+		cLNSLinkageL2DefaultMetric
+			DummySyntax,
+		cLNSLinkageL2DelayMetric
+			DummySyntax,
+		cLNSLinkageL2ExpenseMetric
+			DummySyntax,
+		cLNSLinkageL2ErrorMetric
+			DummySyntax,
+		cLNSLinkageManualL2OnlyMode
+			DummySyntax,
+		-- IS-IS level 2 broadcast linkage package
+		cLNSLinkageL2IntermediateSystemPriority
+			DummySyntax,
+		cLNSLinkageL2CircuitID
+			DummySyntax,
+		cLNSLinkageL2DesignatedIntermediateSystem
+			DummySyntax,
+		cLNSLinkageLanL2DesignatedIntermediateSystemChanges
+			DummySyntax
+	}
+
+cLNSLinkageId OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 1 }
+
+cLNSLinkageOperationalState OBJECT-TYPE
+	SYNTAX OperationalState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 2 }
+
+cLNSLinkageAdministrativeState OBJECT-TYPE
+	SYNTAX AdministrativeState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 3 }
+
+cLNSLinkageSN-ServiceProvider OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 4 }
+
+cLNSLinkageSN-SA-P OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 5 }
+
+cLNSLinkageOperationalProtocols OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 6 }
+
+cLNSLinkageISO9542OperationalSubsets OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 7 }
+
+cLNSLinkageISHoldingTimerMultiplier OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 8 }
+
+cLNSLinkageISConfigurationTime OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 9 }
+
+cLNSLinkageSuggestedESConfigurationTimer OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 10 }
+
+cLNSLinkageRedirectHoldingTime OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 11 }
+
+cLNSLinkageESReachabilityChanges OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 12 }
+
+cLNSLinkageESInvalid9542PDUs OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 13 }
+
+cLNSLinkageESHoldingTimerMultiplier OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 15 }
+
+cLNSLinkageManualISSNPAAddress OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 16 }
+
+cLNSLinkageDefaultESConfigTimer OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 17 }
+
+cLNSLinkageActiveESConfigTimer OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 18 }
+
+cLNSLinkageISReachabilityChanges OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 19 }
+
+cLNSLinkageISInvalid9542PDUs OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 20 }
+
+cLNSLinkageInitialMinimumTimer OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 21 }
+
+cLNSLinkageReserveTimer OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 22 }
+
+cLNSLinkageIdleTimer OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 23 }
+
+cLNSLinkage8208CallsPlaced OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 24 }
+
+cLNSLinkage8208CallsFailed OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 25 }
+
+cLNSLinkageCODLCallsPlaced OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 26 }
+
+cLNSLinkageCODLCallsFailed OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 27 }
+
+cLNSLinkageType OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 28 }
+
+cLNSLinkageISISHelloTimer OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 29 }
+
+cLNSLinkageL1DefaultMetric OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 30 }
+
+cLNSLinkageL1DelayMetric OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 31 }
+
+cLNSLinkageL1ExpenseMetric OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 32 }
+
+cLNSLinkageL1ErrorMetric OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 33 }
+
+cLNSLinkageExternalDomain OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 34 }
+
+cLNSLinkageChangesInAdjacencyState OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 35 }
+
+cLNSLinkageInitializationFailures OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 36 }
+
+cLNSLinkageRejectedAdjacencies OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 37 }
+
+cLNSLinkageISISControlPDUsSent OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 38 }
+
+cLNSLinkageISISControlPDUsReceived OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 39 }
+
+cLNSLinkageIDFieldLengthMismatches OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 40 }
+
+cLNSLinkageMaximumAreaAddressesMismatches OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 41 }
+
+cLNSLinkageCircuitTransmitPassword OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 42 }
+
+cLNSLinkageCircuitReceivePasswords OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 43 }
+
+cLNSLinkageAuthenticationFailures OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 44 }
+
+cLNSLinkageL1IntermediateSystemPriority OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 45 }
+
+cLNSLinkageL1CircuitID OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 46 }
+
+cLNSLinkageL1DesignatedIntermediateSystem OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 47 }
+
+cLNSLinkageLanL1DesignatedIntermediateSystemChanges OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 48 }
+
+cLNSLinkageCallEstablishmentDefaultMetricIncrement OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 49 }
+
+cLNSLinkageCallEstablishmentDelayMetricIncrement OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 50 }
+
+cLNSLinkageCallEstablishmentExpenseMetricIncrement OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 51 }
+
+cLNSLinkageCallEstablishmentErrorMetricIncrement OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 52 }
+
+cLNSLinkagePtPtCiruitId OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 53 }
+
+cLNSLinkageOutgoingCallIVMO OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 54 }
+
+cLNSLinkagePtPtCircuitID OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 55 }
+
+cLNSLinkageNeighbourSNPAAddres OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 56 }
+
+cLNSLinkageL2DefaultMetric OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 57 }
+
+cLNSLinkageL2DelayMetric OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 58 }
+
+cLNSLinkageL2ExpenseMetric OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 59 }
+
+cLNSLinkageL2ErrorMetric OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 60 }
+
+cLNSLinkageManualL2OnlyMode OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 61 }
+
+cLNSLinkageL2IntermediateSystemPriority OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 62 }
+
+cLNSLinkageL2CircuitID OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 63 }
+
+cLNSLinkageL2DesignatedIntermediateSystem OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 64 }
+
+cLNSLinkageLanL2DesignatedIntermediateSystemChanges OBJECT-TYPE
+	SYNTAX DummySyntax
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { cLNSLinkageEntry 65 }
+
+
+-- =====================================================================
+
+cLNSLinkagePackage OBJECT-GROUP
+	OBJECTS {
+		cLNSLinkageOperationalState,
+		cLNSLinkageAdministrativeState,
+		cLNSLinkageSN-ServiceProvider,
+		cLNSLinkageSN-SA-P,
+		cLNSLinkageOperationalProtocols,
+		cLNSLinkageISO9542OperationalSubsets
+	}
+	STATUS current
+	DESCRIPTION
+		""
+	::= { cLNSGroups 1 }
+
+cLNSLinkageISPackage OBJECT-GROUP
+	OBJECTS {
+		cLNSLinkageISHoldingTimerMultiplier,
+		cLNSLinkageISConfigurationTime,
+		cLNSLinkageSuggestedESConfigurationTimer,
+		cLNSLinkageRedirectHoldingTime,
+		cLNSLinkageESReachabilityChanges,
+		cLNSLinkageESInvalid9542PDUs
+	}
+	STATUS current
+	DESCRIPTION
+		""
+	::= { cLNSGroups 2 }
+
+cLNSLinkageESPackage OBJECT-GROUP
+	OBJECTS {
+		cLNSLinkageESHoldingTimerMultiplier,
+		cLNSLinkageManualISSNPAAddress,
+		cLNSLinkageDefaultESConfigTimer,
+		cLNSLinkageActiveESConfigTimer,
+		cLNSLinkageISReachabilityChanges,
+		cLNSLinkageISInvalid9542PDUs
+	}
+	STATUS current
+	DESCRIPTION
+		""
+	::= { cLNSGroups 3 }
+
+cLNSLinkageInitialMinimumTimerOption OBJECT-GROUP
+	OBJECTS {
+		cLNSLinkageInitialMinimumTimer
+	}
+	STATUS current
+	DESCRIPTION
+		""
+	::= { cLNSGroups 4 }
+
+cLNSLinkageReserveTimerOption OBJECT-GROUP
+	OBJECTS {
+		cLNSLinkageReserveTimer
+	}
+	STATUS current
+	DESCRIPTION
+		""
+	::= { cLNSGroups 5 }
+
+cLNSLinkageIdleTimerOption OBJECT-GROUP
+	OBJECTS {
+		cLNSLinkageIdleTimer
+	}
+	STATUS current
+	DESCRIPTION
+		""
+	::= { cLNSGroups 6 }
+
+cLNSISO847304OverISO8208SNDCFOption OBJECT-GROUP
+	OBJECTS {
+		cLNSLinkage8208CallsPlaced,
+		cLNSLinkage8208CallsFailed
+	}
+	STATUS current
+	DESCRIPTION
+		"A collection of objects that implement the ISO8473-4 
+		 CLNP over ISO8208 SNDCF option."
+	::= { cLNSGroups 7 }
+
+cLNSISO847303CODatalinkOption OBJECT-GROUP
+	OBJECTS {
+		cLNSLinkageCODLCallsPlaced,
+		cLNSLinkageCODLCallsFailed
+	}
+	STATUS current
+	DESCRIPTION
+		"A collection of objects that implement management of 
+		 the CLNP over ISO8473-3 CO Datalink option."
+	::= { cLNSGroups 8 }
+
+cLNSLinkageISISISO10589BasicPackage OBJECT-GROUP
+	OBJECTS {
+		cLNSLinkageType,
+		cLNSLinkageISISHelloTimer,
+		cLNSLinkageL1DefaultMetric,
+		cLNSLinkageL1DelayMetric,
+		cLNSLinkageL1ExpenseMetric,
+		cLNSLinkageL1ErrorMetric,
+		cLNSLinkageExternalDomain,
+		cLNSLinkageChangesInAdjacencyState,
+		cLNSLinkageInitializationFailures,
+		cLNSLinkageRejectedAdjacencies,
+		cLNSLinkageISISControlPDUsSent,
+		cLNSLinkageISISControlPDUsReceived,
+		cLNSLinkageIDFieldLengthMismatches,
+		cLNSLinkageMaximumAreaAddressesMismatches
+	}
+	STATUS current
+	DESCRIPTION
+		"A collection of objects that implement an Intermeidate 
+		 System to Intermediate System (IS-IS) linkage in 
+		 accordance with ISO 10589."
+	::= { cLNSGroups 9 }
+
+cLNSLinkageISIS10589AuthenticationPackage OBJECT-GROUP
+	OBJECTS {
+		cLNSLinkageCircuitTransmitPassword,
+		cLNSLinkageCircuitReceivePasswords,
+		cLNSLinkageAuthenticationFailures
+	}
+	STATUS current
+	DESCRIPTION
+		"A collection of objects that provide management of 
+		 authentication for ISO 10589 IS-IS."
+	::= { cLNSGroups 10 }
+
+cLNSLinkageISIS10589BroadcastPackage OBJECT-GROUP
+	OBJECTS {
+		cLNSLinkageL1IntermediateSystemPriority,
+		cLNSLinkageL1CircuitID,
+		cLNSLinkageL1DesignatedIntermediateSystem,
+		cLNSLinkageLanL1DesignatedIntermediateSystemChanges
+	}
+	STATUS current
+	DESCRIPTION
+		"A collection of objects that support broadcast linkage 
+		 for IS-IS ISO 10589."
+	::= { cLNSGroups 11 }
+
+cLNSLinkageISISCallEstablishmentMetricIncrementPackage OBJECT-GROUP
+	OBJECTS {
+		cLNSLinkageCallEstablishmentDefaultMetricIncrement,
+		cLNSLinkageCallEstablishmentDelayMetricIncrement,
+		cLNSLinkageCallEstablishmentExpenseMetricIncrement,
+		cLNSLinkageCallEstablishmentErrorMetricIncrement
+	}
+	STATUS current
+	DESCRIPTION
+		"A collection of objects that provide call establishment 
+		 metric increment information for IS-IS linkages."
+	::= { cLNSGroups 12 }
+
+cLNSLinkageISISPointToPointLinkagePackage OBJECT-GROUP
+	OBJECTS {
+		cLNSLinkagePtPtCiruitId
+	}
+	STATUS current
+	DESCRIPTION
+		"A collection of obejcts providing support for point to 
+		 point linkage for IS-IS."
+	::= { cLNSGroups 13 }
+
+cLNSLinkageISISStaticLinkagePackage OBJECT-GROUP
+	OBJECTS {
+		cLNSLinkageOutgoingCallIVMO,
+		cLNSLinkagePtPtCircuitID,
+		cLNSLinkageNeighbourSNPAAddres
+	}
+	STATUS current
+	DESCRIPTION
+		"A collection of objects providing support for static 
+		 linkage for IS-IS."
+	::= { cLNSGroups 14 }
+
+cLNSLinkageISISLevel2LinkagePackage OBJECT-GROUP
+	OBJECTS {
+		cLNSLinkageL2DefaultMetric,
+		cLNSLinkageL2DelayMetric,
+		cLNSLinkageL2ExpenseMetric,
+		cLNSLinkageL2ErrorMetric,
+		cLNSLinkageManualL2OnlyMode
+	}
+	STATUS current
+	DESCRIPTION
+		"A collection of objects providing support for IS-IS 
+		 Level 2 linkages."
+	::= { cLNSGroups 15 }
+
+cLNSLinkageISISLevel2BroadcastPackage OBJECT-GROUP
+	OBJECTS {
+		cLNSLinkageL2IntermediateSystemPriority,
+		cLNSLinkageL2CircuitID,
+		cLNSLinkageL2DesignatedIntermediateSystem,
+		cLNSLinkageLanL2DesignatedIntermediateSystemChanges
+	}
+	STATUS current
+	DESCRIPTION
+		"A collection of objects providing support for IS-IS 
+		 Level 2 broadcast linkages."
+	::= { cLNSGroups 16 }
+
+-- =====================================================================
+
+-- =====================================================================
+
+-- =====================================================================
+
+
+
+END
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4

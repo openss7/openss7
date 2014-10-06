@@ -1,0 +1,339 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: t_rcvleafchange.3.man,v 1.1.2.2 2011-02-07 02:18:05 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:05 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: t_rcvleafchange.3.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:05  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH T_RCVLEAFCHANGE 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "XTI/TLI Library Calls"
+.SH NAME
+.B t_rcvleafchange
+\- receive addition of point to point to multipoint connection
+.SH SYNOPSIS
+.PP
+.B #include <xti.h>
+.HP 8
+.BI "int t_rcvleafchange(int " fd ", struct t_leaf_status *" change );
+.SH ARGUMENTS
+.PP
+.TP
+.I fd
+the transport endpoint for which to receive leaf change information.
+.TP
+.I change
+a poitner to a
+.B t_leaf_status
+structure to contain returned information about the leaf change.
+.SH DESCRIPTION
+.PP
+.BR t_rcvleafchange ()
+recieves a leaf change indication or confirmation.
+.PP
+.I fd
+specifies the local transport endpoint upon which the leaf change indication
+or confirmation was received.
+.PP
+.I change
+is a pointer to a
+.B t_leaf_status
+structure that returns information about the leaf change.
+The
+.B t_leaf_status
+structure is formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct t_leaf_status {
+	int leafid;
+	int status;
+	int reason;
+};
+\fR\s+1
+.fi
+.PP
+The
+.B t_leaf_status
+structure specifies the following members and information:
+.TP
+.I leafid
+returns an identifier of the leaf to which the status applies.
+.TP
+.I status
+returns the status of the identified leaf and can be one of the following
+values:
+.RS
+.TP 14
+.B T_CONNECT
+the leaf has joined the point to multipoint connection.
+.TP 14
+.B T_DISCONNECT
+the leaf has left the point to multipoint connection.  The
+.I reason
+field indicates the reason for leaving.
+.RE
+.TP
+.I reason
+returns the reason for disconnect.  When
+.I status
+is
+.BR T_CONNECT ,
+this field is meaningless.
+.I reason
+values are transport service provider specific.
+.SH CAVEATS
+.PP
+.BR t_rcvleafchange ()
+is only valid in state
+.BR T_DATAXFER .
+.PP
+.BR t_rcvleafchange ()
+is only valid for transport service providers of service type
+.BR T_COTS " or " T_COTS_ORD
+that support point to multipoint connection management.
+.PP
+In synchronous mode,
+.BR t_rcvleafchange ()
+blocks unit a leaf change confirmation is received.  In asynchronous mode
+where not leaf change confirmation is immediately available,
+.BR t_rcvleafchange ()
+fails, returns -1 and sets
+.IR t_errno (3)
+to
+.BR TNODATA .
+.SH "RETURN VALUE"
+.PP
+Upon success,
+.BR t_rcvleafchange ()
+returns zero (0).
+Upon failure,
+.BR t_rcvleafchange ()
+returns -1 and sets
+.IR t_errno (3)
+to an appropriate error number.
+.SH ERRORS
+.PP
+When
+.BR t_rcvleafchange ()
+fails, it returns -1 and sets
+.IR t_errno (3)
+to an appropriate error number as follows:
+.TP \w'[TNOTSUPPORT]\(em'u
+.RB [ TLOOK ]
+An asynchronous event occured before the call could complete.  See
+.BR t_look (3)
+for more information.
+.TP
+.RB [ TNODATA ]
+An attempt was made to read data but no data indication was available.
+.TP
+.RB [ TNOTSUPPORT ]
+The call requires the use of a TLI primitive not supported by the underlying transport provider.
+.TP
+.RB [ TOUTSTATE ]
+The call was issued with the interface in an incorrect state.
+.TP
+.RB [ TPROTO ]
+A protocol error occured between the XTI/TLI library and the underlying transport provider.
+.TP
+.RB [ TSYSERR ]
+A
+.B Linux
+system error occured and the
+.B Linux
+error number is set in
+.IR errno (3).
+.SH "SEE ALSO"
+.PP
+.BR errno (3),
+.BR t_addleaf (3),
+.BR t_errno (3),
+.BR t_look (3),
+.BR t_removeleaf (3).
+.\"
+.\"
+.SH "BUGS"
+.PP
+.BR t_rcvleafchange ()
+has no known bugs.
+.BR t_rcvleafchange ()
+has been tested for the described behavior using the
+.BR test-xnet (8)
+and
+.BR test-xnet_thr (8)
+conformance test suites.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The XTI/TLI library functions are compatible with 
+SVR4.2,
+.[
+svr42
+.]
+XNS 5.2,
+.[
+xns98
+.]
+SUSv2.
+.[
+susv2
+.]
+Compatibility is tested using the
+.BR test-xnet (8)
+and
+.BR test-xnet_thr (8)
+test case executables and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XTI/TLI,
+.[
+xti revision 1.0
+.]
+TPI,
+.[
+TPI Revision 2.0.0
+.]
+XPG5,
+XNS 5.2,
+.[
+xns98
+.]
+SUSv2.
+.[
+susv2
+.]
+Conformance is tested using the
+.BR test-xnet (8)
+and
+.BR test-xnet_thr (8)
+test case executables and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B t_rcvleafchange
+first appeared in SVR4.2.
+.[
+svr42
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage was written for the OpenSS7 XTI/TLI Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4

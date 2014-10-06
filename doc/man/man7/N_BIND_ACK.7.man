@@ -1,0 +1,282 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: N_BIND_ACK.7.man,v 1.1.2.2 2011-02-07 02:18:20 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:20 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: N_BIND_ACK.7.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:20  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH N_BIND_ACK 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Network Provider Interface (NPI)"
+.SH NAME
+.B N_BIND_ACK, N_bind_ack_t
+\- bind protocol address acknowledgment
+.SH SYNOPSIS
+Format The format of the message is one
+.BR M_PCPROTO (9)
+message block, and its structure is the following:
+.sp
+.nf
+\f(CW\s-1\
+typedef struct {
+    ulong PRIM_type;       /* always N_BIND_ACK */
+    ulong ADDR_length;     /* address length */
+    ulong ADDR_offset;     /* offset of address */
+    ulong CONIND_number;   /* connection indications */
+    ulong TOKEN_value;     /* NC response token value */
+    ulong PROTOID_length;  /* length of protocol id */
+    ulong PROTOID_offset;  /* offset from beg. of block */
+} N_bind_ack_t;
+\fR\s+1
+.fi
+.SH DESCRIPTION
+This primitive indicates to the NS user that the specified network user entity
+has been bound to the requested network address and that the specified number
+of connect indications are allowed to be queued by the NS provider for the
+specified network address.
+.SH PARAMETERS
+.TP
+.I PRIM_type
+Indicates the primitive type.
+
+.TP
+.I ADDR_length
+Is the length of the network address that was bound.
+
+.TP
+.I ADDR_offset
+Is the offset from the beginning of the
+.BR M_PCPROTO (9)
+block where the network address begins.
+
+.TP
+.I CONIND_number
+Is the accepted number of connect indications allowed to be outstanding by the
+NS provider for the specified network address.  If its value is zero, this
+stream cannot accept
+.BR N_CONN_IND (7)
+messages.  If its value is greater than zero, then the NS user can accept
+.BR N_CONN_IND (7)
+messages up to the value specified in this parameter before having to respond
+with a
+.BR N_CONN_RES (7)
+or a
+.BR N_DISCON_REQ (7)
+message.  This field should be ignored for CLNS.
+
+.TP
+.I TOKEN_value
+Conveys the value of the "token" assigned to this stream that canbe used by
+the NS user in a
+.BR N_CONN_RES (7)
+primitive to accept a NC on this stream.  It is a non-zero value, and is unique
+to all streams bound to the NS provider.  This field should be ignored for
+CLNS.
+
+.TP
+.I PROTOID_length
+Conveys the length of the protocol ids that were bound.
+
+.TP
+.I PROTOID_offset
+Conveys the offset of the protocol ids that were bound.  The proper alignment
+of the address in the
+.BR M_PCPROTO (9)
+message block is not guaranteed.
+.SH RULES
+Bind Rules: The following rules apply to the binding of the specified network
+address to the stream
+.IP \- 4
+If the
+.I ADDR_length
+field in the
+.BR N_BIND_REQ (7)
+primitive is zero, then the NS provider is to assign a network address to the
+user.
+.IP \-
+The NS provider is to bind the network address as specified in the
+.BR N_BIND_REQ (7)
+primitive.  If the NS provider cannot bind the specified address, it may assign
+another network address to the user.  It is the network user's responsibility
+to check the network address returned in the
+.B N_BIND_ACK
+primitive to see if it is the same as the one requested.
+.PP
+The following rules apply to negotiating
+.I CONIND_number
+argument:
+.IP \- 4
+The
+.I CONIND_number
+in the
+.B N_BIND_ACK
+primitive must be less than or equal to the
+corresponding requested number as indicated in the
+.BR N_BIND_REQ (7)
+primitive.
+.IP \-
+Only one stream that is bound to the indicated network address may have
+a negotiated accepted number of maximum connect requests greater than zero.  If
+a
+.BR N_BIND_REQ (7)
+primitive specifies a value greater than zero, but another stream
+has already bound itself to the given network address with a value greater than
+zero, the NS provider should assign another protocol address to the user.
+.IP \-
+If a stream with
+.I CONIND_number
+greater than zero is used to accept a connection, the stream will be found
+busy during the duration of that connection and no other streams may be bound
+to that network address with a
+.I CONIND_number
+greater than zero.  This will prevent more than one stream bound
+to the identical network address from accepting connect indications.
+.IP \-
+A stream requesting a
+.I CONIND_number
+of zero should always be legal.  This indicates to the NS provider that the
+stream is to be used to request connections only.
+.IP \-
+A stream with a negotiated
+.I CONIND_number
+greater than zero may generate connect requests or accept connect indications.
+.SH RESPONSE
+If the above rules result in an error condition, then the NS provider must
+issue an
+.BR N_ERROR_ACK (7)
+primitive to the NS user specifying the error as defined
+in the description of the
+.BR N_BIND_REQ (7)
+primitive.
+.SH STATE
+This primitive is in response to a
+.BR N_BIND_REQ (7)
+primitive and is valid in the
+state
+.BR NS_WACK_BREQ .
+.SH "NEW STATE"
+The new state is
+.BR NS_IDLE .
+.SH HISTORY
+.PP
+The Network Provider Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.SH CONFORMANCE
+.PP
+This interface conforms to NPI Revision 2.
+.[
+npi revision 2.0.0 draft 2
+.]
+.XX
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.T2

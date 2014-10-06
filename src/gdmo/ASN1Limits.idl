@@ -1,0 +1,9 @@
+// File: ASN1Limits.idl
+#ifndef _ASN1LIMITS_IDL_
+#define _ASN1LIMITS_IDL_
+// Substitute <MAX> and <MIN> by the max and min (biggest negative)
+// double values your machine can hold for IDL interfaces.
+// Conditional compilation can be used to support multiple architectures.
+#define MIN_FLT <MIN>
+#define MAX_FLT <MAX>
+#endif /* _ASN1LIMITS_IDL_ */

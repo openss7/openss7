@@ -1,0 +1,195 @@
+#!/usr/bin/make -f
+# =============================================================================
+#
+# @(#) $RCSfile: makestubs,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-07-18 19:42:26 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2011-07-18 19:42:26 $ by $Author: brian $
+#
+# =============================================================================
+
+MIBDIRS=../mibs:/usr/share/snmp/mibs:/usr/share/mibs/iana:/usr/share/mibs/ietf:/usr/share/mibs/netsnmp
+MIBFILES=
+#MIBFILES=../mibs/OPENSS7-DL-MIB.mib:../mibs/OPENSS7-LAPB-MIB.mib:../mibs/OPENSS7-LLC2-MIB.mib:../mibs/OPENSS7-M2PA-MIB.mib:../mibs/OPENSS7-M2UA-ASP-MIB.mib:../mibs/OPENSS7-M2UA-MIB.mib:../mibs/OPENSS7-M3UA-ASP-MIB.mib:../mibs/OPENSS7-M3UA-SGP-MIB.mib:../mibs/OPENSS7-METRIC-MIB.mib:../mibs/OPENSS7-SIGTRAN-MIB.mib:../mibs/OPENSS7-SIGTRAN-TC.mib:../mibs/OPENSS7-SMI-MIB.mib:../mibs/OPENSS7-STREAMS-EXT-MIB.mib:../mibs/OPENSS7-STREAMS-MIB.mib:../mibs/OPENSS7-TMN-TC.mib
+#MIBS=+OPENSS7-DL-MIB:OPENSS7-LAPB-MIB:OPENSS7-LLC2-MIB:OPENSS7-M2PA-MIB:OPENSS7-M2UA-ASP-MIB:OPENSS7-M2UA-MIB:OPENSS7-M3UA-ASP-MIB:OPENSS7-M3UA-SGP-MIB:OPENSS7-METRIC-MIB:OPENSS7-SIGTRAN-MIB:OPENSS7-SIGTRAN-TC:OPENSS7-SMI-MIB:OPENSS7-SMI-MIB:OPENSS7-SMI-MIB:OPENSS7-STREAMS-EXT-MIB:OPENSS7-STREAMS-MIB:OPENSS7-TMN-TC:OPENSS7-X25-PLP-MIB:OPENSS7-X25-PLP-MIB
+MIBS=
+
+export MIBS
+export MIBDIRS
+export MIBFILES
+
+#SMIPATH=../mibs:/usr/share/snmp/mibs:/usr/share/mibs/iana:/usr/share/mibs/ietf:/usr/share/mib/netsnmp
+
+#export SMIPATH
+
+#all: simple storage openss7 master
+all: lint dump tree openss7 master
+
+MIBPREFIXES =
+
+SMILINTIGNORES = -i type-unref -i namelength-32 -i opaque-smiv2
+
+-include makestubs.include
+
+dump: $(MIBPREFIXES:%=%.mib)
+
+lint: $(MIBPREFIXES:%=%.lint)
+
+tree check: $(MIBPREFIXES:%=%.tree)
+
+simple: $(MIBPREFIXES:%=%_simple.c) $(MIBPREFIXES:%=%_simple.h)
+
+storage: $(MIBPREFIXES:%=%_storage.c) $(MIBPREFIXES:%=%_storage.h)
+
+openss7: $(MIBPREFIXES:%=%_openss7.c) $(MIBPREFIXES:%=%_openss7.h)
+
+master: \
+	chand_master.c chand_master.h \
+	sigtrand_master.c sigtrand_master.h \
+	ss7confd_master.c ss7confd_master.h \
+	streamsd_master.c streamsd_master.h \
+	xmond_master.c xmond_master.h
+
+chand_master.c chand_master.h: mib2c mib2c.master.conf ../mibs/OPENSS7-MX-MIB.mib
+	./mib2c -c ./mib2c.master.conf -f chand_master OPENSS7-MX-MIB::mxMIB
+	indent -nhnl chand_master.[ch]
+
+sigtrand_master.c sigtrand_master.h: mib2c mib2c.master.conf ../mibs/OPENSS7-SIGTRAN-MIB.mib
+	./mib2c -c ./mib2c.master.conf -f sigtrand_master OPENSS7-SIGTRAN-MIB::sigtranMIB
+	indent -nhnl sigtrand_master.[ch]
+
+ss7confd_master.c ss7confd_master.h: mib2c mib2c.master.conf ../mibs/OPENSS7-SS7-MIB.mib
+	./mib2c -c ./mib2c.master.conf -f ss7confd_master OPENSS7-SS7-MIB::ss7MIB
+	indent -nhnl ss7confd_master.[ch]
+
+streamsd_master.c streamsd_master.h: mib2c mib2c.master.conf ../mibs/OPENSS7-STREAMS-MIB.mib
+	./mib2c -c ./mib2c.master.conf -f streamsd_master OPENSS7-STREAMS-MIB::strMIB
+	indent -nhnl streamsd_master.[ch]
+
+xmond_master.c xmond_master.h: mib2c mib2c.master.conf ../mibs/OPENSS7-XMON-MIB.mib
+	./mib2c -c ./mib2c.master.conf -f xmond_master OPENSS7-XMON-MIB::xmonMIB
+	indent -nhnl xmond_master.[ch]
+
+tables:
+	./mib2c -c ./mib2c.storage.conf mACDLETable
+	./mib2c -c ./mib2c.storage.conf mACTable
+	./mib2c -c ./mib2c.storage.conf resourceTypeIdTable
+	./mib2c -c ./mib2c.storage.conf dLSAPTable
+	./mib2c -c ./mib2c.storage.conf lLCDLETable
+	./mib2c -c ./mib2c.storage.conf lLCStationTable
+	./mib2c -c ./mib2c.storage.conf lLCSAPTable
+	./mib2c -c ./mib2c.storage.conf rDESetupTable
+	./mib2c -c ./mib2c.storage.conf rDEPairTable
+	./mib2c -c ./mib2c.storage.conf lLCCLPMTable
+	./mib2c -c ./mib2c.storage.conf lLCConnectionLessTable
+	./mib2c -c ./mib2c.storage.conf lLCCOPMTable
+	./mib2c -c ./mib2c.storage.conf lLCConnection2Table
+	./mib2c -c ./mib2c.storage.conf lLCConnection2IVMOTable
+	./mib2c -c ./mib2c.storage.conf lLCConnectionlessAckTable
+	./mib2c -c ./mib2c.storage.conf lLCConnectionlessAckIVMOTable
+	indent -nhnl *Table.[ch]
+	./mib2c -c ./mib2c.storage.conf x400pSyncTable
+	./mib2c -c ./mib2c.storage.conf x400pCardTable
+	./mib2c -c ./mib2c.storage.conf x400pSpanTable
+	./mib2c -c ./mib2c.storage.conf x400pChanTable
+	indent -nhnl x400p*Table.[ch]
+	./mib2c -c ./mib2c.storage.conf strModTable
+	./mib2c -c ./mib2c.storage.conf strModInfoTable
+	./mib2c -c ./mib2c.storage.conf strModStatTable
+	./mib2c -c ./mib2c.storage.conf strStatsTable
+	./mib2c -c ./mib2c.storage.conf strApshTable
+	indent -nhnl str*Table.[ch]
+
+clean:
+	@list='$(MIBPREFIXES)'; for p in $$list ; do \
+		echo "rm -fv $${p}_{openss7,simple,storage}.[ch]" ; \
+		rm -fv $${p}_openss7.[ch] ; \
+		rm -fv $${p}_simple.[ch] ; \
+		rm -fv $${p}_storage.[ch] ; \
+		echo "rm -fv $${p}_{openss7,simple,storage}.[ch]~" ; \
+		rm -fv $${p}_openss7.[ch]~ ; \
+		rm -fv $${p}_simple.[ch]~ ; \
+		rm -fv $${p}_storage.[ch]~ ; \
+		echo "rm -fv $${p}.{mib,lint,tree}" ; \
+		rm -fv $${p}.mib ; \
+		rm -fv $${p}.lint ; \
+		rm -fv $${p}.tree ; \
+	done
+	rm -f chand_master.[ch]
+	rm -f chand_master.[ch]~
+	rm -f sigtrand_master.[ch]
+	rm -f sigtrand_master.[ch]~
+	rm -f ss7confd_master.[ch]
+	rm -f ss7confd_master.[ch]~
+	rm -f streamsd_master.[ch]
+	rm -f streamsd_master.[ch]~
+	rm -f xmond_master.[ch]
+	rm -f xmond_master.[ch]~
+	rm -f *Table.[ch]
+	rm -f *Table.[ch]~
+	rm -f x400pSpanTable.[ch]
+	rm -f x400pSpanTable.[ch]~
+	rm -f x400pSyncTable.[ch]
+	rm -f x400pSyncTable.[ch]~
+	rm -f x400p*Table.[ch]
+
+.PHONY: all clean dump lint tree check openss7 simple storage
+# =============================================================================
+#
+# $Log: makestubs,v $
+# Revision 1.1.2.4  2011-07-18 19:42:26  brian
+# - added documentation
+#
+# Revision 1.1.2.3  2010-06-09 12:58:33  brian
+# - updated mibs
+#
+# Revision 1.1.2.2  2010-03-10 08:42:20  brian
+# - added Optranex files
+#
+# Revision 1.1.2.1  2009-06-21 11:42:33  brian
+# - added files to new distro
+#
+# =============================================================================

@@ -1,0 +1,610 @@
+0113	Leeds	N
+0114	Sheffield	N
+0115	Nottingham	N
+0116	Leicester	N
+0117	Bristol	N
+0118	Reading	N
+01200	Clitheroe	Y
+01202	Bournemouth	Y
+01204	Bolton	Y
+01205	Boston	Y
+01206	Colchester	Y
+01207	Consett	Y
+01208	Bodmin	Y
+01209	Redruth	Y
+0121	Birmingham	N
+01223	Cambridge	Y
+01224	Aberdeen	Y
+01225	Bath	Y
+01226	Barnsley	Y
+01227	Canterbury	Y
+01228	Carlisle	Y
+01229	Barrow-in-Furness (2,4,5,6,8);Millom (3,7,9)	Y
+01233	Ashford (Kent)	Y
+01234	Bedford	Y
+01235	Abingdon	Y
+01236	Coatbridge	Y
+01237	Bideford	Y
+01239	Cardigan	Y
+01241	Arbroath	Y
+01242	Cheltenham	Y
+01243	Chichester	Y
+01244	Chester	Y
+01245	Chelmsford	Y
+01246	Chesterfield	Y
+01248	Bangor (Gwynedd)	Y
+01249	Chippenham	Y
+01250	Blairgowrie	Y
+01252	Aldershot	Y
+01253	Blackpool	Y
+01254	Blackburn	Y
+01255	Clacton-on-Sea	Y
+01256	Basingstoke	Y
+01257	Coppull	Y
+01258	Blandford	Y
+01259	Alloa	Y
+01260	Congleton	Y
+01261	Banff	Y
+01262	Bridlington	Y
+01263	Cromer	Y
+01264	Andover	Y
+01267	Carmarthen	Y
+01268	Basildon	Y
+01269	Ammanford	Y
+01270	Crewe	Y
+01271	Barnstaple	Y
+01273	Brighton	Y
+01274	Bradford	Y
+01275	Clevedon	Y
+01276	Camberley	Y
+01277	Brentwood	Y
+01278	Bridgwater	Y
+01279	Bishops Stortford	Y
+01280	Buckingham	Y
+01282	Burnley	Y
+01283	Burton-on-Trent	Y
+01284	Bury St Edmunds	Y
+01285	Cirencester	Y
+01286	Caernarfon	Y
+01287	Guisborough	Y
+01288	Bude	Y
+01289	Berwick-upon-Tweed	Y
+01290	Cumnock	Y
+01291	Chepstow	Y
+01292	Ayr	Y
+01293	Crawley	Y
+01294	Ardrossan	Y
+01295	Banbury	Y
+01296	Aylesbury	Y
+01297	Axminster	Y
+01298	Buxton	Y
+01299	Bewdley	Y
+01300	Cerne Abbas	Y
+01301	Arrochar	Y
+01302	Doncaster	Y
+01303	Folkestone	Y
+01304	Dover	Y
+01305	Dorchester	Y
+01306	Dorking	Y
+01307	Forfar	Y
+01308	Bridport	Y
+01309	Forres	Y
+0131	Edinburgh	N
+01320	Fort Augustus	Y
+01322	Dartford	Y
+01323	Eastbourne	Y
+01324	Falkirk	Y
+01325	Darlington	Y
+01326	Falmouth	Y
+01327	Daventry	Y
+01328	Fakenham	Y
+01329	Fareham	Y
+01330	Banchory	Y
+01332	Derby	Y
+01333	Peat Inn	Y
+01334	St Andrews	Y
+01335	Ashbourne	Y
+01337	Ladybank	Y
+01339	Aboyne (2,3,5,8);Ballater (4,6,7,9)	Y
+01340	Craigellachie	Y
+01341	Barmouth	Y
+01342	East Grinstead	Y
+01343	Elgin	Y
+01344	Bracknell	Y
+01346	Fraserburgh	Y
+01347	Easingwold	Y
+01348	Fishguard	Y
+01349	Dingwall	Y
+01350	Dunkeld	Y
+01352	Mold	Y
+01353	Ely	Y
+01354	Chatteris	Y
+01355	East Kilbride	Y
+01356	Brechin	Y
+01357	Strathaven	Y
+01358	Ellon	Y
+01359	Pakenham	Y
+01360	Killearn	Y
+01361	Duns	Y
+01362	Dereham	Y
+01363	Crediton	Y
+01364	Ashburton	Y
+01366	Downham Market	Y
+01367	Faringdon	Y
+01368	Dunbar	Y
+01369	Dunoon	Y
+01371	Great Dunmow	Y
+01372	Esher	Y
+01373	Frome	Y
+01375	Grays Thurrock	Y
+01376	Braintree	Y
+01377	Driffield	Y
+01379	Diss	Y
+01380	Devizes	Y
+01381	Fortrose	Y
+01382	Dundee	Y
+01383	Dunfermline	Y
+01384	Dudley	Y
+01386	Evesham	Y
+01387	Dumfries	Y
+013873	Langholm	Y
+01388	Bishop Auckland (3,4,6,7,8,9);Stanhope (2,5)	Y
+01389	Dumbarton	Y
+01392	Exeter	Y
+01394	Felixstowe	Y
+01395	Budleigh Salterton	Y
+01397	Fort William	Y
+01398	Dulverton	Y
+01400	Honington	Y
+01403	Horsham	Y
+01404	Honiton	Y
+01405	Goole	Y
+01406	Holbeach	Y
+01407	Holyhead	Y
+01408	Golspie	Y
+01409	Holsworthy	Y
+0141	Glasgow	N
+01420	Alton	Y
+01422	Halifax	Y
+01423	Boroughbridge (3,4,9);Harrogate (2,5,6,7,8)	Y
+01424	Hastings	Y
+01425	Ringwood	Y
+01427	Gainsborough	Y
+01428	Haslemere	Y
+01429	Hartlepool	Y
+01430	Market Weighton (6,7,8,9);North Cave (2,3,4,5)	Y
+01431	Helmsdale	Y
+01432	Hereford	Y
+01433	Hathersage	Y
+01434	Bellingham (2,4,9);Haltwhistle (3,5);Hexham (6,7,8)	Y
+01435	Heathfield	Y
+01436	Helensburgh	Y
+01437	Clynderwen (2,3,4,5);Haverfordwest (6,7,8,9)	Y
+01438	Stevenage	Y
+01439	Helmsley	Y
+01440	Haverhill	Y
+01442	Hemel Hempstead	Y
+01443	Pontypridd	Y
+01444	Haywards Heath	Y
+01445	Gairloch	Y
+01446	Barry	Y
+01449	Stowmarket	Y
+01450	Hawick	Y
+01451	Stow-on-the-Wold	Y
+01452	Gloucester	Y
+01453	Dursley	Y
+01454	Chipping Sodbury	Y
+01455	Hinckley	Y
+01456	Glenurquhart	Y
+01457	Glossop	Y
+01458	Glastonbury	Y
+01460	Chard	Y
+01461	Gretna	Y
+01462	Hitchin	Y
+01463	Inverness	Y
+01464	Insch	Y
+01465	Girvan	Y
+01466	Huntly	Y
+01467	Inverurie	Y
+01469	Killingholme	Y
+01470	Isle of Skye - Edinbane	Y
+01471	Isle of Skye - Broadford	Y
+01472	Grimsby	Y
+01473	Ipswich	Y
+01474	Gravesend	Y
+01475	Greenock	Y
+01476	Grantham	Y
+01477	Holmes Chapel	Y
+01478	Isle of Skye - Portree	Y
+01479	Grantown-on-Spey	Y
+01480	Huntingdon	Y
+01481	Guernsey	N
+01482	Hull	Y
+01483	Guildford	Y
+01484	Huddersfield	Y
+01485	Hunstanton	Y
+01487	Warboys	Y
+01488	Hungerford	Y
+01489	Bishops Waltham	Y
+01490	Corwen	Y
+01491	Henley-on-Thames	Y
+01492	Colwyn Bay	Y
+01493	Great Yarmouth	Y
+01494	High Wycombe	Y
+01495	Pontypool	Y
+01496	Port Ellen	Y
+01497	Hay-on-Wye	Y
+01499	Inveraray	Y
+01501	Harthill	Y
+01502	Lowestoft	Y
+01503	Looe	Y
+01505	Johnstone	Y
+01506	Bathgate	Y
+01507	Alford (Lincs) (4,8,9);Louth (3,6,7);Spilsby (2,5)	Y
+01508	Brooke	Y
+01509	Loughborough	Y
+0151	Liverpool	N
+01520	Lochcarron	Y
+01522	Lincoln	Y
+01524	Lancaster	Y
+015242	Hornby	Y
+01525	Leighton Buzzard	Y
+01526	Martin	Y
+01527	Redditch	Y
+01528	Laggan	Y
+01529	Sleaford	Y
+01530	Coalville	Y
+01531	Ledbury	Y
+01534	Jersey	N
+01535	Keighley	Y
+01536	Kettering	Y
+01538	Ipstones	Y
+01539	Kendal	Y
+015394	Hawkshead	Y
+015395	Grange-over-Sands	Y
+015396	Sedbergh	Y
+01540	Kingussie	Y
+01542	Keith	Y
+01543	Cannock	Y
+01544	Kington	Y
+01545	Llanarth	Y
+01546	Lochgilphead	Y
+01547	Knighton	Y
+01548	Kingsbridge	Y
+01549	Lairg	Y
+01550	Llandovery	Y
+01553	Kings Lynn	Y
+01554	Llanelli	Y
+01555	Lanark	Y
+01556	Castle Douglas	Y
+01557	Kirkcudbright	Y
+01558	Llandeilo	Y
+01559	Llandysul	Y
+01560	Moscow	Y
+01561	Laurencekirk	Y
+01562	Kidderminster	Y
+01563	Kilmarnock	Y
+01564	Lapworth	Y
+01565	Knutsford	Y
+01566	Launceston	Y
+01567	Killin	Y
+01568	Leominster	Y
+01569	Stonehaven	Y
+01570	Lampeter	Y
+01571	Lochinver	Y
+01572	Oakham	Y
+01573	Kelso	Y
+01575	Kirriemuir	Y
+01576	Lockerbie	Y
+01577	Kinross	Y
+01578	Lauder	Y
+01579	Liskeard	Y
+01580	Cranbrook	Y
+01581	New Luce	Y
+01582	Luton	Y
+01583	Carradale	Y
+01584	Ludlow	Y
+01586	Campbeltown	Y
+01588	Bishops Castle	Y
+01590	Lymington	Y
+01591	Llanwrtyd Wells	Y
+01592	Kirkcaldy	Y
+01593	Lybster	Y
+01594	Lydney	Y
+01595	Lerwick Foula (75);Fair Isle (76)	Y
+01597	Llandrindod Wells	Y
+01598	Lynton	Y
+01599	Kyle	Y
+01600	Monmouth	Y
+01603	Norwich	Y
+01604	Northampton	Y
+01606	Northwich	Y
+01608	Chipping Norton	Y
+01609	Northallerton	Y
+0161	Manchester	N
+01620	North Berwick	Y
+01621	Maldon	Y
+01622	Maidstone	Y
+01623	Mansfield	Y
+01624	Isle of Man	Y
+01625	Macclesfield	Y
+01626	Newton Abbot	Y
+01628	Maidenhead	Y
+01629	Matlock	Y
+01630	Market Drayton	Y
+01631	Oban	Y
+01633	Newport	Y
+01634	Medway	Y
+01635	Newbury	Y
+01636	Newark	Y
+01637	Newquay	Y
+01638	Newmarket	Y
+01639	Neath	Y
+01641	Strathy	Y
+01642	Middlesbrough	Y
+01643	Minehead	Y
+01644	New Galloway	Y
+01646	Milford Haven	Y
+01647	Moretonhampstead	Y
+01650	Cemmaes Road	Y
+01651	Oldmeldrum	Y
+01652	Brigg	Y
+01653	Malton	Y
+01654	Machynlleth	Y
+01655	Maybole	Y
+01656	Bridgend	Y
+01659	Sanquhar	Y
+01661	Prudhoe	Y
+01663	New Mills	Y
+01664	Melton Mowbray	Y
+01665	Alnwick	Y
+01666	Malmesbury	Y
+01667	Nairn	Y
+01668	Bamburgh	Y
+01669	Rothbury	Y
+01670	Morpeth	Y
+01671	Newton Stewart	Y
+01672	Marlborough	Y
+01673	Market Rasen	Y
+01674	Montrose	Y
+01675	Coleshill	Y
+01676	Meriden	Y
+01677	Bedale	Y
+01678	Bala	Y
+01680	Isle of Mull - Craignure	Y
+01681	Isle of Mull - Fionnphort	Y
+01683	Moffat	Y
+01684	Malvern	Y
+01685	Merthyr Tydfil	Y
+01686	Llanidloes (2,3,4,7);Newtown (5,6,8,9)	Y
+01687	Mallaig	Y
+01688	Isle of Mull - Tobermory	Y
+01689	Orpington	Y
+01690	Betws-y-Coed	Y
+01691	Oswestry	Y
+01692	North Walsham	Y
+01694	Church Stretton	Y
+01695	Skelmersdale	Y
+01697	Brampton	Y
+016973	Wigton	Y
+016974	Raughton Head	Y
+01698	Motherwell	Y
+01700	Rothesay	Y
+01702	Southend-on-Sea	Y
+01704	Southport	Y
+01706	Rochdale	Y
+01707	Welwyn Garden City	Y
+01708	Romford	Y
+01709	Rotherham	Y
+01720	Isles of Scilly	Y
+01721	Peebles	Y
+01722	Salisbury	Y
+01723	Scarborough	Y
+01724	Scunthorpe	Y
+01725	Rockbourne	Y
+01726	St Austell	Y
+01727	St Albans	Y
+01728	Saxmundham	Y
+01729	Settle	Y
+01730	Petersfield	Y
+01732	Sevenoaks	Y
+01733	Peterborough	Y
+01736	Penzance	Y
+01737	Redhill	Y
+01738	Perth	Y
+01740	Sedgefield	Y
+01743	Shrewsbury	Y
+01744	St Helens	Y
+01745	Rhyl	Y
+01746	Bridgnorth	Y
+01747	Shaftesbury	Y
+01748	Richmond	Y
+01749	Shepton Mallet	Y
+01750	Selkirk	Y
+01751	Pickering	Y
+01752	Plymouth	Y
+01753	Slough	Y
+01754	Skegness	Y
+01756	Skipton	Y
+01757	Selby	Y
+01758	Pwllheli	Y
+01759	Pocklington	Y
+01760	Swaffham	Y
+01761	Temple Cloud	Y
+01763	Royston	Y
+01764	Crieff	Y
+01765	Ripon	Y
+01766	Porthmadog	Y
+01767	Sandy	Y
+01768	Penrith	Y
+017683	Appleby	Y
+017684	Pooley Bridge	Y
+017687	Keswick	Y
+01769	South Molton	Y
+01770	Isle of Arran	Y
+01771	Maud	Y
+01772	Preston	Y
+01773	Ripley	Y
+01775	Spalding	Y
+01776	Stranraer	Y
+01777	Retford	Y
+01778	Bourne	Y
+01779	Peterhead	Y
+01780	Stamford	Y
+01782	Stoke-on-Trent	Y
+01784	Staines	Y
+01785	Stafford	Y
+01786	Stirling	Y
+01787	Sudbury	Y
+01788	Rugby	Y
+01789	Stratford-upon-Avon	Y
+01790	Spilsby	Y
+01792	Swansea	Y
+01793	Swindon	Y
+01794	Romsey	Y
+01795	Sittingbourne	Y
+01796	Pitlochry	Y
+01797	Rye	Y
+01798	Pulborough	Y
+01799	Saffron Walden	Y
+01803	Torquay	Y
+01805	Torrington	Y
+01806	Shetland	Y
+01807	Ballindalloch	Y
+01808	Tomatin	Y
+01809	Tomdoun	Y
+01821	Kinrossie	Y
+01822	Tavistock	Y
+01823	Taunton	Y
+01824	Ruthin	Y
+01825	Uckfield	Y
+01827	Tamworth	Y
+01828	Coupar Angus	Y
+01829	Tarporley	Y
+01830	Kirkwhelpington	Y
+01832	Clopton	Y
+01833	Barnard Castle	Y
+01834	Narberth	Y
+01835	St Boswells	Y
+01837	Okehampton	Y
+01838	Dalmally	Y
+01840	Camelford	Y
+01841	Newquay	Y
+01842	Thetford	Y
+01843	Thanet	Y
+01844	Thame	Y
+01845	Thirsk	Y
+01847	Thurso (2,3,4,5,8);Tongue (6,7,9)	Y
+01848	Thornhill	Y
+01851	Great Bernera (4,6,9);Stornoway (2,3,5,7,8)	Y
+01852	Kilmelford	Y
+01854	Ullapool	Y
+01855	Ballachulish	Y
+01856	Orkney	Y
+01857	Sanday	Y
+01858	Market Harborough	Y
+01859	Harris	Y
+01862	Tain	Y
+01863	Ardgay	Y
+01864	Abington	Y
+01865	Oxford	Y
+01866	Kilchrenan	Y
+01869	Bicester	Y
+01870	Isle of Benbecula	Y
+01871	Castlebay	Y
+01872	Truro	Y
+01873	Abergavenny	Y
+01874	Brecon	Y
+01875	Tranent	Y
+01876	Lochmaddy	Y
+01877	Callander	Y
+01878	Lochboisdale	Y
+01879	Scarinish	Y
+01880	Tarbert	Y
+01882	Kinloch Rannoch	Y
+01883	Caterham	Y
+01884	Tiverton	Y
+01885	Pencombe	Y
+01886	Bromyard	Y
+01887	Aberfeldy	Y
+01888	Turriff	Y
+01889	Rugeley	Y
+01890	Ayton (5,6,7,9);Coldstream (2,3,4,8)	Y
+01892	Tunbridge Wells	Y
+01895	Uxbridge	Y
+01896	Galashiels	Y
+01899	Biggar	Y
+01900	Workington	Y
+01902	Wolverhampton	Y
+01903	Worthing	Y
+01904	York	Y
+01905	Worcester	Y
+01908	Milton Keynes	Y
+01909	Worksop	Y
+0191	Tyneside (2,4,6,8);Durham (3,9);Sunderland (5,7)	N
+01920	Ware	Y
+01922	Walsall	Y
+01923	Watford	Y
+01924	Wakefield	Y
+01925	Warrington	Y
+01926	Warwick	Y
+01928	Runcorn	Y
+01929	Wareham	Y
+01931	Shap	Y
+01932	Weybridge	Y
+01933	Wellingborough	Y
+01934	Weston-super-Mare	Y
+01935	Yeovil	Y
+01937	Wetherby	Y
+01938	Welshpool	Y
+01939	Wem	Y
+01942	Wigan	Y
+01943	Guiseley	Y
+01944	West Heslerton	Y
+01945	Wisbech	Y
+01946	Whitehaven	Y
+019467	Gosforth	Y
+01947	Whitby	Y
+01948	Whitchurch	Y
+01949	Whatton	Y
+01950	Sandwick	Y
+01951	Colonsay	Y
+01952	Telford	Y
+01953	Wymondham	Y
+01954	Madingley	Y
+01955	Wick	Y
+01957	Mid Yell	Y
+01959	Westerham	Y
+01962	Winchester	Y
+01963	Wincanton	Y
+01964	Hornsea (2,5,8,9);Patrington (3,4,6,7)	Y
+01967	Strontian	Y
+01968	Penicuik	Y
+01969	Leyburn	Y
+01970	Aberystwyth	Y
+01971	Scourie	Y
+01972	Glenborrodale	Y
+01974	Llanon	Y
+01975	Alford (Aberdeen) (2,4,5,9);Strathdon (3,6,7,8)	Y
+01977	Pontefract	Y
+01978	Wrexham	Y
+01980	Amesbury	Y
+01981	Wormbridge	Y
+01982	Builth Wells	Y
+01983	Isle of Wight	Y
+01984	Watchet	Y
+01985	Warminster	Y
+01986	Bungay	Y
+01987	Ebbsfleet	Y
+01988	Wigtown	Y
+01989	Ross-on-Wye	Y
+01992	Lea Valley	Y
+01993	Witney	Y
+01994	St Clears	Y
+01995	Garstang	Y
+01997	Strathpeffer	Y
+02	London (0,1,2,31,32,33,34,35,36,37)	N
+023	Southampton (8X);Portsmouth (9X)	N
+024	Coventry	N
+028	Ballycastle (20);Martinstown (21);Ballymena (25);Ballymoney (27);Larne (28);Kilrea (29);Newry (30);Armagh (37);Portadown (38);Banbridge (40);Rostrevor (41);Kircubbin (42);Newcastle (Co. Down) (43);Downpatrick (44);Enniskillen (66);Lisnaskea (67);Kesh (68);Coleraine (70);Londonderry (71);Limavady (77);Magherafelt (79);Carrickmore (80);Newtownstewart (81);Omagh (82);Ballygawley (85);Cookstown (86);Dungannon (87);Fivemiletown (89);Belfast (90,95);Bangor (Co. Down) (91);Lisburn (92);Ballyclare (93);Antrim (94);Saintfield (97)	N
+029	Cardiff	N

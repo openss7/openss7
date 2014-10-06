@@ -1,0 +1,1 @@
+.so man7/N_RESET_IND.7.man

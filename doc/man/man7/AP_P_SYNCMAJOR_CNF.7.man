@@ -1,0 +1,1 @@
+.so man7/P_SYNCMAJOR_CNF.7.man

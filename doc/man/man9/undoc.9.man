@@ -1,0 +1,330 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: undoc.9.man,v 1.1.2.4 2011-04-11 06:13:42 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-04-11 06:13:42 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: undoc.9.man,v $
+.\" Revision 1.1.2.4  2011-04-11 06:13:42  brian
+.\" - working up weak updates
+.\"
+.\" Revision 1.1.2.3  2011-02-07 02:18:46  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH UNDOCUMENTED 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B allocqb, allstream, bcache_allocb, bcache_create, bcache_destroy, bpsize,
+.B __bufcall, create_putlocks, defer_func, di_alloc, di_put, findlinks,
+.B flushq_common, freechain, freeqb, getendq, getf, infonext, isuioq,
+.B kmem_alloc_physcontig, kmem_alloc_physreq, kmem_free_physcontig,
+.B kmem_free_physreq, kmem_zalloc_physreq, map_cv, maplock, mdbblock_alloc,
+.B mdbblock_free, mount, mtp_n_uderror_ind, mtp_n_unitdata_ind,
+.B mtp_n_unitdata_req, physreq_alloc, physreq_free, physreq_prep, pipe,
+.B printf, qallocb, QNAME, qpop, qpush, qschedule, qwait_rw, reallocb,
+.B rmsetwant, rmwanted, rwnext, sccp_n_uderror_ind, sccp_n_unitdata_ind,
+.B sccp_n_unitdata_req, sctp_datack_ind, sctp_datack_req, sctp_data_ind,
+.B sctp_data_req, sctp_exdata_ind, sctp_exdata_req, sparc_ioremap, straln,
+.B strbcpy, stream_free, streams_interrupt, streams_module_address, STREAMS_TIMEOUT, struioget,
+.B struioput, strwakeq, __timeout, udelay, vtop
+\- undocumented functions
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+Various.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+Various.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+.BR DDI/DKI ,
+internal,
+implementation extensions,
+implementation specific.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+These are undocumented function that still need a manual page written for them.
+.TP
+.BR maccompat (9)
+The following functions are undocumented MAC OT compatibility functions:
+.B esballoca, mpnotify
+.TP
+.BR mpscompat (9)
+The following functions are undocumented MPS compatibility functions:
+.B mi_sprintf_putc, mi_tpi_ack_alloc, mi_tpi_conn_con, mi_tpi_conn_ind,
+.B mi_tpi_conn_req, mi_tpi_data_ind, mi_tpi_data_req, mi_tpi_discon_ind,
+.B mi_tpi_discon_req, mi_tpi_err_ack_alloc, mi_tpi_exdata_ind,
+.B mi_tpi_exdata_req, mi_tpi_info_req, mi_tpi_ok_ack_alloc,
+.B mi_tpi_ordrel_ind, mi_tpi_ordrel_req, mi_tpi_uderror_ind,
+.B mi_tpi_unitdata_ind, mi_tpi_unitdata_req
+.TP
+.BR os7compat (9)
+The following functions are undocumented OpenSS7 compatibility functions:
+.B bufq_append, bufq_dequeue, bufq_dequeue_tail, bufq_freehead, bufq_head,
+.B bufq_init, bufq_insert, bufq_length, bufq_lock, bufq_purge, bufq_queue,
+.B bufq_queue_head, bufq_resupply, bufq_size, bufq_splice_head,
+.B bufq_splice_tail, bufq_supply, bufq_tail, bufq_unlink, bufq_unlock,
+.B freechunks, ss7_allocb, ss7_bufcall, ss7_bufpool_init,
+.B ss7_bufpool_release, ss7_bufpool_reserve, ss7_bufpool_term, ss7_bufsrv,
+.B ss7_copyb, ss7_copymsg, ss7_do_timeout, ss7_dupb, ss7_dupmsg,
+.B ss7_esballoc, ss7_esbbcall, ss7_fast_allocb, ss7_fast_allocb_bh,
+.B ss7_fast_freeb, ss7_fast_freeb_bh, ss7_fast_freemsg, ss7_fast_freemsg_bh,
+.B ss7_iput, ss7_isrv, ss7_oput, ss7_osrv, ss7_pullupmsg, ss7_putq,
+.B ss7_r_flush, ss7_srvq, ss7_start_timer, ss7_stop_timer, ss7_trylockq,
+.B ss7_unbufcall, ss7_unlockq, ss7_w_flush
+.TP
+.BR osfcompat (9)
+The following functions are undocumented OSF compatibility functions:
+.B time, uprintf
+.TP
+.BR suncompat (9)
+The following functions are undocumented Solaris compatibility functions:
+.B
+.B ddi_add_intr, ddi_add_softintr, ddi_binding_name, ddi_btop, ddi_btopr,
+.B ddi_check_acc_handle, ddi_check_dma_handle, ddi_copyin, ddi_copyout,
+.B ddi_create_minor_node, ddi_device_copy, ddi_device_zero, ddi_devid_compare,
+.B ddi_devid_free, ddi_devid_init, ddi_devid_register, ddi_devid_sizeof,
+.B ddi_devid_str_decode, ddi_devid_str_encode, ddi_devid_str_free,
+.B ddi_devid_unregister, ddi_devid_valid, ddi_dev_is_needed, ddi_dev_is_sid,
+.B ddi_devmap_segmap, ddi_dev_nintrs, ddi_dev_nregs, ddi_dev_regsize,
+.B ddi_dev_report_fault, ddi_dma_addr_bind_handle, ddi_dma_addr_setup,
+.B ddi_dma_alloc_handle, ddi_dma_buf_bind_handle, ddi_dma_buf_setup,
+.B ddi_dma_burstsizes, ddi_dma_coff, ddi_dma_curwin, ddi_dma_devalign,
+.B ddi_dmae_1stparty, ddi_dmae, ddi_dmae_alloc, ddi_dmae_disable,
+.B ddi_dmae_enable, ddi_dmae_getattr, ddi_dmae_getcnt, ddi_dmae_getlim,
+.B ddi_dmae_prog, ddi_dmae_release, ddi_dmae_stop, ddi_dma_free,
+.B ddi_dma_free_handle, ddi_dma_get_attr, ddi_dma_getwin, ddi_dma_htoc,
+.B ddi_dma_mem_alloc, ddi_dma_mem_free, ddi_dma_movwin, ddi_dma_nextcookie,
+.B ddi_dma_nextseg, ddi_dma_nextwin, ddi_dma_numwin, ddi_dma_segtocookie,
+.B ddi_dma_set_sbus64, ddi_dma_setup, ddi_dma_sync, ddi_dma_unbind_handle,
+.B ddi_driver_major, ddi_driver_name, ddi_enter_critical, ddi_exit_critical,
+.B ddi_ffs, ddi_fls, ddi_get16, ddi_get32, ddi_get64, ddi_get8, ddi_getb,
+.B ddi_get_devstate, ddi_get_driver_private, ddi_get_iblock_cookie,
+.B ddi_get_instance, ddi_get_kt_did, ddi_getl, ddi_getll, ddi_getlongprop,
+.B ddi_getlongprop_buf, ddi_get_name, ddi_get_parent, ddi_getprop,
+.B ddi_getproplen, ddi_get_soft_iblock_cookie, ddi_get_soft_state, ddi_getw,
+.B ddi_in_panic, ddi_intr_hilevel, ddi_io_get16, ddi_io_get32, ddi_io_get64,
+.B ddi_io_get8, ddi_io_getb, ddi_io_getl, ddi_io_getw, ddi_iomin,
+.B ddi_iopb_alloc, ddi_iopb_free, ddi_io_put16, ddi_io_put32, ddi_io_put64,
+.B ddi_io_put8, ddi_io_putb, ddi_io_putl, ddi_io_putw, ddi_io_rep_get16,
+.B ddi_io_rep_get32, ddi_io_rep_get64, ddi_io_rep_get8, ddi_io_rep_getb,
+.B ddi_io_rep_getl, ddi_io_rep_getw, ddi_io_rep_put16, ddi_io_rep_put32,
+.B ddi_io_rep_put64, ddi_io_rep_put8, ddi_io_rep_putb, ddi_io_rep_putl,
+.B ddi_io_rep_putw, ddi_log_sysevent, ddi_mapdev, ddi_mapdev_intercept,
+.B ddi_mapdev_nointercept, ddi_map_regs, ddi_mem_alloc, ddi_mem_free,
+.B ddi_mem_get16, ddi_mem_get32, ddi_mem_get64, ddi_mem_get8, ddi_mem_getb,
+.B ddi_mem_getl, ddi_mem_getll, ddi_mem_getw, ddi_mem_put16, ddi_mem_put32,
+.B ddi_mem_put64, ddi_mem_put8, ddi_mem_putb, ddi_mem_putl, ddi_mem_putll,
+.B ddi_mem_putw, ddi_mem_rep_get16, ddi_mem_rep_get32, ddi_mem_rep_get64,
+.B ddi_mem_rep_get8, ddi_mem_rep_getb, ddi_mem_rep_getl, ddi_mem_rep_getll,
+.B ddi_mem_rep_getw, ddi_mem_rep_put16, ddi_mem_rep_put32, ddi_mem_rep_put64,
+.B ddi_mem_rep_put8, ddi_mem_rep_putb, ddi_mem_rep_putl, ddi_mem_rep_putll,
+.B ddi_mem_rep_putw, ddi_mmap_get_model, ddi_model_convert_from, ddi_node_name,
+.B ddi_peek16, ddi_peek32, ddi_peek64, ddi_peek8, ddi_peek, ddi_peekc,
+.B ddi_peekd, ddi_peekl, ddi_peeks, ddi_poke16, ddi_poke32, ddi_poke64,
+.B ddi_poke8, ddi_poke, ddi_pokec, ddi_poked, ddi_pokel, ddi_pokes,
+.B ddi_prop_create, ddi_prop_exists, ddi_prop_free, ddi_prop_get_int64,
+.B ddi_prop_get_int, ddi_prop_lookup, ddi_prop_lookup_byte_array,
+.B ddi_prop_lookup_int64_array, ddi_prop_lookup_int_array,
+.B ddi_prop_lookup_string, ddi_prop_lookup_string_array, ddi_prop_modify,
+.B ddi_prop_op, ddi_prop_remove, ddi_prop_remove_all, ddi_prop_undefine,
+.B ddi_prop_update, ddi_prop_update_byte_array, ddi_prop_update_int64,
+.B ddi_prop_update_int64_array, ddi_prop_update_int, ddi_prop_update_string,
+.B ddi_prop_update_string_array, ddi_ptob, ddi_put16, ddi_put32, ddi_put64,
+.B ddi_put8, ddi_putb, ddi_putl, ddi_putll, ddi_putw, ddi_regs_map_free,
+.B ddi_regs_map_setup, ddi_remove_intr, ddi_remove_minor_node,
+.B ddi_remove_softintr, ddi_removing_power, ddi_rep_get16, ddi_rep_get32,
+.B ddi_rep_get64, ddi_rep_get8, ddi_rep_getb, ddi_rep_getl, ddi_rep_getll,
+.B ddi_rep_getw, ddi_report_dev, ddi_rep_put16, ddi_rep_put32, ddi_rep_put64,
+.B ddi_rep_put8, ddi_rep_putb, ddi_rep_putl, ddi_rep_putll, ddi_rep_putw,
+.B ddi_root_node, ddi_segmap, ddi_segmap_setup, ddi_set_driver_private,
+.B ddi_slaveonly, ddi_soft_state, ddi_soft_state_fini, ddi_soft_state_free,
+.B ddi_soft_state_init, ddi_soft_state_zalloc, ddi_trigger_softintr,
+.B ddi_umem_free, ddi_umem_lock, ddi_umem_unlock, ddi_unmap_regs, MBLKHEAD,
+.B MBLKIN, MBLKL, MBLKSIZE, MBLKTAIL, mexpandb, mod_strmops, nochpoll, nodev,
+.B nulldev, OFFSET
+.TP
+.BR svr4compat (9)
+The following functions are undocumented SVR 4 compatibility functions:
+.B wakeup
+.TP
+.BR uw7compat (9)
+The following functions are undocumented Unixware compatibility functions:
+.B msgscgth, printf, strioccall
+.\"
+.\"
+.SH USAGE
+.PP
+Unknown.
+.\"
+.\"
+.SH RETURN
+.PP
+Unknown.
+.\"
+.\"
+.SH ERRORS
+.PP
+Unknown.
+.\"
+.\"
+.SH CONTEXT
+.PP
+Unknown.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+Unknown.
+.\"
+.\"
+.SH NOTICES
+.PP
+Unknown.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+Unknown.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+These functions need a manual page.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Unknown.
+.\"
+.\"
+.SH HISTORY
+.PP
+Unknown.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

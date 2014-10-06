@@ -1,0 +1,16 @@
+[Unit]
+Description=Special Shadow Filesystem
+Documentation=man:specfs(5)
+DefaultDependencies=no
+Conflicts=umount.target streams-shutdown.target
+After=specfs.service
+Before=local-fs.target umount.target streams-shutdown.target
+
+[Mount]
+What=specfs
+Where=/dev/streams
+Type=specfs
+Options=uid=0,gid=0,mode=0777
+
+[Install]
+RequiredBy=streams.target

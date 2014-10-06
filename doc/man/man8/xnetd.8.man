@@ -1,0 +1,1 @@
+.so man8/x25netd.8.man

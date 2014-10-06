@@ -1,0 +1,505 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: pipe.2s.man,v 1.1.2.2 2011-02-07 02:17:58 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:17:58 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: pipe.2s.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:17:58  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH PIPE 2S "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System Calls"
+.\"
+.\"
+.SH NAME
+.B pipe, s_pipe
+\- create a \fISTREAMS\fR \fIpipe\fR
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <unistd.h>
+.HP
+.BI "int pipe(int " filedes "[2]);
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I filedes
+A pointer to an array of two file descriptors into which to return the file
+descriptor for each end of the pipe.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR pipe ()
+and
+.BR s_pipe ()
+opens a
+.IR STREAMS -based
+pipe.
+All the way through the
+.B Linux
+kernel series including 3.x, the
+.BR pipe ()
+system call provided by glibc will return a
+.RB non- STREAMS -based
+pipe.
+.RB Non- STREAMS -based
+pipes are
+.I SVR 3
+.[
+svr3
+.]
+style unidirectional pipes that are not implemented using
+.IR STREAMS .
+Many commercial
+.IR UNIX \(rg
+offerings also do not necessarily directly provide
+.IR STREAMS -based
+pipes in response to the
+.BR pipe ()
+system call.
+.PP
+The
+.BR libstreams (3)
+library provides a
+.BR pipe ()
+and
+.BR s_pipe ()
+library call that always provide
+.IR STREAMS -based
+pipes in contrast to glibc that always provides
+.IR "SVR 3" -style
+.[
+svr3
+.]
+pipes.
+.PP
+The characteristics of bi-directional
+.IR STREAMS -based
+pipes, by comparison to
+.IR "SVR 3" -style
+.[
+svr3
+.]
+pipes are as follows:
+.IP \(bu \w'\(bu\(em'u
+.IR STREAMS -based
+pipes are bi-directional.  Both sides are opened for both read and write.
+Data written to one end of the pipe can be read by the other.  Both ends of
+the pipe can have data written and read.
+.IP \(bu
+.IR STREAMS -based
+pipes can have modules pushed and popped from either side of the pipe.
+However, before pushing a
+.I STREAMS
+module on either side of the
+.IR STREAMS -based
+pipe, the
+.BR pipemod (4)
+module should be pushed on one end of the
+.IR STREAMS -based
+pipe to reverse the sens of the
+.BR M_FLUSH (9)
+bits for proper flushing of the pipe.  (Pushing
+.BR pipemod (4)
+is not necessary if no other modules are to be pushed over either end of the
+pipe.)
+.IP \(bu
+.IR STREAMS -based
+pipes can have the
+.BR connld (4)
+module pushed onto one end of the pipe.
+.IP \(bu
+.IR STREAMS -based
+pipes can be attached to an object in a filesystem using
+.BR fattach (2).
+.IP \(bu
+.IR STREAMS -based
+pipes have controllable flow control and minimum and maximum packet size
+characteristics.
+.IP \(bu
+.IR STREAMS -based
+pipes permit the use of
+.BR getmsg "(2s), " getpmsg "(2s), " putmsg "(2s) and " putpmsg (2s)
+system calls on the pipe ends.  This permits control information as well as
+data to be passed across the pipe.
+.IP \(bu
+.IR STREAMS -based
+pipes can pass file descriptors and credentials from one end to the other using
+.BR I_SENDFD (7)
+and
+.BR I_RECVFD (7).
+.IP \(bu
+.IR STREAMS -based
+pipes permit the use of
+.BR streamio (7)
+.I STREAMS
+input-output controls on either pipe end.
+.\"
+.\"
+.SH USAGE
+.PP
+.IR STREAMS -based
+pipes should be used in the following situations:
+.IP \(bu \w'\(bu\(em'u
+Bi-directional data transfer is desired.
+.IP \(bu
+Additional capabilities, such as the ability to preserve record boundardies
+across the pipe, transfer zero-length messages, pass ancilliary control
+information, or pass file descriptors, are desired.
+.IP \(bu
+The ability to link a pipe end beneath a multiplexing driver,
+.BR I_LINK (7),
+or attaching one end to a path in the file system,
+.BR fattach (2),
+is desired.
+.IP \(bu
+Servers based on pipes using
+.BR connld (4)
+and
+.BR fattach (2)
+is to be supported.
+.IP \(bu
+Other
+.I STREAMS
+facilities are desired in association with a pipe end.
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon successful completion,
+.BR pipe ()
+returns zero
+.RB ( 0 );
+on failure, it returns
+minus one
+.RB ( -1 )
+and sets
+.IR errno (3)
+to an appropriate error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+When it fails,
+.BR pipe ()
+returns minus one
+.RB ( -1 ),
+and sets
+.IR errno (3)
+to an appropriate error number as follows:
+.TP \w'[\fBENOMEM\fR]\(em'u
+.RB [ EMFILE ]
+More than
+.RB { OPEN_MAX }
+minus two file descriptors are already in use by the calling process.
+.TP
+.RB [ ENFILE ]
+The system-wide maximum number of simultaneous open file descriptors would be
+exceeded.
+.TP
+.RB [ ENOMEM ]
+Memory could not be allocated for kernel datastructures required to represent
+the pipe.
+.TP
+.RB [ ENODEV ]
+The
+.BR specfs (5)
+file system is not available on the system.
+.TP
+.RB [ ENXIO ]
+A suitable pipe device is not available on the system.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B @PACKAGE_TITLE@
+.IR STREAMS -based
+pipe have been shown to match or even outperform
+.B Linux
+.IR "SVR 3" -style
+pipes, therefore, no performance loss is realized by using a
+.IR STREAMS -based
+pipe over a
+.B Linux
+native pipe.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+There are several ways of implementing
+.IR STREAMS -based
+pipes.
+.B @PACKAGE_TITLE@
+provides two or three approaches.  See
+.BR pipe (4)
+for additional information.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+See
+.BR connld (4)
+for an example.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR pipe (4),
+.BR fifo (4s),
+.BR connld (4),
+.BR pipemod (4),
+.BR libstreams (3),
+.BR M_FLUSH (9),
+.BR getmsg "(2s), " getpmsg "(2s), " putmsg "(2s), " putpmsg (2s),
+.BR fcntl (2),
+.BR fattach (2),
+.IR errno (3),
+.BR specfs (5),
+.BR I_SENDFD (7),
+.BR I_RECVFD (7),
+.BR I_LINK (7),
+.BR streamio (7),
+.BR test-pipe (8),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR pipe "() and " s_pipe ()
+have no known bugs.
+.PP
+Validated behaviour is provided by the
+.BR test-pipe (8)
+test case executable and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR pipe "() and " s_pipe ()
+are compatible with
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+and implementations based on
+.IR "SVR 4.2" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B @PACKAGE_TITLE@
+permits each end of a
+.IR STREAMS -based
+pipe to be linked under a multiplexing driver using the
+.BR I_LINK "(7) or " I_PLINK (7)
+.I STREAMS
+input-output controls described in
+.BR streamio (7).
+This is a
+.B @PACKAGE_TITLE@
+specific feature provided for special test scenarios: many other
+implementations will not permit any pipe end or FIFO to be linked under a
+multiplexing driver.
+.IP ""
+Portable applications will not attempt to link a pipe end under a multiplexing
+driver.
+.IP \(em
+It is normally possible to determine whether a pipe obtained from the
+.BR pipe ()
+call is a
+.IR STREAMS -based
+pipe or a
+.IR "SVR 3" -style
+pipe by testing the file flags with
+.BR fcntl (2).
+If the file flags indicate that both end are open for read and write, then the
+pipe is bi-directional and is a
+.IR STREAMS -based
+pipe.  If the file flags indicates the one end is open for read and the other
+for write, then the pipe is uni-directional and is a
+.IR "SVR 3" -style
+pipe.
+.IP ""
+Portable applications will not assume that a
+.IR STREAMS -based
+pipe has been returned from the
+.BR pipe ()
+call.  A portable application may assume that
+.BR s_pipe (),
+or one of the other methods described in
+.BR pipe (4),
+returns a
+.IR STREAMS -based
+pipe.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR SVID ,
+.[
+svid
+.]
+.BR XID ,
+.[
+xbd5
+.]
+.BR SUSv2 ,
+.[
+susv2
+.]
+.BR SUSv3 ,
+.[
+susv3
+.]
+.BR "POSIX 1003.1/2003" ;
+.[
+susv3
+.]
+.IR Solaris \(rg
+.[
+soldoc
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+documentation.
+.PP
+Conformance is tested using the
+.BR test-pipe (8)
+test case executable and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR pipe ()
+first appeared in
+.IR "UNIX\(rg\ System V Release 3 (SVR3)"
+.[
+svr3
+.]
+and was later replaced with a
+.IR STREAMS -based
+implementation in
+.IR "UNIX\(rg\ System V Release 4 (SVR4)" .
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

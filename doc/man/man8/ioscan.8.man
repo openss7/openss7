@@ -1,0 +1,579 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: ioscan.8.man,v 1.1.2.2 2011-02-07 04:42:17 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 04:42:17 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ioscan.8.man,v $
+.\" Revision 1.1.2.2  2011-02-07 04:42:17  brian
+.\" - updated manual pages
+.\"
+.\" Revision 1.1.2.1  2011-02-07 02:14:43  brian
+.\" - added manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH IOSCAN 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.\"
+.\"
+.SH NAME
+.B ioscan
+\- scan I/O system
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.ad l
+.nh
+.HP \w'\fBioscan\fP\ 'u
+\fBioscan\fP [\fB-k\fP|\fB-u\fP]
+[\fB-d\fP\0\fIdriver\fP|\fB-C\fP\0\fIclass\fP]
+[\fB-I\fP\0\fIinstance\fP]
+[\fB-H\fP\0\fIhw_path\fP]
+[\fB-f\fP[\fB-n\fP]|\fB-F\fP[\fB-n\fP]]
+[\fIdevfile\fP]
+.PD 0
+.HP
+\fBioscan\fP
+\fB-M\fP\0\fIdriver\fP
+\fB-H\fP\0\fIhw_path\fP
+[\fB-I\fP\0\fIinstance\fP]
+.HP
+\fBioscan\fP
+{\fB-h\fP|\fB--help\fP}
+.HP
+\fBioscan\fP
+{\fB-V\fP|\fB--version\fP}
+.HP
+\fBioscan\fP
+{\fB-c\fP|\fB--copying\fP}
+.PD
+.ad b
+.hy 1
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B ioscan
+scans system hardware, usable I/O system devices, or kernel I/O system data
+structures as appropriate, and list the results.  For each hardware module on
+the system,
+.B ioscan
+displays by default the hardware path to the hardware module, the class of
+the hardware module, and a brief description.
+.PP
+By default,
+.B ioscan
+scans the system and lists all reportable hardware found.  The types of
+hardware reported include processors, memory, interface cards and I/O
+devices.  Scanning the hardware may cause drivers to be unbound and others
+bound in their place to match actual system hardware.  Entities that cannot
+be scanned are not listed.
+.PP
+In the second form shown,
+.B ioscan
+forces the specified software driver into the kernel I/O system at the given
+hardware path and forces the software driver to be bound.  This can be used
+to make the system recognize a device that cannot be recognized
+automatically; for example, because it has not yet been connected to the
+system, does not support auto configuration, or because diagnostics need to
+be run on a faulty device.
+.PP
+Generally,
+.B ioscan
+requires superuser privileges.  A non root user may use the
+.B -k
+option, only to display the kernel hardware tree.  Driver binding and actual
+hardware scanning is restricted to root.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.B ioscan
+recognizes the following options:
+.TP
+.BR -C ", " --class " \fI\)class\fP
+Restrict the output listing to those devices belonging to the specified
+class.  Cannot be used with
+.BR -d .
+.TP
+.BR -d ", " --driver " \fI\)driver\fP
+Restrict the output listing to those devices controlled by the specified
+driver.  Cannot be used with
+.BR -C .
+.TP
+.BR -f ", " --full
+Generate a full listing, displaying the module's class, instance number,
+hardware path, driver, software state, hardware type, and a brief
+description.
+.TP
+.BR -F ", " --fields
+Produce a compact listing of fields (described below), separated by colons.
+This option overrides the
+.B -f
+option.
+.TP
+.BR -H ", " --hwpath " \fI\)hw_path\fP
+Restrict the scan and output listing to those devices connected at the
+specified hardware path.  The hardware path must be a bus path.  Scanning
+below the bus level will not probe the hardware and may produce incorrect
+results.  For example, specifying the path at the target level will always
+change the state of the device attached to it as
+.BR NO_HW .
+When used with
+.BR -M ,
+this option specifies the full hardware path at which to bind the software
+modules.
+.TP
+.BR -I ", " --instance " \fI\)instance\fP
+Restrict the scan and output listing to the specified instance, when used
+with either
+.BR -d " or " -C.
+When used with
+.BR -M ,
+specifies the desired instance number for binding.
+.TP
+.BR -k ", " --kernel
+Scan kernel I/O system data structures instead of the actual hardware and
+list the results.  No binding or unbinding of drivers is performed.  The
+.BR -d ", " -C ", " -I ", and " -H
+options can be used to restrict listings.  Cannot be used with
+.BR -u .
+This option does not require superuser privileges.
+.TP
+.BR -M ", " --make " \fI\)driver\fP
+Specifies the software driver to bind at the hardware path given by the
+.B -H
+option.  Must be used with the
+.B -H
+option.
+.TP
+.BR -n ", " --names
+List device names in the output.  Only special files in the
+.B /dev
+directory and its subdirectories are listed.
+.TP
+.BR -u ", " --usable
+Scan and list usable I/O system devices instead of the actual hardware.
+Usable I/O devices are those having a driver in the kernel and an assigned
+instance number.  The
+.BR -d ", " -C ", " -I ", and " -H
+options can be used to restrict listings.  The
+.B -u
+option cannot be used with
+.BR -k .
+.PP
+The
+.BR -d " and " -C
+options can be used to obtain listings of subsets of the I/O system, although
+the entire system is still scanned.  Specifying
+.BR -d " or " -C
+along with
+.BR -I ,
+or specifying
+.B -H
+or a
+.I devfile
+causes
+.B ioscan
+to restrict both the scan and the listing to the hardware subset indicated.
+.\"
+.\"
+.SS Fields
+.PP
+The
+.B -F
+option can be used to generate a compact listing of fields separated by
+colons
+.RB ( : ),
+useful for producing custom listings with
+.BR awk (1).
+Fields include the module's bus type, cdio, is_block, is_char, is_pseudo,
+block major number, character major number, minor number, class, driver,
+hardware path, identify bytes, instance number, module path, module name,
+software state, hardware type, a brief description, and card instance.  If a
+field does not exist, consecutive colons hold the field's position.  Fields
+are defined as follows:
+.TP \w'\fIsoftware_state\fP\ \(em'u
+.I class
+A device category, defined in the files located in the directory
+.B /usr/conf/master.d
+and consistent with the listings output by
+.BR lsdev (8).
+Examples are disk, printer, and tape.
+.TP
+.I instance
+The instance number associated with the device or card.  It is a unique
+number assigned to a card or device within a class.  If no driver is
+available for the hardware component or an error occurs binding the driver,
+the kernel will not assign an instance number and a
+.RB ( -1 ),
+is listed.
+.TP
+.I hw_path
+A numerical string of hardware components, notated sequentially from the bus
+address to the device address.  Typically, the initial number is appended by
+slash
+.RB ( / ),
+to represent a bus converter (if required by your machine), and subsequent
+numbers are separated by periods
+.RB ( . ).
+Each number represents the location of a hardware component on the path to
+the device.
+.TP
+.I driver
+The name of the driver that controls the hardware component.  If no driver is
+available to control the hardware component, a question mark
+.RB ( ? )
+is displayed in the output.
+.TP
+.I software_state
+The result of software binding.
+.RS
+.TP \w'\fBUNCLAIMED\fP\ 'u
+.B CLAIMED
+software bound successfully.
+.PD 0
+.TP
+.B UNCLAIMED
+no associated software found
+.TP
+.B DIFF_HW
+software found does not match the associated software
+.TP
+.B NO_HW
+the hardware at this address is no longer responding
+.TP
+.B ERROR
+the hardware at this address is responding but is in an error state
+.TP
+.B SCAN
+node locked, try again later
+.PD
+.RE
+.TP
+.I hardware_type
+Entity identifier for the hardware component.  It is one of the following
+strings:
+.RS
+.TP \w'\fBPROCESSOR\fP\ 'u
+.B UNKNOWN
+There is no hardware associated or the type of hardware is unknown.
+.PD 0
+.TP
+.B PROCESSOR
+Hardware component is a processor.
+.TP
+.B MEMORY
+Hardware component is memory.
+.TP
+.B BUS_NEXUS
+Hardware component is bus converter or bus adapter.
+.TP
+.B INTERFACE
+Hardware component is an interface card.
+.TP
+.B DEVICE
+Hardware component is a device.
+.PD
+.RE
+.TP
+.I bus_type
+Bus type associated with the node.
+.TP
+.I cdio
+The name associated with the context-dependent I/O module.
+.TP
+.I is_block
+A boolean value indicating whether a device block major number exists.
+A
+.BR T " or " F
+is generated in this field.
+.TP
+.I is_char
+A boolean value indicating whether a device character major number exists.
+A
+.BR T " or " F
+is generated in this field.
+.TP
+.I is_pseudo
+A boolean value indicating a pseudo driver.
+A
+.BR T " or " F
+is generated in this field.
+.TP
+.I block_major
+The device block major number.  A
+.B -1
+indicates that a device block major number does not exist.
+.TP
+.I character_major
+The device character major number.  A
+.B -1
+indicates that a device character major number does not exist.
+.TP
+.I minor
+The device minor number.
+.TP
+.I identify_bytes
+The identify bytes returned from a module or device.
+.TP
+.I module_path
+The software components separated by periods
+.RB ( . ).
+.TP
+.I module_name
+The module name of the software component controlling the node.
+.TP
+.I description
+A description of the device.
+.TP
+.I card_instance
+The instance number of the hardware interface card.
+.\"
+.\"
+.SH EXIT STATUS
+.PP
+.B ioscan
+exits with a status of
+.B 0
+upon normal completion and
+.B 1
+when an error occurred.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+When
+.B ioscan
+encounters and error, it prints a diagnostic message to
+.IR stderr .
+.\"
+.\"
+.SH NOTICES
+.PP
+.B ioscan
+is compatible only with
+.I Linux Fast-STREAMS
+devices.
+The command will not function with regular
+.B Linux
+devices.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+Scan the system hardware and list all the devices belonging to the
+.I disk
+device class:
+.sp
+.nf
+\fC\s-1\
+ioscan -C disk
+\s+1\fP
+.fi
+.PP
+Forcibly bind driver
+.I tape2
+at the hardware path
+.IR 8.4.1 .
+.sp
+.nf
+\fC\s-1\
+ioscan -M tape2 -H 8.4.1
+\s+1\fP
+.fi
+.\"
+.\"
+.\".SH DEVICES
+.\".PP
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/sbin/ioscan
+contains the
+.B ioscan
+command.
+.TP
+.B /dev/config
+The device configuration database.
+.TP
+.B /dev/*
+The device directory.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR config (8),
+.BR lsdev (8),
+.BR ioconfig (4).
+.\"
+.\"
+.SH BUGS
+.PP
+.B ioscan
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B ioscan
+command is provided for compatibility with the
+.IR HP-UX \(rg
+command of the same name,
+.[
+hpuxdoc
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B ioscan
+is provided only for compatibility with
+.IR HP-UX \(rg
+for
+.I Linux Fast-STREAMS
+devices.
+The command will not function with regular
+.B Linux
+devices.
+.IP \(em
+Options
+.BR -h ", " -V " and " -c ,
+all long options, are specific to this
+.I @PACKAGE_TITLE@
+implementation of
+.B ioscan
+and should not be used by portable applications.
+.IP \(em
+No other implementation documents the
+.BR -h ", " -V " or -c
+options.  They should not be used by portable applications.
+.IP \(em
+Options
+.BR --help " and " --version
+are provided for compatibility with GNU coding standards;
+.BR --copying ,
+OpenSS7 coding standards.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR HP-UX \(rg
+documentation.
+.[
+hpuxdoc
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B ioscan
+was developed by HP.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
+
+
+

@@ -1,0 +1,598 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: strload.8.man,v 1.1.2.2 2011-02-07 02:18:31 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:31 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: strload.8.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:31  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH STRLOAD 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.\"
+.\"
+.SH NAME
+.B strload
+\- loads the \fISTREAMS\fR subsystem
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 12
+\fBstrload \fR[\fB-u\fR|\fB-q\fR|[\fB-l\fR]] [\fB-f \fIfile\fR] [\fB-d \fIlist\fR] [\fB-m \fI list\fR]\fP
+.PD 0
+.HP 12
+\fBstrload\fR {\fB-h\fR|\fB--help\fR}
+.HP 12
+\fBstrload\fR {\fB-V\fR|\fB--version\fR}
+.HP 12
+\fBstrload\fR {\fB-C\fR|\fB--copying\fR}
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.I @PACKAGE_TITLE@
+drivers and modules are dynamically loaded and unloaded.  To support this
+function, each driver and module must have a configuration routine that
+performs the necessary initialization and setup operations.
+.PP
+For compatibility with
+.IR AIX \(rg " PSE ,
+.[
+aixcpc
+.]
+.I @PACKAGE_TITLE@
+provides the
+.B strload
+command to load
+.I STREAMS
+drivers and modules.  After loading the driver or module, the
+.B strload
+command calls the driver or module entry point using the
+.B SYS_CFGDD
+and
+.B SYS_CFGMOD
+operations in
+.BR sysconfig (9).
+.PP
+Each
+.I STREAMS
+driver or module must eventually call the
+.BR str_install (9)
+utility to link into
+.IR STREAMS .
+.PP
+Commonly used drivers or modules can be placed in a configuration file, which
+controls the normal setup and tear-down of
+.IR "@PACKAGE_TITLE@" .
+The configuration file allows more flexibility when loading drivers or modules
+by providing user-specified nodes and arguments.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.TP
+.RB [ -l ]
+Loads the referenced drivers and modules.  (This is the default if the
+.B -q
+and
+.B -u
+flags are not specified.)
+If no configuration file, drivers or modules are listed in the command options, only the
+.I STREAMS
+executive is loaded;
+.TP
+.BI -u ", " --unload
+Unloads the referenced drivers and modules.
+If no configuration file, drivers or modules are listed in the command options, the entire
+.I STREAMS
+executive is unloaded;
+.TP
+.BI -q ", " --query
+Queries the referenced drivers and modules.
+If no configuration file, drivers or modules are listed in the command options, only the
+.I STREAMS
+executive is queried;
+.TP
+.BI -f ", " --file " file"
+Specifies the file to use as the configuration file.
+If
+.B -f
+is not specified, the default filename is
+.BR /etc/strload.conf .
+.TP
+.BI -d ", " --drivers " list"
+Specifies a list of driver names to load or unload.
+.I list
+is a comma separated list of driver names.
+.TP
+.BI -m ", " --modules " list"
+Specifies a list of module names to load or unload.
+.I list
+is a comma separated list of module names.
+.PP
+Without any options, by default
+.B strload
+loads the \fISTREAMS\fR executive and takes its configuration from the file
+.BR /etc/strload.conf .
+Only one of
+.BR -l ", " -q " and " -u
+are permitted.
+.\"
+.\"
+.SH "FILE FORMAT"
+.PP
+When the
+.B -f
+or
+.B --file
+.I filename
+options is specified, the format of the supplied file contains
+.B strload
+specified entires.
+.IP \- 3
+Each line in the file contains one entry or comment per line.
+.PD 0
+.IP \-
+Each entry consists of a number of fields delimited by whitespace (see
+.BR isspace (3)).
+.IP \-
+Any field that begins with a \*(lq#\*(rq character is a comment that continues
+to the end of the line.
+.IP \-
+Any line containing only a comment (beginning with optional whitespace and a
+\*(lq#\*(rq character) is ignored.
+.PD
+.PP
+Each line containing a
+.B strload
+specification entry consists of the following fields:
+.TP
+(1) \fIattributes\fP
+Describes the module to load.  The acceptable values are:
+.RS
+.TP 4
+.B d
+Specifies a driver.
+.PD 0
+.TP
+.B m
+Specifies a module.
+.TP
+.B s
+Creates the node as a standard (not cloned) device.
+.TP
+.B +
+Specifies that the module can be configured more than once.  This value must
+be specified for all lines containing the module file name.
+.PD
+.RE
+.TP
+(2) \fIfilename\fP
+Specifies the object file containing the kernel module.  If the filename contains
+a \*(lq/\*(rq (slash) in the filename, the
+.B strload
+command uses the value in the filename field explicitly, looking first in the
+current directory and, upon failure, in the
+.BI /lib/module/ \`uname\ -r\` /streams
+directory.
+.TP
+(3) [\fIargument\fP]
+Has no meaning for the strload command.  This field is optional.  It is
+passed to the kernel module when its configuration routine is called.  Its
+interpretation is specific to that kernel module.  The default argument is the
+value of the filename field.
+.TP
+(4) [\fInode\fP]
+Specifies the name of the node to create.  This field is optional.  It applies
+only to drivers and is used as the created node name when the driver is
+loaded.  By default, the created node is \fB/dev/\fIfilename\fR.
+.TP
+(5+) [\fIminor\fP \fI...\fP]
+Specifies additional, non clone nodes to create for this driver.  This field
+is optional.  The node names are created by appending the minor number to the
+cloned driver node name.  No more than five minor numbers can be given (from 0
+to 4), and a node is created for each one.
+.\"
+.\"
+.SH "STREAMS TUNABLE PARAMETERS"
+.PP
+On
+.IR AIX \(rg
+when the
+.B strload
+command is used to load the
+.I STREAMS
+executive,
+.B strload
+also reads
+.I STREAMS
+system tunable parameters from the file
+.BR /etc/pse_tune.conf .
+.TP
+.B strmsgsz
+A run-time parameter that specifies the maximum number of bytes that a single
+system call can pass to a stream to be placed into the data part of a message
+(in
+.BR M_DATA (9)
+blocks).  Any write subroutine exceeding this size will be broken into
+multiple messages.  A
+.BR putmsg (2s)
+subroutine with a data part exceeding this size will fail returning a
+.RB [ ERANGE ]
+error code.  The default value is 0.
+.TP
+.B strctlsz
+A run-time parameter that specifies the maximum number of bytes that a single
+system call can pass to a stream to be placed into the control part of a
+message (in an
+.BR M_PROTO "(9) or " M_PCPROTO (9)
+block).  A
+.BR putmsg (2s)
+subroutine with a control part exceeding this size will fail returning an
+.RB [ ERANGE ]
+error code.  The default is 1024.
+.TP
+.B nstrpush
+A load-time parameter that indicates the maximum number of modules that can be
+pushed onto a single stream.  The default value is 8.
+.TP
+.B psetimers
+A run-time parameter that specifies the maximum number of timers allocated.
+In the operating system, the
+.I STREAMS
+subsystem allocates a certain number of timer structures at initialization
+time, so the
+.I STREAMS
+driver or module can register the timeout requests.  Lowering this value is
+not allowed until the system reboots, at which time it returns to its default
+value.  The default value is 20.
+.TP
+.B psebufcalls
+A run-time parameter that specifies the maximum number of bufcalls allocated.
+In the operating system, the
+.I STREAMS
+subssytem allocates a certain number of bufcall structures at initialization
+time.  When an allocb subroutine fails, the user can register request for the
+bufcall subroutine.  Lowering this value is not allowed until the system
+reboots, at which time it returns to its default value.  The default value is
+20.
+.TP
+.B strturncnt
+A run-time parameter the specifies the maximum number of requests handled by
+the currently running thread for module- or elsewhere-level
+.I STREAMS
+synchronization.  The module-level synchronization works in such a way that
+only one thread can run in the module at any given time, and all other threads
+trying to acquire the same module enqueue their requests and exit.  After the
+currently running thread completes its work, it dequeues all the previously
+enqueued requests one at a time and starts them.  If there are large numbers
+of requests enqueued in the list, the currently running thread must serve
+everyone.  To eliminate this problem, , the currently running thread serves
+only the
+.B strturncnt
+number of threads.  After that, a separate kernel thread starts all the
+pending requests.  The default value is 15.
+.TP
+.B strthresh
+A run-time parameter that specifies the maximum number of bytes
+.I STREAMS
+is allowed to allocate.  When the threshold is passed, users without the
+appropriate privilege will not be allowed to open streams, push modules, or
+write to
+.I STREAMS
+devices.  The
+.RB [ ENOSR ]
+error code will be returned.  The threshold applies only to the output side;
+therefore, data coming into the system is not affected and continues to work
+properly.  A value of 0 indicates there is no threshold.
+.IP ""
+The strthresh parameter represents a percentage of the value of the thewall
+parameter, and its value can be set between 0 and 100.  The thewall parameter
+indicates the maximum number of bytes that can be allocated by
+.I STREAMS
+and sockets using the net_malloc subroutine.  The user can change the value
+of thewall parameter using the no command.  When the user changes the value of
+the thewall parameter, the threshold gets updated accordingly.  The default
+value is 85, indicating the threshold is 85% of the value of the thewall
+parameter.
+.TP
+.B lowthresh
+A run-time parameter that specifies the maximum number of bytes (in
+percentage) allocated by thewall parameter using allocb for the
+.B BPRI_LO
+priority.  When the total amount of memory allocated by the net_malloc
+subroutine reaches this threshold, the allocb request for the
+.B BPRI_LO
+priority returns 0.  The lowthresh parameter can be set to any value between 0
+and 100.  The default value is 90, indicating the threshold is at 90% of the
+value of thewall parameter.
+.TP
+.B medthresh
+A run-time parameter that specifies the maximum number of bytes (in
+percentage) allocated by thewall parameter using allocb for the
+.B BPRI_MED
+priority.  When the total amount of memory allocated by the net_malloc
+subroutine reaches this threshold, the allocb request for the
+.B BPRI_MED
+priority returns 0.  The lowthresh parameter can be set to any value between 0
+and 100.  The default value is 95, indicating the threshold is at 95% of the
+value of thewall parameter.
+.TP
+.B pseintrstack
+A load-time parameter that indicates the maximum number of the interrupt stack
+size allowed by
+.I STREAMS
+while running in the off level.  Sometimes when a process running other than
+INTBASE level enters a stream, it encounters stack overflow problems because
+of not enough interrupt stack size.  Tuning this parameter properly reduces
+the changes of stack overflow problems.  The default value is 0x3000 (decimal
+12288).
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of two (2) indicates that option syntax was in error.
+.TP
+.BR -f " or " --file
+An exit status of zero (0) indicates that all entries in the
+provided file were loaded, unloaded or queried; one (1) indicates that at
+least one entry was not processed.  Diagnostics concerning the line of the
+file that failed is printed on
+.IR stderr .
+.TP
+.BR -d " or " --driver
+An exit status of zero (0) indicates that all entries in the provided driver
+list were loaded, unloaded or queried; one (1) indicates that at least one
+driver was not processed.  Diagnostics concerning the driver that failed is
+printed on
+.IR stderr .
+.TP
+.BR -m " or " --module
+An exit status of zero (0) indicates that all entries in the provided module
+list were loaded, unloaded or queried; one (1) indicates that at least one
+module was not processed.  Diagnostics concerning the module that failed is
+printed on
+.IR stderr .
+.PP
+All other failures result in an exit status of one (1) and a diagnostic is
+printed on
+.IR stderr .
+.\"
+.\"
+.SH NOTICES
+.PP
+.B strload
+does not check the credentials of the user.  Any user with permission to the
+access the
+.BR nuls (4)
+null device and push the
+.BR sc (4)
+.I STREAMS
+Configuration Module,
+can execute all options.
+For security,
+.B strload
+should never be setuid root.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+An example
+.B strload
+configuration file for use with the command
+.BI "strload -f " filename
+is as follows:
+.RS
+.nf
+\fC\s-2
+#
+# strload - sample configuration file
+#
+
+# Attr Filename Argument Node    Minors
+
+d      dgb                               #line 1
+d      mux      -        -       0       #line 2
+ds     foo                               #line 3
+d+     xtiso    tcp      /dev/xti/tcp    #line 4
+d+     xtiso    udp      /dev/xti/udp    #line 5
+m      aoot                              #line 6
+\s+2\fP
+.fi
+.RE
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.BR sc (4)
+.I STREAMS
+configuration module.
+.TP
+.B /dev/nuls
+.I STREAMS
+null device.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/sbin/strload
+contains the
+.B strload
+command.
+.TP
+.B /etc/strload.conf
+contains the default configuration file.
+.TP
+.BI /lib/modules/ \`uname\ -r\` /kernel/drivers/streams/*.o
+contains
+.I STREAMS
+driver and module loadable kernel modules.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR sc (4),
+.BR modprobe (8),
+.BR insmod (8),
+.BR rmmod (8),
+.\"
+.\"
+.SH BUGS
+.PP
+.B strload
+is only partially implemented.  Only the query options currently work.  The
+load and unload options are not yet implemented.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B strload
+is compatible with
+.IR AIX \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B strload
+options
+.BR -f ", " -d ", " -m ", " -q " and " -u
+are compatible with
+.IR AIX \(rg.
+.IR AIX \(rg
+does not document long options formats, nor the
+.BR -V ", " -h " or " -v
+flags.
+.IP \(em
+Options
+.BR --help " and " --version
+are provided for compatibility with GNU coding standards;
+.BR --copying ,
+OpenSS7 coding standards.
+.IP \(em
+.B strload
+.BI -f " filename"
+file formats are compatible with
+.IR AIX \(rg.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR AIX \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B strload
+first appeared in
+.IR AIX \(rg.
+.[
+aixspg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,322 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: ioconfig.4.man,v 1.1.2.2 2011-02-07 04:42:16 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 04:42:16 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ioconfig.4.man,v $
+.\" Revision 1.1.2.2  2011-02-07 04:42:16  brian
+.\" - updated manual pages
+.\"
+.\" Revision 1.1.2.1  2011-02-07 02:14:40  brian
+.\" - added manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH IOCONFIG 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B ioconfig
+\- ioconfig entry format
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/ioparams.h>
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B ioconfig
+file is used to retain information on system's IO configuration across
+reboots.  It contains two types of information:
+.IP \(bu \w'\(bu\(em'u
+Mappings of dynamically allocated major numbers to drivers.
+.IP \(bu
+Mappings of instance numbers to hardware paths.
+.PP
+At boot time this file is read and the information is stored in the
+.B io_tree
+kernel data structure.  The
+.B ioconfig
+file is created by
+.BR insf (8)
+at install time; and is modified by
+.BR insf "(8), " rmsf "(8) and " ioscan (8)
+when devices are added or removed.  The only purpose of the
+.B ioconfig
+file is to maintain configuration information when the system is not
+running.  While the system is running, all accesses are made directly to the
+kernel
+.B io_tree
+structure, although any tools that change the kernel structures must also
+keep
+.B ioconfig
+consistent.
+.PP
+There will be two copies of
+.B ioconfig
+maintained:
+.BR /etc/ioconfig " and " /stand/ioconfig .
+A second copy is placed in
+.B /stand
+because NFS diskless clients are not guaranteed to have a reliable
+.B /etc
+directory at boot time.
+.PP
+The
+.B ioconfig
+file begins with the
+.B ioconfig
+magic number.
+.sp
+.nf
+\fC\s-1\
+#define IOCONFIG_MAGIC 0x21224941 /* magic number */
+.fi
+.PP
+Following the magic number is an array of
+.B ioconfig_record
+structures, which logically form a tree structure defining the connectivity
+of the various levels of software modules and managers, the device class and
+hardware address of each element, and the logical unit associated with each
+leaf node.  The root of the tree is array element 0.
+.PP
+Each
+.B ioconfig_record
+contains the following fields as defined in
+.BR <sys/ioparams.h> :
+.sp
+.nf
+\fC\s-1\
+#define IOCONFIG_FILE    "/etc/ioconfig"
+#define MAX_NAME_LEN     16
+
+union ioconfig_record {
+    char rec_name[MAX_NAME_LEN]; /* record type */
+    ioconfig_t ioc;
+    dyn_major_t dm;
+} ioconfig_record;
+\s+1\fP
+.fi
+.PP
+The definitions of each element are as follows:
+.TP
+.I rec_name
+Each record must have a character string as its first entry that is used to
+identify the record type.  The default record is the
+.B ioconfig_t .
+When the string begins with an underscore
+.RB ( _ )
+character then it is one of the variants.
+.TP
+.I ioc
+This is the default record entry for the
+.B ioconfig
+file.  The
+.I rec_name
+must not begin with underscore
+.RB ( _ )
+character to distinguish the record from other record types.
+.RS
+.PP
+The
+.B ioconfig_t
+contains the following elements:
+.sp
+.nf
+\fC\s-1\
+typedef struct ioconfig {
+    char name[MAX_NAME_LEN];  /* Node name: disc4, scsi_disk */
+    char class[MAX_NAME_LEN]; /* Node class: disk, tape, etc */
+    hw_path_t hw_path;        /* Path to this node */
+    int instance;             /* Instance number within class */
+} ioconfig_t;
+\s+1\fP
+.fi
+.RE
+.TP
+.I dm
+This record stores information about major numbers dynamically assigned to
+drivers.  It is used to allow major number assignments to persist across
+boots.  The
+.I rec_name
+must begin with an underscore
+.RB ( _ )
+character to distinguish the record from other record types.
+.RS
+.PP
+The
+.B dyn_major_t
+contains the following elements:
+.sp
+.nf
+\fC\s-1\
+typedef struct dyn_major {
+    char rec_name[MAX_NAME_LEN]; /* Must be _DYN_MAJOR" */
+    char name[MAX_NAME_LEN];     /* Driver name */
+    int c_major;
+    int b_major;
+    int reserved;
+} dyn_major_t;
+\s+1\fP
+.fi
+.RE
+.\"
+.\"
+.SH FILES
+.TP
+.B /etc/ioconfig
+.TP
+.B /stand/ioconfig
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR ioscan (8),
+.BR ioinit (8),
+.BR insf (8),
+.BR rmsf (8).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B ioconfig
+file format is provided for compatibility with the
+.IR HP-UX \(rg
+file of the same name,
+.[
+hpuxdoc
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B ioconfig
+is provided only for compatibility with
+.IR HP-UX \(rg
+for
+.I Linux Fast-STREAMS
+devices.
+The file will not function with regular
+.B Linux
+devices.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR HP-UX \(rg
+documentation.
+.[
+hpuxdoc
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B ioconfig
+was developed by HP.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

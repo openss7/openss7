@@ -1,0 +1,507 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4 et
+MEGACO-RINGING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, Unsigned32, 
+    mib-2
+        FROM SNMPv2-SMI
+    DisplayString, RowStatus, TestAndIncr
+        FROM SNMPv2-TC;
+
+megacoRingingMIB MODULE-IDENTITY
+    LAST-UPDATED "200210081200Z"
+    ORGANIZATION 
+        "IETF"
+    CONTACT-INFO 
+        "
+         Postal:
+           Bala Pitchandi
+           UTStarcom Inc
+           33 Wood Avenue South
+           Iselin, NJ 08830
+         
+         Email:
+           bs@utstar.com
+         
+         Phone:
+           +1 (732)442-4457"
+    DESCRIPTION 
+        "The MEGACO RINGING MIB module."
+    REVISION    "200210081200Z"
+    DESCRIPTION 
+        "This is the initial Draft version of this MIB."
+    ::= { mib-2 1002 }
+
+
+-- *****************************************************************
+--
+-- OID and Group Definitions
+--
+-- *****************************************************************
+
+-- OID for the MIB Objects...
+
+megacoRingingMIBObjects OBJECT IDENTIFIER
+    ::= { megacoRingingMIB 1 }
+
+-- The Megaco Ringing MIB contains 2 (object) groups.
+
+mgcoRingingCapabilities OBJECT IDENTIFIER
+    ::= { megacoRingingMIBObjects 1 }
+
+--******************************************************************
+--
+-- MEGACO RINGING MIB ....
+--
+-- The MEGACO RINGING MIB module consists of two tables
+--
+-- (1) mgcoRingingPatternTable
+--      Multiple Ringing patterns are represented through the
+--      mgcoRingingPatternTable.
+--
+-- (2) mgcoRingingCadenceGroupTable
+--      Multiple cadences are represented through the
+--      mgcoRingingCadenceGroupTable. The ring patterns share the
+--      data contained in the megRingingPatternTable and
+--      megRingingCadenceGroupTable.
+--
+--******************************************************************
+
+--******************************************************************
+--
+-- The mgcoRingingPatternTable provides a list of the ringing patterns
+-- available on a Media Gateway. The mgcoRingingPatternTable consists of
+-- four objects
+--
+-- mgcoRingingPatternId (index):
+--    A number indicating a unique pattern; this number represents a
+--    ringing pattern (for a given market) available on a Media Gateway.
+-- mgcoRingingCadenceGroupId
+--    A number indicating a unique Cadence Group Id value that is
+--    associated with a mgcoRingingPatternId. This number is also
+--    an index into the mgcoRingingCadenceGroupTable.
+-- mgcoRingingPatternName
+--    This is a character string  indicating the ringing pattern name
+--    This pattern name could be represented by the text that would
+--    be passed in the Signal Descriptor (i.e., the packageId, the
+--    signalId and other possible parameters).
+-- mgcoRingingPatternRowStatus
+--    This is used to create new rows in this table, modify existing
+--    rows, and to delete existing rows.
+--
+-- The rules that guide this table are
+--
+-- (1) mgcoRingingPatternId represents the pattern id that would be
+--     sent as the parameter in the packages requesting to apply
+--     ringing (like alert/ri etc)
+-- (2) mgcoRingingPatternName represents the pattern name and it could
+--     represent the package/signal (like alert/ri)
+-- (3) mgcoRingingCadenceGroupId represents the cadence group that
+--     constitutes this ringing pattern
+--
+--******************************************************************
+
+mgcoRingingPatternTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MgcoRingingPatternEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains a list of the various Ringing 
+         Pattern Ids available on a Media Gateway. Each row of 
+         the table contains a field to indicate the Ringing 
+         Pattern Id value, a field to indicate the 
+         Cadence Group Id associated with the  Ringing 
+         Pattern Id, a field to hold a name for the pattern"
+    ::= { mgcoRingingCapabilities 1 }
+
+mgcoRingingPatternEntry OBJECT-TYPE
+    SYNTAX      MgcoRingingPatternEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This entry contains objects that indicate the 
+         pattern Id value, the Cadence Group Id value, the 
+         pattern Name, and the status of the row.  The 
+         indices for an entry is the mgcoRingingPatternId 
+         and a manager creates a row in this table to define 
+         a Ringing pattern."
+    INDEX       { mgcoRingingPatternId }
+    ::= { mgcoRingingPatternTable 1 }
+
+MgcoRingingPatternEntry ::= SEQUENCE {
+    mgcoRingingPatternId            Unsigned32,
+    mgcoRingingCadenceGroupId       Unsigned32,
+    mgcoRingingPatternName          DisplayString,
+    mgcoRingingPatternRowStatus     RowStatus
+}
+
+mgcoRingingPatternId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A value to indicate a unique ringing pattern identity."
+    ::= { mgcoRingingPatternEntry 1 }
+
+mgcoRingingCadenceGroupId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A value to indicate the entry in the 
+         mgcoRingingCadenceGroupTable that defines this ringing 
+         pattern, it is an Index into that table"
+    ::= { mgcoRingingPatternEntry 2 }
+
+mgcoRingingPatternName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A string to indicate a unique ringing 
+         pattern identity."
+    ::= { mgcoRingingPatternEntry 3 }
+
+mgcoRingingPatternRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This is used to create new rows in this table, 
+         modify existing rows, and to delete rows."
+    ::= { mgcoRingingPatternEntry 4 }
+
+--******************************************************************
+--
+-- Next Cadence Group Id
+--
+--******************************************************************
+
+mgcoRingingCadenceNextGroupId OBJECT-TYPE
+    SYNTAX      TestAndIncr
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The Next Cadence Group Id value available for a Media 
+         Gateway. Assists the manager in selecting a 
+         value for mgcoRingingCadenceGroupTable. A manager will 
+         'lock' this variable to ensure single access."
+    ::= { mgcoRingingCapabilities 2 }
+
+--******************************************************************
+--
+-- mgcoRingingCadenceGroupTable
+--
+-- The mgcoRingingCadenceGroupTable provides the components that comprise
+-- the various Group Ids. The mgcoRingingCadenceGroupTable is indexed by the
+-- mgcoRingingCadenceGroupId (from the mgcoRingingPatternTable) and the
+-- mgcoRingingCadenceGroupIndex.
+--
+-- The objects of the mgcoRingingCadenceGroupTable are:
+-- mgcoRingingCadenceGroupId (index)
+--    A number indicating a  unique Cadence Group Id value. This value is
+--    from the mgcoRingingPatternTable.
+-- mgcoRingingCadenceGroupIndex (index)
+--    A number indicating the component number of a cadence group. If the
+--    cadence group contains only one component then this value is 1; if
+--    ths cadence group contains multiple components then this value starts
+--    at 1 and increases by one sequentially for each component. The linkage
+--    if any, between components of the group is always sequential in time.
+-- mgcoRingingCadenceGroupName
+--    A decriptive name which identifies this component of the cadence
+--    group
+-- mgcoRingingCadenceGroupRef
+--    A number indicating an existing cadence group Id value.
+-- mgcoRingingCadenceGroupRingingMinDuration
+--    A number indicating the minimum duration of the Ringing Cadence
+--    in milliseconds of a ringing cadence group; The range is decimal 0 to
+--    5000.
+-- mgcoRingingCadenceGroupRingingNomDuration
+--    A number indicating the nominal duration of the Ringing Cadence
+--    in milliseconds of a ringing cadence group; The range is decimal 0 to
+--    5000.
+-- mgcoRingingCadenceGroupRingingMaxDuration
+--    A number indicating the minimum duration of the Ringing Cadence
+--    in milliseconds of a ringing cadence group; The range is decimal 0 to
+--    5000.
+-- mgcoRingingCadenceGroupSilentMinDuration
+--    A number indicating the minimum duration of the Silence period
+--    in milliseconds of a ringing cadence group; The range is decimal 0 to
+--    5000.
+-- mgcoRingingCadenceGroupSilentNomDuration
+--    A number indicating the nominal duration of the Silence period
+--    in milliseconds of a ringing cadence group; The range is decimal 0 to
+--    5000.
+-- mgcoRingingCadenceGroupSilentMaxDuration
+--    A number indicating the maximum duration of the Silence period
+--    in milliseconds of a ringing cadence group; The range is decimal 0 to
+--    5000.
+-- mgcoRingingCadenceGroupRowStatus
+--    This is used to create new rows in this table, modify existing rows,
+--    and to delete rows.
+--
+-- Rules guiding this table are:
+--
+-- (1) A mgcoRingingCadenceGroupId MUST NOT be deleted if it is referenced
+--     by another existing mgcoRingingCadenceGroupId.
+-- (2) A mgcoRingingCadenceGroupId value MUST NOT be the same value as a
+--     mgcoRingingCadenceGroupRef value for the same table row.
+-- (3) A mgcoRingingCadenceGroupRef value MUST be a previously defined
+--     mgcoRingingCadenceGroupId value.
+-- (4) A mgcoRingingCadenceGroupRingingMinDuration value REQUIRES a
+--     mgcoRingingCadenceGroupRingingNomDuration value and a
+--     mgcoRingingCadenceGroupRingingMaxDuration value.
+-- (5) A mgcoRingingCadenceGroupSilentMinDuration value REQUIRES a
+--     mgcoRingingCadenceGroupSilentNomDuration value and a
+--     mgcoRingingCadenceGroupSilentMaxDuration value.
+-- (6) MinDuration MUST be less than NomDuration which MUST be less than
+--     MaxDuration. This applies for both Ringing & Silent durations.
+-- (7) A cadence component could have just ringing duration values (Ring
+--     Burst) in which case, the Silent durations would be all NULL (0).
+--
+-- NOTE: An example of a Megaco/H.248 Ringing MIB tables is given
+--       at the end of the MEGACO RINGING MIB module
+--       specification.  While the example complies with the above
+--       rules, other valid interpretations are possible.
+--******************************************************************
+
+mgcoRingingCadenceGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MgcoRingingCadenceGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains a list of the various cadence 
+         groups.  This table is recursively accessed in 
+         order to completely define a cadence"
+    ::= { mgcoRingingCapabilities 3 }
+
+mgcoRingingCadenceGroupEntry OBJECT-TYPE
+    SYNTAX      MgcoRingingCadenceGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This entry contains objects that describe the 
+         cadence characteristics.  The indices for an entry 
+         are the mgcoRingingCadenceGroupId and 
+         mgcoRingingCadenceGroupIndex. mgcoRingingCadenceGroupId 
+         is a field from the mgcoRingingPatternTable"
+    INDEX       { mgcoRingingCadenceGroupId, 
+                  mgcoRingingCadenceGroupIndex }
+    ::= { mgcoRingingCadenceGroupTable 1 }
+
+MgcoRingingCadenceGroupEntry ::= SEQUENCE {
+    mgcoRingingCadenceGroupIndex                Unsigned32,
+    mgcoRingingCadenceGroupName                 DisplayString,
+    mgcoRingingCadenceGroupRef                  Integer32,
+    mgcoRingingCadenceGroupRingingMinDuration   Integer32,
+    mgcoRingingCadenceGroupRingingNomDuration   Integer32,
+    mgcoRingingCadenceGroupRingingMaxDuration   Integer32,
+    mgcoRingingCadenceGroupSilentMinDuration    Integer32,
+    mgcoRingingCadenceGroupSilentNomDuration    Integer32,
+    mgcoRingingCadenceGroupSilentMaxDuration    Integer32,
+    mgcoRingingCadenceGroupRowStatus            RowStatus
+}
+
+mgcoRingingCadenceGroupIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A value used to access all the entries in the 
+         table that correspond to a particular Group Id. 
+         This value also serves to order the entries for 
+         the Group Index."
+    ::= { mgcoRingingCadenceGroupEntry 1 }
+
+mgcoRingingCadenceGroupName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A descriptive name which would identify this 
+         component of the cadence"
+    ::= { mgcoRingingCadenceGroupEntry 2 }
+
+mgcoRingingCadenceGroupRef OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A value used to recursively enter the 
+         mgcoRingingCadenceGroupTable. It indicates that this 
+         portion of the group is a reference to a 
+         different GroupId in the table."
+    ::= { mgcoRingingCadenceGroupEntry 3 }
+
+mgcoRingingCadenceGroupRingingMinDuration OBJECT-TYPE
+    SYNTAX      Integer32 (0..5000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A value to indicate the minimum duration of 
+         the ringing period of this cadence component. The 
+         possible values range from 0 to 5000"
+    ::= { mgcoRingingCadenceGroupEntry 4 }
+
+mgcoRingingCadenceGroupRingingNomDuration OBJECT-TYPE
+    SYNTAX      Integer32 (0..5000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A value to indicate the nominal duration of 
+         the ringing period of this cadence component. The 
+         possible values range from 0 to 5000. This value 
+         MUST be greater than RingingMinDuration"
+    ::= { mgcoRingingCadenceGroupEntry 5 }
+
+mgcoRingingCadenceGroupRingingMaxDuration OBJECT-TYPE
+    SYNTAX      Integer32 (0..5000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A value to indicate the maximum duration of 
+         the ringing period of this cadence component. The 
+         possible values range from 0 to 5000. This value 
+         MUST be greater than RingingNomDuration"
+    ::= { mgcoRingingCadenceGroupEntry 6 }
+
+mgcoRingingCadenceGroupSilentMinDuration OBJECT-TYPE
+    SYNTAX      Integer32 (0..5000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A value to indicate the minimum duration of 
+         the silent period of this cadence component. The 
+         possible values range from 0 to 5000"
+    ::= { mgcoRingingCadenceGroupEntry 7 }
+
+mgcoRingingCadenceGroupSilentNomDuration OBJECT-TYPE
+    SYNTAX      Integer32 (0..5000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A value to indicate the nominal duration of 
+         the silent period of this cadence component. The 
+         possible values range from 0 to 5000. This value 
+         MUST be greater than SilentMinDuration"
+    ::= { mgcoRingingCadenceGroupEntry 8 }
+
+mgcoRingingCadenceGroupSilentMaxDuration OBJECT-TYPE
+    SYNTAX      Integer32 (0..5000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A value to indicate the maximum duration of 
+         the silent period of this cadence component. The 
+         possible values range from 0 to 5000. This value 
+         MUST be greater than SilentNomDuration"
+    ::= { mgcoRingingCadenceGroupEntry 9 }
+
+mgcoRingingCadenceGroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This is used to create new rows in this table, 
+         modify existing rows, and to delete rows."
+    ::= { mgcoRingingCadenceGroupEntry 10 }
+
+mgcoRingingProperties OBJECT IDENTIFIER
+    ::= { megacoRingingMIBObjects 2 }
+
+-- *****************************************************************
+--
+-- Megaco Profile Property
+--
+-- OIDs that define the Properties that a Termination can support.
+-- The MEGACO-MIB supports a Property Profile Table, in which
+-- a Manager  defines a Property Profile by defining a list of properties
+-- that a termination supports.
+--
+-- mgcoRingingProperty represents the OID for the Ringing Property
+--
+--******************************************************************
+
+mgcoRingingProperty OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Ringing Property Package"
+    ::= { mgcoRingingProperties 1 }
+
+-- *****************************************************************
+--
+-- Megaco-Ringing-MIB Notification Definitions
+--
+-- There Are No Notifications at this time
+--
+-- *****************************************************************
+
+megacoRingingMIBNotifications OBJECT IDENTIFIER
+    ::= { megacoRingingMIB 2 }
+
+mgcoRingingNotifPrefix OBJECT IDENTIFIER
+    ::= { megacoRingingMIBNotifications 0 }
+
+mgcoRingingNotifObjects OBJECT IDENTIFIER
+    ::= { megacoRingingMIBNotifications 1 }
+
+-- *****************************************************************
+--
+-- Conformance for the Megaco-Ringing-MIB
+--
+-- *****************************************************************
+
+megacoRingingConformance OBJECT IDENTIFIER
+    ::= { megacoRingingMIB 3 }
+
+mgcoRingingCompliances OBJECT IDENTIFIER
+    ::= { megacoRingingConformance 1 }
+
+mgcoRingingConfGroups OBJECT IDENTIFIER
+    ::= { megacoRingingConformance 2 }
+
+-- Units of Conformance
+
+mgcoRingingPatternSetGrp OBJECT-GROUP
+    OBJECTS     { mgcoRingingCadenceGroupId, mgcoRingingPatternName, 
+                  mgcoRingingPatternRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "Objects which implement Ringing Pattern Set Definition"
+    ::= { mgcoRingingConfGroups 1 }
+
+mgcoRingingCadenceGroupGrp OBJECT-GROUP
+    OBJECTS     { mgcoRingingCadenceNextGroupId, 
+                  mgcoRingingCadenceGroupName, 
+                  mgcoRingingCadenceGroupRef, 
+                  mgcoRingingCadenceGroupRingingMinDuration, 
+                  mgcoRingingCadenceGroupRingingNomDuration, 
+                  mgcoRingingCadenceGroupRingingMaxDuration, 
+                  mgcoRingingCadenceGroupSilentMinDuration, 
+                  mgcoRingingCadenceGroupSilentNomDuration, 
+                  mgcoRingingCadenceGroupSilentMaxDuration, 
+                  mgcoRingingCadenceGroupRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "Objects which implement Ringing Cadence Group Characteristics 
+         Definition"
+    ::= { mgcoRingingConfGroups 2 }
+
+-- Compliance
+
+mgcoRingingCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "Compliance statement for entities which implement 
+         the Megaco Ringing Package MIB."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { mgcoRingingPatternSetGrp, 
+                  mgcoRingingCadenceGroupGrp }
+
+    ::= { mgcoRingingCompliances 1 }
+
+END -- end of module MEGACO-RINGING-MIB.

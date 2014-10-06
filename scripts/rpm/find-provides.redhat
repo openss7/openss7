@@ -1,0 +1,114 @@
+#!/bin/bash
+
+echo "D: Executing: $0" >&2
+
+# This script reads filenames from STDIN and outputs any relevant provides
+# information that needs to be included in the package.
+
+if [ "$1" ]
+then
+   package_name = "$1"
+fi
+
+[ -z "$OBJDUMP" ] && OBJDUMP=objdump
+
+filelist=`sed "s/['\"]/\\\&/g"`
+
+solist=$(echo $filelist | grep "\\.so" | grep -v "^/lib/ld.so" | \
+	xargs file -L 2>/dev/null | grep "ELF.*shared object" | cut -d: -f1)
+pythonlist=
+tcllist=
+
+#
+# --- Alpha does not mark 64bit dependencies
+case `uname -m` in
+  alpha*)	mark64="" ;;
+  *)		mark64="()(64bit)" ;;
+esac
+
+#
+# --- Library sonames and weak symbol versions (from glibc).
+for f in $solist; do
+    soname=$(objdump -p $f | awk '/SONAME/ {print $2}')
+
+    lib64=`if file -L $f 2>/dev/null | \
+	grep "ELF 64-bit" >/dev/null; then echo "$mark64"; fi`
+    if [ "$soname" != "" ]; then
+	if [ ! -L $f ]; then
+	    echo $soname$lib64
+	    objdump -p $f | awk '
+		BEGIN { START=0 ; }
+		/Version definitions:/ { START=1; }
+		/^[0-9]/ && (START==1) { print $4; }
+		/^$/ { START=0; }
+	    ' | \
+		grep -v $soname | \
+		while read symbol ; do
+		    echo "$soname($symbol)`echo $lib64 | sed 's/()//'`"
+		done
+	fi
+    else
+	echo ${f##*/}$lib64
+    fi
+done | sort -u
+
+#
+# --- Perl modules.
+[ -x /usr/lib/rpm/redhat/perl.prov ] &&
+    echo $filelist | tr '[:blank:]' \\n | grep '\.pm$' | /usr/lib/rpm/redhat/perl.prov | sort -u
+
+#
+# --- Python modules.
+[ -x /usr/lib/rpm/redhat/python.prov -a -n "$pythonlist" ] &&
+    echo $pythonlist | tr '[:blank:]' \\n | /usr/lib/rpm/redhat/python.prov | sort -u
+
+#
+# --- Tcl modules.
+[ -x /usr/lib/rpm/redhat/tcl.prov -a -n "$tcllist" ] &&
+    echo $tcllist | tr '[:blank:]' \\n | /usr/lib/rpm/redhat/tcl.prov | sort -u
+
+#
+# --- libtool
+[ -x /usr/lib/rpm/redhat/find-provides.libtool ] &&
+    echo $filelist | tr '[:blank:]' \\n | /usr/lib/rpm/redhat/find-provides.libtool | sort -u
+
+#
+# --- any other extra find-provides scripts
+for i in /usr/lib/rpm/redhat/find-provides.d/*.prov
+do
+    [ -x $i ] &&
+        (echo $filelist | tr '[:blank:]' \\n | $i | sort -u)
+done
+
+#
+# --- pkgconfig
+[ -x /usr/lib/rpm/redhat/find-provides.pkgconfig ] &&
+    echo $filelist | tr '[:blank:]' \\n | /usr/lib/rpm/redhat/find-provides.pkgconfig | sort -u
+
+#
+# --- Kernel module imported symbols
+#
+# Since we don't (yet) get passed the name of the package being built, we
+# cheat a little here by looking first for a kernel, then for a kmod.
+#
+
+is_kmod=1
+for f in $filelist; do
+    if [ $(echo "$f" | sed -r -ne 's:^.*/lib/modules/(.*)/(.*).ko$:\2:p') ]
+    then
+        is_kernel=1;
+    fi
+    if [ $(echo "$f" | sed -r -ne 's:^.*/boot/(.*):\1:p') ]
+    then
+	unset is_kmod;
+    fi
+done
+if [ ! "$is_kernel" ] || [ "$package_name" == "kernel" ]
+then
+    unset is_kmod
+fi
+
+[ -x /usr/lib/rpm/redhat/find-provides.ksyms ] && [ "$is_kmod" ] &&
+    printf "%s\n" "${filelist[@]}" | /usr/lib/rpm/redhat/find-provides.ksyms
+
+exit 0

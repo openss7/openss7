@@ -1,0 +1,277 @@
+#!/bin/bash
+# =============================================================================
+# 
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date$ by $Author$
+#
+# =============================================================================
+subpkg=repo
+_set_vars() {
+    if [ -r /var/lib/openss7/environ ] ; then
+	. /var/lib/openss7/environ
+    fi
+@package_archhdr@
+datarootdir=@datarootdir@
+}
+
+prein_repo () { :
+    local d un pw o f s ext u p m ud unp pwp id hn key url
+    [ -z "$DEBUG_REPO" ] || { exec 1>&2; set -x; }
+    for s in '' .pacold .pacnew; do
+    for p in credentials; do
+    for d in $localstatedir/lib/$name/; do
+	o=$d$p$s
+	[ -r $o ] || continue
+        un=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $o`
+        pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $o`
+        [ -n "$un" -a -n "$pw" ] || continue
+        break 3
+    done
+    done
+    done
+    [ -n "$un" -a -n "$pw" ] || { un="$custname"; pw="$custpass"; }
+    d=$lcacertdir/$name; n=cacert.crt
+    o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
+    { wget --no-check-certificate -O $f $reposerv://$repobase/cacert.crt 2>/dev/null; update-ca-certificates 2>/dev/null; } ||:
+    d=$localstatedir/lib/$name; n=credentials
+    o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
+    [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
+    hn=`hostname -f`; ip=`hostname -i|sed 'y/ /,/'`;n=patches
+    id=`e=$(for s in /sys/class/net/e*;do if [ ! -L $s ];then continue;fi;echo $(readlink $s)" "$s;done|sort|head -1|cut -f2 "-d ");[ -r $e/address ] && cat $e/address|sed "s,:,,g"`
+    ext="?hn=$hn&ip=$ip&id=$id${un:+&un=}${un}${pw:+&pw=}${pw}"
+    ext="$ext`echo /$reposubdir|sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
+    key="${un:+${un}${pw:+:}${pw}@}"
+    url="$reposerv://$key$repobase/$reporoot/`basename $f`$ext"
+    if ! echo "$url"|wget -i - -O $f 2>/dev/null ; then
+        if echo "$url"|wget -i - -O /dev/null 2>&1|grep '401 Authorization Required' >/dev/null 2>&1 ; then
+            u="$custname"; p="$custpass"
+            m='Authorization required for repository access.'
+            if [ -n "$DISPLAY" -a -x "`which zenity 2>/dev/null`" ]; then
+                zenity --info --text="$m" --no-wrap || return 1
+                while true; do
+                    u=`zenity --entry --text='Username: ' --entry-text="$u" || exit 1` || return 1; u=${u:-$custname}
+                    [ "$u" != "$custname" ] || break
+                    p=`zenity --entry --text="Password for '$u': " --hide-text || exit 1` || continue
+                    [ -z "$p" -o "$p" = "$custpass" ] || break
+                done
+            elif [ "${DISPLAY+set}" = set -a -x "`which whiptail 2>/dev/null`" ]; then
+                whiptail --msgbox "$m" 7 50 >/dev/tty </dev/tty || return 1
+                while true; do
+                    u=`whiptail --inputbox 'Username: ' 8 40 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || return 1; u=${u:-$custname}
+                    [ "$u" != "$custname" ] || break
+                    p=`whiptail --passwordbox "Password for '$u': " 8 40 2>&1 >/dev/tty </dev/tty || exit 1` || continue
+                    [ -z "$p" -o "$p" = "$custpass" ] || break
+                done
+            elif [ "${DISPLAY+set}" = set -a -x "`which dialog 2>/dev/null`" ]; then
+                dialog --msgbox "$m" 5 50 >/dev/tty </dev/tty || return 1
+                while true; do
+                    u=`dialog --inputbox 'Username: ' 0 0 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || return 1; u=${u:-$custname}
+                    [ "$u" != "$custname" ] || break
+                    p=`dialog --passwordbox "Password for '$u': " 0 0 2>&1 >/dev/tty </dev/tty || exit 1` || continue
+                    [ -z "$p" -o "$p" = "$custpass" ] || break
+                done
+            else
+                echo "$m" >/dev/tty
+                while true; do
+                    ud="$u"
+                    read -e  -p "Username [ENTER:default;CTRL-D:cancel] ($u): " u </dev/tty >/dev/tty || { echo '' >/dev/tty; return 1; }; u=${u:-$ud}
+                    [ "$u" != "$custname" ] || break
+                    read -es -p "Password [ENTER:default;CTRL-D:cancel] ($u): " p </dev/tty >/dev/tty || { echo '' >/dev/tty; continue; }
+                    echo '' >/dev/tty
+                    [ -z "$p" -o "$p" = "$custpass" ] || break
+                done
+            fi
+            key="${u:+${u}${p:+:}${p}@}"
+            url="$reposerv://$key$repobase/$reporoot/`basename $f`$ext"
+            rm -f -- $f
+            if ! echo "$url"|wget -i - -O $f 2>/dev/null; then
+                rm -f -- $f
+                m='Authorization failed.'
+                if [ -n "$DISPLAY" -a -x "`which zenity 2>/dev/null`" ]; then
+                    zenity --error --text="$m" --no-wrap
+                elif [ "${DISPLAY+set}" = set -a -x "`which whiptail 2>/dev/null`" ]; then
+                    whiptail --msgbox "$m" 7 50 >/dev/tty </dev/tty
+                elif [ "${DISPLAY+set}" = set -a -x "`which dialog 2>/dev/null`" ]; then
+                    dialog --msgbox "$m" 5 50 >/dev/tty </dev/tty
+                else
+                    echo "$m" >/dev/tty
+                fi
+                [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
+                return 1
+            fi
+	fi
+    fi
+    if [ ! -e $f ]; then
+        [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
+        return 1
+    fi
+    [ "$o" != "$f" ] || rm -f -- $o.$$
+    chmod 0600 $f
+    un=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $f`
+    pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $f`
+    [ -n "$un" -a -n "$pw" ] || return 1
+    unp="`echo $un|cut -c1-24`"
+    pwp="`echo $pw|cut -c1-24`"
+    echo "$pwp$unp" >$d/$n
+    key="${un:+${un}${pw:+:$pw}@}"
+    ext="`echo /$reposubdir|sed 's,//,/,g;s,/,?distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
+    d=$pacmanrepodir; n=${PACKAGE}.defs
+    o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
+    [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
+    url="$reposerv://$key$repobase/$reporoot/$n$ext"
+    if ! echo "$url"|wget -i - -O $f 2>/dev/null || [ ! -e $f ]; then
+        [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
+        return 1
+    fi
+    [ "$o" != "$f" ] || rm -f -- $o.$$
+    f=/root/.netrc; [ ! -e $f ] || mv -f -- $f $f.$$
+    ( umask 0077; cat /dev/null >$f )
+    [ ! -r $f.$$ ] || sed "/^machine[[:space:]]*$repobase/d" $f.$$ >>$f
+    echo "machine $repobase login $un password $pw" >>$f
+    rm -f -- $f.$$
+    return 0
+}
+
+postin_repo () { :
+    mv -f -- "${pacmanconfig}" "${pacmanconfig}.pacold"
+    cat "${pacmanconfig}.pacold" | awk '
+	BEGIN{options=0;myline=0}
+	/BEGIN openss7-repo/{myline=1}
+	/^[[:space:]]*XferCommand/{if (!myline) $0="#"$0;}
+	/^[[:space:]]*([[]|Include)/{
+	  if (options && !myline) {
+	    print "## BEGIN openss7-repo: do not remove this line\n"
+	    print "# OpenSS7 repositories require wget or curl\n"
+	    print "#XferCommand = /usr/bin/curl -n -C - -f %u > %o"
+	    print "#XferCommand = /usr/bin/wget --passive-ftp -c -O %o %u\n"
+	    print "# OpenSS7 repository definitions are here"
+	    print "# Leave these ahead of other repository definitions\n"
+	    print "Include = /etc/pacman.d/openss7.defs"
+	    print "\n## END openss7-repo: do not remove this line"
+	    options=0
+	  }
+	}
+	/^[[:space:]]*[[][[:space:]]*options[[:space:]]*[]]/{options=1;}
+	{if (!myline) print$0;}
+	/END openss7-repo/{myline=0}
+    ' >${pacmanconfig}
+}
+
+prerm_repo () { :
+    mv -f -- "${pacmanconfig}" "${pacmanconfig}.pacold"
+    cat "${pacmanconfig}.pacold" | awk '
+	BEGIN{myline=0}
+	/BEGIN openss7-repo/{myline=1}
+	{if (!myline) print$0;}
+	/END openss7-repo/{myline=0}
+    ' >${pacmanconfig}
+}
+
+postin_keyring () { :
+    if [ -x /usr/bin/pacman-key ]; then
+	/usr/bin/pacman-key --populate openss7
+    fi
+}
+
+# pre_install($newver) - Run right before files are extracted.  One argument is
+#	passed: new package full version string.
+#
+pre_install() {
+    _set_vars
+    prein_repo || exit $?
+}
+
+# post_install($newver) - Run right after files are extracted.  One argument is
+#	passed: new package full version string.
+#
+post_install() {
+    _set_vars
+    postin_repo || :
+    postin_keyring || :
+}
+
+# pre_upgrade($newver,$oldver) - Run right before files are extracted.  Two
+#	arguments are passed in this order: new package ful version string, old
+#	package full version string.
+#
+pre_upgrade() {
+    _set_vars
+    prerm_repo || :
+}
+
+# post_upgrade($newver,$oldver) - Run after files are extracted.  Two arguments
+#	are passed in this order: new package full version string, old package
+#	full version string.
+#
+post_upgrade() {
+    _set_vars
+    postin_repo || :
+}
+
+# pre_remove($oldver) - Run right before files are removed.  One argument is
+#	passed: old package full version string.
+#
+pre_remove() {
+    _set_vars
+    prerm_repo || :
+}
+
+# post_remove($oldver) - Run right after files are removed.  One argument is
+#	passed: old package full version string.
+#
+post_remove() {
+    _set_vars
+}
+
+set +e
+
+# =============================================================================
+#
+# $Log$
+# =============================================================================
+# vim: sw=4 tw=80

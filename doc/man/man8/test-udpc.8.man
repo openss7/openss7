@@ -1,0 +1,384 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: test-udpc.8.man,v 1.1.2.3 2011-02-07 02:18:32 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:32 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: test-udpc.8.man,v $
+.\" Revision 1.1.2.3  2011-02-07 02:18:32  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH TEST-UDPC 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.\"
+.\"
+.SH NAME
+.B test-udpc, test-udps
+\- client and server UDP test programs
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP
+\fBtest-udpc\fR [\fIoptions\fR]
+.PD 0
+.HP
+\fBtest-udpc\fR {\fB-h\fR|\fB--help\fR}
+.HP
+\fBtest-udpc\fR {\fB-V\fR|\fB--version\fR}
+.HP
+\fBtest-udpc\fR {\fB-C\fR|\fB--copying\fR}
+.PD
+.HP
+\fBtest-udps\fR [\fIoptions\fR]
+.PD 0
+.HP
+\fBtest-udps\fR {\fB-h\fR|\fB--help\fR}
+.HP
+\fBtest-udps\fR {\fB-V\fR|\fB--version\fR}
+.HP
+\fBtest-udps\fR {\fB-C\fR|\fB--copying\fR}
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+These commands are client
+.RB ( test-udpc )
+and server
+.RB ( test-udps )
+programs for transferring test data between server and client.  These programs are written in the
+same fashion as a pair of test programs for both
+.BR tcp (7)
+and
+.BR udp (7)
+that are documented in the
+.BR test-tcpc (8),
+.BR test-tcps (8),
+.BR test-sctpc (8)
+and
+.BR test-sctps (8)
+manual pages.
+The purpose of this set of 6 programs is to perform comparison tests between SCTP, TCP and UDP.
+.PP
+When the server
+.RB ( test-udps )
+is started, it listens on a specified port number (or port
+.B 18000
+if no port number is specified) for incoming connections.  When a connection arrives, as a result of
+the client
+.RB ( test-udpc )
+being started, the server polls for received packets and sends them back to their source.
+.PP
+Then the client
+.RB ( test-udpc )
+is started, it connects to a specified port number (or port
+.B 18000
+if no port number is specified) and beings sending data at a specified length as fast as possible.
+.PP
+Both the server
+.RB ( test-udps )
+and the client
+.RB ( test-udpc )
+report the number of bytes transmitted on an interval
+.RB ( 1
+second if not specified).
+Both programs run continuously until they are killed.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+These commands do not take non-option arguments.
+.\"
+.\"
+.SH OPTIONS
+.PP
+The following options are applicable to both
+.B test-udpc
+and
+.BR test-udps :
+.TP
+\fB-l\fR, \fB--loc_host\fR \fIADDRESS\fR
+Specify the local host (bind address).  The default is
+.BR 0.0.0.0 .
+.TP
+\fB-p\fR, \fB--port\fR \fIPORTNUM\fR
+Specify the port number.  For
+.B test-udpc
+this is the remote port number to which to connect.  For
+.B test-udps
+this is the local port number to which to bind.
+The default is
+.BR 18000 .
+.TP
+\fB-w\fR, \fB--length\fR \fILENGTH\fR
+Specify the \fILENGTH\fR of sent messages in bytes.  The default is
+.BR 64 .
+.TP
+\fB-t\fR, \fB--rep_time\fR \fIINTERVAL\fR
+Specify the report time \fIINTERVAL\fR in seconds.  The default is
+.RB ( 1 ).
+.TP
+\fB-q\fR, \fB--quiet\fR
+Suppress normal output.  This option is equivalent to \fB--verbose\fR=\fI0\fR.
+.TP
+\fB-v\fR, \fB--verbose\fR [\fILEVEL\fR]
+Increase or set (to \fILEVEL\fR) the output verbosity.  This option may be repeated.  If not
+specified, the verbosity level is
+.RB ( 1 ).
+.TP
+\fB-h\fR, \fB--help\fR
+When this option is encountered,
+.B command
+displays usage information on
+.I stdout
+and exits.
+.TP
+\fB-V\fR, \fB--version\fR
+When this option is encountered,
+.B command
+displays version information on
+.I stdout
+and exits.
+.TP
+\fB-C\fR, \fB--copying\fR
+When this option is encountered,
+.B command
+displays copying information on
+.I stdout
+and exits.
+.\"
+.SS test-udpc Options
+.PP
+The following options are applicable only to
+.BR test-udpc :
+.TP
+\fB-r\fR, \fB--rem_host\fR \fIADDRESS\fR
+Specify the remote host (connect address).  The default is
+.BR 127.0.0.2 .
+.\"
+.SS test-udps Options
+.PP
+The following options are applicable only to
+.BR test-udps :
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+When an error occurs,
+.B test-udpc
+and
+.B test-udps
+will print a diagnostic message to
+.I stderr
+and exit with a non-zero exit code.
+Errors result from an error of a system call on the UDP socket, or an error in the option arguments
+passed to the command.  The exit status will be
+.B 1
+in the case of a socket error and
+.B 2
+in the case of a option argument error.
+.\"
+.\"
+.SH NOTICES
+.PP
+These are crude programs and were only used for adhoc checkout testing.  They will be eventually
+dropped from the
+.B @PACKAGE_TITLE@
+release.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+At one terminal type:
+.RS
+.nf
+\fC\s-1
+test-udps -l 127.0.0.2 -p 18000 -w 64 -n -t 5
+\s+1\fP
+.fi
+.RE
+to start the server program.  In another terminal type:
+.RS
+.nf
+\fC\s-1
+test-udpc -r 127.0.0.2 -p 18000 -w 64 -n -t 5
+\s+1\fP
+.fi
+.RE
+Each command will display the number of bytes and messages sent and a total count of the number of
+bytes and messages sent every 5 seconds.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/libexec/sctp/test-udpc
+The
+.B test-udpc
+test program.
+.TP
+.B /usr/libexec/sctp/test-udps
+The
+.B test-udps
+test program.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR sctp (7),
+.BR test-tcpc (8),
+.BR test-tcps (8),
+.BR tcp (7),
+.BR test-udpc (8),
+.BR test-udps (8),
+.BR udp (7).
+.\"
+.\"
+.SH BUGS
+.PP
+These test programs do not function very well and will often hang.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+See
+.BR sctp (7),
+.BR tcp (7)
+and
+.BR udp (7),
+for addiitonal compatibiltiy considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+None.
+.\"
+.\"
+.SH VERSIONS
+.PP
+Many of these test programs were new for Linux 2.2.
+.\"
+.\"
+.XX
+.[
+rfc2960
+.]
+.[
+rfc1122
+.]
+.[
+rfc3309
+.]
+.[
+rfc3168
+.]
+.[
+rfc3758
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.TI

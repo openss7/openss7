@@ -1,0 +1,410 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: alloc_proto.9.man,v 1.1.2.2 2011-02-07 02:18:36 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:36 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: alloc_proto.9.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:36  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH ALLOC_PROTO 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B alloc_proto
+\- allocate control and data message blocks
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _SVR3_SOURCE
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/ddi.h>
+.HP
+.BI "mblk_t *alloc_proto(size_t " psize ", size_t " dsize ", int " type ", " uint " bpri );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I psize
+the size of the control part of the message.
+.TP
+.I dsize
+the size of the data part of the message.
+.TP
+.I type
+the message type of the control part of the message.
+.TP
+.I bpri
+the priority of the requested message buffers.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR alloc_proto ()
+allocates two message blocks, one to contain a control message and another to
+contain a data message.  The control part of the message is of
+type
+.I type
+and size
+.IR psize .
+The data part of the message is of
+type
+.BR M_DATA (9)
+and of size
+.IR dsize .
+Both buffers are requested with priority
+.IR bpri .
+The data message will be linked after the control message using the
+.I b_cont
+member of the control (initial) message block.
+.PP
+The
+.I bpri
+can be one of the following values:
+.sp
+.TS
+expand tab(:);
+lb0ls.
+BPRI_LO\ \ :requests low priority message buffers.
+BPRI_MED\ \ :requests medium priority message buffers.
+BPRI_HI\ \ :requests high priority message buffers.
+BPRI_WAITOK\ \ :block for low priority message buffers.
+.TE
+.PP
+If
+.BR alloc_proto ()
+is called with a
+.I bpri
+other than
+.BR BPRI_LO ", " BPR_MED ", " BPRI_HI " or " BPRI_WAITOK ,
+the request will be treated as
+.BR BPRI_LO .
+.PP
+The
+.I bpri
+argument is ignored by many
+.IR SVR 4
+based implementations.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR alloc_proto ()
+is an
+.I SVR 3
+function.
+.B _SVR3_SOURCE
+must be defined before including
+.I STREAMS
+header files to expose the prototype for this function.
+Also,
+.B @PACKAGE_TITLE@
+must have been compiled with kernel configuration parameter
+.B CONFIG_STREAMS_SVR3_COMPAT
+defined.
+.PP
+Priority
+.B BPRI_WAITOK
+is added for
+.IR OSF/1 \(rg
+.[
+osfdoc
+.]
+compatibility and should not be used by portable
+.I STREAMS
+drivers or modules.
+.PP
+.BR alloc_proto ()
+is an
+.I SVR 3
+.[
+svr3
+.]
+remnant and should not be used by portable
+.I STREAMS
+drivers and modules.
+.PP
+Portable
+.I STREAMS
+drivers and modules should not rely on the behaviour of the implementation in
+response to a particular setting of the
+.I bpri
+argument.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR alloc_proto ()
+returnes a
+.BR mblk_t (9)
+pointer to the allocated message blocks.  The first allocated message block will have
+a data block type of
+.I type
+and a size of
+.IR psize ;
+the second allocated message will have a data block type of
+.BR M_DATA (9)
+and a size of
+.IR bsize .
+All bands and flags will be cleared on both message and data blocks.
+.IR b_rptr " and " b_wptr
+will be set to the beginning of the data block buffer a read for both control
+and data message blocks.
+.PP
+Upon failure,
+.BR alloc_proto ()
+will return a
+.B NULL
+message pointer.
+.\"
+.\"
+.SH ERRORS
+.PP
+When an error occurs,
+.BR alloc_proto ()
+will fail and return a
+.B NULL
+message pointer.
+.PP
+.BR alloc_proto ()
+will only fail if there is insufficient memory to allocate the necessary
+data structures for the message blocks, data blocks or data buffers, for the
+given values of
+.IR psize ", " bsize " and " bpri .
+.PP
+Failure to allocate a message block is typically followed by a call to
+.BR bufcall (9),
+or a related callback.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR alloc_proto ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
+.PP
+The priority
+.B BPRI_WAITOK
+must only be used in a call from a blocking context (i.e. user context).
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR alloc_proto ()
+is MP-safe.  The caller has exclusive access to the returned message.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR alloc_proto ()
+is a
+.IR "SVR 3" -specific
+function:
+.B _SVR3_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B @PACKAGE_TITLE@
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_SVR3
+or
+.B CONFIG_STREAMS_COMPAT_SVR3_MODULE
+defined.
+.PP
+.BR alloc_proto ()
+performs two separate calls to 
+.BR allocb (9)
+to acquire the necessary buffers.  If the second call to
+.BR allocb (9)
+fails, the first buffer is freed.
+.PP
+See
+.BR allocb (9)
+for a discussion on the use and implementation of
+.IR bpri .
+.PP
+.BR alloc_proto ()
+will fail to allocate a combined message data block
+under the same circumstances as
+.BR allocb (9).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR mblk_t (9),
+.BR allocb (9),
+.BR freeb (9),
+.BR freemsg (9),
+.BR bufcall (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR alloc_proto ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR alloc_proto ()
+is compatible with
+.I SVR 3 STREAMS
+.[
+svr3spg
+.]
+and
+systems based on
+.IR "SVR 3" ,
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+This is not a
+.I SVR 4.2 MP DDI/DKI
+.[
+usldk
+.]
+function.
+.IP \(em
+.IR xSTRa \(rg
+.[
+xstra
+.]
+provides this function, but initializes
+.I b_wptr
+to point to the end of each data buffer.
+.IP \(em
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 3" .
+.[
+svr3spg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.IR "SVR 3" ;
+.[
+svr3spg
+.]
+.IR xSTRa \(rg
+documentation.
+.[
+xstra
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

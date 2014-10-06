@@ -1,0 +1,147 @@
+// File: OSICaching.idl
+#ifndef _OSICACHING_IDL_
+#define _OSICACHING_IDL_
+#include <OSIMgmt.idl>
+#pragma prefix jidm.org
+module OSICaching {
+typedef unsigned long ExpirationInterval; // in seconds
+typedef ASN1_ObjectIdentifier ManagedObjectClass;
+typedef sequence <ManagedObjectClass> ManagedObjectClassSeq;
+typedef ASN1_ObjectIdentifier AttrId;
+typedef sequence < ASN1_ObjectIdentifier > AttrIdSeq;
+// NoSuchAttributes is raised when any specified attribute identifiers
+// are either unknown or invalid.
+exception NoSuchAttributes {
+AttrIdSeq unknown_attributes;
+};
+// AttributesNotCached is raised when any specified attribute identifiers
+// to relevant caching operations are not being cached.
+exception AttributesNotCached {
+AttrIdSeq attr_id_list;
+};
+// NoSuchObjectClasses is raised when any specified object classes are
+// either unknown or invalid.
+exception NoSuchObjectClasses {
+ManagedObjectClassSeq unknown_mocs;
+};
+// ObjectClassesNotCached is raised when any specified object classes
+// to relevant caching operations are not being cached.
+exception ObjectClassesNotCached {
+ManagedObjectClassSeq moc_list;
+};
+// InvalidObjectClassAttributesPairs is raised when any specified attribute
+// identifiers do not belong to the specified managed object class.
+struct ObjectClassAttributesPair {
+ManagedObjectClass moc;
+AttrIdSeq attr_id_list;
+};
+typedef sequence<ObjectClassAttributesPair> ObjectClassAttributesPairSeq;
+exception InvalidObjectClassAttributesPairs {
+ObjectClassAttributesPairSeq invalid_pairs;
+};
+/* There may be situations when more than one type of error may occur
+* because of a single invocation of an operation. To accurately convey
+* the different types of error information, CacheConfigException is used
+* by some operations. If any of the members of the following exception
+* are not relevant, then such members shall be empty sequences, i.e.,
+* sequences of zero length. For example, when passing an argument of
+* AttrIdSeq to remove cached attributes , the client may pass some invalid
+* or unkown attribute identifiers, and some valid attribute identifiers
+* that are not cached. In such situations, CacheConfigException is raised
+* with the invalid or unknown attribute identifiers specified in the
+* no_such_attributes member, the valid but not cached attribute
+* identifiers specified in the attrs_not_cached member, and the rest of
+* the members set to zero length sequences.
+*/
+exception CacheConfigException {
+AttrIdSeq no_such_attributes;
+ManagedObjectClassSeq no_such_classes;
+AttrIdSeq attrs_not_cached;
+ManagedObjectClassSeq mocs_not_cached;
+ObjectClassAttributesPairSeq invalid_moc_attrs_pairs;
+};
+// abstract interface for configuring all caches
+interface CacheConfigurator {
+void set_default_expiration_interval (
+in ExpirationInterval expiration_interval,
+in boolean override_specific_settings
+);
+ExpirationInterval get_default_expiration_interval ();
+void set_caching_enabled (
+in boolean enabled,
+in boolean override_specific_settings
+);
+boolean is_caching_enabled ();
+};
+// cached attribute information
+struct CachedAttribute {
+AttrId attr_id;
+ExpirationInterval expiration_interval;
+};
+typedef sequence < CachedAttribute > CachedAttributeSeq;
+// abstract interface to configure per-attribute cache
+interface PerAttributeCacheConfigurator {
+void add_cached_attributes (
+in CachedAttributeSeq attr_list,
+in boolean override_specific_settings
+) raises ( NoSuchAttributes );
+void remove_cached_attributes (
+in AttrIdSeq attr_id_list,
+in boolean override_specific_settings
+) raises ( CacheConfigException );
+CachedAttributeSeq get_cached_attributes ();
+ExpirationInterval get_expiration_interval (
+in AttrId attr_id
+) raises ( CacheConfigException );
+void set_expiration_interval(
+in AttrIdSeq attr_id_list,
+in ExpirationInterval interval
+) raises ( CacheConfigException );
+};
+// managed object class with indicated attributes cached
+struct CachedObjectClass {
+ManagedObjectClass moc;
+CachedAttributeSeq cached_attributes_list;
+};
+typedef sequence < CachedObjectClass > CachedObjectClassSeq;
+// abstract interface to configure per-class cache
+interface PerClassCacheConfigurator {
+void add_cached_classes (
+in CachedObjectClassSeq class_list,
+in boolean override_specific_settings
+) raises ( CacheConfigException );
+void remove_cached_classes (
+in ManagedObjectClassSeq moc_list,
+in boolean override_specific_settings
+) raises ( CacheConfigException );
+void remove_cached_attributes_from_class_cache(
+in ManagedObjectClass moc,
+in AttrIdSeq attr_id_list,
+in boolean override_specific_settings
+) raises ( CacheConfigException );
+CachedObjectClassSeq get_cached_classes ();
+CachedAttributeSeq get_cached_attributes_for_class (
+in ManagedObjectClass moc
+) raises ( OSIMgmt::NoSuchObjectClass );
+void set_expiration_interval_for_class (
+in ManagedObjectClass moc,
+in AttrIdSeq attr_list,
+in ExpirationInterval extension_duration
+) raises ( CacheConfigException );
+};
+interface ProxyAgent : OSIMgmt::ProxyAgent,
+CacheConfigurator,
+PerAttributeCacheConfigurator,
+PerClassCacheConfigurator {};
+interface ManagedObject : OSIMgmt::ManagedObject,
+CacheConfigurator,
+PerAttributeCacheConfigurator {
+void refresh_cached_values (
+in AttrIdSeq attr_list
+) raises ( CacheConfigException );
+void invalidate_cached_values (
+in AttrIdSeq attr_list
+) raises ( CacheConfigException );
+};
+};
+#endif /* _OSICACHING_IDL_ */

@@ -1,0 +1,1279 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: tpi_tr.7.man,v 1.1.2.2 2011-02-07 02:18:29 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:29 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: tpi_tr.7.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:29  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH TPI-TR 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Transport Provider Interface (TPI)"
+.\"
+.\"
+.SH NAME
+.B TPI-TR
+\- Transport Provider Interface \- Corrigendum for Transaction Sublayer (TR) Conformance
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/tpi.h>
+.br
+.B #include <sys/tpi_ss7.h>
+.br
+.B #include <sys/tpi_mtp.h>
+.br
+.B #include <sys/tpi_sccp.h>
+.br
+.B #include <sys/tpi_tr.h>
+.HP
+.BI "int " fd " = open(" device ", " flags );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B TPI-TR
+provides a stream supporting the Transport Provider Interface,
+.RB tpi (7),
+to the Transaction Sublayer of of Transport Capabilities Application Part (TCAP).
+.[
+q771
+.]
+This
+.IR STREAMS (4)
+interface provides the
+.BR tcap (4)
+or
+.BR tua (4)
+protocol service interface using the T-primitives of the
+.BR tpi (7).
+This interface is intended solely for use by user programs, libraries such as
+.BR xnet (3),
+.BR xti (3)
+and
+.BR sockets (3),
+or protocol modules requiring the
+.BR tpi (7)
+interface such as
+.BR timod (4),
+.BR sockmod (4)
+and
+.BR socksys (4).
+.\"
+.\"
+.SH "ADDRESS FORMATS"
+.PP
+The
+.B TPI-TR
+uses the same address as SCCP.  See
+.BR tpi_sccp (7).
+.\"
+.\"
+.SH OPTIONS
+.PP
+.B TPI-TR
+uses options at the
+.BR T_SS7_MTP ", " T_SS7_SCCP " and " T_SS7_TCAP
+option levels.  All options used are of end-to-end
+significance.
+.\"
+.SS T_SS7_MTP
+.PP
+.B TPI-TR
+uses the quality of service options provided by MTP.  See
+.BR tpi_mtp (7).
+The options used from the SS7 MTP level are as follows:
+.TP
+.B T_MTP_SLS
+Specifies the signalling link selection code that will be
+used in outbound MTP messages.  This can be used as an
+alternative to the
+.BR T_SCCP_SEQ_CTRL
+option.
+.TP
+.B T_MTP_MP
+Specifies the message priority that will be used in outbound
+MTP messages.  This can be used as an alternative to the
+.BR T_SCCP_PRIORITY
+or
+.BR T_SCCP_IMPORTANCE
+options; however, only for ANSI-based SCCP and MTP protocol
+variants.
+.\"
+.SS T_SS7_SCCP
+.PP
+.B TPI-TR
+uses the quality of service options provided by SCCP.  See
+.BR tpi_sccp (7).
+The options used from the SS7 SCCP level are as follows:
+.TP
+.B T_SCCP_SEQ_CTRL
+Specifies the SCCP sequence control Quality of Service
+parameter when SCCP connectionless protocol class 1 is
+specified.
+The option value is a
+.BR t_uscalar_t
+with a value from zero (0) to 255.
+.TP
+.B T_SCCP_PRIORITY
+Specifies the SCCP message priority for ANSI-based SCCP
+and MTP protocol variants with message priorities.
+The option value is a
+.BR t_uscalar_t ,
+with values from zero (0) to three (3).
+.TP
+.B T_SCCP_IMPORTANCE
+Specifies the SCCP message imporatance for ITU-based SCCP
+and MTP protocol variants with international congestion
+control.
+The option value is a
+.BR t_uscalar_t ,
+with values from zero (0) to eight (8).
+.TP
+.B T_SCCP_PCLASS
+Specifies the SCCP protocol class to use.  The option value
+is
+.BR T_SCCP_PCLASS_0 " or " T_SCCP_PCLASS_1 .
+.RS
+.TP
+.I T_SCCP_PCLASS_0
+SCCP protocol class 0 is specified.  SCCP selection control
+is ignored.
+.TP
+.I T_SCCP_PCLASS_1
+SCCP protocol class 1 is specified.  SCCP selection control
+is used.
+.RE
+.TP
+.B T_SCCP_RET_ERROR
+Specifies that SCCP should return messages on error.  When
+the message is returned a TR-NOTICE indication will be
+issued to the TR-user.
+The option value is
+.BR T_YES " or " T_NO .
+.TP
+.B T_SCCP_SRCE_ADDR
+Specifies the SCCP originating address for TPI primitives
+that do not include the originating address in the primitive
+and the originating address is not implied by the bound
+address.
+The option value is a
+.BR sockaddr_sccp
+structure.
+.TP
+.B T_SCCP_DEST_ADDR
+Specifies the SCCP destination address for TPI primtiives
+that do not include the destination address in the primtiive
+and the destination address in not implied by the bound
+address.
+The option value is a
+.BR sockaddr_sccp
+structure.
+.TP
+.B T_SCCP_RESP_ADDR
+Specifies the SCCP responding address for TPI primitive that
+do not include the responding address in the primitive and
+the responding address is not implied by the the bound
+address.
+The option value is a
+.BR sockaddr_sccp
+structure.
+.\"
+.SS T_SS7_TCAP
+.PP
+The options defined for the SS7 TCAP level are as follows:
+.TP
+.B T_TCAP_TRANSACTION_ID
+Specifies the local transaction ID in primitives requiring an
+originating transaction ID.
+The option value is a
+.BR t_uscalar_t
+significant to a full 32-bits.
+.TP
+.B T_TCAP_TERMINATION
+Specifies a termination type.  The option value is a
+.BR t_uscalar_t
+that can assume one of the following values:
+.RS
+.TP
+.I T_TCAP_TERMINATION_PREARRANGED
+The termination is "prearranged" and no message will be sent
+to the peer for a TR-END request.
+.TP
+.I T_TCAP_TERMINATION_BASIC
+The termination is "basic" and an END message will be sent to
+the peer for a TR-END request.
+.RE
+.TP
+.B T_TCAP_REASON
+The TR-NOTICE "reason" parameter.  This can have one of the
+values described below under
+.RI \(lq ERRORS .\(rq
+.\"
+.\"
+.SH MAPPING OF PRIMITIVES
+.PP
+.B TPI-TR
+maps the service primitives of the Transaction Sublayer of TCAP onto the
+service primitives of the TPI.
+.sp
+.TS
+tab(;);
+llll.
+TR-UNI;req;T-UNITDATA;req
+TR-UNI;ind;T-UNITDATA;ind
+TR-BEGIN;req;T-CONNECT;req
+TR-BEGIN;ind;T-CONNECT;ind
+TR-CONTINUE;1st-res;T-CONNECT;res
+TR-CONTINUE;1st-ind;T-CONNECT;con
+TR-CONTINUE;req;T-DATA;req
+TR-CONTINUE;ind;T-DATA;ind
+TR-END;1st-req;T-CONNECT;res
+TR-END;1st-ind;T-DISCONNECT;ind
+TR-END;req;T-RELEASE;req
+TR-END;ind;T-DISCONNECT;ind
+TR-U-ABORT;req;T-DISCONNECT;req
+TR-U-ABORT;ind;T-DISCONNECT;ind
+TR-P-ABORT;ind;T-DISCONNECT;ind
+TR-NOTICE;ind;T-UNITDATA-ERROR;ind
+;;T-DISCONNECT;ind
+;;T-DATA;ind
+.TE
+.\"
+.SS TR-UNI request \(em T_UNITDATA_REQ
+.PP
+The TR-UNI request service primitive is implemented using the
+T_BIND_REQ and T_UNITDATA_REQ primitives.  The T_BIND_REQ
+primitive establishes the "Originating Address" and the
+T_UNITDATA_REQ primitive provides the "Destination Address".
+The "Quality of Service" parameters are passed using an XTI
+options structure.  "User data" is passed using the
+associated M_DATA message blocks.
+.\"
+.SS TR-UNI indication \(em T_UNITDATA_IND
+.PP
+The TR-UNI indication service primitive is implemented using
+the T_BIND_REQ and T_UNITDATA_IND service primitives.  The
+T_BIND_REQ primitive establishes the destination address and
+the T_UNITDATA_IND primitive provides the originating address.
+The "Quality of Service" parameters are passed using an XTI
+options structure.  "User data" is passed using the
+associated M_DATA message blocks.
+.\"
+.SS TR-BEGIN request \(em T_CONN_REQ
+.PP
+The TR-BEGIN request service primitive is implemented using
+the T_BIND_REQ and T_CONN_REQ service primitives.  The
+T_BIND_REQ primitive establishes the "originating address"
+and the T_CONN_REQ primitive provides the "destination
+adress".  The "Transaction ID" and "Qualify of Service"
+parameters are passed using an XTI options structure.  "User
+data" is passed using the associated M_DATA message blocks.
+.\"
+.SS TR-BEGIN indication \(em T_CONN_IND
+.PP
+The TR-BEGIN indication service primitive is implemented
+using the T_BIND_REQ and T_CONN_IND primitives.  The
+T_BIND_REQ primitive establishes the "destination address"
+and the T_CONN_IND primitive provides the "originating
+address".  The "Transaction ID" and "Quality of Service"
+paramters are passed using an XTI options structure.  "User
+data" is passed using the associated M_DATA message blocks.
+.\"
+.SS TR-CONTINUE request \(em T_CONN_RES
+.PP
+The first (confirming) TR-CONTINUE request service primitive
+is implemented using the T_BIND_REQ and the T_CONN_RES
+primitives.  The T_BIND_REQ primitive establishes the
+"originating address" primitive and the T_CONN_RES implies
+the "transaction ID" using the SEQ_number field from the
+T_CONN_IND primitive.  The "Quality of Service" parameters
+are passed using an XTI options structure.  "User data" is
+passed using the associated M_DATA message blocks.
+.\"
+.SS TR-CONTINUE indication \(em T_CONN_CON
+.PP
+The first (confirming) TR-CONTINUE indication service
+primitive is implemented using the T_CONN_CON primitive.  The
+"originating address" is provided by T_CONN_CON primitive.
+The "transaction ID" is implied by the interface, but may
+alos be contained in an XTI option structure.  The "Quality
+of Service" parameters are indicated in an XTI option
+structure.  "User data" is passed using the associated M_DATA
+message blocks.
+.\"
+.SS TR-CONTINUE request \(em T_OPTDATA_REQ, T_DATA_REQ
+.PP
+Subsequent (continuing) TR-CONTINUE request service primitives
+are implemented using the T_OPTDATA_REQ or T_DATA_REQ
+primitive.  The T_OPTDATA_REQ primitive is used when the user
+wishes to supply optional "Quality of Serivce" parameters as
+an XTI option structure.  Otherwise, the T_DATA_REQ primitive
+(or simply an M_DATA message block) is used.
+.\"
+.SS TR-CONTINUE indication \(em T_OPTDATA_IND, T_DATA_REQ
+.PP
+Subsequent (continuing) TR-CONTINUE indication service
+primitives are implemented using T_OPTDATA_IND or T_DATA_IND
+primitives.  The T_OPTDATA_IND primitive is used when the
+remote user supplied an optional "Quality of Service"
+parameters to the corresponding request and it is attached as
+an XTI option structure.  Otherwise, the T_DATA_IND primitive
+(or simply an M_DATA message block) is used.
+.\"
+.SS TR-END request \(em T_CONN_RES
+.PP
+The TR-END request primitive used as a direct response to the
+TR-BEGIN indication primitive is implemented using a
+T_CONN_RES primitive.  The "transaction id" is implied by the
+SEQ_number field, but may also be added as an XTI options
+structure.  The "Quality of Service" parameters are
+optionally passed using an XTI options structure.  The
+"termination" parameter is passed using an XTI options
+structure to distinguish this T_CONN_RES from one that
+implements the TR-CONTINUTE primitive.  Note that the TPI
+provider responds with a T_OK_ACK followed by a T_DISCON_IND
+primitive.
+.\"
+.SS TR-END request \(em T_ORDREL_REQ
+.PP
+The TR-END request primitive used as a response to a
+TR-CONTINUE indication (T_CONN_CON or T_DATA_IND) is
+implemented using a T_ORDREL_REQ primitive.  The TPI provider
+will respond internally with a T_ORDREL_IND.  An T_ORDREL_REQ
+with associated M_DATA message blocks will be considered to
+be a "basic" termination TR-END request, even if the length
+of the associated M_DATA blocks is zero.  A T_ORDREL_REQ with
+no associated M_DATA message blocks will be considered to be
+a "prearranged" termination TR-END request.  If, however, the
+"termination" option is previously set with T_OPTMGMT_REQ,
+the set termination option will be used.
+.\"
+.SS TR-END indication \(em T_DISCON_IND
+.PP
+The TR-END indication primitive used as a direct response to
+the TR-BEGIN request primitive is implemented using a
+T_DISCON_IND primtive.  In this case, the DISCON_reason field
+is set to zero (0) by the service provider to distinguish a
+TR-END indication from TR-U-ABORT and TR-P-ABORT indications.
+.PP
+The TR-END indication primitive used as a response to a
+TR-CONTINUE request (T_CONN_RES or T_DATA_REQ) is implemented
+using a T_DISCON_IND primitive.  In this case, the
+DISCON_reason field is set to zero (0) by the service
+provider to distinguish a TR-END indication from TR-U-ABORT
+and TR-P-ABORT indications.
+.\"
+.SS TR-U-ABORT request \(em T_DISCON_REQ
+.PP
+The TR-U-ABORT request primitive is implemented using the
+T_DISCON_REQ primitive.  If the user wishes to pass "Quality
+of Service" parameters it must be set prior to the
+T_DISCON_REQ using the T_OPTMGMT_REQ primitive.  The
+"transaction id" is implied by the connection.  "User data"
+may be passed with M_DATA message blocks attached to the
+T_DISCON_REQ.
+.\"
+.SS TR-U-ABORT indication \(em T_DISCON_IND
+.PP
+The TR-U-ABORT indication primitive is implemented using the
+T_DISCON_IND primitive with special values of the
+DISCON_reason field.  Both the "Quality of Serivce"
+parameters and "transaction ID" are unavailable.  "User data"
+is available in the M_DATA message blocks attached ot the
+T_DISCON_IND primitive.
+.\"
+.SS TR-P-ABORT indication \(em T_DISCON_IND
+.PP
+The TR-P-ABORT indication primitive is implemented using the
+T_DISCON_IND primitive with special values of the
+DISCON_reason field.  The "P-abort" parameter is coded into
+the DISCON_reason field.
+.\"
+.SS TR-NOTICE indication \(em T_OPTDATA_IND, T_DISCON_IND, T_UDERROR_IND
+.PP
+When the transaction is in an established state
+(TS_DATAXFER), the TR-NOTICE indication is indicated with a
+T_OPTDATA_IND primitive containing a T_TR_NOTICE flag in the
+DATA_flag field of the T_OPTDATA_IND.  The "reason" parameter
+is coded into an XTI option structure and passed with the
+T_OPTDATA_IND.  Returned data (if any) is passed in the
+associated M_DATA message blocks.
+.PP
+When the transaction is in the outbound state (TS_WCON_CREQ),
+the TR-NOTICE indication is indicated with a T_DISCON_IND
+primitive containing the "reason" parameter codified into the
+DISCON_reason field.  Returned data (if any) is passed in the
+associated M_DATA message blocks.
+.PP
+When the TR-NOTICE indication is in response to a TR-UNI
+request, the TR-NOTICE indication is indicated with a
+T_UDERROR_IND primitive containing the "destination address"
+(the "originating address" is implied by the interface) and
+the "reason" parameter codified in the ERROR_type field.
+Returned data (if any) is passed in the associated M_DATA
+message blocks.
+.\"
+.\"
+.SH LOCAL MANAGEMENT PRIMITIVES
+.PP
+.\"
+.SS T_INFO_REQ
+.PP
+This primitive is interpreted as in
+.BR T_INFO_REQ (7).
+.\"
+.SS T_INFO_ACK
+.PP
+This primitive has the following interprentations:
+.RS
+.TP
+.I TSDU_size
+If the unerlying SCCP connectionless protocol variant
+supports SCCP [LX]UDT[S] messages with segmentation and
+reassembly, or if the TCAP protocol variant supports
+Invoke/NL and Result/NL, this number could be
+.B T_INFINITE
+or very large.  Otherwise, it returns the amount of TR user
+data that can be contained in a single CONTINUE or
+CONVERSATION message.
+.TP
+.I ETSDU_size
+Returns
+.BR T_INVALID .
+.TP
+.I CDATA_size
+Returns the amount of TR user data that can be contained in a
+single BEGIN or QUERY message.
+.TP
+.I DDATA_size
+Returns the amount of TR user data that can be contained in a
+single END or RESPONSE message.
+.TP
+.I ADDR_size
+This field will be the size of the
+.B sockaddr
+structure.
+.TP
+.I OPT_size
+This field is interpreted as described in
+.BR T_INFO_ACK (7).
+Care should be taken that the TR conforming transport
+provider not return too large a value: this value is used for
+reserving buffers using
+.BR t_alloc (3)
+in
+.BR xti (3).
+Therefore, this value should not be greater than the sum of
+the sizes of all of the options described under
+.RI \(lq OPTIONS ,\(rq
+above, plus the size of the
+.B t_opthdr
+structure for each option.
+.TP
+.I TIDU_size
+The transport interface data unit size is the maximum size of
+data that can be transferred across the PTI interface for the
+given stream.  For TR, this is the maximum amount of TR user
+data that can fit into a CONTINUE or CONVERSATION message.
+.TP
+.I SERV_type
+Returns
+.BR T_COTS_ORD .
+.TP
+.I CURRENT_state
+This field is interpreted as in
+.BR T_INFO_ACK (7).
+.TP
+.I PROVIDER_flag
+The TPI-TR transport service provider sets
+.BR XPG4_1 .
+.RE
+.\"
+.SS T_ADDR_REQ
+.PP
+This primitive is interpreted as in
+.BR T_ADDR_REQ (7).
+.\"
+.SS T_ADDR_ACK
+.PP
+.TP
+.IR LOCADDR_length ", " LOCADDR_offset
+The length and offset from the start of the primitive message
+block of the
+.B sockaddr_sccp
+structure that describes the SCCP address to which the stream
+is bound.  If the stream is not in a bound state, then
+.IR LOCADDR_length " and " LOCADDR_offset
+return zero (0).
+.TP
+.IR REMADDR_length ", " REMADDR_offset
+The length and offset from the start of the primtive message
+block of the
+.B sockaddr_sccp
+structure that describes the SCCP address ot which the stream
+is connected.  If the stream is not in a connected state, the
+.IR REMADDR_length " and " REMADDR_offset
+return zero (0).
+.PP
+.B Additional rules for local and remote addresses:
+.IP \(em \w'\(em\(em'u
+Each address, when present, must specify an SCCP-SAP or
+wildcard SCCP-SAP.  That is, the
+.I sccp_ri
+field of the address must contain
+.BR T_SCCP_RI_DPC_SSN .
+.IP \(em
+The address cannot contain a Global Title.  That is, the
+.I sccp_gtt
+field of the address must contain
+.BR T_SCCP_GTT_NONE .
+.IP \(em
+If the stream is bound as a default destination or a default
+listener, an address will be included in
+.IR LOCADDR_length " and " LOCADDR_offset
+but the
+.IR sccp_pc " and " sccp_ssn
+fields of the address will be \(lqwildcarded\(rq.
+.\"
+.SS T_CAPABILITY_REQ
+.PP
+This primitive is interpreted as described in
+.BR T_CAPABILITY_REQ (7).
+.\"
+.SS T_CAPABILITY_ACK
+.PP
+This primitive is interpreted as described in
+.BR T_CAPABILITY_ACK (7),
+and returns the
+.I T_info_ack
+structure as described above under
+.RI \(lq T_INFO_ACK \(rq.
+.\"
+.SS T_BIND_REQ
+.PP
+This primitive is interpreted as described in
+.BR T_BIND_REQ (7).
+.\"
+.SS T_BIND_ACK
+.PP
+This primitive is interpreted as described in
+.BR T_BIND_ACK (7),
+with the following additional rules:
+.TP
+.IR ADDR_length ", " ADDR_offset
+The length and offset from the beginning of the primitive
+message block of the
+.B sockaddr_sccp
+structure that contains the SCCP address that was bound.
+.PP
+.B Additional rules for binding the TSAP:
+.IP \(em \w'\(em\(em'u
+The address specified must contiain an SCCP-SAP.  That is,
+the
+.I sccp_ri
+field must be set to
+.BR T_SCCP_RI_DPC_SSN .
+Otherwise, the TR conforming provider will return
+.RB [ TBADADDR ].
+.IP \(em
+The address cannot contain a Global Title: the
+.I sccp_gtt
+field of the address must contain
+.B T_SCCP_GTT_NONE .
+Otherwise, the TR conforming provider will return
+.RB [ TBADADDR ].
+.IP \(em
+If no address is specified (the
+.I ADDR_length
+field is zero (0)), or if an address is specified but both
+the
+.I sccp_pc
+and
+.I sccp_ssn
+fields are \(lqwildcarded\(rq, it is assumed that the user
+wishes to perform a \(lqwildcard\(rq bind.  For such a bind,
+the TR provider observes the following rules:
+.RS
+.IP \(em \w'\(em\(em'u
+If an application context has been specified for the stream
+with
+.BR T_OPTMGMT_REQ (7),
+the TR provider will bind the stream as a default destination
+for TR-UNI primitives, and default listener for TR-BEGIN
+primitives, for the application context.
+.IP \(em
+If no application context has been provided, the SCCP
+provider will bind the stream as the default destination for
+TR-UNI primitives, and default listener for TR-BEGIN
+primitives.
+.IP \(em
+A stream bound to the default destination will receive all
+TR-UNI indication priitives that have no other bind match.  A
+stream bound as a default listener will receive all
+TR-BEGIN indications that have no other stream listening.
+Only one stream may be bound as a default destination and one
+stream bound as a default listener.
+.IP \(em
+A stream bound as a default destination cannot initiate
+TR-UNI request primitives.  A stream bound as a default
+listener cannot initiate TR-BEGIN request primitives.
+.RE
+.PP
+.B Additional rules for the number of connection indications:
+.IP \(em
+A stream bound with a
+.I CONIND_number
+of zero may be used for initiating or receiving TR-UNI
+primitives or for initiating TR-BEGIN request primitives.
+.IP \(em
+A stream bound with a
+.I CONIND_number
+greater than zero may be used for receiving TR-UNI primitives
+or for responding to TR-BEGIN primitives.
+.\"
+.SS T_UNBIND_REQ
+.PP
+This primitive is interpreted as described in
+.BR T_UNBIND_REQ (7).
+.\"
+.SS T_OK_ACK
+.PP
+This primitive is interpreted as described in
+.BR T_OK_ACK (7).
+.\"
+.SS T_ERROR_ACK
+.PP
+This primitive is interpreted as described in
+.BR T_ERROR_ACK (7).
+.\"
+.SS T_OPTMGMT_REQ
+.PP
+This primitive is intepreted as described in
+.BR T_OPTMGMT_REQ (7),
+with the options described under
+.RI \(lq OPTIONS ,\(rq
+above.
+.\"
+.SS T_OPTMGMT_ACK
+.PP
+This primitive is intepreted as described in
+.BR T_OPTMGMT_ACK (7),
+with the options described under
+.RI \(lq OPTIONS ,\(rq
+above.
+.\"
+.\"
+.SH PROTOCOL SERVICE PRIMITIVES
+.PP
+.\"
+.SS T_UNITDATA_REQ
+.PP
+This primitive is interpreted as described in
+.BR T_UNITDATA_REQ (7).
+.PP
+This primitive is used to request a TR-UNI request primitive
+of the TR provider.  Because there is no source address in
+the
+.BR T_UNITDATA_REQ (7)
+primitive, when the stream is bound to a
+\(lqwildcard\(rq address it is necessary to specify the
+source address for the message using the
+.B T_SCCP_SRCE_ADDR
+option in an XTI options structure in the
+.IR OPT_length " and " OPT_offset
+field when sending TR-UNI requests from a \(lqwildcard\(rq
+bound stream.  Otherwise, the source address used is the
+bound address.
+.PP
+Options used with the
+.BR T_UNITDATA_REQ (7)
+primitive are as follows:
+.TP
+.B T_SCCP_SRCE_ADDR
+.PD 0
+.TP
+.BR T_MTP_SLS " or " T_SCCP_SEQ_CTRL
+.TP
+.BR T_MTP_MP ", " T_SCCP_PRIORITY " or " T_SCCP_IMPORTANCE
+.PD
+.\"
+.SS T_UNITDATA_IND
+.PP
+This primitive is interpreted as described in
+.BR T_UNITDATA_IND (7).
+.PP
+This primitive is used to indicate a TR-UNI indication
+primitives of the TR provider.  Because there is no
+destination address in the
+.BR T_UNITDATA_IND (7)
+primitive, when the stream is boudn to a \(lqwildcard\(rq
+address it is necessary to retrieve the destination address
+for the message from the
+.B T_SCCP_DEST_ADDR
+XTI option structure in the
+.IR OPT_length " and " OPT_offset
+fields when retrieving TR-UNI request from a \(lqwildcard\(rq
+bound stream.  Otherwise, the destination address implied is
+the bound address.
+.PP
+Options indicated with the
+.BR T_UNITDATA_IND (7)
+primitive are as follows:
+.TP
+.B T_SCCP_DEST_ADDR
+.PD 0
+.TP
+.B T_SCCP_SEQ_CTRL
+.TP
+.BR T_SCCP_PRIORITY " or " T_SCCP_IMPORTANCE
+.PD
+.\"
+.SS T_UDERROR_IND
+.PP
+This primitive is interpreted as described in
+.BR T_UDERROR_IND (7).
+The primitive is only issued in response to a TR-UNI request
+primitive that failed to be delivered by SCCP.
+SCCP defines a number of protocol specific errors:
+.TP
+.B T_SCCP_INFR_P_FAILURE
+.PD 0
+.TP
+.B T_SCCP_INFR_P_CONGESTION
+.TP
+.B T_SCCP_INFR_P_QOS_CHANGE
+.TP
+.B T_SCCP_INFR_U_FAILURE
+.TP
+.B T_SCCP_INFR_U_CONGESTION
+.TP
+.B T_SCCP_INFR_U_QOS_CHANGE
+.TP
+.B T_SCCP_INFR_UNSPECIFIED
+.TP
+.B T_SCCP_STATUS_USER_IN_SERVICE
+.TP
+.B T_SCCP_STATUS_USER_OUT_OF_SERVICE
+.TP
+.B T_SCCP_STATUS_REMOTE_SCCP_AVAILABLE
+.TP
+.B T_SCCP_STATUS_REMOTE_SCCP_UNAVAILABLE
+.TP
+.B T_SCCP_STATUS_REMOTE_SCCP_UNEQUIPPED
+.TP
+.B T_SCCP_STATUS_REMOTE_SCCP_INACCESSIBLE
+.TP
+.B T_SCCP_STATUS_REMOTE_SCCP_CONGESTED[_x]
+.TP
+.B T_SCCP_STATUS_SIGNALLING_POINT_INACCESSIBLE
+.TP
+.B T_SCCP_STATUS_SIGNALLING_POINT_CONGESTED[_x]
+.TP
+.B T_SCCP_STATUS_SIGNALLING_POINT_ACCESSIBLE
+.PD
+.\"
+.SS T_CONN_REQ
+.PP
+This primitive is interpreted as described in
+.BR T_CONN_REQ (7),
+and corresponds to a TR-BEGIN request.  The "originating
+address" is the bound address or, when the bound address is a
+\(lqwildcard\(rq address, the address specified with the
+.BR T_SCCP_SRCE_ADDR
+XTI option structure.  Quality of service paramters are
+specified using the SCCP quality of service parameter XTI
+options structures.  The originating transaction ID is
+specified using the
+.BR T_TCAP_TRANSACTION_ID
+XTI options structure.  User data is passed in associated
+M_DATA message blocks.
+.\"
+.SS T_CONN_CON
+.PP
+This primitive is interpreted as described in
+.BR T_CONN_CON (7),
+and corresponds to a TR-CONTINUE (confirmation) indication.
+The "destination address" is the bound address or, when the
+bound address is a
+\(lqwildcard\(rq address, the "destination address" is
+supplied in the
+.B T_SCCP_DEST_ADDR
+XTI option structure.  Quality of service paramters are
+indicated using the SCCP quality of service paramter XTI
+options structures.  The originating transaction ID is
+specified using the
+.BR T_TCAP_TRANSACTION_ID
+XTI options structure.  User data is passed in associated
+M_DATA message blocks.
+.\"
+.SS T_CONN_IND
+.PP
+This primitive is interpreted as described in
+.BR T_CONN_IND (7),
+and corresponds to a TR-BEGIN indication.  The "destination
+address" is the bound address or, when the bound address is a
+\(lqwildcard\(rq address, the "destination address" is
+supplied in the
+.B T_SCCP_DEST_ADDR
+XTI option structure.  Quality of service parameters are
+indicated using the SCCP quality of service parameter XTI
+options structures.  The originating transaction ID is
+specified using the
+.BR T_TCAP_TRANSACTION_ID
+XTI options structure.  User data is passed in associated
+M_DATA message blocks.
+.\"
+.SS T_CONN_RES
+.PP
+This primitive is interpreted as described in
+.BR T_CONN_REQ (7),
+and corresponds to either a TR-CONTINUE (confirmation)
+request or a TR-END request depending on the present or
+absence of the
+.BR T_TCAP_TERMINATION
+XTI options structure in the associated options.  The
+"responding address" is the destination address of the
+corresponding
+.B T_CONN_IND (7)
+primitive, or is specified in the
+.BR T_SCCP_RESP_ADDR
+XTI option structure.
+Quality of service parameters are specified using the SCCP
+quality of service parameters XTI options structures.  The
+originating transaction ID is specified using the
+.BR T_TCAP_TRANSACTION_ID
+XTI options structure.  User data is passed in associated
+M_DATA message blocks.
+.PP
+When the XTI options contains a
+.BR T_TCAP_TERMINATION
+option, the primitive corresponds to a TR-END request and the
+value of the option determines the "termination" type.  The
+TR provider will always respond to this
+.BR T_CONN_RES (7)
+with a
+.BR T_DISCON_IND (7)
+primtive.
+.\"
+.SS T_DATA_REQ
+.PP
+This primitive is interpreted as described in
+.BR T_DATA_REQ (7),
+and corresponds to a TR-CONTINUE (continuation) request.  The
+Quality of Service parameters used are those associated with
+the stream during connection negotiation or set prior with
+the
+.BR T_OPTMGMT_REQ (7)
+primitive.
+User data is passed in associated M_DATA message blocks.
+.\"
+.SS T_DATA_IND
+.PP
+This primitive is interpreted as described in
+.BR T_DATA_IND (7),
+and corresponds to a TR-CONTINUE (continuation) indication.
+The Quality of Service parameters used are those associated
+with the stream during transcation initiation or set prior
+with the
+.BR T_OPTMGMT_REQ (7)
+primitive.
+User data is passed in associated M_DATA message blocks.
+.\"
+.SS T_EXDATA_REQ
+.PP
+This primitive is not used by TPI-TR and will generate a
+fatal
+.RB [ EPROTO ]
+error if issued.
+.\"
+.SS T_EXDATA_IND
+.PP
+This primmitive is not used by TPI-TR and will never be
+issued by the TR provider.
+.\"
+.SS T_OPTDATA_REQ
+.PP
+This primitive is interpreted as described in
+.BR T_OPTDATA_REQ (7),
+and corresponds to a TR-CONTINUE (continuation) request.  The
+Quality of Service parameters are those specified in XTI
+options structures or associated with the stream during
+transaction initiation or set prior with the
+.BR T_OPTMGMT_REQ (7)
+primitive.
+User data is passed in associated M_DATA message blocks.
+.\"
+.SS T_OPTDATA_IND
+.PP
+This primitive is interpreted as described in
+.BR T_OPTDATA_IND (7),
+and corresponds to a TR-CONTINUE (continuation) indication,
+or a TR-NOTICE indication, depending on the
+setting of the
+.BR T_TCAP_NOTICE
+flag in the
+.I DATA_flags
+field and the presence or absence of a
+.BR T_TCAP_REASON
+XTI options structure.
+.PP
+When the
+.B T_TCAP_NOTICE
+flag is not set in the
+.I DATA_flags
+field and the
+.B T_TCAP REASON
+XTI options structure is not present in the associated
+options, the primitive corresponds to a TR-CONTINUE
+(continuation) indication primtive.  The Quality of Service
+parameters are indicated in XTI options structures.  User
+data is passed in associated M_DATA message blocks.
+.PP
+When the
+.B T_TCAP_NOTICE
+flag is set in the
+.I DATA_flags
+field, the primitive corresponds to a TR-NOTICE indicaiton
+and the "reason" parameter is contained in the
+.B T_TCAP_REASON
+XTI options structure in the associated options.  The
+returned data (if any) is passed in associated M_DATA message
+blocks.
+.\"
+.SS T_DISCON_REQ
+.PP
+This primitive is interpreted as described in
+.BR T_DISCON_REQ (7),
+and corresponds to a TR-U-ABORT request.  The Quality of
+Service parameters are those associated with the stream or
+set prior using the
+.BR T_OPTMGMT_REQ (7)
+primtiive.  The "transaction id" is implied by the
+connection.  "User data" may be passed in associated M_DATA
+message blocks.
+.\"
+.SS T_DISCON_IND
+.PP
+This primitive is interpreted as described in
+.BR T_DISCON_IND (7),
+and, depending on the value of the
+.I DISCON_reason
+field, corresponds to a TR-END, TR-U-ABORT, TR-P-ABORT, or
+TR-NOTICE indication.
+The primitive will correspond to a TR-NOTICE only when issued
+in response to a T_CONN_REQ (that is in the TS_WCON_CREQ
+state).  When the message corresponds to a TR-END,
+TR-U-ABORT, TR-P-ABORT or TR-NOTICE indication is determined
+by examining the
+.I DISCON_reason
+field.  Any returned data associated with a TR-NOTICE, and
+any user data associated with a TR-END or TR-U-ABORT
+indication will be passed in associated M_DATA message
+blocks.
+.\"
+.SS T_ORDREL_REQ
+.PP
+This primitive is interpreted as described in
+.BR T_ORDREL_REQ (7),
+and corresponds to a TR-END request.  The "termination"
+parameter is taken from the value set for the stream prior
+using the
+.BR T_TCAP_TERMINATION
+XTI option structure and the
+.BR T_OPTMGMT_REQ (7)
+primitive.
+When the termination is
+.BR T_TCAP_TERMINATION_BASIC ,
+any user data is passed in associated M_DATA message blocks.
+The TR-provide will always respond with a
+.BR T_ORDREL_IND (7)
+or
+.BR T_DISCON_IND (7)
+primitive to complete the state transition.
+.\"
+.SS T_ORDREL_IND
+.PP
+This primitive is interpreted as described in
+.BR T_ORDREL_IND (7),
+and corresponds to a TR-END indication primitive.  Any user
+data associated with the TR-END indication primitive will be
+passed in associated M_DATA message blocks.  The TR-user must
+respond with a
+.BR T_ORDREL_REQ (7)
+or
+.BR T_DISCON_REQ (7)
+primitive to complete the state transition.
+.\"
+.\"
+.SH INPUT-OUTPUT CONTROLS
+.PP
+.B TPI-TR
+supports the
+.BR timod (4)
+input-output controls when the
+.BR timod (4)
+module is pushed over the stream.
+.B TPI-TR
+supports the
+.BR sockmod (4)
+input-output controls when the
+.BR sockmod (4)
+module is pushed over the stream.
+.\"
+.\"
+.SH ERROR HANDLING
+.PP
+Protocol errors are handled using the
+.BR T_UDERROR_IND (7)
+and
+.BR T_DISCON_IND (7)
+primitives described above.
+.PP
+Non-fatal interface errors are handled using the
+.BR T_ERROR_ACK (7)
+primitive as described for
+.BR tpi (7).
+.PP
+Fatal interface errors are handled using the
+.IR STREAMS (4)
+.BR M_ERROR (9)
+or
+.BR M_HANGUP (9)
+primitives that result in the failure of all subsequent
+operations on the stream.
+.\"
+.\"
+.SH ERRORS
+.PP
+The following protocol errors can be returned in the
+.I ERROR_type
+field of the
+.BR T_UDERROR_IND (7)
+primitive:
+.PP
+Any of the connectionless protocol class errors returned by
+.BR tpi_sccp (7)
+may also be returned in the
+.BR T_UDERROR_IND (7).
+.PP
+The following protocol errors can be returned in the
+.I DISCON_reason
+field of the
+.BR T_DISCON_IND (7)
+primitive:
+.PP
+Any of the connectionless protocol class errors returned by
+.BR tpi_sccp (7)
+may also be returned in the
+.BR T_DISCON_IND (7).
+.PP
+The following protocol errros can be returned in the
+.B T_TCAP_REASON
+XTI option structure in the
+.BR T_OPTDATA_IND (7)
+primitive:
+.PP
+Any of the non-fatal errors described in
+.BR tpi (7)
+may also be returned in a
+.BR T_ERROR_ACK (7)
+primitive by
+.BR TPI-TR .
+.PP
+Any of the fatal errors described in
+.BR tpi (7)
+may also be retunred in an
+.IR errno (3)
+value in response to a read or write operation on the stream.
+.\"
+.\"
+.SH AUTHOR
+.PP
+Brian F. G. Bidulock <bidulock@openss7.org>
+.br
+The OpenSS7 Project http://www.openss7.org
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage describes Version 2 of the
+.BR TPI-TR
+interface.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR sccp (4),
+.BR tcap (4),
+.BR sua (4),
+.BR tua (4),
+.BR tpi (7),
+.BR tpi_sccp (7),
+.BR streamio (7),
+.BR putmsg (2s),
+.BR getmsg (2s),
+.BR putpmsg (2s),
+.BR getpmsg (2s),
+.BR read (2s),
+.BR write (2s).
+.\"
+.\"
+.XX
+.[
+q711
+.]
+.[
+q712
+.]
+.[
+q713
+.]
+.[
+q714
+.]
+.[
+q715
+.]
+.[
+q771
+.]
+.[
+q772
+.]
+.[
+q773
+.]
+.[
+q774
+.]
+.[
+q775
+.]
+.[
+t1.112
+.]
+.[
+t1.114
+.]
+.[
+tpi revision 2.0.0 draft 2
+.]
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.TI
+
+
+
+
+
+
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+

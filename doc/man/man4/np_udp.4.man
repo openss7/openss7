@@ -1,0 +1,458 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: np_udp.4.man,v 1.1.2.2 2011-02-07 02:18:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:10 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: np_udp.4.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:10  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH NP-UDP 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B np_udp
+\- STREAMS User Datagram Protocol (UDP) Driver
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/socket.h>
+.br
+.B #include <netinet/ip.h>
+.br
+.B #include <netinet/udp.h>
+.br
+.B #include <sys/npi.h>
+.br
+.B #include <sys/npi_ip.h>
+.br
+.B #include <sys/npi_udp.h>
+.HP 12
+.BI "int " udp_stream " = open(" udp_device ", " oflag );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B NPI-UDP
+pseudo-device
+driver provides an interface between
+.I STREAMS
+drivers and the Linux UDP subsystem.  It presents an
+.BR npi (7)
+Network Provider Interface 
+.[
+NPI Revision 2.0.0
+.]
+to
+.I STREAMS
+drivers and provides access to the native Linux UDP subsystem.
+.PP
+.B NPI-UDP
+is implemented as a
+.IR STREAMS (4)
+pseudo-device driver and provides the following devices:
+.TP
+.IR /dev/np_udp ", " /dev/streams/np_udp ", " /dev/streams/clone/np_udp
+This device provides access to the
+.B NPI-UDP
+protocol service interface using the N-primitives of the Network Provider Interface,
+.[
+NPI Revision 2.0.0
+.]
+.BR npi (7),
+used for the User Datagram Protocol as described in
+.BR npi_udp (7).
+The
+.BR npi (7)
+interface provided on a stream opening this device is suitable for use with
+the
+.BR sockets (3)
+library and provides the
+.B NPI-UDP
+interface using sockets as described in
+.BR npi_udp (7).
+This stream provides connectionless, connection-oriented and multiplexed NPI services.
+.TP
+.IR /dev/udpcl ", " /dev/streams/np_udp/udpcl
+This named minor device provides access to the
+.B NPI-UDP
+protocol service interface using the N-primitives of the Network Provider
+Interface,
+.[
+NPI Revision 2.0.0
+.]
+.BR npi (7),
+used for the User Datagram Protocol as described in
+.BR npi_udp (7).
+The
+.BR npi (7)
+service interface provided on a Stream opening this device uses, by default,
+a connectionless protocol.  This is the typical and default service interface
+for
+.B NPI-UDP
+Streams.
+.TP
+.IR /dev/udpco ", " /dev/streams/np_udp/udpco
+This device provides access to the
+.B NPI-UDP
+protocol service interface using the N-primitives of the Network Provider
+Interface,
+.[
+NPI Revision 2.0.0
+.]
+.BR npi (7),
+used for the User Datagram Protocol as described in
+.BR npi_udp (7).
+The
+.BR npi (7)
+service interface provided on a Stream opening this device uses, by default,
+a connection-oriented protocol.  This is an atypical service interface for
+.B NPI-UDP
+Streams, but has some specific use for symmetric UDP applications.
+.RS
+.PP
+A pseudo-connection-oriented service interface is particularly useful for
+symmetric, bidirectional UDP applications.  Symmetric, bidirectional UDP
+applications are those that send from the same transport address for which
+they receive and do not wish to receive packets from any remote transport
+address other than the one to which they are connected.
+An example of an application that can utilize pseudo-connection-oriented
+service from UDP is the Real-Time Transport Protocol (RTP),
+.[
+rfc1889
+.]
+where it is being used in symmetric, bidirectional mode.
+.[
+bcp131
+.]
+.PP
+A multi-homed pseudo-connection-oriented service interface is particularly
+useful for multi-homed symmetric, bidirectional UDP applications.
+Multi-homed applications are those that form connections between a local set
+of IP addresses and a remote set of IP addresses, instead of simply between
+two IP addresses, as in the single-homed case.
+An example of an application that can utilize multi-homed
+pseudo-connection-oriented service from UDP is the Stream Control Transport
+Protocol (SCTP),
+.[
+rfc4960
+.]
+.BR sctp (4),
+when run over UDP.
+.RE
+.TP
+.IR /dev/udpmux ", " /dev/streams/np_udp/udpmux
+This device provides access to the
+.B NPI-UDP
+protocol service interface using modified N-primitives of the Network
+Provider Interface,
+.[
+NPI Revision 2.0.0
+.]
+.BR npi (7),
+used for the User Datagram Protocol as described in
+.BR npi_udp (7).
+The
+.BR npi (7)
+service interface provided on a Stream opening this device uses, by default,
+a multiplexed protocol.  This is a specialized service interface that
+provides for many UDP connectionless or connection-oriented instances on the
+same Stream.  Each
+.BR npi (7)
+primitive is tagged with a connection identifier in a word prepended to the
+primitive.
+.RS
+.PP
+This device has particular use for large-scale access to the UDP subsystem,
+where a multiplexing driver does not wish to link an individual UDP Stream
+for each connection.  Instead, the device may link one NPI-UDP multiplexed
+Stream and form as many individual and independent connections as desired.
+The device supports both connectionless and pseudo-connection-oriented
+operation, as well as multi-homing.
+.RE
+.\"
+.\"
+.SH USAGE
+.PP
+The following entries in
+.B /etc/sock2path
+provides the information necessary for
+.BR socksys (4)
+to use these devices:
+.PP
+.nf
+\f(CW\s-1\
+PF_INET     SOCK_RAW      IPPROTO_UDP   /dev/udpcl   npi   clts
+PF_INET     SOCK_RAW      IPPROTO_UDP   /dev/udpco   npi   cots
+\s+1\fP
+.fi
+.PP
+For additional information, see
+.BR socksys (4)
+and
+.BR sock2path (5).
+.\"
+.\"
+.SH IOCTLS
+.PP
+All interfaces support a set of management IO controls using
+.BR ioctl (2s)
+and
+.BR streamio (7)
+.I I_STR
+system calls on the
+.IR udp_stream ", " udp_xtistr " or " udp_socket .
+These management controls are described in
+.BR udp_ioctl (4).
+.\"
+.\"
+.SH NOTICES
+.PP
+.B NPI-UDP
+has several implementations.  This manpage is for the
+.IR STREAMS (4)
+implementation.  There is also an
+.BR INET (4)
+implementation which provides
+.BR tpi (7)
+access to the Linux NET4 version of
+.BR NPI-UDP .
+For more information, see
+.BR udp (7).
+.PP
+Note that using
+.BR sockets (3)
+over
+.I STREAMS
+for the
+.B NPI-UDP
+driver might be rather inefficient: unless you need to push modules, use a
+direct Linux native socket instead.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+The current
+.B NPI-UDP
+pseudo-device driver hook directly into the Linux kernel UDP subsystem.
+Previous approaches used a STREAMS over Sockets method that was inefficient
+and inflexible.
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
+.SH FILES
+.PP
+.BR <sys/socket.h> ,
+.BR <netinet/ip.h> ,
+.BR <netinet/udp.h> ,
+.BR <sys/npi.h> ,
+.BR <sys/npi_ip.h> ,
+.BR <sys/tpi.h> ,
+.BR <sys/tpi_ip.h> ,
+.BR <sys/xti.h> ,
+.BR <sys/xti_ip.h> .
+.\"
+.\"
+.SH DEVICES
+.PP
+.IR /dev/np_udp ,
+.IR /dev/rawip .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR ioctl (2s),
+.BR npi (7),
+.BR npi_ip (7),
+.BR npi_udp (7),
+.BR sock2path (5),
+.BR ip (7),
+.BR ip (8),
+.BR udp (7),
+.BR udp_ioctl (4),
+.BR socket (7),
+.BR sockets (3),
+.BR socksys (4),
+.BR streamio (7),
+.BR STREAMS (4),
+.BR tpi (7),
+.BR tpi_ip (7),
+.BR tpi_udp (7),
+.BR xnet (3),
+.BR xti (3),
+.BR xti_ip (3),
+.BR xti_udp (3).
+.\"
+.\"
+.SH BUGS
+The
+.B NPI-UDP
+driver should be merged with the
+.BR udp2 (4)
+driver so that only one UDP hook is installed in the Linux IP system.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.I /dev/rawip
+device providing a Transport Provider Interface
+.[
+tpi revision 2.0.0 draft 2
+.]
+is roughly compatible with the raw udp TPI streams provided by
+.IR Solaris \(rg
+.[
+soldoc
+.]
+and other
+.IR UNIX \(rg
+implementations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+While as consistent with the Network Provider Interface as possible, NPI
+interfaces to UDP services are implementation dependent and are not subject
+to standardization.
+In particular, the multiplexed NPI interface is non-standard as is only
+intended to solve problems associated with internal STREAMS interfaces
+between modules and the Linux UDP subsystem.
+.\"
+.\"
+.SH HISTORY
+.PP
+.I STREAMS
+access to UDP services was originally performed using an STREAMS over Socket
+approach using the
+.BR INET (4)
+pseudo-device driver from the
+.I strinet
+package.  A more flexible direct implementation was performed using a separate
+driver that hooked directly into the Linux UDP subsystem, but initially only
+provided the user-based Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0 draft 2
+.]
+.BR tpi (7),
+interface.  This
+Network Provider Interface (NPI),
+.[
+NPI Revision 2.0.0
+.]
+.BR npi (7),
+interface was provided to
+better support stacking protocol modules on top of the UDP driver.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.T4

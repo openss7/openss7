@@ -1,0 +1,7 @@
+syn keyword Type OM_sint OM_sint16 OM_sint32 OM_uint OM_uint16 OM_uint32 OM_double OM_boolean OM_descriptor
+syn keyword Type OM_enumeration OM_exclusions OM_integer OM_modification OM_object OM_object_identifier
+syn keyword Type OM_private_object OM_public_object OM_real OM_return_code OM_string_length OM_string OM_syntax OM_type
+syn keyword Type OM_type_list OM_padded_object OM_value OM_value_length OM_value_position OM_workspace
+
+syn keyword Type OMP_copy OMP_copy_value OMP_create OMP_decode OMP_delete OMP_encode OMP_get OMP_instance OMP_put
+syn keyword Type OMP_read OMP_remove OMP_write OMP_functions OMP_workspace

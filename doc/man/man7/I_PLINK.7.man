@@ -1,0 +1,765 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: I_PLINK.7.man,v 1.1.2.2 2011-02-07 02:18:18 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:18 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: I_PLINK.7.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:18  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH I_PLINK 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Protocols"
+.\"
+.\"
+.SH NAME
+.B I_PLINK
+\- persistently link a Stream beneath a \fISTREAMS\fP multiplexing driver
+.\"
+.\"
+.SH SYNOPSIS   
+.PP
+.B #include <sys/types.h>
+.br
+.B #include <stropts.h>
+.HP
+.BI "int " retval " = ioctl (int " fd ", I_PLINK, ... /* " arg " */);"
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I fd
+the file descriptor of a Stream connected to a multiplexing driver.
+.TP
+.I cmd
+always
+.BR I_PLINK .
+.TP
+.I arg
+is the integer file descriptor of the Stream to link.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B I_PLINK
+.BR ioctl (2s)
+command links one Stream, with file descriptor
+.IR arg ,
+under the multiplexing driver of another Stream, with file descriptor
+.IR fd .
+.PP
+.I fd
+is the file descriptor of a Stream connected to a multiplexing driver, that was returned from the
+.BR open (2s)
+system call when the multiplexing driver was opened and the Stream created.  A multiplexing driver
+is a
+.I STREAMS
+driver that has a lower multiplexer definition.  A lower multiplexer definition exists when the
+.I st_muxrinit
+and
+.I st_muxwinit
+members of the
+.BR streamtab (9)
+structure defining the driver are
+.RB non- NULL .
+.PP
+.I arg
+is the file descriptor of another Stream, that was returned from the
+.BR open (2s)
+or
+.BR pipe (2s)
+system call when the Stream was created.
+In general, the Stream specified by
+.I arg
+can be any regular Stream,
+.IR STREAMS -based
+.BR pipe (4),
+or
+.IR STREAMS -based
+.BR fifo (4s),
+but
+.I arg
+must be associated with a Stream.
+.PP
+.B I_PLINK
+performs a persistent link of the Stream, specified by
+.IR arg ,
+beneath the multiplexing driver associated with
+.IR fd .
+Persistent links are not automatically dismantled when the control Stream,
+.IR fd ,
+is closed and remain after the last reference to the control Stream is otherwise relinquished.
+Persistent links can only be removed with an explicit call to
+.BR I_PUNLINK (7).
+.PP
+The
+.B I_PLINK
+operation will cause the Stream head to generate a
+.BR M_IOCTL (9)
+message with a
+.BR M_DATA (9)
+block containing a
+.BR linkblk (9)
+structure.  This
+.BR M_IOCTL (9)
+message is passed downstream to the multiplexing driver.  A positive
+.BR M_IOCACK (9)
+or negative
+.BR M_IOCNAK (9)
+acknowledgement is expected from the driver before the operation can complete.
+.PP
+The
+.B I_PLINK
+.BR ioctl (2s)
+call will block waiting to acquire exclusive access to the Streams associated with
+.I fd
+and
+.IR arg ,
+awaiting allocation of the necessary internal
+.I STREAMS
+.BR linkblk (9)
+and
+.BR syncq (9)
+data structures,
+awaiting the allocation of an
+.BR M_IOCTL (9)
+message to pass downstream,
+and
+awaiting an acknowledgement from the driver.
+.PP
+The
+.B I_PLINK
+operation will fail if the call times out awaiting acknowledgement from the driver,
+the call is interrupted by a signal,
+or either the control Stream,
+.IR fd ,
+or the linked Stream,
+.IR arg ,
+receives a hangup
+.BR M_HANGUP (9)
+or an asynchronous error
+.BR M_ERROR (9)
+message before the call can complete.
+.PP
+When successful, the operation completes and a system-wide unique multiplex link indentifier is
+returned.  This value can subsequently be used as an argument to an
+.BR I_PUNLINK (7)
+operation, to unlink the linked Stream.
+.PP
+.I STREAMS
+records the fact that this link is a persistent link.  Even though the returned multiplex link identifier
+is system-wide unique, a call to
+.BR I_UNLINK (7)
+with a multiplex identifier returned from an
+.I I_PLINK
+operation will fail and return
+.RB [ EINVAL ].
+.\"
+.\"
+.SH USAGE
+.PP
+.B I_PLINK
+is used to form a persistent link between a multiplexing driver and another Stream.  Persistent links
+are not associated with the control Stream (specified by
+.IR fd ).
+When the control Stream is closed and the last reference to the Stream relinquished, persistent
+links will remain intact.
+.PP
+It is not necessary to keep a persistently linked Stream open for it to remain linked.  When the
+Stream is unlinked with
+.B I_PUNLINK (7),
+the Stream will be unlinked and the reference to the Stream released causing the previously linked
+Stream to be dismantled.
+.PP
+The control Stream itself can be later linked underneath another multiplexing driver.  In this
+manner, complex trees of multiplexed Streams can be created.  However, if persistent links are used
+throughout, all control Streams can be closed and the configuration will remain intact.
+.PP
+In contrast, the
+.BR I_LINK (7)
+.BR ioctl (2s)
+causes a Stream to be regularly (non-persistently) linked under a multiplexing driver.
+.PP
+Persistent links are typically used for system initialization without the need for a daemon process.
+When the system boots, initialization scripts create the multiplex and then close all file descriptors
+associated with the Streams involved.  The multiplex configuration persists for the life of the
+system, or until explicitly dismantled or reconfigured.
+.PP
+In contrast, regular links created with
+.BR I_LINK (7)
+require the existence of a daemon process to maintain the multiplex by holding a control Stream
+open.
+See
+.BR I_LINK (7).
+.PP
+Because of the power of persistent links, most multiplexing driver designs require that the caller
+have adequate privilege to form a persistent link.  The credentials of the caller are passed to the
+driver in the
+.BR M_IOCTL (9)
+message requesting formation of a persistent link.  The driver will typically deny formation of a
+persistent link unless the caller has root privilege.  If the passed credentials reveal that the
+caller does not have adequate privilege, the driver normally responds with a
+.BR M_IOCNAK (9)
+message containing the
+.RB [ EPERM ]
+error number.
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon success, the
+.B I_PLINK
+.BR ioctl (2s)
+command returns a positive integer.
+Upon failure, the
+.B I_PLINK
+.BR ioctl (2s)
+command returns minus one
+.RB ( -1 )
+and sets
+.IR errno (3)
+to an appropriate error number.
+.PP
+When successful,
+.B I_PLINK
+returns a positive integer representing the multiplex identifier of the linked Stream.  This value
+can subsequently be used in a
+.BR I_PUNLINK (7)
+command.
+.\"
+.\"
+.SH ERRORS
+.PP
+When the
+.B I_PLINK
+.BR ioctl (2s)
+command fails, it returns minus one
+.RB ( -1 )
+and sets
+.IR errno (3)
+to one of the following errors:
+.TP \w'[EWOULDBLOCK]\(em'u
+.RB [ EBADF ]
+.I fd
+does not specify a valid, open file descriptor.
+.TP
+.RB [ ENODEV ]
+.I fd
+refers to a file that does not support the
+.BR ioctl (2s)
+system call.
+.TP
+.RB [ ENOSTR ]
+.I fd
+is not associated with a Stream.
+.TP
+.RB [ EINVAL ]
+.I fd
+refer to a
+.IR STREAMS -based
+.BR pipe (4)
+or
+.BR fifo (4s).
+.TP
+.RB [ EINVAL ]
+.I fd
+refers to a Stream connected to a driver that does not have a lower multiplex definition.
+.TP
+.RB [ EINVAL ]
+.I fd
+is linked under a multiplexing driver.
+.TP
+.RB [ EIO ]
+.I fd
+specifies a Stream that has closed or is closing.
+.TP
+.RB [ ENOTTY ]
+.I fd
+specifies a Stream that is a controlling terminal that has closed or is closing.
+.TP
+.RB [ ENXIO ]
+.I fd
+received a hangup
+.BR M_HANGUP (9)
+message.
+.TP
+.RB [ EIO ]
+.I fd
+specifies a controlling terminal, the calling process is not a member of the foreground process
+group and is a member of an orphaned process group, or is blocking
+.RI { SIGTTIN }
+signals.
+.TP
+.RB [ ERESTARTSYS ]
+.I fd
+is a controlling terminal, the calling process is a member of a background process group and is not
+blocking
+.RI { SIGTTIN }
+or
+.RI { SIGTTOU }
+signals, and a
+.RI { SIGTTIN }
+or
+.RI { SIGTTOU }
+signal was sent.
+.TP
+.RB [ EBADF ]
+.I arg
+does not specify a valid, open file descriptor.
+.TP
+.RB [ EINVAL ]
+.I arg
+is not associated with a Stream.
+.TP
+.RB [ EINVAL ]
+.I arg
+is associated with the same Stream as
+.IR fd .
+.TP
+.RB [ EINVAL ]
+.I arg
+specifies a Stream that is already linked under a multiplexing driver.
+.TP
+.RB [ EIO ]
+.I arg
+specifies a Stream that is closed or is closing.
+.TP
+.RB [ ENOTTY ]
+.I arg
+specifies a controlling terminal that is closed or is closing.
+.TP
+.RB [ ENXIO ]
+.I arg
+received a hangup
+.BR M_HANGUP (9)
+message.
+.TP
+.RB [ EIO ]
+.I arg
+received an error
+.BR M_ERROR (9)
+message containing a persistent read or write error.
+.TP
+.RB [ ENOSR ]
+a
+.BR linkblk (9)
+structure could not be allocated to complete the operation.
+.TP
+.RB [ ENOSR ]
+a synchronization queue
+.BR syncq (9)
+data structure could not be allocated to complete the operation.
+.TP
+.RB [ ERESTARTSYS ]
+a signal was received (or generated by the call) before the operation could begin.
+.TP
+.RB [ EINTR ]
+a signal was received before the operation could complete.
+.TP
+.RB [ ETIME ]
+the operation timed out waiting for an acknowledgement from the driver.
+.TP
+.RB [ ENXIO ]
+a negative acknowledgement
+.BR M_IOCNAK (9)
+was received from the driver with no specified error.
+.TP
+.RB [ ENXIO ]
+the driver responded incorrectly (with a well formed
+.BR M_COPYIN (9)
+or
+.BR M_COPYOUT (9)
+message.)
+.\"
+.\"
+.PP
+Also, if
+.I fd
+receives an error
+.BR M_ERROR (9)
+message, containing a persistent read error,
+.BR errno (3)
+will be set to the error number in the message.
+.PP
+If
+.I fd
+receives an error
+.BR M_ERROR (9)
+message, containing only a persistent write error,
+.BR errno (3)
+will be set to the error number in the message.  If the
+.B SNDPIPE
+write option is set for the Stream, the calling process will also be sent a
+.RI { SIGPIPE }
+signal.
+.\"
+.\"
+.PP
+The operation requires that the driver send a positive
+.BR M_IOCACK (9)
+or negative
+.BR M_IOCNAK (9)
+acknowledgement.
+If a negative
+.BR M_IOCNAK (9)
+acknowledgement message is received that contains an error,
+.BR errno (3)
+will be set to the error number in the message.
+.\"
+.\"
+.SH NOTICES
+.PP
+.I STREAMS
+.BR ioctl (2s)
+calls are complex and there is much conflicting documentation in specific
+areas of behaviour.  Not all bugs are bugs and not all features are features.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+The
+.I "SVR 4.2 SPG"
+.[
+svr42spg
+.]
+indicates that
+.I STREAMS
+keeps track of linked Streams and detects when a loop could occur in a given multiplex arrangement,
+and that
+.RB [ EINVAL ]
+can be returned when a possible looping configuration is detected.
+.RS
+.ll -7n
+.PP
+\(lqThe construction of cycles is not allowed when creating links.  A cycle could be constructued by
+creating a persistent link of multiplexer 2 below multiplexer 1 and then closing the controlling
+file descriptor associated with the multiplexer 2 and reopening it again and then linking the
+multiplexer 1 below the multiplexer 2.  This is not allowed.  The operating system prevents a
+multiplexer configuration from containing a cycle to ensure that messages cannot be routed
+infinitely, thus creating an infinite loop or overflowing the kernel stack.\(rq
+.[
+svr42spg
+.]
+.ll +7n
+.RE
+.PP
+.B @PACKAGE_TITLE@
+does not detect such arrangements, because, for the most part, they can represent valid
+configurations.  This is likely, however, a security issue, particularly if a looping arrangement
+can be built by an unprivileged user.
+.PP
+Because persistent links typically require root privilege, this is not such an issue for persistent
+links as it is for regular links.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+In the following example, a persistent link is created and the creator of the link exits.
+.PP
+.RS 0
+.nf
+\fC\s-1\
+ 1 int
+ 2 main()
+ 3 {
+ 4     int fd_str;
+ 5     int fd_mux;
+ 6     int muxid;
+ 7 
+ 8     if ((fd_mux = open("/dev/mux/1", O_RDWR)) == -1) {
+ 9         perror("can't open mux");
+10         exit(1);
+11     }
+12     if ((fd_str = open("/dev/nuls/1", O_RDWR)) == -1) {
+13         perror("can't open str");
+14         exit(2);
+15     }
+16     if ((muxid = ioctl(fd_mux, I_PLINK, fd_str)) < 0) {
+17         perror("can't link str");
+18         exit(3);
+19     }
+20     exit(0);
+21 }
+\s+1\fP
+.fi
+.RE
+.PP
+At a later point, the following program could be used to remove the persistent link.
+.PP
+.RS 0
+.nf
+\fC\s-1\
+ 1 int
+ 2 main()
+ 3 {
+ 4     int fd_mux;
+ 5 
+ 6     if ((fd_mux = open("/dev/mux/0", O_RDWR)) == -1) {
+ 7         perror("can't open mux");
+ 8         exit(1);
+ 9     }
+10     if (ioctl(fd_mux, I_PUNLINK, MUXID_ALL) == -1) {
+11         perror("can't unlink str");
+12         exit(2);
+13     }
+14     exit(0);
+15 }
+\s+1\fP
+.fi
+.RE
+.PP
+Note that at line 6, a different Stream to the multiplexing driver was opened to remove the
+persistent link as was opened at line 8 in the previous listing.  The persistently linked Stream is
+still unlinked, regardless of the control Stream used.
+.PP
+Instead of using
+.B MUXID_ALL
+at line 10 in the second listing, the
+.I muxid
+from the first listing could have been stored in a file and used in the second listing.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR I_PUNLINK (7),
+.BR I_LINK (7),
+.BR ioctl (3p),
+.BR streamio (7),
+.BR ioctl (2s),
+.BR errno (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.I STREAMS
+.BR ioctl (2s)
+calls are complex and there is much conflicting documentation in specific
+areas of behaviour.  Not all bugs are bugs and not all features are features.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B I_PLINK
+is compatible with
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+and implementations based on
+.IR "SVR 4.2" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B I_PLINK
+conforms as closely as possible to the
+.I POSIX/SUSv3
+specifications.
+Where a specific
+.IR "SVR 4.2" -based
+implemntation differs from
+.IR POSIX/SUSv3 ,
+there will be differences with this
+.I @PACKAGE_TITLE@
+implementation.
+.IP ""
+Portable
+.I STREAMS
+applications programs will expect conformance to
+.IR POSIX/SUSv3 .
+.IP \(em
+.B I_PLINK
+returns a positive integer multiplexer identifier.  This identifier is derived from the address of a
+.BR linkblk (9)
+structure within the kernel and is not a small integer as some applications might expect.  Returning
+other than a small integer is shortcut practise used by a number of
+.IR "SVR 4.2" -based
+implementations.
+.IP ""
+Portable
+.I STREAMS
+applications programs will not expect a small integer multiplexer identifier, but will treat the
+multiplexer identifier as opaque with only the following exception: the multiplexer identifier is
+greater than zero and can be tested as such.
+.IP \(em
+.B I_PLINK
+will return a multiplexer identifier that is unique across all regular and persistent links.  Some
+implementations might return a small integer multiplexer identifier that identifies the cardinal
+regular link for a given control Stream.
+.IP ""
+Portable
+.I STREAMS
+applications will treat the returned multiplexer identifier as opaque, except to test whether it is
+greater than zero.
+.IP \(em
+.B I_PLINK
+use the special value,
+.BR MUXID_ALL ,
+of minus one
+.RB ( -1 ).
+.IP ""
+Although all known implementations use the the value of minus one for
+.BR MUXID_ALL ,
+portable
+.I STREAMS
+application programs will not directly specify minus one, but will use the symbol
+.BR MUXID_ALL
+for this value.
+.PP
+For general
+.BR ioctl (2s)
+compatibility, see
+.BR streamio (7).
+.PP
+If your
+.B Linux
+system is equipped with
+.I OpenGroup
+manual pages, see
+.BR ioctl (3p)
+for the equivalent
+.I POSIX/SUSv3
+reference page.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVID,
+.[
+svid
+.]
+XID,
+.[
+xbd5
+.]
+SUSv2,
+.[
+susv2
+.]
+SUSv3,
+.[
+susv3
+.]
+POSIX.
+.PP
+Conformance is tested using the
+.BR test-streams (8)
+test case executable and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ioctl (2s)
+for
+.I STREAMS
+first appeared in SVR 3.
+.[
+svr3
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

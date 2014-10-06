@@ -1,0 +1,328 @@
+#TLD	CC	TYPE		SPONSOR
+#---	--	----		-------
+.AC	AC	country-code	Network Information Center (AC Domain Registry) c/o Cable and Wireless (Ascension Island)
+.AD	AD	country-code	Andorra Telecom
+.AE	AE	country-code	Telecommunication Regulatory Authority (TRA)
+.AERO	ZZ	sponsored	Societe Internationale de Telecommunications Aeronautique (SITA INC USA)
+.AF	AF	country-code	Ministry of Communications and IT
+.AG	AG	country-code	UHSA School of Medicine
+.AI	AI	country-code	Government of Anguilla
+.AL	AL	country-code	Electronic and Postal Communications Authority - AKEP
+.AM	AM	country-code	Internet Society
+.AN	AN	country-code	University of The Netherlands Antilles
+.AO	AO	country-code	Faculdade de Engenharia da Universidade Agostinho Neto
+.AQ	AQ	country-code	Mott and Associates
+.AR	AR	country-code	MRECIC (Ministerio de Relaciones Exteriores, Comercio Internacional y Culto)
+.ARPA	ZZ	infrastructure	Internet Assigned Numbers Authority
+.AS	AS	country-code	AS Domain Registry
+.ASIA	ZZ	sponsored	DotAsia Organisation Ltd.
+.AT	AT	country-code	NIC.AT Internet Verwaltungs und Betriebsgesellschaft m.b.H
+.AU	AU	country-code	.au Domain Administration (auDA)
+.AW	AW	country-code	SETAR
+.AX	AX	country-code	Ålands landskapsregering
+.AZ	AZ	country-code	IntraNS
+.BA	BA	country-code	Universtiy Telinformatic Centre (UTIC)
+.BB	BB	country-code	Government of Barbados Ministry of Economic Affairs and Development Telecommunications Unit
+.BD	BD	country-code	Ministry of Post & Telecommunications Bangladesh Secretariat
+.BE	BE	country-code	DNS BE vzw/asbl
+.BF	BF	country-code	ARCE-AutoritÈ de RÈgulation des Communications Electroniques
+.BG	BG	country-code	Register.BG
+.BH	BH	country-code	BATELCO
+.BI	BI	country-code	Centre National de l'Informatique
+.BIZ	ZZ	generic-restricted	NeuStar, Inc.
+.BJ	BJ	country-code	Offices des Postes et Telecommunications
+.BL	BL	country-code	Not assigned
+.BM	BM	country-code	Registry General Ministry of Labour and Immigration
+.BN	BN	country-code	Jabatan Telekom Brunei
+.BO	BO	country-code	Agencia para el Desarrollo de la Información de la Sociedad en Bolivia
+.BQ	BQ	country-code	Not assigned
+.BR	BR	country-code	Comite Gestor da Internet no Brasil
+.BS	BS	country-code	The College of the Bahamas
+.BT	BT	country-code	Ministry of Information and Communications
+.BV	BV	country-code	UNINETT Norid A/S
+.BW	BW	country-code	University of Botswana
+.BY	BY	country-code	Open Contact Ltd.
+.BZ	BZ	country-code	University of Belize
+.CA	CA	country-code	Canadian Internet Registration Authority (CIRA) Autorite Canadienne pour les Enregistrements Internet (ACEI)
+.CAT	ZZ	sponsored	Fundacio puntCAT
+.CC	CC	country-code	eNIC Cocos (Keeling) Islands Pty. Ltd. d/b/a Island Internet Services
+.CD	CD	country-code	Office Congolais des Postes et Télécommunications - OCPT
+.CF	CF	country-code	Societe Centrafricaine de Telecommunications (SOCATEL)
+.CG	CG	country-code	ONPT Congo and Interpoint Switzerland
+.CH	CH	country-code	SWITCH The Swiss Education & Research Network
+.CI	CI	country-code	INP-HB Institut National Polytechnique Felix Houphouet Boigny
+.CK	CK	country-code	Telecom Cook Islands Ltd.
+.CL	CL	country-code	NIC Chile (University of Chile)
+.CM	CM	country-code	Cameroon Telecommunications (CAMTEL)
+.CN	CN	country-code	Computer Network Information Center, Chinese Academy of Sciences
+.CO	CO	country-code	.CO Internet S.A.S.
+.COM	ZZ	generic	VeriSign Global Registry Services
+.COOP	ZZ	sponsored	DotCooperation LLC
+.CR	CR	country-code	National Academy of Sciences Academia Nacional de Ciencias
+.CU	CU	country-code	CENIAInternet Industria y San Jose Capitolio Nacional
+.CV	CV	country-code	Agência Nacional das Comunicações (ANAC)
+.CW	CW	country-code	University of the Netherlands Antilles
+.CX	CX	country-code	Christmas Island Internet Administration Limited
+.CY	CY	country-code	University of Cyprus
+.CZ	CZ	country-code	CZ.NIC, z.s.p.o
+.DE	DE	country-code	DENIC eG
+.DJ	DJ	country-code	Djibouti Telecom S.A
+.DK	DK	country-code	Dansk Internet Forum
+.DM	DM	country-code	DotDM Corporation
+.DO	DO	country-code	Pontificia Universidad Catolica Madre y Maestra Recinto Santo Tomas de Aquino
+.DZ	DZ	country-code	CERIST
+.EC	EC	country-code	NIC.EC (NICEC) S.A.
+.EDU	ZZ	sponsored	EDUCAUSE
+.EE	EE	country-code	National Institute of Chemical Physics and Biophysics
+.EG	EG	country-code	Egyptian Universities Network (EUN) Supreme Council of Universities
+.EH	EH	country-code	Not assigned
+.ER	ER	country-code	Eritrea Telecommunication Services Corporation (EriTel)
+.ES	ES	country-code	Red.es
+.ET	ET	country-code	Ethio telecom
+.EU	EU	country-code	EURid vzw/asbl
+.FI	FI	country-code	Finnish Communications Regulatory Authority
+.FJ	FJ	country-code	The University of the South Pacific IT Services
+.FK	FK	country-code	Falkland Islands Government
+.FM	FM	country-code	FSM Telecommunications Corporation
+.FO	FO	country-code	FO Council
+.FR	FR	country-code	AFNIC (NIC France) - Immeuble International
+.GA	GA	country-code	Gabon Telecom
+.GB	GB	country-code	Reserved Domain - IANA
+.GD	GO	country-code	The National Telecommunications Regulatory Commission (NTRC)
+.GE	GE	country-code	Caucasus Online
+.GF	GF	country-code	Net Plus
+.GG	GG	country-code	Island Networks Ltd.
+.GH	GH	country-code	Network Computer Systems Limited
+.GI	GI	country-code	Sapphire Networks
+.GL	GL	country-code	TELE Greenland A/S
+.GM	GM	country-code	GM-NIC
+.GN	GN	country-code	Centre National des Sciences Halieutiques de Boussoura
+.GOV	ZZ	sponsored	General Services Administration Attn: QTDC, 2E08 (.gov Domain Registration)
+.GP	GP	country-code	Networking Technologies Group
+.GQ	GQ	country-code	GETESA
+.GR	GR	country-code	ICS-FORTH GR
+.GS	GS	country-code	Government of South Georgia and South Sandwich Islands (GSGSSI)
+.GT	GT	country-code	Universidad del Valle de Guatemala
+.GU	GU	country-code	University of Guam Computer Center
+.GW	GW	country-code	Fundação IT & MEDIA Universidade de Bissao
+.GY	GY	country-code	University of Guyana
+.HK	HK	country-code	Hong Kong Internet Registration Corporation Ltd.
+.HM	HM	country-code	HM Domain Registry
+.HN	HN	country-code	Red de Desarrollo Sostenible Honduras
+.HR	HR	country-code	CARNet - Croatian Academic and Research Network
+.HT	HT	country-code	Consortium FDS/RDDH
+.HU	HU	country-code	Council of Hungarian Internet Providers (CHIP)
+.ID	ID	country-code	IDNIC-PPAU Mikroelektronika
+.IE	IE	country-code	University College Dublin Computing Services Computer Centre
+.IL	IL	country-code	Internet Society of Israel
+.IM	IM	country-code	Isle of Man Government
+.IN	IN	country-code	National Internet Exchange of India
+.INFO	ZZ	generic	Afilias Limited
+.INT	ZZ	sponsored	Internet Assigned Numbers Authority
+.IO	IO	country-code	IO Top Level Domain Registry Cable and Wireless
+.IQ	IQ	country-code	Communications and Media Commission (CMC)
+.IR	IR	country-code	Institute for Research in Fundamental Sciences
+.IS	IS	country-code	ISNIC - Internet Iceland ltd.
+.IT	IT	country-code	IIT - CNR
+.JE	JE	country-code	Island Networks (Jersey) Ltd.
+.JM	JM	country-code	University of West Indies
+.JO	JO	country-code	National Information Technology Center (NITC)
+.JOBS	ZZ	sponsored	Employ Media LLC
+.JP	JP	country-code	Japan Registry Services Co., Ltd.
+.KE	KE	country-code	Kenya Network Information Center (KeNIC)
+.KG	KG	country-code	AsiaInfo Telecommunication Enterprise
+.KH	KH	country-code	Ministry of Post and Telecommunications
+.KI	KI	country-code	Ministry of Communications, Transport, and Tourism Development
+.KM	KM	country-code	Comores Telecom
+.KN	KN	country-code	Ministry of Finance, Sustainable Development Information & Technology
+.KP	KP	country-code	Star Joint Venture Company
+.KR	KR	country-code	Korea Internet & Security Agency (KISA)
+.KW	KW	country-code	Ministry of Communications
+.KY	KY	country-code	The Information and Communications Technology Authority
+.KZ	KZ	country-code	Association of IT Companies of Kazakhstan
+.LA	LA	country-code	Lao National Internet Committee (LANIC) Science Technology and Environment Agency
+.LB	LB	country-code	American University of Beirut Computing and Networking Services
+.LC	LC	country-code	University of Puerto Rico
+.LI	LI	country-code	Universitaet Liechtenstein
+.LK	LK	country-code	Council for Information Technology LK Domain Registrar
+.LR	LR	country-code	Data Technology Solutions, Inc.
+.LS	LS	country-code	National University of Lesotho
+.LT	LT	country-code	Kaunas University of Technology Information Technology Development Institute
+.LU	LU	country-code	RESTENA
+.LV	LV	country-code	University of Latvia Institute of Mathematics and Computer Science Department of Network Solutions (DNS)
+.LY	LY	country-code	General Post and Telecommunication Company
+.MA	MA	country-code	Agence Nationale de Réglementation des Télécommunications (ANRT)
+.MC	MC	country-code	Gouvernement de Monaco Direction des Communications Electroniques
+.MD	MD	country-code	MoldData S.E.
+.ME	ME	country-code	Government of Montenegro
+.MF	MF	country-code	Not assigned
+.MG	MG	country-code	NIC-MG (Network Information Center Madagascar)
+.MH	MH	country-code	Cabinet Office
+.MIL	ZZ	sponsored	DoD Network Information Center
+.MK	MK	country-code	Ministry of Foreign Relations
+.ML	ML	country-code	SOTELMA
+.MM	MM	country-code	Ministry of Communications, Posts & Telegraphs
+.MN	MN	country-code	Datacom Co., Ltd.
+.MO	MO	country-code	University of Macau
+.MOBI	ZZ	sponsored	mTLD Top Level Domain Limited dba dotMobi
+.MP	MP	country-code	Saipan Datacom, Inc.
+.MQ	MQ	country-code	MEDIASERV
+.MR	MR	country-code	University of Nouakchott
+.MS	MS	country-code	MNI Networks Ltd.
+.MT	MT	country-code	NIC (Malta)
+.MU	MU	country-code	Internet Direct Ltd
+.MUSEUM	ZZ	sponsored	Museum Domain Management Association
+.MV	MV	country-code	Dhiraagu Pvt. Ltd. (DHIVEHINET)
+.MW	MW	country-code	Malawi Sustainable Development Network Programme (Malawi SDNP)
+.MX	MX	country-code	NIC-Mexico ITESM - Campus Monterrey
+.MY	MY	country-code	MYNIC Berhad
+.MZ	MZ	country-code	Centro de Informatica de Universidade Eduardo Mondlane
+.NA	NA	country-code	Namibian Network Information Center
+.NAME	ZZ	generic-restricted	VeriSign Information Services, Inc.
+.NC	NC	country-code	Office des Postes et Telecommunications
+.NE	NE	country-code	SONITEL
+.NET	ZZ	generic	VeriSign Global Registry Services
+.NF	NF	country-code	Norfolk Island Data Services
+.NG	NG	country-code	Nigeria Internet Registration Association
+.NI	NI	country-code	Universidad Nacional del Ingernieria Centro de Computo
+.NL	NL	country-code	SIDN (Stichting Internet Domeinregistratie Nederland)
+.NO	NO	country-code	UNINETT Norid A/S
+.NP	NP	country-code	Mercantile Communications Pvt. Ltd.
+.NR	NR	country-code	CENPAC NET
+.NU	NU	country-code	The IUSN Foundation
+.NZ	NZ	country-code	InternetNZ
+.OM	OM	country-code	Telecommunications Regulatory Authority (TRA)
+.ORG	ZZ	generic	Public Interest Registry (PIR)
+.PA	PA	country-code	Universidad Tecnologica de Panama
+.PE	PE	country-code	Red Cientifica Peruana
+.PF	PF	country-code	Gouvernement de la Polynésie française
+.PG	PG	country-code	PNG DNS Administration Vice Chancellors Office The Papua New Guinea University of Technology
+.PH	PH	country-code	PH Domain Foundation
+.PK	PK	country-code	PKNIC
+.PL	PL	country-code	Research and Academic Computer Network
+.PM	PM	country-code	AFNIC (NIC France) - Immeuble International
+.PN	PN	country-code	Pitcairn Island Administration
+.PR	PR	country-code	Gauss Research Laboratory Inc.
+.PRO	ZZ	generic-restricted	Registry Services Corporation dba RegistryPro
+.PS	PS	country-code	Ministry Of Telecommunications & Information Technology, Government Computer Center.
+.PT	PT	country-code	Fundação para a Computação Científica Nacional
+.PW	PW	country-code	Micronesia Investment and Development Corporation
+.PY	PY	country-code	NIC-PY
+.QA	QA	country-code	The Supreme Council of Information and Communication Technology (ictQATAR)
+.RE	RE	country-code	AFNIC (NIC France) - Immeuble International
+.RO	RO	country-code	National Institute for R&D in Informatics
+.RS	RS	country-code	Serbian National Register of Internet Domain Names (RNIDS)
+.RU	RU	country-code	Coordination Center for TLD RU
+.RW	RW	country-code	NIC Congo - Interpoint SARL
+.SA	SA	country-code	Communications and Information Technology Commission
+.SB	SB	country-code	Solomon Telekom Company Limited
+.SC	SC	country-code	VCS Pty Ltd
+.SD	SD	country-code	Sudan Internet Society
+.SE	SE	country-code	The Internet Infrastructure Foundation
+.SG	SG	country-code	Singapore Network Information Centre (SGNIC) Pte Ltd
+.SH	SH	country-code	Government of St. Helena
+.SI	SI	country-code	Academic and Research Network of Slovenia (ARNES)
+.SJ	SJ	country-code	UNINETT Norid A/S
+.SK	SK	country-code	SK-NIC, a.s.
+.SL	SL	country-code	Sierratel
+.SM	SM	country-code	Telecom Italia San Marino S.p.A.
+.SN	SN	country-code	Universite Cheikh Anta Diop NIC Senegal
+.SO	SO	country-code	Ministry of Post and Telecommunications
+.SR	SR	country-code	Telesur
+.SS	SS	country-code	Not assigned
+.ST	ST	country-code	Tecnisys
+.SU	SU	country-code	Russian Institute for Development of Public Networks (ROSNIIROS)
+.SV	SV	country-code	SVNet
+.SX	SX	country-code	SX Registry SA B.V.
+.SY	SY	country-code	National Agency for Network Services (NANS)
+.SZ	SZ	country-code	University of Swaziland Department of Computer Science
+.TC	TC	country-code	Melrex TC
+.TD	TD	country-code	Société des télécommunications du Tchad (SOTEL TCHAD)
+.TEL	ZZ	sponsored	Telnic Ltd.
+.TF	TF	country-code	AFNIC (NIC France) - Immeuble International
+.TG	TG	country-code	Cafe Informatique et Telecommunications
+.TH	TH	country-code	Thai Network Information Center Foundation
+.TJ	TJ	country-code	Information Technology Center
+.TK	TK	country-code	Telecommunication Tokelau Corporation (Teletok)
+.TL	TL	country-code	Ministry of Infrastructure Information and Technology Division
+.TM	TM	country-code	TM Domain Registry Ltd
+.TN	TN	country-code	Agence Tunisienne d'Internet
+.TO	TO	country-code	Government of the Kingdom of Tonga H.R.H. Crown Prince Tupouto'a c/o Consulate of Tonga
+.TP	TP	country-code	-
+.TR	TR	country-code	Middle East Technical University Department of Computer Engineering
+.TRAVEL	ZZ	sponsored	Tralliance Registry Management Company, LLC.
+.TT	TT	country-code	University of the West Indies Faculty of Engineering
+.TV	TV	country-code	Ministry of Finance and Tourism
+.TW	TW	country-code	Taiwan Network Information Center (TWNIC)
+.TZ	TZ	country-code	Tanzania Network Information Centre (tzNIC)
+.UA	UA	country-code	Communication Systems Ltd
+.UG	UG	country-code	Uganda Online Ltd.
+.UK	GB	country-code	Nominet UK
+.UM	UM	country-code	Not assigned
+.US	US	country-code	NeuStar, Inc.
+.UY	UY	country-code	SeCIU - Universidad de la Republica
+.UZ	UZ	country-code	Computerization and Information Technologies Developing Center UZINFOCOM
+.VA	VA	country-code	Holy See Secretariat of State Internet Office of the Holy See
+.VC	VC	country-code	Ministry of Telecommunications, Science, Technology and Industry
+.VE	VE	country-code	Comisión Nacional de Telecomunicaciones (CONATEL)
+.VG	VG	country-code	Pinebrook Developments Ltd
+.VI	VI	country-code	Virgin Islands Public Telcommunications System c/o COBEX Internet Services
+.VN	VN	country-code	Ministry of Information and Communications of Socialist Republic of Viet Nam
+.VU	VU	country-code	Telecom Vanuatu Limited
+.WF	WF	country-code	AFNIC (NIC France) - Immeuble International
+.WS	WS	country-code	Government of Samoa Ministry of Foreign Affairs
+.测试	--	test	Internet Assigned Numbers Authority
+.परीक्षा	--	test	Internet Assigned Numbers Authority
+.한국	KR	country-code	KISA (Korea Internet & Security Agency)
+.ভারত	IN	country-code	National Internet Exchange of India
+.বাংলা	country-code	Not assigned
+.ИСПЫТАНИЕ	--	test	Internet Assigned Numbers Authority
+.ҚАЗ	--	country-code	Not assigned
+.СРБ	SR	country-code	Serbian National Register of Internet Domain Names (RNIDS)
+.테스트	--	test	Internet Assigned Numbers Authority
+.சிங்கப்பூர் SG	country-code	Singapore Network Information Centre (SGNIC) Pte Ltd
+.טעסט	--	test	Internet Assigned Numbers Authority
+.中国	CN	country-code	China Internet Network Information Center
+.中國	CN	country-code	China Internet Network Information Center
+.భారత్	IN	country-code	National Internet Exchange of India
+.ලංකා	LK	country-code	LK Domain Registry
+.測試	--	test	Internet Assigned Numbers Authority
+.ભારત	IN	country-code	National Internet Exchange of India
+.भारत	IN	country-code	National Internet Exchange of India
+.آزمایشی	--	test	Internet Assigned Numbers Authority
+.பரிட்சை	--	test	Internet Assigned Numbers Authority
+.УКР	--	country-code	Not assigned
+.香港	HK	country-code	Hong Kong Internet Registration Corporation Ltd.
+.ΔΟΚΙΜΉ	--	test	Internet Assigned Numbers Authority
+.إختبار	--	test	Internet Assigned Numbers Authority
+.台湾	TW	country-code	Taiwan Network Information Center (TWNIC)
+.台灣	TW	country-code	Taiwan Network Information Center (TWNIC)
+.الجزائر	DZ	country-code	CERIST
+.عمان	--	country-code	Not assigned
+.ایران	--	country-code	Not assigned
+.امارات	OM	country-code	Telecommunications Regulatory Authority (TRA)
+.پاکستان	--	country-code	Not assigned
+.الاردن	JO	country-code	National Information Technology Center (NITC)
+.بھارت	IN	country-code	National Internet Exchange of India
+.المغرب	MA	country-code	Agence Nationale de Réglementation des Télécommunications (ANRT)
+.السعودية	SA	country-code	Communications and Information Technology Commission
+.مليسيا	--	country-code	Not assigned
+.გე	--	country-code	Not assigned
+.ไทย	TH	country-code	Thai Network Information Center Foundation
+.سورية	SY	country-code	National Agency for Network Services (NANS)
+.РФ	RU	country-code	Coordination Center for TLD RU
+.تونس	TN	country-code	Agence Tunisienne d'Internet
+.ਭਾਰਤ	IN	country-code	National Internet Exchange of India
+.مصر	OM	country-code	National Telecommunication Regulatory Authority - NTRA
+.قطر	QA	country-code	Supreme Council for Communications and Information Technology (ictQATAR)
+.இலங்கை	LK	country-code	LK Domain Registry
+.இந்தியா	IN	country-code	National Internet Exchange of India
+.新加坡	SG	country-code	Singapore Network Information Centre (SGNIC) Pte Ltd
+.فلسطين	PS	country-code	Ministry of Telecom & Information Technology (MTIT)
+.テスト	--	test	Internet Assigned Numbers Authority
+.XXX	ZZ	sponsored	ICM Registry LLC
+.YE	YE	country-code	TeleYemen
+.YT	YT	country-code	AFNIC (NIC France) - Immeuble International
+.ZA	ZA	country-code	ZA Domain Name Authority
+.ZM	ZM	country-code	ZAMNET Communication Systems Ltd.
+.ZW	ZW	country-code	Postal and Telecommunications Regulatory Authority of Zimbabwe (POTRAZ)

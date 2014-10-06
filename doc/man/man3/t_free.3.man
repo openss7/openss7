@@ -1,0 +1,302 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: t_free.3.man,v 1.1.2.2 2011-02-07 02:18:05 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:05 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: t_free.3.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:05  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH T_FREE 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "XTI/TLI Library Calls"
+.SH NAME
+.B t_free
+\- free an XTI/TLI library structure
+.SH SYNOPSIS
+.PP
+.B #include <xti.h>
+.HP 8
+.BI "int t_free(void *" ptr ", int " type );
+.SH ARGUMENTS
+.PP
+.TP
+.I ptr
+a pointer to the structure to free.
+.TP
+.I type
+the type of the structure pointed to.
+.SH DESCRIPTION
+.PP
+.BR t_free ()
+frees an XTI/TLI structure that was allocated with the
+.BR t_alloc (3)
+call or allocated using
+.BR malloc (3).
+.PP
+.I ptr
+is a pointer to a structure that was allocated with
+.BR t_alloc "(3) or " malloc (3).
+.PP
+.I type
+is the structure type to deallocated, and may be one of the following:
+.TP
+.B T_BIND
+specifies the
+.B t_bind
+structure.
+.TP
+.B T_OPTMGMT
+specifies the
+.B t_optmgmt
+structure.
+.TP
+.B T_CALL
+specifies the
+.B t_call
+structure.
+.TP
+.B T_DIS
+specifies the
+.B t_discon
+structure.
+.TP
+.B T_UNITDATA
+specifies the
+.B t_unitdata
+structure.
+.TP
+.B T_UDERROR
+specifies the
+.B t_uderr
+structure.
+.TP
+.B T_INFO
+specifies the
+.B t_info
+structure.
+.PP
+In addition to freeing the structure,
+.BR t_free ()
+will free any buffers still attached to
+.BR netbuf (3)
+parameters within the structure.
+.SH "RETURN VALUE"
+.PP
+Upon success,
+.BR t_free ()
+returns zero (0).
+Upon failure,
+.BR t_free ()
+returns -1 and sets
+.IR t_errno (3)
+to an appropriate error number.
+.SH ERRORS
+.PP
+When
+.BR t_free ()
+fails, it returns -1 and sets
+.IR t_errno (3)
+to an appropriate error number as follows:
+.TP \w'[TNOTSUPPORT]\(em'u
+.RB [ TNOSTRUCTYPE ]
+The argument \fItype\fR was not a valid or supported structure type.
+.TP
+.RB [ TPROTO ]
+A protocol error occured between the XTI/TLI library and the underlying transport provider.
+.TP
+.RB [ TSYSERR ]
+A \fBLinux\fR system error occured and the \fBLinux\fR error number is set in \fIerrno\fR(3).
+.SH "SEE ALSO"
+.PP
+.BR t_alloc (3),
+.BR malloc (3),
+.BR netbuf (3),
+.IR t_errno (3),
+.IR errno (3),
+.BR test-xnet (8),
+.BR test-xnet_thr (8).
+.\"
+.\"
+.SH "BUGS"
+.PP
+.BR t_free ()
+has no known bugs.
+.BR t_free ()
+has been tested for the described behavior using the
+.BR test-xnet (8)
+and
+.BR test-xnet_thr (8)
+conformance test suites.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The XTI/TLI library functions are compatible with 
+SVR4.2,
+.[
+svr42
+.]
+XNS 5.2,
+.[
+xns98
+.]
+SUSv2.
+.[
+susv2
+.]
+Compatibility is tested using the
+.BR test-xnet (8)
+and
+.BR test-xnet_thr (8)
+test case executables and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XTI/TLI,
+.[
+xti revision 1.0
+.]
+TPI,
+.[
+TPI Revision 2.0.0
+.]
+XPG5,
+XNS 5.2,
+.[
+xns98
+.]
+SUSv2.
+.[
+susv2
+.]
+Conformance is tested using the
+.BR test-xnet (8)
+and
+.BR test-xnet_thr (8)
+test case executables and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B t_free
+first appeared in SVR4.2.
+.[
+svr42
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage was written for the OpenSS7 XTI/TLI Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4

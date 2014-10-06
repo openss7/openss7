@@ -1,0 +1,452 @@
+AD	AND	020	Andorra
+AD	AND	020	Andorra (Principality of)
+AE	ARE	784	United Arab Emirates
+AF	AFG	004	Afghanistan
+AG	ATG	028	Antigua and Barbuda
+AI	AIA	660	Anguilla
+AL	ALB	008	Albania
+AL	ALB	008	Albania (Republic of)
+AM	ARM	051	Armenia
+AM	ARM	051	Armenia (Republic of)
+AN	ANT	530	Netherlands Antilles
+AO	AGO	024	Angola
+AO	AGO	024	Angola (Republic of)
+AQ	ATA	010	Antarctica
+AR	ARG	032	Argentina
+AR	ARG	032	Argentine Republic
+AS	ASM	016	American Samoa
+AT	AUT	040	Austria
+AU	AUS	036	Australia
+AW	ABW	533	Aruba
+AX	ALA	248	Åland Islands
+AZ	AZE	031	Azerbaijan
+AZ	AZE	031	Azerbaijani Republic
+BA	BIH	070	Bosnia and Herzegovina
+BA	BIH	070	Bosnia and Herzegowina
+BB	BRB	052	Barbados
+BD	BGD	050	Bangladesh
+BD	BGD	050	Bangladesh (People's Republic of)
+BE	BEL	056	Belgium
+BF	BFA	854	Burkina Faso
+BG	BGR	100	Bulgaria
+BG	BGR	100	Bulgaria (Republic of)
+BH	BHR	048	Bahrain
+BH	BHR	048	Bahrain (Kingdom of)
+BI	BDI	108	Burundi
+BI	BDI	108	Burundi (Republic of)
+BJ	BEN	204	Benin
+BJ	BEN	204	Benin (Republic of)
+BL	BLM	652	Saint Barthelemy
+BM	BMU	060	Bermuda
+BN	BRN	096	Brunei
+BN	BRN	096	Brunei Darussalam
+BO	BOL	068	Bolivia
+BO	BOL	068	Bolivia (Plurinational State of)
+BQ	BES	535	Bonaire, Saint Eustatius and Saba
+BR	BRA	076	Brazil
+BR	BRA	076	Brazil (Federative Republic of)
+BS	BHS	044	Bahamas
+BS	BHS	044	Bahamas (Commonwealth of the)
+BT	BTN	064	Bhutan
+BT	BTN	064	Bhutan (Kingdom of)
+BV	BVT	074	Bouvet Island
+BW	BWA	072	Botswana
+BW	BWA	072	Botswana (Republic of)
+BY	BLR	112	Belarus
+BY	BLR	112	Belarus (Republic of)
+BZ	BLZ	084	Belize
+CA	CAN	124	Canada
+CC	CCK	166	Cocos (Keeling) Islands
+CD	COD	180	Congo, The DRC
+CD	COD	189	Democratic Republic of the Congo
+CF	CAF	140	Central African Republic
+CG	COG	178	Congo
+CG	COG	178	Congo (Republic of the)
+CG	COG	178	Republic of the Congo
+CH	CHE	756	Switzerland
+CH	CHE	756	Switzerland (Confederation of)
+CI	CIV	384	Côte d'Ivoire
+CI	CIV	384	Côte d'Ivoire (Republic of)
+CI	CIV	384	Ivory Coast
+CK	COK	184	Cook Islands
+CL	CHL	152	Chile
+CM	CMR	120	Cameroon
+CM	CMR	120	Cameroon (Republic of)
+CN	CHN	156	China
+CN	CHN	156	China (People's Republic of)
+CO	COL	170	Colombia
+CO	COL	170	Colombia (Republic of)
+CR	CRI	188	Costa Rica
+CU	CUB	192	Cuba
+CV	CPV	132	Cape Verde
+CV	CPV	132	Cape Verde (Republic of)
+CW	CUW	531	Curaçao
+CX	CXR	162	Christmas Island
+CY	CYP	196	Cyprus
+CY	CYP	196	Cyprus (Republic of)
+CZ	CZE	203	Czech Republic
+DE	DEU	276	Germany
+DE	DEU	276	Germany (Federal Republic of)
+DJ	DJI	262	Djibouti
+DJ	DJI	262	Djibouti (Republic of)
+DK	DNK	208	Denmark
+DM	DMA	212	Dominica
+DM	DMA	212	Dominica (Commonwealth of)
+DO	DOM	214	Dominican Republic
+DZ	DZA	012	Algeria
+DZ	DZA	012	Algeria (People's Democratic Republic of)
+EC	ECU	218	Ecuador
+EE	EST	233	Estonia
+EE	EST	233	Estonia (Republic of)
+EG	EGY	818	Egypt
+EG	EGY	818	Egypt (Arab Republic of)
+EH	ESH	732	Western Sahara
+ER	ERI	232	Eritrea
+ES	ESP	724	Spain
+ET	ETH	231	Ethiopia
+ET	ETH	231	Ethiopia (Federal Democratic Republic of)
+FI	FIN	246	Finland
+FJ	FJI	242	Fiji
+FJ	FJI	242	Fiji (Republic of)
+FK	FLK	238	Falkland Islands
+FK	FLK	238	Falkland Islands (Malvinas)
+FM	FSM	583	Micronesia
+FM	FSM	583	Micronesia (Federated States of)
+FM	FSM	583	Micronesia, Federated States of
+FO	FRO	234	Faroe Islands
+FR	FRA	250	France
+FX	FXX	249	France, Metropolitan
+GA	GAB	266	Gabon
+GA	GAB	266	Gabonese Republic
+GB	GBR	826	United Kingdom
+GB	GBR	826	United Kingdom of Great Britain and Northern Ireland
+GD	GRD	308	Grenada
+GE	GEO	258	Georgia
+GE	GEO	268	Georgia
+GF	GUF	254	French Guiana
+GF	GUF	254	French Guiana (French Department of)
+GH	GHA	288	Ghana
+GI	GIB	292	Gibraltar
+GL	GRL	304	Greenland
+GL	GRL	304	Greenland (Denmark)
+GM	GMB	270	Gambia
+GM	GMB	270	Gambia (Republic of the)
+GN	GIN	324	Guinea
+GN	GIN	324	Guinea (Republic of)
+GP	GLP	312	Guadeloupe
+GP	GLP	312	Guadeloupe (French Department of)
+GQ	GNQ	226	Equatorial Guinea
+GQ	GNQ	226	Equatorial Guinea (Republic of)
+GR	GRC	300	Greece
+GS	SGS	239	South Georgia and South S.S.
+GT	GTM	320	Guatemala
+GT	GTM	320	Guatemala (Republic of)
+GU	GUM	316	Guam
+GW	GNB	624	Guinea-Bissau
+GW	GNB	624	Guinea-Bissau (Republic of)
+GY	GUY	328	Guyana
+HK	HKG	344	Hong Kong
+HK	HKG	344	Hong Kong, China
+HM	HMD	334	Heard and Mc Donald Islands
+HN	HND	340	Honduras
+HN	HND	340	Honduras (Republic of)
+HR	HRV	191	Croatia
+HR	HRV	191	Croatia (Republic of)
+HR	HRV	191	Croatia (local name: Hrvatska)
+HT	HTI	332	Haiti
+HT	HTI	332	Haiti (Republic of)
+HU	HUN	348	Hungary
+HU	HUN	348	Hungary (Republic of)
+ID	IDN	360	Indonesia
+ID	IDN	360	Indonesia (Republic of)
+IE	IRL	372	Ireland
+IL	ISR	376	Israel
+IL	ISR	376	Israel (State of)
+IM	IMN	833	Isle of Man
+IN	IND	356	India
+IN	IND	356	India (Republic of)
+IO	IOT	086	British Indian Ocean Territory
+IO	IOT	086	Diego Garcia
+IQ	IRQ	368	Iraq
+IQ	IRQ	368	Iraq (Republic of)
+IR	IRN	364	Iran
+IR	IRN	364	Iran (Islamic Republic of)
+IS	IS	352	Iceland
+IS	ISL	352	Iceland
+IT	ITA	380	Italy
+JE	JEY	832	Jersey
+JM	JAM	388	Jamaica
+JO	JOR	400	Jordan
+JO	JOR	400	Jordan (Hashemite Kingdom of)
+JP	JPN	392	Japan
+KE	KEN	404	Kenya
+KE	KEN	404	Kenya (Republic of)
+KG	KGZ	417	Kyrgyz Republic
+KG	KGZ	417	Kyrgyzstan
+KH	KHM	116	Cambodia
+KH	KHM	116	Cambodia (Kingdom of)
+KI	KIR	296	Kiribati
+KI	KIR	296	Kiribati (Republic of)
+KM	COM	174	Comoros
+KM	COM	174	Comoros (Union of the)
+KN	KNA	659	Saint Kitts and Nevis
+KP	PRK	408	Democratic People's Republic of Korea
+KP	PRK	408	Korea, D.P.R.O.
+KP	PRK	408	North Korea
+KR	KOR	410	Korea (Republic of)
+KR	KOR	410	Korea, Republic of
+KR	KOR	410	South Korea
+KW	KWT	414	Kuwait
+KW	KWT	414	Kuwait (State of)
+KY	CYM	136	Cayman Islands
+KZ	KAZ	398	Kazakhstan
+KZ	KAZ	398	Kazakhstan (Republic of)
+LA	LAO	418	Lao People's Democratic Republic
+LA	LAO	418	Laos
+LB	LBN	422	Lebanon
+LC	LCA	662	Saint Lucia
+LI	LIE	438	Liechtenstein
+LI	LIE	438	Liechtenstein (Principality of)
+LK	LKA	144	Sri Lanka
+LK	LKA	144	Sri Lanka (Democratic Socialist Republic of)
+LR	LBR	430	Liberia
+LR	LBR	430	Liberia (Republic of)
+LS	LSO	426	Lesotho
+LS	LSO	426	Lesotho (Kingdom of)
+LT	LTU	440	Lithuania
+LT	LTU	440	Lithuania (Republic of)
+LU	LUX	442	Luxembourg
+LV	LVA	428	Latvia
+LV	LVA	428	Latvia (Republic of)
+LY	LBY	434	Libya
+LY	LBY	434	Libya (Socialist People's Libyan Arab Jamahiriya)
+LY	LBY	434	Libyan Arab Jamahiriya
+MA	MAR	504	Morocco
+MA	MAR	504	Morocco (Kingdom of)
+MC	MCO	492	Monaco
+MC	MCO	492	Monaco (Principality of)
+MD	MDA	498	Moldova
+MD	MDA	498	Moldova (Republic of)
+MD	MDA	498	Moldova, Republic of
+ME	MNE	499	Montenegro
+ME	MNE	499	Montenegro (Republic of)
+MF	MAF	563	Saint Martin
+MF	MAF	663	Saint Martin (French Portion)
+MG	MDG	450	Madagascar
+MG	MDG	450	Madagascar (Republic of)
+MH	MHL	584	Marshall Islands
+MH	MHL	584	Marshall Islands (Republic of the)
+MK	MKD	807	Macedonia
+MK	MKD	807	The Former Yugoslav Republic of Macedonia
+ML	MLI	466	Mali
+ML	MLI	466	Mali (Republic of)
+MM	MMR	104	Burma (Myanmar)
+MM	MMR	104	Myanmar
+MM	MMR	104	Myanmar (Burma)
+MM	MMR	104	Myanmar (Union of)
+MM	MMR	104	Myanmar (the Republic of the Union of)
+MN	MNG	496	Mongolia
+MO	MAC	446	Macao, China
+MO	MAC	446	Macau
+MP	MNP	580	Northern Mariana Islands
+MP	MNP	580	Northern Mariana Islands (Commonwealth of the)
+MQ	MTQ	474	Martinique
+MQ	MTQ	474	Martinique (French Department of)
+MR	MRT	478	Mauritania
+MR	MRT	478	Mauritania (Islamic Republic of)
+MS	MSR	500	Montserrat
+MT	MLT	470	Malta
+MU	MUS	480	Mauritius
+MU	MUS	480	Mauritius (Republic of)
+MV	MDV	462	Maldives
+MV	MDV	462	Maldives (Republic of)
+MW	MWI	454	Malawi
+MX	MEX	484	Mexico
+MY	MYS	458	Malaysia
+MZ	MOZ	508	Mozambique
+MZ	MOZ	508	Mozambique (Republic of)
+NA	NAM	516	Namibia
+NA	NAM	516	Namibia (Republic of)
+NC	NCL	540	New Caledonia
+NC	NCL	540	New Caledonia (Territoire français d'outre-mer)
+NE	NER	562	Niger
+NE	NER	562	Niger (Republic of the)
+NF	NFK	574	Australian External Territories
+NF	NFK	574	Norfolk Island
+NF	NFK	574	Norfolk Island
+NG	NGA	566	Nigeria
+NG	NGA	566	Nigeria (Federal Republic of)
+NI	NIC	558	Nicaragua
+NL	NLD	528	Netherlands
+NL	NLD	528	Netherlands (Kingdom of the)
+NO	NOR	578	Norway
+NP	NPL	524	Nepal
+NP	NPL	524	Nepal (Federal Democratic Republic of)
+NR	NRU	520	Nauru
+NR	NRU	520	Nauru (Republic of)
+NU	NIU	570	Niue
+NZ	NZL	554	New Zealand
+OM	OMN	512	Oman
+OM	OMN	512	Oman (Sultanate of)
+PA	PAN	591	Panama
+PA	PAN	591	Panama (Republic of)
+PE	PER	604	Peru
+PF	PYF	258	French Polynesia
+PF	PYF	258	French Polynesia (Territoire français d'outre-mer)
+PG	PNG	598	Papua New Guinea
+PH	PHL	608	Philippines
+PH	PHL	608	Philippines (Republic of the)
+PK	PAK	586	Pakistan
+PK	PAK	586	Pakistan (Islamic Republic of)
+PL	POL	616	Poland
+PL	POL	616	Poland (Republic of)
+PM	SPM	666	Saint Pierre and Miquelon
+PM	SPM	666	Saint Pierre and Miquelon (Collectivité territoriale de la République française)
+PM	SPM	666	Saint Pierre and Miquelon (Collectivité territoriale de la République française)
+PM	SPM	666	St. Pierre and Miquelon
+PN	PCN	612	Pitcairn
+PN	PCN	612	Pitcairn Islands
+PR	PRI	630	Puerto Rico
+PS	PSE	275	Gaza Strip
+PS	PSE	275	Palestinian Territories
+PS	PSE	275	West Bank
+PT	PRT	620	Portugal
+PW	PLW	585	Palau
+PW	PLW	585	Palau (Republic of)
+PY	PRY	600	Paraguay
+PY	PRY	600	Paraguay (Republic of)
+QA	QAT	634	Qatar
+QA	QAT	634	Qatar (State of)
+RE	REU	638	Reunion
+RO	ROM	642	Romania
+RO	ROU	642	Romania
+RS	SRB	688	Serbia
+RS	SRB	688	Serbia (Republic of)
+RU	RUS	643	Russia
+RU	RUS	643	Russian Federation
+RW	RWA	646	Rwanda
+RW	RWA	646	Rwanda (Republic of)
+SA	SAU	682	Saudi Arabia
+SA	SAU	682	Saudi Arabia (Kingdom of)
+SB	SLB	090	Solomon Islands
+SC	SYC	690	Seychelles
+SC	SYC	690	Seychelles (Republic of)
+SD	SDN	736	Sudan
+SD	SDN	736	Sudan (Republic of the)
+SE	SWE	752	Sweden
+SG	SGP	702	Singapore
+SG	SGP	702	Singapore (Republic of)
+SH	SHN	654	Saint Helena
+SH	SHN	654	Saint Helena, Ascension and Tristan da Cunha
+SH	SHN	654	St. Helena
+SI	SVN	705	Slovenia
+SI	SVN	705	Slovenia (Republic of)
+SJ	SJM	744	Svalbard
+SJ	SJM	744	Svalbard and Jan Mayen Islands
+SK	SVK	703	Slovak Republic
+SK	SVK	703	Slovakia
+SK	SVK	703	Slovakia (Slovak Republic)
+SL	SLE	694	Sierra Leone
+SM	SMR	674	San Marino
+SM	SMR	674	San Marino (Republic of)
+SN	SEN	686	Senegal
+SN	SEN	686	Senegal (Republic of)
+SO	SOM	706	Somali Democratic Republic
+SO	SOM	706	Somalia
+SR	SUR	740	Suriname
+SR	SUR	740	Suriname (Republic of)
+SS	SSD	728	South Sudan
+SS	SSD	728	South Sudan (Republic of)
+ST	STP	678	Sao Tome and Principe
+ST	STP	678	Sao Tome and Principe (Democratic Republic of)
+SV	SLV	222	El Salvador
+SV	SLV	222	El Salvador (Republic of)
+SX	SXM	534	Sint Maarten
+SX	SXM	534	Sint Maarten (Dutch part)
+SY	SYR	760	Syria
+SY	SYR	760	Syrian Arab Republic
+SZ	SWZ	748	Swaziland
+SZ	SWZ	748	Swaziland (Kingdom of)
+TC	TCA	796	Turks and Caicos Islands
+TD	TCD	148	Chad
+TD	TCD	148	Chad (Republic of)
+TF	ATF	260	French Departments and Territories in the Indian Ocean
+TF	ATF	260	French Southern Territories
+TG	TGO	768	Togo
+TG	TGO	768	Togolese Republic
+TH	THA	764	Thailand
+TJ	TJK	762	Tajikistan
+TJ	TJK	762	Tajikistan (Republic of)
+TK	TKL	772	Tokelau
+TL	TLS	626	Democratic Republic of Timor-Leste
+TL	TLS	626	Timor-Leste
+TL	TLS	626	Timor-Leste (formerly East Timor)
+TM	TKM	795	Turkmenistan
+TN	TUN	788	Tunisia
+TO	TON	776	Tonga
+TO	TON	776	Tonga (Kingdom of)
+TP	TMP	626	East Timor
+TR	TUR	792	Turkey
+TT	TTO	780	Trinidad and Tobago
+TV	TUV	798	Tuvalu
+TW	TWN	158	Taiwan
+TW	TWN	158	Taiwan, China
+TW	TWN	158	Taiwan, Province of China
+TZ	TZA	834	Tanzania
+TZ	TZA	834	Tanzania (United Republic of)
+TZ	TZA	834	Tanzania, United Republic of
+UA	UKR	804	Ukraine
+UG	UGA	800	Uganda
+UG	UGA	800	Uganda (Republic of)
+UM	UMI	581	U.S. Minor Islands
+US	USA	840	United States
+US	USA	840	United States of America
+UY	URY	858	Uruguay
+UY	URY	858	Uruguay (Eastern Republic of)
+UZ	UZB	860	Uzbekistan
+UZ	UZB	860	Uzbekistan (Republic of)
+VA	VAT	336	Holy See (Vatican City State)
+VA	VAT	336	Holy See (Vatican City)
+VA	VAT	336	Vatican City State
+VC	VCT	670	Saint Vincent and the Grenadines
+VE	VEN	862	Venezuela
+VE	VEN	862	Venezuela (Bolivarian Republic of)
+VG	VGB	092	British Virgin Islands
+VG	VGB	092	Virgin Islands (British)
+VI	VIR	850	US Virgin Islands
+VI	VIR	850	United States Virgin Islands
+VI	VIR	850	Virgin Islands (U.S.)
+VN	VNM	704	Viet Nam
+VN	VNM	704	Viet Nam (Socialist Republic of)
+VN	VNM	704	Vietnam
+VU	VUT	548	Vanuatu
+VU	VUT	548	Vanuatu (Republic of)
+WF	WLF	876	Wallis and Futuna
+WF	WLF	876	Wallis and Futuna (Territoire français d'outre-mer)
+WF	WLF	876	Wallis and Futuna Islands
+WS	WSM	882	Samoa
+WS	WSM	882	Samoa (Independent State of)
+YE	YEM	887	Yemen
+YE	YEM	887	Yemen (Republic of)
+YT	MYT	175	Mayotte
+YT	MYT	175	Mayotte
+ZA	ZAF	710	South Africa
+ZA	ZAF	710	South Africa (Republic of)
+ZM	ZMB	894	Zambia
+ZM	ZMB	894	Zambia (Republic of)
+ZW	ZWE	716	Zimbabwe
+ZW	ZWE	716	Zimbabwe (Republic of)
+ZZ	-	-	Global Mobile Satellite System (GMSS), shared code
+ZZ	-	-	Group of countries, shared code
+ZZ	-	-	Inmarsat SNAC
+ZZ	-	-	International
+ZZ	-	-	International Freephone Service
+ZZ	-	-	International Mobile, shared code
+ZZ	-	-	International Networks, shared code
+ZZ	-	-	International Networks, shared code
+ZZ	-	-	International Premium Rate Service (IPRS)
+ZZ	-	-	International Shared Cost Service (ISCS)
+ZZ	-	-	Reserved
+ZZ	-	-	Telecommunications for Disaster Relief (TDR)
+ZZ	-	-	Trial of a proposed new international telecommunication public correspondence service, shared code
+ZZ	-	-	Universal Personal Telecommunication Service (UPT)

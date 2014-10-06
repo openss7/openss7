@@ -1,0 +1,264 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: SL_CLEAR_BUFFERS_REQ.7.man,v 1.1.2.2 2011-02-07 02:18:25 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:25 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: SL_CLEAR_BUFFERS_REQ.7.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:25  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH SL_CLEAR_BUFFERS_REQ 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Signalling Link Interface (SLI)"
+.SH NAME
+.B SL_CLEAR_BUFFERS_REQ, sl_clear_buffers_req_t
+\- clear buffers request primitive
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+The clear buffers request service primitive consists of one
+.BR M_PROTO "(9) or " M_PCPROTO (9)
+message block, structured as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct {
+    sl_long sl_primitive;
+} sl_clear_buffers_req_t;
+\s+1\fP
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The clear buffers request service primitive is originated by the SLS user to
+request that all message buffers be cleared by the SLS provider.  This
+includes receive buffer, retransmission buffer and transmission buffers.
+.\"
+.SS Parameters
+.PP
+The clear buffers request service primitive contains the following parameters:
+.TP
+.I sl_primitive
+Specifies the service primitive type.  Always
+.BR SL_CLEAR_BUFFERS_REQ .
+.\"
+.SS State
+.PP
+This primitive is only valid in the
+.B LMI_ENABLED
+management state and the
+.B SL_STATE_OUT_OF_SERVICE
+link state.
+.\"
+.SS "New State"
+.PP
+The new state remains unchanged.
+.\"
+.SS Modes
+.PP
+This primitive is issued in all modes.
+.\"
+.SS Originator
+.PP
+This primitive is issued by the SLS User.
+.\"
+.SS Response
+.PP
+The clear buffers request service primitive requires the SLS provider to
+indicate when the receive buffer and retransmission buffers are cleared, as
+follows:
+.IP \(en \w'\(en\(em'u
+.B Successful:
+When successful, the SLS provider clears the receive buffer, retransmission
+buffer and transmission buffer.  When the receive buffer is cleared, the SLS
+provider indicates the clearing with the
+.BR SL_RB_CLEARED_IND (7)
+primitive.  When the retransmission buffer is cleared, the SLS provider
+indicates the clearing with the
+.BR SL_RTB_CLEARED_IND (7)
+primitive.  The state remains unchanged.
+.IP \(en
+.B Unsuccessful (non-fatal errors):
+When unsuccessful, the SLS provider negatively acknowledges the primitive
+using the
+.BR LMI_ERROR_ACK (7)
+primitive
+containing the error and reason for failure.  The state remains unchanged.
+.\"
+.SS Errors
+.PP
+.B Non-Fatal Errors:
+applicable non-fatal errors are as follows:
+.TP \w'\fBLMI_LAN_COLLISIONS\fR\(em'u
+.B LMI_UNSPEC
+Unknown or unspecified.
+.PD 0
+.TP
+.B LMI_DISC
+Disconnected.
+.TP
+.B LMI_EVENT
+Protocol-specific event occurred.
+.TP
+.B LMI_FATALERR
+Device has become unusable.
+.TP
+.B LMI_OUTSTATE
+Primitive was issued from invalid state.
+.TP
+.B LMI_PROTOSHORT
+.BR M_PROTO (9)
+block too short.
+.TP
+.B LMI_SYSERR
+UNIX system error.
+.TP
+.B LMI_DEVERR
+Start of device-specific error codes.
+.PD
+.\"
+.\"
+.SH NOTES
+.PP
+.\"
+.SS "Rules for Q.703 Conformance"
+.PP
+.\"
+.SS "Rules for ANSI T1.111.3 Conformance"
+.PP
+.\"
+.SS "Rules for ETSI ETS 300 008-1 Conformance"
+.PP
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/sli.h> ,
+.BR <ss7/sli_ioctl.h> .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR sli (7).
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for
+.BR "@PACKAGE@-@VERSION@" .
+The Signalling Link Interface (SLI) is specific to
+.B OpenSS7
+and first appeared in
+.BR strss7-0.8.2 .
+This is
+.I Version 1
+of the SLI interface.
+.[
+sli
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,291 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: mtp_socket.7.man,v 1.1.2.2 2011-02-07 02:18:28 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:28 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: mtp_socket.7.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:28  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.\"
+.\"
+.TH MTP 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "MTP Interface (MTPI)"
+.\"
+.\"
+.SH NAME
+.B mtp
+\- SS7 Message Transfer Part (MTP) sockets
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/socket.h>
+.br
+.B #include <netss7/ss7.h>
+.br
+.B #include <netss7/mtp.h>
+.HP
+.BI "int " mtp_socket " = socket(" \fRPF_SS7\fI ", " \fRSOCK_RDM\fI ", " \fRSS7PROTO_MTP\fI );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B MTP
+is an implementation of the MTP (Message Transfer Part) defined in ITU-T
+Recommendation Q.704.
+.B MTP
+provides reliable delivery of ordered or unordered packets over a full duplex
+connection between two
+.I SOCK_RDM
+sockets on top of
+.BR ss7 (7).
+.B MTP
+can provide strong assurances that the data arrives in order on a stream, if
+requested, and retransmits lost packets.  It generates and checks a per packet
+checksum to catch transmission errors.
+.PP
+.B MTP
+provides the following socket types:
+.TP
+.B SOCK_RDM
+A connectionless socket that preserves message boundaries and provides ordered
+or unordered reliable delivery on multiple streams.
+.TP
+.B SOCK_SEQPACKET
+A connection oriented socket that preserves message boundaries.
+.SS "Connection Establishment"
+.PP
+.SS "Sending Data"
+.PP
+.SS "Receiving Data"
+.PP
+.SS "Connection Release"
+.PP
+.SS "ADDRESS FORMATS"
+.PP
+.SS "SOCKET CALLS"
+.PP
+.SS "FEATURES"
+.PP
+.\"
+.\"
+.\".SH "SYSCTLS"
+.\".PP
+.\"
+.\"
+.SH "SOCKET OPTIONS"
+.PP
+The following
+.B SOL_SS7
+socket options are supported by
+.BR MTP :
+.TP
+.B SS7_PVAR
+.TP
+.B SS7_MPLEV
+.TP
+.B SS7_DEBUG
+.TP
+.B SS7_PCR
+.TP
+.B SS7_HSL
+.TP
+.B SS7_XSN
+.TP
+.B SS7_CLUSTER
+.PP
+The following
+.B SOL_MTP
+socket options are supported by
+.BR MTP :
+.TP
+.B MTP_ADDR
+Pass an ancillary message that contains the
+.B sockaddr_mtp
+structure that supplies the source address of the message to send or the
+destination address of the received message.
+When used with
+.BR setsockopt "(3) and " getsockopt (3),
+the argument is a flag that tells the socket whether the
+.B MTP_ADDR
+message should be passed or not.  The message itself can only be sent or
+retrieved as a control message with a packet using
+.BR recvmsg "(3) or " sendmsg (3).
+If
+.B MTP_ADDR
+is passed to
+.BR sendmsg (3),
+then the outgoing packet will be send with the source address provided.
+.TP
+.B MTP_MP
+.TP
+.B MTP_SLS
+.TP
+.B MTP_RECVADDR
+.TP
+.B MTP_RECVMP
+.TP
+.B MTP_RECVSLS
+.TP
+.B MTP_DEBUG
+.\"
+.\"
+.SH IOCTLS
+.PP
+See
+.BR mtp_ioctl (4).
+.\"
+.\"
+.\".SH "ERROR HANDLING"
+.\".PP
+.\"
+.\"
+.\".SH ERRORS
+.\".PP
+.\"
+.\"
+.\".SH CAVEATS
+.\".PP
+.\"
+.\"
+.\".SH BUGS
+.\".PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR mtp (4).
+.\"
+.\"
+.\".SH VERSIONS
+.\".PP
+.\"
+.XX
+.[
+xns98
+.]
+.[
+q700
+.]
+.[
+q701
+.]
+.[
+q704
+.]
+.[
+t1.111
+.]
+.[
+mtpv1
+.]
+.[
+jtq704
+.]
+.[
+mtpi revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@
+.]
+.[
+$LIST$
+.]
+.TI

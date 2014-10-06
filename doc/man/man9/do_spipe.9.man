@@ -1,0 +1,352 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: do_spipe.9.man,v 1.1.2.2 2011-02-07 02:18:39 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:39 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: do_spipe.9.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:39  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH DO_SPIPE 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B do_spipe
+\- implement the \fBpipe\fR(2s) system call
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/strsubr.h>
+.HP
+.BI "long do_spipe(int *" fds ");
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I fds
+an array of two integers into which to return file descriptors for either end of the pipe.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+internal,
+implementation specific.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR do_spipe ()
+is a
+.B "@PACKAGE_TITLE@"
+internal implementation specific function that
+creates a
+.IR STREAMS -based
+.BR pipe (4)
+and returns the file descriptors for either end of the pipe in the two element integer array pointed
+to by
+.IR fds .
+The difference between this and the usual
+.B Linux
+.BR do_pipe ()
+call is that
+.BR do_spipe ()
+creates and returns a
+.IR STREAMS -based
+.BR pipe (4).
+.\"
+.\"
+.SH USAGE
+.PP
+.BR do_spipe ()
+is used by the Stream head,
+.BR sth (4)
+module, to emulate the
+.BR pipe (2s)
+system call using the
+.BR I_PIPE (7)
+.BR ioctl (2s)
+call.
+.PP
+.BR do_spipe ()
+has no other use or purpose, and will not be used by
+.I STREAMS
+drivers and modules other than the Stream head,
+.BR sth (4)
+module.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR do_spipe ()
+creates the pipe, returns the file descriptors in the array pointed to by
+.I fds
+and returns zero
+.RB ( 0 );
+upon failure,
+it returns a negative error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR do_spipe ()
+fails, the pipe is not created, and
+.BR do_spipe ()
+returns an appropriate negative error number as follows:
+.TP \w'[\fBENAMETOOLONG\fR]\(em'u
+.RB [ ENFILE ]
+no available file descriptor for the calling process.
+.TP
+.RB [ ENFILE ]
+the system file table is full.
+.TP
+.RB [ ENFILE ]
+an
+.B snode
+could not be allocated in the
+.BR specfs (5)
+file system due to insufficient memory.
+.TP
+.RB [ ENOMEM ]
+an
+.B snode
+could not be allocated in the
+.BR specfs (5)
+file system due to insufficient memory.
+.TP
+.RB [ ENODEV ]
+the
+.BR specfs (5)
+file system could not be mounted.
+.TP
+.RB [ ENOMEM ]
+a directory entry could not be allocated within the
+.BR specfs (5)
+file system due to insufficient memory.
+.TP
+.RB [ ENXIO ]
+the
+.BR pipe (4)
+driver does not have file operation associated with it, or or does not support the
+.BR open ()
+file operation.
+.PP
+Any error returned by
+.BR get_unused_fd ():
+.TP \w'[\fBENAMETOOLONG\fR]\(em'u
+.RB [ ENOMEM ]
+a new array for the file table could not be allocated due to insufficient memory.
+.TP
+.RB [ EMFILE ]
+too many files aare open in the system.
+.PP
+Any error returned by the
+.BR pipe (4)
+driver to its
+.BR qi_qopen (9)
+open routine.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR do_spipe ()
+can only be invoked in user process context.  Note that this does include kernel module
+initialization and termination routines as well as
+.I STREAMS
+driver or module
+.IR qi_qopen (9)
+open routines
+and
+.IR qi_qclose (9)
+close routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR do_spipe ()
+is MP-safe when called from the correct context.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR do_spipe ()
+is an internal
+.B "@PACKAGE_TITLE@"
+function intended to provide the back-end to a
+.B Linux
+system call.
+It is only exported for use by the Stream head,
+.BR sth (4),
+for
+.BR ioctl (2s)
+emulation of the
+.BR pipe (2s)
+system call, when
+.BR sth (4)
+is configured as a separate loadable kernel module.  (The symbol need not be exported otherwise.)
+.PP
+.BR do_spipe ()
+will not be called by portable
+.I STREAMS
+drivers and modules.
+.I STREAMS
+drivers and modules calling this function that exist outside the
+.B @PACKAGE@-@VERSION@
+package, might be broken from verion to version and release to release.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR do_spipe ()
+is implemented simply by
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR pipe (2s),
+.BR close (2s),
+.BR sth (4),
+.BR I_FDETACH (7),
+.BR ioctl (2s),
+.IR qi_qopen (9),
+.IR qi_qclose (9),
+.IR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR do_spipe ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+See
+.BR pipe (2s)
+for compatibility.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+See
+.BR pipe (2s)
+for conformance.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR do_spipe ()
+is new for
+.BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

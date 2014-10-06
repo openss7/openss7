@@ -1,0 +1,599 @@
+/*****************************************************************************
+
+ @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:35 $
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2011-09-20 09:51:35 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: loop.c,v $
+ Revision 1.1.2.6  2011-09-20 09:51:35  brian
+ - updates from git
+
+ Revision 1.1.2.5  2011-09-02 08:46:33  brian
+ - sync up lots of repo and build changes from git
+
+ Revision 1.1.2.4  2011-05-31 09:46:04  brian
+ - new distros
+
+ Revision 1.1.2.3  2010-11-28 14:21:33  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
+ Revision 1.1.2.2  2009-06-29 07:35:43  brian
+ - SVR 4.2 => SVR 4.2 MP
+
+ Revision 1.1.2.1  2009-06-21 11:20:47  brian
+ - added files to new distro
+
+ *****************************************************************************/
+
+static char const ident[] = "$RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:35 $";
+
+/*
+ *  This file contains a classic loop driver for SVR 4.2 MP STREAMS.  The loop driver is a general
+ *  purpose STREAMS-based pipe-like driver that can be used for connecting two upper-level STREAMS
+ *  together to form a structure similar to a STREAMS-based Pipe, but which has an additional driver
+ *  module beneath each STREAM head.  Upper level STREAMS are linked together using ioctl()
+ *  commands contained in <sys/loop.h>.
+ */
+#ifdef NEED_LINUX_AUTOCONF_H
+#include NEED_LINUX_AUTOCONF_H
+#endif
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#include <linux/sched.h>
+#include <linux/interrupt.h>
+
+#include <sys/kmem.h>
+#include <sys/stream.h>
+#include <sys/strconf.h>
+#include <sys/strsubr.h>
+#include <sys/ddi.h>
+#include <sys/loop.h>
+
+#include "sys/config.h"
+
+#define LOOP_DESCRIP	"SVR 4.2 STREAMS Null Stream (LOOP) Driver"
+#define LOOP_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define LOOP_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
+#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:35 $"
+#define LOOP_DEVICE	"SVR 4.2 MP STREAMS Null Stream (LOOP) Device"
+#define LOOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
+#define LOOP_LICENSE	"GPL"
+#define LOOP_BANNER	LOOP_DESCRIP	"\n" \
+			LOOP_EXTRA	"\n" \
+			LOOP_COPYRIGHT	"\n" \
+			LOOP_REVISION	"\n" \
+			LOOP_DEVICE	"\n" \
+			LOOP_CONTACT	"\n"
+#define LOOP_SPLASH	LOOP_DEVICE	" - " \
+			LOOP_REVISION	"\n"
+
+#ifdef CONFIG_STREAMS_LOOP_MODULE
+MODULE_AUTHOR(LOOP_CONTACT);
+MODULE_DESCRIPTION(LOOP_DESCRIP);
+MODULE_SUPPORTED_DEVICE(LOOP_DEVICE);
+MODULE_LICENSE(LOOP_LICENSE);
+#ifdef MODULE_VERSION
+MODULE_VERSION(PACKAGE_ENVR);
+#endif				/* MODULE_VERSION */
+#endif				/* CONFIG_STREAMS_LOOP_MODULE */
+
+#ifndef CONFIG_STREAMS_LOOP_NAME
+#define CONFIG_STREAMS_LOOP_NAME "loop"
+#endif
+#ifndef CONFIG_STREAMS_LOOP_MODID
+#error CONFIG_STREAMS_LOOP_MODID must be defined.
+#endif
+#ifndef CONFIG_STREAMS_LOOP_MAJOR
+#error CONFIG_STREAMS_LOOP_MAJOR must be defined.
+#endif
+
+#ifdef MODULE
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-loop");
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
+
+#ifndef CONFIG_STREAMS_LOOP_MODULE
+static
+#endif
+modID_t modid = CONFIG_STREAMS_LOOP_MODID;
+
+#ifdef CONFIG_STREAMS_LOOP_MODULE
+#ifndef module_param
+MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0444);
+#endif
+MODULE_PARM_DESC(modid, "Module id number for LOOP driver. (0 for auto allocation)");
+#endif				/* CONFIG_STREAMS_LOOP_MODULE */
+
+#ifdef MODULE
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_LOOP_MODID));
+MODULE_ALIAS("streams-driver-loop");
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
+
+#ifndef CONFIG_STREAMS_LOOP_MODULE
+static
+#endif
+major_t major = CONFIG_STREAMS_LOOP_MAJOR;
+
+#ifdef CONFIG_STREAMS_LOOP_MODULE
+#ifndef module_param
+MODULE_PARM(major, "h");
+#else
+module_param(major, uint, 0444);
+#endif
+MODULE_PARM_DESC(major, "Major device number for LOOP driver. (0 for auto allocation)");
+#endif				/* CONFIG_STREAMS_LOOP_MODULE */
+
+#ifdef MODULE
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CONFIG_STREAMS_LOOP_MAJOR));
+MODULE_ALIAS("/dev/loop.1");
+MODULE_ALIAS("/dev/loop.2");
+MODULE_ALIAS("/dev/loop_clone");
+//MODULE_ALIAS("devname:loop_clone");
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LOOP_MAJOR));
+MODULE_ALIAS("/dev/streams/loop");
+MODULE_ALIAS("/dev/streams/loop/*");
+MODULE_ALIAS("/dev/streams/clone/loop");
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
+
+STATIC struct module_info loop_minfo = {
+	.mi_idnum = CONFIG_STREAMS_LOOP_MODID,
+	.mi_idname = CONFIG_STREAMS_LOOP_NAME,
+	.mi_minpsz = STRMINPSZ,
+	.mi_maxpsz = STRMAXPSZ,
+	.mi_hiwat = STRHIGH,
+	.mi_lowat = STRLOW,
+};
+
+static struct module_stat loop_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat loop_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+
+typedef struct loop {
+	struct loop *next;		/* list linkage */
+	struct loop **prev;		/* list linkage */
+	struct loop *other;		/* other stream */
+	dev_t dev;			/* device number */
+	queue_t *rq;			/* this rd queue */
+	queue_t *wq;			/* this wr queue */
+} loop_t;
+
+STATIC struct loop *loop_opens = NULL;
+#if	defined DEFINE_SPINLOCK
+STATIC DEFINE_SPINLOCK(loop_lock);
+#elif	defined __SPIN_LOCK_UNLOCKED
+STATIC spinlock_t loop_lock = __SPIN_LOCK_UNLOCKED(loop_lock);
+#elif	defined SPIN_LOCK_UNLOCKED
+STATIC spinlock_t loop_lock = SPIN_LOCK_UNLOCKED;
+#else
+#error cannot initialize spin locks
+#endif
+
+/*
+ *  Locking
+ */
+#if defined CONFIG_STREAMS_NOIRQ || defined _TEST
+
+#define spin_lock_str(__lkp, __flags) \
+	do { (void)__flags; spin_lock_bh(__lkp); } while (0)
+#define spin_unlock_str(__lkp, __flags) \
+	do { (void)__flags; spin_unlock_bh(__lkp); } while (0)
+
+#else
+
+#define spin_lock_str(__lkp, __flags) \
+	spin_lock_irqsave(__lkp, __flags)
+#define spin_unlock_str(__lkp, __flags) \
+	spin_unlock_irqrestore(__lkp, __flags)
+
+#endif
+
+STATIC streamscall int
+loop_wput(queue_t *q, mblk_t *mp)
+{
+	struct loop *p = q->q_ptr, *o;
+	unsigned long flags;
+	int err;
+
+	switch (mp->b_datap->db_type) {
+	case M_IOCTL:
+	{
+		union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
+
+		switch (ioc->iocblk.ioc_cmd) {
+		case LOOP_SET:
+		{
+			dev_t dev;
+
+			if (ioc->iocblk.ioc_count != sizeof(dev)) {
+				err = -EINVAL;
+				break;
+			}
+			if (mp->b_cont == NULL) {
+				err = -EINVAL;
+				break;
+			}
+			dev = *(dev_t *) mp->b_cont->b_rptr;
+			spin_lock_str(&loop_lock, flags);
+			for (o = loop_opens; o; o = o->next)
+				if (o->dev == dev)
+					break;
+			if (o == NULL) {
+				spin_unlock_str(&loop_lock, flags);
+				err = -ENXIO;
+				break;
+			}
+			if (p->other || o->other) {
+				spin_unlock_str(&loop_lock, flags);
+				err = -EBUSY;
+				break;
+			}
+			p->other = o;
+			o->other = p;
+			enableok(o->wq);
+			enableok(p->wq);
+			qenable(o->wq);
+			qenable(p->wq);
+			spin_unlock_str(&loop_lock, flags);
+			err = 0;
+			break;
+		}
+		default:
+			err = -EINVAL;
+			break;
+		}
+		if (err == 0) {
+			mp->b_datap->db_type = M_IOCACK;
+			ioc->iocblk.ioc_count = 0;
+			ioc->iocblk.ioc_rval = 0;
+			ioc->iocblk.ioc_error = 0;
+		} else {
+			mp->b_datap->db_type = M_IOCNAK;
+			ioc->iocblk.ioc_count = 0;
+			ioc->iocblk.ioc_rval = -1;
+			ioc->iocblk.ioc_error = -err;
+		}
+		qreply(q, mp);
+		break;
+	}
+	case M_FLUSH:
+		if (mp->b_rptr[0] & FLUSHW) {
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
+			else
+				flushq(q, FLUSHDATA);
+		}
+		spin_lock_str(&loop_lock, flags);
+		if (p->other) {
+			queue_t *rq;
+
+			rq = p->other->rq;
+			spin_unlock_str(&loop_lock, flags);
+			/* switch sense of flush flags */
+			switch (mp->b_rptr[0] & (FLUSHW | FLUSHR | FLUSHRW)) {
+			case FLUSHR:
+				mp->b_rptr[0] = (mp->b_rptr[0] & ~FLUSHR) | FLUSHW;
+				break;
+			case FLUSHW:
+				mp->b_rptr[0] = (mp->b_rptr[0] & ~FLUSHW) | FLUSHR;
+				break;
+			}
+			putnext(rq, mp);
+		} else {
+			spin_unlock_str(&loop_lock, flags);
+			if (mp->b_rptr[0] & FLUSHR) {
+				if (mp->b_rptr[0] & FLUSHBAND)
+					flushband(RD(q), mp->b_rptr[1], FLUSHDATA);
+				else
+					flushq(RD(q), FLUSHDATA);
+				mp->b_rptr[0] &= ~FLUSHW;
+				qreply(q, mp);
+			} else {
+				freemsg(mp);
+			}
+		}
+		break;
+	default:
+		spin_lock_str(&loop_lock, flags);
+		if (p->other) {
+			if (!q->q_first) {
+				queue_t *rq;
+
+				rq = p->other->rq;
+				spin_unlock_str(&loop_lock, flags);
+				if (rq) {
+					if (mp->b_datap->db_type >= QPCTL
+					    || bcanputnext(rq, mp->b_band)) {
+						putnext(rq, mp);
+						break;
+					}
+				}
+			} else
+				spin_unlock_str(&loop_lock, flags);
+			putq(q, mp);
+		} else {
+			spin_unlock_str(&loop_lock, flags);
+			freemsg(mp);
+			putnextctl2(OTHERQ(q), M_ERROR, ENXIO, ENXIO);
+		}
+		break;
+	}
+	return (0);
+}
+
+/*
+ *  The driver only puts messages on its write queue when they fail flow control on the queue beyond
+ *  the other read queue.  When flow control subsides, the read service procedure on the othe STREAM
+ *  will explicitly enable us.
+ */
+STATIC streamscall int
+loop_wsrv(queue_t *q)
+{
+	struct loop *p = q->q_ptr;
+	unsigned long flags;
+	queue_t *rq = NULL;
+	mblk_t *mp;
+
+	spin_lock_str(&loop_lock, flags);
+	if (p->other)
+		rq = p->other->rq;
+	spin_unlock_str(&loop_lock, flags);
+
+	if (rq) {
+		while ((mp = getq(q))) {
+			if (mp->b_datap->db_type >= QPCTL || bcanputnext(rq, mp->b_band)) {
+				putnext(rq, mp);
+				continue;
+			}
+			putbq(q, mp);
+			break;
+		}
+	} else
+		flushq(q, FLUSHALL);
+
+	return (0);
+}
+
+/*
+ *  The driver never places messages on the read queue, therefore, the read service procedure is
+ *  only invoked when backenabled from upstream.  Back enabling is due to flow control that caused a
+ *  message to tbe put (back) to the other STREAM's write queue so the driver needs to explicitly
+ *  enable that write queue now.
+ */
+STATIC streamscall int
+loop_rsrv(queue_t *q)
+{
+	struct loop *p = q->q_ptr;
+	unsigned long flags;
+
+	spin_lock_str(&loop_lock, flags);
+	if (p->other && p->other->wq)
+		qenable(p->other->wq);
+	spin_unlock_str(&loop_lock, flags);
+	return (0);
+}
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  OPEN and CLOSE
+ *
+ *  -------------------------------------------------------------------------
+ */
+STATIC streamscall int
+loop_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+{
+	struct loop *p, **pp = &loop_opens;
+	major_t cmajor = getmajor(*devp);
+	minor_t cminor = getminor(*devp);
+	unsigned long flags;
+
+	if (q->q_ptr != NULL) {
+		return (0);	/* already open */
+	}
+	if (sflag == MODOPEN || WR(q)->q_next) {
+		return (ENXIO);	/* can't open as module */
+	}
+	if (!(p = kmem_alloc(sizeof(*p), KM_NOSLEEP))) {	/* we could sleep */
+		return (ENOMEM);	/* no memory */
+	}
+	bzero(p, sizeof(*p));
+	switch (sflag) {
+	case CLONEOPEN:
+		if (cminor < 1)
+			cminor = 1;
+	case DRVOPEN:
+	{
+		major_t dmajor = cmajor;
+
+		if (cminor < 1) {
+			return (ENXIO);
+		}
+		spin_lock_str(&loop_lock, flags);
+		for (; *pp && (dmajor = getmajor((*pp)->dev)) < cmajor; pp = &(*pp)->next) ;
+		for (; *pp && dmajor == getmajor((*pp)->dev) &&
+		     getminor(makedevice(cmajor, cminor)) != 0; pp = &(*pp)->next) {
+			minor_t dminor = getminor((*pp)->dev);
+
+			if (cminor < dminor)
+				break;
+			if (cminor == dminor) {
+				if (sflag == CLONEOPEN)
+					cminor++;
+				else {
+					spin_unlock_str(&loop_lock, flags);
+					kmem_free(p, sizeof(*p));
+					pswerr(("%s: stream already open!\n", __FUNCTION__));
+					return (EIO);	/* bad error */
+				}
+			}
+		}
+		if (getminor(makedevice(cmajor, cminor)) == 0) {	/* no minors left */
+			spin_unlock_str(&loop_lock, flags);
+			kmem_free(p, sizeof(*p));
+			return (EBUSY);	/* no minors left */
+		}
+		p->dev = *devp = makedevice(cmajor, cminor);
+		p->rq = q;
+		p->wq = WR(q);
+		noenable(p->wq);
+		if ((p->next = *pp))
+			p->next->prev = &p->next;
+		p->prev = pp;
+		*pp = p;
+		q->q_ptr = WR(q)->q_ptr = p;
+		spin_unlock_str(&loop_lock, flags);
+		qprocson(q);
+		return (0);
+	}
+	}
+	pswerr(("%s: bad sflag %d\n", __FUNCTION__, sflag));
+	return (ENXIO);
+}
+
+STATIC streamscall int
+loop_close(queue_t *q, int oflag, cred_t *crp)
+{
+	struct loop *p;
+	unsigned long flags;
+
+	if ((p = q->q_ptr) == NULL) {
+		pswerr(("%s: already closed\n", __FUNCTION__));
+		return (0);	/* already closed */
+	}
+	qprocsoff(q);
+	spin_lock_str(&loop_lock, flags);
+	if (p->other && p->other->rq)
+		putnextctl(p->other->rq, M_HANGUP);
+	if ((*(p->prev) = p->next))
+		p->next->prev = p->prev;
+	p->next = NULL;
+	p->prev = &p->next;
+	p->other = NULL;
+	p->dev = 0;
+	p->rq = NULL;
+	p->wq = NULL;
+	q->q_ptr = WR(q)->q_ptr = NULL;
+	spin_unlock_str(&loop_lock, flags);
+	return (0);
+}
+
+STATIC struct qinit loop_rqinit = {
+	.qi_srvp = loop_rsrv,
+	.qi_qopen = loop_open,
+	.qi_qclose = loop_close,
+	.qi_minfo = &loop_minfo,
+	.qi_mstat = &loop_rstat,
+};
+
+STATIC struct qinit loop_wqinit = {
+	.qi_putp = loop_wput,
+	.qi_srvp = loop_wsrv,
+	.qi_minfo = &loop_minfo,
+	.qi_mstat = &loop_wstat,
+};
+
+#ifdef CONFIG_STREAMS_LOOP_MODULE
+STATIC
+#endif
+struct streamtab loopinfo = {
+	.st_rdinit = &loop_rqinit,
+	.st_wrinit = &loop_wqinit,
+};
+
+STATIC struct cdevsw loop_cdev = {
+	.d_name = CONFIG_STREAMS_LOOP_NAME,
+	.d_str = &loopinfo,
+	.d_flag = D_MP,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+	.d_kmod = THIS_MODULE,
+};
+
+#ifdef CONFIG_STREAMS_LOOP_MODULE
+STATIC
+#endif
+int __init
+loopinit(void)
+{
+	int err;
+
+#ifdef CONFIG_STREAMS_LOOP_MODULE
+	printk(KERN_INFO LOOP_BANNER);
+#else
+	printk(KERN_INFO LOOP_SPLASH);
+#endif
+	loop_minfo.mi_idnum = modid;
+	if ((err = register_strdev(&loop_cdev, major)) < 0)
+		return (err);
+	if (major == 0 && err > 0)
+		major = err;
+	return (0);
+};
+
+#ifdef CONFIG_STREAMS_LOOP_MODULE
+STATIC
+#endif
+void __exit
+loopexit(void)
+{
+	unregister_strdev(&loop_cdev, major);
+};
+
+#ifdef CONFIG_STREAMS_LOOP_MODULE
+module_init(loopinit);
+module_exit(loopexit);
+#endif

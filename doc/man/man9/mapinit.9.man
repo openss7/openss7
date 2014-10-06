@@ -1,0 +1,1 @@
+.so man9/rminit.9.man

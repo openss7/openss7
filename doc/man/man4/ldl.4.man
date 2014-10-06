@@ -1,0 +1,531 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: ldl.4.man,v 1.1.2.2 2011-02-07 02:18:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:10 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ldl.4.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:10  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH LDL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B ldl
+\- Linux Data Link (LDL) driver
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <unistd.h>
+.br
+.B #include <stropts.h>
+.br
+.B #include <sys/dlpi.h>
+.br
+.B #include <sys/ldl.h>
+.HP 12
+.BI "int " fd " = open(" /dev/ldl ", " oflag );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B LDL
+driver provides an interface between
+.I STREAMS
+drivers and Linux network drivers.  It registers itself as a client of a Linux
+network driver and then presents a DLPI Provider interface
+.[
+dlpi revision 2.0.0 draft 2
+.]
+to
+.I STREAMS
+drivers, which may be pushed or linked above
+.BR LDL .
+.\"
+.\"
+.SH IOCTLS
+.PP
+The
+.B LDL
+driver implements the following ioctls.  The user codes these ioctls as type
+.B I_STR
+(see
+.BR streamio (7))
+and passes a structure of type
+.B struct strioctl
+to the driver.  The
+.B ic_cmd
+field of this structure is decoded according to the following table.  the
+.BR ic_dp " and " ic_len
+fields delimit an argument structure which is also passed to the driver.  The
+argument structure differs for each type of
+.BR ic_cmd .
+.PP
+.DS
+.TS
+tab(@);
+lbt lbt s s s.
+_
+ic_cmd value@Argument Structure
+\^@_
+\^@Description
+_
+.T&
+lbt lt s s s.
+LDL_SETFLAGS@IN/OUT: \fBstruct ldl_flags_ioctl\fR
+\&@_
+\^@T{
+Used to set internal option flags for the open stream.  See ldl.c source for details.
+T}
+_
+LDL_FINDPPA@IN: \fBchar[]\fR OUT: \fBlong\fR
+\&@_
+\^@T{
+The agrument is an ASCII string representing a network device mnemonic such as
+.IR "eth0" .
+If such a device can be found then the argument is overwritten with a long
+word whose numerical value can be used as the
+.B dl_ppa
+field of a
+.BR DL_ATTACH_REQ (7).
+T}
+_
+LDL_GETNAME@IN: \fINone\fR OUT: \fBchar[]\fR
+\&@_
+\^@T{
+This ioctl returns the ASCII string form of the network device mnemonic for
+the stream.
+T}
+_
+.TE
+.DE
+.\"
+.\"
+.SH USAGE
+.PP
+The
+.B LDL
+is controlled by
+.BR dlpi (7)
+primitives from its upstream client.  The DLPI primitives understood by this
+driver are as follows. 
+.B DLPI
+mnemonics come from the file <sys/dlpi.h>.
+.B LDL
+mnemonics come from the file <sys/ldl.h>.
+.\"
+.SS DL_INFO_REQ
+.PP
+A
+.BR DL_INFO_REQ (7)
+causes
+.B LDL
+to return a
+.BR DL_INFO_ACK (7).
+If the stream has not been attached to a device then the returned values will
+consist of default values.  If the stream has been attached then information
+will be returned that pertains the the underlying Linux network device.
+.\"
+.SS DL_PHYS_ADDR_REQ
+.PP
+A
+.BR DL_PHYS_ADDR_REQ (7)
+causes
+.B LDL
+to return a
+.BR DL_PHYS_ADDR_ACK (7)
+(or
+.BR DL_ERROR_ACK (7)).
+The response will contain the current physical address of the Linux network
+device.  The option to retrieve the factory address is not implemented and
+will always produce a
+.BR DL_ERROR_ACK (7)
+response.
+.\"
+.SS DL_ATTACH_REQ
+.PP
+The stream must be in the
+.B DL_UNATTACHED
+state for the
+.BR DL_ATTACH_REQ (7)
+primitive to succeed.
+The
+.B dl_ppa
+field specifies the device number of the Linux network device to attach in its
+low order bits.  In the
+.B LDL_FRAME_MASK
+bits, the
+.B dl_ppa
+specifies the framing type to use with the device.  The valid framing types
+are:
+.BR LDL_FRAME_EII ", " LDL_FRAME_802_2 ", " LDL_FRAME_802_3 ", " LDL_FRAME_SNAP " and " LDL_FRAME_RAW_LLC .
+The device number is usually obtained by issuing an
+.B LDL_FINDPPA
+ioctl.  This ioctl takes a network device mnemonic, such as
+.BR "eth0" ,
+as an argument and produces a number suitable for use as the
+.B dl_ppa
+value in a
+.BR DL_ATTACH_REQ (7).
+If the attach succeeds,
+.B LDL
+returns a
+.BR DL_OK_ACK (7)
+and sets the state of the stream to
+.BR DL_UNBOUND .
+It returns a
+.BR DL_ERROR_ACK (7)
+if it fails.
+.\"
+.SS DL_DETACH_REQ
+.PP
+A
+.BR DL_DETACH_REQ (7)
+causes
+.B LDL
+to detach from the Linux network device.  The stream must be in the
+.B DL_UNBOUND
+state for this primitive to be valid.
+If the detach succeeds,
+.B LDL
+returns a
+.BR DL_OK_ACK (7)
+and sets the state of the stream to
+.BR DL_UNATTACHED .
+It returns a
+.BR DL_ERROR_ACK (7)
+if it fails.
+.\"
+.SS DL_BIND_REQ
+.PP
+A
+.BR DL_BIND_REQ (7)
+causes
+.B LDL
+to bind an address to the stream.  The stream must be in
+the
+.B DL_UNBOUND
+state for this primitive to succeed.
+The bound address is used in demultiplexing frames received from the Linux
+network driver.  The SAP conveyed in the
+.BR DL_BIND_REQ (7)
+is used to select those received frames that are sent upstream on a particular
+stream.
+If the bind succeeds
+.B LDL
+returns a
+.BR DL_OK_ACK (7)
+and sets the state of the stream to
+.BR DL_IDLE .
+If it fails then a
+.BR DL_ERROR_ACK (7)
+is sent upstream.
+.\"
+.SS DL_UNBIND_REQ
+.PP
+A
+.BR DL_UNBIND_REQ (7)
+causes
+.B LDL
+to unbind all SAPs from the stream.  The stream must be in
+the
+.B DL_IDLE
+state for this primitive to succeed.
+If the unbind succeeds,
+.B LDL
+returns a
+.BR DL_OK_ACK (7)
+and sets the state of
+the stream to
+.BR DL_UNBOUND .
+If it fails then a
+.BR DL_ERROR_ACK (7)
+is sent upstream.
+.\"
+.SS DL_SUBS_BIND_REQ
+.PP
+A
+.BR DL_SUBS_BIND_REQ (7)
+causes
+.B LDL
+to add an additional SAP to the list of SAPs associated with the stream.  The
+stream must be in the
+.B DL_IDLE
+state for this primitive to succeed.
+If the subs-bind succeeds,
+.B LDL
+returns a
+.BR DL_SUBS_BIND_ACK .
+If it
+fails then a
+.BR DL_ERROR_ACK
+is sent upstream.
+.\"
+.SS DL_SUBS_UNBIND_REQ
+.PP
+A
+.BR DL_SUBS_UNBIND_REQ (7)
+causes
+.B LDL
+to remove the given SAP from the list of SAPs associated with the stream.  The
+stream must be in the
+.B DL_IDLE
+state for this primitive to succeed.
+If the subs-unbind succeeds,
+.B LDL
+returns a
+.BR DL_OK_ACK (7).
+If it fails
+then a
+.BR DL_ERROR_ACK (7)
+is sent upstream.  The state of the stream is left in the
+.BR DL_IDLE
+state in either case.
+.\"
+.SS DL_PROMISCON_REQ
+.PP
+The intent of the
+.BR DL_PROMISCON_REQ (7)
+primitive is to set the Linux network device into the so-called "promiscuous"
+mode of operation.  However, it is unimplemented.
+.\"
+.SS DL_PROMISCOFF_REQ
+.PP
+The
+.BR DL_PROMISCOFF_REQ (7)
+primitive would undo the effect of a
+.BR DL_PROMISCON_REQ (7).
+However, it is unimplemented.
+.\"
+.SS DL_UNITDATA_REQ
+.PP
+The
+.BR DL_UNITDATA_REQ (7)
+primitive is used to send data to the Linux network driver.  The destination
+address is used to set the physical address of the receiver of the data.  The
+stream must be in the
+.BR DL_IDLE
+state for this primitive to succeed.
+If the stream is operating in raw mode then the address field is ignored and
+it is assumed that the client has completely formatted the frame for
+transmission by the Linux network driver.
+If this primitive fails, a
+.BR DL_UDERROR_IND (7)
+is sent upstream.  There is no response in the case of success.
+.\"
+.SS M_DATA
+.PP
+.BR M_DATA (9)
+is an acceptable alternative to a
+.BR DL_UNITDATA_REQ (7)
+for sending data on a raw-mode stream.
+If the data transmission operation fails, a
+.BR DL_UDERROR_IND (7)
+is sent upstream.  There is no response in the case of success.
+For data received from the Linux network driver,
+.B LDL
+forwards a copy of the received data in a
+.BR DL_UNITDATA_IND (7)
+DLPI message to each client whose stream is attached to the particular network
+driver and who has a SAP bound to the stream that matches the SAP information
+in the received frame.  Note that for non-raw frame operations that the MAC
+header is stripped from the received frame prior to forwarding it to the
+client.  The address of the sender is retained in the address field of the
+.BR DL_UNITDATA_IND (7)
+primitive.
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.\".SH IMPLEMENTATION
+.\".PP
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.B /dev/ldl
+the
+.B ldl
+device
+.TP
+.B /dev/streams/ldl
+the
+.B ldl
+device
+.TP
+.B /dev/streams/clone/ldl
+the clone
+.B ldl
+device
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR ldlconfig (8),
+.BR ldltest (8),
+.BR dlpi (7),
+.BR streamio (7),
+.BR DL_ATTACH_REQ (7),
+.BR DL_INFO_REQ (7),
+.BR DL_PHYS_ADDR_REQ (7),
+.BR DL_PHYS_ADDR_ACK (7),
+.BR DL_ERROR_ACK (7),
+.BR DL_ATTACH_REQ (7),
+.BR DL_OK_ACK (7),
+.BR DL_DETACH_REQ (7),
+.BR DL_BIND_REQ (7),
+.BR DL_UNBIND_REQ (7),
+.BR DL_SUBS_BIND_REQ (7),
+.BR DL_PROMISCON_REQ (7),
+.BR DL_PROMISCOFF_REQ (7),
+.BR DL_UNITDATA_REQ (7),
+.BR DL_UDERROR_IND (7),
+.BR DL_UNITDATA_IND (7),
+.BR M_DATA (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.B ldl
+has no known bugs.  As this driver is largely untested, there may be unknown
+bugs.  Report bugs to
+.RB < bugs@openss7.org >.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B ldl
+is compatible with the driver of the same name from the
+GCOM
+.I LiS-2.18.0
+release.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+DLPI.
+.[
+dlpi revision 2.0.0 draft 2
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+Most of the devices and modules here appeared in earlier releases of LiS.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.T4

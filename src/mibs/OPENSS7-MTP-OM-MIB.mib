@@ -1,0 +1,2259 @@
+-- vim: ft=mib comments=\f\b\:\"ITU\-T,\f\b\:ITU\-T,\f\:\",\b\:\-\-,\:\-\-,\f\b\:\-,\f\b\:\· fo+=tcqlornw12 tw=64 ai nocin nosi sts=4 sw=4 et
+-- =============================================================================
+-- 
+-- @(#) $RCSfile: OPENSS7-MTP-OM-MIB.mib,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-07-18 19:42:19 $
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- Note well: notwithstanding this AGPL license, you are not permitted to make 
+-- modifications under the OpenSS7 project's enterprise object identifier arc: 
+-- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
+-- identifier arc under your control.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date: 2011-07-18 19:42:19 $ by $Author: brian $
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log: OPENSS7-MTP-OM-MIB.mib,v $
+-- Revision 1.1.2.2  2011-07-18 19:42:19  brian
+-- - added documentation
+--
+-- Revision 1.1.2.1  2009-06-21 11:39:31  brian
+-- - added files to new distro
+--
+-- =============================================================================
+
+OPENSS7-MTP-OM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MtpCongestionLevel, MtpUserPart, NetworkPointCode, mtpLsId, mtpRsId, 
+    mtpSlId, mtpSpId
+        FROM OPENSS7-MTP-MIB
+    openss7Q752
+        FROM OPENSS7-SMI
+    PerfCurrentCount
+        FROM PerfHist-TC-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, TimeInterval, TruthValue
+        FROM SNMPv2-TC;
+
+mtpOmMIB MODULE-IDENTITY
+    LAST-UPDATED "201112101120Z"
+    ORGANIZATION 
+        "The OpenSS7 Project"
+    CONTACT-INFO 
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Crescent
+         Edmonton, Alberta  T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         mailto:bidulock@openss7.org"
+    DESCRIPTION 
+        "The purpose of this MIB is to provide SNMP support for the MTP 
+         operational measurements provided in ITU-T Q.752 and ANSI 
+         T1.116.  There exists a draft GDMO specification for ANSI 
+         T1.116.1 from which this MIB is based.  Strangely enough, no 
+         GDMO is standardized for SS7 operational measurements.
+         
+         The objective of this MIB is to support both the reporting of 
+         statistics obtained from Operational Measurements as well as 
+         providing a mechanism to activate and report the results of OM 
+         studies.
+         
+         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+         
+         All Rights Reserved.
+         
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+         
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+         
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+         
+         Note well: notwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
+    REVISION    "201112101120Z"
+    DESCRIPTION 
+        "Corrections an smilint workup."
+    REVISION    "200812092229Z"
+    DESCRIPTION 
+        "This is the initial revision of this MIB."
+    ::= { openss7Q752 1 }
+
+
+ServiceIndicatorOctet ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x"
+    STATUS      current
+    DESCRIPTION 
+        "Provides a specification of the service indicator octet 
+         (SIO) against which statistics are collected."
+    SYNTAX      OCTET STRING (SIZE(1))
+
+mtpOmNotifications OBJECT IDENTIFIER
+    ::= { mtpOmMIB 0 }
+
+mtpOmObjects OBJECT IDENTIFIER
+    ::= { mtpOmMIB 1 }
+
+mtpOmTables OBJECT IDENTIFIER
+    ::= { mtpOmObjects 1 }
+
+mtpOmHandledMSUsOpcDpcSioTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MtpOmHandledMSUsOpcDpcSioEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "T1.116.1/D.3.5 Handled MSUs per OPC/DPC/SIO.
+         
+         This managed object class starts a measurement for a specific 
+         OPC/DPC/SIO combination. The preferred granularityPeriods are 5 
+         and 30 minutes. Activation of these measurements should be 
+         limited to a small number of OPC/DPC combinations at a given 
+         time. The measurement attribute is read-only."
+    REFERENCE   
+        "ANSI T1.116.1D handledMSUsOpcDpcSioMeasurement.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1884) currentData.
+         ANSI T1.116.1 mtpSignPoint."
+    ::= { mtpOmTables 1 }
+
+mtpOmHandledMSUsOpcDpcSioEntry OBJECT-TYPE
+    SYNTAX      MtpOmHandledMSUsOpcDpcSioEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "
+         These measurements are needed on a per link set or per route 
+         basis.  Activateion of the measuremetns is recommended on a per 
+         Point Code (PC) or set of Point Codes and/or Service Indicator 
+         (SI) or set of SI basis.  For an example of a set of point 
+         codes that might be usd as a basis, resolution down to the area 
+         or network might be performed, and the set could be all those 
+         SPs in an area.  Another possibility or the set could be all 
+         Point Codes.
+         
+         The measurements are not obligatory.  They may be used to 
+         diagnose focused signalling overloads.
+         
+         It should be possible, possibly by activating just a few 
+         combinations of OPC (or OPC sets), DPC (or DPC sets) and SI (or 
+         SI sets) at a time to cover any combination that might be 
+         applicable for the network in the node in which the 
+         measurements are being performed.
+         
+         Note that these measurements do not specify where they are to 
+         be taken, neither do they state what should collect them (e.g. 
+         an external monitoring device connected to the signalling links 
+         concerned)."
+    REFERENCE   
+        "ANSI T1.116.1D handledMSUsOpcDpcSioMeasurement.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1884) currentData.
+         ANSI T1.116.1 mtpSignPoint."
+    INDEX       { mtpSpId, mtpOmOpc, mtpOmDpc, mtpOmSio }
+    ::= { mtpOmHandledMSUsOpcDpcSioTable 1 }
+
+MtpOmHandledMSUsOpcDpcSioEntry ::= SEQUENCE {
+    mtpOmOpc                            NetworkPointCode,
+    mtpOmDpc                            NetworkPointCode,
+    mtpOmSio                            ServiceIndicatorOctet,
+    mtpOmHandledMSUsOpcDpcSio           PerfCurrentCount, -- handledMSUsOpcDpcSio
+    mtpOmHandledMSUsOpcDpcSioRowStatus  RowStatus
+}
+
+mtpOmOpc OBJECT-TYPE
+    SYNTAX      NetworkPointCode
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The index of a conceptual row in the table.  This is the 
+         orginating point code for which the measurement of handled MSUs 
+         is to be made.  This point code is represented using the 
+         NetworkPointCode textual convention."
+    REFERENCE   
+        "ANSI T1.116.1D opc"
+    ::= { mtpOmHandledMSUsOpcDpcSioEntry 1 }
+
+mtpOmDpc OBJECT-TYPE
+    SYNTAX      NetworkPointCode
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An index component of the index for this conceptual row in the 
+         table.  This is the destination point code for MSUs for which 
+         the measurement of handled MSUs is performed.  This point code 
+         is represented using the NetworkPointCode textual convention."
+    REFERENCE   
+        "ANSI T1.116.1D dpc"
+    ::= { mtpOmHandledMSUsOpcDpcSioEntry 2 }
+
+mtpOmSio OBJECT-TYPE
+    SYNTAX      ServiceIndicatorOctet
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An index component of the index for this conceptual row in the 
+         table.  This is the service indicator for MUSs for which the 
+         measurement of handled MSUs is performed.  The service 
+         indicator octet is represented using the ServiceIndicatorOctet 
+         textual convention."
+    REFERENCE   
+        "ANSI T1.116.1D sio"
+    ::= { mtpOmHandledMSUsOpcDpcSioEntry 3 }
+
+mtpOmHandledMSUsOpcDpcSio OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/6.7.
+         
+         This measurement measures the number of handled MSU for a given 
+         Signalling Point where the count is broken out on the basis of 
+         the DPC, OPC and SIO fields of the MTP header contained in the 
+         MSU."
+    REFERENCE   
+        "ANSI T1.116.2/2000 Clause 6.7.
+         ANSI T1.116.1D handledMSUsOpcDpcSio."
+    ::= { mtpOmHandledMSUsOpcDpcSioEntry 4 }
+
+mtpOmHandledMSUsOpcDpcSioRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may create or 
+         delete conceptual rows in this table.  Creating a conceptual 
+         row in this table requests that the agent begin collecting the 
+         operational measurements corresponding to the indices of the 
+         created conceptual row.  Measurements will only be collected 
+         for conceptual rows in this table that were explicitly created 
+         by a management station.  Conceptual rows in this table are not 
+         created by any internal interface.
+         
+         Implementations may require that activation of this measurement 
+         be limited to a small number of signalling point code 
+         combinations at a given time.  The agent is permitted to refuse 
+         the creation of additional rows beyond an implementation 
+         dependent maximum."
+    ::= { mtpOmHandledMSUsOpcDpcSioEntry 5 }
+
+
+-- Handled Octets OPC/DPC/SIO Measurement
+
+mtpOmHandledOctetsOpcDpcSioTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MtpOmHandledOctetsOpcDpcSioEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "T1.116.1/D.3.6 Handled Octets per OPC/DPC/SIO
+         
+         This managed object class starts a measurement for a specific 
+         OPC/DPC/SIO combination. The preferred granularityPeriods are 5 
+         and 30 minutes. Activation of these measurements should be 
+         limited to a small number of OPC/DPC combinations at a given 
+         time. The attribute is read-only."
+    REFERENCE   
+        "ANSI T1.116.1D handledOctetsOpcDpcSioMeasurement.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1884) currentData.
+         ANSI T1.116.1 mtpSignPoint."
+    ::= { mtpOmTables 2 }
+
+mtpOmHandledOctetsOpcDpcSioEntry OBJECT-TYPE
+    SYNTAX      MtpOmHandledOctetsOpcDpcSioEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "
+         These measurements are needed on a per link set or per route 
+         basis.  Activateion of the measuremetns is recommended on a per 
+         Point Code (PC) or set of Point Codes and/or Service Indicator 
+         (SI) or set of SI basis.  For an example of a set of point 
+         codes that might be usd as a basis, resolution down to the area 
+         or network might be performed, and the set could be all those 
+         SPs in an area.  Another possibility or the set could be all 
+         Point Codes.
+         
+         The measurements are not obligatory.  They may be used to 
+         diagnose focused signalling overloads.
+         
+         It should be possible, possibly by activating just a few 
+         combinations of OPC (or OPC sets), DPC (or DPC sets) and SI (or 
+         SI sets) at a time to cover any combination that might be 
+         applicable for the network in the node in which the 
+         measurements are being performed.
+         
+         Note that these measurements do not specify where they are to 
+         be taken, neither do they state what should collect them (e.g. 
+         an external monitoring device connected to the signalling links 
+         concerned)."
+    REFERENCE   
+        "ANSI T1.116.1D handledOctetsOpcDpcSioMeasurement.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1884) currentData.
+         ANSI T1.116.1 mtpSignPoint."
+    INDEX       { mtpSpId, mtpOmOpc, mtpOmDpc, mtpOmSio }
+    ::= { mtpOmHandledOctetsOpcDpcSioTable 1 }
+
+MtpOmHandledOctetsOpcDpcSioEntry ::= SEQUENCE {
+    mtpOmHandledOctetsOpcDpcSioInterval     TimeInterval,
+    mtpOmHandledOctetsOpcDpcSio             PerfCurrentCount, -- handledOctetsOpcDpcSio
+    mtpOmHandledOctetsOpcDpcSioRowStatus    RowStatus
+}
+
+mtpOmHandledOctetsOpcDpcSioInterval OBJECT-TYPE
+    SYNTAX      TimeInterval (30000 | 180000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the time interval over which measurement in this 
+         conceptual row are collected.  Intervals of 5 and 30 minutes 
+         must be supported.  Other intervals are optional."
+    DEFVAL      { 180000 } -- 30 minutes
+    ::= { mtpOmHandledOctetsOpcDpcSioEntry 1 }
+
+mtpOmHandledOctetsOpcDpcSio OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    UNITS       "Octets/OPC/DPC/SIO"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/6.6.
+         
+         Number of SIF and SIO octets handled with given OPC, DPC and 
+         SIO in units of number of MSUs per OPC, DPC and SIO combination 
+         collected over a 5- or 30-minute interval.  This operational 
+         measurement is non-obligatory.  This measurement may be used 
+         for performance managment, accounting management, and network 
+         administration and planning."
+    REFERENCE   
+        "ANSI T1.116.1D handledOctetsOpcDpcSio.
+         ANSI T1.116.2/2000 Table 6 (6.6)."
+    ::= { mtpOmHandledOctetsOpcDpcSioEntry 2 }
+
+mtpOmHandledOctetsOpcDpcSioRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may create or 
+         delete conceptual rows in this table.  Creating a conceptual 
+         row in this table requests that the agent begin collecting the 
+         operational measurements corresponding to the indices of the 
+         created conceptual row.  Measurements will only be collected 
+         for conceptual rows in this table that were explicitly created 
+         by a management station.  Conceptual rows in this table are not 
+         created by any internal interface.
+         
+         Implementations may require that activation of this measurement 
+         be limited to a small number of signalling point code 
+         combinations at a given time.  The agent is permitted to refuse 
+         the creation of additional rows beyond an implementation 
+         dependent maximum."
+    ::= { mtpOmHandledOctetsOpcDpcSioEntry 3 }
+
+mtpOmHandledOctetsSIOTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MtpOmHandledOctetsSIOEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "T1.116.1/D.3.7 Handled Octets per SIO
+         
+         This managed object class starts a measurement for a specific 
+         SIO. The preferred granularityPeriods are 5 and 30 minutes. The 
+         attribute is read-only."
+    REFERENCE   
+        "ANSI T1.116.1D handledOctetsSIOMeasurement.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1884) currentData.
+         ANSI T1.116.1 mtpSignPoint."
+    ::= { mtpOmTables 3 }
+
+mtpOmHandledOctetsSIOEntry OBJECT-TYPE
+    SYNTAX      MtpOmHandledOctetsSIOEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "
+         These measurements are needed on a per link set or per route 
+         basis.  Activateion of the measuremetns is recommended on a per 
+         Point Code (PC) or set of Point Codes and/or Service Indicator 
+         (SI) or set of SI basis.  For an example of a set of point 
+         codes that might be usd as a basis, resolution down to the area 
+         or network might be performed, and the set could be all those 
+         SPs in an area.  Another possibility or the set could be all 
+         Point Codes.
+         
+         The measurements are not obligatory.  They may be used to 
+         diagnose focused signalling overloads.
+         
+         It should be possible, possibly by activating just a few 
+         combinations of OPC (or OPC sets), DPC (or DPC sets) and SI (or 
+         SI sets) at a time to cover any combination that might be 
+         applicable for the network in the node in which the 
+         measurements are being performed.
+         
+         Note that these measurements do not specify where they are to 
+         be taken, neither do they state what should collect them (e.g. 
+         an external monitoring device connected to the signalling links 
+         concerned)."
+    REFERENCE   
+        "ANSI T1.116.1D handledOctetsSIOMeasurement.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1884) currentData.
+         ANSI T1.116.1 mtpSignPoint."
+    INDEX       { mtpSpId, mtpOmSio }
+    ::= { mtpOmHandledOctetsSIOTable 1 }
+
+MtpOmHandledOctetsSIOEntry ::= SEQUENCE {
+    mtpOmHandledOctetsSIO   PerfCurrentCount -- handledOctetsSIO
+}
+
+mtpOmHandledOctetsSIO OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/6.3."
+    REFERENCE   
+        "ANSI T1.116.1D handledOctetsSIO"
+    ::= { mtpOmHandledOctetsSIOEntry 1 }
+
+mtpOmOblSpUtilizationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MtpOmOblSpUtilizationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "T1.116.1/D.3.10 Obligated Signalling Point Utilisation Data
+         
+         This managed object class contains all obligated signalling 
+         point utilisation data. The preferred granularityPeriods are 5 
+         minutes. The attributes are read-only."
+    REFERENCE   
+        "ANSI T1.116.1D oblSignallingPointUtilisationData.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1884) currentData.
+         ANSI T1.116.1 mtpSignPoint."
+    ::= { mtpOmTables 4 }
+
+mtpOmOblSpUtilizationEntry OBJECT-TYPE
+    SYNTAX      MtpOmOblSpUtilizationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in this table is indxed by the signalling 
+         point identifier of an adjacent signalling point.  Each 
+         row contains the duration of which the adjacent 
+         signalling poit was unavailable."
+    REFERENCE   
+        "ANSI T1.116.1D oblSignallingPointUtilisationData.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1884) currentData.
+         ANSI T1.116.1 mtpSignPoint."
+    INDEX       { mtpSpId }
+    ::= { mtpOmOblSpUtilizationTable 1 }
+
+MtpOmOblSpUtilizationEntry ::= SEQUENCE {
+    mtpOmAdjacentInaccessibleDuration   TimeInterval  -- adjacentInaccessibleDuration
+}
+
+mtpOmAdjacentInaccessibleDuration OBJECT-TYPE
+    SYNTAX      TimeInterval (0..180000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/5.2 Duration of 
+         adjacent SP inaccessible.  Seconds per SP.  Accumuated counts 
+         on 5 and 30 minute intervals are obligatory.  This operational 
+         measurement can be derived from events indicating the start and 
+         stop of ajacent SP inaccessible (items 5.1 and 5.4)."
+    REFERENCE   
+        "ANSI T1.116.1D adjacentInaccessibleDuration.
+         ANSI T1.116.2/2000 Table 5 (5.2)."
+    ::= { mtpOmOblSpUtilizationEntry 1 }
+
+mtpOmAllSpUtilizationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MtpOmAllSpUtilizationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "T1.116.1/D.3.4 All Signalling Point Utilisation Data
+         
+         This managed object class contains all signalling point 
+         utilisation data. The preferred granularityPeriods are 5 or 30 
+         minutes. The attributes are read-only."
+    REFERENCE   
+        "ANSI T1.116.1D allSignallingPointUtilisationData.
+         ANSI T1.116.1D oblSignallingPointUtilisationData.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1884) currentData.
+         ANSI T1.116.1 mtpSignPoint."
+    ::= { mtpOmTables 5 }
+
+mtpOmAllSpUtilizationEntry OBJECT-TYPE
+    SYNTAX      MtpOmAllSpUtilizationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in this table is indexed by the signalling 
+         point identifier of an adjacent signalling point.  Each 
+         row contains the number of time that the adjacent 
+         signalling point was inaccessible during the interval."
+    REFERENCE   
+        "ANSI T1.116.1D allSignallingPointUtilisationData.
+         ANSI T1.116.1D oblSignallingPointUtilisationData.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1884) currentData.
+         ANSI T1.116.1 mtpSignPoint."
+    INDEX       { mtpSpId }
+    ::= { mtpOmAllSpUtilizationTable 1 }
+
+MtpOmAllSpUtilizationEntry ::= SEQUENCE {
+    mtpOmAdjacentInaccessibleEvents     PerfCurrentCount, -- adjacentInaccessibleEvents
+    mtpOmAllSpUtilizationRowStatus      RowStatus
+}
+
+mtpOmAdjacentInaccessibleEvents OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    UNITS       "Events/SP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/5.1
+         
+         Adjacent SP inaccessible.  Events per SP. On occurence reports 
+         are obligatory and permanent and are handled by alarm events.  
+         Accumuated counts on 5 and 30 minute intervals are optional.  
+         This operational measurement can be derived from events 
+         indicating the start and stop of ajacent SP inaccessible (items 
+         5.1 and 5.4)."
+    REFERENCE   
+        "ANSI T1.116.1D adjacentInaccessibleEvents"
+    ::= { mtpOmAllSpUtilizationEntry 1 }
+
+mtpOmAllSpUtilizationRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may create or 
+         delete conceptual rows in this table.  Creating a conceptual 
+         row in this table requests that the agent begin collecting the 
+         operational measurements corresponding to the indices of the 
+         created conceptual row.  Measurements will only be collected 
+         for conceptual rows in this table that were explicitly created 
+         by a management station.  Conceptual rows in this table are not 
+         created by any internal interface."
+    ::= { mtpOmAllSpUtilizationEntry 2 }
+
+mtpOmReceivedOctetsOPCTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MtpOmReceivedOctetsOPCEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "T1.116.1/D.3.11 Received Octets per OPC
+         
+         This managed object class starts a measurement for a specific 
+         OPC. The preferred granularityPeriods are 5 and 30 minutes. 
+         Activation of these measurements should be limited to a small 
+         number of signalling point codes at a given time. The attribute 
+         is read-only."
+    REFERENCE   
+        "ANSI T1.116.1D receivedOctetsOPCMeasurement.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1884) currentData.
+         ANSI T1.116.1 mtpSignPoint."
+    ::= { mtpOmTables 6 }
+
+mtpOmReceivedOctetsOPCEntry OBJECT-TYPE
+    SYNTAX      MtpOmReceivedOctetsOPCEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "
+         These measurements are needed on a per link set or per route 
+         basis.  Activateion of the measuremetns is recommended on a per 
+         Point Code (PC) or set of Point Codes and/or Service Indicator 
+         (SI) or set of SI basis.  For an example of a set of point 
+         codes that might be usd as a basis, resolution down to the area 
+         or network might be performed, and the set could be all those 
+         SPs in an area.  Another possibility or the set could be all 
+         Point Codes.
+         
+         The measurements are not obligatory.  They may be used to 
+         diagnose focused signalling overloads.
+         
+         It should be possible, possibly by activating just a few 
+         combinations of OPC (or OPC sets), DPC (or DPC sets) and SI (or 
+         SI sets) at a time to cover any combination that might be 
+         applicable for the network in the node in which the 
+         measurements are being performed.
+         
+         Note that these measurements do not specify where they are to 
+         be taken, neither do they state what should collect them (e.g. 
+         an external monitoring device connected to the signalling links 
+         concerned)."
+    REFERENCE   
+        "ANSI T1.116.1D receivedOctetsOPCMeasurement.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1884) currentData.
+         ANSI T1.116.1 mtpSignPoint."
+    INDEX       { mtpSpId, mtpOmOpc }
+    ::= { mtpOmReceivedOctetsOPCTable 1 }
+
+MtpOmReceivedOctetsOPCEntry ::= SEQUENCE {
+    mtpOmReceivedOctetsOPCInterval      TimeInterval,
+    mtpOmReceivedOctetsOPC              PerfCurrentCount, -- receivedOctetsOPC
+    mtpOmReceivedOctetsOPCRowStatus     RowStatus
+}
+
+mtpOmReceivedOctetsOPCInterval OBJECT-TYPE
+    SYNTAX      TimeInterval (90000 | 180000)
+    UNITS       "Seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the time interval over which measurement in this 
+         conceptual row are collected.  Intervals of 15 and 30 minutes 
+         must be supported.  Other intervals are optional."
+    ::= { mtpOmReceivedOctetsOPCEntry 1 }
+
+mtpOmReceivedOctetsOPC OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    UNITS       "Octets/OPC"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/6.1.
+         
+         The number of SIF and SIO octets received with given OPC (or 
+         OPC set) collected over an interval of 15 or 30 minutes.  This 
+         is a non-obligatory measurement that may be derived (from 6.6).  
+         This measurement may be used for performance analysis, 
+         accounting management, or network administration and planning."
+    REFERENCE   
+        "ANSI T1.116.1D receivedOctetsOPC"
+    ::= { mtpOmReceivedOctetsOPCEntry 2 }
+
+mtpOmReceivedOctetsOPCRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may create or 
+         delete conceptual rows in this table.  Creating a conceptual 
+         row in this table requests that the agent begin collecting the 
+         operational measurements corresponding to the indices of the 
+         created conceptual row.  Measurements will only be collected 
+         for conceptual rows in this table that were explicitly created 
+         by a management station.  Conceptual rows in this table are not 
+         created by any internal interface.
+         
+         Implementations may require that activation of this measurement 
+         be limited to a small number of signalling point codes at a 
+         given time.  The agent is permitted to refuse the creation of 
+         additional rows beyond an implementation dependent maximum."
+    ::= { mtpOmReceivedOctetsOPCEntry 3 }
+
+mtpOmReceivedOctetsOpcSioTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MtpOmReceivedOctetsOpcSioEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "T1.116.1/D.3.12. Received Octets per OPC/SIO.
+         
+         This managed object class starts a measurement for a specific 
+         OPC/SIO combination. The preferred granularityPeriods are 5 and 
+         30 minutes. Activation of these measurements should be limited 
+         to a small number of signalling point codes at a given time. 
+         The attribute is read-only."
+    REFERENCE   
+        "ANSI T1.116.1D receivedOctetsOpcSioMeasurement.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1884) currentData.
+         ANSI T1.116.1 mtpSignPoint."
+    ::= { mtpOmTables 7 }
+
+mtpOmReceivedOctetsOpcSioEntry OBJECT-TYPE
+    SYNTAX      MtpOmReceivedOctetsOpcSioEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "
+         These measurements are needed on a per link set or per route 
+         basis.  Activateion of the measuremetns is recommended on a per 
+         Point Code (PC) or set of Point Codes and/or Service Indicator 
+         (SI) or set of SI basis.  For an example of a set of point 
+         codes that might be usd as a basis, resolution down to the area 
+         or network might be performed, and the set could be all those 
+         SPs in an area.  Another possibility or the set could be all 
+         Point Codes.
+         
+         The measurements are not obligatory.  They may be used to 
+         diagnose focused signalling overloads.
+         
+         It should be possible, possibly by activating just a few 
+         combinations of OPC (or OPC sets), DPC (or DPC sets) and SI (or 
+         SI sets) at a time to cover any combination that might be 
+         applicable for the network in the node in which the 
+         measurements are being performed.
+         
+         Note that these measurements do not specify where they are to 
+         be taken, neither do they state what should collect them (e.g. 
+         an external monitoring device connected to the signalling links 
+         concerned)."
+    REFERENCE   
+        "ANSI T1.116.1D receivedOctetsOpcSioMeasurement.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1884) currentData.
+         ANSI T1.116.1 mtpSignPoint."
+    INDEX       { mtpSpId, mtpOmOpc, mtpOmSio }
+    ::= { mtpOmReceivedOctetsOpcSioTable 1 }
+
+MtpOmReceivedOctetsOpcSioEntry ::= SEQUENCE {
+    mtpOmReceivedOctetsOpcSioInterval   TimeInterval,
+    mtpOmReceivedOctetsOpcSio           PerfCurrentCount, -- receivedOctetsOpcSio
+    mtpOmReceivedOctetsOpcSioRowStatus  RowStatus
+}
+
+mtpOmReceivedOctetsOpcSioInterval OBJECT-TYPE
+    SYNTAX      TimeInterval (90000 | 180000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the time interval over which measurement in this 
+         conceptual row are collected.  Intervals of 15 and 30 minutes 
+         must be supported.  Other intervals are optional."
+    DEFVAL      { 180000 }
+    ::= { mtpOmReceivedOctetsOpcSioEntry 1 }
+
+mtpOmReceivedOctetsOpcSio OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    UNITS       "Octets/OPC/SIO"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/6.4.
+         
+         The number of SIF and SIO octets received with given OPC and 
+         SIO collected over an interval of 15 or 30 minutes.  This a 
+         non-obligatory measurement that may be used for performance 
+         analysis, accounting management, and network administration and 
+         planning."
+    REFERENCE   
+        "ANSI T1.116.1D receivedOctetsOpcSio"
+    ::= { mtpOmReceivedOctetsOpcSioEntry 2 }
+
+mtpOmReceivedOctetsOpcSioRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may create or 
+         delete conceptual rows in this table.  Creating a conceptual 
+         row in this table requests that the agent begin collecting the 
+         operational measurements corresponding to the indices of the 
+         created conceptual row.  Measurements will only be collected 
+         for conceptual rows in this table that were explicitly created 
+         by a management station.  Conceptual rows in this table are not 
+         created by any internal interface.
+         
+         Implementations may require that activation of this measurement 
+         be limited to a small number of signalling point codes at a 
+         given time.  The agent is permitted to refuse the creation of 
+         additional rows beyond an implementation dependent maximum."
+    ::= { mtpOmReceivedOctetsOpcSioEntry 3 }
+
+mtpOmSpDataTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MtpOmSpDataEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "T1.116.1/D.3.16. Signalling Point Data.
+         
+         This managed object class contains informations about 
+         signalling point. The preferred granularityPeriod are 5 or 30 
+         minutes. All attributes are read-only and are referenced by an 
+         instance of ss7FirstAndIntervalThresholdData managed object 
+         class so does discardedMSUs attribute when it is used as a 
+         first and interval measurement."
+    REFERENCE   
+        "ANSI T1.116.1D signallingPointData.
+         ANSI T1.116.1D ss7FirstandIntervalCurrentData.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1884) currentData.
+         ANSI T1.116.1 mtpSignPoint."
+    ::= { mtpOmTables 8 }
+
+mtpOmSpDataEntry OBJECT-TYPE
+    SYNTAX      MtpOmSpDataEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row is indexed by the signalling point identifier 
+         of a remote signalling point a user part on that 
+         signalling point and the congestion level experienced.  
+         Each row contains information concenring congestion 
+         events during the current interval."
+    REFERENCE   
+        "ANSI T1.116.1D signallingPointData.
+         ANSI T1.116.1D ss7FirstandIntervalCurrentData.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1884) currentData.
+         ANSI T1.116.1 mtpSignPoint."
+    INDEX       { mtpSpId, mtpOmUserPart, mtpOmCongestionLevel }
+    ::= { mtpOmSpDataTable 1 }
+
+MtpOmSpDataEntry ::= SEQUENCE {
+    mtpOmUserPart                       MtpUserPart,
+    mtpOmCongestionLevel                MtpCongestionLevel,
+    mtpOmSpDiscardedMSUs                PerfCurrentCount, -- discardedMSUs
+    mtpOmSpTransmittedUPUnavailable     PerfCurrentCount, -- transmittedUPUnavailable
+    mtpOmSpReceivedUPUnavailable        PerfCurrentCount, -- receivedUPUnavailable
+    mtpOmSpReceivedTFC                  PerfCurrentCount, -- receivedTFC
+    mtpOmSpReceivedTFCLevel0            PerfCurrentCount, -- receivedTFC
+    mtpOmSpReceivedTFCLevel1            PerfCurrentCount, -- receivedTFC
+    mtpOmSpReceivedTFCLevel2            PerfCurrentCount, -- receivedTFC
+    mtpOmSpReceivedTFCLevel3            PerfCurrentCount  -- receivedTFC
+}
+
+mtpOmUserPart OBJECT-TYPE
+    SYNTAX      MtpUserPart
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the user part on the remote signalling point 
+         using the MtpUserPart textual convention."
+    ::= { mtpOmSpDataEntry 1 }
+
+mtpOmCongestionLevel OBJECT-TYPE
+    SYNTAX      MtpCongestionLevel
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the congestion level using the 
+         MtpCongestionLevel textual convention."
+    ::= { mtpOmSpDataEntry 2 }
+
+-- This is not correct.  I don't think that this column should be here 
+-- as it is based on MSUs per signalling link and therefore should be 
+-- associated wtih a signLinkTpId.
+--
+mtpOmSpDiscardedMSUs OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.1/3.10"
+    REFERENCE   
+        "ANSI T1.116.1D discardedMSUs"
+    ::= { mtpOmSpDataEntry 3 }
+
+mtpOmSpTransmittedUPUnavailable OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    UNITS       "Events/UP/SP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/5.6.
+         See also Chapter T1.111.4 11.7.2.
+         
+         User Part Unavailable (UPU) MSU transmitted correlated as 
+         events per user part for each signalling point, collected on a 
+         first and interval basis.  This is a non-obligatory measurement 
+         that is permanently activated when available.  The measurement 
+         is used for fault detection, near real-time monitoring, 
+         configuration management and performance management.
+         
+         When this measurement exceeds an implementation-dependent 
+         threshold, the management process is informed with a Quality of 
+         Service alarm indication."
+    REFERENCE   
+        "ANSI T1.116.1D transmittedUPUnavailable.
+         ANSI T1.116.2/2000 Table 5 (5.6).
+         ANSI T1.111.4/2000 11.7.2."
+    ::= { mtpOmSpDataEntry 4 }
+
+mtpOmSpReceivedUPUnavailable OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    UNITS       "Event/UP/SP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/5.7.
+         See also Chapter T1.111.4 11.7.2.
+         
+         User Part Unavailable (UPU) MSU received correlated as events 
+         per user part for each signalling point, collected on a first 
+         and interval basis.  This is a non-obligatory measurement that 
+         is permanently activated when available.  The measurement is 
+         used for fault-detection, near real-time monitoring, 
+         configuration management and performance management.
+         
+         When this measurement exceeds an implementation-dependent 
+         threshold, the management process is informed with a Quality of 
+         Service alarm indication.  Note that for a UPU for an 
+         unequipped MTP user results in the management process being 
+         informed immediately."
+    REFERENCE   
+        "ANSI T1.116.1D receivedUPUnavailable.
+         ANSI T1.116.2/2000 Table 5 (5.7).
+         ANSI T1.111.4/2000 11.7.2."
+    ::= { mtpOmSpDataEntry 5 }
+
+mtpOmSpReceivedTFC OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    UNITS       "Events/Level/SP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/5.8.
+         
+         The number of Transfer Controlled (TFC) messages received per 
+         congestion level and signalling point collected on a first and 
+         interval basis.  This is a non-obligatory measurement that is 
+         permanently activated when available.  The measurement is used 
+         for fault detection, near real-time monitoring, and performance 
+         analysis.
+         
+         TFC received indicates congestion in the route set toward the 
+         destination.  For the national option of multiple levels of 
+         convestion, the congestion status is included."
+    REFERENCE   
+        "ANSI T1.116.1D receivedTFC.
+         ANSI T1.116.1/2000 Table 5 (5.8)."
+    ::= { mtpOmSpDataEntry 6 }
+
+mtpOmSpReceivedTFCLevel0 OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    UNITS       "Events/Level/SP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/5.8.
+         
+         The number of Transfer Controlled (TFC) messages received per 
+         congestion level and signalling point collected on a first and 
+         interval basis.  This is a non-obligatory measurement that is 
+         permanently activated when available.  The measurement is used 
+         for fault detection, near real-time monitoring, and performance 
+         analysis."
+    REFERENCE   
+        "ANSI T1.116.1D receivedTFC.
+         ANSI T1.116.1/2000 Table 5 (5.8)."
+    ::= { mtpOmSpDataEntry 7 }
+
+mtpOmSpReceivedTFCLevel1 OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    UNITS       "Events/Level/SP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/5.8.
+         
+         The number of Transfer Controlled (TFC) messages received per 
+         congestion level and signalling point collected on a first and 
+         interval basis.  This is a non-obligatory measurement that is 
+         permanently activated when available.  The measurement is used 
+         for fault detection, near real-time monitoring, and performance 
+         analysis."
+    REFERENCE   
+        "ANSI T1.116.1D receivedTFC.
+         ANSI T1.116.1/2000 Table 5 (5.8)."
+    ::= { mtpOmSpDataEntry 8 }
+
+mtpOmSpReceivedTFCLevel2 OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    UNITS       "Events/Level/SP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/5.8.
+         
+         The number of Transfer Controlled (TFC) messages received per 
+         congestion level and signalling point collected on a first and 
+         interval basis.  This is a non-obligatory measurement that is 
+         permanently activated when available.  The measurement is used 
+         for fault detection, near real-time monitoring, and performance 
+         analysis."
+    REFERENCE   
+        "ANSI T1.116.1D receivedTFC.
+         ANSI T1.116.1/2000 Table 5 (5.8)."
+    ::= { mtpOmSpDataEntry 9 }
+
+mtpOmSpReceivedTFCLevel3 OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    UNITS       "Events/Level/SP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/5.8.
+         
+         The number of Transfer Controlled (TFC) messages received per 
+         congestion level and signalling point collected on a first and 
+         interval basis.  This is a non-obligatory measurement that is 
+         permanently activated when available.  The measurement is used 
+         for fault detection, near real-time monitoring, and performance 
+         analysis."
+    REFERENCE   
+        "ANSI T1.116.1D receivedTFC.
+         ANSI T1.116.1/2000 Table 5 (5.8)."
+    ::= { mtpOmSpDataEntry 10 }
+
+mtpOmTransmittedOctetsDPCTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MtpOmTransmittedOctetsDPCEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "T1.116.1/D.3.20. Transmitted Octets per DPC.
+         
+         This managed object class starts a measurement for a specific 
+         DPC. The preferred granularityPeriods are 5 and 30 minutes. 
+         Activation of these measurements should be limited to a small 
+         number of signalling point codes at a given time. The attribute 
+         is read-only."
+    REFERENCE   
+        "ANSI T1.116.1D transmittedOctetsDPCMeasurement.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1994) currentData.
+         ANSI T1.116.1 mtpSignPoint."
+    ::= { mtpOmTables 9 }
+
+mtpOmTransmittedOctetsDPCEntry OBJECT-TYPE
+    SYNTAX      MtpOmTransmittedOctetsDPCEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "
+         These measurements are needed on a per link set or per route 
+         basis.  Activateion of the measuremetns is recommended on a per 
+         Point Code (PC) or set of Point Codes and/or Service Indicator 
+         (SI) or set of SI basis.  For an example of a set of point 
+         codes that might be usd as a basis, resolution down to the area 
+         or network might be performed, and the set could be all those 
+         SPs in an area.  Another possibility or the set could be all 
+         Point Codes.
+         
+         The measurements are not obligatory.  They may be used to 
+         diagnose focused signalling overloads.
+         
+         It should be possible, possibly by activating just a few 
+         combinations of OPC (or OPC sets), DPC (or DPC sets) and SI (or 
+         SI sets) at a time to cover any combination that might be 
+         applicable for the network in the node in which the 
+         measurements are being performed.
+         
+         Note that these measurements do not specify where they are to 
+         be taken, neither do they state what should collect them (e.g. 
+         an external monitoring device connected to the signalling links 
+         concerned)."
+    REFERENCE   
+        "ANSI T1.116.1D transmittedOctetsDPCMeasurement.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1994) currentData.
+         ANSI T1.116.1 mtpSignPoint."
+    INDEX       { mtpSpId, mtpOmDpc }
+    ::= { mtpOmTransmittedOctetsDPCTable 1 }
+
+MtpOmTransmittedOctetsDPCEntry ::= SEQUENCE {
+    mtpOmTransmittedOctetsDPC           PerfCurrentCount, -- transmittedOctetsDPC
+    mtpOmTransmittedOctetsDPCRowStatus  RowStatus
+}
+
+mtpOmTransmittedOctetsDPC OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/6.2."
+    REFERENCE   
+        "ANSI T1.116.1D transmittedOctetsDPC"
+    ::= { mtpOmTransmittedOctetsDPCEntry 1 }
+
+mtpOmTransmittedOctetsDPCRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may create or 
+         delete conceptual rows in this table.  Creating a conceptual 
+         row in this table requests that the agent begin collecting the 
+         operational measurements corresponding to the indices of the 
+         created conceptual row.  Measurements will only be collected 
+         for conceptual rows in this table that were explicitly created 
+         by a management station.  Conceptual rows in this table are not 
+         created by any internal interface.
+         
+         Implementations may require that activation of this measurement 
+         be limited to a small number of signalling point codes at a 
+         given time.  The agent is permitted to refuse the creation of 
+         additional rows beyond an implementation dependent maximum."
+    ::= { mtpOmTransmittedOctetsDPCEntry 2 }
+
+mtpOmTransmittedOctetsDpcSioTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MtpOmTransmittedOctetsDpcSioEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "T1.116.1/D.3.21.  Transmitted Octets per DPC/SIO.
+         
+         This managed object class starts a measurement for a specific 
+         DPC/SIO combination. The preferred granularityPeriods are 5 and 
+         30 minutes. Activation of these measurements should be limited 
+         to a small number of signalling point codes at a given time. 
+         The attribute is read-only."
+    REFERENCE   
+        "ANSI T1.116.1D transmittedOctetsDpcSioMeasurement.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1994) currentData.
+         ANSI T1.116.1 mtpSignPoint."
+    ::= { mtpOmTables 10 }
+
+mtpOmTransmittedOctetsDpcSioEntry OBJECT-TYPE
+    SYNTAX      MtpOmTransmittedOctetsDpcSioEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "
+         These measurements are needed on a per link set or per route 
+         basis.  Activateion of the measuremetns is recommended on a per 
+         Point Code (PC) or set of Point Codes and/or Service Indicator 
+         (SI) or set of SI basis.  For an example of a set of point 
+         codes that might be usd as a basis, resolution down to the area 
+         or network might be performed, and the set could be all those 
+         SPs in an area.  Another possibility or the set could be all 
+         Point Codes.
+         
+         The measurements are not obligatory.  They may be used to 
+         diagnose focused signalling overloads.
+         
+         It should be possible, possibly by activating just a few 
+         combinations of OPC (or OPC sets), DPC (or DPC sets) and SI (or 
+         SI sets) at a time to cover any combination that might be 
+         applicable for the network in the node in which the 
+         measurements are being performed.
+         
+         Note that these measurements do not specify where they are to 
+         be taken, neither do they state what should collect them (e.g. 
+         an external monitoring device connected to the signalling links 
+         concerned)."
+    REFERENCE   
+        "ANSI T1.116.1D transmittedOctetsDpcSioMeasurement.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1994) currentData.
+         ANSI T1.116.1 mtpSignPoint."
+    INDEX       { mtpSpId, mtpOmDpc, mtpOmSio }
+    ::= { mtpOmTransmittedOctetsDpcSioTable 1 }
+
+MtpOmTransmittedOctetsDpcSioEntry ::= SEQUENCE {
+    mtpOmTransmittedOctetsDpcSio            PerfCurrentCount, -- transmittedOctetsDpcSio
+    mtpOmTransmittedOctetsDpcSioRowStatus   RowStatus
+}
+
+mtpOmTransmittedOctetsDpcSio OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/6.5."
+    REFERENCE   
+        "ANSI T1.116.1D transmittedOctetsDpcSio"
+    ::= { mtpOmTransmittedOctetsDpcSioEntry 1 }
+
+mtpOmTransmittedOctetsDpcSioRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may create or 
+         delete conceptual rows in this table.  Creating a conceptual 
+         row in this table requests that the agent begin collecting the 
+         operational measurements corresponding to the indices of the 
+         created conceptual row.  Measurements will only be collected 
+         for conceptual rows in this table that were explicitly created 
+         by a management station.  Conceptual rows in this table are not 
+         created by any internal interface.
+         
+         Implementations may require that activation of this measurement 
+         be limited to a small number of signalling point codes at a 
+         given time.  The agent is permitted to refuse the creation of 
+         additional rows beyond an implementation dependent maximum."
+    ::= { mtpOmTransmittedOctetsDpcSioEntry 2 }
+
+mtpOmSignRsInformationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MtpOmSignRsInformationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "T1.116.1/D.3.13.  Route Set Information Data.
+         
+         This managed object class contains all permanent signalling 
+         point duration data.  The granularityPeriod is 30 minutes. The 
+         attributes are read-only."
+    REFERENCE   
+        "ANSI T1.116.1D signRouteSetInformationData.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1994) currentData.
+         ANSI T1.116.1 signRouteSetNePart."
+    ::= { mtpOmTables 11 }
+
+mtpOmSignRsInformationEntry OBJECT-TYPE
+    SYNTAX      MtpOmSignRsInformationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in this table is indexed by the signalling 
+         route set network element part identifier.  Each row 
+         contains the amount of time that the route set was 
+         unavailable."
+    REFERENCE   
+        "ANSI T1.116.1D signRouteSetInformationData.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1994) currentData.
+         ANSI T1.116.1 signRouteSetNePart."
+    INDEX       { mtpRsId }
+    ::= { mtpOmSignRsInformationTable 1 }
+
+MtpOmSignRsInformationEntry ::= SEQUENCE {
+    mtpOmRouteSetUnavailable            PerfCurrentCount, -- routeSetUnavailable
+    mtpOmRouteSetUnavailableDuration    TimeInterval -- routeSetUnavailableDuration
+}
+
+mtpOmRouteSetUnavailable OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/4.9.
+         See also Chapter T1.111.4 11.2.2.
+         
+         These are not basic measurements and can be derived (from 4.11 
+         and 4.12).  This measurement is obligatory in international 
+         networks."
+    REFERENCE   
+        "ANSI T1.116.1D routeSetUnavailable"
+    ::= { mtpOmSignRsInformationEntry 1 }
+
+mtpOmRouteSetUnavailableDuration OBJECT-TYPE
+    SYNTAX      TimeInterval (0..180000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/4.10.
+         See also Chapter T1.111.4 11.2.1.
+         
+         These are not basic measurements and can be derived (from 4.11 
+         and 4.12).  This measurement is obligatory in international 
+         networks."
+    REFERENCE   
+        "ANSI T1.116.1D routeSetUnavailableDuration"
+    ::= { mtpOmSignRsInformationEntry 2 }
+
+mtpOmSlsDurationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MtpOmSlsDurationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "T1.116.1/D.3.15.  Signalling Link Set Duration Data.
+         
+         This managed object class contains all signalling link set 
+         duration data. The granularityPeriod is 30 minutes. The 
+         attributes are read-only."
+    REFERENCE   
+        "ANSI T1.116.1D signallingLinkSetDurationData.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1994) currentData.
+         ANSI T1.116.1/2000 signLinkSetTp."
+    ::= { mtpOmTables 12 }
+
+mtpOmSlsDurationEntry OBJECT-TYPE
+    SYNTAX      MtpOmSlsDurationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in this table is indexed by the link set 
+         termination point identifier.  Each row contains the 
+         period of time that the signalling link set was 
+         unavailable."
+    REFERENCE   
+        "ANSI T1.116.1D signallingLinkSetDurationData.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1994) currentData.
+         ANSI T1.116.1/2000 signLinkSetTp."
+    INDEX       { mtpLsId }
+    ::= { mtpOmSlsDurationTable 1 }
+
+MtpOmSlsDurationEntry ::= SEQUENCE {
+    mtpOmSlsUnavailable     TimeInterval    -- slsUnavailable
+}
+
+mtpOmSlsUnavailable OBJECT-TYPE
+    SYNTAX      TimeInterval (0..180000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents Measurement T1.116.2/4.2.
+         
+         This is not a basic measurement.  It can be derived (from 4.3 
+         and 4.4)."
+    REFERENCE   
+        "ANSI T1.116.1D slsUnavailable"
+    ::= { mtpOmSlsDurationEntry 1 }
+
+mtpOmAll5And30MinSlDurationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MtpOmAll5And30MinSlDurationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "T1.116.1/D.3.2.  All 5 And 30 Minutes Signalling Link Duration Data.
+         
+         This managed object class contains all obligated signalling 
+         link duration data.  The preferred granularityPeriod is 5 and 
+         30 minutes. The attributes are read-only."
+    REFERENCE   
+        "ANSI T1.116.1D all5And30MinSignallingLinkDurationData.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1994) currentData.
+         ANSI T1.116.1/2000 signLinkTp."
+    ::= { mtpOmTables 13 }
+
+mtpOmAll5And30MinSlDurationEntry OBJECT-TYPE
+    SYNTAX      MtpOmAll5And30MinSlDurationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in this table is indexed by the signalling 
+         link termination point identifier.  Each row contains 
+         the duration of time that the signalling link was 
+         inhibited or busy."
+    REFERENCE   
+        "ANSI T1.116.1D all5And30MinSignallingLinkDurationData.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1994) currentData.
+         ANSI T1.116.1/2000 signLinkTp."
+    INDEX       { mtpSlId }
+    ::= { mtpOmAll5And30MinSlDurationTable 1 }
+
+MtpOmAll5And30MinSlDurationEntry ::= SEQUENCE {
+    mtpOmAll5And30MinSlDurationInterval     TimeInterval,
+    mtpOmLocalMgntInhibit                   TimeInterval,   -- localMgntInhibit
+    mtpOmLocalMgntUninhibit                 TimeInterval,   -- localMgntUninhibit
+    mtpOmLocalBusy                          PerfCurrentCount,       -- localBusy
+    mtpOmAll5And30MinSlDurationRowStatus    RowStatus
+}
+
+mtpOmAll5And30MinSlDurationInterval OBJECT-TYPE
+    SYNTAX      TimeInterval (30000 | 180000)
+    UNITS       "Seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the collection interval for the conceptual row 
+         containing this object.  The collection intervals supported 
+         must include 5 minutes and 30 minutes."
+    ::= { mtpOmAll5And30MinSlDurationEntry 1 }
+
+mtpOmLocalMgntInhibit OBJECT-TYPE
+    SYNTAX      TimeInterval (0..180000)
+    UNITS       "Events/SL"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/2.13.
+         See also 10.2/T1.111.4.
+         
+         Local management inhibit in number of events per signalling 
+         link collected on a 5 or 30 minute interval.  This is a 
+         non-obligatory measurement that may be derived (from 2.16 which 
+         is a alarm indication event)."
+    REFERENCE   
+        "ANSI T1.116.1D localMgntInhibit.
+         ANSI T1.116.2/2000 Table 2 (2.13).
+         ANSI T1.111.4/2000 10.2."
+    ::= { mtpOmAll5And30MinSlDurationEntry 2 }
+
+mtpOmLocalMgntUninhibit OBJECT-TYPE
+    SYNTAX      TimeInterval (0..180000)
+    UNITS       "Events/SL"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/2.14.
+         See also 10.3/T1.111.4.
+         
+         Local management unininhibit in number of events per signalling 
+         link collected on a 5 or 30 minute interval.  This is a 
+         non-obligatory measurement that may be derived (from 2.17 and 
+         2.19 which are alarm clearing events)."
+    REFERENCE   
+        "ANSI T1.116.1D localMgntUninhibit.
+         ANSI T1.116.2/2000 Table 2 (2.14).
+         ANSI T1.111.4/2000 10.3."
+    ::= { mtpOmAll5And30MinSlDurationEntry 3 }
+
+mtpOmLocalBusy OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    UNITS       "SIBs/SL"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/2.15.
+         See also 9.3/T1.111.4.
+         
+         Duration of local busy in SIBs per signalling link collected 
+         over a 5 or 30 minute interval.  This is a non-obligatory 
+         measurement.  The measurement is used for near-real-time fault 
+         detection, general fault detection, and  MTP performance 
+         studies."
+    REFERENCE   
+        "ANSI T1.116.1D localBusy.
+         ANSI T1.116.2/2000 Table 2 (2.15).
+         ANSI T1.111.4/2000 9.3."
+    ::= { mtpOmAll5And30MinSlDurationEntry 4 }
+
+mtpOmAll5And30MinSlDurationRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may create or 
+         delete conceptual rows in this table.  Creating a conceptual 
+         row in this table requests that the agent begin collecting the 
+         operational measurements corresponding to the indices of the 
+         created conceptual row.  Measurements will only be collected 
+         for conceptual rows in this table that were explicitly created 
+         by a management station.  Conceptual rows in this table are not 
+         created by any internal interface."
+    ::= { mtpOmAll5And30MinSlDurationEntry 5 }
+
+
+-- Obligatory Signalling Link Duration Data Table
+
+mtpOmOblSlDurationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MtpOmOblSlDurationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "T1.116.1/D.3.8.  Obligated Signalling Link Duration Data.
+         
+         This managed object class contains the obligated signalling 
+         link duration data.  The preferred granularityPeriod is 30 
+         minutes. The attributes are read-only."
+    REFERENCE   
+        "ANSI T1.116.1D oblSignallingLinkDurationData.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1884) currentData.
+         ANSI T1.116.1 signLinkTp."
+    ::= { mtpOmTables 14 }
+
+mtpOmOblSlDurationEntry OBJECT-TYPE
+    SYNTAX      MtpOmOblSlDurationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in this table is indexed by the signalling 
+         link termination point identifier.  Each row contains 
+         the duration of time that signalling link was 
+         unavailable."
+    REFERENCE   
+        "ANSI T1.116.1D oblSignallingLinkDurationData.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1884) currentData.
+         ANSI T1.116.1 signLinkTp."
+    INDEX       { mtpSlId }
+    ::= { mtpOmOblSlDurationTable 1 }
+
+MtpOmOblSlDurationEntry ::= SEQUENCE {
+    mtpOmSlUnavailabilityDuration   TimeInterval, -- slUnavailabilityDuration
+    mtpOmSlInServiceDuration        TimeInterval -- slInServiceDuration
+}
+
+mtpOmSlUnavailabilityDuration OBJECT-TYPE
+    SYNTAX      TimeInterval (0..180000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/2.1
+         
+         Duration of signalling link unavailability (for any reason) in 
+         units of seconds per signalling link.  This is an obligatory 
+         operational measurement to be collected on a 30 minute basis.  
+         This operational measurement is permanently activated.  This 
+         operational measurement may be derived (from 1.2, 1.12, 2.5 and 
+         2.6).
+         
+         This measurement can be used in calculations for the detection 
+         of increases in signalling link signalling unit error rates 
+         (ANSI T1.116.2/2000 6.2.1.4.1).  It may also be used in the 
+         calculation of signalling link utilization (ANSI T1.116.2/2000 
+         6.2.2.1)."
+    REFERENCE   
+        "ANSI T1.116.1D slUnavailabilityDuration"
+    ::= { mtpOmOblSlDurationEntry 1 }
+
+mtpOmSlInServiceDuration OBJECT-TYPE
+    SYNTAX      TimeInterval (0..180000)
+    UNITS       "Seconds/SL"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/1.1
+         
+         Duration of link in the in-service state in units of seconds 
+         per signalling link.  This is an obligatory operational 
+         measurement to be collected on a 30 minute basis.  This 
+         operational measurement is permanently activated.  This 
+         operational measurement may be derived (from 1.2 and 1.12, 
+         which are alarm and alarm clearing events).
+         
+         This measurement can be used in calculations for the detection 
+         of increases in signalling link signalling unit error rates 
+         (ANSI T1.116.2/2000 6.2.1.4.1).  It may also be used in the 
+         calculation of signalling link utilization (ANSI T1.116.2/2000 
+         6.2.2.1)."
+    REFERENCE   
+        "ANSI T1.116.1D slInServiceDuration.
+         ANSI T1.116.1/2000 Table 1 (1.1)."
+    ::= { mtpOmOblSlDurationEntry 2 }
+
+
+-- All 30-minute Signalling Link Duration Data Table
+
+mtpOmAll30MinSlDurationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MtpOmAll30MinSlDurationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "T1.116.1/D.3.1.  All 30 Minutes Signalling Link Duration Data.
+         
+         This managed object class contains all signalling link duration 
+         data with granularityPeriod 30 minutes. The attributes are 
+         read-only."
+    REFERENCE   
+        "ANSI T1.116.1D all30MinSignallingLinkDurationData.
+         ANSI T1.116.1D oblSignallingLinkDurationData.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1884) currentData.
+         ANSI T1.116.1 signLinkTp."
+    ::= { mtpOmTables 15 }
+
+mtpOmAll30MinSlDurationEntry OBJECT-TYPE
+    SYNTAX      MtpOmAll30MinSlDurationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in this table is indexed by the signalling 
+         link termination point identifier.  Each row contains 
+         the amount of time that the signalling link was 
+         inhibitied, failed or blocked."
+    REFERENCE   
+        "ANSI T1.116.1D all30MinSignallingLinkDurationData.
+         ANSI T1.116.1D oblSignallingLinkDurationData.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1884) currentData.
+         ANSI T1.116.1 signLinkTp."
+    INDEX       { mtpSlId }
+    ::= { mtpOmAll30MinSlDurationTable 1 }
+
+MtpOmAll30MinSlDurationEntry ::= SEQUENCE {
+    mtpOmAll30MinSlDurationInterval     TimeInterval,
+    mtpOmSlLocalInhibition              TimeInterval, -- slLocalInhibition
+    mtpOmSlRemoteInhibition             TimeInterval, -- slRemoteInhibition
+    mtpOmSlFailed                       TimeInterval, -- slFailed
+    mtpOmSlRemoteProcOutage             TimeInterval, -- slRemoteProcOutage
+    mtpOmAll30MinSlDurationRowStatus    RowStatus
+}
+
+mtpOmAll30MinSlDurationInterval OBJECT-TYPE
+    SYNTAX      TimeInterval (30000 | 180000)
+    UNITS       "Seconds/SL"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the collection interval for operational measurements 
+         in this and related conceptual rows."
+    DEFVAL      { 180000 } -- 30 minutes
+    ::= { mtpOmAll30MinSlDurationEntry 1 }
+
+mtpOmSlLocalInhibition OBJECT-TYPE
+    SYNTAX      TimeInterval (0..180000)
+    UNITS       "Seconds/SL"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/2.5.
+         See also 3.2.8/T1.111.4.
+         
+         Duration of signalling link inhibition due to local management 
+         actions in units of seconds per signalling link collected on a 
+         30 minute interval.  This is a non-obligatory operational 
+         measurement that may be derived (from 2.16 and 2.17 which are 
+         alarm indication and clearing events).
+         
+         This operational measurement is used in MTP performance 
+         studies."
+    REFERENCE   
+        "ANSI T1.116.1D slLocalInhibition.
+         ANSI T1.116.1/2000 Table 2 (2.5).
+         ANSI T1.111.4/2000 3.2.8."
+    ::= { mtpOmAll30MinSlDurationEntry 2 }
+
+mtpOmSlRemoteInhibition OBJECT-TYPE
+    SYNTAX      TimeInterval (0..180000)
+    UNITS       "Seconds/SL"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/2.6.
+         See also 3.2.2/T1.111.4.
+         
+         Duration of signalling link inhibition due to remote management 
+         actions in units of seconds per signalling link collected on a 
+         30 minute interval.  This is a non-obligatory operational 
+         measurement that may be derived (from 2.18 and 2.19 which are 
+         alarm indication and clearing events).
+         
+         This operational measurement is used in MTP performance 
+         studies."
+    REFERENCE   
+        "ANSI T1.116.1D slRemoteInhibition.
+         ANSI T1.116.1/2000 Table 2 (2.6).
+         ANSI T1.111.4/2000 3.2.2."
+    ::= { mtpOmAll30MinSlDurationEntry 3 }
+
+mtpOmSlFailed OBJECT-TYPE
+    SYNTAX      TimeInterval (0..180000)
+    UNITS       "Seconds/SL"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/2.7.
+         See also 3.2.2/T1.111.4.
+         
+         Duration of signalling link unavailability due to link failure 
+         in units of seconds per signalling link collected on a 30 
+         minute interval.  This is non-obligatory operational 
+         measurement that may be derived (from 1.2 and 1.12 which are 
+         alarm indication and clearing events).
+         
+         This operational measurement is used in MTP performance 
+         studies."
+    REFERENCE   
+        "ANSI T1.116.1D slFailed.
+         ANSI T1.116.1/2000 Table 2 (2.7).
+         ANSI T1.111.4/2000 3.2.2."
+    ::= { mtpOmAll30MinSlDurationEntry 4 }
+
+mtpOmSlRemoteProcOutage OBJECT-TYPE
+    SYNTAX      TimeInterval (0..180000)
+    UNITS       "Seconds/SL"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurementT1.116.2/2.9.
+         See also 3.2.6/T1.111.4.
+         
+         Duraing of signalling link unavailability due to remote 
+         processor outage in units of seconds per siganlling link 
+         collected on a 30 minute interval.  This is a non-obligatory 
+         operational measurement that may be derived (from 2.10 and 2.11 
+         which are alarm indication and clearing events).
+         
+         This operational measurement is used in MTP performance 
+         studies."
+    REFERENCE   
+        "ANSI T1.116.1D slRemoteProcOutage.
+         ANSI T1.111.4/3.2.6."
+    ::= { mtpOmAll30MinSlDurationEntry 5 }
+
+mtpOmAll30MinSlDurationRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may create or 
+         delete conceptual rows in this table.  Creating a conceptual 
+         row in this table requests that the agent begin collecting the 
+         operational measurements corresponding to the indices of the 
+         created conceptual row.  Measurements will only be collected 
+         for conceptual rows in this table that were explicitly created 
+         by a management station.  Conceptual rows in this table are not 
+         created by any internal interface."
+    ::= { mtpOmAll30MinSlDurationEntry 6 }
+
+mtpOmOblSlUtilizationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MtpOmOblSlUtilizationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "T1.116.1/D.3.9.  Obligated Signalling Link Utilisation Data.
+         
+         This managed object class contains all obligated signalling 
+         link utilisation data. The granularityPeriods is 30 minutes. 
+         The attributes are read-only."
+    REFERENCE   
+        "ANSI T1.116.1D oblSignallingLinkUtilisationData
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1884) currentData.
+         ANSI T1.116.1 signLinkTp."
+    ::= { mtpOmTables 16 }
+
+mtpOmOblSlUtilizationEntry OBJECT-TYPE
+    SYNTAX      MtpOmOblSlUtilizationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in this table is indexed by the signalling 
+         link termination point identifier.  Each row contains 
+         the number of octets transmitted and received, the 
+         signal units received and the discarded MSUs."
+    REFERENCE   
+        "ANSI T1.116.1D oblSignallingLinkUtilisationData
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1884) currentData.
+         ANSI T1.116.1 signLinkTp."
+    INDEX       { mtpSlId }
+    ::= { mtpOmOblSlUtilizationTable 1 }
+
+MtpOmOblSlUtilizationEntry ::= SEQUENCE {
+    mtpOmSlSignUnitsReceived        PerfCurrentCount, -- signUnitsReceived
+    mtpOmSlTransmittedOctetsSIFSIO  PerfCurrentCount, -- transmittedOctetsSIFSIO
+    mtpOmSlReceivedOctetsSIFSIO     PerfCurrentCount, -- receivedOctetsSIFSIO
+    mtpOmSlDiscardedMSUs            PerfCurrentCount  -- discardedMSUs
+}
+
+mtpOmSlSignUnitsReceived OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/1.8.
+         See also 4/T1.111.4.
+         
+         Indicates the incoming message error rate."
+    REFERENCE   
+        "ANSI T1.116.1D signUnitsReceived"
+    ::= { mtpOmOblSlUtilizationEntry 1 }
+
+mtpOmSlTransmittedOctetsSIFSIO OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/3.1.
+         See also 2.3.8/T1.111.4.
+         
+         The number of SIF and SIO octets transmitted does not include 
+         SIF and SIO octets that are retransmitted."
+    REFERENCE   
+        "ANSI T1.116.1D transmittedOctetsSIFSIO"
+    ::= { mtpOmOblSlUtilizationEntry 2 }
+
+mtpOmSlReceivedOctetsSIFSIO OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.1/3.4"
+    REFERENCE   
+        "ANSI T1.116.1D receivedOctetsSIFSIO"
+    ::= { mtpOmOblSlUtilizationEntry 3 }
+
+mtpOmSlDiscardedMSUs OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.1/3.10
+         
+         The number of MSUs discarded due to signalling link congestion.  
+         The significance and method of measuring this item depends upon 
+         the method of congestion handling employed in the newtork.  The 
+         three congestion handling methods are:
+         
+         a) single congestion level without priority; or
+         b) national option of multiple levels without message 
+            priorities; or
+         c) the national option of multiple congestion levels with 
+            message priorities.
+         
+         For cases a) and b), messages are discarded by the MTP only 
+         under extreme overload.  Thus the count indicates, if greater 
+         than zero, an extreme congestion.  It indicates the 
+         effectiveness of flow control procedures.  For case c), 
+         messages with priority less thatn the discard level are 
+         discarded in the MTP.  For this case, the MSUs discarded due to 
+         SL congestion (thresholds 1, 2 and 3 separately) are counted 
+         based on the greatest congestion discard threshold in effect on 
+         the link.  For example, if the congestion on a link has 
+         exceeded congestion discard threshold 2, and therefore MSUs 
+         with priority 0 and 1 are being discarded, a MSU discarded with 
+         priority 0 is counted in the threshould 2 count."
+    REFERENCE   
+        "ANSI T1.116.1D discardedMSUs"
+    ::= { mtpOmOblSlUtilizationEntry 4 }
+
+mtpOmAllSlUtilizationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MtpOmAllSlUtilizationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "T1.116.1/D.3.3.  All Signalling Link Utilisation Data.
+         
+         This managed object class contains all signalling link 
+         utilisation data. The preferred granularityPeriods are 5 and 30 
+         minutes. The attributes are read-only."
+    REFERENCE   
+        "ANSI T1.116.1D allSignallingLinkUtilisationData.
+         ANSI T1.116.1D oblSignallingLinkUtilisationData.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1884) currentData.
+         ANSI T1.116.1 signLinkTp."
+    ::= { mtpOmTables 17 }
+
+mtpOmAllSlUtilizationEntry OBJECT-TYPE
+    SYNTAX      MtpOmAllSlUtilizationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in this table is indexed by the signalling 
+         link termination point identifier.  Each row contains 
+         the number of alignments, negative acknowledgements, 
+         retransmitted octets, tranmsitted and received MSUs for 
+         the signalling link."
+    REFERENCE   
+        "ANSI T1.116.1D allSignallingLinkUtilisationData.
+         ANSI T1.116.1D oblSignallingLinkUtilisationData.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1884) currentData.
+         ANSI T1.116.1 signLinkTp."
+    INDEX       { mtpSlId }
+    ::= { mtpOmAllSlUtilizationTable 1 }
+
+MtpOmAllSlUtilizationEntry ::= SEQUENCE {
+    mtpOmSlAlignment                PerfCurrentCount, -- slAlignment
+    mtpOmSlNegAckReceived           PerfCurrentCount, -- negAckReceived
+    mtpOmSlRetransmittedOctets      PerfCurrentCount, -- retransmittedOctets
+    mtpOmSlTransmittedMSUs          PerfCurrentCount, -- transmittedMSUs
+    mtpOmSlReceivedMSUs             PerfCurrentCount, -- receivedMSUs
+    mtpOmAllSlUtilizationRowStatus  RowStatus
+}
+
+mtpOmSlAlignment OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents Measurement T1.116.2/1.7.
+         
+         Indicates a signalling data link fault that prevents the 
+         signalling data link from moving into service."
+    REFERENCE   
+        "ANSI T1.116.1D slAlignment"
+    ::= { mtpOmAllSlUtilizationEntry 1 }
+
+mtpOmSlNegAckReceived OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/1.9
+         
+         Indicates the outgoing message error rate."
+    REFERENCE   
+        "ANSI T1.116.1D negAckReceived"
+    ::= { mtpOmAllSlUtilizationEntry 2 }
+
+mtpOmSlRetransmittedOctets OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/3.2.
+         See also 5/T1.111.4.
+         
+         The opening flag and the check bits are included in the count."
+    REFERENCE   
+        "ANSI T1.116.1D retransmittedOctets"
+    ::= { mtpOmAllSlUtilizationEntry 3 }
+
+mtpOmSlTransmittedMSUs OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/3.3
+         
+         The number of message signal units transmitted does not include 
+         message signal units that are retransmitted."
+    REFERENCE   
+        "ANSI T1.116.1D transmittedMSUs"
+    ::= { mtpOmAllSlUtilizationEntry 4 }
+
+mtpOmSlReceivedMSUs OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.1/3.5,
+         
+         The number of message signal units received consists of all 
+         message signal units that are passed to Level 3 for processing."
+    REFERENCE   
+        "ANSI T1.116.1D receivedMSUs"
+    ::= { mtpOmAllSlUtilizationEntry 5 }
+
+mtpOmAllSlUtilizationRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may create or 
+         delete conceptual rows in this table.  Creating a conceptual 
+         row in this table requests that the agent begin collecting the 
+         operational measurements corresponding to the indices of the 
+         created conceptual row.  Measurements will only be collected 
+         for conceptual rows in this table that were explicitly created 
+         by a management station.  Conceptual rows in this table are not 
+         created by any internal interface."
+    ::= { mtpOmAllSlUtilizationEntry 6 }
+
+mtpOmSlCongestionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MtpOmSlCongestionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "T1.116.1/D.3.14.  Signalling Link Congestion Data.
+         
+         This managed object class contains the optional signalling link 
+         congestion data.  The preferred granularityPeriods are 5 and 30 
+         minutes. The attributes slCongestedStarts, slCongestionStops 
+         and congestionEventsMSULoss can be referenced from an instance 
+         of ss7FirstAndIntervalThresholdData when they are used for a 
+         first and interval measurement. The attributes are 
+         read-only."
+    REFERENCE   
+        "ANSI T1.116.1D signallingLinkCongestionData.
+         ANSI T1.116.1D ss7FirstandIntervalCurrentData.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1994) currentData.
+         ANSI T1.116.1 signLinkTp."
+    ::= { mtpOmTables 18 }
+
+mtpOmSlCongestionEntry OBJECT-TYPE
+    SYNTAX      MtpOmSlCongestionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each conceptual row in this table represents the collected 
+         optional operational measurements for the signalling link that 
+         corresponds to the signLinkTpId index of the conceptual row.  
+         Rows only exist in this table when created explicitly by 
+         management stations.  Rows are not created in this table by 
+         internal interfaces."
+    REFERENCE   
+        "ANSI T1.116.1D signallingLinkCongestionData.
+         ANSI T1.116.1D ss7FirstandIntervalCurrentData.
+         ANSI T1.116.1D ss7CurrentData.
+         ITU-T Rec. Q.822 (1994) currentData.
+         ANSI T1.116.1 signLinkTp."
+    INDEX       { mtpSlId, mtpOmCongestionLevel }
+    ::= { mtpOmSlCongestionTable 1 }
+
+MtpOmSlCongestionEntry ::= SEQUENCE {
+    mtpOmSlCongestionFirst          TruthValue,
+    mtpOmSlCongestionInterval       TimeInterval,
+    mtpOmSlCongestionStarts         PerfCurrentCount, -- slCongestedStarts
+    mtpOmSlCongestionStops          PerfCurrentCount, -- slCongestionStops
+    mtpOmSlCongestionEventsMSULoss  PerfCurrentCount, -- congestionEventsMSULoss
+    mtpOmSlCongestionRowStatus      RowStatus
+}
+
+mtpOmSlCongestionFirst OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies whether the first occurence of an event within the 
+         interval represented by the counts in the columnar objects in 
+         this table are to be reported as a SNMP trap or notification.  
+         When true(1), it indicates that the first event within the 
+         interval is to be reported; when false(2), no report will be 
+         generated."
+    DEFVAL      { false }
+    ::= { mtpOmSlCongestionEntry 1 }
+
+mtpOmSlCongestionInterval OBJECT-TYPE
+    SYNTAX      TimeInterval (30000 | 180000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the time interval over which measurement in this 
+         conceptual row are collected.  Intervals of 5 and 30 minutes 
+         must be supported.  Other intervals are optional."
+    DEFVAL      { 180000 }
+    ::= { mtpOmSlCongestionEntry 2 }
+
+mtpOmSlCongestionStarts OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/3.6.
+         See also 3.8/T1.111.4.
+         
+         Signalling link congestion indications per signalling link 
+         collected on a first and interval basis, or over a 5 or 30 
+         minute interval.  This measurement is non-obligatory and may be 
+         used for fault detection, near real-time monitoring, 
+         performance analysis and network administration and planning.
+         
+         The signalling link congestion refers to link status 
+         'congested' at Level 3.  A link is marked at Level 3 as 
+         congested when a congestion threshold is reached at the 
+         transmit side.  Measurements should be kept for thresholds 1, 2 
+         and 3 separately if that national option is selected.
+         
+         The reporting of this item on occurence should be considered 
+         carefully, since there might be many events in a short 
+         interval.  This might occur for example if the congestion onset 
+         and abatement thresholds were close together, or if the 
+         transmission/retransmission buffer size were significantly 
+         greater than the reception buffer at the other end of the link, 
+         and congestion occurred."
+    REFERENCE   
+        "ANSI T1.116.1D slCongestedStarts.
+         ANSI T1.116.2/2000 Table 3 (3.6).
+         ANSI T1.114.1/2000 3.8.
+         ITU-T Q.752 (1997) Table 3 (3.6).
+         ITU-T Q.752 (1997) 2.4.6.
+         ITU-T Q.704 (1993) 3.6 and 11."
+    ::= { mtpOmSlCongestionEntry 3 }
+
+mtpOmSlCongestionStops OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/3.9.
+         See also 3.8/T1.111.4.
+         
+         Stop of signalling link congestion events per signalling link 
+         collected on a first and interval basis.  This measurement is 
+         non-obligatory and may be used for fault detection and 
+         performance analysis.
+         
+         Stop of signalling link congestion occurs for a link at Level 3 
+         when the buffer occupancy has dropped below the congestion 
+         abatement threshold.  If a number of thresholds is used, the 
+         event is marked separately for each threshold.
+         
+         The reporting of this item on occurence should be considered 
+         carefully, since there might be many events in a short 
+         interval.  This might occur for example if the congestion onset 
+         and abatement thresholds were close together, or if the 
+         transmission/retransmission buffer size were significantly 
+         greater than the reception buffer at the other end of the link, 
+         and congestion occurred."
+    REFERENCE   
+        "ANSI T1.116.1D slCongestionStops"
+    ::= { mtpOmSlCongestionEntry 4 }
+
+mtpOmSlCongestionEventsMSULoss OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents measurement T1.116.2/3.11
+         
+         The number of congestion events resulting in loss of MSUs per 
+         signalling link collected on a first and interval basis, or 
+         over a 5 or 30 minute interval.  This measurement is 
+         non-obligatory and may be used for fault detection, near 
+         real-time monitoring, performance analysis and network 
+         administration and planning.
+         
+         This measurement is per congestion level.  For the national 
+         option of multiple congestion levels with message priorities, a 
+         congestion event that may result in the loss of MSUs for 
+         threshold 'n' begins when congestion discard threshold 'n' is 
+         exceeded.  A new congestion event that may result in the loss 
+         of MSUs for threshold 'n' cannot begin until the congestion 
+         level falls below congestion abatement threshold 'n'.  Only one 
+         congestion event which may result in the loss of MSUs can be in 
+         effect at one time, this being the greatest numbered threshold.  
+         Therefore, the congestion even that may result in the loss of 
+         MSUs for threshold 'n' is suspended (not stopped) when 
+         congestion discard threshod 'n+1' is exceeded, and resumed (not 
+         a new one started) when the congestion level falls below 
+         congestion abatement threshold 'n+1'."
+    REFERENCE   
+        "ANSI T1.116.1D congestionEventsMSULoss.
+         ANSI T1.116.2/2000 Table 3 (3.11).
+         ITU-T Q.752 (1997) Table 3 (3.11).
+         ITU-T Q.752 (1997) 2.4.10."
+    ::= { mtpOmSlCongestionEntry 5 }
+
+mtpOmSlCongestionRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may create or 
+         delete conceptual rows in this table.  Creating a conceptual 
+         row in this table requests that the agent begin collecting the 
+         operational measurements corresponding to the indices of the 
+         created conceptual row.  Measurements will only be collected 
+         for conceptual rows in this table that were explicitly created 
+         by a management station.  Conceptual rows in this table are not 
+         created by any internal interface."
+    ::= { mtpOmSlCongestionEntry 6 }
+
+mtpOmScalars OBJECT IDENTIFIER
+    ::= { mtpOmObjects 2 }
+
+mtpOmNotifs OBJECT IDENTIFIER
+    ::= { mtpOmObjects 3 }
+
+mtpOmOids OBJECT IDENTIFIER
+    ::= { mtpOmObjects 4 }
+
+mtpOmConformance OBJECT IDENTIFIER
+    ::= { mtpOmMIB 2 }
+
+mtpOmCompliance OBJECT IDENTIFIER
+    ::= { mtpOmConformance 1 }
+
+mtpOmGroups OBJECT IDENTIFIER
+    ::= { mtpOmConformance 2 }
+
+mtpOmCapabilities OBJECT IDENTIFIER
+    ::= { mtpOmConformance 3 }
+
+mtpOmObjectGroup OBJECT-GROUP
+    OBJECTS     { mtpOmHandledMSUsOpcDpcSio, 
+                  mtpOmHandledMSUsOpcDpcSioRowStatus, 
+                  mtpOmHandledOctetsOpcDpcSioInterval, 
+                  mtpOmHandledOctetsOpcDpcSio, 
+                  mtpOmHandledOctetsOpcDpcSioRowStatus, 
+                  mtpOmHandledOctetsSIO, 
+                  mtpOmAdjacentInaccessibleDuration, 
+                  mtpOmAdjacentInaccessibleEvents, 
+                  mtpOmAllSpUtilizationRowStatus, 
+                  mtpOmReceivedOctetsOPCInterval, mtpOmReceivedOctetsOPC, 
+                  mtpOmReceivedOctetsOPCRowStatus, 
+                  mtpOmReceivedOctetsOpcSioInterval, 
+                  mtpOmReceivedOctetsOpcSio, 
+                  mtpOmReceivedOctetsOpcSioRowStatus, 
+                  mtpOmSpDiscardedMSUs, mtpOmSpTransmittedUPUnavailable, 
+                  mtpOmSpReceivedUPUnavailable, mtpOmSpReceivedTFC, 
+                  mtpOmSpReceivedTFCLevel0, mtpOmSpReceivedTFCLevel1, 
+                  mtpOmSpReceivedTFCLevel2, mtpOmSpReceivedTFCLevel3, 
+                  mtpOmTransmittedOctetsDPC, 
+                  mtpOmTransmittedOctetsDPCRowStatus, 
+                  mtpOmTransmittedOctetsDpcSio, 
+                  mtpOmTransmittedOctetsDpcSioRowStatus, 
+                  mtpOmRouteSetUnavailable, 
+                  mtpOmRouteSetUnavailableDuration, mtpOmSlsUnavailable, 
+                  mtpOmAll5And30MinSlDurationInterval, 
+                  mtpOmLocalMgntInhibit, mtpOmLocalMgntUninhibit, 
+                  mtpOmLocalBusy, mtpOmAll5And30MinSlDurationRowStatus, 
+                  mtpOmSlUnavailabilityDuration, 
+                  mtpOmSlInServiceDuration, 
+                  mtpOmAll30MinSlDurationInterval, 
+                  mtpOmSlLocalInhibition, mtpOmSlRemoteInhibition, 
+                  mtpOmSlFailed, mtpOmSlRemoteProcOutage, 
+                  mtpOmAll30MinSlDurationRowStatus, 
+                  mtpOmSlSignUnitsReceived, 
+                  mtpOmSlTransmittedOctetsSIFSIO, 
+                  mtpOmSlReceivedOctetsSIFSIO, mtpOmSlDiscardedMSUs, 
+                  mtpOmSlAlignment, mtpOmSlNegAckReceived, 
+                  mtpOmSlRetransmittedOctets, mtpOmSlTransmittedMSUs, 
+                  mtpOmSlReceivedMSUs, mtpOmAllSlUtilizationRowStatus, 
+                  mtpOmSlCongestionFirst, mtpOmSlCongestionInterval, 
+                  mtpOmSlCongestionStarts, mtpOmSlCongestionStops, 
+                  mtpOmSlCongestionEventsMSULoss, 
+                  mtpOmSlCongestionRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "Provides a general complicance group for this MIB."
+    ::= { mtpOmGroups 1 }
+
+mtpOmGeneralCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "Provides a general compliance for this MIB."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { mtpOmObjectGroup }
+
+    ::= { mtpOmCompliance 1 }
+
+END -- end of module OPENSS7-MTP-OM-MIB.

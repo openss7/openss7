@@ -1,0 +1,58 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 5.9i
+.lt 5.9i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 5.9i
+.nr LT 5.9i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+box center tab(:);
+lb|cb|cb|cb|cb|cb|lb|lb
+l|l|c|n|n|c|n|n.
+Part Number:Rate:FM:nm:km:Digikey PN:Price:Avnet
+=
+EOLS-1326-02:OC-48/12/3:S:1310:2:::
+EOLS-1326-X:OC-48/12/3:S:1310:40:::
+EOLS-1526-X:OC-48/12/3:S:1550:80:::
+_
+EOLS-1324-02:OC-48:S:1310:2:::
+EOLS-1324-X:OC-48:S:1310:40:::
+EOLS-1524-X:OC-48:S:1550:100:::
+EOLS-1306-X:OC-12:S:1310:40:::
+EOLS-1506-X:OC-12:S:1550:80:::
+EOLS-1303-X:OC-3:S:1310:60:::
+EOLS-15-3-X:OC-3:S:1550:120:::
+.\"_
+.\"EOLS-BI1324-02:OC-48:S:1310:2:::
+.\"EOLS-BI1524-02:OC-48:S:1550:2:::
+.\"EOLS-BI1324-X:OC-48:S:1310:40:::
+.\"EOLS-BI1524-X:OC-48:S:1550:40:::
+.\"EOLS-BI1624-X-OL:OC-48:S:1550:100:::
+.\"EOLS-BI1624-X-LO:OC-48:S:1490:100:::
+.\"EOLS-BI1648-X-OL:OC-48:S:1550:80:::
+.\"EOLS-BI1648-X-LO:OC-48:S:1490:80:::
+.\"EOLS-BI1303-20:OC-3:S:1310:20:::
+.\"EOLS-BI1503-20:OC-3:S:1550:20:::
+.\"EOLS-BI1303-X:OC-3:S:1310:80:::
+.\"EOLS-BI1503-X:OC-3:S:1550:80:::
+.TE

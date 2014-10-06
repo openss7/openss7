@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# These are the build root policies that Red Hat invokes at the end
+# of the %install scriptlet.
+
+# Compress man pages (Red Hat uses GNU gzip)
+/usr/lib/rpm/redhat/brp-compress
+
+# Strip ELF binaries (Red Hat uses GNU binutils).
+/usr/lib/rpm/redhat/brp-strip
+
+# Strip even more sections (Red Hat uses GNU binutils).
+/usr/lib/rpm/redhat/brp-strip-comment-note
+
+/usr/lib/rpm/brp-python-bytecompile

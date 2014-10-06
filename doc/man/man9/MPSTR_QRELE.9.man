@@ -1,0 +1,380 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: MPSTR_QRELE.9.man,v 1.1.2.2 2011-02-07 02:18:34 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:34 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: MPSTR_QRELE.9.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:34  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH MPSTR_QRELE 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B MPSTR_QRELE
+\- release a queue from exclusive access
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _SVR4_SOURCE
+.br
+.B #include <sys/stream.h>
+.HP
+.BI "void MPSTR_QRELE(queue_t *" q ", pl_t" priority );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'priority\(em'u
+.I q
+A pointer to the
+.BR queue (9)
+structure to release from exclusive access.
+.TP
+.I priority
+The interrupt priority level to restore.
+A value of minus one (-1) indicates that the interrupt priority level is not to be restored.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR MPSTR_QRELE ()
+releases an exclusive (write) lock on the
+.BR queue (9)
+structure specified by the
+.I q
+argument and restores the interrupt priority level
+specified by the
+.I priority
+argument.
+If the
+.I priority
+argument is minus one (-1),
+no interrupt priority level will be restored.
+The lock must have previously been acquired using
+.BR MPSTR_QLOCK (9),
+and the
+.I priority
+argument is normally the interrupt priority level return in the call to
+.BR MPSTR_QLOCK (9).
+.\"
+.\"
+.SH USAGE
+.PP
+.BR MPSTR_QRELE ()
+is used to release exclusive access to a
+.BR queue (9)
+structure that was acquired for the purpose of manipulating members of the
+structure and related
+.BR qband (9)
+structures
+or
+.BR msgb (9)
+messages stored on the queue.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR MPSTR_QRELE ()
+returns
+.BR void .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR MPSTR_QRELE ()
+is always successful.  Calling
+.BR MPSTR_QRELE ()
+with invalid or uninitialized arguments, or for a
+.I q
+that has not been previously acquired using
+.BR MPSTR_QLOCK (9)
+will yeild indeterminate results.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR MPSTR_QRELE ()
+can be called from any context, except interrupt service routines.  If other
+processors are spinning on awaiting acquiring the lock, one processor will
+succeed.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR MPSTR_QRELE ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR MPSTR_QRELE ()
+is a
+.IR "SVR 4.2" -specific
+function:
+.B _SVR4_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B @PACKAGE_TITLE@
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_SVR4
+or
+.B CONFIG_STREAMS_COMPAT_SVR4_MODULE
+defined.
+.PP
+See
+.BR MPSTR_QLOCK (9)
+for additional notices.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR MPSTR_QRELE ()
+unnests the
+.I q_rwlock
+member of the
+.BR queue (9)
+structure specified by
+.IR q ,
+based on the owning
+.B task_struct
+task structure as specified by the
+.IR q_owner " and " q_nest
+members.
+In addtion,
+.BR MPSTR_QRELE ()
+restores the interrupt mask specified by the
+.I priority
+argument.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+See
+.BR MPSTR_QLOCK (9)
+for an example use of
+.BR MPSTR_QRELE ().
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR MPSTR_QLOCK (9),
+.BR MPSTR_STPLOCK (9),
+.BR MPSTR_STPRELE (9),
+.BR freezestr (9),
+.BR unfreezestr (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR MPSTR_QRELE ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR MPSTR_QRELE ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI"
+.[
+usldk
+.]
+and systems based on
+.IR "SVR 4.2 MP" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B Linux
+does not have interrupt priority levels in the same sense as
+.IR "SVR 4.2" .
+The
+.I priority
+argument of
+.BR MPSTR_QRELE ()
+corresponds to interrupt flags returned by
+.BR MPSTR_QLOCK (9)
+rather than
+.BR spl .
+See
+.BR splx (9)
+for more information.
+.IP \(em
+.BR MPSTR_QRELE ()
+is implemented as an
+.B extern inline
+function.
+.I "SVR 4.2 MP"
+and systems based on
+.I "SVR 4.2"
+implement
+.BR MPSTR_QRELE ()
+as a C preprocessor macro.
+.IP \(em
+.BR MPSTR_QRELE ()
+is implemented as a recursive (nesting) release, meaning that it can be called
+on a queue multiply locked by
+.BR MPSTR_QLOCK (9).
+Some systems based on
+.I SVR 4.2 MP
+implement
+.BR MPSTR_QRELE ()
+as a non-recursive release.
+.IP \(em
+.BR MPSTR_QRELE ()
+is provided for source level compatibility with
+.IR "SVR 4.2"
+for the purpose of porting
+.IR "SVR 4.2"
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE@-@VERSION@
+.]
+differ from that of
+.IR "SVR 4.2"
+binaries are incompatible.
+.IP \(em
+.BR MPSTR_QRELE ()
+only provides functionality comparable to
+.IR "SVR 4.2"
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR MPSTR_QRELE ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.[
+uslspg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR MPSTR_QRELE ()
+first appeared in
+.IR "SVR 4.0 MP" .
+.[
+svr4dk
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

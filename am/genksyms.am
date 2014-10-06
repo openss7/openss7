@@ -1,0 +1,529 @@
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
+## =============================================================================
+## 
+# @(#) $RCSfile: genksyms.am,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-03-26 04:28:45 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU Affero General Public License as published by the Free
+## Software Foundation; version 3 of the License.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+## details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+## write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+## 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2011-03-26 04:28:45 $ by $Author: brian $
+##
+## =============================================================================
+
+##
+## This automake file fragment includes rules for generating symbol versions.  This is only necessary
+## (and permissible) if the kernel supports versioned symbols.
+##
+
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
+if PKG_BUILD_KERNEL
+## PKG_BUILD_KERNEL
+
+if AMDEP
+## AMDEP
+-include $(DEPDIR)/modversions.Ph
+## AMDEP
+endif
+
+if WITH_KO_MODULES
+###################################################################################################
+## WITH_KO_MODULES
+
+if AMDEP
+## AMDEP
+$(DEPDIR)/modversions.Ph:
+	$(AM_V_at)test -d $(DEPDIR) || $(MKDIR_P) $(DEPDIR)
+	@$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "Creating $@ dependencies..." ; \
+	( \
+		list="$(EXPORT_SRCFILES)" ; for s in $$list ; do \
+			if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi ; \
+			r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
+			echo "sinclude ./$(DEPDIR)/$$r.Pver" ; echo "" ; \
+			echo "$$r.ver: $$d$$s" ; echo "" ; \
+		done ; \
+		objs= ; \
+		list="$(KERNEL_OBJECTS)" ; for obj in $$list ; do \
+			a=`echo "$$obj" | sed 's,^lib.*_a-,$(kpre),'` ; \
+			v=`echo "$$obj" | sed 's,^lib.*_a-,,;s,\.o$$,,'` ; \
+			case " $(EXPORT_VERFILES) " in \
+				(*" $(PKGINCL)/versions/$$v.ver "*) \
+					echo "$$a: $$obj $$v.ver" ; echo "" ; \
+					objs="$${objs}$${objs:+ }$$obj" ; \
+				;; \
+			esac ; \
+		done ; \
+		echo "stamp-verobjs: $$objs" ; echo "" ; \
+	) >$(DEPDIR)/modversions.Tph || { rm -f $(DEPDIR)/modversions.Tph ; exit 1 ; } ; \
+	$(am__mv) $(DEPDIR)/modversions.Tph $@
+
+DISTCLEANFILES += $(DEPDIR)/modversions.Tph $(DEPDIR)/modversions.Ph
+
+distclean-modversions_Ph:
+	@( \
+		echo "$(DEPDIR)/modversions.Tph" ; \
+		echo "$(DEPDIR)/modversions.Ph" ; \
+		sources="$(EXPORT_SRCFILES)" ; for s in $$sources ; do \
+			echo "$(DEPDIR)/$$r.Tpver" ; \
+			echo "$(DEPDIR)/$$r.Pver" ; \
+		done \
+	) | $(am__base_remove)
+
+DISTCLEAN_LOCAL += distclean-modversions_Ph
+## AMDEP
+endif
+
+MY_SUFFIXES		+= .c .ver
+
+.c.ver:
+if am__fastdepCC
+## am__fastdepCC
+	if ( $(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $@ -MMD -MP -MF "$(DEPDIR)/$*.TPver" `test -f '$<' || echo '$(srcdir)/'`$< | $(KGENKSYMS) > $@ ) \
+	then $(am__mv) "$(DEPDIR)/$*.TPver" "$(DEPDIR)/$*.Pver"; else rm -f -- "$(DEPDIR)/$*.TPver"; exit 1; fi
+## am__fastdepCC
+else
+## !am__fastdepCC
+if AMDEP
+## AMDEP
+	source='$<' object='$@' libtool=no DEPDIR='$(DEPDIR)' depfile='$(DEPDIR)/$*.Pver' tmpdepfile='$(DEPDIR)/$*.TPver' $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+## AMDEP
+endif
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ `test -f '$<' || echo '$(srcdir)/'`$< | $(KGENKSYMS) > $@
+## !am__fastdepCC
+endif
+
+if KERNEL_VERSIONS
+## KERNEL_VERSIONS
+
+if am__fastdepCC
+## am__fastdepCC
+stamp-verfiles: $(EXPORT_SRCFILES)
+	@list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
+		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
+		r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
+		$(ECHO_Q) "  CPP   " $$r.ver ; \
+		$(ECHO_V) "$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$r.ver -MMD -MP -MF \"$(DEPDIR)/$$r.Pver\" $$d$$s | $(KGENKSYMS) > $$r.ver" ; \
+		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$r.ver -MMD -MP -MF "$(DEPDIR)/$$r.Pver" $$d$$s | $(KGENKSYMS) > $$r.ver ; \
+	done ; \
+	date -uIseconds > $@
+## am__fastdepCC
+else
+## !am__fastdepCC
+if AMDEP
+## AMDEP
+stamp-verfiles: $(EXPORT_SRCFILES)
+	@list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
+		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
+		r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
+		$(ECHO_Q) "  CPP   " $$r.ver ; \
+		$(ECHO_V) "source=\"$$s\" object=\"$$r.ver\" libtool=no DEPDIR='$(DEPDIR)' depfile=\"$(DEPDIR)/$$r.Pver\" tmpdepfile=\"$(DEPDIR)/$$r.TPver\" $(CCDEPMODE) $(depcomp)  \
+		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(KGENKSYMS) > $$r.ver" ; \
+		source="$$s" object="$$r.ver" libtool=no DEPDIR='$(DEPDIR)' depfile="$(DEPDIR)/$$r.Pver" tmpdepfile="$(DEPDIR)/$$r.TPver" $(CCDEPMODE) $(depcomp)  \
+		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(KGENKSYMS) > $$r.ver ; \
+	done ; \
+	date -uIseconds > $@
+## AMDEP
+else
+## !AMDEP
+stamp-verfiles: $(EXPORT_SRCFILES)
+	@list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
+		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
+		r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
+		$(ECHO_Q) "  CPP   " $$r.ver ; \
+		$(ECHO_V) "$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(KGENKSYMS) > $$r.ver" ; \
+		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(KGENKSYMS) > $$r.ver ; \
+	done ; \
+	date -uIseconds > $@
+## !AMDEP
+endif
+## !am__fastdepCC
+endif
+
+## KERNEL_VERSIONS
+else
+## ! KERNEL_VERSIONS
+
+stamp-verfiles: $(EXPORT_SRCFILES)
+	@list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
+		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
+		r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
+		$(ECHO_Q) "  CPP   " $$r.ver ; \
+		$(ECHO_V) "echo '/* dummy load script */' > \"$$r.ver\"" ; \
+		echo '/* dummy load script */' > "$$r.ver" ; \
+	done ; \
+	date -uIseconds > $@
+
+## ! KERNEL_VERSIONS
+endif
+
+clean-verfiles:
+	@vers=`echo " $(EXPORT_SRCFILES) " | sed 's, *  , ,g;s, [^[:space:]]*/, ,g;s,\.c ,.ver ,g'` ; \
+	list="stamp-verfiles $$vers" ; $(am__list_remove)
+
+CLEAN_LOCAL		+= clean-verfiles
+
+stamp-verobjs: stamp-verfiles $(KERNEL_OBJECTS) $(PKG_LDS) $(PKG_ABI)
+	@test -z '$(PKG_LDS)' || pkg_lds='-T $(PKG_LDS)' ; \
+	 test -z '$(PKG_ABI)' || pkg_abi='--version-script $(PKG_ABI)' ; \
+	list="$?" ; for obj in $$list ; do \
+		test :$$obj != :$(PKG_LDS) || continue ; \
+		test :$$obj != :$(PKG_ABI) || continue ; \
+		test :$$obj != :stamp-verfiles || continue ; \
+		if $(OBJDUMP) -h $$obj | grep -q __ksymtab; then \
+			a=`echo "$$obj" | sed 's,^lib.*_a-,$(kpre),'` ; \
+			v=`echo "$$obj" | sed 's,^lib.*_a-,,;s,\.o$$,,'` ; \
+			$(ECHO_Q) "  LD    " $$a ; \
+			$(ECHO_V) "$(LD) -r $$pkg_lds $$pkg_abi -o a.$$$$.out $$obj $$v.ver && $(am__mv) -- a.$$$$.out $$a" ; \
+			$(LD) -r $$pkg_lds $$pkg_abi -o a.$$$$.out $$obj $$v.ver && $(am__mv) -- a.$$$$.out $$a ; \
+		else \
+			a=`echo "$$obj" | sed 's,^lib.*_a-,$(kpre),'` ; \
+			$(ECHO_Q) "  LD    " $$a ; \
+			$(ECHO_V) "$(LD) -r $$pkg_lds $$pkg_abi -o a.$$$$.out $$obj && $(am__mv) -- a.$$$$.out $$a" ; \
+			$(LD) -r $$pkg_lds $$pkg_abi -o a.$$$$.out $$obj && $(am__mv) -- a.$$$$.out $$a ; \
+		fi ; \
+	done ; \
+	date -uIseconds > $@
+
+ALL_LOCAL		+= stamp-verobjs
+
+clean-verobjs:
+	@objs=`echo " $(KERNEL_OBJECTS) " | sed 's, *  , ,g;s, lib[^[:space:]]*_a-, $(kpre),g'` ; \
+	list="stamp-verobjs $$objs" ; $(am__list_remove)
+
+CLEAN_LOCAL		+= clean-verobjs
+
+## WITH_KO_MODULES
+###################################################################################################
+else
+###################################################################################################
+## !WITH_KO_MODULES
+
+if AMDEP
+## AMDEP
+$(DEPDIR)/modversions.Ph: $(EXPORT_SRCFILES)
+	$(AM_V_at)test -d $(DEPDIR) || $(MKDIR_P) $(DEPDIR)
+	@$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "Creating $@ dependencies..." ; \
+	v=`echo "$(MODVERSIONS_H)" | sed s',/[^/]*$$,,'`/versions ; \
+	$(MKDIR_P) $$v ; \
+	( \
+		vers='' ; \
+		list='$(EXPORT_SRCFILES)'; \
+		for s in $$list ; do \
+			if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
+			r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
+			p=`echo "$$v" | sed 's,^[^/]*/,,'` ; \
+			echo "sinclude ./$(DEPDIR)/$$r.Pver" ; echo "" ; \
+			echo "$$v/$$r.ver: $$d$$s" ; echo "" ; \
+			vers="$${vers}$${vers:+ }$$v/$$r.ver" ; \
+		done ; \
+		echo "" ; echo "$(MODVERSIONS_H): $$vers" ; \
+		objs= ; \
+		list="$(KERNEL_OBJECTS)" ; for obj in $$list ; do \
+			a=`echo "$$obj" | sed 's,^lib.*_a-,$(kpre),'` ; \
+			echo "$$a: $$obj" ; echo "" ; \
+			objs="$${objs}$${objs:+ }$$obj" ; \
+		done ; \
+		echo "stamp-verobjs: $$objs" ; echo "" ; \
+	) >$(DEPDIR)/modversions.Tph || { rm -f $(DEPDIR)/modversions.Tph ; exit 1 ; } ; \
+	$(am__mv) $(DEPDIR)/modversions.Tph $@
+
+DISTCLEANFILES += $(DEPDIR)/modversions.Tph $(DEPDIR)/modversions.Ph
+
+distclean-modversions_Ph:
+	@( \
+		echo "$(DEPDIR)/modversions.Tph" ; \
+		echo "$(DEPDIR)/modversions.Ph" ; \
+		sources='$(EXPORT_SRCFILES)'; for s in $$sources ; do \
+			r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
+			echo "$(DEPDIR)/$$r.Tpver" ; \
+			echo "$(DEPDIR)/$$r.Pver" ; \
+		done \
+	) | $(am__base_remove)
+
+DISTCLEAN_LOCAL += distclean-modversions_Ph
+## !AMDEP
+endif
+
+MY_SUFFIXES		+= .c .ver
+
+.c.ver:
+if am__fastdepCC
+## am__fastdepCC
+	if ( $(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $@ -MMD -MP -MF "$(DEPDIR)/$*.TPver" `test -f '$<' || echo '$(srcdir)/'`$< | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $@ ) \
+	then $(am__mv) "$(DEPDIR)/$*.TPver" "$(DEPDIR)/$*.Pver"; else rm -f -- "$(DEPDIR)/$*.TPver"; exit 1; fi
+## am__fastdepCC
+else
+## !am__fastdepCC
+if AMDEP
+## AMDEP
+	source='$<' object='$@' libtool=no DEPDIR='$(DEPDIR)' depfile='$(DEPDIR)/$*.Pver' tmpdepfile='$(DEPDIR)/$*.TPver' $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+## AMDEP
+endif
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ `test -f '$<' || echo '$(srcdir)/'`$< | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $@
+## !am__fastdepCC
+endif
+
+if KERNEL_VERSIONS
+## KERNEL_VERSIONS
+
+$(MODVERSIONS_H): $(EXPORT_SRCFILES) $(EXPORT_VERFILES)
+	@$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "Creating $@ header file..." ; \
+	v=`echo "$(MODVERSIONS_H)" | sed 's,/[^/]*$$,,'`/versions ; \
+	$(MKDIR_P) $$v ; \
+	( \
+		echo "#ifndef _SYS_$(PACKAGE_UCNAME)_MODVERSIONS_H" ; \
+		echo "#define _SYS_$(PACKAGE_UCNAME)_MODVERSIONS_H" ; \
+		vers='' ; \
+		list='$(EXPORT_SRCFILES)'; \
+		for s in $$list ; do \
+			if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
+			r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
+			p=`echo "$$v" | sed 's,^.*/include/,,'` ; \
+			echo "#include \"$$p/$$r.ver\"" ; \
+			vers="$${vers}$${vers:+ }$$v/$$r.ver" ; \
+		done ; \
+		echo "#endif /* _SYS_$(PACKAGE_UCNAME)_MODVERSIONS_H */" ; \
+	) >$(MODVERSIONS_H).tmp || { rm -f $(MODVERSIONS_H).tmp ; exit 1 ; } ; \
+	$(am__mv) $(MODVERSIONS_H).tmp $@
+
+if am__fastdepCC
+## am__fastdepCC
+$(EXPORT_VERFILES): $(EXPORT_SRCFILES) $(STRCONF_CONFIG)
+	@v=`echo "$(MODVERSIONS_H)" | sed 's,/[^/]*$$,,'`/versions ; \
+	$(MKDIR_P) $$v ; \
+	list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
+		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
+		r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
+		$(ECHO_Q) "  CPP   " $$r.ver ; \
+		$(ECHO_V) "$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$v/$$r.ver -MMD -MP -MF \"$(DEPDIR)/$$r.Pver\" $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver" ; \
+		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$v/$$r.ver -MMD -MP -MF "$(DEPDIR)/$$r.Pver" $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver ; \
+	done
+## am__fastdepCC
+else
+## !am__fastdepCC
+if AMDEP
+## AMDEP
+$(EXPORT_VERFILES): $(EXPORT_SRCFILES) $(STRCONF_CONFIG)
+	@v=`echo "$(MODVERSIONS_H)" | sed s',/[^/]*$$,,'`/versions ; \
+	$(MKDIR_P) $$v ; \
+	list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
+		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
+		r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
+		$(ECHO_Q) "  CPP   " $$r.ver ; \
+		$(ECHO_V) "source=\"$$s\" object=\"$$v/$$r.ver\" libtool=no DEPDIR='$(DEPDIR)' depfile=\"$(DEPDIR)/$$r.Pver\" tmpdepfile=\"$(DEPDIR)/$$r.TPver\" $(CCDEPMODE) $(depcomp)  \
+		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver" ; \
+		source="$$s" object="$$v/$$r.ver" libtool=no DEPDIR='$(DEPDIR)' depfile="$(DEPDIR)/$$r.Pver" tmpdepfile="$(DEPDIR)/$$r.TPver" $(CCDEPMODE) $(depcomp)  \
+		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver ; \
+	done
+## AMDEP
+else
+## !AMDEP
+$(EXPORT_VERFILES): $(EXPORT_SRCFILES) $(STRCONF_CONFIG)
+	@v=`echo "$(MODVERSIONS_H)" | sed s',/[^/]*$$,,'`/versions ; \
+	$(MKDIR_P) $$v ; \
+	list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
+		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
+		r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
+		$(ECHO_Q) "  CPP   " $$r.ver ; \
+		$(ECHO_V) "$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver" ; \
+		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver ; \
+	done
+## !AMDEP
+endif
+## !am__fastdepCC
+endif
+
+BUILD_SPECIFIC_FILES = $(AUTOCONFIG_H) $(MODVERSIONS_H) $(EXPORT_VERFILES)
+
+## KERNEL_VERSIONS
+else
+## !KERNEL_VERSIONS
+
+$(MODVERSIONS_H):
+	$(AM_V_GEN)$(MKDIR_P) $(PKGINCL) ; \
+	echo "#ifndef _SYS_$(PACKAGE_UCNAME)_MODVERSIONS_H"	>  $(MODVERSIONS_H) ; \
+	echo "#define _SYS_$(PACKAGE_UCNAME)_MODVERSIONS_H"	>> $(MODVERSIONS_H) ; \
+	echo "#endif /* _SYS_$(PACKAGE_UCNAME)_MODVERSIONS_H */"	>> $(MODVERSIONS_H)
+
+BUILD_SPECIFIC_FILES = $(AUTOCONFIG_H) $(MODVERSIONS_H)
+
+## !KERNEL_VERSIONS
+endif
+
+stamp-verobjs: $(KERNEL_OBJECTS) $(PKG_LDS) $(PKG_ABI)
+	@test -z '$(PKG_LDS)' || pkg_lds='-T $(PKG_LDS)' ; \
+	 test -z '$(PKG_ABI)' || pkg_abi='--version-script $(PKG_ABI)' ; \
+	list="$?" ; for obj in $$list ; do \
+		test :$$obj != :$(PKG_LDS) || continue ; \
+		test :$$obj != :$(PKG_ABI) || continue ; \
+		a=`echo "$$obj" | sed 's,^lib.*_a-,$(kpre),'` ; \
+		$(ECHO_Q) "  LD    " $$a ; \
+		$(ECHO_V) "$(LD) -r $$pkg_lds $$pkg_abi -o a.$$$$.out $$obj && $(am__mv) -- a.$$$$.out $$a" ; \
+		$(LD) -r $$pkg_lds $$pkg_abi -o a.$$$$.out $$obj && $(am__mv) -- a.$$$$.out $$a ; \
+	done ; \
+	date -uIseconds > $@
+
+ALL_LOCAL		+= stamp-verobjs
+
+clean-verobjs:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@objs=`echo " $(KERNEL_OBJECTS) " | sed 's, *  , ,g;s, lib[^[:space:]]*_a-, $(kpre),g'` ; \
+	list="stamp-verobjs $$objs" ; $(am__list_remove)
+
+CLEAN_LOCAL		+= clean-verobjs
+
+clean-ksyms:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+
+##
+# Remove the stamp file autoconf doesn't know about.
+##
+distclean-ksyms:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@if test -n "$(AUTOCONFIG_H)" ; then \
+		p=`echo "$(AUTOCONFIG_H)" | sed 's,[^/]*$$,,'` ; \
+		if test -d "$$p" ; then \
+			rm -f -- $(AUTOCONFIG_H) $${p}stamp-h2 ; \
+		fi \
+	fi
+	@list="$(BUILD_SPECIFIC_FILES)" ; $(am__list_remove)
+
+maintainer-clean-ksyms:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+
+install-ksyms: $(BUILD_SPECIFIC_FILES)
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_INSTALL)
+	test -z "$(pkgincludedir)" || $(MKDIR_P) "$(DESTDIR)$(pkgincludedir)"
+	test -z "$(kversion)" || $(MKDIR_P) "$(DESTDIR)$(pkgincludedir)/$(kversion)"
+	test -z "$(target_cpu)" || $(MKDIR_P) "$(DESTDIR)$(pkgincludedir)/$(kversion)/$(target_cpu)"
+	@pkgstrip=`echo "sys/$(PACKAGE_TARNAME)" | sed 's,.,.,g'`; \
+	dirstrip=`echo "$(PKGINCL)" | sed "s,^$$pkgstrip,,"`; \
+	incstrip=`echo "$$dirstrip" | sed 's,.,.,g'`; \
+	list='$(BUILD_SPECIFIC_FILES)'; for p in $$list; do \
+		case $$p in \
+			$(PKGINCL)/*) f=`echo "$$p" | sed "s,^$$incstrip,,"`;; \
+			*) f=$$p;; \
+		esac; \
+		$(ECHO_V) "$(INSTALL_DATA) '$$p' '$(DESTDIR)$(pkgincludedir)/$(kversion)/$(target_cpu)/$$f'"; \
+		$(INSTALL_DATA) "$$p" "$(DESTDIR)$(pkgincludedir)/$(kversion)/$(target_cpu)/$$f"; \
+	done
+
+post-ksyms:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+
+uninstall-ksyms:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_UNINSTALL)
+	@pkgstrip=`echo "sys/$(PACKAGE_TARNAME)" | sed 's,.,.,g'`; \
+	dirstrip=`echo "$(PKGINCL)" | sed "s,^$$pkgstrip,,"`; \
+	incstrip=`echo "$$dirstrip" | sed 's,.,.,g'`; \
+	list='$(BUILD_SPECIFIC_FILES)'; for p in $$list; do \
+		case $$p in \
+			$(PKGINCL)/*) f=`echo "$$p" | sed "s,^$$incstrip,,"`;; \
+			*) f=$$p;; \
+		esac; \
+		echo "$(DESTDIR)$(pkgincludedir)/$(kversion)/$(target_cpu)/$$f"; \
+	done | $(am__base_remove)
+
+postun-ksyms:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+
+ksyms-all: $(BUILD_SPECIFIC_FILES)
+
+INSTALL_DATA_LOCAL	+= install-ksyms
+
+POST_INSTALL_AM		+= post-ksyms
+
+UNINSTALL_LOCAL		+= uninstall-ksyms
+
+POST_UNINSTALL_MA	+= postun-ksyms
+
+ALL_LOCAL		+= ksyms-all
+
+CLEAN_LOCAL		+= clean-ksyms
+
+DISTCLEAN_LOCAL		+= distclean-ksyms
+
+MAINTAINER_CLEAN_LOCAL	+= maintainer-clean-ksyms
+
+## !WITH_KO_MODULES
+###################################################################################################
+endif
+
+## PKG_BUILD_KERNEL
+endif
+## PKG_BUILD_ARCH
+endif
+
+## =============================================================================
+##
+## $Log: genksyms.am,v $
+## Revision 1.1.2.7  2011-03-26 04:28:45  brian
+## - updates to build process
+##
+## Revision 1.1.2.6  2011-03-17 07:01:27  brian
+## - build and repo system improvements
+##
+## Revision 1.1.2.5  2009-07-21 11:06:11  brian
+## - changes from release build
+##
+## Revision 1.1.2.4  2009-07-13 07:13:26  brian
+## - changes for multiple distro build
+##
+## Revision 1.1.2.3  2009-07-04 03:51:32  brian
+## - updates for release
+##
+## Revision 1.1.2.2  2009-06-29 07:35:35  brian
+## - improvements to build process
+##
+## Revision 1.1.2.1  2009-06-21 10:26:00  brian
+## - added files to new distro
+##
+## =============================================================================
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

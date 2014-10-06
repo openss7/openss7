@@ -1,0 +1,147 @@
+<body>
+This package provides the Classes and Exceptions required to represent JAIN
+TCAP protocol stacks, JAIN TCAP applications, as well as the Classes and
+Exceptions needed to send and receive JAIN TCAP primitives. The implementation
+of the two stack vendor specific interfaces, namely JainTcapStack and
+JainTcapProvider will be vendor specific, however the naming of these
+proprietory implementations is mandated.  The class name of the vendor specific
+implementations must be the JAIN TCAP &quot;InterfaceName&quot; of which that
+class implements with &quot;Impl&quot; appended to the end of it. For example a
+vendor implementation of the JainTcapStack Interface must be called
+&quot;JainTcapStackImpl&quot;.  Therefore once each vendor has implemented the
+JAIN TCAP API specification they must has two proprietary classes called
+JainTcapStackImpl.class and JainTcapProviderImpl.class. The characteristics of
+the three main interfaces are listed below: <ul>
+
+<li> <a href="JainTcapStack.html">JainTcapStack</a>:
+This Interface defines the minimial management properties that enables the JAIN
+TCAP API specification to operate independently of the JAIN OAM API
+Specification. Therefore the JainTcapStack Object is a representation of the
+main management functionality of the TCAP layer, as well as the central point
+for the creation of JainTcapProviders.  From within the JainTcapStack Object it
+is possible for any application to get a list of JainTcapProvider objects that
+are attached to the underlying JainTcapStack by using the
+<a href="JainTcapStack.html#getProviderList()">getProviderList</a> method
+with the JainTcapStack Object. This method returns an ArrayList
+of JainTcapProvider references of which a JainTcapListener Object may register.
+Similiarly if the JainTcapStack Object has no JainTcapProviders attached
+to it, the JainTcapListener may use the <a href="JainTcapStack.html#createProvider()">createProvider method</a> to create a new JainTcapProvider object.<br>
+<br>
+<BR></li>
+
+<li> <a href="JainTcapProvider.html">JainTcapProvider</a>:
+This Interface defines the methods for adding JainTcapListeners to, and
+removing JainTcapListeners from a list of registered JainTcapListeners held
+within the JainTcapProvider.  The JainTcapListener registers with a
+JainTcapProvider with a <a href="JainAddress.html">User Address</a>, this is
+explained in more detail in the definition of a
+<a href="JainTcapListener.html">JainTcapListener</a> below. Other methods
+defined within the JainTcapProvider provide the functionality for a
+JainTcapListener to obtain a Dialogue with another JainTcapListener based on a
+Dialogue Id. The JainTcapProvider also defines the functionality to obtain
+Invoke Id's based on a specific Dialogue Id, that enables a JainTcapListener to
+Invoke operations on another JainTcapListener to which a Dialogue has been
+initiated. In order for communication to take place between a local
+JainTcapListener and a remote JainTcapListener, the local JainTcapListener must
+send a number of <a href="ComponentReqEvent.html">Component Request Events</a>
+interspersed by <a href="DialogueReqEvent.html">Dialogue Request Events</a> to
+it's associated JainTcapProvider. The Jain User Address of the remote
+JainTcapListener should be set in the appropriate Dialogue Request Events.<br>
+<br>
+<BR></li>
+
+<li> <a href="JainTcapListener.html">JainTcapListener</a>:
+This Interface defines the methods required by all JainTcapListeners to receive
+and process Events that are emitted by a JainTcapProvider. A remote
+JainTcapProvider which receives Component Indications and a Dialogue Indication
+(which were sent by the local JainTcapListener) out of the TCAP layer of its
+SS7 protocol stack, encapsulates them as Events and passes them to the remote
+JainTcapListener.  As mentioned above this occurs by Event passing, were the
+remote JainTcapProvider invokes the
+<a href="JainTcapListener.html#processComponentIndEvent(jain.protocol.ss7.tcap.ComponentIndEvent)">processComponentIndEvent</a>
+and
+<a href="JainTcapListener.html#processDialogueIndEvent(jain.protocol.ss7.tcap.DialogueIndEvent)">processDialogueIndEvent</a>
+as appropriate and passes the relevant Event within the method to the remote
+JainTcapListener.  The same process occurs when the local JainTcapProvider
+passes Indication Events (received from the remote JainTcapListener) to the
+local JainTcapListener.<br>
+<BR><ul>
+
+<li>A JainTcapListener registers with a JainTcapProvider to become an Event
+Listener of that JainTcapProvider, it registers with an object reference to
+itself and its Jain User Address. These two values are stored by the
+JainTcapProvider and the Jain User Address is used as a lookup to obtain an
+object reference to a specific JainTcapListener. The Jain User Address is used
+for the routing of Tcap messages between various local and remote
+JainTcapListeners.&nbsp;<br>
+<BR></li>
+
+<li>A JainTcapListener may have multiple Tcap User Addresses, which enables it
+to operate over a number of Sub-Systems, however the JainTcapListener may only
+register with a JainTcapProvider, with only one Tcap User Address at any
+specific time. For example if a specific JainTcapListenerImpl (application
+developer specific implementation of the JainTcapListener interface), which
+operates over two Jain User Addresses, wants to register itself for both tcap
+User Adresses with the same JainTcapProviderImpl (vendor specific
+implementation of the JainTcapProvider interface), then the
+JainTcapListenerImpl will have to invoke the
+<a href="JainTcapProvider.html#addJainTcapListener(jain.protocol.ss7.tcap.JainTcapListener, jain.address.JainAddress)">addJainTcapListener</a>
+method within the JainTcapProviderImpl twice, once for each Jain User
+Address.&nbsp; <br></li>
+
+<li>The Jain User Address methods defined within the JainTcapListener
+interface, provide the functionality that enables the JainTcapListenerImpl to
+manipulate and maintain the list of Tcap User Addresses it supports.</li>
+</ul></li>
+
+
+</ul>
+<b>Note:</b> <p>&nbsp;The cardinality of the relationship between
+JainTcapListeners and JainTcapProviders is not restricted in any way. The
+restriction of this cardinality is dependent on a vendors specific
+implementation of the JAIN TCAP API, were the necessary exceptions are thrown
+if the specificied cardinality is violated.  However it is mandated that there
+may only be one JainTcapStack Object for the TCAP Layer of an SS7 protocol
+stack.
+
+<hr/><div class="boilerplate" style="font-size: x-small;">
+Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
+Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
+ 
+All Rights Reserved. <p>
+ 
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License as published by the Free
+Software Foundation, version 3 of the license. <p>
+ 
+This program is distributed in the hope that it will be useful, but <b>WITHOUT
+ANY WARRANTY</b>; without even the implied warranty of <b>MERCHANTABILITY</b>
+or <b>FITNESS FOR A PARTICULAR PURPOSE</b>.  See the GNU Affero General Public
+License for more details. <p>
+
+ You should have received a copy of the GNU Affero General Public License along
+with this program.  If not, see
+<a href="http://www.gnu.org/licenses/">&lt;http://www.gnu.org/licenses/&gt</a>,
+or write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+02139, USA. <p>
+ 
+<em>U.S. GOVERNMENT RESTRICTED RIGHTS</em>.  If you are licensing this
+Software on behalf of the U.S. Government ("Government"), the following
+provisions apply to you.  If the Software is supplied by the Department of
+Defense ("DoD"), it is classified as "Commercial Computer Software" under
+paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+Regulations ("DFARS") (or any successor regulations) and the Government is
+acquiring only the license rights granted herein (the license rights
+customarily provided to non-Government users).  If the Software is supplied to
+any unit or agency of the Government other than DoD, it is classified as
+"Restricted Computer Software" and the Government's rights in the Software are
+defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR")
+(or any successor regulations) or, in the cases of NASA, in paragraph
+18.52.227-86 of the NASA Supplement to the FAR (or any successor regulations). <p>
+ 
+Commercial licensing and support of this software is available from OpenSS7
+Corporation at a fee.  See
+<a href="http://www.openss7.com/">http://www.openss7.com/</a>
+</div><hr/>
+</body>

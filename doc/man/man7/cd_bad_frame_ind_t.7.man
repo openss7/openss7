@@ -1,0 +1,1 @@
+.so man7/CD_BAD_FRAME_IND.7.man

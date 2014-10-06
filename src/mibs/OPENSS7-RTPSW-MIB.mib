@@ -1,0 +1,1299 @@
+-- vim: ft=mib comments=\f\b\:\"ITU\-T,\f\b\:ITU\-T,\f\:\",\b\:\-\-,\:\-\-,\f\b\:\-,\f\b\:\· fo+=tcqlornw12 tw=64 ai nocin nosi sts=4 sw=4 et
+-- =============================================================================
+-- 
+-- @(#) $RCSfile: OPENSS7-RTPSW-MIB.mib,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2011-07-18 19:45:07 $
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- Note well: notwithstanding this AGPL license, you are not permitted to make 
+-- modifications under the OpenSS7 project's enterprise object identifier arc: 
+-- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
+-- identifier arc under your control.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date: 2011-07-18 19:45:07 $ by $Author: brian $
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log: OPENSS7-RTPSW-MIB.mib,v $
+-- Revision 1.1.2.1  2011-07-18 19:45:07  brian
+-- - added new MIBs
+--
+-- =============================================================================
+
+OPENSS7-RTPSW-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    openss7Modules
+        FROM OPENSS7-SMI
+    AdministrativeState, OperationalState, ProceduralStatus, 
+    StandbyStatus, UsageState
+        FROM OPENSS7-SMI-MIB
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, TimeInterval
+        FROM SNMPv2-TC
+    TransportAddress, TransportAddressType
+        FROM TRANSPORT-ADDRESS-MIB;
+
+rtpswMIB MODULE-IDENTITY
+    LAST-UPDATED "201112101120Z"
+    ORGANIZATION 
+        "The OpenSS7 Project"
+    CONTACT-INFO 
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Crescent
+         Edmonton, Alberta T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         E-mail: bidulock@openss7.org"
+    DESCRIPTION 
+        "
+         
+         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+         
+         All Rights Reserved.
+         
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+         
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+         
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+         
+         Note well: notwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
+    REVISION    "201112101120Z"
+    DESCRIPTION 
+        "Corrections an smilint workup."
+    REVISION    "201106282224Z"
+    DESCRIPTION 
+        "Initial version of this mib."
+    ::= { openss7Modules 500 }
+
+-- This should move somewhere else and be imported here...
+PortRange ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2d-2d,"
+    STATUS      current
+    DESCRIPTION 
+        "This type represents a set of port ranges.  The syntax 
+         a list of 2-octet pairs, where the first two-octets in 
+         the pair represents the lower number in a port range, 
+         most significant byte first (network byte order), and 
+         the second two-octet in the pair, the higher number.  
+         Multiple pairs can be specified to a maximum of 
+         8 pairs.  A zero-length octet string represents no 
+         ports.  To represent all ports requires a range 
+         0-65535."
+    SYNTAX      OCTET STRING (SIZE(0 | 4 | 8 | 12 | 16 | 20 | 24 | 30 | 
+                    32))
+
+rtpswNotifications OBJECT IDENTIFIER
+    ::= { rtpswMIB 0 }
+
+rtpswNotifs OBJECT IDENTIFIER
+    ::= { rtpswMIB 1 }
+
+rtpswScalars OBJECT IDENTIFIER
+    ::= { rtpswMIB 2 }
+
+rtpswTables OBJECT IDENTIFIER
+    ::= { rtpswMIB 3 }
+
+rtpswInterface OBJECT IDENTIFIER
+    ::= { rtpswTables 1 }
+
+rtpswInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RtpswInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The RTP switching interface table is a table of 
+         interfaces and their characteristics for use in RTP 
+         switching."
+    ::= { rtpswInterface 1 }
+
+rtpswInterfaceEntry OBJECT-TYPE
+    SYNTAX      RtpswInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the RTP switching interface table is 
+         indexed by its rtpswInterfaceId and contains 
+         information about the usability and configuration of 
+         interfaces for RTP switching."
+    INDEX       { rtpswInterfaceId }
+    ::= { rtpswInterfaceTable 1 }
+
+RtpswInterfaceEntry ::= SEQUENCE {
+    rtpswInterfaceId                Unsigned32,
+    rtpswInterfaceIndex             Unsigned32,
+    rtpswInterfaceName              SnmpAdminString,
+    rptswInterfaceAdminState        AdministrativeState,
+    rtpswInterfaceOperState         OperationalState,
+    rtpswInterfaceProcStatus        ProceduralStatus,
+    rtpswInterfacePg                Unsigned32,
+    rtpswInterfaceStandbyStatus     StandbyStatus,
+    rtpswInterfaceRowStatus         RowStatus
+}
+
+rtpswInterfaceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a non-zero ordinal index into the 
+         rtpswInterfaceTable."
+    ::= { rtpswInterfaceEntry 1 }
+
+rtpswInterfaceIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the ifIndex value of the associated 
+         interface.  Only one of the rtpswInterfaceIndex and 
+         rtpswInterfaceName need be specified when creating 
+         a row."
+    ::= { rtpswInterfaceEntry 2 }
+
+rtpswInterfaceName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the ifName value of the associated interface.  
+         Only one of the rtpswInterfaceIndex and 
+         rtpswInterfaceName need be specified when creating 
+         a row."
+    ::= { rtpswInterfaceEntry 3 }
+
+rptswInterfaceAdminState OBJECT-TYPE
+    SYNTAX      AdministrativeState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents the administrative capability 
+         of the interface to perform the RTP switching function.  
+         The following administrative states are defined:
+         
+         - locked(0), use of the interface for RTP switching has 
+           been prohibited by a management station; setting the 
+           value to locked(0) results in the immediate and 
+           disruptive withdrawal from service of the interface.
+         
+         - unlocked(1), use of the interface for RTP switching 
+           has been permitted by a management station;
+         
+         - shuttingDown(2), use of the interface for RTP 
+           switching is administratively permitted to existing 
+           instances of use only.  While the system remains in 
+           the shutting down state, the management station may 
+           at any time cause the managed object to revert to the 
+           unlocked state; setting the interface to 
+           shuttingDown(2) results in the graceful withdrawal 
+           from service of the interface and all contained 
+           objects; once all users of the interface have 
+           withdrawn, the state will change autonomously to 
+           locked(0).
+         
+         Whenever the administrative state of an interface is 
+         changed, a state change notification is generated."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               administrativeState attribute."
+    DEFVAL      { locked }
+    ::= { rtpswInterfaceEntry 4 }
+
+rtpswInterfaceOperState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the operational state of the interface in 
+         accordance with the OperationalState textual convention 
+         and ITU-T Rec. X.721 | ISO/IEC 10165-2.  The defined 
+         states are:
+         
+         - enabled(0), the interface is operational and ready 
+           for use;
+           
+         - disable(1), the interface is not available for use.
+           
+         A change in operational state shall generate a state 
+         change notification."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               operationalState attribute."
+    ::= { rtpswInterfaceEntry 5 }
+
+rtpswInterfaceProcStatus OBJECT-TYPE
+    SYNTAX      ProceduralStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the procedural status of the interface in 
+         accordance with the ProceduralStatus textual convention 
+         of the OPENSS7-SMI-MIB and ITU-T Rec. X.721 | ISO/IEC 
+         10165-2.  The procedural status can have zero or more 
+         of the following conditions:
+         
+         - initializationRequired(0),
+         - notInitialized(1),
+         - initializing(2),
+         - reporting(3),
+         - terminating(4),"
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               Attribute-ASN1Module.ProceduralStatus.
+         ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+               Section 8.1.2.2."
+    ::= { rtpswInterfaceEntry 6 }
+
+rtpswInterfacePg OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the protection group corresponding to this 
+         interface as an index into the protectionGroupTable of 
+         the protection group that is protecting this interface.  
+         The value is the value of the protectionGroupId that 
+         indexes a specific protection group within the 
+         protectionGroupTable.  When there is no protection 
+         group associated with the interface, this value is zero 
+         (0).
+         
+         Note that the protection group for an IP address must 
+         be the same as the protection group of the interface to 
+         which IP address belongs."
+    ::= { rtpswInterfaceEntry 7 }
+
+rtpswInterfaceStandbyStatus OBJECT-TYPE
+    SYNTAX      StandbyStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the standby status of the interface.  This 
+         entry is used to indicate MAC mirroring arrangements 
+         such as Ethernet Bonding.  The type is single-valued 
+         and read-only and can assume the following values:
+         
+         - hotStandby(0), the interface is not providing service 
+           but is operating in synchronism with another 
+           interface (perhaps on another host) that is to be 
+           backed-up.  An interface with a hot standby status 
+           will be immediately able to take over the role of the 
+           resource to be backed up, without the need for 
+           initialization activity, and will contain the same 
+           information as the resource being backed up.  The 
+           operational state during this status is enabled(0) and 
+           the administrative state is unlocked(0).  The 
+           availability status is offline();
+         
+         - coldStandby(1), the interface is to back-up another 
+           interface (perhaps on another host), but is not 
+           synchronized with that resource.  An interface with 
+           a cold standby status will not immediately be able to 
+           take over the role of a resource to be backed up, and 
+           will require some initialization activity.  The 
+           operational state is enabled(0) or disabled(1); the 
+           administrative state is locked(0) or unlocked(1); 
+           procedural status contains not initialized or 
+           initialization required; availability status is 
+           offline;
+         
+         - providingService(2), the back-up interface is 
+           providing service and is backing up another interface 
+           (perhaps on a different host).  The administrative 
+           state is unlocked(1); availability status is 
+           online()."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               Attribute-ASN1Module.StandbyStatus.
+         ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+               Section 8.1.2.5."
+    ::= { rtpswInterfaceEntry 8 }
+
+rtpswInterfaceRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may 
+         create or delete rows in this table."
+    ::= { rtpswInterfaceEntry 9 }
+
+rtpswIfAddr OBJECT IDENTIFIER
+    ::= { rtpswTables 2 }
+
+rtpswIfAddrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RtpswIfAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The RTP switching interface address table is a table of 
+         interface addresses and their characteristics for use 
+         in RTP switching."
+    ::= { rtpswIfAddr 1 }
+
+rtpswIfAddrEntry OBJECT-TYPE
+    SYNTAX      RtpswIfAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the RTP switching interface address table 
+         is indexed by its rtpswIfAddrId and contains 
+         information about the usability and configuration of 
+         interface addresses for RTP switching."
+    INDEX       { rtpswIfAddrId }
+    ::= { rtpswIfAddrTable 1 }
+
+RtpswIfAddrEntry ::= SEQUENCE {
+    rtpswIfAddrId               Unsigned32,
+    rtpswIfIndex                Unsigned32,
+    rtpswIfName                 SnmpAdminString,
+    rtpswIfPortRange            PortRange,
+    rtpswIfAddrGuardTime        TimeInterval,
+    rtpswIfAddrAdminState       AdministrativeState,
+    rtpswIfAddrOperState        OperationalState,
+    rtpswIfAddrProcStatus       ProceduralStatus,
+    rtpswIfAddrPg               Unsigned32,
+    rtpswIfAddrStandbyStatus    StandbyStatus,
+    rtpswIfAddrRowStatus        RowStatus
+}
+
+rtpswIfAddrId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides an ordinal, non-zero index into the RTP-SW 
+         Interface Address Table (rtpswIfAddrTable)."
+    ::= { rtpswIfAddrEntry 1 }
+
+rtpswIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the ifIndex of the interface."
+    ::= { rtpswIfAddrEntry 2 }
+
+rtpswIfName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a name for the interface."
+    ::= { rtpswIfAddrEntry 3 }
+
+rtpswIfPortRange OBJECT-TYPE
+    SYNTAX      PortRange
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the port range that is usable for RTP 
+         switching for the interface address, using the 
+         PortRange textual convention.  This is a pair of port 
+         number representing the range."
+    DEFVAL      { "\x80\x00\xff\xff" } -- { '8000FFFF'X }
+    ::= { rtpswIfAddrEntry 4 }
+
+rtpswIfAddrGuardTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "Centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the guard time that will be applied to 
+         a listening(2) termination point when it attempts to 
+         transition to the idle(0) state.  Instead of 
+         transitioning directly to the idle state, it enters 
+         a wait(4) state for the time interval specified by this 
+         object.  This avoids cross-talk that might occur if the 
+         address is immediately reused and early media arrives 
+         from a separate source.  The local IP address and port 
+         associated with the termination point will be frozen 
+         until it exits the wait(4) state.
+         
+         Specify this value as zero (0) to have the termination 
+         point transition directly from the listening(2) state 
+         to the idle(0) state.
+         
+         This value does not affect transitions from the 
+         connected(3) state directly to the idle(0) state.
+         
+         The default value is 5 seconds."
+    DEFVAL      { 500 }
+    ::= { rtpswIfAddrEntry 5 }
+
+rtpswIfAddrAdminState OBJECT-TYPE
+    SYNTAX      AdministrativeState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the administrative state of the IP address in 
+         accordance with the AdministrativeState textual 
+         convention of the OPENSS7-SMI-MIB and ITU-T Rec. X.721 
+         | ISO/IEC 10165-2.  This is a single-valued read-write 
+         attribute that can assume one of the following values:
+         
+         - locked(0), the IP address is administratively 
+           prohibited from performing RTP switching service for 
+           its users;
+         
+         - unlocked(1), the IP address is administratively 
+           permitted to perform RTP switching services for it 
+           users; this is independent of its inherent 
+           operability;
+         
+         - shuttingDown(2), use for RTP switching of the IP 
+           address is administratively permitted to existing 
+           instances of use only; while the IP address remains 
+           in the shutting down state, the management station 
+           may at any time cause the managed object to revert to 
+           the unlocked state.
+         
+         Setting the object to locked(0) results in immediate 
+         and disruptive withdrawal from service of the IP 
+         address.  Setting the object to shuttingDown(2) results 
+         in the graceful withdrawal from service of the IP 
+         address.  Setting the object to unlocked(1) results in 
+         placing back into service the IP address."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               Attribute-ASN1Module.AdministrativeState.
+         ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+               Section 8.1.1.3."
+    ::= { rtpswIfAddrEntry 6 }
+
+rtpswIfAddrOperState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the operational state of the IP address in 
+         accordance with the OperationalState textual convention 
+         of the OPENSS7-SMI-MIB and ITU-T Rec. X.721 | ISO/IEC 
+         10165-2.  This is a single-valued read-only attribute 
+         that can assume one of the following values:
+         
+         - disabled(0), the IP address is totally inoperable and 
+           unable to provide RTP switching service to its users;
+         
+         - enabled(1), the IP address is partially or fully 
+           operable and available for use.
+         
+         When the IP address is reachable from the network, this 
+         object assumes the enabled(1) value; otherwise, it 
+         assumes the disabled(2) value."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               Attribute-ASN1Module.OperationalState.
+         ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+               Section 8.1.1.1."
+    ::= { rtpswIfAddrEntry 7 }
+
+rtpswIfAddrProcStatus OBJECT-TYPE
+    SYNTAX      ProceduralStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the procedural status of the IP address in 
+         accordance with the ProceduralStatus textual convention 
+         of the OPENSS7-SMI-MIB and ITU-T Rec. X.721 | ISO/IEC 
+         10165-2.  This is a set-valued read-only attribute that 
+         can contain zero or more of the following values:
+         
+         - initializationRequired(0),
+         
+         - notInitialized(1),
+         
+         - initializing(2),
+         
+         - reporting(3), not used;
+         
+         - terminating(4),"
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               Attribute-ASN1Module.ProceduralStatus.
+         ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+               Section 8.1.2.2."
+    ::= { rtpswIfAddrEntry 8 }
+
+rtpswIfAddrPg OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the protection group corresponding to this 
+         IP address as a index into the protectionGroupTable of 
+         the protection group that is protecting this IP 
+         address.  The value is the value of the 
+         protectionGroupId that indexes a specific protection 
+         group within the protectionGroupTable.  When there is 
+         no protection group associated with the IP address, 
+         this value is zero (0).
+         
+         Note that the protection group for an IP address must 
+         be the same as the protection group of the interface 
+         to which the IP address belongs."
+    REFERENCE   
+        "ITU-T Rec. M.3100 (2005) : protectionGroupR2 MOC
+         ITU-T Rec. G.744.3 : protectionGroupR1 MOC"
+    ::= { rtpswIfAddrEntry 9 }
+
+rtpswIfAddrStandbyStatus OBJECT-TYPE
+    SYNTAX      StandbyStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the standby status of the interface in 
+         accordance with the StandbyStatus textual convetion of 
+         the OPENSS7-SMI-MIB and ITU-T Rec. X.721 | ISO/IEC 
+         10165-2.  This entry is used to indicate IP address 
+         takeover arrangements such as gratuitous ARP or 
+         Ethernet MAC cloning.  The type is single-valued and 
+         read-only and can assume the following values:
+         
+         - hotStandby(0), the interface is not providing service 
+           for the IP address but is operating in synchronism 
+           with another interface serving the IP address 
+           (perhaps on another host) that is to be backed-up.  
+           An interface with a hot standby status will be 
+           immediately able to take over the role of the 
+           resource to be backed up, without the need for 
+           initialization activity, and will contain the same 
+           information as the resource being backed up.  The 
+           operational state during this status is enabled(0) and 
+           the administrative state is unlocked(0).  The 
+           availability status is offline();
+           
+         - coldStandby(1), the interface serving the IP address 
+           is to back-up another interface serving the IP 
+           address (perhaps on another host), but is not 
+           sycnhronized with that resource.  An IP address with 
+           a cold standby status will not immediately be able to 
+           take over the role of the IP address to be backed up, 
+           and will require some initialization activity.  The 
+           oeprational state is enabled(0) or disabled(1); the 
+           administrative state is locked(0) or unlocked(1); 
+           procedural status contains not initialized or 
+           initialization required; availability status is 
+           offline();
+           
+         - providingService(2), the back-up interface is 
+           providing service for the IP address and is backing 
+           up the IP address on another interface (perhaps on 
+           a different host).  The administrative status is 
+           unlocked(1); availability status is online()."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               Attribute-ASN1Module.StandbyStatus.
+         ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+               Section 8.1.2.5."
+    ::= { rtpswIfAddrEntry 10 }
+
+rtpswIfAddrRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may 
+         add and remove rows from this table."
+    ::= { rtpswIfAddrEntry 11 }
+
+rtpswTermPoint OBJECT IDENTIFIER
+    ::= { rtpswTables 3 }
+
+rtpswTermPointTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RtpswTermPointEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The RTP termination point table provides a table of 
+         termination points (transport addresses) on the host 
+         that represent a local termination point for a leg of 
+         a cross-connected RTP media stream."
+    ::= { rtpswTermPoint 1 }
+
+rtpswTermPointEntry OBJECT-TYPE
+    SYNTAX      RtpswTermPointEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the RTP termination point table provides 
+         information about a single termination point."
+    INDEX       { rtpswTermPointId }
+    ::= { rtpswTermPointTable 1 }
+
+RtpswTermPointEntry ::= SEQUENCE {
+    rtpswTermPointId                Unsigned32,
+    rtpswTermPointState             INTEGER,
+    rtpswTermPointType              TransportAddressType,
+    rtpswTermPointLocalAddress      TransportAddress,
+    rtpswTermPointRemoteAddress     TransportAddress,
+    rtpswTermPointOperState         OperationalState,
+    rtpswTermPointUsageState        UsageState,
+    rtpswTermPointProcStatus        ProceduralStatus
+}
+
+rtpswTermPointId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a non-zero ordinal index for the 
+         rtpswTermPointEntry table and can also act as an 
+         integer identifier for any termination point for the 
+         host."
+    ::= { rtpswTermPointEntry 1 }
+
+rtpswTermPointState OBJECT-TYPE
+    SYNTAX      INTEGER { idle(0), bound(1), listening(2), connected(3), 
+                    wait(4) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the state of the termination point.  This is 
+         a single-valued read-only attribute.  The object can 
+         assume one of the following values:
+         
+         - idle(0), the termination point is idle;
+         
+         - bound(1), the termination point is bound to a local 
+           transport address specified by the rtpswTermPointType 
+           and rtpswTermPointLocalAddress; however, the 
+           termination poitn is not listening for packets;
+         
+         - listening(2), the termination point is listening on 
+           the local transport address specified by the 
+           rtpswTermPointType and rtpswTermPointLocalAddress.
+         
+         - connected(3), the termination point is connected 
+           between the local transport address indicated in the 
+           rtpswTermPointType and rtpswTermPointLocalAddress and 
+           the rtpswTermPointRemoteAddress;
+         
+         - wait(4), the termination point is in guard timer 
+           lockout.
+         
+         Termination points in the idle state are removed from 
+         this table autonomously by the managed system.  It is 
+         rare that the idle(0) value be reported.
+         
+         Guard timer lockout occurs when the termination point 
+         attempts to transition from the listening(2) state to 
+         the idle(0) state.  Because early media could arrive 
+         to the listening address from a previous call when 
+         a new call is set up, causing a cross-talk condition, 
+         a guard time is applied before an not fully connected 
+         address can be reused for another call."
+    ::= { rtpswTermPointEntry 2 }
+
+rtpswTermPointType OBJECT-TYPE
+    SYNTAX      TransportAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the type of termination point transport 
+         address in accordance with the TransportAddressType 
+         textual convention of the TRANSPORT-ADDRESS-MIB. For 
+         IPv4 this is udpIpv4(1); for IPv6, udpIpv6(2)."
+    ::= { rtpswTermPointEntry 3 }
+
+rtpswTermPointLocalAddress OBJECT-TYPE
+    SYNTAX      TransportAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the termination point's local transport 
+         address of type rtpswTermPointType in accordance with 
+         the TransportAddress textual convention of the 
+         TRANSPORT-ADDRESS-MIB.  This is an IP address and port 
+         number.  When the termination point is not bound, the 
+         local address is the null string."
+    ::= { rtpswTermPointEntry 4 }
+
+rtpswTermPointRemoteAddress OBJECT-TYPE
+    SYNTAX      TransportAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the termination point's remote transport 
+         address of type rtpswTermPointType in accordance with 
+         the TransportAddress textual convention of the 
+         TRANSPORT-ADDRESS-MIB.  This is an IP address and port 
+         number.  When the termination point is not connected, 
+         the remote address is the null string."
+    ::= { rtpswTermPointEntry 6 }
+
+rtpswTermPointOperState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the operational state of the termination point 
+         in accordance with X.721 | ISO/IEC 10165-2 and the 
+         OperationalState textual convention of the 
+         OPENSS7-SMI-MIB.  This state is single-valued and 
+         read-only and can indicate one of the following values:
+         
+         - disabled(0), the termination point is totally 
+           inoperable and unable to provide service;
+         
+         - enabled(1), the termination point is partially or 
+           fully operable and available for use.
+         
+         Termination points that are in guard timer lockout 
+         return a value of disabled(0) when this column is read."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               Attribute-ASN1Module.OperationalState.
+         ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+               Section 8.1.1.1."
+    ::= { rtpswTermPointEntry 7 }
+
+rtpswTermPointUsageState OBJECT-TYPE
+    SYNTAX      UsageState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the usage state of the termination point in 
+         accordance with X.721 | ISO/IEC 10165-2 and the 
+         UsageState textual convention of the OPENSS7-SMI-MIB.  
+         This state is single-valued and read-only and can 
+         indicate one of the following values:
+         
+         - idle(0), the termination point is not currently in 
+           use;
+         
+         - active(1), the termination point is currently in use 
+           and has sufficient spare operating capacity to 
+           provide for additional users simultaneously;
+         
+         - busy(2), the termination point is in use, but it has 
+           no spare operating capacity to provide for additional 
+           users at this instant.
+         
+         Termination points that are in guard timer lockout 
+         return a value of idle(0) when this column is read."
+    ::= { rtpswTermPointEntry 8 }
+
+rtpswTermPointProcStatus OBJECT-TYPE
+    SYNTAX      ProceduralStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the procedural status of the termination point 
+         in accordance with X.721 | ISO/IEC 10165-2 and the 
+         ProceduralStatus textual convention of the 
+         OPENSS7-SMI-MIB.  This status is set-valued and 
+         read-only and can indicate zero or more of the 
+         following:
+         
+         - initializationRequired(0), the termination point 
+           requires initialization to be invoked by the manager 
+           before it can perform its normal functions and this 
+           procedure has not been initiated.  The terminating(4) 
+           condition may also be present.  The operational state 
+           is disabled(1);
+         
+         - notInitialized(1), the termination point requires 
+           initialization before it can perform its normal 
+           functions, and this procedure has not been initiated.  
+           The termination point initializes itself 
+           autonomously, but the operational state may be either 
+           disabled(1) or enabled(0);
+         
+         - initializing(2), the termination point requires 
+           initialization before it can perform its normal 
+           functions, and this procedure has been initiated, but 
+           is not yet complete.  When this condition is present, 
+           the initialization required condition is absent, 
+           as initialization has already begun.  The operational 
+           state may be disabled(1) or enabled(0);
+         
+         - reporting(3), present when the termination point is 
+           reporting its measurements;
+         
+         - terminating(4), the termination point is in 
+           a termination phase.  If the termination point does 
+           not reinitialize itself autonomously, the 
+           initialization required condition is also present and 
+           the operational state is disabled(1); otherwise, the 
+           operational state may be either disabled(1) or 
+           enabled(0).
+         
+         Termination points that are in guard timer lockout have 
+         the terminating condition is present.  When setting up and 
+         not yet part of a cross-connection, the initializing 
+         condition is present.  Termination points initialize 
+         themselves autonomously."
+    DEFVAL      { {} }
+    ::= { rtpswTermPointEntry 9 }
+
+rtpswTermPointRevTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RtpswTermPointRevEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The RTP switching termination point reverse table is 
+         a convenience table that provides a reverse lookup of 
+         an index in the rtpswTermPointTable."
+    ::= { rtpswTermPoint 2 }
+
+rtpswTermPointRevEntry OBJECT-TYPE
+    SYNTAX      RtpswTermPointRevEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the rtpswTermPointRevTable is indexed by 
+         RTP transport address.  Each row contains the index in 
+         the rtpswTermPointTable that corresponds to the 
+         transport address."
+    INDEX       { rtpswTermPointRevType, rtpswTermPointRevAddr }
+    ::= { rtpswTermPointRevTable 1 }
+
+RtpswTermPointRevEntry ::= SEQUENCE {
+    rtpswTermPointRevType       TransportAddressType,
+    rtpswTermPointRevAddr       TransportAddress,
+    rtpswTermPointTableIndex    Unsigned32
+}
+
+rtpswTermPointRevType OBJECT-TYPE
+    SYNTAX      TransportAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides the transport address type of the transport 
+         address contained in the rtpswTermPointRevAddr column 
+         in accordance with the transport address type textual 
+         convention of the TRANSPORT-ADDRESS-MIB."
+    REFERENCE   
+        "TRANSPORT-ADDRESS-MIB::TransportAddressType, 
+             TransportAddress"
+    ::= { rtpswTermPointRevEntry 1 }
+
+rtpswTermPointRevAddr OBJECT-TYPE
+    SYNTAX      TransportAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides the transport address of the type specified by 
+         the rtpswTermPointRevType column in accordance with the 
+         transport address textual convention of the 
+         TRANSPORT-ADDRESS-MIB."
+    REFERENCE   
+        "TRANSPORT-ADDRESS-MIB::TransportAddressType, 
+             TransportAddress"
+    ::= { rtpswTermPointRevEntry 2 }
+
+rtpswTermPointTableIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the index within the rtpswTermPointTable 
+         (value of rtpswTermPointId) at which the entry 
+         corresponding to the RTP transport type and address 
+         that are used as an index to the row in this table 
+         (rtpswTermPointRevTable)."
+    ::= { rtpswTermPointRevEntry 3 }
+
+rtpswForw OBJECT IDENTIFIER
+    ::= { rtpswTables 4 }
+
+rtpswForwTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RtpswForwEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The RTP switching forwarding table provides a table 
+         that associates incoming and outgoing legs of an RTP 
+         session that transits the host, and provides 
+         information concerning the state of such a connection."
+    ::= { rtpswForw 1 }
+
+rtpswForwEntry OBJECT-TYPE
+    SYNTAX      RtpswForwEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the rtpswForwTable is indexed by 
+         rtpswForwId, which is an index that is used only within 
+         this table.  The rtpswForwId can be obtained by pairing 
+         of rtpswTermPointId using the rtpswForwRevTable."
+    INDEX       { rtpswForwId }
+    ::= { rtpswForwTable 1 }
+
+RtpswForwEntry ::= SEQUENCE {
+    rtpswForwId         Unsigned32,
+    rtpswForwTpType     TransportAddressType,
+    rtpswForwTpCalling  TransportAddress,
+    rtpswForwTpCalled   TransportAddress,
+    rtpswForwState      BITS
+}
+
+rtpswForwId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides non-zero ordinal index into the 
+         rtpswForwTable.  This value may have special 
+         significance to the agent and managed device due to the 
+         need to provide guard times for RTP connections to 
+         avoid cross-talk."
+    ::= { rtpswForwEntry 1 }
+
+rtpswForwTpType OBJECT-TYPE
+    SYNTAX      TransportAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the type of address that is contained in the 
+         rtpswForwTpCalling and rtpswForwTpCalled addresses 
+         using the TransportAddressType textual convention of 
+         the TRANSPORT-ADDRESS-MIB."
+    REFERENCE   
+        "TRANSPORT-ADDRESS-MIB::TransportAddressType, 
+             TransportAddress"
+    ::= { rtpswForwEntry 2 }
+
+rtpswForwTpCalling OBJECT-TYPE
+    SYNTAX      TransportAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the calling transport address in the format 
+         indicated by the rtpswForwTpType in accordance with the 
+         TransportAddress textual convention of the 
+         TRANSPORT-ADDRESS-MIB."
+    REFERENCE   
+        "TRANSPORT-ADDRESS-MIB::TransportAddressType, 
+             TransportAddress"
+    ::= { rtpswForwEntry 3 }
+
+rtpswForwTpCalled OBJECT-TYPE
+    SYNTAX      TransportAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the called transport address in the format 
+         indicated by the rtpswForwTpType in accordance with the 
+         TransportAddress textual convention of the 
+         TRANSPORT-ADDRESS-MIB."
+    REFERENCE   
+        "TRANSPORT-ADDRESS-MIB::TransportAddressType, 
+             TransportAddress"
+    ::= { rtpswForwEntry 4 }
+
+rtpswForwState OBJECT-TYPE
+    SYNTAX      BITS { ctForward(0), ctReverse(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the current state of the forwarding 
+         cross-connection."
+    ::= { rtpswForwEntry 5 }
+
+rtpswForwRevTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RtpswForwRevEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The RTP switching forwarding reverse table is 
+         a convenience table that provides a reverse lookup of 
+         an index in the rtpswForwTable."
+    ::= { rtpswForw 2 }
+
+rtpswForwRevEntry OBJECT-TYPE
+    SYNTAX      RtpswForwRevEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the rtpswForwRevTable is indexed 
+         by the pair of termination point identifiers that 
+         define the connection.  Each row contains the index in 
+         the rtpswForwTable that corresponds to the 
+         pairing of termination points.  The ordering of the 
+         termination point identifiers is unimportant: the 
+         reverse pairing yields the same index."
+    INDEX       { rtpswTermPointId, rtpswTermPointId }
+    ::= { rtpswForwRevTable 1 }
+
+RtpswForwRevEntry ::= SEQUENCE {
+    rtpswForwTableIndex     Unsigned32
+}
+
+rtpswForwTableIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the index within the rtpswForwTable (value of 
+         rtpswForwId) at which the entry corresponding to the 
+         pairing of RTP termination points that are used as an 
+         index to the row in this table (rtpswForwRevTable)."
+    ::= { rtpswForwRevEntry 1 }
+
+rtpswCall OBJECT IDENTIFIER
+    ::= { rtpswTables 5 }
+
+rtpswCallTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RtpswCallEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The RTP switching call table provides a table that 
+         contains information concerning ongoing call 
+         information of an RTP session that transits the host, 
+         and provides information concerning the state of such 
+         a connection."
+    ::= { rtpswCall 1 }
+
+rtpswCallEntry OBJECT-TYPE
+    SYNTAX      RtpswCallEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the rtpswCallTable is indexed by the 
+         RTP call identifier.  Each row contains information 
+         concerning a single ongoing call.  Calls that have 
+         completed may still exist in this table but have a call 
+         state that indicates that the call is connected in 
+         neither direction."
+    INDEX       { rtpswCallId }
+    ::= { rtpswCallTable 1 }
+
+RtpswCallEntry ::= SEQUENCE {
+    rtpswCallId                 Unsigned32,
+    rtpswCallTpCallingType      TransportAddressType,
+    rtpswCallTpRemoteCalling    TransportAddress,
+    rtpswCallTpLocalCalling     TransportAddress,
+    rtpswCallTpCalledType       TransportAddressType,
+    rtpswCallTpLocalCalled      TransportAddress,
+    rtpswCallTpRemoteCalled     TransportAddress,
+    rtpswCallState              BITS
+}
+
+rtpswCallId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides the call identifier used to identify an 
+         instance of a call.  The call identifier is not 
+         necessarily a monotonically increasing ordinal index 
+         value and may have special significance to the agent.
+         
+         RTP switching call identifiers are guaranteed to be 
+         unique within a 24-hour period.  That is, no call 
+         identifier will be assigned to two calls that occured 
+         within the same 24-hour period.
+         
+         For an average 2-minute call duration, 720 identifiers 
+         within the the 32-bit counter will be consumed per 
+         24-hour period per channel.  The 32-bit counter can 
+         supoprt 5,965,232 channels at this rate.  For a 500,000 
+         channel system, identifiers will not be reused within 
+         a 12 day period,"
+    ::= { rtpswCallEntry 1 }
+
+rtpswCallTpCallingType OBJECT-TYPE
+    SYNTAX      TransportAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the calling leg transport address type.  This 
+         is typically UDPv4() or UDPv6().  The transport address 
+         type of the calling leg may be different from the 
+         transport address of the called leg when address 
+         translation is performed between IPv4 and IPv6."
+    ::= { rtpswCallEntry 2 }
+
+rtpswCallTpRemoteCalling OBJECT-TYPE
+    SYNTAX      TransportAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the remote transport address of the calling 
+         leg.  This transport address is of the type specified 
+         by the rtpswCallTpCallingType."
+    ::= { rtpswCallEntry 3 }
+
+rtpswCallTpLocalCalling OBJECT-TYPE
+    SYNTAX      TransportAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the local transport address of the calling 
+         leg.  This transport address is of the type specified 
+         by the rtpswCallTpCallingType."
+    ::= { rtpswCallEntry 4 }
+
+rtpswCallTpCalledType OBJECT-TYPE
+    SYNTAX      TransportAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the called leg transport address type.  This 
+         is typically UDPv4() or UDPv6().  The transport address 
+         type of the called leg may be different from the 
+         transport address type of the calling leg when address 
+         translation is performed between IPv4 and IPv6."
+    ::= { rtpswCallEntry 5 }
+
+rtpswCallTpLocalCalled OBJECT-TYPE
+    SYNTAX      TransportAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the local transport address of the called 
+         leg. This transport address is of the type specified by 
+         the rtpswCallTpCalledType."
+    ::= { rtpswCallEntry 6 }
+
+rtpswCallTpRemoteCalled OBJECT-TYPE
+    SYNTAX      TransportAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the remote transport address of the called 
+         leg. This transport address is of the type specified by 
+         the rtpswCallTpCalledType."
+    ::= { rtpswCallEntry 7 }
+
+rtpswCallState OBJECT-TYPE
+    SYNTAX      BITS { forwardConnect(0), reverseConnect(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the call state of the call."
+    ::= { rtpswCallEntry 8 }
+
+rtpswOids OBJECT IDENTIFIER
+    ::= { rtpswMIB 4 }
+
+rtpswGroups OBJECT IDENTIFIER
+    ::= { rtpswMIB 5 }
+
+rtpswCompliances OBJECT IDENTIFIER
+    ::= { rtpswMIB 6 }
+
+rtpswMandatoryGroup OBJECT-GROUP
+    OBJECTS     { rtpswInterfaceIndex, rtpswInterfaceName, 
+                  rtpswInterfaceRowStatus, rtpswIfIndex, rtpswIfName, 
+                  rtpswIfPortRange, rtpswIfAddrGuardTime, 
+                  rtpswIfAddrRowStatus, rtpswTermPointState, 
+                  rtpswTermPointType, rtpswTermPointLocalAddress, 
+                  rtpswTermPointRemoteAddress, rtpswTermPointTableIndex, 
+                  rtpswForwTableIndex }
+    STATUS      current
+    DESCRIPTION 
+        "A group that provides all of the mandatory compliance 
+         objects."
+    ::= { rtpswGroups 1 }
+
+rtpswOptionalGroup OBJECT-GROUP
+    OBJECTS     { rptswInterfaceAdminState, rtpswInterfaceOperState, 
+                  rtpswInterfaceProcStatus, rtpswInterfacePg, 
+                  rtpswInterfaceStandbyStatus, rtpswIfAddrAdminState, 
+                  rtpswIfAddrOperState, rtpswIfAddrProcStatus, 
+                  rtpswIfAddrPg, rtpswIfAddrStandbyStatus, 
+                  rtpswTermPointOperState, rtpswTermPointUsageState, 
+                  rtpswTermPointProcStatus, rtpswForwTpType, 
+                  rtpswForwTpCalling, rtpswForwTpCalled, rtpswForwState, 
+                  rtpswCallTpCallingType, rtpswCallTpRemoteCalling, 
+                  rtpswCallTpLocalCalling, rtpswCallTpCalledType, 
+                  rtpswCallTpLocalCalled, rtpswCallTpRemoteCalled, 
+                  rtpswCallState }
+    STATUS      current
+    DESCRIPTION 
+        "A group that provides all of the optional compliance 
+         objects."
+    ::= { rtpswGroups 2 }
+
+rtpswFullCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "Provides a compliance profile that provides full 
+         compliance to this mib."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { rtpswMandatoryGroup }
+
+        GROUP   rtpswOptionalGroup
+        DESCRIPTION   
+              "Groups that provide optional capabilities."
+
+    ::= { rtpswCompliances 1 }
+
+END -- end of module OPENSS7-RTPSW-MIB.

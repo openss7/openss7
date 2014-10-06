@@ -1,0 +1,373 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: mi_release.9.man,v 1.1.2.2 2011-02-07 02:18:42 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:42 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: mi_release.9.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:42  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH MI_RELEASE 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B mi_release
+\- unlock a queue private structure
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _MPS_SOURCE
+.br
+.B #include <sys/stream.h>
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/mpsddi.h>
+.HP
+.BI "void \fRmi_release(\fPcaddr_t " ptr \fR)\fP;
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I ptr
+a pointer to the locked queue private structure returned from a call to either
+.BR mi_acquire "(9) or " mi_acquire_sleep (9).
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR MPS \(rg-specific
+DDI.
+.PP
+.I "Linux Fast-STREAMS"
+specific.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR mi_acquire (),
+.BR mi_acquire_sleep (9),
+and
+.BR mi_release (9)
+are a set of per queue pair Stream locking functions that can be used with the
+functions from the
+.BR mi_open_comm (9)
+family.
+.PP
+.BR mi_release ()
+unlocks the specified locked private structure that was returned from a previous successful call to
+.BR mi_acquire "(9) or " mi_acquire_sleep (9).
+.PP
+If another thread failed a call to
+.BR mi_acquire (9)
+while the structure was locked,
+.BR mi_release ()
+will schedule the queue procedure, using
+.BR qenable (9),
+of the queue whose pointer was passed to the failed
+.BR mi_acquire (9)
+call.
+.PP
+If another thread failed a call to
+.BR mi_acquire_sleep (9)
+while the structure was locked,
+.BR mi_release ()
+will wake the process that was put to sleep by
+.RB mi_acquire_sleep (9).
+.\"
+.\"
+.SH USAGE
+.PP
+.BR mi_acquire "(9), " mi_acquire_sleep "(9) and " mi_release ()
+simplify the implementation of private structure locks for fully MP-SAFE
+.IR STREAMS (9)
+modules and drivers.  The function attempts to unlock the private structure associated with the
+pointer argument,
+.IR  ptr ,
+locked by a previous call to
+.BR mi_acquire (9)
+or
+.BR mi_acquire_sleep (9).
+.PP
+.BR mi_release ()
+is called at the end of put or service procedure execution when the procedure wishes exclusive
+access to the private structure (perhaps to alter state variable) and acquires the lock at the
+beginning of the procedure.
+.PP
+.BR mi_release ()
+is always successful when passed valid arguments.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR mi_release ()
+returns
+.BR void .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR mi_release ()
+is always successful.  If
+.BR mi_release ()
+is passed invalid or uninitialized arguments, or a
+.IR ptr
+argument that has not been locked by the calling context, the result will be indeterminate.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR mi_release ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and
+interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR mi_release ()
+is MP-safe, however, the caller is responsible for ensuring the validity of the passed in pointer
+across the call.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR mi_release ()
+must only be called for a private structure that was allocated with
+.BR mi_alloc (9)
+or
+.BR mi_alloc_sleep (9)
+or one of the other private structure allocation functions from the
+.BR mi_open_comm (9)
+family of functions.
+.PP
+Any queue that uses
+.BR mi_release ()
+should have a queue service procedure.
+.PP
+Each successful call to
+.BR mi_acquire (9)
+or
+.BR mi_acquire_sleep (9)
+must me matched with a corresponding call to
+.BR mi_release ()
+or processor or process deadlock may occur.
+.PP
+The lock acquired by
+.BR mi_acquire (9)
+or
+.BR mi_acquire_sleep (9)
+on the private structure associated with queue,
+.IR q ,
+is not a recursive lock.  That is, if
+.BR mi_acquire (9)
+or
+.BR mi_acquire_sleep (9)
+are called successively for the same queue,
+.IR  q,
+and with no intervening call to
+.BR mi_release (),
+the first call to
+.BR mi_acquire (9)
+or
+.BR mi_acquire_sleep (9)
+succeeds, and the second call to
+.BR mi_acquire (9)
+fails and the second call to
+.BR mi_acquire_sleep (9)
+sleeps indefinitely.
+The is adequate for both put, service and open, close routines which are seldomly reentrant.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR mi_release ()
+is implemented using basic lock and syncrhonization variable functions.  See
+.BR UNLOCK (9)
+and
+.BR SV_BROADCAST (9).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR mi_acquire (9),
+.BR mi_acquire_sleep (9),
+.BR UNLOCK (9),
+.BR SV_WAIT_SIG (9),
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR mi_release ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR mi_release ()
+is
+compatible with
+.IR MPS \(rg,
+.IR AIX \(rg,
+.IR MacOT \(rg,
+and
+.IR Solaris \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR mi_release ()
+is an OpenSS7 Project specific implementation of an
+.IR MPS \(rg-compatible
+function and should not be used by portable
+.I STREAMS
+drivers and modules.
+.IP \(em
+.BR mi_release ()
+is provided for use with SS7 drivers and modules that need some automatic locking of queue pair
+private structure for speed and efficiency.
+.IP \(em
+.BR mi_release ()
+does not exist in any other
+.IR MPS \(rg
+implementation other than
+.IR "Linux Fast-STREAMS" .
+.PP
+See
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
+.BR suncompat (9),
+and
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Conforms to
+.B OpenSS7
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR mi_release ()
+is new for
+.BR "@PACKAGE_TITLE@" .
+It is largely equivalent to the
+.BR ss7_unlockq (9)
+SS7 common function that appeared in early releases of the
+.B strss7
+package and is also contained in
+.BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

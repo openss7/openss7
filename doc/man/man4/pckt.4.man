@@ -1,0 +1,763 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: pckt.4.man,v 1.1.2.2 2011-02-07 02:18:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:10 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: pckt.4.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:10  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH PCKT 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.\"
+.\"
+.SH NAME
+.B pckt
+\- \fISTREAMS\fR Packet Mode Module
+.\"
+.\"
+.SH SYNOPSIS
+.HP
+.BI "int fd = open(" \fR\(lq/dev/ptmx\(rq\fP ", " \fRO_RDWR\fP );
+.HP
+.BI "int ioctl(" fd ", " \fRI_PUSH\fP ", " \fR\(lqpckt\(rq\fP );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B pckt
+is a
+.IR STREAMS (9)
+module that is pushed over the master side of a
+.IR STREAMS -based
+pseudo-terminal device,
+.BR pty (4),
+to packetize messages sent by the slave side of the pseudo-terminal that would
+otherwise be processed by the Stream head.  This allows the user process on
+the master side of the pseudo-terminal to be informed of state changes.
+.PP
+To enable the packet mode on the master side of a pseudo-terminal,
+.BR pty (4),
+the user process must push the
+.RI \(lq pckt \(rq
+module using the
+.BR I_PUSH (7)
+.I STREAMS
+input-output control command.
+.PP
+Once packet mode has been enabled on the master side Stream by pushing the
+.B pckt
+module, all master write-side operations,
+.BR write (2s),
+.BR putmsg (2s),
+.BR putpmsg (2s),
+remain unaltered.
+When the user process on the master side writes or puts a message to the
+Stream, it is simply passed to the slave by the pseudo-terminal device,
+.BR pty (4),
+in the same fashion a when the module was not present.
+.PP
+In the packet mode, master read-side operations,
+.BR read (2s),
+.BR getmsg (2s),
+.BR getpmsg (2s),
+are altered.
+The
+.B pckt
+module intercepts
+.IR STREAMS (9)
+messages that would have been processed by a real
+.BR tty (4)
+driver, and converts them into
+.BR M_PROTO (9)
+messages that to be read by the master side user process using
+.BR read (2s),
+.BR getmsg (2s),
+or
+.BR getpmsg (2s).
+(Without the
+.B pckt
+module in place, these messages normally processed by a real
+.BR tty (4),
+would be processed (and misinterpreted) by the Stream head.
+.PP
+Messages intercepted in this fashion are encapsulated (packetized) by
+transforming them into
+.BR M_DATA (9)
+messages and prepending an
+.BR M_PROTO (9)
+message block that contains the original value of the message type (before
+being overwritten with
+.BR M_DATA (9)).
+.PP
+Message types that are transformed in this fashion are:
+.BR M_DATA (9),
+.BR M_FLUSH (9),
+.BR M_IOCTL (9),
+.BR M_PCPROTO (9),
+.BR M_PROTO (9),
+.BR M_READ (9),
+.BR M_START (9),
+.BR M_STARTI (9),
+.BR M_STOP "(9) and "
+.BR M_STOPI (9).
+The remaining message types are passed to the Stream head unchanged.  Of the
+messages packetized, most are packetized unaltered and passed to the Stream
+head to be read by the user process.
+.BR M_FLUSH "(9), " M_IOCTL "(9) and " M_READ (9)
+receive special treatment
+as follows:
+.\"
+.SS M_FLUSH\fR(9)
+The pseudo-terminal device,
+.BR pty (4),
+slave side reverses the sense of the
+.BR M_FLUSH (9)
+flush bits so that they can be used directly by the master side Stream head in
+a fashion similar to the
+.BR pipemod (4)
+module.  To provide an encapsulated message that contains flush bits that are
+the same as they were issued by the user of the slave side of the
+.BR pty (4),
+.B pckt
+reverses the
+.BR FLUSHR " and " FLUSHW
+bits (again) before packetizing the
+.BR M_FLUSH (9)
+message.
+Also, because every Stream must respond to
+.BR M_FLUSH (9)
+by flushing queues,
+.B pckt
+also passes a copy of the
+.BR M_FLUSH (9)
+message to the Stream head.  However, to preserve packetized messages that may
+be sitting on the Stream head read queue, the read side is not flushed and the
+.B FLUSHR
+bit in any
+.BR M_FLUSH (9)
+message copy passed to the Stream head will be cleared.
+.PP
+The result is as follows, depending on the value of the
+.BR M_FLUSH (9)
+bits:
+.TP \w'\fBFLUSHRW\fR\(em'u
+.B FLUSHR
+The bits are set to
+.B FLUSHW
+and the message is packetized.  No
+.BR M_FLUSH (9)
+message is sent to the Stream head.
+.TP
+.B FLUSHW
+The bits are set to
+.BR FLUSHR
+and the message is packetized.  An
+.BR M_FLUSH (9)
+message is sent to the Stream head containing the
+.B FLUSHW
+flag.
+.TP
+.B FLUSHRW
+The bits are set to
+.B FLUSHRW
+and the message is packetized.  An
+.BR M_FLUSH (9)
+message is sent to the Stream head containing only the
+.BR FLUSHW
+flag.
+.\"
+.SS M_IOCTL\fR(9)
+The
+.BR M_IOCTL (9)
+message is packetized as normal on 32-bit systems.  On 64-bit systems, where
+the user process that pushed the
+.B pckt
+module on the master side of the pseudo-terminal,
+.BR pty (4),
+device is a 32-bit process, the
+.BR iocblk (9)
+structure contained in the message block is transformed by the
+.B pckt
+module into a 32-bit representation of the
+.BR iocblk (9)
+structure
+.RB ( "struct iocblk32" )
+before being packetized.
+.PP
+It is possible for the
+.BR pckt (4)
+module to determine whether the master process is a 32-bit or 64-bit process (remember that only one
+open of the master side of a pseudo-terminal is permitted) by whether the
+.B FILP32
+flag was passed in the
+.IR oflags
+argument to the
+.BR qi_qopen (9)
+procedure of the 
+.B pckt
+module.  Also, the
+.B IOC_ILP32
+flag is set in the
+.I ioc_flag
+field of the
+.BR iocblk (9)
+structure indicates the data model of the sender; however, the data model of the sender happens to
+be the slave side.
+.PP
+.BR ptem (4)
+only sends the following input-output controls to the master side:
+.BR TCSETA ,
+.BR TCSETAW ,
+.BR TCSETAF ,
+.BR TCSETS ,
+.BR TCSETSW ,
+.BR TCSETSF ,
+.BR TCSBRK  " and "
+.BR TIOCSWINSZ .
+.BR TCSETA ,
+.BR TCSETAW ,
+.BR TCSETAF ,
+have an argument containing a
+.BR termio (7)
+structure;
+.BR TCSETS ,
+.BR TCSETSW ,
+.BR TCSETSF ,
+have an argument containing a
+.BR termios (3)
+structure;
+.BR TCSBRK ,
+has an integer argument;
+.BR TIOCSWINSZ ,
+has an argument containing a
+.BR winsize
+structure.
+These three structures are all made up of
+.BR short s,
+.BR int s,
+and
+.BR char s,
+and do not require conversion.
+.sp
+.RS
+The
+.B winsize
+structure is defined in
+.B <sys/termios.h>
+as follows:
+.sp
+.nf
+\fC\s-1\
+struct winsize {
+    unsigned short ws_row;
+    unsigned short ws_col;
+    unsigned short ws_xpixel;
+    unsigned short ws_ypixel;
+};\s+1\fP
+.fi
+.TP \w'\ ws_ypixel\(em'u
+.I ws_row
+The number of rows for the window vertical dimension.
+.PD 0
+.TP
+.I ws_col
+The number of columns for the window horizontal dimension.
+.TP
+.I ws_xpixel
+The number of pixels for the window horizontal dimension.
+.TP
+.I ws_ypixel
+The number of pixels for the window vertical dimension.
+.PD
+.RE
+.PP
+Although
+.BR M_IOCTL (9)
+messages are packetized, there is no way for the user process to acknowledge
+the message.  (Normally the default Stream head behaviour is to send a
+.BR M_IOCNAK (9)
+message in response to any
+.BR M_IOCTL (9)
+message received at the Stream head.)
+The
+.BR M_IOCTL (9)
+message arriving at the master side of a pseudo-terminal have normally been sent by the
+pseudo-terminal emulation module,
+.BR ptem (4),
+pushed on the slave side.  These
+.BR M_IOCTL (9)
+messages are copies of the ones for which the
+.BR ptem (4)
+module has already returned positive acknowledgement via
+.BR M_IOCACK (9)
+messages back to
+.BR ldterm (4).
+(In case the
+.B pckt
+module was not pushed, the
+.BR ptem (4)
+module discards any
+.BR M_IOCNAK (9)
+messages that might have been sent by the Stream head in response to arriving
+.BR M_IOCTL (9)
+messages.)
+.\"
+.SS M_READ\fR(9)
+The
+.BR M_READ (9)
+message is packetized as normal on 32-bit systems.  On 64-bit systems, where
+the user process that pushed the
+.B pckt
+module is a 32-bit process, the
+.B size_t
+count contained in the message block is transformed by the
+.B pckt
+module into a 32-bit representation of the
+.B size_t
+.RB ( size32_t )
+before being packetized.
+.PP
+(The
+.B pckt
+module can detect when it was pushed by a 32-bit process when the
+.B FILP32
+bit is set in the
+.I oflag
+argument to the
+.BR qi_qopen (9)
+call that is issued when pushing the module.)
+.PP
+The user process reading the master side of the pseudo-terminal device is
+responsible for any other 64-bit to 32-bit conversions that might be required
+on data structures contained in other messages of which the
+.B pckt
+module is unaware.
+.\"
+.\"
+.SS Summary
+.PP
+To summarize, the
+.B pckt
+module does the following:
+.IP \(bu \w'\(bu\(em'u
+When a message is passed to the
+.B pckt
+module on its write queue, the modules does no processing and passes the
+mssage to the next module or driver.
+.IP \(bu
+The
+.B pckt
+modules creates an
+.BR M_PROTO (9)
+message when one of the following messages is passed to it:
+.BR M_DATA (9),
+.BR M_IOCTL (9),
+.BR M_PROTO (9),
+.BR M_PCPROTO (9),
+.BR M_FLUSH (9),
+.BR M_START (9),
+.BR M_STOP (9),
+.BR M_STARTI (9),
+.BR M_STOPI "(9) and
+.BR M_READ (9).
+.IP ""
+All other messages are passed through.  The
+.BR M_PROTO (9)
+message containing an intercepted message is passed upstream and retreived
+when the user process on the master side issues
+.BR read (2s),
+.BR getmsg "(2s) or "
+.BR getpmsg (2s).
+.IP \(bu
+If the message is an
+.BR M_FLUSH (9)
+message,
+.B pckt
+does the following:
+.IP ""
+If the flag is
+.BR FLUSHW ,
+it is changed to
+.B FLUSHR
+(because
+.B FLUSHR
+was the original flag before the
+.BR pts (4)
+driver changed it),
+packetized into a
+.BR M_PROTO (9)
+message, and passed upstream.
+To prevent the Stream head's read queue from being flushed, the original
+.BR M_FLUSH (9)
+message must not be passed upstream.
+.IP ""
+If the flag is
+.BR FLUSHR ,
+it is changed to
+.BR FLUSHW ,
+packetized into an
+.BR M_PROTO (9)
+message, and passed upstream.  To flush write queues properly, an
+.BR M_FLUSH (9)
+message with the
+.B FLUSHW
+flag set is also sent upstream.
+.IP ""
+If the flag is
+.BR FLUSHRW ,
+the message with both flags set is packetized and passed upstream.  An
+.BR M_FLUSH (9)
+message with only the
+.B FLUSHW
+flag set is sent upstream.
+.\"
+.\"
+.SH USAGE
+.PP
+When a master wishes to use the control side of a pseudo-terminal in the
+packet mode, the
+.B pckt
+module is normally pushed on the master side of a pseudo-terminal,
+.BR pty (4),
+device before any call to
+.BR fork (2)
+or
+.BR exec (3)
+that invokes the slave process.  This ensures that there are no messages queued
+at the master side Stream head before the module is pushed.
+.RB ( pckt
+does not check the Stream head read queue when it is pushed, as
+.BR tirdwr (4)
+does.)
+.PP
+The
+.B pckt
+module is not normally popped from the Stream, but the Stream is simply closed
+once an end-of-file has been read or the Stream is hung up by the slave side.
+.\"
+.\"
+.SH IOCTLS
+.PP
+The
+.B pckt
+module does not process any intput-output controls of its own.
+.\"
+.\"
+.SH NOTICES
+.PP
+The user process reading the master side of the pseudo-terminal device,
+.BR pty (4),
+is responsible for separating data originally contained in
+.BR M_DATA (9)
+message blocks, from the control portion.  So, for example, the
+.BR M_IOCTL (9)
+message consists of one
+.BR M_IOCTL (9)
+message block and a string of
+.BR M_DATA (9)
+message blocks.  Once packetized, these will be transformed into one
+.BR M_PROTO (9)
+message block containing the original
+.B M_IOCTL
+message type, followed by the entire message made up of
+.BR M_DATA (9)
+message blocks.  It is the user's responsibility to separate the data portion
+of a message read by
+.BR getmsg (2s)
+into the original
+.BR M_IOCTL (9)
+portion and the
+.BR M_DATA (9)
+portion.  Doing so will always make some assumptions about the length of the
+original leading message block in the message.
+.PP
+The
+.BR M_CTL (9)
+message is conspicuous by its absence in the list of packetized messages.
+Nevertheless, it is not possible for the user process to send an
+.BR M_CTL (9)
+in response.
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
+.SH MODULES
+.PP
+.B pckt
+is a
+.I STREAMS
+module named
+.RI \(lq pckt \(rq.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR pty (4),
+.BR tty (4),
+.BR pipemod (4),
+.BR iocblk (9),
+.IR STREAMS (9),
+.BR I_PUSH (7),
+.BR write (2s),
+.BR putmsg (2s),
+.BR putpmsg (2s),
+.BR read (2s),
+.BR getmsg (2s),
+.BR getpmsg (2s),
+.BR M_PROTO (9),
+.BR M_DATA (9),
+.BR M_FLUSH (9),
+.BR M_IOCTL (9),
+.BR M_PCPROTO (9),
+.BR M_READ (9),
+.BR M_START (9),
+.BR M_STARTI (9),
+.BR M_STOP (9),
+.BR M_STOPI (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.B pckt
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B pckt
+is compatible with
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+and implementations based on
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+such as
+.IR Solaris \(rg,
+.[
+soldoc
+.]
+.IR OSF/1 \(rg,
+.[
+osfdoc
+.]
+and
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR Solaris \(rg
+.[
+soldoc
+.]
+and
+.IR OSF/1 \(rg
+.[
+osfdoc
+.]
+document the reversal of the
+.BR M_FLUSH (9)
+flush bits.
+.IR OSF/1 \(rg
+.[
+osfdoc
+.]
+has an error in its documentation with regard to the handling of the
+.B FLUSHRW
+bits for packetization.
+.IP \(em
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+documents that the original message type is contained in the first four
+(4) bytes of the
+.BR M_PROTO (9)
+message block delivered to the Stream head in packet mode.  (This is
+presumably to maintain structure alignment on the data part of the message if
+read from the Stream using the control-data mode of
+.BR read (2s).
+.IR Solaris \(rg
+.[
+soldoc
+.]
+places the original message type in the first (and only) byte of the
+.BR M_PROTO (9)
+message block.
+.IR OSF/1 \(rg
+does not document the number of message bytes contained in the
+.BR M_PROTO (9)
+message block.
+.IP ""
+Portable programs will use
+.BR getmsg (2s)
+or
+.BR getpmsg (2s)
+to retrieve the messages and will examine the length of the control part of
+the message before attempting to interpret the bytes within the control part
+of the message.
+.IP \(em
+.IR UnixWare \(rg
+does not include
+.BR M_START (9)
+is the list of processed messages in its documentation.
+.[
+uw7doc
+.]
+As
+.BR M_START (9)
+is a message commonly sent by
+.BR ldterm (4)
+to a terminal device,
+.BR tty (4),
+this is probably a documentation error.
+.PP
+See
+.BR STREAMS (9)
+for more compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2,
+.[
+svr42
+.]
+SVID,
+.[
+svid
+.]
+XID,
+.[
+xbd5
+.]
+SUSv2,
+.[
+susv2
+.]
+SUSv3.
+.[
+susv3
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B pckt
+first appeared in SVR 3.
+.[
+svr3
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

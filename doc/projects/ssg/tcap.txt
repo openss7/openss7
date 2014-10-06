@@ -1,0 +1,41 @@
+                                                                                
+                 _______                                _______                 
+                |       | STREAM                       |       | STREAM         
+                 \_____/  head                          \_____/  head           
+                    |                                      |                    
+ Transport Provider /                 TCI                  /                    
+ Interface (TPI)    \    Transaction Component Interface   \                    
+                    /                                      /                    
+                    |                                      |                    
+          ,---------O--------------------------------------O---------,          
+          |         |                                      |         |          
+          |   ______|______                          ______|______   |          
+          |  |             |                        |             |  |          
+          |  |             |       TC Module        |             |  |          
+          |  |             |  Transaction Component |             |  |          
+          |  |_____________|       Sub-Layer        |_____________|  |          
+          |         |                                      |         |          
+          |         |                                      |         |          
+          |         |                                      |         |          
+          '---------O--------------------------------------O---------'          
+                    |                                      |                    
+ Transport Provider |                TRI                   |                    
+ Interface (TPI)    |         Transaction Interface        |                    
+                    |                                      |                    
+          ,----O----O----O----------------------------O----O----O----,          
+          |    |    |    |                            |    |    |    |          
+          |   _|____|____|_                          _|____|____|_   |          
+          |  |             |                        |             |  |          
+          |  |             |       TR Driver        |             |  |          
+          |  |             |  Transaction Sub-Layer |             |  |          
+          |  |_____________|                        |_____________|  |          
+          |         |                                      |         |          
+          |         |                                      |         |          
+          |         |                                      |         |          
+          '---------O--------------------------------------O---------'          
+                    |                                      |                    
+                    |               SCCPI                  |                    
+                    |  Signalling Connection Control Part  |                    
+                    |             Interface                |                    
+                    |                                      |                    
+                                                                                

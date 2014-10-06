@@ -1,0 +1,601 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: m2uaasconf.8.man,v 1.1.2.2 2011-02-07 02:18:30 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:30 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: m2uaasconf.8.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:30  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH M2UAASCONF 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.SH NAME
+.B m2uaasconf
+\- M2UA-AS Driver Configuration Utility
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 12
+\fBm2uaasconf\fR [\fIoptions\fR] [[{\fB-l\fR|\fB--list\fR}] [\fISGID\fR [\fI...\fR]]]
+.PD 0
+.HP
+\fBm2uaasconf\fR [\fIoptions\fR] {\fB-a\fR|\fB--add\fR} {[\fBsg\fR]|\fBkey\fR} \fISGID\fR \fIarguments\fR \fI...\fR
+.HP
+\fBm2uaasconf\fR [\fIoptions\fR] {\fB-c\fR|\fB--cha\fR} {[\fBsg\fR]|\fBkey\fR} \fISGID\fR \fIarguments\fR \fI...\fR
+.HP
+\fBm2uaasconf\fR [\fIoptions\fR] {\fB-d\fR|\fB--del\fR} {[\fBsg\fR]|\fBkey\fR} \fISGID\fR [\fIarguments\fR \fI...\fR]
+.HP
+\fBm2uaasconf\fR [\fIoptions\fR] {\fB-f\fR|\fB--file\fR} [\fIFILENAME\fR]
+.HP
+\fBm2uaasconf\fR {\fB-h\fR|\fB--help\fR}
+.HP
+\fBm2uaasconf\fR {\fB-V\fR|\fB--version\fR}
+.HP
+\fBm2uaasconf\fR {\fB-C\fR|\fB--copying\fR}
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B m2uasconf
+is a configuration utility for the M2UA-AS multiplexing driver,
+.BR m2ua-as (4).
+Its purpose is to open SCTP Streams, link them under the M2UA-AS driver, and configure them using
+M2UA-AS driver input-output controls.
+.PP
+The
+.B m2uasconf
+utility is intended to be run at system startup from a System V init script, or when reconfiguration
+of the M2UA-AS driver is necessary.  The utility can also be used to display the configuration of
+the M2UA-AS driver at any time.  Once configuration of the M2UA-AS multiplexing driver is complete,
+application programs (SL-Users) can open, attach, enable and use Signalling Link streams opened on
+the driver.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.B M2UAASCONF
+provides the following command-line options:
+.SS "Command Options"
+.PP
+One of the following mutually exclusive command options must be specified.  If no command options
+are specified,
+.B M2UAASCONF
+will behave as though the
+.B -l
+option was specified and list the full configuration for the M2UA-AS driver.
+.TP
+[[\fB-l\fR, \fB--list\fR] [\fISGID\fR [\fI...\fR]]]
+List the configuration information associated with a specified set of SGs, or list the configuration
+information fo all SGs (if no arguments are specified).  The information is displayed in the same
+format as contained in the
+.BR m2uaasconf
+configuration file.  This option can be used to obtain information about specific M2UA-AS SGs, as
+well as providing the ability to regenerate the M2UA-AS entries in the
+.BR m2uaasconf
+configuration file.
+.RS
+.PP
+Arguments consist of a whitespace separated list of SG identifiers.  Each SG identifier can consist
+of a number (specifying the local integer SG identifier) or an ASCII string (specifying the global
+SG Common Language Equipment Identifier).  When arguments are specified, the configuration
+associated with the SG identified by each argument is listed.  When no arguments are specified, the
+configuration for all SGs are listed.
+.PP
+The output format is one line per SG or Key entry and is consistent with the file format described
+under
+.RI \(lq "FILE FORMAT" \(rq,
+below.
+The
+.B -o
+option can be used to regenerate the configuration file.
+.RE
+.TP
+\fB-a\fR, \fB--add\fR {[\fBsg\fR]|\fBkey\fR} \fISGID\fR \fIarguments\fR \fI...\fR
+Add an SG or Key configuration entry.  The format of the arguments are the same as for the
+.B sg
+or
+.B key
+entry in the configuraion file.
+The argument format is consistent with the file format described under
+.RI \(lq "FILE FORMAT" \(rq,
+below.
+The entry must not overlap with an existing entry or an error will result.
+.TP
+\fB-c\fR, \fB--cha\fR {[\fBsg\fR]|\fBkey\fR} \fISGID\fR \fIarguments\fR \fI...\fR
+Change an SG or Key configuration entry.  The format of the arguments are the same as for the
+.B sg
+or
+.B key
+entry in the configuration file.
+The argument format is consistent with the file format described uder
+.RI \(lq "FILE FORMAT" \(rq,
+below.
+The entry must uniquely identify an existing entry to alter or an error will result.
+.TP
+\fB-d\fR, \fB--del\fR {[\fBsg\fR]|\fBkey\fR} \fISGID\fR [\fIarguments\fR \fI...\fR]
+Remove an SG or Key configuration entry.  The format of the arguments are the same as for the
+.B sg
+or
+.B key
+entry in the configuration file; however, only a sufficient number of arguments necessary to
+uniquely identify the entry are necessary.  Therefore, an SG entry can be deleted by specifying only
+the
+.IR sgid .
+Additional arguments are normally necessary to uniquely identify a Key entry for deletion.
+If the entry does not exist or cannot be uniquely identified, an error will result.
+.TP
+\fB-f\fR, \fB--file\fR [\fIFILENAME\fR]
+Create SG and Key configuration entries using the configuration file,
+.IR FILENAME ,
+or, if
+.I FILENAME
+is not specified, the default configuration file.  The default configuration file depends on the
+Linux distribution, but is normally
+.BR /etc/sysconf/m2uaasconf .
+Entries in the file are processed line by line and are added to the configuration as though the
+.B --add
+option were specified with the entry line fields as arguments.
+.RS
+.PP
+See
+.RI \(lq "FILE FORMAT" \(rq,
+below, for a description of the configuration file format.
+.RE
+.PP
+The following command options are common to all OpenSS7 project command line utilities:
+.TP
+\fB-h\fR, \fB--help\fR, \fB-H\fR, \fB-?\fR, \fB--?\fR
+When this option is encountered, print usage information to
+.I stdout
+and exit.
+.TP
+\fB-V\fR, \fB--version\fR
+When this option is encountered, print version information to
+.I stdout
+and exit.
+.TP
+\fB-C\fR, \fB--copying\fR
+When this option is encountered, print copying information to
+.I stdout
+and exit.
+.\"
+.SS General Options
+.PP
+.TP
+\fB-q\fR, \fB--quiet\fR
+Specifies that the caller
+.\"
+.\"
+.SH "FILE FORMAT"
+.PP
+When the
+\fB-f\fP, \fB--file\fP [\fIFILENAME\fP]
+option is specified, the supplied file contains M2UA-AS configuration entries as follows:
+.IP \(bu \w'\(bu\(em'u
+Each line in the file contains one entry or comment per line.
+.IP \(bu
+Each entry consists of a number of fields separated by whitespace.
+.IP \(bu
+Any field that begins with an octothorpe character,
+.RB ` # ',
+is a comment that continues to the end of the line.
+.IP \(bu
+Any line containing only a comment (beginning with optional whitespace followed by an octothorpe
+character,
+.RB ` # ')
+is ignored.
+.IP \(bu
+Blank lines are ignored.
+.PP
+Each line containing an M2UA-AS configuration entry consists of either a
+.B sg
+entry or a
+.B key
+entry.
+An
+.B sg
+entry begins with the string
+.RB \(lq sg \(rq
+in the first field.
+A
+.B key
+entry begins with the string
+.RB \(lq key \(rq
+in the first field.
+.SS SG Configuration Entries
+.PP
+Each line containing an M2UA-AS SG configuration entry consists of the following fields:
+.ad l
+.HP \w'\fBsg\fR\ 'u
+.B sg
+.RI < sgid >
+.RI < aspid >
+.RI < local-endpoint >
+.RI < remote-endpoint >
+.RI < streams >
+.RI < version >
+.RI < options >
+.ad b
+.PP
+Where,
+.TP
+.I sgid
+is an SG identifier that is an integer number locally identifying an ASP-SG relation (i.e. SCTP
+association), or a Common Language Equipment Identifier used to globally identify the remote SG.
+When both an integer and CLEI SG identifier are specified, they are separated by a comma with no
+intervening withspace.
+.TP
+.I aspid
+is an ASP Identifier that will be used in the ASP Up request to the SG.  If this field is specified
+as a single dash,
+.RB ( - ),
+then no ASP Identifier will be used in the ASP Up request to the SG.
+This field may also contain a Common Language Equipment Identifier used to globally identify the
+ASP.  When both an integer and CLEI ASP identifier are specified, they are separated by a common
+with no intervening whitespace.
+.TP
+.I local-endpoint
+is the local endpoint address to which the SCTP association is bound to communicate with the remote
+SG.  This can take the form:
+{\fIhostname\fR|\fIipaddress\fR}[\fB,\fR{\fIhostname\fR|\fIipaddress\fR}][\fB:\fR{\fIport\fR|\fIservice\fR}].
+The special hostname consisting of a single star,
+.RB ( * ),
+can be used to indicate a wildcard address.  When the wildcard address is used, only one
+.IR hostname " or " ipaddress
+can occur in the address.  If the
+.IR port " or " service
+is not specified, then a dynamic port number will be allocated.  If the
+.I service
+is specified as
+.RB \(lq m2ua ,\(rq
+then the M2UA registered (well-known) port number will be used.
+.TP
+.I remote-endpoint
+is the remote endpoint address to which the SCTP association is connected to communicate with the
+remote SG.  This can take the form:
+{\fIhostname\fR|\fIipaddress\fR}[\fB,\fR{\fIhostname\fR|\fIipaddress\fR}][\fB:\fR{\fIport\fR|\fIservice\fR}].
+If the
+.IR port " or " service
+is not specified, the M2UA registered (well-known) port number will be used.
+.TP
+.I streams
+is the number of SCTP data streams that will be requested on connection with this SG.
+.TP
+.I version
+is the version of the M2UA protocol that is supported by this SG.  The field can be a single dash
+.RB ( - ),
+indicating that the default is to be used; otherwise, one of the following values.
+.RS
+.TP
+.B rfc3331
+the SG supports Version 1 of the M2UA protocol as specified in RFC 3331.
+.[
+rfc3331
+.]
+.TP
+.B ts102141
+the SG supports Version 1 of the M2UA protocol as specified in RFC 3331 and modified by ETSI TS 102
+141.
+.[
+ts 102 141
+.]
+.RE
+.TP
+.I options
+is a list of comma-separated SG options, with no embedded whitespace.  Which defined options are
+valid might depend upon the setting of
+.IR version ,
+above.  Options that are undefined or unsupported for a given
+.I version
+are ignored.  When no options are specified, this filed contains a single dash
+.RB ( - ).
+The following options are defined:
+.RS
+.TP
+.B dynamic
+When included in the options, this keyword specifies that the SG requires dynamic configuration
+(registration).  If this option is not included, the SG requires static configuration (no
+registration).
+.RE
+.SS Key Configuration Entries
+.PP
+Each line containing an M2UA-AS Key configuration entry consists of the following fields:
+.ad l
+.HP \w'\fBkey\fR\ 'u
+.B key
+.RI < sgid >
+.RI < iid >
+.RI < sdti >
+.RI < sdli >
+.RI < tmode >
+.ad b
+.PP
+Where,
+.TP
+.I sgid
+.TP
+.I iid
+.TP
+.I sdti
+.TP
+.I sdli
+.TP
+.I tmode
+.SS Procedures
+.PP
+The
+.B m2uaasconf
+utility, reads this configuration file and performs the following steps for each entry in the file:
+.IP 1. \w'0.\(em'u
+The
+.B m2uaasconf
+utility opens an SCTP association by opening the
+.B /dev/sctp_t
+device, or the device specified with the
+.B -s
+option.
+.IP 2.
+The
+.B m2uaasconf
+utility opens a stream on the M2UA-AS driver using the
+.B /dev/m2ua-as
+device, or the device specified by the
+.B -e
+option, and links the SCTP stream under the M2UA-AS multiplexing driver using the
+.IR I_LINK "(7) or " I_PLINK (7)
+input-output control.
+The
+.B m2uaasconf
+utility can then close the file descriptor for the SCTP stream.
+.IP 3.
+The
+.B m2uaasconf
+utility uses the
+.B M2UA_AS_IOCSCONFIG
+input-output control to associated the lower multiplex SCTP stream with an ASP-SG relation.  The
+input-output control takes the information provided in the configuration file line entry, and the
+multiplexer identifier returned from the
+.IR I_LINK "(7) or " I_PLINK (7)
+input-output control operation.  The M2UA-AS driver, in response to the
+.B M2UA_AS_IOCSCONFIG
+input-output control, complets the ASP-SG relation information as part of the lower multiplex stream
+private structure.  The M2UA-AS driver also binds and connects the SCTP association and attempts to
+bring the ASP to the ASP Up state with the remote SG.
+.IP 4.
+Steps 1 thorugh 3, above, are repeated for each entry in the configuration file.
+.IP 5.
+The utility can also open and attach signalling links streams and link them under the SL-MUX
+multiplexing driver with a global PPA and CLEI.
+.\"
+.\"
+.SH SIGNALS
+.PP
+.TP
+.RI { SIGHUP }
+This signal causes the
+.B m2uaasconf
+utility to reread the configuration file.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero (0) indicates that the command was successful; one (1) indicates that an
+error occured and a diagnostic message is printed to
+.IR stderr ;
+two (2) indicates that the option syntax was in error and a diagnostic message is printed on
+.IR stderr .
+.PP
+The
+.B --quiet
+options suppresses the printing of diagnostic messages to
+.IR stderr .
+.\"
+.\"
+.SH EXAMPLES
+.PP
+Sample configuration file:
+.RS
+.PP
+.nf
+\fC\s-3\
+1,EDTNAB55M2SGP01 1,EDTNAB55M2ASP01 localhost localhost:m2ua 257 ts102141 -
+2,EDTNAB55M2SGP01 2,EDTNAB55M2ASP02 localhost localhost:m2ua 257 ts102141 -
+3,EDTNAB55M2SGP02   EDTNAB55M2ASP03 localhost localhost:1000  33 rfc3331  dynamic
+\s+3\fP
+.fi
+.RE
+.PP
+Set the configuration according to the configuration file:
+.RS
+.PP
+.nf
+\fC\s-1\
+#> m2uaasconf -f ./sampleconf
+\s+1\fP
+.fi
+.RE
+.PP
+Remove one entry:
+.RS
+.PP
+.nf
+\fC\s-1\
+#> m2uaasconf -d EDTNAB55M2SGP02
+\s+1\fP
+.fi
+.RE
+.PP
+Add the removed entry back:
+.RS
+.PP
+.nf
+\fC\s-1\
+#> m2uaasconf -a 3,EDTNAB55M2SGP02 EDTNAB55M2ASP03 localhost localhost:1000 33 rfc3331 dynamic
+\s+1\fP
+.fi
+.RE
+.PP
+List all entries:
+.RS
+.PP
+.nf
+\fC\s-1\
+#> m2uaasconf
+\s+1\fP
+.fi
+.RE
+.PP
+List one entry:
+.RS
+.PP
+.nf
+\fC\s-1\
+#> m2uaasconf 3
+\s+1\fP
+.fi
+.RE
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH BUGS
+.PP
+.B m2uaasconf
+has no known bugs.
+Report problems to
+.RI < bugs@openss7.org >.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR m2ua-as (4),
+.BR sl-mux (4).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B m2uaasconf
+is an OpenSS7-specific configuration command.  Because this command is used at startup and is
+transparent to the SL-User opening SL streams, compatibility is not an issue.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Configuration is not subject to standardization.
+The utility conforms to OpenSS7 project specifications, coding and options standards.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B m2uaasconf
+configuration utility was first released in sigtran 0.9.2.2.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

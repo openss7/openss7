@@ -1,0 +1,12 @@
+#!/bin/bash
+
+codes=`cat ccodes.txt | grep -v '^#' | grep -v '^ZZ' | cut -f1 | uniq`
+
+cat /dev/null > tmp.log
+
+for code in $codes; do
+	echo "processing $code";
+	#LANG=C.UTF-8 links -width 200 -dump 'http://www.geopostcodes.com/index.php?pg=resources&file=ISO_3166_2_Regions_codes&code='$code  -html-assume-codepage UTF-8 >> tmp.log
+	LANG=C.UTF-8 lynx -nolist -width=200 -dump 'http://www.geopostcodes.com/index.php?pg=resources&file=ISO_3166_2_Regions_codes&code='$code >> tmp.log
+
+done

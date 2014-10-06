@@ -1,0 +1,10 @@
+                                                                                
+                              |                  |                              
+                              |                  |                              
+                              |                  |                              
+                              |                  |                              
+                           /--| ~   ~   ~   ~   ~|--\                           
+        DL_DISCONNECT <---/   |   ~   ~   ~   ~  |   \---->  DL_DISCONNECT      
+           indication         |                  |           indication         
+                              |                  |                              
+                                                                                

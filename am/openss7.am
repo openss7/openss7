@@ -1,0 +1,1407 @@
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
+## =============================================================================
+## 
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 1.1.2.15 $) $Date: 2011-09-02 08:46:27 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU Affero General Public License as published by the Free
+## Software Foundation; version 3 of the License.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+## details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+## write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+## 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2011-09-02 08:46:27 $ by $Author: brian $
+##
+## =============================================================================
+
+##TOMAKE_OPTIONS = gnits 1.11 dist-bzip2 std-options -Wall color-tests
+
+ECHO = echo
+
+ECHO_V = test -n '$(AM_V_at)' || $(ECHO)
+ECHO_Q = test -z '$(AM_V_at)' || $(ECHO)
+
+am__short_list = \
+	sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
+	sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
+
+am__base_remove = \
+	$(am__short_list) | \
+	while read line ; do \
+		$(ECHO) "rm -f -- $$line" ; \
+		rm -f -- $$line ; \
+	done
+
+am__echo_list = \
+	for f in $$list ; do echo "$$f" ; done
+
+am__list_remove = \
+	$(am__echo_list) | $(am__base_remove)
+
+am__echo_build = \
+	for f in $$list; do if test ! -f $(srcdir)/$$f ; then echo "$$f" ; fi ; done
+
+am__list_remove_build = \
+	$(am__echo_build) | $(am__base_remove)
+
+am__base_install = \
+	$(am__short_list) | \
+	while read files ; do \
+		$(ECHO) " $(INSTALL_DATA) $$files '$(DESTDIR)$$dir'"; \
+		$(INSTALL_DATA) $$files "$(DESTDIR)$$dir" || exit $$?; \
+	done
+
+am__list_install = \
+	$(ECHO_V) "test -z '$$dir' || $(MKDIR_P) '$(DESTDIR)$$dir'"; \
+	test -z "$$dir" || $(MKDIR_P) "$(DESTDIR)$$dir"; \
+	test -n "$$dir" || list=; \
+	for p in $$list ; do \
+		if test -f "$$p"; then d=; else d=$(srcdir)/ ; fi ; \
+		echo "$$d$$p"; \
+	done | $(am__base_install)
+
+am__gpg_prepare = \
+	user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+	pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
+	pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"
+
+am__gpg_clear_sign_file = \
+	if test ! -s $$f || ! $(GPG) --verify -- $$f >/dev/null 2>&1; then \
+		test ! -s $$f || $(ECHO) "D: gpg BAD $$f" ; \
+		$(am__gpg_prepare) ; \
+		$(ECHO) "$(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -- $$f 2>/dev/null"; \
+		eval "$$pipe $(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -- $$f 2>/dev/null"; \
+		sigs="$$sigs$${sigs:+ }$$f" ; \
+	else \
+		$(ECHO) "D: gpg OK  $$f" ; \
+		touch "$$f"; \
+	fi
+
+am__gpg_verify_sign_file = \
+	if test ! -s $$a || ! $(GPG) --verify -- $$a >/dev/null 2>&1; then \
+		test ! -s $$a || $(ECHO) "D: gpg BAD $$a" ; \
+		$(am__gpg_prepare) ; \
+		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
+		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
+		sigs="$$sigs$${sigs:+ }$$a" ; \
+	else \
+		$(ECHO) "D: gpg OK  $$a" ; \
+		touch "$$a"; \
+	fi
+
+am__gpg_binary_sign_file = \
+	if test ! -s $$a || ! $(GPG) --verify -- $$a >/dev/null 2>&1; then \
+		test ! -s $$a || $(ECHO) "D: gpg BAD $$a" ; \
+		$(am__gpg_prepare) ; \
+		$(ECHO) "$(GPG) -b --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
+		eval "$$pipe $(GPG) -b --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
+		sigs="$$sigs$${sigs:+ }$$a" ; \
+	else \
+		$(ECHO) "D: gpg OK  $$a" ; \
+	fi
+
+am__gpg_export_key_file = \
+	test -s $$k || { \
+		$(am__gpg_prepare) ; \
+		$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$k"; \
+		$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$k ; \
+	}
+
+am__gpg_clear_sign = \
+	$(AM_V_GEN) f='$@'; $(am__gpg_clear_sign_file)
+
+am__gpg_verify_sign = \
+	$(AM_V_GEN) a='$@';f='$<'; $(am__gpg_verify_sign_file)
+
+am__gpg_binary_sign = \
+	$(AM_V_GEN) a='$@';f='$<'; $(am__gpg_binary_sign_file)
+
+am__gpg_export_key = \
+	$(AM_V_GEN) k='$@'; $(am__gpg_export_key_file)
+
+am__compress_data_file = \
+	if test -s $$f ; then \
+		$(ECHO_Q) "  GEN   $$f.gz" ; \
+		$(ECHO_V) " $(GZIP_CMD) $(GZIP) -c $$f >$$f.gz" ; \
+		$(GZIP_CMD) $(GZIP) -c $$f >$$f.gz ; \
+		$(ECHO_Q) "  GEN   $$f.bz2" ; \
+		$(ECHO_V) " $(BZIP2_CMD) $(BZIP2) -c $$f >$$f.bz2" ; \
+		$(BZIP2_CMD) $(BZIP2) -c $$f >$$f.bz2 ; \
+		$(ECHO_Q) "  GEN   $$f.xz" ; \
+		$(ECHO_V) " $(XZ_CMD) $(XZ) -c $$f >$$f.xz" ; \
+		$(XZ_CMD) $(XZ) -c $$f >$$f.xz ; \
+	fi
+
+am__gpg_sign_compressed_file = \
+	am__fsave="$$f" ; \
+	am__ssave="$$s" ; \
+	for s in '' .gz .bz2 .lzma .xz ; do \
+		f="$$am__fsave$$s" ; \
+		test -s "$$f" || continue ; \
+		a="$$f.asc" ; \
+		$(am__gpg_verify_sign_file) ; \
+	done ; \
+	f="$$am__fsave" ; \
+	s="$$am__ssave"
+
+##
+# Accumulate these 'till the end
+##
+ALL_LOCAL		=
+INSTALL_DATA_LOCAL	=
+INSTALL_DATA_HOOK	=
+INSTALL_EXEC_LOCAL	=
+INSTALL_EXEC_HOOK	=
+UNINSTALL_LOCAL		=
+UNINSTALL_HOOK		=
+MOSTLYCLEAN_LOCAL	=
+CLEAN_LOCAL		=
+DISTCLEAN_LOCAL		=
+MAINTAINER_CLEAN_LOCAL	=
+DIST_HOOK		=
+CHECK_LOCAL		=
+INSTALLCHECK_LOCAL	=
+DISTCHECK_HOOK		=
+RELEASE_CLEAN_LOCAL	=
+UPDATE_CLEAN_LOCAL	=
+
+PRE_INSTALL_AM		=
+POST_INSTALL_AM		=
+PRE_UNINSTALL_MA	=
+POST_UNINSTALL_MA	=
+
+RETEST_AM		=
+
+MANS_AM			=
+INSTALL_MANS_AM		=
+UNINSTALL_MANS_MA	=
+
+MIBS_AM			=
+INSTALL_MIBS_AM		=
+UNINSTALL_MIBS_MA	=
+
+SNMP_AM			=
+INSTALL_SNMP_AM		=
+UNINSTALL_SNMP_MA	=
+
+##
+# Accumulate until the end
+##
+
+BUILT_SOURCES		=
+
+##
+# In case we only need the files version:
+##
+MOSTLYCLEANFILES	=
+CLEANFILES		=
+DISTCLEANFILES		=
+MAINTAINERCLEANFILES	=
+RELEASECLEANFILES	=
+UPDATECLEANFILES	=
+REPOCLEANFILES		=
+
+##
+# Accumulate extras until the end.
+##
+EXTRA_DIST		=
+EXTRA_SCRIPTS		=
+EXTRA_PROGRAMS		=
+EXTRA_LIBRARIES		=
+EXTRA_KERNEL_MODULES	=
+EXTRA_DOCS		=
+EXTRA_TEX		=
+
+dist_doc_DATA		=
+
+##
+# Accumlate special targets until the end.
+##
+MY_SUFFIXES		=
+MY_PHONY		=
+MY_PRECIOUS		=
+MY_INTERMEDIATE		=
+MY_SECONDARY		=
+MY_RECURSIVE_TARGETS	=
+MY_REVERSIVE_TARGETS	=
+
+dist_noinst_SCRIPTS	=
+
+AM_INSTALLCHECK_STD_OPTIONS_EXEMPT =
+
+RELEASE_FILES		=
+
+RELEASE			=
+RELEASE_SIGN		=
+RELEASE_LINKS		=
+RELEASE_DIRECTORIES	=
+RELEASE_INSTALL		=
+RELEASE_UNINSTALL	=
+
+UPDATE			=
+UPDATE_SIGN		=
+UPDATE_LINKS		=
+UPDATE_DIRECTORIES	=
+UPDATE_INSTALL		=
+UPDATE_UNINSTALL	=
+
+REPO			=
+REPO_SIGN		=
+REPO_CLEAN		=
+REPO_LINKS		=
+REPO_DIRECTORIES	=
+REPO_INSTALL		=
+REPO_INSTALL_LOCAL	=
+REPO_UNINSTALL		=
+
+FORCED_TARGETS		=
+FORCE			=
+
+$(FORCED_TARGETS):
+	@target=`echo "$@" | sed 's,^forced-,,'` ; \
+	$(ECHO_V) "$(MAKE) FORCE=force $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target" ; \
+	$(MAKE) FORCE=force $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target
+
+MY_PHONY		+= $(FORCED_TARGETS)
+
+if MAINTAINER_MODE
+MAINTAINER_MODE = yes
+else
+MAINTAINER_MODE = no
+endif
+
+##
+## Like automake recursive targets, but mine.
+##
+$(MY_RECURSIVE_TARGETS):
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@set fnord $$MAKEFLAGS; amf=$$2; dot_seen=no; \
+	target=`$(ECHO) $@ | sed s/-recursive//`; \
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	     if test "$$subdir" = "."; then dot_seen=yes; fi; \
+	done; \
+	if test "$$dot_seen" = "no"; then list="$$list ."; fi; \
+	for subdir in $$list; do \
+		case " m4 intl po " in (*" $$subdir "*) continue ;; esac; \
+		$(ECHO_V) "D: Making $$target in $$subdir"; \
+		if test "$$subdir" = "."; then local="$$target-am"; else local="$$target"; fi; \
+		$(ECHO_V) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$local)"; \
+		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$local) \
+			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac; \
+	done; \
+	test -z "$$fail"
+
+MY_PHONY	+= $(MY_RECURSIVE_TARGETS)
+
+##
+## Like automake recursive targets, except that they execute subdirectories in the reverse order.
+## We also try to override uninstall-recursive.  Automake will probably complain violently.
+##
+$(MY_REVERSIVE_TARGETS):
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@set fnord $$MAKEFLAGS; amf=$$2; dot_seen=no; \
+	target=`$(ECHO) $@ | sed s/-reversive//`; \
+	list=''; rev='$(SUBDIRS)'; for subdir in $$rev; do \
+	     	if test "$$subdir" = "."; then dot_seen=yes; fi; \
+		list="$$subdir $$list"; \
+	done; \
+	if test "$$dot_seen" = "no"; then list=". $$list"; fi; \
+	for subdir in $$list; do \
+		case " m4 intl po " in (*" $$subdir "*) \
+			if test "$$target" = "remove"; then target='uninstall'; else continue; fi ;; \
+		esac; \
+		$(ECHO_V) "D: Making $$target in $$subdir"; \
+		if test "$$subdir" = "."; then local="$$target-ma"; else local="$$target"; fi; \
+		$(ECHO_V) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$local)"; \
+		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$local) \
+			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac; \
+	done; \
+	test -z "$$fail"
+
+MY_PHONY	+= $(MY_REVERSIVE_TARGETS)
+
+##
+## Like automake recursive targets, except that they do not execute in the current directory (unless
+## there are no subdirectories), only subdirectories.
+##
+ALL_RECURSIVE_TARGETS = all-check all-distcheck all-installcheck all-install
+
+ALL_EXPORT_OPTS =
+
+$(ALL_RECURSIVE_TARGETS): ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+$(ALL_RECURSIVE_TARGETS):
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@set fnord $$MAKEFLAGS; amf=$$2; \
+	target=`$(ECHO) $@ | sed 's|^all-||'`; \
+	list='$(subdirs) .'; \
+	for subdir in $$list; do \
+		$(ECHO_V) "D: Making $$target in $$subdir"; \
+		$(ECHO_V) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target)"; \
+		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target) \
+			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac; \
+	done; \
+	test -z "$$fail"
+
+MY_PHONY	+= $(ALL_RECURSIVE_TARGETS)
+
+##
+## Like automake recursive targets, except that they do not execute in the current directory (unless
+## there are no subdirectories), and operate on subdirectories in reverse order.
+##
+ALL_REVERSIVE_TARGETS = all-uninstall
+
+$(ALL_REVERSIVE_TARGETS): ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+$(ALL_REVERSIVE_TARGETS):
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@set fnord $$MAKEFLAGS; amf=$$2; \
+	target=`$(ECHO) $@ | sed 's|^all-||'`; \
+	list=''; rev='$(subdirs) .'; for subdir in $$rev; do \
+		list="$$subdir $$list"; \
+	done; \
+	for subdir in $$list; do \
+		$(ECHO_V) "D: Making $$target in $$subdir"; \
+		$(ECHO_V) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target)"; \
+		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target) \
+			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac; \
+	done; \
+	test -z "$$fail"
+
+MY_PHONY	+= $(ALL_REVERSIVE_TARGETS)
+
+##
+# directory for test suites and other test programs
+##
+if PERFORM_CHECKS
+dist_check_SCRIPTS	= @top_srcdir@/scripts/check
+#dist_check_SCRIPTS	= scripts/check_commands
+TESTS			= $(dist_check_SCRIPTS)
+TESTS_ENVIRONMENT	= srcdir='$(srcdir)' \
+			  top_srcdir='$(top_srcdir)' \
+			  top_builddir='$(top_builddir)' \
+			  cross_compiling='$(cross_compiling)' \
+			  MAINTAINER_MODE='$(MAINTAINER_MODE)' \
+			  bin_PROGRAMS='$(bin_PROGRAMS)' \
+			  dist_bin_SCRIPTS='$(dist_bin_SCRIPTS)' \
+			  sysbin_PROGRAMS='$(sysbin_PROGRAMS)' \
+			  sbin_PROGRAMS='$(sbin_PROGRAMS)' \
+			  pkglibexec_PROGRAMS='$(pkglibexec_PROGRAMS)' \
+			  dist_sbin_SCRIPTS='$(dist_sbin_SCRIPTS)' \
+			  syssbin_PROGRAMS='$(syssbin_PROGRAMS)' \
+			  dist_pkglibexec_SCRIPTS='$(dist_pkglibexec_SCRIPTS)' \
+			  dist_initrd_SCRIPTS='$(dist_initrd_SCRIPTS)' \
+			  dist_noinst_SCRIPTS='$(dist_noinst_SCRIPTS)' \
+			  AM_INSTALLCHECK_STD_OPTIONS_EXEMPT='$(AM_INSTALLCHECK_STD_OPTIONS_EXEMPT)'
+else
+dist_check_SCRIPTS	= 
+TESTS			= 
+TESTS_ENVIRONMENT	= 
+endif
+
+MY_RECURSIVE_TARGETS	+= check-clean-recursive
+
+#! check-clean:
+#!     This target removes log files left behind by the `check' target.  By
+#!     default, the check scripts append to log files in the top level build
+#!     directory.  This target can be used to clean out those log files before
+#!     the next run.
+#!
+check-clean: check-clean-recursive
+
+check-clean-am:
+	rm -f -- check_*.log check_*.err check_*.out
+
+MY_PHONY	+= check-clean check-clean-am
+
+#!
+#! Text Documentation Targets
+#! --------------------------
+#!
+#! The following targets are used to build, install and uninstall just the text
+#! documentation from the distribution.  These targets are good for creating a
+#! distribution of just the text documentation.  When building atop multiple
+#! packages, these targets recurse down through each package.  It is optional to
+#! build and install text documentation.  It will always be removed by the
+#! 'uninstall' target.
+#!
+#! txt:
+#!     Build all of the text documentation.  This involves creating text
+#!     documents from texinfo manuals and internet drafts.
+#!
+#! install-txt:
+#!     Installs the text documentation under DESTDIR.  Specify DESTDIR to place
+#!     the text documentation wherever you see fit.  If DESTDIR is not specified
+#!     on the command line, the text documentation will be installed in the
+#!     normal installation directory (@docdir@).
+#!
+#! uninstall-txt:
+#!     Uninstalls the text documentation from DESTDIR.  Specify DESTDIR to
+#!     indicate from where to remove the text documentation.  If DESTDIR is not
+#!     specified on the command line, the text documentation will be removed
+#!     from the normal installation directory (@docdir@).
+#!
+txt: txt-recursive
+
+txt-am:
+
+install-txt: install-txt-recursive
+
+install-txt-am: install-txt-local
+
+install-txt-local:
+
+uninstall-txt: uninstall-txt-reversive
+
+uninstall-txt-ma:
+
+UNINSTALL_LOCAL		+= uninstall-txt-ma
+
+MY_PHONY		+= txt txt-am install-txt install-txt-am install-txt-local uninstall-txt uninstall-txt-ma
+MY_RECURSIVE_TARGETS	+= txt-recursive install-txt-recursive
+MY_REVERSIVE_TARGETS	+= uninstall-txt-reversive
+
+## -----------------------------------------------------
+
+uninstall-dvi: uninstall-dvi-reversive
+uninstall-dvi-ma:
+
+MY_PHONY		+= uninstall-dvi-ma
+MY_REVERSIVE_TARGETS	+= uninstall-dvi-reversive
+
+## -----------------------------------------------------
+
+uninstall-ps: uninstall-ps-reversive
+uninstall-ps-ma:
+
+MY_PHONY		+= uninstall-ps-ma
+MY_REVERSIVE_TARGETS	+= uninstall-ps-reversive
+
+## -----------------------------------------------------
+
+uninstall-pdf: uninstall-pdf-reversive
+uninstall-pdf-ma:
+
+MY_PHONY		+= uninstall-pdf-ma
+MY_REVERSIVE_TARGETS	+= uninstall-pdf-reversive
+
+## -----------------------------------------------------
+
+uninstall-html: uninstall-html-reversive
+uninstall-html-ma:
+
+MY_PHONY		+= uninstall-html-ma
+MY_REVERSIVE_TARGETS	+= uninstall-html-reversive
+
+## -----------------------------------------------------
+
+uninstall-info: uninstall-info-reversive
+uninstall-info-ma:
+
+MY_PHONY		+= uninstall-info-ma
+MY_REVERSIVE_TARGETS	+= uninstall-info-reversive
+
+## -----------------------------------------------------
+
+sgml: sgml-recursive
+
+sgml-am:
+
+install-sgml: install-sgml-recursive
+
+install-sgml-am:
+
+uninstall-sgml: uninstall-sgml-reversive
+
+uninstall-sgml-ma:
+
+UNINSTALL_LOCAL		+= uninstall-sgml-ma
+
+MY_PHONY		+= sgml sgml-am install-sgml install-sgml-am
+
+MY_RECURSIVE_TARGETS	+= sgml-recursive install-sgml-recursive
+MY_REVERSIVE_TARGETS	+= uninstall-sgml-reversive
+
+## -----------------------------------------------------
+
+doxy:
+
+MY_PHONY		+=  doxy
+
+#!
+#! Manual Page Targets
+#! -------------------
+#!
+#! The following targets are used to build, install and uninstall just the
+#! manual pages from the distribution.  These targets are good for creating a
+#! distribution of just the manual pages.  When building atop multiple
+#! packages, these targets recurse down through each package.
+#!
+#! mans:
+#!     Build all of the manual pages.  This involves performing parameter
+#!     substitutions on manual pages and optionally cooking the manual pages
+#!     if `--with-cooked-manpages' was requested during configuration.
+#!
+#! install-mans:
+#!     Installs the manual pages under DESTDIR.  Specify DESTDIR to place the
+#!     manual pages wherever you see fit.  If DESTDIR is not specified on the
+#!     command line, the manual pages will be installed in the normal
+#!     installation directory (@mandir@).
+#!
+#! uninstall-mans:
+#!     Uninstalls the manual pages from DESTDIR.  Specify DESTDIR to indicate
+#!     from where to remove the manual pages.  If DESTDIR is not specified on
+#!     the command line, the manual pages will be removed from the normal
+#!     installation directory (@mandir@).
+#!
+mans: mans-recursive
+
+mans-am: $(MANS_AM)
+
+install-mans: install-mans-recursive
+
+install-mans-am: $(INSTALL_MANS_AM)
+
+uninstall-mans: uninstall-mans-reversive
+
+uninstall-mans-ma: $(UNINSTALL_MANS_MA)
+
+MY_PHONY		+= mans mans-am install-mans install-mans-am uninstall-mans uninstall-mans-ma
+
+MY_RECURSIVE_TARGETS	+= mans-recursive install-mans-recursive
+MY_REVERSIVE_TARGETS	+= uninstall-mans-reversive
+
+#!
+#! SNMP Agent Targets:
+#! -------------------
+#!
+#! The following targets are used to build, install and uninstall just the MIBS
+#! or SNMP agents from the distribution.  These targets are good for installing
+#! MIBS on managements systems, or when developing agents to reduce the
+#! development cycle.  When building atop multiple packages, these targets
+#! recurse down through each sub-package.
+#!
+#! mibs:
+#!     Build all of the SNMP MIBs.  This step is not usually necessary as the
+#!     MIBs are simple text files.
+#!
+#! install-mibs:
+#!     Installs just the SNMP MIBs under DESTDIR.  Specify DESTDIR or
+#!     'snmpmibdir' to place the MIBs where you see fit.  If DESTDIR or
+#!     'snmpmibdir' are not specified on the command line, the MIBs will be
+#!     installed in the normal installation directory. (@snmpmibdir@)
+#!
+#! uninstall-mibs:
+#!     Uninstalls the MIBs from DESTDIR.  Specify DESTDIR or 'snmpmibdir' to
+#!     indicate from where to remove the MIBs.  If DESTDIR or 'snmpmibdir' is
+#!     not specified on the command line, the MIBs will be removed from the
+#!     normal installation directory.
+mibs: mibs-recursive
+
+mibs-am: $(MIBS_AM)
+
+install-mibs: install-mibs-recursive
+
+install-mibs-am: $(INSTALL_MIBS_AM)
+
+uninstall-mibs: uninstall-mibs-reversive
+
+uninstall-mibs-ma: $(UNINSTALL_MIBS_MA)
+
+MY_PHONY	+= mibs mibs-am install-mibs install-mibs-am uninstall-mibs uninstall-mibs-ma
+
+MY_RECURSIVE_TARGETS	+= mibs-recursive install-mibs-recursive
+MY_REVERSIVE_TARGETS	+= uninstall-mibs-reversive
+
+#!
+#! snmp:
+#!     Build all of the SNMP agents and utilities.  This includes dynamically
+#!     loadable modules for ucd-snmp or net-snmp, and command line and perlTk
+#!     utilities.
+#!
+#! install-snmp:
+#!     Installs the SNMP agents and utilities under DESTDIR.  Specify DESTDIR to
+#!     place the SNMP agents and utilities where you see fit.  If DESTDIR is not
+#!     specified on the command line, the SNMP agents and utilities will be
+#!     installed in the normal installation directory. (@snmpdlmoddir@)
+#!
+#! uninstall-snmp:
+#!     Uninstalls the SNMP agents and utilities under DESTDIR.  Specify DESTDIR
+#!     to indicate from where to remove the SNMP agents and utilities.  If
+#!     DESTDIR is not specified no the command line, the SNMP agents and
+#!     utilities will be removed from the normal installation directory.
+#!     (@snmpdlmoddir@)
+snmp: snmp-recursive
+
+snmp-am: $(SNMP_AM)
+
+install-snmp: install-snmp-recursive
+
+install-snmp-am: $(INSTALL_SNMP_AM)
+
+uninstall-snmp: uninstall-snmp-reversive
+
+uninstall-snmp-ma: $(UNINSTALL_SNMP_MA)
+
+MY_PHONY	+= snmp snmp-am install-snmp install-snmp-am uninstall-snmp uninstall-snmp-ma
+
+MY_RECURSIVE_TARGETS	+= snmp-recursive install-snmp-recursive
+MY_REVERSIVE_TARGETS	+= uninstall-snmp-reversive
+
+#!
+#! Development Targets:
+#! --------------------
+#!
+#! Development targets provide for the generation of auxilliary files for use
+#! with programming development tools such as vim, emacs and cscope.  These
+#! targets are available always as they can assist in debugging during simple
+#! compilation as well as during maintainer mode.
+#!
+#! tags ctags:
+#!     These are standard automake targets that generate tags files in the build
+#!     and source directories for emacs and vim.  An example of the use of these
+#!     is as follows:  Suppose that the package is configured and a compile is
+#!     attempted as follows:
+#!
+#!     $> wget http://www.openss7.org/tarballs/@PACKAGE_TARNAME@-@VERSION@.tar.bz2
+#!     $> tar xjf @PACKAGE_TARNAME@-@VERSION@.tar.bz2
+#!     $> pushd @PACKAGE_TARNAME@-@VERSION@
+#!     $> ./configure      # successful
+#!     $> make             # some error is generated causing compile to fail
+#!     $> make tags ctags
+#!     $> vim +:make       # vim will jump to failing line in source file
+#!
+tags ctags:
+
+##
+# Have the makefile regenerate libtool if necessary
+##
+$(OBJECTS): libtool
+libtool: $(LIBTOOL_DEPS)
+	$(SHELL) ./config.status --recheck
+
+##
+# I use vim, not emacs.  The following triggers Automake 1.8 to include
+# targets for making vim tags files along with emacs TAGS files.
+##
+CTAGIDS			= -I __initdata \
+			  -I __exitdata \
+			  -I EXPORT_SYMBOL \
+			  -I EXPORT_SYMBOL_NOVERS \
+			  -I EXPORT_SYMBOL_GPL \
+			  -I FASTCALL \
+			  -I STREAMSCALL \
+			  -I STREAMS_FASTCALL \
+			  -I STREAMS_REGPARMS \
+			  -I asmlinkage \
+			  -I fastcall \
+			  -I streamscall \
+			  -I streams_fastcall \
+			  -I streams_regparms \
+			  -I __attribute__+ \
+			  -I __BEGIN_DECLS \
+			  -I __END_DECLS \
+			  -I __THROW \
+			  -I __const=const \
+			  -I __inline__=inline \
+			  -I STATIC=static \
+			  -I BIG_STATIC=static \
+			  -I BIG_STATIC_INLINE=inline \
+			  -I BIG_STATIC_STH=static \
+			  -I BIG_STATIC_INLINE_STH=inline \
+			  -I streams_inline=inline \
+			  -I INLINE=inline \
+			  -I streams_noinline \
+			  -I noinline \
+			  -I __always_inline=inline \
+			  -I _RP \
+			  -I __depr \
+			  -I HEAD_DECLARATION+ \
+			  -I STR_DECLARATION+ \
+			  -I __EXTERN_INLINE=inline \
+			  -I __STREAMS_EXTERN_INLINE=inline \
+			  -I __STRUTIL_EXTERN_INLINE=inline \
+			  -I __STRSCHD_EXTERN_INLINE=inline \
+			  -I __AIX_EXTERN_INLINE=inline \
+			  -I __HPUX_EXTERN_INLINE=inline \
+			  -I __IRIX_EXTERN_INLINE=inline \
+			  -I __LIS_EXTERN_INLINE=inline \
+			  -I __LFS_EXTERN_INLINE=inline \
+			  -I __MAC_EXTERN_INLINE=inline \
+			  -I __MPS_EXTERN_INLINE=inline \
+			  -I __OS7_EXTERN_INLINE=inline \
+			  -I __OSF_EXTERN_INLINE=inline \
+			  -I __SUN_EXTERN_INLINE=inline \
+			  -I __SUX_EXTERN_INLINE=inline \
+			  -I __SVR3_EXTERN_INLINE=inline \
+			  -I __SVR4_EXTERN_INLINE=inline \
+			  -I __UW7_EXTERN_INLINE=inline \
+			  -I __UXP_EXTERN_INLINE=inline \
+			  -I __EXTERN=extern \
+			  -I __STREAMS_EXTERN=extern \
+			  -I __STRUTIL_EXTERN=extern \
+			  -I __STRSCHD_EXTERN=extern \
+			  -I __AIX_EXTERN=extern \
+			  -I __HPUX_EXTERN=extern \
+			  -I __IRIX_EXTERN=extern \
+			  -I __LIS_EXTERN=extern \
+			  -I __LFS_EXTERN=extern \
+			  -I __MAC_EXTERN=extern \
+			  -I __MPS_EXTERN=extern \
+			  -I __OS7_EXTERN=extern \
+			  -I __OSF_EXTERN=extern \
+			  -I __SUN_EXTERN=extern \
+			  -I __SUX_EXTERN=extern \
+			  -I __SVR3_EXTERN=extern \
+			  -I __SVR4_EXTERN=extern \
+			  -I __UW7_EXTERN=extern \
+			  -I __UXP_EXTERN=extern \
+			  -I __unlikely \
+			  -I __hot \
+			  -I __hot_in \
+			  -I __hot_out \
+			  -I __hot_put \
+			  -I __hot_get \
+			  -I __hot_read \
+			  -I __hot_write
+CTAGSFLAGS = --language-force=C --c-types=+px $(CTAGIDS)
+TAGS_FILES = $(DIST_SOURCES)
+
+# if MAINTAINER_MODE
+# ALL_LOCAL		+= TAGS CTAGS
+# endif
+
+##
+# Some like cscope, so this will build a cscope database
+##
+
+##CSCOPE = cscope
+##CSCOPE_FILES = $(DIST_SOURCES)
+##CSCOPEFLAGS = -b
+##CSCOPE_ARGS =
+##
+##cscope-recursive:
+##	list='$(SUBDIRS)'; for subdir in $$list; do \
+##	     test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) cscope); \
+##	done
+##
+##cscope-files-recursive:
+##	list='$(SUBDIRS)'; for subdir in $$list; do \
+##	     test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) CSCOPEFILES='$(CSCOPEFILES)' cscope-files); \
+##	done
+##
+###! cscope:
+###!     cscope(1) is a powerful tool for cross-referencing function calls and
+###!     declarations in C source files.  This target generates the necessary
+###!     cscope auxiliary files in each subdirectory necessary to use cscope from
+###!     any point the package in the same manner as tags files above.  Try:
+###!
+###!     $> make cscope; cscope
+###!     $> make cscope; vim '+:cs add cscope.out'
+###!
+##cscope: CSCOPE
+##
+##CSCOPE: cscope.files cscope-recursive cscope.out
+##
+##cscope.files:
+##	list='$(SOURCES) $(HEADERS) $(CSCOPE_FILES)'; \
+##	echo "-k -p5 -q" > $@; \
+##	for i in $$list; do \
+##		if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
+##	done | $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
+##		END { if (nonempty) { for (i in files) print i; }; }' >> $@
+##	$(MAKE) $(AM_MAKEFLAGS) CSCOPEFILES="`/bin/pwd`/cscope.files" cscope-files-recursive
+##
+##cscope.out: cscope.files
+##	$(CSCOPE) $(CSCOPEFLAGS) $(AM_CSCOPEFLAGS) $(CSCOPE_ARGS) || :
+##
+##cscope-files: cscope-files-recursive
+##	list='$(SOURCES) $(HEADERS) $(CSCOPE_FILES)'; \
+##	s=`(cd $(srcdir); /bin/pwd)`; b=`/bin/pwd`; \
+##	test -z '$(CSCOPEFILES)' || \
+##	for i in $$list; do \
+##		if test -f "$$i"; then d="$$b/"; else d="$$s/"; fi; \
+##		case "$$i" in /*) d=;; esac; \
+##		echo "$$d$$i"; \
+##	done | $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
+##		END { if (nonempty) { for (i in files) print i; }; }' >> $(CSCOPEFILES)
+##
+##MY_PHONY		+= cscope cscope-recursive cscope-files cscope-files-recursive CSCOPE
+##DISTCLEANFILES		+= cscope.files cscope.out cscope.in.out cscope.po.out
+
+##
+# A rule to generate an ifnames.log file
+##
+ifnames.log:
+	find $(abs_srcdir) $(abs_builddir) -name "*.h" -o -name "*.c" -o -name "*.h.in" | egrep -v '/(config.h.in|config.h)$$' | xargs ifnames > $@
+
+ifnames: ifnames.log
+
+MY_PHONY		+= ifnames
+
+CLEANFILES		+= check_commands.log
+
+DISTCLEANFILES		+= *.log config.site *.err *.out
+
+MAINTAINERCLEANFILES	+= $(srcdir)/Makefile.in
+
+all-local: $(ALL_LOCAL)
+
+pre-install: pre-install-recursive
+
+pre-install-am: $(PRE_INSTALL_AM)
+
+MY_RECURSIVE_TARGETS	+= pre-install-recursive
+MY_PHONY		+= pre-install pre-install-am
+
+install-exec-local: pre-install-am $(INSTALL_EXEC_LOCAL)
+
+install-exec-hook: $(INSTALL_EXEC_HOOK)
+
+install-data-local: $(INSTALL_DATA_LOCAL)
+
+install-data-hook: $(INSTALL_DATA_HOOK) post-install-am
+
+post-install: post-install-recursive
+
+post-install-am: $(POST_INSTALL_AM)
+
+MY_RECURSIVE_TARGETS	+= post-install-recursive
+MY_PHONY		+= post-install post-install-am
+
+pre-uninstall: pre-uninstall-reversive
+
+pre-uninstall-ma: $(PRE_UNINSTALL_MA)
+
+MY_REVERSIVE_TARGETS	+= pre-uninstall-reversive
+MY_PHONY		+= pre-uninstall pre-uninstall-ma
+
+uninstall-local: pre-uninstall-ma $(UNINSTALL_LOCAL)
+
+uninstall-hook: $(UNINSTALL_HOOK) post-uninstall-ma
+
+post-uninstall: post-uninstall-ma
+
+post-uninstall-ma: $(POST_UNINSTALL_MA)
+
+MY_REVERSIVE_TARGETS	+= post-uninstall-reversive
+MY_PHONY		+= post-uninstall post-uninstall-ma
+
+mostlyclean-local: $(MOSTLYCLEAN_LOCAL)
+
+clean-local: $(CLEAN_LOCAL)
+
+distclean-local: $(DISTCLEAN_LOCAL)
+
+maintainer-clean-local: $(MAINTAINER_CLEAN_LOCAL)
+
+dist-hook: $(DIST_HOOK)
+
+check-local: $(CHECK_LOCAL)
+
+installcheck-local: $(INSTALLCHECK_LOCAL)
+
+distcheck-hook: $(DISTCHECK_HOOK)
+
+retest: retest-recursive
+
+retest-am: $(RETEST_AM)
+
+MY_RECURSIVE_TARGETS	+= retest-recursive
+MY_PHONY		+= retest retest-am
+
+remove-ma: uninstall-am
+
+remove: remove-recursive
+
+MY_REVERSIVE_TARGETS	+= remove-reversive
+MY_PHONY		+= remove remove-ma
+
+$(REPO_DIRECTORIES)::
+	$(AM_V_GEN)test -d $@ || { $(ECHO_V) " $(MKDIR_P) $@"; $(MKDIR_P) $@; }
+
+#! Repository targets:
+#! -------------------
+#!
+#! The following target is used to create the appropriate repositories in the
+#! package distribution directory.  It is good for finalizing builds and
+#! additions to the package repository, which is what I use it for.  This target
+#! only needs to be invoked from the topmost package.
+#!
+#! repo:
+#!     Build (or rebuild) all of the auxiliary and meta-data files in the
+#!     package distribution directory necessary to create repomd, yast, yum,
+#!     apt, urpmi, apt-rpm and tar repositories as appropriate for the current
+#!     distribution.  The targets invoked by this target are also invoked by the
+#!     `release' target at the end of packaging the distribution directory.
+#!
+repo: $(REPO_DIRECTORIES) $(REPO_LINKS) $(REPO)
+
+MY_PHONY		+= repo $(REPO)
+FORCED_TARGETS		+= forced-repo forced-repo.log
+
+#! repo-sign:
+#!     Sign all of the auxiliary and meta-data files in the package distribution
+#!     directory necessary to authenticate the meta-data for the repomd, yast,
+#!     yum, apt, urpmi, apt-rpm and tar repositories as appropriate for the
+#!     current distribution.  Should the auxiliary or meta-data files not yet
+#!     exist, they will be created by invoking the `repo' target automatically.
+#!     The targets invoked by this target are also invoked by the `release-sign'
+#!     target at the end of packaging the distribution directory and signing
+#!     packages.
+#!
+repo-sign: $(REPO_DIRECTORIES) $(REPO_LINKS) $(REPO_SIGN)
+
+MY_PHONY		+= repo-sign $(REPO_SIGN)
+FORCED_TARGETS		+= forced-repo-sign forced-repo-sign.log
+
+#! repo-clean:
+#!     The targets invoked by this target are also invoked by the
+#!     `release-clean' target at the end of removal of distribution packages.
+#!
+repo-clean: $(REPO_CLEAN)
+	@list="$(REPOCLEANFILES)" ; $(am__list_remove)
+
+MY_PHONY		+= repo-clean $(REPO_CLEAN)
+FORCED_TARGETS		+= forced-repo-clean
+
+#! repo-install:
+#! 	Installs the repository definitions necessary for an install source on
+#! 	the build machine.  This may include installing APT, YUM, ZYPPER, YaST,
+#! 	URPMI or APT-RPM repository definitions.  This is primarily for testing
+#! 	repository definitions and installation procedures.  Must be executed as
+#! 	root.  This target is different from repo-install-local in that it only
+#! 	installs remote (@reposerv@://) repository sources.
+#!
+repo-install: $(REPO_INSTALL)
+
+MY_PHONY		+= repo-install $(REPO_INSTALL)
+FORCED_TARGETS		+= forced-repo-install
+
+#! repo-install-local:
+#! 	Installs the repository definitions necessary for an install source on
+#! 	the build machine.  This may include installing APT, YUM, ZYPPER, YaST,
+#! 	URPMI or APT-RPM repository definitions.  This is primarily for testing
+#! 	repository definitions and installation procedures.  Must be executed as
+#! 	root.  This target is different from repo-install in that it only
+#! 	installs local (file://) repository sources.
+#!
+repo-install-local: $(REPO_INSTALL_LOCAL)
+
+MY_PHONY		+= repo-install-local $(REPO_INSTALL_LOCAL)
+FORCED_TARGETS		+= forced-repo-install-local
+
+#! repo-uninstall:
+#! 	Removes the repository definitions necessary for an install source on
+#! 	the build machine.  This may include removing APT, YUM, ZYPPER, YaST,
+#! 	URPMI or APT-RPM repository definitions.  This is primarily for testing
+#! 	repository definitions and removal procedures.  Must be executed as
+#! 	root.  This target removes installation sources added both by
+#! 	repo-install and repo-install-local targets.
+#!
+repo-uninstall: $(REPO_UNINSTALL)
+
+MY_PHONY		+= repo-uninstall $(REPO_UNINSTALL)
+FORCED_TARGETS		+= forced-repo-uninstall
+
+$(RELEASE_DIRECTORIES)::
+	$(AM_V_GEN)test -d $@ || { $(ECHO_V) " $(MKDIR_P) $@"; $(MKDIR_P) $@; }
+
+#!
+#! Release Targets:
+#! ----------------
+#!
+#! The following are targets used to generate complete releases into the package
+#! distribution directory.  These are good for unattended and NFS builds, which
+#! is what I use them for.  Also, when building from atop multiple packages,
+#! these targets also recurse down through each package.  They may also be used
+#! from within the individual sub-package.
+#!
+#! release:
+#!     Build all of the things necessary to generate a release.  On an rpm
+#!     system this is the distribution archives, the source rpm, and the
+#!     architecture dependent and architecture independent binary rpms.  All
+#!     items are placed in the package distribution directory that can be
+#!     specified with the `--with-pkg-distdir=DIR' option to `configure'.
+#!
+#! forced-release:
+#!     The release target will not regenerate any files that already exist in
+#!     the package distribution directory.  This forced target will.
+#!
+release: $(RELEASE_DIRECTORIES) $(RELEASE_LINKS) $(RELEASE)
+
+MY_PHONY		+= release $(RELEASE_LINKS) $(RELEASE)
+FORCED_TARGETS		+= forced-release
+
+#! release-files:
+#!     This target automagically updates release files when in maintainer mode.
+#!
+release-files: release-files-recursive
+release-files-am: $(RELEASE_FILES)
+
+MY_RECURSIVE_TARGETS 	+= release-files-recursive
+MY_PHONY		+= release-files-am release-files
+
+#! release-sign:
+#!     You will be prompted for a password, unless to specify it to make with
+#!     the GNUPGPASS variable.  For unattended or non-interactive builds with
+#!     signing, you can do that as: 'make GNUPGPASS=mypasswd release-sign'
+#!
+#! forced-release-sign:
+#!     The release-sign target will not regenerate any files that already exist
+#!     in the package distribution directory.  This forced target will.
+#!
+release-sign: $(RELEASE_DIRECTORIES) $(RELEASE_LINKS) $(RELEASE_SIGN)
+
+MY_PHONY		+= release-sign $(RELEASE_LINKS) $(RELEASE_SIGN)
+FORCED_TARGETS		+= forced-release-sign
+
+#! release-clean:
+#!     This target will remove all distribution files for the current package
+#!     from the package distribution directory.
+#!
+release-clean: release-clean-reversive release-clean-local
+
+release-clean-ma:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@reverse="$(RELEASE_CLEAN_LOCAL)"; targets=; for t in $$reverse; do \
+		targets="$$t$${targets:+ $$targets}"; \
+	done; \
+	for target in $$targets; do \
+		$(ECHO_V) "D: Making $$target in `pwd`"; \
+		$(ECHO_V) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target"; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target; \
+	done
+
+release-clean-local:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@reverse="$(RELEASECLEANFILES)"; list=; for f in $$reverse; do \
+		list="$$f$${list:+ $$list}"; \
+	done ; $(am__list_remove)
+
+MY_REVERSIVE_TARGETS	+= release-clean-reversive
+MY_PHONY		+= release-clean-ma release-clean-local release-clean $(RELEASE_CLEAN_LOCAL)
+FORCED_TARGETS		+= forced-release-clean
+
+#! release-install:
+#! 	Installs release rpms or debs into the release directory $(REPODIR) and
+#! 	updates any required repository metafiles.  It is intended on being used
+#! 	with REPODIR specified on the command line or during configure.  The
+#! 	directory defaults to the distribution directory.  Note that when
+#! 	REPODIR is not specified, this target does nothing.
+#!
+#! forced-release-install:
+#! 	The `release-install' target will not install any release rpms or debs
+#! 	that already exists in the package repository directory.  This forced
+#! 	target will.
+#!
+release-install: $(RELEASE_INSTALL)
+
+MY_PHONY		+= release-install $(RELEASE_INSTALL)
+FORCED_TARGETS		+= forced-release-install
+
+#! release-uninstall:
+#! 	Removes release rpms or debs from the release directory $(REPODIR) and
+#! 	updates any required repository metafiles.  It is intended on being used
+#! 	with REPODIR specified on the command line or during configure.  The
+#! 	directory defaults to the distribution directory.  Note that when
+#! 	REPODIR is not specified, this target does nothing.
+#!
+#! forced-release-uninstall:
+#! 	The `release-uninstall' target will not remove any release rpms or debs
+#! 	that already exist in the package repository directory and were not
+#! 	created by us.  This forced target will.
+#!
+release-uninstall: $(RELEASE_UNINSTALL)
+
+MY_PHONY		+= release-uninstall $(RELEASE_UNINSTALL)
+FORCED_TARGETS		+= forced-release-uninstall
+
+$(UPDATE_DIRECTORIES)::
+	$(AM_V_GEN)test -d $@ || { $(ECHO_V) " $(MKDIR_P) $@"; $(MKDIR_P) $@; }
+
+#! Update Targets:
+#! ---------------
+#!
+#! The following are targets used to update complete releases into and existing
+#! package distribution directory.  These are good for unattended NFS builds,
+#! which is what I use them for.  Also, when building from atop multiple
+#! packages, these targets also recurse down through each package.  They may
+#! also be used from within the individual sub-package.  The difference between
+#! these targets and the Release Targets is that these targets will not disrupt
+#! the existing distribution.
+#!
+$(USTAMP)::
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test ! -f $@ || exit 0
+	echo `date -uIseconds` > $@
+	touch $@
+
+#! update:
+#!     Build all of the things necessary to generate an update.  Updates consist
+#!     of updating components in existing release packages.  This is primarily
+#!     for generating kernel module binary packages for a newly released kernel.
+#!     In these instances, no source packages are changed and only binary
+#!     packages corresponding to the new kernel are affected.  Nevertheless, if
+#!     source packages do not exist for the newly released sub-package, they will
+#!     be created.
+#!
+#! forced-update:
+#!     The `update' target will not regenerate any files that already exist in
+#!     the package distribution directory that were created by this update run.
+#!     This forced target will.
+#!
+update: $(USTAMP) $(UPDATE_DIRECTORIES) $(UPDATE_LINKS) $(UPDATE)
+
+MY_PHONY		+= update $(UPDATE)
+FORCED_TARGETS		+= forced-update
+
+#! update-sign:
+#!     Standard input will be prompted for a password, unless you specify it to
+#!     make with the GNUPGPASS variable.  For unattended or non-interactive builds
+#!     with signing, you can do that as: 'make GNUPGPASS=mypasswd update-sign'
+#!
+#! forced-update-sign:
+#!     The `update-sign' target will not regenerate or sign any files that
+#!     already exist in the package distribution directory or have already been
+#!     signed.  This forced target will both regenerate and resign.
+#!
+update-sign: $(USTAMP) $(UPDATE_DIRECTORIES) $(UPDATE_LINKS) $(UPDATE_SIGN)
+
+MY_PHONY		+= update-sign $(UPDATE_SIGN)
+FORCED_TARGETS		+= forced-update-sign
+
+#! update-clean:
+#!     This target will remove all update files for the current package from the
+#!     package distribution directories.
+#!
+update-clean: update-clean-reversive update-clean-local
+
+update-clean-ma:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@reverse="$(UPDATE_CLEAN_LOCAL)"; targets=; for t in $$reverse; do \
+		targets="$$t$${targets:+ $$targets}"; \
+	done; \
+	for target in $$targets; do \
+		$(ECHO_V) "D: Making $$target in `pwd`"; \
+		$(ECHO_V) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target"; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target; \
+	done
+
+update-clean-local:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@reverse="$(UPDATECLEANFILES)"; list=; for f in $$reverse; do \
+		if test -e $$f -a \( ! -f '$(USTAMP)' -o $$f -nt '$(USTAMP)' \); then \
+			list="$$f$${list:+ $$list}"; \
+		fi; \
+	done ; $(am__list_remove)
+
+MY_REVERSIVE_TARGETS 	+= update-clean-reversive
+MY_PHONY		+= update-clean-ma update-clean-local update-clean $(UPDATE_CLEAN_LOCAL)
+FORCED_TARGETS		+= forced-update-clean
+
+#! update-install:
+#! 	Installs updated rpms or debs into the release directory $(REPODIR) and
+#! 	updates any required repository metafiles.  It is intended on being used
+#! 	with REPODIR specified on the command line or during configure.  The
+#! 	directory defaults to the distribution directory.  Note that when
+#! 	REPODIR is not specified, this target does nothing.  This differs from
+#! 	the release-install target in that it only affects updated rpms or debs
+#! 	(e.g. new kmod packages).
+#!
+#! forced-update-install:
+#! 	The `update-install' target will not install any update rpms or debs
+#! 	that already exist in the package repository directory.  This forced
+#! 	target will.
+#!
+update-install: $(UPDATE_INSTALL)
+
+MY_PHONY		+= update-install $(UPDATE_INSTALL)
+FORCED_TARGETS		+= forced-update-install
+
+#! update-uninstall:
+#! 	Removes updated rpms or debs from the release directory $(REPODIR) and
+#! 	updates any required repository metafiles.  It is intended on being used
+#! 	with REPODIR specified on the command line or during configure.  The
+#! 	directory defaults to the distribution directory.  Note that when
+#! 	REPODIR is not specified, this target does nothing.  This differs from
+#! 	the release-uninstall target in that it only affects updated rpms or
+#! 	debs (e.g. new kmod packages).
+#!
+#! forced-update-uninstall:
+#! 	The `update-uninstall' target will not remove any update rpms or debs
+#! 	that already exist in the package repository directory and were not
+#! 	created by us.  This forced target will. 
+#!
+update-uninstall: $(UPDATE_UNINSTALL)
+
+MY_PHONY		+= update-uninstall $(UPDATE_UNINSTALL)
+FORCED_TARGETS		+= forced-update-uninstall
+
+##
+## Some logging targets for the head makefile targets.
+##
+LOGGING_TARGETS = compile.log check.log install.log installcheck.log dist.log distcheck.log \
+		  rpms.log sign.log srpm.log resign.log dsc.log sigs.log debs.log csig.log \
+		  uninstall.log release.log release-sign.log rebuild.log reupload.log remove.log \
+		  repo.log repo-sign.log update.log update-sign.log
+
+#!
+#! Logging targets:
+#! ----------------
+#!
+#! For convenience, to log the output of a number of targets to a file, log
+#! targets are defined.  The log file itself is used as the target to make, but
+#! make invokes the target minus a .log suffix.  So, for example, to log the
+#! results of target 'foo', invoke the target 'foo.log'.  The only target that
+#! this does not apply to is 'compile.log'.  When you invoke the target
+#! 'compile.log' a simple 'make' is invoked and logged to the file
+#! 'compile.log'.  The 'foo.log' rule applies to all other targets.  This does
+#! not work for all targets, just a selected few.  Following are the logging
+#! targets:
+#!
+#! First the common ones:
+#!
+#!     compile.log, check.log, install.log, installcheck.log, uninstall.log,
+#!     remove.log
+#!
+#! and the maintainer mode ones:
+#!
+#!     dist.log, distcheck.log, srpm.log, rpms.log, sign.log, rebuild.log,
+#!     resign.log, release.log, release-sign.log, repo.log, repo-sign.log,
+#!     update.log, update-sign.log
+#!
+#! If you want to add one, simply add it to LOGGING_TARGETS in Makefile.am
+#!
+$(LOGGING_TARGETS): FORCE
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@target=`$(ECHO) "$@" | sed 's|\.log$$||;s|compile||'`; \
+	if test -n '$(AP_AUTOPR)'; then sendpr='$(AP_AUTOPR)'; else sendpr='false'; fi; \
+	{ $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target || \
+	{ exec 1>/dev/stdout; $$sendpr --batch --config=$(AP_CONFIG) --target="$@"; }; } 2>&1 \
+	| tee $@
+
+configure.log: FORCE
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@if test -n '$(AP_AUTOPR)'; then sendpr='$(AP_AUTOPR)'; else sendpr='false'; fi; \
+	{ (cd $(top_builddir); ./config.status --recheck; ./config.status) || \
+	{ exec 1>/dev/stdout; $$sendpr --batch --config=$(AP_CONFIG) --target="$@"; }; } 2>&1 \
+	| tee $@
+
+FORCE:
+
+##
+# Make logging targets precious (automake hates direct dependencies so we hide it)
+##
+MY_PRECIOUS	+= $(LOGGING_TARGETS) configure.log
+
+##
+# Collected suffixes from other automake fragments to avoid problems with automake conditionals.
+##
+SUFFIXES = $(MY_SUFFIXES)
+
+##
+# Collected phonys from other automake fragments to avoid problems with automake conditionals.
+##
+PHONY = .PHONY
+$(PHONY): $(MY_PHONY)
+
+INTERMEDIATE = .INTERMEDIATE
+#(INTERMEDIATE): $(MY_INTERMEDIATE)
+
+SECONDARY = .SECONDARY
+#(SECONDARY): $(MY_SECONDARY)
+
+PRECIOUS = .PRECIOUS
+$(PRECIOUS): $(MY_PRECIOUS)
+
+DISTCLEANFILES		+= $(CONFIG_DIST)
+DISTCLEANFILES		+= $(CONFIG_BLDREQ)
+
+## =============================================================================
+##
+## $Log: openss7.am,v $
+## Revision 1.1.2.15  2011-09-02 08:46:27  brian
+## - sync up lots of repo and build changes from git
+##
+## Revision 1.1.2.14  2011-08-07 11:14:24  brian
+## - mostly mandriva and ubuntu build updates
+##
+## Revision 1.1.2.13  2011-07-27 07:52:11  brian
+## - work to support Mageia/Mandriva compressed kernel modules and URPMI repo
+##
+## Revision 1.1.2.12  2011-05-31 09:46:00  brian
+## - new distros
+##
+## Revision 1.1.2.11  2011-05-10 13:45:33  brian
+## - weak modules workup
+##
+## Revision 1.1.2.10  2011-04-05 16:35:11  brian
+## - weak module design
+##
+## Revision 1.1.2.9  2011-03-26 04:28:45  brian
+## - updates to build process
+##
+## Revision 1.1.2.8  2011-02-28 19:51:29  brian
+## - better repository build
+##
+## Revision 1.1.2.7  2011-01-18 17:11:41  brian
+## - add files back to the build
+##
+## Revision 1.1.2.6  2010-11-28 13:35:22  brian
+## - build updates and manual page corrections
+##
+## Revision 1.1.2.5  2009-07-21 11:06:11  brian
+## - changes from release build
+##
+## Revision 1.1.2.4  2009-07-13 07:13:26  brian
+## - changes for multiple distro build
+##
+## Revision 1.1.2.3  2009-07-04 03:51:32  brian
+## - updates for release
+##
+## Revision 1.1.2.2  2009-06-29 07:35:35  brian
+## - improvements to build process
+##
+## Revision 1.1.2.1  2009-06-21 10:26:00  brian
+## - added files to new distro
+##
+## =============================================================================
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

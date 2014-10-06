@@ -1,0 +1,877 @@
+OpenSS7 -- kernel module notes.  2013-01-03
+$Id: NOTES.kmod,v 1.1.2.6 2011-09-02 08:46:26 brian Exp $
+Copyright (c) 2008-2011  Monavacon Limited. <http://www.monavacon.com/>
+Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
+See the end for copying conditions (for this file).
+
+
+Kernel Upgrades:
+================
+
+Weak Updates
+------------
+
+On recent distributions, kernel modules can be updated automatically
+using the kABI method.  This method is applicable to all RPM-based
+distributions.  The method uses kernel symbol and symset 'Requires' and
+'Provides' capabilities to determine the compatability of kernel modules
+with an upgraded kernel (typically security updates).  The scripts
+
+  /sbin/weak-modules (on redhat)
+  /usr/lib/module-init-tools/weak-modules  (on SuSE)
+  /usr/lib/module-init-tools/weak-modules2 (on SuSE)
+
+are used.
+OpenSS7 kernel module can have weak-updates applied; however, relinking
+of the ripped kernel symbols is required.  This is because, unbeknownst
+to the kABI approach, our kernel modules may be accessing kernel symbols
+inside the kernel by address (particularly the specfs.ko module).
+Therefore, the weak update will update exported kernel symbols but will
+break non-exported ones unless relinking is performed.
+
+RedHat Approach:
+
+--add-kernel
+
+  The --add-kernel argument to /sbin/weak-modules is used whenever a
+  kernel is added and runs from the %post scriptlet for the kernel
+  package.  This process relies on the existence of /boot/symvers-
+  $add_krel.gz.  For every other kernel, $krel, that has a
+  /lib/modules/$krel/extra directory, for each module in the
+  /lib/modules/$krel/extra directory, the script attempts to create a
+  /lib/modules/$add_krel/weak-updates/$subpath symbolic link to
+  /lib/modules/$krel/extra/$subpath if the kernel module is compatible.
+
+  The kernel module is considered compatible when it uses symbols only
+  from /boot/symvers-$add_krel.gz or exported by kernel modules in the
+  /lib/modules/$module_krel/extra directory (which is the
+  /lib/modules/$krel/extra directory in which the module resides when
+  properly installed.  Note that this pretty much assumes that
+  weak-updates will be successful on all of the kernel modules provided
+  in that /extra directory.
+
+  Note that kernels are processed in reverse rpmsort order.  That is,
+  the newest kernels are processed first.  Once the symbolic link has
+  been created, subsequent kernel consideration will not alter it.
+  Therfore, a non-idempotent quirk of the script is that when older
+  kernels are added, weak-updates of kernel modules from kernels newer
+  than the kernel will be preferred over kernel modules of older
+  kernels.
+
+  Note also, that a symbolic link in weak-updates will be created
+  regardless of whether the kernel modules exist in extra.  This relies
+  on modprobe's preference to use a module from extra over the same
+  module in weak-updates.
+
+--remove-kernel
+
+  The --remove-kernel argument to /sbin/weak-modules is used whenever a
+  kernel is removed and runs from the %postun scriptlet for the kernel.
+  This simply removes the weak-updates subdirectory and all of the
+  symbolic links contained within it.
+
+--add-modules
+
+  The --add-modules argument to /sbin/weak-modules is used whenever a
+  kmod package is added and runs from the %post scriptlet for the kmod
+  package.  The script is fed the list of installed kernel modules and
+  contains the full path to each kernel module.  For each kernel module
+  added, the module's kernel release is computed (/sbin/modinfo -F
+  vermagic) as the kernel for which the module was compiled when the
+  file exists, or the /lib/modules/$module_krel/ component of the path.
+  The subpath for the module is formed by stripping 4 directories from
+  its pathname (or null if the module is not installed under
+  /lib/modules/$module_krel).  (This is really just a quirk of the
+  script, because if the modules do not exist in the /extra subdirectory
+  of the kernel for which they are built, the add-kernel and
+  remove-modules operations peformed by the script will fail, even
+  though the add-modules portion will succeed.)
+
+  For each of the kernels other than the kernel for which the module was
+  built, an attempt is made to form a symbolic link between the kernel
+  module and /lib/modules/$krel/weak-updates/$subpath.  Should the
+  symbolic link already exist, and should the kernel for which the
+  existing linked module was built be newer that that of the kernel
+  module being installed, the existing (newer) module is kept.
+  Otherwise, if the module is compatible with the kernel in question,
+  the symbolic link is created (overwritten).
+
+--remove-modules --delete-modules
+
+  The --remove-modules argument to /sbin/weak-modules is used whenever a
+  kmod package is removed and runs from the %post scriptlet for the kmod
+  package.  The script is fed the list of installed kernel modules and
+  contains the full path to each kernel module.   These names are
+  expected to be in the /lib/modules/$module_krel/extra subdirectory.
+  For each of the symbolic links added in the weak-modules directory of
+  each kernel (in reverse version order), the symbolic link is removed
+  when it links to the removed kernel module.  When the --delete-modules
+  argument is not given, the script also attempts to replace the
+  symbolic links with links to older kernel modules belonging to older
+  kernels of the same name.  It also attempts to prune any resulting
+  empty directories.
+  
+OpenSS7 Kernel Modules under RedHat/Fedora weak-updates:
+
+  Under the current approach, we install our kernel modules under the
+  /extra subdirectory when weak-updates are available on recent
+  RedHat/Fedora-based systems.  We invoke the /sbin/weak-moduels script
+  with --add-modules from %post and --remove-modules from %postun.  We
+  have a trigger script that runs post on a kernel package installation.
+
+  A separate step is required for the kmod package %post, %postun and
+  %triggerpost (on kernel package).  This separate step must walk all of
+  the weak-updates symbolic links that link to openss7 modules and
+  relink any of those that have ripped kernel module symbol references.
+  Any that have kernel references are relinked with the weak-updated
+  kernel's symbols and then moved over the symbolic link.  This ensures
+  that the properly linked kernel module is in place.  It is also
+  possible to perform (check or reperform) this linking from the init
+  scripts when a kernel boots.
+
+  A separate step is also required in the %preun when removing the
+  kernel module package.  This is because the --remove-modules option to
+  /sbin/weak-modules assumes that the entry in weak-modules is a
+  symbolic link to the removed module.  If we do not want to replace (as
+  in --delete-modules option), the files can simply be removed.
+  Otherwise, the original symbolic link must be restored (this is
+  dangerous when performed on the running kernel unless the STREAMS
+  system has been shut down from the init script).
+
+  Because we want to still support non-RPM installs, the specfs init
+  script should checks whether relinking is required before inserting
+  the specfs kernel module on boot.  This can also be a backstop in case
+  the non-indempotent weak-modules script misbehaves.
+
+  Also, there is an issue when the openss7 package is installed for
+  other than the running kernel and there does not exist a package for
+  the running kernel.  There is a point it time where the weak-updates
+  links might be to an incompatible kernel module for the running
+  kernel.
+
+Client Kernel Modules under RedHat weak-updates:
+
+  When a client kernel module is installed as an RPM package, all is
+  well provided that the client kernel module RPM is packaged as a kmod
+  package for weak updates.
+
+  The issues arrise when the client kernel modules are simply installed
+  in the /extra subdirectory.  In this case, the interaction with adding
+  and removing kernels and adding and removing openss7 modules are as
+  follows:  (Assume that the client kernel module is installed for a
+  kernel version for which an openss7 package is (or was) installed.)
+
+  1) When a kernel is added, weak updates will be performed on the
+     openss7 modules as well as the client modules.  Once the openss7
+     modules are relinked, there should be no problems.
+
+  2) When the openss7 modules are removed, only the openss7 symbolic
+     links are adjusted.  Therefore, an unloadable client kernel module
+     and its symbolic weak update links will remain.
+
+  3) When the openss7 modules are added, only the openss7 symbolic links
+     are adjusted.  Therefore, any client modules are not added to
+     compatible kernels (because they depended on symbols not present
+     before the openss7 package was added).  To update the links for the
+     client module will either required running --add-modules on those
+     kernel modules.  Note that client modules can only be updated with
+     --add-modules if they reside in the same kernel directory as that
+     for which the openss7 modules are installed (because the script
+     only adds symbols from kernel modules in the /extra subdirectory of
+     the kernel version for which the client module was compiled).
+
+  4) When the openss7 modules are upgraded, only the openss7 symbolic
+     links are affected.  Should the client module not be compatible
+     with the upgraded openss7 modules, it will simply fail to load.
+
+SuSE Approach:
+
+SuSE Code 10 Approach
+
+  The SuSE Code 10 approach uses the /lib/module-init-tools/weak-modules
+  script that is fashioned after the RedHat one.  The differences are as
+  follows:
+
+  - The SuSE Code 10 version uses the /updates kernel module
+    subdirectory instead of the /extra kernel module subdirectory.
+
+  - The SuSE Code 10 version does not have the --delete-modules option
+    and always behaves as though it was not provided.
+
+  - The SuSE Code 10 version appears to have fixed a bug that still
+    remains in the RedHat version of the script when replacing kernel
+    module weak updates during module removal.  The RedHat version
+    checks whether the module is compatible with the kernel for which it
+    was installed instead of the kernel for which it will be updated.
+
+  - The SuSE Code 10 version appears to have introduced the quirk that
+    if the kernel module that is being removed still exists, it will be
+    weak-updated again after the symbolic links for it have been
+    removed.
+
+SuSE Code 11 Approach
+
+  The Code 11 approach uses the /usr/lib/module-init-tools/weak-modules2
+  script.  This script takes the following primary options:
+
+  --add-kernel
+
+    Simply performs the kernel_changed() operation on the added kernel
+    version.
+
+  --remove-kernel
+
+    This simply removes the /lib/modules/$krel/weak-updates
+    subdirectory.
+
+  --add-kernel-modules
+
+    Simply performs the kernel_changed() operation on the kernel to
+    which modules are being added.
+
+  --remove-kernel-modules
+
+    Simply performs the kernel_changed() operation on the kernel from
+    which modules are being removed.
+
+  --add-kmp
+
+    Checks whether there is any old version of the kmp and performs
+    remove_kmp_modules() on the old kmp (if any) and add_kmp_modules()
+    on the new kmp, for each kernel version present.
+
+  --remove-kmp
+
+    Checks whether there is any old version of the kmp and performs
+    remove_kmp_modules() on the removed version and add_kmp_modules() on
+    the older version (if they can_replace_kmp()).
+
+  The result is similar in that all kernel modules contained in kmp
+  packages are updated with symbolic links in the /weak-updates
+  subdirectories of installed kernels.  The approach for relinking
+  kernel modules that have symbolic links in /weak-updates is
+  the same.  A peculiarity is that modules in both /extra and /updates
+  subdirectories are updated.  Also, the symbolic links formed in
+  weak-updates are formed as /extra/$subpath or /updates/$subpath
+  depending on where the modules were originally installed.  Note that
+  the depmod order is /updates /extra /built-in /weak-updates.
+
+OpenSS7 Kernel Modules under SuSE Code 11 weak-updates2:
+
+  Under the current approach we install our kernel modules under the
+  /updates subdirectory (when we want weak-modules to see them) or the
+  /extra subdirectory (when we don't want weak-modules to see them).  We
+  must perform the same secondary actions as with the redhat approach;
+  however, we must look in /weak-updates/updates/openss7 and
+  /weak-updates/extra/openss7 directories instead of
+  /weak-updates/openss7 directories as in the weak-modules script
+  approach.
+
+Client Kernel Modules under SuSE Code 11 weak-updates2:
+
+  There are issues with SuSE Code 11 weak-updates2 for client modules:
+  When client modules are installed as simple kernel modules (non-RPM),
+  they will not automatically update from weak-updates2.  However, if
+  openss7 modules are kmp installed in /updates, it is possible to run
+  the Code 10 weak-update script with --add-modules fed the module names
+  of any kernel modules in /updates that depend on STREAMS and are not
+  owned by a kmp package.  Again, --add-modules to the old weak-modules
+  script will only update client kernel modules for which openss7
+  modules are also installed in /updates for the same kernel.
+
+  Another possiblity is to perform an action similiar to the
+  --add-modules of the old weak-updates package ourselves, relieving the
+  restriction that the client kernel modules need to be in the same
+  kernel as the openss7 package.
+
+The SuSE Code 11 KMP form (weak-modules2) is somewhat different in that
+it uses an rpm search on "*-kmp-$flavor" to determine the install kernel
+modules that are suitable for weak-updates.  To keep the SuSE version
+from performing weak-updates on our kernel module sub-package, simply do
+not name it in accordance with the SuSE KMP conventions.
+
+The SuSE Code 10 form (weak-modules) is similary to that of the RedHat
+approach.  It performs weak updates for kernel modules that are in
+/lib/modules/$(uname -r)/{extra,updates}.  Because we do not install or
+kernel modules in {extra,updates}, the SuSE Code 10 form will not
+attempt to perform weak-updates on our (openss7) modules.
+
+The SuSE Code 11 KMP form (weak-modules2) will, however, attempt to
+perform weak updates on kernel modules that follow the SuSE KMP
+specification.  This includes special naming and only updates modules
+that are installed under RPM and have a name of the form
+'*-kmp-$flavor'.  It does not matter, however, whether the kernel
+modules themselves are installed in the 'extra' or 'updates' module
+subdirectory.  To check whether modules are suitable for weak update,
+/sbin/depmod is used with the special SuSE '-E' flag which is fed the
+/boot/symvers-$(uname -r).gz file, or, in the absence of that file, the
+'-F' flag is used with the /boot/System.map-$(uname -r) file.  Now, of
+course, the System.map file only contains the kernel exported by the
+kernel proper and none of the associated modules.  This is only a
+problem when a KMP uses symbols from modules of the kernel instead of
+the kernel proper.
+
+Therefore, to ensure that the weak modules process is being performed
+correctly, it is necessary that we slip STREAMS symbols into the
+/boot/symvers-$(uname -r).gz file.  This can eb accomplished by using a
+%triggerin and %triggerun trigger script.  When a kernel or kernel-devel
+package is installed, the openss7-kernel or openss7-kernel-devel package
+triggerin script is triggered after the kernel files have been installed
+and any %post script run for the kernel.  This %post kernel script will
+include any running weak-modules2 that will ignore STREAMS modules
+(unless they are also KMP modules).  When the openss7-kernel %triggerin
+script is run, create the /boot/symvers-$(uname -r).gz file using the
+System.symvers and Modules.symvers files from the openss7-kernel
+package and run the Code 11 weak-updates2 again so that any KMP modules
+depending on STREAMS will be weak updated.  Also, when the
+openss7-kernel-devel %triggerin script is run, recreate the
+/boot/symvers-$(uname -r).gz file, because our version will be
+overwritten by the installation of the kernel-devel package.
+
+The SuSE Code 10 form (weak-modules) will, however, attempt to perform
+weak updates on kernel modules (whether under RPM or not) that exist in
+the /lib/modules/$(uname -r)/updates subdirectory.  However, to resolve
+whether a given kernel modules supports the weak update, the symbols
+from /boot/symvers-$(uname -r).gz (i.e. provided "by the kernel and
+mainline modules") are checked against the symbols from the kernel
+module acquired using /sbin/modeprobe with the --dump-modversions flag.
+The issue here is that the /boot/symvers-$(uname -r).gz is simply a
+compressed form of the Module.symvers file generated when the kernel and
+its associated modules are built.  Therefore, if this file is not
+supplemented with STREAMS symbols, modules that depend on STREAMS
+symbols will simply not be updated.  A wrinkle is that SuSE Code 11 has
+the /boot/symvers-$(uname -r).gz file provided by the kernel-devel
+package instead of the kernel package.  Without the symvers file
+present, weak-updates will simply not be performed in this way.
+
+Therefore, to ensure that the weak modules process is begin performed
+correctly, it is necessary that we slip STREAMS symbols into the
+/boot/symvers-$(uname -r).gz file.  This can be accomplished by using a
+%triggerin and %triggerun trigger script.  When a kernel is installed,
+the openss7-kernel package triggerin script is triggerred after the
+kernel files have been installed and any %post script run for the
+kernel.  This %post kernel script will include running weak-modules2
+that will ignore STREAMS modules (unless they are also KMP modules, see
+above).  When the openss7-kernel %triggerin script is run, we strap our
+Module.symvers symbols into /boot/symvers-$(uname -r).gz and run the
+Code 10 weak-modules to peform a weak module update on any STREAMS
+modules.  We must also rerun weak-modules2 to weak-update any KMP
+modules that exist in the /lib/modules/$(uname -r)/extra subdirectory,
+as the SuSE weak-modules script only considers the 'updates'
+subdirectory.  If /boot/symvers-$(uname -r).gz does not exist (because
+the kernel-devel package is not loaded), we can create it by
+concatenating our System.symvers and Module.symvers files from the
+openss7-kernel package.  (We used to place these files in the
+openss7-devel-kernel package, but they need to now be moved to the
+openss7-kernel package.)
+
+Kernel Updates:
+---------------
+
+There are two fundamental ways of signalling updates to kernel modules
+when kernels are updated: the Fedora way and the SuSE way.
+
+RedHat Approach:
+
+The Fedora/RHEL/CentOS way is to use the yum-fedorakmod (now, yum-kmod)
+plugin to yum.  The plugin works as follows:
+
+- To find available kernel modules it finds all available packages in
+  all repositories that provide 'kernel-modules'.
+
+- To find installed kernel modules it finds all packages that provide
+  'kernel-modules'.
+
+- When a kernel is added, it attempts to also resolve all installed
+  kernel modules against the new kernel considering all available kernel
+  modules.  If it cannot resolve, the resolution failure is provided and
+  the kernel is not updated.
+
+There are two configuration options for yum-kmod: pinkernels and
+installforallkernels.  The default for both is unset.
+
+- pinkernels, when set, requires that there be a kernel module package
+  for the new kernel that is the same as each kernel module package that
+  was built _with_ the running kernel.  This does not affect us because
+  this is only for in-tree modules.
+
+- installforallkernels, when set, attempts to upgrade kernel modules for
+  all installed kernels.  This likely does no affect us either.
+
+The wrinkles with the fedora kmod approach are as follows:
+
+- The rpm package name must be the same for all kernels.  This means
+  that the kernel version must be embedded in the rpm package version.
+
+- Because the kernel version is in the rpm package version, rpm packages
+  cannot be upgraded without removing the package for an older kernel
+  version.  Therefore, yum was set to always install and not upgrade any
+  rpm package providing 'kernel-modules'.
+
+- The approach places 'Provides: %{name}-kmod' and 'Provides:
+  kmod-%{name}' into the kmod rpm package.  I don't know what this is
+  for.
+
+- Many kernel module packages (such as for CentOS 5.5) do not place the
+  kernel version in the %{version} or %{release}.  This appears to mean
+  that only one set of kernel modules (of the same version) are possible
+  in each of the 'main' and 'updates' repositories.  We don't really
+  want that and would prefer to have a single repository.
+
+- We will need to require that yum-kmod (or yum-fedorakmod) is
+  installed.  We can put this dependency in our openss7-repo rpm, such
+  as 'Requries: yum-kmod', or/also in the openss7-kernel package.
+
+- another possible approach is providing our own YUM plugin in the
+  openss7-repo package.
+
+SuSE Approach:
+
+For Code 9, SuSE used the kernel-update-tool behind YaST2 to perform a
+similary approach.  For Code 10 and 11, this was integrated into
+libzypp.
+
+The SuSE approach appears to use the same upgrade resolution approach as
+RedHat, which is embedding the kernel version in the version string for
+the modules rpm package.  However, the SuSE approach does not use
+'kernel-modules'.  Some notes:
+
+- recent code version put 'Provides: multiversion(kernel)' in KMP
+  packages.  There is a corresponding option (in /etc/zypp/zypp.conf)
+  named 'multiversion'.  This option identifies which rpm packages are
+  permitted to have multiple versions installed.  It can be set to
+  'provides:multiversion(kernel)' to permit multiple versions of kernels
+  and multiple versions of any package that provides
+  multiversion(kernel).  This, therefore, applies to any kernel module
+  package, whether it uses weak-updates or not.  Therefore, we always
+  define 'Provides: multiversion(kernel)'.
+
+  Note that, by default, SuSE does not load more that one kernel
+  version at a time.  There are several flavors for each version of
+  kernel, but SuSE does not normally load more than one version.
+  Setting the multiversion = kernel, then more than one version of
+  kernel will be loaded, but that does not handle KMP or other kernel
+  modules.  So, when set to other than the default, multiversion should
+  be set to 'provides:multiversion(kernel)' to permit multiple versions
+  of openss7-kernel modules to be loaded.  This is similar to the Fedora
+  approach of always installing (instead of upgrading) packages that
+  provide 'kernel-modules'.
+
+- older code versions put 'Requires: kernel%{kernel_flavor}' and newer
+  code versions put 'Enhances: kernel%{kernel_flavor}', where the
+  'Enhances' keyword is new only to the SuSE rpm program.
+
+- all code versions include 'Provides: %{name}-kmp%{kernel_flavor}' and
+  'Provides: %{name}-kmp'.
+
+- all code version require that the version string be
+  %{version}_%{kernel_string}, where %{kernel_string} is the kernel
+  %version, without the flavor, and y'-'_'.
+
+Summing it all up:
+------------------
+
+The %{version} of the kernel modules package will contain the kernel
+version and not the %{name} as previously.  This is so that yum and
+zypper can see an upgrade path from one kernel version of the modules to
+another.
+
+'Provides: kernel-modules = %{_kversion}' is used to signal yum that
+multiple versions are to be maintained for the same package.  Yum does
+not necessarily need yum-kmod to do this.
+
+'Provides: multiversion(kernel)' are used to signal yum and zypper that
+mutliple versions are to be maintained for the same package.
+
+
+Detailed description of yum-kmod:
+
+- the actions are taken as a post-resolve hook.
+
+- get  a list of installed kernels and a list of installed modules.
+
+- the list of installed kernels is any installed RPMs that provide
+  kernel-%{arch} for any supported architecture.
+
+- the list of installed modules is a list of any installed RPMs that
+  provide 'kernel-modules'.
+
+- For each member in the transaction, if the member is a kernel and the
+  kernel is being removed, remove the kernel from the list of installed
+  kernels.  If the member provides 'kernel-modules' and is to be
+  installed or upgraded to, add the package from the transaction into the
+  new modules packages list.  If the member is a kernel and is to be
+  installed or upgraded to, add the kernel to the new kernels list.
+
+- When the 'pinkernels' option is set, the intent is to neither install
+  nor upgrade a new kernel until matching modules are available.
+
+  For all of the packages that require a kernel (or kernel symbol set)
+  for an installed kernel, search for 'Provides: %{name}-kmod' and use
+  %{name}-kmod as the name of the package regardless of what its real
+  %name may be.  For each kernel to be installed, ensure that there is a
+  package that provides %{name}-kmod and requires the new kernel (or
+  kernel symbol set) in the transaction set.  Otherwise, the new kernel
+  is removed from the update list.
+
+  Note that this means that 'yum update kernel' is likely to always fail
+  because it does not have the necessary kernel modules to be updated as
+  well; however, 'yum update' will succeed to install the new kernel
+  only when there are updates available for the corresponding kernel
+  modules as well.  This is ok.  We need to set pinkernels in
+  /etc/yum/yum-plugins.d/kmod.conf.
+
+- When the 'installallkmods' option is set, collect all of the kmod
+  names (%(name)-kmod) for the entire transaction set.  If the kmod name
+  is in any available modules, mark them as interesting.  If there are
+  interesting modules that are not already installed for a kernel, mark
+  them for installation.  This has the effect of adding kernel modules
+  that become available for installed kernels to be installed as well.
+
+  We probably want to set the 'installallkmods' option as well.
+
+- For each new module in the transaction resulting from the actions
+  above, if the new module requires the same kernel (kernel-%{arch}) or
+  requires any of the same kernel symbol sets, 'kernel(', as an already
+  installed module of the same name, then remove the old version of the
+  module.  (Remember the default for packages providing 'kernel-modules'
+  is 'install' rather than 'upgrade'.  Removing the old version in this
+  case, simply changes that back to an upgrade.)
+
+  Note that this has significant ramifications on how we build kernel
+  modules.  The assumption seems to be that if we have any kernel symbol
+  sets in our requirements, then we are a kABI module.  Our openss7
+  kernel module packages should then NOT CONTAIN ANY KERNEL SYMBOL SET
+  definitions.  This might be a bug in yum-kmod, but there is nothing we
+  can do.
+
+Tricks:
+-------
+
+Tricks for keeping OpenSS7 kernel modules from not being weak-updated
+using RH weak-modules or SuSE weak-modules2 from module-init-tools:
+
+Respin
+======
+
+  We now use the weak-updates approach with relinking.  This uses the
+  awk script, `/sbin/openss7-modules', that performs weak-updates using
+  symbolic links but also relinks kernel modules that need absolute
+  symbols.
+
+
+RHEL/CentOS:
+------------
+
+    RHEL/CentOS names its kernels kernel-2.6.M-ABI[.REL.REV].DIST,
+    where:
+
+	M        = upstream kernel minor version number (which never
+		   changes for DIST)
+	ABI      = ABI (which should never change for DIST)
+	REL      = major patch level
+	REV      = minor patch level
+	DIST     = distribution (.e.g. el5)
+
+    RHEL/CentOS uname -r returns 2.6.M-ABI[.REL.REV].DIST as well.
+
+    This means that RHEL/CentOS kernels always load into their own
+    /lib/modules space and relinking installed kernel modules is not
+    necessary on kernel updates.
+
+    Kernel packages provide:
+
+	kernel-ARCH = 2.6.M-ABI[.REL.REV].DIST
+	kernel = 2.6.M-ABI[.REL.REV].DIST
+	kernel = 2.6.M
+	kernel(SYMBOLSET) = CRC ...
+	kernel-drm = 4.3.0
+
+Fedora:
+-------
+
+    Fedora names its kernels kernel-2.6.M-ABI.REV[_.]DIST, where:
+
+	M        = upstream kernel minor version number
+	ABI      = ABI
+	REV      = revision which is monotonically increasing regardless
+		   of M-ABI or DIST.
+	DIST     = distribution (e.g. FC5, f13)
+
+SuSE:
+-----
+
+    SuSE names its kernels kernel-FLAVOR-2.6.M.REL-ABI.REV.BLD, where:
+
+	FLAVOR   = kernel flavor (e.g. default, xen)
+	M.REL    = upstream kernel minor version numbers (but .REL
+		   component does not precisely track upstream)
+	ABI      = ABI, does not change necessarily when M.REL or
+		   .REV.BLD changes  (I don't know, REL might be ABI and
+		   this field might just be an additional revision).
+	REV.BLD  = SUSE revision and build number
+
+    On SuSE, uname -r will return 2.6.M.REL-ABI.REV-FLAVOR and does not
+    include the BLD number.
+
+    One ramification of this is that multiple build numbers will load
+    into the same /lib/modules space.  Therefore, upon update of the
+    kernel it is always necessary to consider relinking installed kernel
+    modules on SuSE.
+
+    Kernel packages provide:
+
+	kernel-FLAVOR_ARCH = 2.6.M.REL-ABI.REV.BLD
+	kernel-FLAVOR = 2.6.M.REL-ABI.REV.BLD
+	kernel = 2.6.M.REL-ABI.REV
+	kernel-FLAVOR-nongpl
+	kernel-smp
+	smp
+	kernel(FLAVOR:SYMBOLSET) = CRC ...
+	multiversion(kernel)
+
+    Note that over the full range of SuSE kernels on SLE-11-SP1, the
+    OpenSS7 kernel modules are compatible, from 2.6.32.12-0.7 to
+    2.6.32.27-0.2.
+
+Debian:
+-------
+
+    Debian names its kernels linux-image-2.6.M[.REL]-ABI[-FEATURES]-
+    FLAVOR, where:
+
+	M[.REL]  = upstream kernel minor version numbers (the .REL
+		   component is not normally used).
+	ABI      = ABI for M[.REL]
+	FEATURES = special features of kernel (e.g. xen, pae) (SUSE
+		   calls this flavor)
+	FLAVOR   = architecture (e.g. 686)
+
+    However, these kernel packages are versioned 2.6.M[.REL]-REV, where:
+
+	M[.REL]  = upstream kernel minor version numbers (the [.REL]
+		   component is not normally used).
+	REV      = revision of the same M[.REL]
+
+    So, Debian does not include the ABI number in the release string.
+
+    On Debian, uname -r will return 2.6.M[.REL]-ABI[-FEATURES]-FLAVOR.
+
+    This is important because when kernels are updated that do not
+    change the kernel ABI, they will use the same /lib/modules/-
+    2.6.M[.REL]-ABI[-FEATURES]-FLAVOR subdirectory and kernel modules
+    will be overwritten.  Note also that the /boot/abi-2.6.M[.REL]-
+    ABI[-FEATURES]-FLAVOR file will always contain the same symbol
+    versions.
+
+    Kernel packages provide:
+
+	linux-image
+	linux-image-2.6
+	linux-modules-2.6.M[.REL]-ABI[-FEATURES]-FLAVOR
+
+Ubuntu:
+-------
+
+    Ubuntu names it kernels linux-image-2.6.M.REL-ABI[-FEATURES]-FLAVOR
+    in the same manner as Debian, so:
+
+	M.REL    = upstream kernel minor version numbers (the .REL
+		   component is not normally used).
+	ABI      = ABI for M.REL
+	FEATURES = special features of kernel (e.g. xen, pae) (SUSE
+		   calls this flavor)
+	FLAVOR   = architecture (e.g. 686)
+
+    However, Ubuntu versions its kernels 2.6.M.REL-ABI.REV, where:
+
+	M.REL    = upstream kernel minor version numbers (the .REL
+		   component is not normally used).
+	ABI      = ABI for M.REL
+	REV      = revision of the same M.REL-ABI, new ABI causes
+		   REV to bump new M.REL causes REV to reset to one
+
+    So, Ubuntu includes the ABI number in the release string.
+
+    On Ubuntu, uname -r will return 2.6.M.REL-ABI[-FEATURES]-FLAVOR,
+    just as Debian.
+
+    This is important because when kernels are updated that do not
+    change the kernel ABI, they will use the same /lib/modules/-
+    2.6.M.REL- ABI[-FEATURES]-FLAVOR subdirectory and kernel modules
+    will be overwritten.  Note also that the /boot/abi-2.6.M.REL-
+    ABI[-FEATURES]- FLAVOR file will always contain the same symbol
+    versions.
+
+Mageia, Mandriva:
+-----------------
+
+    Mandriva names its kernels kernel-FLAVOR-2.6.M.REL-ABI.KIND, where
+
+	FLAVOR	= kernel flavor from same source, e.g. desktop, server,
+		  xen-pvops, linus.
+	M.REL	= upstream kernel minor version numbers (the .REL
+		  component is always used).
+	ABI	= ABI for 2.6.M
+	KIND	= the kind of kernel, e.g. mga, mdv.
+
+    The kernel version number is typically just `1' and the release is
+    typically just 1.DIST, where
+
+	DIST	= distribution string which is a concatenation of distro
+		  and distro release version, e.g. mga1, mdv102.
+
+    The kernel requires kernel-firmware > DATE-SPIN.  The kernel
+    provides: kernel = 2.6.M.REL-ABI.DIST, kernel = 2.6.M,
+    kernel-FLAVOR, a bunch of kmod(MODULE) provides,
+    kernel-FLAVOR-2.6.M.REL-ABI.KIND = 1-1.DIST and
+    kernel-FLAVOR-2.6.M.REL-ABI.KIND(ARCH) = 1-1.DIST.
+
+    The uname -r provided by these kernels is 2.6.M.REL-FLAVOR-ABI.KIND.
+
+    Mandriva also provides a kernel virtual package named
+    kernel-FLAVOR-latest with an increasing version number that requires
+    kernel-FLAVOR-2.6.M.REL-ABI.KIND (name only) and
+    kernel-FLAVOR-2.6.M'.REL'-ABI'.KIND, where M'.REL'-ABI' is the
+    corresponding components of the next oldest kernel.
+
+    The kernel-FLAVOR-latest package provides kernel-FLAVOR-latest,
+    kernel-FLAVOR-latest(ARCH) = 2.6.M.REL-ABI.DIST, and also
+    kernel-FLAVOR-latest, kernel-FLAVOR-latest(ARCH) =
+    2.6.M'.REL'-ABI'.DIST, where M'.REL'-ABI' is the corresponding
+    components of the next oldest 'latest' package.
+
+    This is used to keep the version number in the name, but allow the
+    most recent version to be updated without special treatment.  It
+    also allows the urpme --auto-orphan function to collect redundant
+    kernel packages (older than the last two kernel versions). (Note
+    that this technique could also be used for debian and ubuntu.)  The
+    same approach is used for the -devel- and -source- packages.
+
+    It is possible to create an openss7-FLAVOR-latest virtual package
+    that requires a specific version of kernel-FLAVOR-latest package and
+    requires openss7-FLAVOR-2.6.M.REL-ABI.KIND and
+    openss7-FLAVOR-2.6.M'.REL'-ABI'.KIND.  In this way, the
+    kernel-FLAVOR-latest package cannot be upgraded without the
+    equivalent openss7-FLAVOR-latest package of the same version being
+    available.  However, the oldest kernel-FLAVOR-latest version
+    provided by the kernel-FLAVOR-latest package must specifically be
+    required.  This should stop an upgrade to a kernel for which there
+    is no support on the repository (i.e. any kernel-FLAVOR-latest
+    upgrade that bumps past the oldest kernel).  This should handle MES,
+    Mandriva and Mageia properly.
+
+Archlinux:
+----------
+
+    Archlinux named its 2.6-series kernels, kernel26[-FLAVOR]; its
+    3.x-series kernels, linux[-FLAVOR]
+
+	FLAVOR = '' for base kernels, and 'lts' for long-term-support
+		 kernels.  Some AUR kernels use 'mainline' for
+		 plain-jane kernel.org kernels.
+
+    On Archlinux, uname -r will return 2.6.M-FLAV for 2.6-series
+    kernels, 3.M-FLAV for older 3.x-series kernels, and 3.M.REL-REV-FLAV
+    for newer 3.x-series kernels, where:
+
+	M[.REL]	= upstream kernel minor version numbers (the .REL
+		  component is always used).
+	REV	= revision of the same M[.REL] (package version)
+	FLAV	= 'ARCH' for default kernels, 'lts' for long-term
+		  support kernels.  AUR uses 'mainline' for plain-jane
+		  kernel.org kernels.
+
+    This is important.  For the original 2.6 and 3.x schemes, when
+    kernels are updated that do not change the kernel ABI, they will
+    used the same /lib/modules/2.6.M-FLAV or /lib/modules/3.M-FLAV
+    subdirectory and kernel modules will be overwritten.
+    
+    The most recent scheme; however, uses a different
+    /lib/modules/3.M.REL-REV-FLAV directory and kernel modules are not
+    overwritten.  A separate /lib/extramodules-3.M-FLAV directory is
+    symbolic linked from /lib/modules/3.M.REL-REV-FLAV/extramodules that
+    can contain modules that are not overwritten.  There is a file
+    called 'version' in this extramodules directory that contains the
+    kernel version (uname -r) (and is owned by the kernel package).
+    Archlinux really only supports one version of kernel for each FLAV,
+    so this file is always owned by the current kernel for 3.M-FLAV.
+
+    The old version did not support weak updates.  The newer version
+    supports weak updates by putting kernel modules in
+    /lib/extramodules-3.M-FLAV/openss7 and checking
+    /lib/extramodules-3.M-FLAV/version at boot to see whether kernel
+    updates are required.
+
+    UPDATE:
+
+    We do not put kernel modules in extramodules because the weak module
+    mechanism (openss7-modules awk script) expects different
+    subdirectories per kernel release.
+
+    We had to come up with a new openss7 kernel module naming scheme for
+    archlinux.  The old naming scheme named the kernel modules package:
+    openss7-@kversion@-@VERSION@.(2.6.M|3.M)-@PACKAGE_PACRELEASE@.REV-ARCH.pkg.tar.xz
+
+    Under the new scheme, an openss7 kernel modules package will work
+    with any 3.M kernel.  Therefore, the kernel modules package are
+    named openss7-linux(-FLAV)-@VERSION@.3.M-@PACKAGE_PACRELEASE@.REV-ARCH.pkg.tar.xz
+
+    Which is the same as the old names; however, getting the 3.M no
+    longer consists of splitting `uname -r` at '-'.
+
+-----
+
+=========================================================================
+
+ Copyright (c) 2008-2011  Monavacon Limited  <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian Bidulock  <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ Permission is granted to make and distribute verbatim copies of this
+ manual provided the copyright notice and this permission notice are
+ preserved on all copies.
+
+ Permission is granted to copy and distribute modified versions of this
+ manual under the conditions for verbatim copying, provided that the
+ entire resulting derived work is distributed under the terms of a
+ permission notice identical to this one
+
+ Since the Linux kernel and libraries are constantly changing, this
+ manual page may be incorrect or out-of-date.  The author(s) assume no
+ responsibility for errors or omissions, or for damages resulting from
+ the use of the information contained herein.  The author(s) may not
+ have taken the same level of care in the production of this manual,
+ which is licensed free of charge, as they might when working
+ professionally.
+
+ Formatted or processed versions of this manual, if unaccompanied by the
+ source, must acknowledge the copyright and authors of this work.
+
+-------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+ on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department
+ of Defense ("DoD"), it is classified as "Commercial Computer Software"
+ under paragraph 252.227-7014 of the DoD Supplement to the Federal
+ Acquisition Regulations ("DFARS") (or any successor regulations) and
+ the Government is acquiring only the license rights granted herein (the
+ license rights customarily provided to non-Government users).  If the
+ Software is supplied to any unit or agency of the Government other than
+ DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19
+ of the Federal Acquisition Regulations ("FAR") (or any successor
+ regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+ NASA Supplement to the FAR (or any successor regulations).
+
+=========================================================================
+
+ Commercial licensing and support of this software is available from
+ OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+
+=========================================================================
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

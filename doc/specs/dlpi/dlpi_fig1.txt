@@ -1,0 +1,13 @@
+
+                                                                   
+                            _______________                        
+          Request/Response |               |                       
+             Primitives    |   DLS User    |                       
+                 |         |_______________|                       
+                 V        Full |Duplex |Connection                 
+     - - - - - - - - - - - - - | - - - | - - - - - - - - - - - - - 
+                            ___V_______|___  DLPI    ^             
+                           |               |         |             
+                           | DLS Provider  |Indication/Confirmation
+                           |_______________|      Primitives       
+                                                                   

@@ -1,0 +1,14 @@
+#!/bin/bash
+set -x
+where=`dirname $0`
+srcdir=`(cd $where/..; pwd)`
+# use native tools for arch
+$srcdir/configure \
+	WFLAGS='-Wno-unused-but-set-variable -Wno-system-headers -Wno-endif-labels' \
+	--libexecdir='${exec_prefix}/lib' \
+	--with-pkg-distdir=/u6/repo \
+	--with-pkg-repodir=/u5/repo \
+	--enable-maintainer-mode \
+	--disable-sysvinit \
+	$* \
+	2>&1 | tee configure.log

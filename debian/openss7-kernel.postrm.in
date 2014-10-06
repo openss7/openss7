@@ -1,0 +1,178 @@
+#!/bin/bash
+# @configure_input@
+# =============================================================================
+# 
+# @(#) $RCSfile: openss7-kernel.postrm.in,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-05-15 12:01:18 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2011-05-15 12:01:18 $ by $Author: brian $
+#
+# =============================================================================
+subpkg=kernel
+@openss7_header@
+datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
+#
+# postrm_oldmods() - Perform a depmod on the kernel for which we have removed kernel modules.  This
+#   can only be performed for 2.4 module systems.  The debhelper scriptlets will perform this
+#   operation at an inopportune moment so the dh_installmodules debhelpers are disabled.
+#
+@WITH_KO_MODULES_FALSE@postrm_oldmods () {
+@WITH_KO_MODULES_FALSE@    local sysmap
+@WITH_KO_MODULES_FALSE@    sysmap=/boot/System.map-@kversion@
+@WITH_KO_MODULES_FALSE@    if [ -x "`which depmod 2>/dev/null`" ]; then
+@WITH_KO_MODULES_FALSE@        if [ "@kversion@" = "`uname -r`" ]; then
+@WITH_KO_MODULES_FALSE@            depmod -a || :
+@WITH_KO_MODULES_FALSE@        elif [ -r $sysmap ]; then
+@WITH_KO_MODULES_FALSE@            UNAME_MACHINE=@target_cpu@ \
+@WITH_KO_MODULES_FALSE@            depmod -ae -F $sysmap @kversion@ || :
+@WITH_KO_MODULES_FALSE@        fi
+@WITH_KO_MODULES_FALSE@    fi
+@WITH_KO_MODULES_FALSE@}
+#
+# postrm_initscripts() - When old modules for the running kernel have been removed, stop the init
+#   scripts.  Note that dpkg is smarter than rpm about the installation and removal order of
+#   packages and the init scripts should still be present.
+#
+@WITH_KO_MODULES_FALSE@postrm_initscripts () {
+@WITH_KO_MODULES_FALSE@    local reverse i
+@WITH_KO_MODULES_FALSE@    if [ "@kversion@" = "`uname -r`" ]; then
+@WITH_KO_MODULES_FALSE@        reverse=
+@WITH_KO_MODULES_FALSE@        for i in $initfiles; do
+@WITH_KO_MODULES_FALSE@            reverse="$i${reverse:+ }$reverse"
+@WITH_KO_MODULES_FALSE@        done
+@WITH_KO_MODULES_FALSE@        for i in $reverse; do
+@WITH_KO_MODULES_FALSE@            if [ -f @initrddir@/$i ] ; then
+@WITH_KO_MODULES_FALSE@                [ -x "`which service     2>/dev/null`" ] && { service     $i stop && continue || :; }
+@WITH_KO_MODULES_FALSE@                [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i stop && continue || :; }
+@WITH_KO_MODULES_FALSE@                [ -x "@initrddir@/$i"                  ] && { @initrddir@/$i stop && continue || :; }
+@WITH_KO_MODULES_FALSE@            fi
+@WITH_KO_MODULES_FALSE@        done
+@WITH_KO_MODULES_FALSE@    fi
+@WITH_KO_MODULES_FALSE@}
+#
+# postrm_weakmods() - When the kernel modules package was removed (base should be present because
+#   dpkg is smarter than rpm on package ordering) delete the symbolic links of the other kernels to
+#   the about to be removed kernel modules.  The --delete-modules option to the openss7-modules awk
+#   script denotes that kernel modules are to be removed from @kmoduledir@/@ksubdir@ and
+#   --remove-modules denotes that weak links in any other subtree that point to or are relinked
+#   versions of the to be removed modules are to be removed as well.  After the removal, depmod is
+#   performed on the directories with removed links or modules to update dependencies.
+#
+@WITH_KO_MODULES_TRUE@postrm_weakmods () {
+@WITH_KO_MODULES_TRUE@    if [ -x @sbindir@/${name}-modules ]; then
+@WITH_KO_MODULES_TRUE@        scripts=`echo "$initfiles" | sed -e 's/ /,/g'`
+@WITH_KO_MODULES_TRUE@        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--verbose=1,p'`"
+@WITH_KO_MODULES_TRUE@        if [ -n "$scripts" ]; then
+@WITH_KO_MODULES_TRUE@            @sbindir@/${name}-modules -- $v -e \
+@WITH_KO_MODULES_TRUE@                --initscripts="$scripts" \
+@WITH_KO_MODULES_TRUE@                --delete-modules \
+@WITH_KO_MODULES_TRUE@                --remove-modules @kversion@ || :
+@WITH_KO_MODULES_TRUE@        else
+@WITH_KO_MODULES_TRUE@            @sbindir@/${name}-modules -- $v -e \
+@WITH_KO_MODULES_TRUE@                --delete-modules \
+@WITH_KO_MODULES_TRUE@                --remove-modules @kversion@ || :
+@WITH_KO_MODULES_TRUE@        fi
+@WITH_KO_MODULES_TRUE@    fi
+@WITH_KO_MODULES_TRUE@}
+#
+# postrm_symvers() - On final removal, remove the symvers file that we added for debian.
+#
+@WITH_KO_MODULES_TRUE@postrm_symvers () {
+@WITH_KO_MODULES_TRUE@    rm -f -- /boot/symvers-@kversion@.gz || :
+@WITH_KO_MODULES_TRUE@}
+#
+# postrm_kernel() -
+#
+postrm_kernel () { :
+@WITH_KO_MODULES_FALSE@    postrm_oldmods || :
+@WITH_KO_MODULES_FALSE@    postrm_initscripts || :
+@WITH_KO_MODULES_TRUE@    postrm_weakmods || :
+@WITH_KO_MODULES_TRUE@    postrm_symvers || :
+}
+# -----------------------------------------------------------------------------
+# Primary functions:
+# -----------------------------------------------------------------------------
+# remove-postrm remove
+remove_postrm () { :
+    postrm_kernel || :
+}
+# remove-postrm purge
+purge_postrm () { :
+}
+# old-postrm upgrade new-version
+upgrade_postrm () { :
+}
+# old-postrm upgrade new-version ...FAILED
+# new-postrm failed-upgrade old-version
+failed_upgrade_postrm () { :
+}
+# new-preinst install [old-version] ...FAILED
+# new-postrm abort-install [old-version]
+abort_install_postrm () { :
+}
+# new-preinst upgrade old-version ...FAILED
+# new-postrm abort-upgrade old-version
+abort_upgrade_postrm () { :
+}
+# dis-postrm disappear overwriter overwriter-version
+disappear_postrm () { :
+}
+@mscript_postrm@
+@mscript_debhelper@
+# =============================================================================
+#
+# $Log: openss7-kernel.postrm.in,v $
+# Revision 1.1.2.2  2011-05-15 12:01:18  brian
+# - many build system refinements
+#
+# Revision 1.1.2.1  2011-05-10 13:45:28  brian
+# - weak modules workup
+#
+# =============================================================================
+# vim: ft=sh sw=4 noet nocin nosi formatoptions+=tcqlorn

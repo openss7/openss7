@@ -1,0 +1,610 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: tpi_tc.7.man,v 1.1.2.2 2011-02-07 02:18:29 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:29 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: tpi_tc.7.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:29  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH TPI-TC 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Transport Provider Interface (TPI)"
+.\"
+.\"
+.SH NAME
+.B TPI-TC
+\- Transport Provider Interface \- Corrigendum for Component Sublayer (TC) Conformance
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/tpi.h>
+.br
+.B #include <sys/tpi_ss7.h>
+.br
+.B #include <sys/tpi_mtp.h>
+.br
+.B #include <sys/tpi_sccp.h>
+.br
+.B #include <sys/tpi_tc.h>
+.HP
+.BI "int " fd " = open(" device ", " flags );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B TPI-TCAP
+provides a stream supporting the Transport Provider Interface,
+.RB tpi (7),
+to the Component Sublayer (TC) of Transport Capabilities Application Part (TCAP).
+.[
+q771
+.]
+This
+.IR STREAMS (4)
+interface provides the
+.BR tc (4)
+or
+.BR tua (4)
+protocol service interface using the T-primitives of the
+.BR tpi (7).
+This interface is intended solely for use by user programs, libraries such as
+.BR xnet (3),
+.BR xti (3)
+and
+.BR sockets (3),
+or protocol modules requiring the
+.BR tpi (7)
+interface such as
+.BR timod (4),
+.BR sockmod (4)
+and
+.BR socksys (4).
+.\"
+.\"
+.SH "ADDRESS FORMATS"
+.PP
+The
+.B TPI-TCAP
+uses the same address as SCCP.  See
+.BR tpi_sccp (7).
+.\"
+.\"
+.SH MAPPING OF PRIMITIVES
+.PP
+.B TPI-TC
+maps the Dialogue Handling service primitives of the
+Component Sublayer of TCAP onto the service primitives of the
+TPI as follows:
+.sp
+.TS
+tab(;);
+llll.
+TC-UNI;req;T-UNITDATA;req
+TC-UNI;ind;T-UNITDATA;ind
+TC-BEGIN;req;T-CONNECT;req
+TC-BEGIN;ind;T-CONNECT;ind
+TC-CONTINUE;1st-res;T-CONNECT;res
+TC-CONTINUE;1st-ind;T-CONNECT;con
+TC-CONTINUE;req;T-DATA;req
+TC-CONTINUE;ind;T-DATA;ind
+TC-END;1st-req;T-CONNECT;res
+TC-END;1st-ind;T-DISCONNECT;ind
+TC-END;req;T-RELEASE;req
+TC-END;ind;T-DISCONNECT;ind
+TC-U-ABORT;req;T-DISCONNECT;req
+TC-U-ABORT;ind;T-DISCONNECT;ind
+TC-NOTICE;ind;T-UNITDATA-ERROR;ind
+;;T-DISCONNECT;ind
+;;T-DATA;ind
+.TE
+.PP
+.B TPI-TC
+masp the Component Handling service primitives of the
+Component Sublayer of TCAP onto the serviec primtives of the
+TPI as follows:
+.sp
+.TS
+.tab(;);
+llll.
+TC-INVOKE;req;T-DATA,T-UNITDATA;req
+TC-INVOKE;ind;T-DATA,T-UNITDATA;ind
+TC-RESULT-L;req;T-DATA,T-UNITDATA;req
+TC-RESULT-L;ind;T-DATA,T-UNITDATA;ind
+TC-RESULT-NL;req;T-DATA,T-UNITDATA;req
+TC-RESULT-NL;ind;T-DATA,T-UNITDATA;ind
+TC-U-ERROR;req;T-DATA,T-UNITDATA;req
+TC-U-ERROR;ind;T-DATA,T-UNITDATA;ind
+TC-L-CANCEL;ind;T-DATA,T-UNITDATA;ind
+TC-U-CANCEL;req;T-DATA,T-UNITDATA;req
+TC-L-REJECT;ind;T-DATA,T-UNITDATA;ind
+TC-R-REJECT;ind;T-DATA,T-UNITDATA;ind
+TC-U-REJECT;req;T-DATA,T-UNITDATA;req
+TC-U-REJECT;ind;T-DATA,T-UNITDATA;ind
+TC-TIMER-RESET;ind;T-DATA,T-UNITDATA;ind
+.TE
+
+.\"
+.SS TC-UNI request \(em T_BIND_REQ, T_UNITDATA_REQ
+.PP
+"Quality of Service" parameters are specified with XTI options
+structures.  The "originating address" is associated with the
+stream using the
+.BR T_BIND_REQ (7)
+primtive, or is specified in the
+.B T_SCCP_SRCE_ADDR
+XTI options structure.  "Application context name" is
+specified in the
+.BR T_TCAP_APPLICATION_CONTEXT
+XTI options structure.
+The "dialogue ID" is contained in the
+.BR T_TCAP_DIALOGUE_ID
+XTI options structure.
+"User information" is specified in associated M_DATA message
+blocks.
+Components are accumulated from previous
+.BR T_UNITDATA_REQ (7)
+primitives corresponding to component handling primitives and
+having the same
+.BR T_TCAP_DIALOGUE_ID .
+.\"
+.SS TC-UNI indication \(em T_BIND_REQ, T_UNITDATA_IND
+.PP
+"Quality of service" parameters are indicated with XTI
+options structures.  The "destination address" is associated
+with the strem using the
+.BR T_BIND_REQ (7)
+primitive, or is specified in the
+.BR T_SCCP_DEST_ADDR
+XTI options structure.  "Application context name" is
+specified in the
+.BR T_TCAP_APPLICATION_CONTEXT
+XTI options structure.
+The "dialogue ID" is indicated in the
+.BR T_TCAP_DIALOGUE_ID
+XTI options structure.
+"User information" is indicated in associated M_DATA message
+blocks.
+"Components present" is indicated using the
+.BR T_TCAP_COMPONENTS
+XTI options structure.
+Components will be indicated in following
+.BR T_UNITDATA_IND (7)
+primitives indicating the component type and components in
+associated M_DATA message blocks for the same
+.BR T_TCAP_DIALOGUE_ID .
+.\"
+.SS TC-BEGIN request \(em T_BIND_REQ, T_CONN_REQ
+.PP
+"Quality of service" parameters are specified with XTI
+options structures.  The "originating address" is associated
+with the stream using the
+.BR T_BIND_REQ (7)
+primitive, or is specified in the
+.BR T_SCCP_SRCE_ADDR
+XTI options structure.  "Application context name" is
+specified in the
+.BR T_TCAP_APPLICATION_CONTEXT
+XTI options structure.
+The "dialogue ID" is specified in the
+.BR T_TCAP_DIALOGUE_ID
+XTI options structure.
+"User information" is specified in associated M_DATA message
+blocks.
+Components are accumulated from previous
+.BR T_UNITDATA_REQ (7)
+primitives corresponding to component handling primitives and
+having the same
+.BR T_TCAP_DIALOGUE_ID .
+.\"
+.SS TC-BEGIN indication \(em T_BIND_REQ, T_CONN_IND
+.PP
+"Quality of service" parameters are indicated with XTI
+options structures.
+The "destination address" is associated with the strem using
+the
+.BR T_BIND_REQ (7)
+primitive, or is specified in the
+.BR T_SCCP_DEST_ADDR
+XTI options structure.  "Application context name" is
+specified in the
+.BR T_TCAP_APPLICATION_CONTEXT
+XTI options structure.
+The "dialogue ID" is indicated in the
+.BR T_TCAP_DIALOGUE_ID
+XTI options structure.
+"User information" is indicated in associated M_DATA message
+blocks.
+"Components present" is indicated using the
+.BR T_TCAP_COMPONENTS
+XTI options structure.
+Components will be indicated in following
+.BR T_OPTDATA_IND (7)
+primitives indicating the component type and components in
+associated M_DATA message blocks for the same
+.BR T_TCAP_DIALOGUE_ID .
+.\"
+.SS TC-CONTINUE request \(em T_CONN_RES
+.PP
+"Quality of service" parameters are specified with XTI
+options structures.  The "originating address" is associated
+with the stream using the
+.BR T_BIND_REQ (7)
+primitive, or is obtained form the "destination address" of
+the corresponding
+.BR T_CONN_IND (7)
+primitive, or is specified in the
+.BR T_SCCP_RESP_ADDR
+XTI options structure.  "Application context name" is
+specified in the
+.BR T_TCAP_APPLICATION_CONTEXT
+XTI options structure.
+The "dialogue ID" is implied by the connection.  "User
+information" is specified in associated M_DATA message
+blocks.
+Components are accumulated from previous
+.BR T_UNITDATA_REQ (7)
+primitives corresponding to component handling primitives and
+having the same
+.BR T_TCAP_DIALOGUE_ID .
+.\"
+.SS TC-CONTINUE indication \(em T_CONN_CON
+.PP
+"Quality of service" parameters are indicated with XTI
+options structures.
+The "responding address" is the same as the "destinating
+address" in the corresponding
+.BR T_CONN_REQ (7)
+primtive, or is specified in the
+.BR T_SCCP_RESP_ADDR
+XTI options structure.
+"Application context name" is specified in the
+.BR T_TCAP_APPLICATION_CONTEXT
+XTI options structure.
+The "dialogue ID" is implied by the connection.
+"User information" is indicated in associated M_DATA message
+blocks.
+"Components present" is indicated using the
+.BR T_TCAP_COMPONENTS
+XTI options structure.
+Components will be indicated in following
+.BR T_OPTDATA_IND (7)
+primitives indicating the component type and components in
+associated M_DATA message blocks for the same
+.BR T_TCAP_DIALOGUE_ID .
+.\"
+.SS TC-CONTINUE request \(em T_OPTDATA_REQ, T_DATA_REQ
+.PP
+"Quality of service" parameters are specified with XTI
+options structures.
+The "dialogue ID" is implied by the connection.
+"User information" is indicated in associated M_DATA message
+blocks.
+Components are accumulated from previous
+.BR T_OPTDATA_REQ (7)
+primitives corresponding to component handling primitives.
+.\"
+.SS TC-CONTINUE indication \(em T_OPTDATA_IND, T_DATA_REQ
+.PP
+"Quality of service" parameters are indicated with XTI
+options structures.
+The "dialogue ID" is implied by the connection.
+"User information" is indicated in associated M_DATA message
+blocks.
+"Components present" is indicated using the
+.BR T_TCAP_COMPONENTS
+XTI options structure.
+Components will be indicated in following
+.BR T_OPTDATA_IND (7)
+primitives indicating the component type and components in
+associated M_DATA message blocks.
+.\"
+.SS TC-END request \(em T_CONN_RES
+.PP
+"Quality of service" parameters are specified with XTI
+options structures.
+The "dialogue ID" is implied by the connection.
+"Application context name" is specified in the
+.BR T_TCAP_APPLICATION_CONTEXT
+XTI options structure.
+"User information" is specified in associated M_DATA message
+blocks.
+"Termination" is specified in the
+.BR T_TCAP_TERMINATION
+XTI options structure.
+Components are accumulated from previous
+.BR T_UNITDATA_REQ (7)
+primitives corresponding to component handling primitives and
+having the same
+.BR T_TCAP_DIALOGUE_ID .
+.\"
+.SS TC-END request \(em T_ORDREL_REQ
+.PP
+"Quality of service" parameters are specified with XTI
+options structures.
+The "dialogue ID" is implied by the connection.
+"User information" is specified in associated M_DATA message
+blocks.
+"Termination" is specified in the
+.BR T_TCAP_TERMINATION
+XTI options structure using the
+.BR T_OPTMGMT_REQ (7)
+primitive.
+.\"
+.SS TC-END indication \(em T_DISCON_IND
+.PP
+"Quality of service" parameters are indicated with XTI
+options structures.
+The "dialogue ID" is implied by the connection.
+"User information" is indicated in associated M_DATA message
+blocks.
+"Components present" is indicated using the
+.BR T_TCAP_COMPONENTS
+XTI options structure.
+Components will be indicated in following
+.BR T_UNITDATA_IND (7)
+primitives indicating the component type and components in
+associated M_DATA message blocks.
+.\"
+.SS TC-U-ABORT request \(em T_DISCON_REQ
+.PP
+"Quality of service" parameters are specified with XTI
+options structures.
+The "dialogue ID" is implied by the connection.
+"Application context name" is specified in the
+.BR T_TCAP_APPLICATION_CONTEXT
+XTI options structure using the
+.BR T_OPTMGMT_REQ (7)
+primitive.
+"Abort reason" is specified in the
+.BR T_TCAP_REASON
+XTI options structure using the
+.BR T_OPTMGMT_REQ (7)
+primitive.
+"User information" is specified in associated M_DATA message
+blocks.
+.\"
+.SS TC-U-ABORT indication \(em T_DISCON_IND
+.PP
+"Quality of service" parameters are indicated with XTI
+options structures.
+The "dialogue ID" is implied by the connection.
+"Application context name" is indicated in the
+.BR T_TCAP_APPLICATION_CONTEXT
+XTI options structure retrieve with
+.BR T_OPTMGMT_REQ (7).
+"Abort reason" is codified in the
+.I DISCON_reason
+field.
+"User information" is specified in associated M_DATA message
+blocks.
+.\"
+.SS TC-NOTICE indication \(em T_OPTDATA_IND, T_DISCON_IND, T_UDERROR_IND
+.PP
+The "dialogue ID" is implied by the connection or is
+indicated in the
+.BR T_TCAP_DIALOGUE_ID
+XTI options structure.
+"Originating address" is implied by the connection, the bound
+address or specified in the
+.BR T_SCCP_SRCE_ADDR
+XTI options structure.
+"Destination address" is implied by the connection, the
+bound address or specified in the
+.BR T_SCCP_DEST_ADDR
+XTI option structure.
+"Report cause" is codified in the
+.IR ERROR_type " or " DISCON_reason
+fields, or indicated in the
+.BR T_TCAP_REAONS
+XTI option structure.
+.\"
+.SS TC-INVOKE request \(em T_OPTDATA_REQ, T_UNITDATA_REQ
+.PP
+.BR T_OPTDATA_REQ (7)
+is used during the data transfer state;
+.BR T_UNITDATA_REQ (7)
+otherwise.
+.\"
+.SS TC-INVOKE indication \(em T_OPTDATA_IND, T_UNITDATA_IND
+.PP
+.BR T_OPTDATA_IND (7)
+is used during the data transfer state;
+.BR T_UNITDATA_IND (7)
+otherwise.
+.\"
+.SS TC-RESULT-L request \(em T_OPTDATA_REQ, T_UNITDATA_REQ
+.PP
+.BR T_OPTDATA_REQ (7)
+is used during the data transfer state;
+.BR T_UNITDATA_REQ (7)
+otherwise.
+.\"
+.SS TC-RESULT-L indication \(em T_OPTDATA_IND, T_UNITDATA_IND
+.PP
+.BR T_OPTDATA_IND (7)
+is used during the data transfer state;
+.BR T_UNITDATA_IND (7)
+otherwise.
+.\"
+.SS TC-RESULT-NL request \(em T_OPTDATA_REQ, T_UNITDATA_REQ
+.PP
+.BR T_OPTDATA_REQ (7)
+is used during the data transfer state;
+.BR T_UNITDATA_REQ (7)
+otherwise.
+.\"
+.SS TC-RESULT-NL indication \(em T_OPTDATA_IND, T_UNITDATA_IND
+.PP
+.BR T_OPTDATA_IND (7)
+is used during the data transfer state;
+.BR T_UNITDATA_IND (7)
+otherwise.
+.\"
+.SS TC-U-ERROR request \(em T_OPTDATA_REQ, T_UNITDATA_REQ
+.PP
+.BR T_OPTDATA_REQ (7)
+is used during the data transfer state;
+.BR T_UNITDATA_REQ (7)
+otherwise.
+.\"
+.SS TC-U-ERROR indication \(em T_OPTDATA_IND, T_UNITDATA_IND
+.PP
+.BR T_OPTDATA_IND (7)
+is used during the data transfer state;
+.BR T_UNITDATA_IND (7)
+otherwise.
+.\"
+.SS TC-L-CANCEL indication \(em T_OPTDATA_IND, T_UNITDATA_IND
+.PP
+.BR T_OPTDATA_IND (7)
+is used during the data transfer state;
+.BR T_UNITDATA_IND (7)
+otherwise.
+.\"
+.SS TC-U-CANCEL request \(em T_OPTDATA_REQ, T_UNITDATA_REQ
+.PP
+.BR T_OPTDATA_REQ (7)
+is used during the data transfer state;
+.BR T_UNITDATA_REQ (7)
+otherwise.
+.\"
+.SS TC-L-REJECT indication \(em T_OPTDATA_IND, T_UNITDATA_IND
+.PP
+.BR T_OPTDATA_IND (7)
+is used during the data transfer state;
+.BR T_UNITDATA_IND (7)
+otherwise.
+.\"
+.SS TC-R-REJECT indication \(em T_OPTDATA_IND, T_UNITDATA_IND
+.PP
+.BR T_OPTDATA_IND (7)
+is used during the data transfer state;
+.BR T_UNITDATA_IND (7)
+otherwise.
+.\"
+.SS TC-U-REJECT request \(em T_OPTDATA_REQ, T_UNITDATA_REQ
+.PP
+.BR T_OPTDATA_REQ (7)
+is used during the data transfer state;
+.BR T_UNITDATA_REQ (7)
+otherwise.
+.\"
+.SS TC-U-REJECT indication \(em T_OPTDATA_IND, T_UNITDATA_IND
+.PP
+.BR T_OPTDATA_IND (7)
+is used during the data transfer state;
+.BR T_UNITDATA_IND (7)
+otherwise.
+.\"
+.SS TC-TIMER-RESET indication \(em T_OPTDATA_IND, T_UNITDATA_IND
+.PP
+.BR T_OPTDATA_IND (7)
+is used during the data transfer state;
+.BR T_UNITDATA_IND (7)
+otherwise.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

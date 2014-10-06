@@ -1,0 +1,500 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: ap_ioctl.3.man,v 1.1.2.2 2011-02-07 02:17:59 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:17:59 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ap_ioctl.3.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:17:59  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH AP_IOCTL 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B ap_ioctl
+\- Control the generation of software interrupts.
+.\"
+.\"
+.SH INTERFACE
+.PP
+ACSE/Presentation Library Interface,
+XAP.
+.[
+xap c303
+.]
+.\"
+.\"
+.SH LIBRARY
+.PP
+.BR libxap (3).
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xap.h>
+.HP
+.BI "typedef union { long " l "; void *" v " } ap_val_t;
+.HP
+.BI "int ap_ioctl(int " fd ", int " request ", ap_val_t " argument ", unsigned long *" aperrno_p );
+.\"
+.\"
+.SH ARGUMENTS
+.TP \w'\fIaperrno_p\fR\(em'u
+.I fd
+A file descriptor identifying the XAP instance.
+.TP
+.I request
+Identifies the request.  Can be one of
+.BR AP_SETPOLL ,
+.BR AP_GETPOLL .
+.TP
+.I argument
+A pointer to a
+.B ap_val_t
+structure.
+.TP
+.I aperrno_p
+A pointer to a memory extent into which to receive an error number.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function controls the generation of software interrupts for the XAP instance identified by
+.IR fd .
+.PP
+Software interrupt is an asynchronous mechanism that can be used to inform an application of pending
+events or state changes for a service that it is using. An XAP implementation may use such a mechanism
+to inform the XAP user about incoming events such as a primitive available to be received, or outgoing
+events such as a flow control restriction being lifted. This mechanism is complementary to the
+.BR ap_poll (3)
+function which provides synchronous notification of such events.
+.PP
+Support for software interrupt and the mechanism by which such an interrupt is signalled to the XAP
+user is a feature of the operating system platform on which the XAP implementation runs.  XAP does not
+define a software interrupt interface mechanism itself. Further, support for the function provided by
+.BR ap_ioctl ()
+is not a mandatory part of XAP and if not available,
+.BR ap_ioctl ()
+returns
+.RB [ AP_NOT_SUPPORTED ].
+Therefore a portable application should not rely on provision of this mechanism.
+.PP
+If the user requires software interrupts to be generated when a data event occurs, then
+.BR ap_ioctl ()
+should be called with a
+.I request
+parameter of
+.BR AP_SETPOLL .
+The
+.I l
+member of the
+.B ap_val_t
+.I argument
+parameter is a bitmask used to indicate which events should generate a software interrupt. All XAP
+Library implementations recognise the following events:
+.TP \w'\fBAP_POLLWRBAND\fR\(em'u
+.B AP_POLLRDNORM
+Data (for example, an XAP Library primitive or user data associated with an XAP Library primitive) has
+arrived on the normal data flow and is available to be read.
+.sp
+Normal (band 0) data may be read from \fIfd\fP without blocking.  For \fISTREAMS\fP(4) special
+files, this event occurs when a \fBM_PROTO\fP(9) or \fBM_DATA\fP(9) message (in band zero(0))
+arrives at the Stream head and is generated even when the data available is of zero length.  See
+\fBgetmsg\fP(2s).
+.TP
+.B AP_POLLRDBAND
+Data has arrived outside the normal data flow and is available to be read. In implementations that do
+not support multiple data bands, this event will result in the same action as the
+.B AP_POLLRDNORM
+event.
+.sp
+Priority (band > 0) data may be read from \fIfd\fP without blocking.  For \fISTREAMS\fP(4) special
+files, this event occurs when a \fBM_PROTO\fP(9) or \fBM_DATA\fP(9) message (in a band greater than
+zero) arrives at the Stream head and is generated even when the data available is of zero length.
+See \fBgetpmsg\fP(2s).
+.TP
+.B AP_POLLIN
+Data has arrived (on either band) and is available to be read.
+.sp
+Nomral priority data may be read from \fIfd\fP without blocking.  For \fISTREAMS\fP(4) special
+files, this event occurs when a \fBM_PROTO\fP(9) or \fBM_DATA\fP(9) message (in any band) arrives at
+the Stream head and is generated even when the data available is of zero length.  See
+\fBgetmsg\fP(2s).
+.TP
+.B AP_POLLOUT
+Data can be sent on the normal priority band.
+.sp
+Normal (band 0) data may be written to \fIfd\fP without blocking.  For \fISTREAMS\fP(4) special
+files, this even occurs when band zero high water makr thresholds have not been exceeded, or when
+band zero becomes back-enabled (falls below the low water mark threshold).
+.TP
+.B AP_POLLWRNORM
+The same as AP_POLLOUT.
+.TP
+.B AP_POLLWRBAND
+Out-of-band data can be sent. This event will be treated as
+.B AP_POLLOUT
+in implementations that do not support multiple data bands.
+.sp
+Priority (band > 0) data may be written to \fIfd\fP without blocking.  For \fISTREAMS\fP(4) special
+files, this event occurs when any non-zero band high water mark thresholds have not been exceeded,
+or when any non-zero band becomes back-enabled (falls below the low water makr threshold).  This
+event only occurs for bands that have been written to at least once.
+.PP
+Support for events other than those listed above is optional. Users interested in developing
+applications that are portable across different XAP Library implementations should keep this caveat in
+mind.
+.PP
+If the user requires software interrupts to be disabled then
+.BR ap_ioctl ()
+should be called with a
+.I request
+parameter of
+.BR AP_SETPOLL
+and the
+.I l
+member of the
+.B ap_val_t
+.I argument
+value as 0.
+.PP
+If the user wishes to obtain the current settings of the software interrupts bitmask then
+.BR ap_ioctl ()
+should be called with a
+.I request
+parameter of
+.BR AP_GETPOLL .
+The
+.I v
+member of the
+.B ap_val_t
+.I argument
+must point to a location where the current setting of the bitmask is to be written by
+.BR ap_ioctl ().
+.PP
+.I aperrno_p
+must be set to point to a location which will be used to carry an error code back to the user.
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon successful completion, a value of zero
+.RB ( 0 )
+is returned. Otherwise, a value of
+minus one
+.RB ( -1 )
+is returned and the location pointed to by
+.I aperrno_p
+is set to indicate the error.
+.\"
+.\"
+.SH ERRORS
+.TP \w'[\fBAP_NOT_SUPPORTED\fR]\(em'u
+.RB [ AP_BADF ]
+The
+.I fd
+paramter does not identify an XAP instance.
+.TP
+.RB [ AP_NOT_SUPPORTED ]
+.BR ap_ioctl ()
+operation is not supported by this implementation of XAP.
+.PP
+In addition, operating system class errors are reported.
+.TP \w'[\fBAP_NOT_SUPPORTED\fR]\(em'u
+.RB [ EFAULT ]
+\fIargument.v\fP points outside the caller's valid address space.  Normally
+the calling process is also sent a fatal {\fISIGSEGV\fP} signal.
+.TP
+.RB [ EINVAL ]
+\fIfd\fP,  \fIrequest\fP, \fIargument\fP, or a member of \fIargument\fP, or a
+member of a structure pointed to by \fIargument\fP is invalid.
+.TP
+.RB [ EINVAL ]
+\fIrequest\fP was \fBAP_GETPOLL\fP and the process is not registered to
+receive a {\fISIGPOLL\fP} or {\fISIGURG\fP} signal.
+.TP
+.RB [ EIO ]
+\fIfd\fP refers to a Stream that is closing.
+.TP
+.RB [ ENXIO ]
+\fIfd\fP refers to a Stream that has received a hangup, that is, a
+\fBM_HANGUP\fP(9) message was received by the Stream head.
+.TP
+.RB [ EPIPE ]
+\fIfd\fP referes to a \fISTREAMS\fP-based pipe and the other end of the pipe
+is closed.
+.TP
+.RB [ EINVAL ]
+\fIfd\fP refers to a Stream that is linked under a multiplexing driver.  If a
+Stream is linked under a multiplexing driver, all \fBioctl\fP(2s) commands
+other than \fBI_UNLINK\fP(7) or \fBI_PUNLINK\fP(7) will return [\fBEINVAL\fP].
+.TP
+.RB [ ERESTARTSYS ]
+A signal was received (or generated by the call) before the operation could
+begin.
+.TP
+.RB [ EINTR ]
+A signal was received before the operation could complete.
+.TP
+.RB [ ENOSR ]
+A message block could not be allocated during the operation and the operation
+is not permitted to block.  Under some circumstances, an \fBioctl\fP(2s)
+command will block awaiting the availability of message blocks, regardless of
+the setting of \fBO_NDELAY\fP or \fBO_NONBLOCK\fP.
+.PP
+Any error delivered to the Stream head in an \fBM_ERROR\fP(9) message can be
+returned.
+.\"
+.\"
+.SH MT-LEVEL
+.PP
+.BR ap_ioctl ()
+is MT-safe.  Note that
+.BR ap_ioctl ()
+is a thread cancellation point, as is the underlying \fBioctl\fP(2s) system
+call.
+.\"
+.\"
+.SH NOTICES
+.PP
+The OpenSS7 XAP library also supports the following:
+.TP \w'\fBAP_POLLWRBAND\fR\(em'u
+.B AP_POLLPRI
+High-priority data may be read from \fIfd\fP without blocking.  For
+\fISTREAMS\fP(4) special files, this event occurs when an \fBM_PCPROTO\fP(9)
+and \fBM_DATA\fP(9) message arrives at the Stream head and is generated even
+when the data available is of zero length.
+.TP
+.B AP_POLLMSG
+A pending signal has occured on the file.  For \fISTREAMS\fP(4) special files,
+this event occurs when an \fBM_SIG\fP(9) message arrives at the Stream head.
+.TP
+.B AP_POLLERR
+An error has occured on the file.  For \fISTREAMS\fP(4) special fiels, this
+event occurs when an \fBM_ERROR\fP(9) message arrives at the Stream head.
+.TP
+.B AP_POLLHUP
+A hangup has occured on the file.  For \fISTREAMS\fP(4) special files, this
+event occurs when an \fBM_HANGUP\fP(9) message arrives at the Stream head or
+the Stream is closing.  A Stream cannot be writable while this event is in
+force.
+.TP
+.B AP_POLLURG
+A modifier to \fBAP_POLLRDBAND\fP to generate a {\fISIGURG\fP} signal instead of a
+{\fISIGPOLL\fP} signal.
+.PP
+Note that setting signals in this fashion does not survive a
+.BR fork (2)
+system call.  Each process must regsister for signals to receive them.
+Signals are not inherited from the parent process even if the file descriptor
+remains open in the child process.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+The OpenSS7 XAP implementation translates \fBAP_SETPOLL\fP to
+\fBI_SETSIG\fP(7) and \fBAP_GETPOLL\fP to \fBI_GETSIG\fP(7).  The values are
+mapped as follows:
+.sp
+.TS
+tab(:);
+lll.
+AP_GETPOLL:I_GETSIG:Implementation.
+AP_SETPOLL:I_SETSIG:Implementation.
+_
+AP_POLLRDNORM:S_RDNORM:XAP standard.
+AP_POLLRDBAND:S_RDBAND:XAP standard.
+AP_POLLIN:S_INPUT:XAP standard.
+AP_POLLOUT:S_OUTPUT:XAP standard.
+AP_POLLWRNORM:S_WRNORM:XAP standard.
+AP_POLLWRBAND:S_WRBAND:XAP standard.
+_
+AP_POLLPRI:S_HIPRI:OpenSS7 option.
+AP_POLLMSG:S_MSG:OpenSS7 option.
+AP_POLLERR:S_ERROR:OpenSS7 option.
+AP_POLLHUP:S_HANGUP:OpenSS7 option.
+AP_POLLURG:S_BANDURG:OpenSS7 option.
+.TE
+.PP
+The last four are implementation extentions to the XAP specification.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR ap_poll (3),
+.BR poll (2s).
+.\"
+.\"
+.SH "BUGS"
+.PP
+.BR ap_ioctl ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR ap_ioctl ()
+is compatible with
+XAP,
+.[
+xap c303
+.]
+and implementations based on XAP, such as
+.IR "USL ONP" \(rg,
+.IR "Solaris Solstice OSI" \(rg,
+.IR "HP-UX OTS/9000" \(rg,
+.IR "AIX OSI/6000" \(rg,
+.IR "Digital DECnet/OSI" \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+This function is not supported by the APLI library.  For OpenSS7 APLI library
+applications, \fBI_SETSIG\fP(7) and \fBI_GETSIG\fP(7) should be used directly.
+See \fBstreamio\fP(7).
+.IP \(em
+For XAP library applications, \fBap_ioctl\fP() should be used instead of the
+\fISTREAMS\fP \fBI_SETSIG\fP(7) and \fBI_GETSIG\fP(7) STREAMS input-output
+controls.
+.IP \(em
+The OpenSS7 XAP library provides \fBAP_POLLPRI\fP, \fBAP_POLLMSG\fP,
+\fBAP_POLLERR\fP, \fBAP_POLLHUP\fP and \fBAP_POLLURG\fP in the obvious manner
+to support \fISTREAMS\fR(4) standard events described in \fII_SETSIG\fP(7).
+This is a rather obvious approach to these extensions and should be compatible
+with most \fISTREAMS\fP-based APLI and XAP implementations.
+.IP \(em
+Only source compatibility is attempted.
+Binary compatibility is not
+attempted: any exhibited binary compatibility is coincidental and is scheduled
+to be removed on the next release.
+.PP
+See \fBAPLI\fP(3), \fBXAP\fP(3) and \fISTREAMS\fP(4) for additional
+compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XAP.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ap_ioctl ()
+first appeared in XAP.
+.[
+xap c303
+.]
+The rationale behind specification of the \fBap_ioctl\fP() function appears to
+be to support non-STREAMS implementations of the library.
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 XAP Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4
+
+
+

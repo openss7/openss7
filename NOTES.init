@@ -1,0 +1,142 @@
+NOTES.init -- read me file.  2011-04-23
+$Id: NOTES.init,v 1.1.2.1 2011-05-10 13:45:29 brian Exp $
+Copyright (c) 2008-2011  Monavacon Limited  <http://www.monavacon.com/>
+Copyright (c) 2001-2008  OpenSS7 Corporation  <http://www.openss7.com/>
+Copyright (c) 1997-2001  Brian Bidulock  <bidulock@openss7.org>
+See the end for copying conditions (for this file).
+
+
+Notes on init scripts:
+======================
+
+We used to place init script start and stop links in the 0-6 run levels.
+Recently, however, the requirement to relink modules before loading in
+support of weak-updating modules, the init scripts needed to run earlier
+in the boot sequence.  There are, again, three basic approaches to
+modern sysv init processes:
+
+RedHat/CentOS/Fedora
+--------------------
+
+RHEL5 and earlier executes /etc/rc.d/rc.sysinit directly from the si::
+entry in /etc/inittab.  It has no particular run-parts like boot
+sequence.  System initialization under RHEL6 is done by upstart instead
+of sysv-init scripts and run-level from /etc/inittab.  Nevertheless, it
+still runs /etc/rc.d/rc.sysinit first and then starts the appropriate
+run level from there just as the old inittab did.
+
+However, rc.sysinit executes *.modules files found in the directory,
+/etc/sysconfig/modules.  This is performed just after starting udev and
+before mounting pts (pseudo-terminals) and applying system controls from
+/etc/sysctl.conf.  This is a perfect place to execute our scripts, so se
+place an openss7.modules in /etc/sysconfig/modules and have it execute
+our scripts with the runlevel set to 'B'. (There is no runlevel in the
+RedHat rc.sysinit at this point).
+
+One problem is that local filesystems do not seem to be mounted at this
+point and the root filesystem may still be read-only.
+
+Therefore, normal 1235 init scripts must be used.
+
+SuSE/OpenSuSE
+-------------
+
+SuSE used to use insserv for differential links, which it still does,
+but now insserv is very LSB compliant.  Nevertheless, SuSE supports to
+runlevel other than 0-6: B and S.  B is the system boot scripts that are
+linked in /etc/init.d/boot.d.  S is the startup scripts for single-user
+mode (scripts common to all runlevels 1 2 3 5) linked in
+/etc/init.d/rcS.d and are not run until after all of the scripts in
+/etc/init.d/boot.d.
+
+SuSE runs parts in the /etc/init.d/boot.d directory directly from the
+si:: entry in /etc/inittab by running /etc/init.d/boot.
+
+We want to run our scripts after $local_fs but before boot.klog where
+possible (because we want STREAMS up before syslog, but maybe the
+STREAMS error and trace loggers after klog).
+
+Note that scripts in /etc/init.d/boot.d will be run in parallel.
+
+Scripts that are executable will be run with the 'start' argument;
+however, scripts that are not executable will be run as a script under
+/bin/sh with a 'b' argument encased with "Running $i" and the return
+code displayed as success or failure.
+
+Debian/Ubuntu
+-------------
+
+Debian used to use a fixed ordered process using the update-rc.d script
+for installing and removing init scripts.  However, it now uses an LSB
+compliant insserv utility (taken, it seems, from SuSE).  This is the LSB
+prioritizing scheme with dependencies.
+
+Debian/Ubuntu still uses a S runlevel, where system initialization
+scripts are run.  Debian/Ubuntu runs parts in the /etc/rcS.d directory
+directly from the si:: entry in /etc/inittab.
+
+The 'runlevel' environment variable will be set to 'S' when scripts are
+exectuted from rc 'S'.  The 'previous' environment variable will be set
+to 'N'.  This is a clue that the script is being run at boot.
+
+Debian/Ubuntu no longer treat scripts with a .sh extension differently
+(sourcing them instead of executing them).  Note that Debian uses
+/bin/dash as a /bin/sh replacement and no bashisms should be present in
+the scripts.
+
+Note that scripts in /etc/rcS.d will be run in parallel.
+
+-----
+
+=========================================================================
+
+ Copyright (c) 2008-2011  Monavacon Limited  <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian Bidulock  <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ Permission is granted to make and distribute verbatim copies of this
+ manual provided the copyright notice and this permission notice are
+ preserved on all copies.
+
+ Permission is granted to copy and distribute modified versions of this
+ manual under the conditions for verbatim copying, provided that the
+ entire resulting derived work is distributed under the terms of a
+ permission notice identical to this one
+
+ Since the Linux kernel and libraries are constantly changing, this
+ manual page may be incorrect or out-of-date.  The author(s) assume no
+ responsibility for errors or omissions, or for damages resulting from
+ the use of the information contained herein.  The author(s) may not
+ have taken the same level of care in the production of this manual,
+ which is licensed free of charge, as they might when working
+ professionally.
+
+ Formatted or processed versions of this manual, if unaccompanied by the
+ source, must acknowledge the copyright and authors of this work.
+
+-------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+ on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department
+ of Defense ("DoD"), it is classified as "Commercial Computer Software"
+ under paragraph 252.227-7014 of the DoD Supplement to the Federal
+ Acquisition Regulations ("DFARS") (or any successor regulations) and
+ the Government is acquiring only the license rights granted herein (the
+ license rights customarily provided to non-Government users).  If the
+ Software is supplied to any unit or agency of the Government other than
+ DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19
+ of the Federal Acquisition Regulations ("FAR") (or any successor
+ regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+ NASA Supplement to the FAR (or any successor regulations).
+
+=========================================================================
+
+ Commercial licensing and support of this software is available from
+ OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+
+=========================================================================
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

@@ -1,0 +1,35 @@
+# =============================================================================
+# @configure_input@
+# @(#) $RCSfile: mscript_preinst.in,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-05-10 13:45:29 $
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# This software is licensed under the GNU Affero General Public License (AGPL)
+# Version 3, 19 November 2007, available at <http://www.gnu.org/licenses/>.
+# -----------------------------------------------------------------------------
+eval "echo '${package}: \"$@\"'" >&2
+case "$1" in
+    (install) : # install fresh or some configuration
+	# new-preinst install [old-version]
+	if [ $# -gt 1 ]
+	then : # new-preinst install old-version
+	    reinstall_preinst "$@"
+	else : # new-preinst install
+	    install_preinst "$@"
+	fi
+	;;
+    (upgrade) : # upgrade (step 2)
+	# new-preinst upgrade old-version
+	upgrade_preinst "$@"
+	;;
+    (abort-upgrade) :
+	# old-postrm upgrade new-version ... failed
+	# new-postrm failed-upgrade old-version ... failed
+	# old-preinst abort-upgrade new-version
+	abort_upgrade_preinst "$@"
+	;;
+esac
+# -----------------------------------------------------------------------------
+# vim: ft=sh sw=4 noet
+# @configure_input@
+# =============================================================================

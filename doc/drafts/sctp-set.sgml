@@ -1,0 +1,16 @@
+<!DOCTYPE Set PUBLIC "-//OASIS//DTD DocBook V4.1//EN" [
+<!ENTITY book1 SYSTEM "sctp-book1.sgml">
+<!ENTITY book2 SYSTEM "sctp-book2.sgml">
+<!ENTITY book3 SYSTEM "sctp-book3.sgml">
+<!ENTITY book4 SYSTEM "sctp-book4.sgml">
+]>
+<set>
+<title>OpenSS7 SCTP Documentation Set</title>
+<setinfo>
+<corpauthor>OpenSS7 Corporation</corpauthor>
+</setinfo>
+&book1;
+&book2;
+&book3;
+&book4;
+</set>

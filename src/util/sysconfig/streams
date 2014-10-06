@@ -1,0 +1,110 @@
+#
+# This is an initial configuration file for the STREAMS subsystem.
+#
+
+# Update kernel modules at boot?
+STREAMS_KUPDATE='no'
+# Load modules at boot?
+STREAMS_BOOTLOAD='no'
+# Mount specfs file system at boot?
+STREAMS_BOOTMOUNT='no'
+
+# Mount specfs file system?
+STREAMS_MOUNTSPECFS='yes'
+# Unmount specfs file system?
+STREAMS_UMOUNTSPECFS='yes'
+# Mount point?
+STREAMS_MOUNTPOINT='/dev/streams'
+# Mount options are as follows:
+# user id to assign to device and module directories
+STREAMS_UID='0'
+# group id to assign to device and modules directories
+STREAMS_GID='0'
+# mode to assign to device and module directories
+STREAMS_MODE='0777'
+
+# Kernel modules to preload before system configuration.
+STREAMS_PRELOAD='streams streams-sth streams-clone'
+# Kernel modules for STREAMS drivers to remove.
+STREAMS_DRIVERS='streams-echo streams-fifo streams-log streams-loop streams-mux streams-nsdev streams-nuls streams-pipe streams-sad streams-sfx streams-spx streams-pty'
+# Kernel modules for STREAMS modules to remove.
+STREAMS_MODULES='streams-srvmod streams-connld streams-nullmod streams-pipemod streams-sc streams-testmod streams-aixcompat streams-hpuxcompat streams-irixcompat streams-liscompat streams-maccompat streams-mpscompat streams-os7compat streams-osfcompat streams-suncompat streams-svr3compat streams-svr4compat streams-uw7compat streams-ldterm streams-pckt streams-ptem streams-ttcompat streams-bufmod streams-pfmod streams-nbuf streams-pf'
+# NOTE: streams-liscompat does not seem to be installed
+
+# Make real character devices before intializing subsystem?
+STREAMS_MAKEDEVICES='no'
+# Remove devices when removing subsystem?
+STREAMS_REMOVEDEVICES='no'
+# Force removal of kernel modules when shutting down.
+STREAMS_FORCEREMOVE='no'
+
+# =============================================================================
+# 
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-10 13:45:38 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2011-05-10 13:45:38 $ by $Author: brian $
+#
+# -----------------------------------------------------------------------------
+#
+# $Log: streams,v $
+# Revision 1.1.2.3  2011-05-10 13:45:38  brian
+# - weak modules workup
+#
+# Revision 1.1.2.2  2011-02-07 04:44:28  brian
+# - updated init scripts
+#
+# Revision 1.1.2.1  2009-06-21 11:48:00  brian
+# - added files to new distro
+#
+# Revision 0.9.2.9  2008-04-28 12:54:12  brian
+# - update file headers for release
+#
+# Revision 0.9.2.8  2007/08/13 22:46:41  brian
+# - GPLv3 header updates
+#
+# =============================================================================
+
+# vim ft=conf sw=4 tw=80

@@ -1,0 +1,215 @@
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
+## =============================================================================
+## 
+# @(#) $RCSfile: netconfig.am,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-05-15 12:01:19 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU Affero General Public License as published by the Free
+## Software Foundation; version 3 of the License.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+## details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+## write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+## 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2011-05-15 12:01:19 $ by $Author: brian $
+##
+## =============================================================================
+
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
+
+##
+# This was changed from PKG_BUILD_INDEP to PKG_BUILD_ARCH because it is far too
+# complex to maintainer scripts to place these files in an architecture
+# independent package away from the library binaries that they configure.
+##
+
+if PKG_BUILD_USER
+## PKG_BUILD_USER
+
+##
+# These targets are responsible for installing the network configuration
+# information into the /etc/netconfig database.  This is performed by looking
+# for the /etc/nslconfig.d directory, installing this package's file into that
+# directory under the package name, and then rebuilding the /etc/netconfig
+# file.  If the /etc/netconfig file does not exist, then the file is simply
+# installed in the /etc/nslconfig.d directory (it might be an rpm or deb
+# build).
+##
+
+install-netconfig: src/util/sysconfig/netconfig
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/nslconfig.d
+	$(INSTALL_DATA) $< $(DESTDIR)$(sysconfdir)/nslconfig.d/@PACKAGE_LCNAME@
+
+##
+# If the /etc/netconfig file exists after we have placed the /etc/nslconfig.d
+# subdirectory entry, then check if it is one we built.  If it is, simply empty
+# it and start again, otherwise if it is not one we built it likely belongs to
+# the libtirpc package so do not calculate a new one: use the netconfig.xnsl
+# name instead.  If /etc/netconfig.xnsl already exists, use this alternate file
+# in preference to /etc/netconfig.  Also, if this is an rpm, dpkg or target
+# installation, use the alternate file name to avoid clobbering the nfs4 file
+# during final installation.  If there are no entries in the /etc/nslconfig.d
+# subdirectory, assume that we are being removed.  Note that if nothing really
+# gets installed in the /etc/nslconfig.d subdirectory, calling this has no
+# overall effect.
+#
+# Note: do not do post-netconfig when building RPMS because each RPM will
+# conflict on the /etc/netconfig.xnsl file.
+##
+
+post-netconfig:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@netc_fil="$(DESTDIR)$(sysconfdir)/netconfig" ; \
+	netc_alt="$(DESTDIR)$(sysconfdir)/netconfig.xnsl" ; \
+	netc_dir="$(DESTDIR)$(sysconfdir)/nslconfig.d" ; \
+	netc_tmp="$${TMPDIR-/var/tmp}/netconfig.tmp.$$$$" ; \
+	found='no' ; \
+	files="$$netc_dir/*" ; \
+	if test -n '$(DESTDIR)$(rootdir)' -a ! -e $$netc_fil -a ! -e $$netc_alt ; then \
+		exit 0 ; \
+	fi ; \
+	if test -r $$netc_fil ; then \
+		if ! grep '^# Generated from nslconfig.d' $$netc_fil >/dev/null 2>&1 ; then \
+			netc_fil="$$netc_alt" ; \
+		fi ; \
+	else \
+		if test -r $$netc_alt -o -n '$(DESTDIR)$(rootdir)'; then \
+			netc_fil="$$netc_alt" ; \
+		fi ; \
+	fi ; \
+	$(ECHO) "  $(ECHO) '# Generated from nslconfig.d by @PACKAGE_LCNAME@ ' >$$netc_tmp" ; \
+	$(ECHO) "  $(ECHO) '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!' >>$$netc_tmp" ; \
+	$(ECHO) "  $(ECHO) '# EDIT THE FILES IN THE nslconfig.d DIRECTORY INSTEAD.' >>$$netc_tmp" ; \
+	$(ECHO) '# Generated from nslconfig.d by @PACKAGE_LCNAME@ ' >$$netc_tmp ; \
+	$(ECHO) '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!' >>$$netc_tmp ; \
+	$(ECHO) '# EDIT THE FILES IN THE nslconfig.d DIRECTORY INSTEAD.' >>$$netc_tmp ; \
+	for f in $$files ; do \
+		if test -f $$f -a "$$f" = "$$netc_dir/strnsl" ; then \
+			case $$f in \
+				(*.rpmsave|*.rpmnew|*.rpmorig) ;; \
+				(*) 	$(ECHO) "  $(ECHO) '# Generated from nslconfig.d/'`basename $$f` >>$$netc_tmp" ; \
+					$(ECHO) '# Generated from nslconfig.d/'`basename $$f` >>$$netc_tmp ; \
+					$(ECHO) "  sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$netc_tmp" ; \
+					sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$netc_tmp ; \
+					found='yes' ;; \
+			esac ; \
+		fi ; \
+	done ; \
+	for f in $$files ; do \
+		if test -f $$f -a "$$f" != "$$netc_dir/strnsl" ; then \
+			case $$f in \
+				(*.rpmsave|*.rpmnew|*.rpmorig) ;; \
+				(*) 	$(ECHO) "  $(ECHO) '# Generated from nslconfig.d/'`basename $$f` >>$$netc_tmp" ; \
+					$(ECHO) '# Generated from nslconfig.d/'`basename $$f` >>$$netc_tmp ; \
+					$(ECHO) "  sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$netc_tmp" ; \
+					sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$netc_tmp ; \
+					found='yes' ;; \
+			esac ; \
+		fi ; \
+	done ; \
+	if test :$$found = :no ; then \
+		$(ECHO) "  rm -f -- $$netc_fil" ; \
+		rm -f -- $$netc_fil ; \
+		$(ECHO) "  rmdir $$netc_dir" ; \
+		rmdir $$netc_dir 2>/dev/null || :; \
+	else \
+		if ! diff $$netc_tmp $$netc_fil >/dev/null 2>&1 ; then \
+			$(ECHO) "  cp -f -b -v --suffix=.rpmsave -- $$netc_tmp $$netc_fil" ; \
+			cp -f - b -v --suffix=.rpmsave -- $$netc_tmp $$netc_fil ; \
+		fi ; \
+	fi ; \
+	rm -f -- $$netc_tmp || :; \
+	if test "$$netc_fil" != "$$netc_alt" ; then \
+		$(ECHO) "  rm -f -- $$netc_alt" ; \
+		rm -f -- $$netc_alt || :; \
+	fi
+
+uninstall-netconfig:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_UNINSTALL)
+	rm -f $(DESTDIR)$(sysconfdir)/nslconfig.d/@PACKAGE_LCNAME@
+
+if INSTALL_INITSCRIPTS
+## INSTALL_INITSCRIPTS
+
+INSTALL_DATA_HOOK	+= install-netconfig
+
+POST_INSTALL_AM		+= post-netconfig
+
+UNINSTALL_LOCAL		+= uninstall-netconfig
+
+POST_UNINSTALL_MA	+= post-netconfig
+
+## INSTALL_INITSCRIPTS
+endif
+
+## PKG_BUILD_USER
+endif
+## PKG_BUILD_ARCH
+endif
+
+EXTRA_DIST		+= src/util/sysconfig/netconfig
+
+## =============================================================================
+##
+## $Log: netconfig.am,v $
+## Revision 1.1.2.6  2011-05-15 12:01:19  brian
+## - many build system refinements
+##
+## Revision 1.1.2.5  2011-05-10 13:45:33  brian
+## - weak modules workup
+##
+## Revision 1.1.2.4  2011-03-17 07:01:27  brian
+## - build and repo system improvements
+##
+## Revision 1.1.2.3  2009-07-04 03:51:32  brian
+## - updates for release
+##
+## Revision 1.1.2.2  2009-06-29 07:35:35  brian
+## - improvements to build process
+##
+## Revision 1.1.2.1  2009-06-21 10:26:00  brian
+## - added files to new distro
+##
+## =============================================================================
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor tw=80

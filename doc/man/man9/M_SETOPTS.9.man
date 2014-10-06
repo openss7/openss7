@@ -1,0 +1,1580 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: M_SETOPTS.9.man,v 1.1.2.2 2011-02-07 02:18:35 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:35 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: M_SETOPTS.9.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:35  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH M_SETOPTS 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B M_SETOPTS
+\- \fISTREAMS\fP set stream head options message
+.\"
+.\"
+.SH FORMAT
+.PP
+The
+.B M_SETOPTS
+message block is a
+.BR datab (9)
+structure and associated data buffer that contains structured data.
+.PP
+An
+.B M_SETOPTS
+message is a normal priority message that consists of a single
+.B M_SETOPTS
+message block.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B M_SETOPTS
+message is sent to the
+Stream head
+by a driver or module wanting to alter some characteristics of the
+Stream head.
+It is generated by any downstream module, and is interpreted by the
+Stream head.
+The data buffer of the message has the following structure:
+.PP
+.nf
+\fC\s-1\
+struct stroptions {
+    uint so_flags;              /* options to set */
+    short so_readopt;           /* read option */
+    ushort so_wroff;            /* write offset */
+    ssize_t so_minpsz;          /* minimum read packet size */
+    ssize_t so_maxpsz;          /* maximum read packet size */
+    size_t so_hiwat;            /* read queue hi water mark */
+    size_t so_lowat;            /* read queue lo water mark */
+    unsigned char so_band;      /* band for water marks */
+    unsigned char so_filler[3]; /* padding */
+    ushort so_erropt;           /* Solaris */
+    ssize_t so_maxblk;          /* Solaris */
+    ushort so_copyopt;          /* Solaris */
+    ushort so_wrpad;            /* write (tail) padding */
+};
+\s+1\fP
+.fi
+where
+.I so_flags
+specifies which options are to be altered, and can be any combination of the following:
+.RS
+.TP \w'SO_COWDISABLE\(em'u
+.B SO_ALL
+set all old options (Solaris uses true mask)
+.PD 0
+.TP
+.B SO_READOPT
+set read option
+.TP
+.B SO_WROFF
+set write offset
+.TP
+.B SO_MINPSZ
+set min packet size
+.TP
+.B SO_MAXPSZ
+set max packet size
+.TP
+.B SO_HIWAT
+set high water mark
+.TP
+.B SO_LOWAT
+set low water mark
+.TP
+.B SO_MREADON
+set read notification ON
+.TP
+.B SO_MREADOFF
+set read notification OFF
+.TP
+.B SO_NDELON
+old TTY semantics for NDELAY reads/writes
+.TP
+.B SO_NDELOFF
+STREAMS semantics for NDELAY reads/writes
+.TP
+.B SO_ISTTY
+the stream is acting as a terminal
+.TP
+.B SO_ISNTTY
+the stream is not acting as a terminal
+.TP
+.B SO_TOSTOP
+stop on background writes to this stream
+.TP
+.B SO_TONSTOP
+do not stop on background writes to stream
+.TP
+.B SO_BAND
+water marks affect band
+.TP
+.B SO_DELIM
+messages are delimited
+.TP
+.B SO_NODELIM
+turn off delimiters
+.TP
+.B SO_STRHOLD
+UnixWare/Solaris: enable strwrite message coalescing
+.TP
+.B SO_ERROPT
+Solaris
+.TP
+.B SO_LOOP
+UnixWare
+.TP
+.B SO_COPYOPT
+Solaris: user io copy options
+.TP
+.B SO_MAXBLK
+Solaris: maximum block size
+.TP
+.B SO_COWENABLE
+OSF/HPUX
+.TP
+.B SO_COWDISABLE
+OSF/HPUX
+.TP
+.B SO_WRPAD
+@PACKAGE_TITLE@: write tail padding
+.TP
+.B SO_NOCSUM
+@PACKAGE_TITLE@: no checksum on copy
+.TP
+.B SO_CSUM
+@PACKAGE_TITLE@: UDP/TCP checksum on copy
+.TP
+.B SO_CRC32C
+@PACKAGE_TITLE@: CRC32C checksum on copy
+.TP
+.B SO_SKBUFF
+@PACKAGE_TITLE@: allocate sk_buffs for data
+.TP
+.B SO_NOSKBUFF
+@PACKAGE_TITLE@: do not allocate sk_buffs for data
+.PD
+.RE
+.\"
+.\"
+.SS SO_ALL
+.PP
+Update all options according to the values specified in the remaining files of the
+.BR stroptions (9)
+structure.
+.\"
+.\"
+.SS SO_READOPT
+.PP
+Sets the read options for the Stream head.  The read options consist of two bit fields that
+determine the read mode and the read control mode for the Stream head.
+.PP
+The read mode determines how the
+.BR read (2s)
+system call handles messages and message boundaries.
+It can contain one of the following mutually exclusive flags:
+.\"
+.TP
+.B RNORM
+This is the default.
+In byte-stream mode, message boundaries are normally ignored.  When the
+.B SO_DELIM
+flag is used to set the
+.B STRDELIM
+option in the Stream head, message boundaries are no longer ignored.
+If a message contains more data than is necessary to satisfy the
+.BR read (2s)
+request, the remainder is placed back onto the Stream head read queue (with the same messages flags
+as were present in the original message block of the original message).
+See
+.RI \(lq SO_DELIM ,\(rq
+below, for more information.
+.\"
+.TP
+.B RMSGD
+In message-discard mode, only one message at a time is read  If the message contains more data
+than was requested by
+.BR read (2s)
+with
+.IR nbytes ,
+the remainder of the message is discarded.
+.\"
+.TP
+.B RMSGN
+In message-non-discard mode, only one message at a time is read.  If the message contains more data
+than was requested by
+.BR read (2s)
+with
+.IR nbytes ,
+the remainder of the mssage is placed back onto the Stream head read queue.
+.\"
+.TP
+.B RFILL
+Message fill modes is the same as byte-stream mode, with the exception that
+.BR read (2s)
+requests attempt to fill a buffer completely before returning to the
+application.  This mode can be used in conjuction with the
+.B SO_MREADON
+option.
+.PP
+The read control mode determines how the
+.BR read (2s)
+system call handles messages on the Stream head read queue that contain control parts.
+It can contain one of the following mutually exclusive flags:
+.\"
+.TP
+.B RPROTNORM
+This is the default.
+In control-normal mode,
+whenever
+.BR read (2s)
+encounters a message on the Stream head read queue that contains a control part (i.e.
+leading
+.BR M_PROTO "(9) or " M_PCPROTO (9)
+message block),
+.BR read (2s)
+either terminates and returns the number of bytes read so far, or fails, returns minus one
+.RB ( -1 )
+and sets
+.IR errno (3)
+to
+.RB [ EBADMSG ].
+.\"
+.TP
+.B RPROTDAT
+In control-data mode,
+whenever
+.BR read (2s)
+encounters a message on the Stream head read queue that contains a control part, the Stream head
+converts the
+.BR M_PROTO "(9) or " M_PCPROTO (9)
+message blocks directly to
+.BR M_DATA (9)
+message blocks and processes them with the normal data part of the message.
+.\"
+.TP
+.B RPROTDIS
+In control-discard mode,
+whenever
+.BR read (2s)
+encounters a message on the Stream head read queue that contains a control part, the Stream head
+discards the
+.BR M_PROTO "(9) or " M_PCPROTO (9)
+message blocks,
+processing any remaining
+.BR M_DATA (9)
+message blocks as thought the control part did not exist.
+.PP
+Read options can also be set and examined by a user program with the
+.BR I_SRDOPT "(7) or " I_GRDOPT (7)
+commands to
+.BR ioctl (2s)
+as detailed in
+.BR streamio (7).
+.\"
+.\"
+.SS SO_WROFF
+.PP
+Specifies a write offset (for the
+.I b_rptr
+member of the
+.BR msgb (9)
+structure message block) into the message block at which data will be written.
+.BR write (2s)
+applies this offset before writing data into the first
+.BR M_DATA (9)
+message block passed downstream as a result of the
+.BR write (2s)
+operation.
+.BR putmsg (2s)
+and
+.BR putpmsg (2s)
+applies this offset before writing data into the first
+.BR M_DATA (9)
+message block that forms part of a message before passing the message downstream.
+.PP
+Although
+.B @PACKAGE_TITLE@
+applies the write offset to each message in the fashion described above, the downstream module
+cannot always assume that
+.BR M_DATA (9)
+message blocks contain the appropriate write offset.  It is possible that the
+.BR M_DATA (9)
+was either generated by or modified by an intervening module and that it did not contain the write
+offset because it was either not generated by the Stream head, or it was subsequently modified by
+an intervening module.  The driver or module that requested a write offset should ensure that the
+appropriate offset exists by comparing the
+.I db_base
+pointer to the
+.I b_rptr
+pointer to ensure that the appropriate offset exists in the necessary message blocks.
+.\"
+.\"
+.SS SO_MINPSZ
+.PP
+Sets the minimum packet size associated with the Stream head read queue.  The default is zero
+.RB ( 0 ).
+This value in the Stream head read queue acts as an advisory value to the driver or module
+immediately below the stream head on the minimum size of
+.BR M_DATA (9)
+messages.  Note that for
+.IR STREAMS -based
+pipes and FIFOs (with no modules pushed), the Stream head read queue
+.I is
+queue below the the Stream head write queue on the write side of the pipe or FIFO.  This means that,
+although this setting has an advisory effect on the read side of a Stream, it can have a mandatory
+effect on the write side of a pipe or FIFO (with no modules pushed).
+.PP
+Most drivers and modules simply ignore this advisory minimum.
+.\"
+.\"
+.SS SO_MAXPSZ
+.PP
+Sets the maximum packet size associated with the Stream head read queue.  The default is
+.BR INFPSZ .
+This value in the Stream head read queue acts as an advisory value to the driver or module
+immediately below the stream head on the maximum size of
+.BR M_DATA (9)
+messages.  Note that for
+.IR STREAMS -based
+pipes and FIFOs (with no modules pushed), the Stream head read queue
+.I is
+queue below the the Stream head write queue on the write side of the pipe or FIFO.  This means that,
+although this setting has an advisory effect on the read side of a Stream, it can have a mandatory
+effect on the write side of a pipe or FIFO (with no modules pushed).
+.PP
+Most drivers and modules simply ignore this advisory maximum.
+.\"
+.\"
+.SS SO_HIWAT
+.PP
+Sets the high water mark,
+.IR q_hiwat ,
+for the Stream head read queue.  This watermark is important to read side flow control and
+determines when the read side of the Stream is full.
+.\"
+.\"
+.SS SO_LOWAT
+.PP
+Sets the low water mark,
+.IR q_lowat ,
+for the Stream head read queue.  This watermark is important to read side flow control and
+determines when the read side of the Stream should be back-enabled.
+.\"
+.\"
+.SS SO_MREADON
+.PP
+Enables the Stream head to generate
+.BR M_READ (9)
+messages when processing a
+.BR read (2s)
+system call and there is no data to be read.  The message contains the number of bytes the reader is
+expecting as a
+.B long
+value stored in four data bytes.  If both
+.B SO_MREADON
+and
+.B SO_MREADOFF
+are set in
+.IR so_flags ,
+.B SO_MREADOFF
+has precedence.
+.\"
+.\"
+.SS SO_MREADOFF
+.PP
+Disables the Stream head generation of an
+.BR M_READ (9)
+message when processing a
+.BR read (2s)
+system call and there is no data to be read.  This is the default.  If both
+.BR SO_MREADON " and " SO_MREADOFF
+are set in
+.IR so_flags ,
+.B SO_MREADOFF
+has precedence.
+.\"
+.\"
+.SS SO_NDELON
+.PP
+Set
+.RI non- STREAMS
+tty semantics for
+.BR O_NDELAY " (or " O_NONBLOCK )
+processing on
+.BR read (2s)
+and
+.BR write (2s)
+system calls.
+This sets the
+.B STRNDEL
+flag in the
+.I sd_flag
+member of the Stream head
+.BR stdata (9)
+structure.
+If both
+.BR SO_NDELON " and " SO_NDELOFF
+are set in
+.IR so_flags ,
+.B SO_NDELOFF
+has precedence.
+.PP
+If
+.BR O_NDELAY " (or " O_NONBLOCK )
+is set, a
+.BR read (2s)
+will return zero
+.RB ( 0 )
+if no data is waiting to be read at the Stream head.
+If
+.BR O_NDELAY " (or " O_NONBLOCK )
+is clear, a
+.BR read (2s)
+will block until data becomes available at the Stream head.
+.PP
+Regardless of the state of
+.BR O_NDELAY " (or " O_NONBLOCK ),
+a
+.BR write (2s)
+will block on flow control and will block if buffers are not available.
+.\"
+.\"
+.SS SO_NDELOFF
+.PP
+Set
+.I STREAMS
+semantics for
+.BR O_NDELAY " (or " O_NONBLOCK )
+processing on
+.BR read (2s)
+and
+.BR write (2s)
+system calls.
+This clears the
+.B STRNDEL
+flag in the
+.I sd_flag
+member of the Stream head
+.BR stdata (9)
+structure.
+This is the default for newly created Stream heads.
+If both
+.BR SO_NDELON " and " SO_NDELOFF
+are set in
+.IR so_flags ,
+.B SO_NDELOFF
+has precedence.
+.PP
+If
+.BR O_NDELAY " (or " O_NONBLOCK )
+is set, a
+.BR read (2s)
+will return minus one
+.RB ( -1 )
+and set
+.IR errno (3)
+to
+.RB [ EAGAIN ]
+if no data is waiting to be read at the Stream head.
+If
+.BR O_NDELAY " (or " O_NONBLOCK )
+is clear, a
+.BR read (2s)
+will block until data becomes available at the Stream head.
+.PP
+If
+.BR O_NDELAY " (or " O_NONBLOCK )
+is set, a
+.BR write (2s)
+will return minus one
+.RB ( -1 )
+and set
+.IR errno (3)
+to
+.RB [ EAGAIN ]
+if flow control is in effect when the call is received.
+It will block if buffers are not available.
+If
+.BR O_NDELAY " (or " O_NONBLOCK )
+is set and part of the buffer has been written and a flow control or buffers not available condition
+is encountered,
+.BR write (2s)
+will terminate and return the number of bytes written.
+If
+.BR O_NDELAY " (or " O_NONBLOCK )
+is clear, a
+.BR write (2s)
+will block on flow control and will block if buffers are not available.
+.PP
+In the
+.IR STREAMS -based
+pipe and FIFO mechanism, the behaviour of
+.BR read (2s)
+and
+.BR write (2s)
+is different for the
+.BR O_NDELAY " (or " O_NONBLOCK )
+flags.
+See
+.BR read (2s)
+and
+.BR write (2s)
+for details.
+.\"
+.\"
+.SS SO_ISTTY
+.PP
+Sets the fact that the Stream is a control terminal for a process.  That is, it is responsible for
+providing standard input, output and error connection for the process.
+This sets the
+.B STRISTTY
+flag in the
+.I sd_flag
+member of the Stream head
+.BR stdata (9)
+structure.
+If both
+.BR SO_ISNTTY " and " SO_ISNTTY
+are set in
+.IR so_flags ,
+.B SO_ISNTTY
+has precedence.
+.\"
+.\"
+.SS SO_ISNTTY
+Sets the fact that the Stream is a non-controlling terminal.  That is, it is not responsible for the
+standard input, output or error of any process.
+This clears the
+.B STRISTTY
+flag in the
+.I sd_flag
+member of the Stream head
+.BR stdata (9)
+structure.
+If both
+.BR SO_ISNTTY " and " SO_ISNTTY
+are set in
+.IR so_flags ,
+.B SO_ISNTTY
+has precedence.
+.PP
+Non-control terminals do not need to perform a large number of behaviours normally associated with
+ttys such as access control, job control, signals, tracking the session and group leaders and
+control processes, etc.  In fact, ttys that are not controlling terminals can be treated largely as
+normal STREAMS.
+.PP
+.\"
+.\"
+.SS SO_TOSTOP
+.PP
+Sets the Stream head so that it will stop a process attempting to perform a background write to the
+Stream.
+This sets the
+.BR STRTOSTOP
+flag in the
+.I sd_flag
+member of the Stream head
+.BR stdata (9)
+structure.
+If both
+.BR SO_TOSTOP " and " SO_TONSTOP
+are set in
+.IR so_flags ,
+.B SO_TONSTOP
+takes precedence.
+.\"
+.\"
+.SS SO_TONSTOP
+.PP
+Resets the Stream head so that it will not stop a process an attempting to perform a background write to the
+Stream.
+This clears the
+.BR STRTOSTOP
+flag in the
+.I sd_flag
+member of the Stream head
+.BR stdata (9)
+structure.
+If both
+.BR SO_TOSTOP " and " SO_TONSTOP
+are set in
+.IR so_flags ,
+.B SO_TONSTOP
+takes precedence.
+.\"
+.\"
+.SS SO_BAND
+.PP
+Specifies that the
+.IR so_minpsz ,
+.IR so_maxpsz ,
+.IR so_hiwat ,
+.IR so_lowat ,
+fields and the
+.BR SO_MINPSZ ,
+.BR SO_MAXPSZ ,
+.BR SO_HIWAT ,
+.BR SO_LOWAT ,
+flags apply to the message band,
+.BR qband (9)
+structure, specified in
+.IR so_band .
+.\"
+.\"
+.SS SO_DELIM
+.PP
+Set the Stream head for message delimitation.
+This sets the
+.B STRDELIM
+flag in the
+.I sd_flag
+member of the
+.BR stdata (9)
+structure.
+If both
+.BR SO_DELIM " and " SO_NODELIM
+are set in
+.IR so_flags ,
+.B SO_NODELIM
+takes precedence.
+.PP
+Setting the
+.B STRDELIM
+flag alters the Stream head behaviour for handling of
+.BR read (2s)
+and
+.BR write (2s)
+in byte-stream read mode.
+.PP
+When
+.B STRDELIM
+is set,
+.BR read (2s)
+will terminate on a delimited message and will not return a zero-length delimited message to the
+Stream head read queue on a short read.  Also, when the file is set for blocking operation in
+byte-stream read mode, the
+caller will block until either
+.I nbytes
+have been read, a message boundary is encountered, a zero-length message is encountered, or a signal
+or error conditions occurs.  Zero-length messages that are delimited (indicating read cessation)
+will not be returned to the Stream head write queue but non-delimited zero-length messages
+(indicating end-of-file) will.  This is consistent with
+.I SVR 4
+.[
+magic
+.]
+.BR read (2s)
+behaviour.
+.PP
+When
+.B STRDELIM
+and
+.B SNDMREAD
+are both set on the Stream head, the generation of
+.BR M_READ (9)
+messages by the Stream head is altered.
+.IP \(em \w'\(em\(em'u
+The generation of
+.BR M_READ (9)
+messages is altered when the
+.B STRDELIM
+flag is also set.  If there is insufficient data available at the Stream head read queue and
+.BR read (2s)
+goes to block for the first time, regardless of whether some data has already been transferred,
+.BR read (2s)
+generates an
+.BR M_READ (9)
+message downstream with the number of bytes remaining outstanding to service the read request.
+This is consistent with
+.I SVR 4
+behaviour for the generation of
+.BR M_READ (9).
+.IP \(em
+The handling of
+.BR M_READ (9)
+messages by the downstream driver or module should be altered.  When there is sufficient data
+available at the downstream module to service the request, the
+.BR M_READ (9)
+is transformed into an
+.BR M_DATA (9)
+message containing the requested data and returned upstream.
+When there is insufficient data at the downstream driver or module to service the request, one of
+three actions should be taken:
+.RS
+.IP 1) \w'0)\(em'u
+If there is some amount of data less than the requested amount available, the driver or module may
+transform the
+.BR M_READ (9)
+message into a
+.BR M_DATA (9)
+message containing the available data.  The
+.B MSGDELIM
+flag can be set on this message to make
+.BR read (2s)
+terminate the read with a short read, or can be left unset to cause
+.BR read (2s)
+to block awaiting additional data.
+.IP 2)
+If there is no data available at the driver or module, the driver or module may transform the
+.BR M_READ (9)
+message into a zero-length
+.BR M_DATA (9)
+message, setting the
+.B MSGDELIM
+flag on this message, and responding with it upstream.  This will signal
+.BR read (2s)
+at the Stream head to terminate the read with a short count.  Note, however, that if no data has
+been read so far at the Stream head when the zero-length message arrives,
+.BR read (2s)
+will terminate and return zero
+.RB ( 0 ).
+.IP 3)
+If there is no data available at the driver or module, or there is insufficient data that the module
+or driver does not wish to forward at this time, the driver or module may discard the
+.BR M_READ (9)
+message and defer taking any action.
+.BR read (2s)
+will then block at the Stream head awaiting the arrival of data.
+.RE
+.PP
+When
+.B STRDELIM
+is set,
+.BR write (2s)
+will add
+.B MSGDELIM
+flags to indicated delimited messages.  The
+.B MSGDELIM
+flag is set in the last
+.BR M_DATA (9)
+message of a full write.  Partial writes do not set the
+.BR MSGDELIM
+flag in any message.  This is also true for buffers longer than
+.IR q_maxpsz ,
+where
+.I q_minpsz
+is zero and
+.BR write (2s)
+breaks the write into multiple
+.IR q_maxpsz -sized
+messages.  In this case,
+.B MSGDELIM
+is only set on the last
+.BR M_DATA (9)
+message in the sequence and only when a full write of
+.I nbytes
+occurs.
+.\"
+.\"
+.SS SO_NODELIM
+.PP
+Reset the Stream head from message delimitation.  This clears the
+.B STRDELIM
+flag in the
+.I sd_flag
+member of the
+.BR stdata (9)
+structure.
+This is the default for newly created Stream heads.
+If both
+.BR SO_DELIM " and " SO_NODELIM
+are set in
+.IR so_flags ,
+.B SO_NODELIM
+takes precedence.
+.PP
+Clearing the
+.B STRDELIM
+flag alters the Stream head behaviour for handling of
+.BR read (2s)
+and
+.BR write (2s)
+in byte-stream read mode.
+.PP
+When
+.B STRDELIM
+is clear,
+.BR read (2s)
+will terminate when
+.I nbytes
+are read, some data has been read and there is
+no more data to be read immediately at the Stream head read queue,
+when a zero-length message is encountered.  Message boundaries are ignored.  Zero-length messages
+(that can only indicate end-of-file)
+are returned  to the Stream head read queue to be consumed by a subsequent call.
+.BR read (2s)
+only terminates on a signal or error condition when the signal or error condition is detected before
+data any is read.
+This is consistent with
+.I POSIX
+.[
+susv3
+.]
+.BR read (2s)
+behaviour.
+.PP
+When
+.B SNDMREAD
+is set and
+.B STRDELIM
+is clear, the generation of
+.BR M_READ (9)
+messages at the Stream head and the necessary interpretation of
+.BR M_READ (9)
+messages at the downstream driver or module are as described above under
+.RI \(lq SO_MREADON .\(rq
+.PP
+When
+.B STRDELIM
+is clear,
+.BR write (2s)
+will generate no
+.B MSGDELIM
+flags in messages.
+.\"
+.\"
+.SS SO_STRHOLD
+.PP
+Sets the Stream head for the message hold option.  
+.I STREAMS
+provides a hold option that improves the performance of
+.I STREAMS
+when the process issues many small writes.  The message hold option is enabled if the system
+adminstrator has changed the system control,
+.BR sysctl_str_strhold ,
+to be non-zero and if the Stream head flag
+.B STRHOLD
+is set by a driver or module.  A downstream driver or module sets the Stream head
+.B STRHOLD
+bit by sending a
+.BR M_SETOPTS (9)
+message upstream with the
+.B SO_STRHOLD
+flag set in the
+.I so_flags
+member of the
+.BR stroptions (9)
+stucture contained in the message.  (The
+.BR ldterm (4)
+tty line discipline module does this.)  The process may also issue a
+.BR I_SWROPT (7)
+command to
+.BR ioctl (2s)
+with the
+.B SNDHOLD
+flag set in the argument to enable the hold option on a particular Stream, but this is a
+.B @PACKAGE_TITLE@
+extension.  Normally the hold option can only be activated and deactivated by a downstream module or
+driver.
+.PP
+The message hold option exploits the fact that
+.BR allocb (9)
+allocates a buffer with a data size that is always equal to or greater than
+.BR FASTBUF .
+The buffer is allocated and the data is copied into it.
+.BR write (2s)
+then checks to see if another
+.BR write (2s)
+of the same size will fit into the same buffer.  If it will, the buffer is held temporarily on the
+Stream head write queue, a timer is started (usually, 10 milliseconds, but settable with the
+.B sysctl_str_rtime
+system control), and the Stream head is linked into the
+.I scanqhead
+list in the
+.I STREAMS
+scheduler.
+.PP
+One of three things will then happen:
+.IP 1) \w'0)\(em'u
+A second
+.BR write (2s)
+occurs with a data part that is small enough to fit into the remaining portion of the saved buffer.
+The data is put into the buffer and sent downstream.  Since two writes have been sent downstream in
+one message, the optimization is successful.
+.IP 2)
+A second
+.BR write (2s)
+occurs with a data portion that is too big to fit into the remaining portion of the saved buffer.
+The saved message is sent downstream followed by another message holding the data of the second
+.BR write (2s).
+.IP 3)
+No second
+.BR write (2s)
+occurs so the timer expires.  The timeout processing performed by
+.BR runqueues ()
+scans the
+.I scanqhead
+list in the
+.I STREAMS
+scheduler and sends downstream any messages held on the Stream head write queues whose timeouts have
+expired.
+.PP
+In implementation it is not too difficult to multiplex a single timer against the
+.I scanqhead
+list, rather than setting a timer per Stream.
+.PP
+.IR Solaris \(rg
+.[
+solspg
+.]
+no longer implements this option.
+.\"
+.\"
+.SS SO_ERROPT
+.PP
+When the
+.B SO_ERROPT
+flag is specified in the
+.I so_flags
+member of the
+.B stroptions
+structure, the
+.I so_erropt
+member is interpreted by the Stream head.
+.PP
+The
+.I so_erropt
+member can contain one of the following flags:
+.TP \w'WERRNONPERSIST\(em'u
+.B RERRNORM
+Specifies normal read error operation at the Stream head: any read error will be returned for
+any read system call issued on the Stream head until the error is reset by the driver or module.
+.TP
+.B RERRNONPERSIST
+Specifies non-persistent read error operation at the Stream head: any read error will be returned
+for the first read system call issued on the Stream head and automatically reset thereafter.
+.PP
+and one of the following flags:
+.TP \w'WERRNONPERSIST\(em'u
+.B WERRNORM
+Specifies normal write error operation at the Stream head: any write error will be returned for
+any write system call issued on the Stream head until the error is reset by the driver or module.
+.TP
+.B WERRNONPERSIST
+Specifies non-persistent write error operation at the Stream head: any write error will be returned
+for the first write system call issued on the Stream head and automatically reset thereafter.
+.PP
+The
+.B SO_ERROPT
+flag and the associated
+.I so_erropt
+member are
+.IR Solaris \(rg
+.[
+solspg
+.]
+specific options implemented by
+.B @PACKAGE_TITLE@
+for compatibility.
+The error options can also be examine or set by the user with the
+.BR I_GERROPT (7)
+and
+.BR I_SERROPT (7)
+.I STREAMS
+input output controls,
+.BR streamio (7).
+See
+.RB \(lq COMPATIBILITY \(rq,
+below.
+.\"
+.\"
+.SS SO_LOOP
+.PP
+.B SO_LOOP
+is an undocumented
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+specific option, not implemented by
+.BR "@PACKAGE_TITLE@" .
+See
+.BR \(lq COMPATIBILITY \(rq,
+below.
+.\"
+.\"
+.SS SO_COPYOPT
+.PP
+.I so_copyopt
+can contain zero or more of the following flags:
+.TP \w'MAPINOK\(em'u
+.B MAPINOK
+Specifies that user data forming the data part of a
+.BR write (2s),
+.BR putmsg (2s)
+or
+.BR putpmsg (2s)
+call should be mapped into the kernel instead of copied in with
+.BR copyin (9).
+.TP
+.B NOMAPIN
+Specifies the normal behaviour that user data forming the data part of a write operation will be
+copied in with
+.BR copyin (9).
+.PP
+If both
+.BR MAPINOK " and " NOMAPIN
+are set,
+If neither are set, the existing Stream head setting is unchanged in this regard.
+.B NOMAPIN
+takes precedence.
+.TP \w'MAPINOK\(em'u
+.B REMAPOK
+Specifies that user data forming the data part of a
+.BR read (2s),
+.BR getmsg (2s),
+or
+.BR getpmsg (2s)
+call should be page-flipped from the kernel into user sapce instead of copied out with
+.BR copyout (9).
+.TP
+.B NOREMAP
+Specifies the normal behaviour that user data forming the data part of a read operation will be
+copied out with
+.BR copyout (9).
+.PP
+If both
+.BR REMAPOK " and " NOREMAP
+are set,
+.B NOREMAP
+takes precedence.
+If neither are set, the existing Stream head setting is unchanged in this regard.
+.PP
+Note that the
+.BR MAPINOK ", " NOMAPIN ", " REMAPOK " and " NOREMAP
+flags are located in
+.BR <sys/stropts.h> " instead of " <sys/stream.h> .
+.PP
+.B SO_COPYOPT
+and the associated
+.I so_copyopt
+member of the
+.B stroptions
+structure are
+.IR Solaris \(rg
+specific options not implemented by
+.BR "@PACKAGE_TITLE@" .
+See
+.RB \(lq COMPATIBILITY \(rq,
+below.
+.\"
+.\"
+.SS SO_MAXBLK
+.PP
+.B SO_MAXBLK
+and the associated
+.I so_maxblk
+member of the
+.B stroptions
+structure are
+.IR Solaris \(rg
+specific options not implemented by
+.BR "@PACKAGE_TITLE@" .
+.IR Solaris \(rg
+provides the capability of changing the maximum block size on a per-stream basis.
+.B "@PACKAGE_TITLE@"
+takes the
+.I SVR 4.2
+approach of enforcing only a global maximum block size for all streams.
+See
+.RB \(lq COMPATIBILITY \(rq,
+below.
+.\"
+.\"
+.SS SO_COWENABLE
+.SS SO_COWDISABLE
+.PP
+.BR SO_COWENABLE " and " SO_COWDISABLE
+are
+.IR OSF/1 \(rg
+.[
+osfspg
+.]
+and
+.IR HPUX \(rg
+.[
+hpuxspg
+.]
+specific flags that are not well documented.
+.PP
+.B @PACKAGE_TITLE@
+reserves these two flags for a zero-copy implementation at the Stream head that works as follows:
+.PP
+When the Stream head is set for copy-on-write with the
+.B SO_COWENABLE
+flag, data portions of messages are mapped from user-space into kernel space and the copy-on-write
+characteristic set on the mapped kernel page.  Any attempt to write to the page will result in a
+copy of the user-space page to the kernel page before writing.  If no attempt is made to write to
+the page, and effective zero-copy architecture results in which the data can be copied directly from
+user space to interface devices at the driver.
+.PP
+This mechanism is not yet implemented by
+.BR "@PACKAGE_TITLE@" ,
+however, these two flags are reserved for such a future implementation.
+.\"
+.\"
+.SS SO_WRPAD
+.PP
+Specifies the write padding (for the
+.I b_wptr
+member of the
+.BR msgb (9)
+structure message block) for the message block after the extent where data will be written.
+.BR write (2s)
+applies this padding after writing data into the last
+.BR M_DATA (9)
+message block passed downstream as a result of the
+.BR write (2s)
+operation.
+.BR putmsg (2s)
+and
+.BR putpmsg (2s)
+applies this padding after writing data into the last
+.BR M_DATA (9)
+message block that forms part of a message before passing the message downstream.
+.PP
+Although
+.B @PACKAGE_TITLE@
+applies the write padding to each message in the fashion described above, the downstream module
+cannot always assume that
+.BR M_DATA (9)
+message blocks contain the appropriate write padding.  It is possible that
+.BR M_DATA (9)
+was either generated by or modified by an intervening module and that it did not contain the write
+padding because it was either not generated by the Stream head, or it was subsequently modified by
+an intervening module.  The driver or module that requested a write offset should ensure that the
+appropriate offset exists by comparing the
+.I db_lim
+pointer to the
+.I b_wptr
+pointer to ensure that the appropriate padding exists in the necessary message blocks.
+.PP
+The
+.B SO_WRPAD
+flag and the associated
+.I so_wrpad
+member are specific to
+.BR "@PACKAGE_TITLE@" .
+.B SO_WRPAD
+and
+.I so_wrpad
+are similar to
+.B SO_WROFF
+and
+.I so_wroff
+with the exception that instead of adding an offset to the beginning of a data buffer for the data
+part of a message, (that is, specifying headroom for the buffer)
+.B SO_WRPAD
+and
+.I so_wrpad
+specify the amount of padded added to the end of the data buffer for the data part of a message,
+(that is, specifies the tailroom for the buffer).
+.\"
+.\"
+.SS SO_NOCSUM
+.SS SO_CSUM
+.SS SO_CRC32C
+.PP
+Specifies the checksum algorithm to be used to calculate a partial checksum when copying data from
+the user into
+.BR M_DATA (9)
+message blocks.  The result of the partial checksum will be written to the
+.I b_csum
+member of the
+.BR msgb (9)
+structure and the appropriate message flag
+.RB ( MSGCSUM " or " MSGCRC32C )
+will be set in the corresponding
+.I b_flag
+member.
+This permits a Van Jacobson style checksum and copy operation for networking protocol streams,
+and is used by
+.B @PACKAGE_TITLE@
+high-performance network pseudo-device drivers.
+.PP
+The
+.BR SO_NOCSUM ", " SO_CSUM " and " SO_CRC32C
+flags,
+the
+.I b_csum
+member,
+and the
+.BR MSGCSUM " and " MSGCRC32C
+message flags
+are specific to
+.BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.SS SO_SKBUFF
+.SS SO_NOSKBUFF
+.PP
+Specifies whether
+.B Linux
+style socket buffers
+.RB ( "struct sk_buff" )
+are to be allocated to form the data buffer of the data block instead of the normal kernel memory
+allocation associated with
+.BR allocb (9).
+.PP
+When specified, the Stream head will allocate a socket buffer and perform a call to
+.BR esballoc (9)
+with the data buffer portion of the socket buffer described and a special
+.BR frtn_t (9)
+structure that will free the socket buffer when the data block is freed.  The stream head will also
+set the
+.BR DB_SKBUFF
+flag in the
+.I db_flag
+member of the
+.BR datab (9)
+structure to indicate to downstream drivers that a socket buffer has already been allocated and
+associated with the data block.
+.PP
+Downstream drivers or modules that recognize the
+.B DB_SKBUFF
+flag can acquire a reference to the socket buffer using
+.BR skb_get ()
+or
+.BR skb_clone ()
+on the socket buffer pointer stored in
+.BR db_frtn->free_arg .
+Note that the socket buffer is initially empty and is left by the Stream head in the state that it
+was when freshly allocated.
+.PP
+This option is used by
+.B @PACKAGE_TITLE@
+high-performance network drivers to avoid excessive handling and conversion of data buffers between
+.I STREAMS
+and underlying
+.B Linux
+packet handling.
+.PP
+The
+.BR SO_SKBUFF " and " SO_NOSKBUFF
+flags are specific to
+.BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.SH USAGE
+.PP
+.B M_SETOPTS
+messages cannot be generated directly by a user level process.
+.B M_SETOPTS
+messages arriving at a driver can be discarded (ignored and freed).
+.B M_SETOPTS
+messages are consumed by the
+Stream head.
+.B M_SETOPTS
+can be generated by drivers and modules.
+.\"
+.\"
+.PP
+The following are guidelines for processing of the
+.B M_SETOPTS
+message in drivers and modules:
+.IP \(bu \w'\(bu\(em'u
+Intermediate modules that do not recognize the
+.B M_SETOPTS
+message must pass it on as any normal priority message.  That is, it is subject to flow control
+and order must be maintained with other normal priority messages on the queue.
+.IP \(bu
+Drivers that do not recognize the
+.B M_SETOPTS
+message will discard it.
+.IP \(bu
+Modules recognizing the
+.B M_SETOPTS
+message may record or alter its contents, but must pass the message upstream or downstream to the
+Stream head.
+Note that the message can arrive at a
+Stream head
+in the downstream direction for a
+.IR STREAMS -based
+.BR pipe (4).
+.IP ""
+One reason for a module to alter the contents of a
+.B M_SETOPTS
+message is to, for example, add its own write offset requirements to the write offset requirements
+of the driver.
+.PP
+The
+.B M_SETOPTS
+message is used whenever a driver or module wishes to change a
+Stream head
+setting synchronized with the data stream.
+.\"
+.\"
+.SH "NOTICES"
+.PP
+The zero-copy architectures offerred by the
+.IR Solaris \(rg
+.B SO_COPYOPT
+option, and the
+.IR OSF/1 \(rg
+and
+.IR HPUX \(rg
+.BR SO_COWENABLE " and " SO_COWDISABLE
+option, are attractive and a similar mechanism should be implemented for
+.BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR M_PCSETOPTS (9),
+.BR datab (9),
+.BR msgb (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B M_SETOPTS
+.I STREAMS
+message is compatible with
+.IR "SVR 4.2 MP STREAMS" ,
+and implementations based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B M_SETOPTS
+has a different constant value on
+older versions of
+.IR OSF/1 \(rg.
+.[
+osfspg
+.]
+.IP \(em
+The
+.B SO_STRHOLD
+option is only implemented by
+.IR "SVR 4" ,
+.[
+svr4spg
+.]
+.IR UnixWare \(rg,
+.[
+uw7spg
+.]
+and
+.IR Solaris \(rg,
+.[
+solspg
+.]
+and
+.BR "@PACKAGE_TITLE@" ,
+.[
+lfs
+.]
+although the flag is defined by other
+.I STREAMS
+implementations.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules may set this option but should not rely on the option being truly implemented by
+the Stream head.
+.IP \(em
+.BR SO_ERROPT ", " SO_COPYOPT " and " SO_MAXBLK
+and the associated
+.IR so_erropt ", " so_copyopt " and " so_maxblk
+members of the
+.B stroptions
+structure are
+.IR Solaris \(rg
+.[
+solspg
+.]
+specific.
+These options are implemented by
+.B @PACKAGE_TITLE@
+for compatibility with
+.IR Solaris \(rg.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will not use these options.
+.IP \(em
+.B SO_LOOP
+is an undocumented and unimplemented
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+specific option.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will not attempt to use this option.
+.IP \(em
+.BR SO_COWENABLE " and " SO_COWDISABLE
+are undocumented and unimplemented
+.IR OSF/1 \(rg
+.[
+osfspg
+.]
+and
+.IR HPUX \(rg
+.[
+hpuxspg
+.]
+specific options.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will not attempt to use these options.
+.IP \(em
+.BR SO_WRPAD ", " SO_NOCSUM ", " SO_CSUM ", " SO_CRC32C ", " SO_SKBUFF " and " SO_NOSKBUF ,
+the associated
+.IR so_wrapd " and " b_csum
+members, and the
+.BR MSGCSUM " and " MSGCRC32C
+message flags, are
+.B @PACKAGE_TITLE@
+specific options.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will not attempt to use these options.
+.IP \(em
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP STREAMS" .
+.[
+svr42spg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B M_SETOPTS
+message first appeared in
+.IR "SVR 3" .
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,740 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: xti_ss7.3.man,v 1.1.2.2 2011-02-07 02:18:07 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:07 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: xti_ss7.3.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:07  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.\"
+.\"
+.TH XTI-SS7 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "XTI/TLI Library Calls"
+.\"
+.\"
+.SH NAME
+.B xti_ss7
+\- X/Open Transport Interface \- Corrigendum for Signalling System No. 7 (SS7)
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xti.h>
+.br
+.B #include <xti_ss7.h>
+.\"
+.\"
+.HP
+.BI "int " ss7_xistr " = t_open(" device ", " flags );
+.\"
+.\"
+.SH OVERVIEW
+.PP
+This manual section describes the protocol-specific information that is relevant for SS7
+.[
+q700
+.]
+.[
+t1.111
+.]
+transport providers; it describes the protocol-specific information that is relevant when SS7
+services
+.[
+q700
+.]
+are provided over an IP network using SIGTRAN
+.[
+rfc2719
+.]
+.RB ( SIGTRAN (4))
+or TALI
+.[
+TALI
+.]
+.RB ( tali (4))
+and it defines the data structures and constants required for SS7 transport providers that are
+exposed through the XTI/TLI
+.[
+xti revision 1.0
+.]
+.[
+xns99
+.]
+.B <xti_ss7.h>
+header file.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B XTI-SS7
+is an
+.I X/Open Transport Interface
+.[
+xti revision 1.0
+.]
+.[
+xns99
+.]
+based interface with specific support of the Signalling System Number 7 protocol.
+.[
+q700
+.]
+.[
+mtpv1
+.]
+.[
+t1.111
+.]
+.\"
+.\"
+.SH "ADDRESS FORMAT"
+.PP
+The SS7 address format depends upon the specific protocol level being addressed.  See
+.BR xti_mtp (3)
+and
+.BR xti_sccp (3)
+for more information on address formats.
+.\"
+.\"
+.SH OPTIONS
+.PP
+Options are formatted according to the
+.B t_opthdr
+structure as described in
+.BR xti (3).
+An SS7 transport provider compliant to this specification supports none, all
+or any subset of the options defined here.  An implementation may restrict the
+use of any of these options by offering them only in the privileged or
+read-only mode.  M3UA
+.RB ( m3ua (4))
+and TALI
+.RB ( tali (4))
+transport providers only support a subset of
+the options defined here.
+.\"
+.\"
+.PP
+An SS7 conforming transport provider supports several leves of options, but supports at least the
+lowest option level as described below.
+.\"
+.SS T_SS7_SS7
+.PP
+Options within this level are specific to Signalling System No. 7 (SS7) and
+are common to all the protocol levels in SS7.
+.\"
+.\"
+.PP
+The options defined with the option level
+.B T_SS7_SS7
+are as follows:
+.\"
+.\"
+.TP
+.B T_SS7_PVAR
+This option is a
+.B t_uscalar_t
+that specifies or indicates the protocol variant supported by the provider.
+This option can be used with
+.BR t_optmgmt (3).
+It is normally not possible to set or negotiate this value using the XTI/TLI
+stream.  This value is normally read-only to the XTI/TLI user stream and is set
+using management configuration IO controls on the specific driver.
+.RS
+.PP
+Protocol variant can be one of the following values:
+.PP
+.TS
+tab(:);
+li 1 l.
+T_SS7_PVAR_ITUT88:\(em ITU-T 1988 Recommendations
+T_SS7_PVAR_ITUT93:\(em ITU-T 1993 Recommendations
+T_SS7_PVAR_ITUT96:\(em ITU-T 1996 Recommendations
+T_SS7_PVAR_ITUT00:\(em ITU-T 2000 Recommendations
+T_SS7_PVAR_ETSI88:\(em ETSI 1988 Specifications
+T_SS7_PVAR_ETSI93:\(em ETSI 1993 Specifications
+T_SS7_PVAR_ETSI96:\(em ETSI 1996 Specifications
+T_SS7_PVAR_ETSI00:\(em ETSI 2000 Specifications
+T_SS7_PVAR_ANSI88:\(em ANSI 1988 Standards
+T_SS7_PVAR_ANSI92:\(em ANSI 1992 Standards
+T_SS7_PVAR_ANSI96:\(em ANSI 1996 Standards
+T_SS7_PVAR_ANSI00:\(em ANSI 2000 Standards
+T_SS7_PVAR_JTTC94:\(em JTTC 1994 Specifications
+.TE
+.RE
+.\"
+.\"
+.TP
+.B T_SS7_MPLEV
+This option is a
+.B t_scalar_t
+that has value
+.BR T_YES " or " T_NO ,
+that indicates whether the SS7 protocol provider supports multiple levels of
+message priority and congestion.  When this option has setting
+.BR T_YES ,
+it indicates that the SS7 protocol provider supports multiple levels of
+message priority; when
+.BR T_NO ,
+that it does not.
+This value is normally read-only to the XTI/TLI user.
+.TP
+.B T_SS7_DEBUG
+This option indicates the debug settings.
+The option value is a
+.B t_uscalar_t
+representing the debug level and flags.  The valid values are implementation
+specific.
+.\"
+.\"
+.TP
+.B T_SS7_PCR
+This option is a
+.B t_scalar_t
+that has value
+.BR T_YES " or " T_NO ,
+that indicates whether the SS7 protocol provider supports Preventative Cyclic
+Retransmission on signalling links.  When this option has setting
+.BR T_YES ,
+it indicates that the SS7 protocol provider supports Preventative Cyclic
+Retransmission; when
+.BR T_NO ,
+that it does not.
+This value is normally read-only to the XTI/TLI user.
+.TP
+.B T_SS7_HSL
+This options is a
+.B t_scalar_t
+that has value
+.BR T_YES " or " T_NO ,
+that indicates whether the SS7 protocol provider supports High Speed Links.
+When this option has setting
+.BR T_YES ,
+it idnicates that the SS7 protocol provider supports High Speed Links; when
+.BR T_NO ,
+that it does not.
+.TP
+.B T_SS7_XSN
+This option indicates whether the SS7 transport provider supports Extended
+Sequence Numbers.
+The option value is a
+.B t_uscalar_t
+that can have the value
+.BR T_YES " or " T_NO .
+.\"
+.\"
+.TP
+.B T_SS7_CLUSTER
+This option indicates whether the SS7 transport provider supports Cluster
+Routing.
+The option value is a
+.B t_uscalar_t
+that can have the value
+.BR T_YES " or " T_NO .
+.\"
+.\"
+.SH FUNCTIONS
+.PP
+.\"
+.SS \fB\)t_accept\fR(3)
+.PP
+Most
+.B SS7
+transport providers do not support connection indications.  The
+.BR t_accept (3)
+XTI/TLI call will fail in this case, return -1, and set
+.IR errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.\"
+.SS \fB\)t_bind\fR(3)
+.PP
+For SS7 conforming transport providers, the
+.I req->addr
+field contains an SS7-SAP as described under
+.IR "\*(lqADDRESS FORMAT\*(rq" ,
+for the appropriate SS7 protocol level.
+If any address field are \*(lqwildcarded\*(rq, the SS7 conforming
+transport provider may assign a value to the \*(lqwildcarded\*(rq fields.  If
+the SS7 conforming transport provider completes a \*(lqwildcarded\*(rq field,
+it must return the resulting bound address in the
+.I ret->addr
+parameter.
+.\"
+.\"
+.PP
+SS7 supports a connectionless, connection oriented and pseudo-connection oriented modes.  To bind a
+connectionless stream,
+.I req->qlen
+should be set to zero (0).
+To bind a pseudo-connection oriented stream,
+.I req->qlen
+should be set to a non-zero positive integer.
+Because SS7 pseudo-connection oriented modes do not support connection indications,
+on return from
+.BR t_bind (3),
+SS7 conforming transport providers will return a
+.I ret->qlen
+of zero (0) regardless of the setting of
+.IR ret->qlen .
+.\"
+.SS \fB\)t_close\fR(3)
+.PP
+This function operates as described in
+.BR t_close (3)
+without change.
+.\"
+.\"
+.\"
+.SS \fB\)t_connect\fR(3)
+.PP
+For pseudo-connection oriented service providers, this XTI/TLI call associates the
+local SS7 endpoint with a remote SS7 endpoint to form a signalling relation.
+No protocol messages are exchanged and the association is a local relationship
+only.
+For connectionless service providers, this XTI/TLI call will fail (unless they also support the
+pseudo-connection oriented mode), return -1, and set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.\"
+.\"
+.\"
+.SS \fB\)t_getinfo\fR(3)
+.PP
+.\"
+.\"
+.TP
+.I addr
+For compatibility with the
+.BR sockets (3)
+library, SS7 uses a
+.B sockaddr
+structured address.  This size will always be the size of a
+.B sockaddr
+structure.
+.\"
+.\"
+.TP
+.I options
+The maximum size of options is provider specific.  The
+.B OpenSS7
+SS7 implementations
+return the maximum size of an options structure containing all
+SS7 options.
+.\"
+.\"
+.TP
+.I tsdu
+The maximum size of a transport service data unit.  For SS7 this is the
+maximum size of the payload of the specific user part.  This varies depending on the
+protocol variant and options supported.  Also, for a specific SS7 provider,
+this value may be different depending on the limitations of underlying SS7
+links.  The maximum value that will be reported here for SS7 is guaranteed to
+be less than 3094.  For a typical SS provider using narrow-band SS7 links,
+this value will be as small as 272.  For
+.BR SIGTRAN (4)
+or
+.BR tali (4),
+this value could be
+.BR T_INFINITE .
+.\"
+.\"
+.TP
+.I etsdu
+SS7 does not support the concept of expedited data directly.  Some protocol levels, such as
+.BR sccp (4)
+do.  When unsupported, the SS7 transport provider will always return
+.BR T_INVALID .
+.\"
+.\"
+.TP
+.I connect
+SS7 does not support the concept of connection data at all protocol levels.  When in
+pseudo-connection oriented mode, the value of
+.I connect
+will be either zero,
+.BR T_INVALID ,
+or the same as the value of
+.IR tsdu .
+.\"
+.\"
+.TP
+.I discon
+SS7 does not support the concept of disconnection data at all protocol levels.  When in
+pseudo-connection oriented mode, the value of
+.I discon
+will be either zero,
+.BR T_INVALID ,
+or the same as the value of
+.IR tsdu .
+.\"
+.\"
+.TP
+.I servtype
+SS7 supports true connectionless mode, pseudo-connection oriented mode and true connection oriented
+with variying support at varying protocol levels.
+SS7 conforming transport providers may return
+.BR T_CLTS " or " T_COTS .
+SS7 conforming transport providers at some protocol levels may return
+.BR T_COTS_ORD .
+.\"
+.\"
+.TP
+.I flags
+SS7 does provide for orderly release with disconnection data (using
+.BR tcap (4)).
+SS7 confroming trasnprot providers may return
+.BR T_ORDRELDATA " or " T_SNDZERO
+flags.
+SS7 conforming providers will return
+.BR XPG4_1 .
+.\"
+.SS \fB\)t_listen\fR(3)
+.PP
+.B SS7
+supports connection indications in both the pseudo-connection oriented and true connection oriented
+modes.  The
+.BR t_listen (3)
+XTI/TLI call, when unsupported, will fail, return -1, and set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ],
+.RB [ TBADQLEN ],
+.RB [ TLOOK ],
+.RB [ TNODATA ],
+.RB [ TOUTSTATE ],
+.RB [ TQFULL ]
+or
+.RB [ TSYSERR ].
+.\"
+.SS \fB\)t_open\fR(3)
+.PP
+SS7 conformoing transprot providers will return in the
+.B t_info
+structure the same information as returned to the
+.BR t_getinfo (3)
+library call as described above.
+Otherwise this function operates as described in
+.BR t_open (3).
+.\"
+.SS \fB\)t_optmgmt\fR(3)
+.PP
+SS7 conforming trasnport providers support the options described under
+.IR \*(lqOPTIONS\*(rq ,
+above.
+.\"
+.SS \fB\)t_rcvconnect\fR(3)
+.PP
+.B SS7
+does not support connection indications at all protocol levels.  The
+.BR t_rcvconnect (3)
+XTI/TLI call will fail when unsupported, return -1, and set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.\"
+.SS \fB\)t_rcvdis\fR(3)
+.PP
+.B SS7
+does not support disconnect indications at all protocol levels.  The
+.BR t_rcvdis (3)
+XTI/TLI call will fail when supported, return -1, and set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.\"
+.SS \fB\)t_rcv\fR(3), \fB\)t_rcvv\fR(3)
+.PP
+For pseudo-connection oriented or true connection oriented service providers, these XTI/TLI calls
+receive data from the remote SS7 peer on a connected stream.
+For connectionless service providers, these XTI/TLI calls will fail, return -1 and
+set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.\"
+.SS \fB\)t_rcvreldata\fR(3)
+.PP
+.B SS7
+does not support release indications in all modes at all protocol levels.  The
+.BR t_rcvreldata (3)
+XTI/TLI call will fail when unsupported, return -1, and set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.\"
+.SS \fB\)t_rcvrel\fR(3)
+.PP
+.B SS7
+does not support release indications in all modes at all protocol levels.  The
+.BR t_rcvrel (3)
+XTI/TLI call will fail when unsupported, return -1, and set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.\"
+.SS \fB\)t_rcvudata\fR(3), \fB\)t_rcvvudata\fR(3)
+.PP
+For connectionless or pseudo-connectionless service providers, this XTI/TLI call sends a unit data to the
+MTP peer with the specified options, described under
+.I \*(lqOPTIONS\*(rq
+above.
+For connection oriented and pseudo-connection oriented service providers, these XTI/TLI calls will fail,
+return -1 and set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.\"
+.SS \fB\)t_rcvuderr\fR(3)
+.PP
+.B SS7
+will return the options specified under
+.I \*(lqOPTIONS\*(rq ,
+above.
+.\"
+.\"
+.SS \fB\)t_snddis\fR(3)
+.PP
+For connection oriented and pseudo-connection oriented service providers, this XTI/TLI library call releases
+the signalling relation associated with the requesting stream.  For
+connectionless service providers, this XTI/TLI library call fails, returns -1, and
+sets
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.\"
+.SS \fB\)t_snd\fR(3), \fB\)t_sndv\fR(3)
+.PP
+For connected connection oriented or pseudo-connection oriented service privders, these XTI/TLI library calls are
+used to send data, with or without gather, to the peer on the signalling
+relation.
+.\"
+.SS \fB\)t_sndreldata\fR(3)
+.PP
+.B SS7
+does not support orderly release with data at all protocol levels.  The
+.BR t_sndreldata (3)
+XTI/TLI call will fail when unsupported, return -1, and set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.\"
+.SS \fB\)t_sndrel\fR(3)
+.PP
+.B SS7
+does not support orderly release at all protocol levels.  The
+.BR t_sndrel (3)
+XTI/TLI call will fail when unuspported, return -1, and set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.\"
+.SS \fB\)t_sndudata\fR(3), \fB\)t_sndvudata\fR(3)
+.PP
+For connectionless or pseudo-connectionless service providers, this XTI/TLI call sends a unit data to the
+SS7 peer with the specified options, described under
+.I \*(lqOPTIONS\*(rq
+above.
+For connection and pseudo-connection oriented services providers, these XTI/TLI calls will fail,
+return -1 and set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.\"
+.SS \fB\)t_unbind\fR(3)
+.PP
+This function operates as described in
+.BR t_unbind (3).
+.\"
+.\"
+.SH CAVEATS
+.PP
+Some SS7 protocol levels do not support a true connection-oriented service and only provide a
+true connectionless or pseudo-connection-oriented service.  Some SS7 protocol levels might not
+support a connectionless service and only provide a connection oriented or pseudo-connectionless
+service emulated using on-demand connections.
+.\"
+.\"
+.SH DEVICES
+.PP
+.\"
+.\"
+.PP
+There are a number of SS7 devices providing the Transport Provider Interface
+that provide SS7 conforming TPI devices as follows:
+.\"
+.\"
+.TP
+.IR /dev/mtp-tpi-cl ", " /dev/mtp-tpi-co
+These devices provide true connectionless and pseudo-connection oriented MTP
+transport providers.
+For more information on the SS7 MTP device, see
+.BR mtp (4).
+.\"
+.\"
+.TP
+.IR /dev/tali-mtp-tpi-cl ", " /dev/tali-mtp-tpi-co
+These devices provide true connectionless and pseudo-connection oriented MTP
+transport providers.
+For more information on the TALI MTP, see
+.BR tali (4).
+.\"
+.\"
+.TP
+.IR /dev/m3ua-tpi-cl ", " /dev/m3ua-tpi-co
+These devices provide true connectionless and pseudo-connection oriented MTP
+transport providers.
+For more information on the SIGTRAN M3UA device, see
+.BR m3ua (4).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR m3ua (4),
+.BR mtp (4),
+.BR tali (4),
+.BR sockets (3),
+.BR t_errno (3),
+.BR t_optmgmt (3),
+.BR t_rcvudata (3),
+.BR t_rcvvudata (3),
+.BR t_sndudata (3),
+.BR t_sndvudata (3),
+.BR xnet (3),
+.BR xti (3).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B XTI-SS7
+driver is specific to the
+.IR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This is an unofficial Corrigendum to
+.IR "XNS 5.2 Revision 2" .
+.[
+xns99
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The XTI-SS7 interface first appears in the
+.IR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.IR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

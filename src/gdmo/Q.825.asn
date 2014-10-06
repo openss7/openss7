@@ -1,0 +1,661 @@
+--< GDMO.Document "ITU-T Rec. Q.825 (1998)" { itu-t(0) recommendation(0) q(17) q825(825) } >--
+MODULE "ITU-T Rec. Q.825 (1998)" { itu-t(0) recommendation(0) q(17) q825(825) }
+--< ASN1.Version 1990 Q825-CDR-ASN1Module {itu-t(0) recommendation(0) q(17) q825(825) asn1Modules(2) q825ASN1Module(0)} >--
+-- A.10 ASN.1 defined types module
+Q825-CDR-ASN1Module {itu-t(0) recommendation(0) q(17) q825(825) asn1Modules(2) q825ASN1Module(0)}
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- EXPORTS everything
+IMPORTS
+ObjectInstance FROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3) }
+--see Rec. X.711
+NameType FROM ASN1DefinedTypesModule {ccitt recommendation m gnm(3100) informationModel(0)
+asn1Modules(2) asn1DefinedTypesModule(0)}
+-- see Rec. M.3100
+ManagementExtension FROM
+Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1}
+--see Rec. X.721
+PointCode FROM MTPDefinedTypesModule { itu-t recommendation q(17) omap(751) mtp(1)
+informationModel(0) mtpDefinedTypesModule(0) }
+--see Rec. Q.751.1
+ReportingTriggers FROM Schedule-ASN1Module { joint-iso-ccitt ms(9) function(2) part15(15) modules (1)};
+--see Rec. X.742
+-- OBJECT IDENTIFIERS
+q825-InformationModel OBJECT IDENTIFIER ::= {itu-t(0) recommendation(0) q(17) q825(825)
+informationModel(0)}
+q825ObjectClass OBJECT IDENTIFIER ::= {q825-InformationModel managedObjectClass(3)}
+q825Package OBJECT IDENTIFIER ::= {q825-InformationModel package(4)}
+q825NameBinding OBJECT IDENTIFIER ::= {q825-InformationModel nameBinding(5)}
+q825Attribute OBJECT IDENTIFIER ::= {q825-InformationModel attribute(6)}
+q825Action OBJECT IDENTIFIER ::= {q825-InformationModel action(7)}
+q825Notification OBJECT IDENTIFIER ::= {q825-InformationModel notification(8)}
+-- DEFAULT VALUE DEFINITION
+defaultCreationTrigger CreationTriggerList::={}
+-- Supporting productions
+Integer ::= INTEGER
+-- BLOCK CONTENTS
+BlockRecordInfo ::= SEQUENCE {
+blockHeaderRecord [0] BlockHeaderRecord OPTIONAL,
+usageRecords [1] SEQUENCE OF RecordContent }
+BlockHeaderRecord ::= SEQUENCE {
+exchangeInfo [0] ExchangeInfo OPTIONAL,
+sequenceNumber [1] SequenceNumber,
+reasonForOutput [2] ReasonForOutput OPTIONAL,
+extensions [3] ManagementExtensions OPTIONAL }
+-- FILE CONTENTS
+FileHeaderRecord ::= SEQUENCE {
+productionDateTime StartDateTime,
+exchangeInfo ExchangeInfo,
+fileName FileName,
+reasonForOutput ReasonForOutput,
+firstRecordId RecordId OPTIONAL,
+-- Present if the requested first record id is different from what was requested in the created file request
+extensions ManagementExtensions OPTIONAL}
+Trailer ::= SEQUENCE {
+numberOfRecords [0] INTEGER,
+lastRecordId [1] INTEGER }
+-- USAGE METERING RECORDS
+RecordContent ::= CHOICE {
+callRecord [0] CallRecord,
+supplServiceInputRecord [1] SupplServiceInputRecord,
+standardAdditionalRecordTypes [2] ManagementExtensions,
+additionalRecordTypes [3] ManagementExtensions }
+CallRecord ::= SET {
+recordType [0] RecordType,
+startTimeStamp [1] StartTimeStamp,
+participantInfo [2] ParticipantInfo,
+bearerService [3] BearerService,
+serviceUser [4] ServiceUser,
+callIdentificationNumber [6] CallIdentificationNumber,
+supplementaryServices [5] SupplementaryServices OPTIONAL,
+immediateNotificationForUsageMetering [7] ImmediateNotification OPTIONAL,
+cause [8] Cause OPTIONAL,
+iNSpecificInfo [9] INSpecificInfo OPTIONAL,
+partialGeneration [10] PartialGeneration OPTIONAL,
+exchangeInfo [11] ExchangeInfo OPTIONAL,
+relatedCallNumber [12] RelatedCallNumber OPTIONAL,
+cDRPurpose [13] CDRPurpose OPTIONAL,
+additionalParticipantInfo [14] AdditionalParticipantInfo OPTIONAL,
+callingPartyCategory [15] CallingPartyCategory OPTIONAL,
+callingPartyType [16] CallingPartyType OPTIONAL,
+chargingInformation [17] ChargingInformation OPTIONAL,
+progress [18] Progress OPTIONAL,
+accessDelivery [19] AccessDelivery OPTIONAL,
+trunkGroupOutgoing [20] TrunkGroupOutgoing OPTIONAL,
+trunkGroupIncoming [21] TrunkGroupIncoming OPTIONAL,
+fallbackBearerService [22] FallbackBearerService OPTIONAL,
+teleservice [23] Teleservice OPTIONAL,
+callDuration [24] CallDuration OPTIONAL,
+uUInfo [25] UUInfo OPTIONAL,
+standardExtensions [26] StandardExtensions OPTIONAL,
+recordExtensions [30] RecordExtensions OPTIONAL,
+b-PartyCategory [31] B-PartyCategory OPTIONAL,
+iSUPPreferred [32] ISUPPreferred OPTIONAL,
+networkManagementControls [33] NetworkManagementControls OPTIONAL,
+glare [34] Glare OPTIONAL,
+recordId [35] RecordId OPTIONAL,
+dataValidity [36] DataValidity OPTIONAL,
+callStatus [37] CallStatus OPTIONAL,
+carrierId [38] CarrierId OPTIONAL,
+dPC [39] PointCode OPTIONAL,
+oPC [40] PointCode OPTIONAL
+}
+SupplServiceInputRecord ::= CallRecord
+(WITH COMPONENTS {
+recordType PRESENT,
+startTimeStamp PRESENT,
+participantInfo PRESENT,
+bearerService PRESENT,
+serviceUser PRESENT,
+callIdentificationNumber PRESENT,
+supplementaryServices PRESENT,
+immediateNotificationForUsageMetering OPTIONAL,
+cause OPTIONAL,
+iNSpecificInfo OPTIONAL,
+exchangeInfo OPTIONAL,
+cDRPurpose OPTIONAL,
+additionalParticipantInfo OPTIONAL,
+callingPartyCategory OPTIONAL,
+callingPartyType OPTIONAL,
+chargingInformation OPTIONAL,
+standardExtensions OPTIONAL,
+recordExtensions OPTIONAL,
+recordId OPTIONAL })
+AccessDelivery ::= BIT STRING {
+setupMessageGenerated (0)} (SIZE(8))
+-- Bit 0 (setupMessageGeneration) has the following meaning:
+-- 0 No set-up message generated
+-- 1 Set-up message generated
+-- Bit 1 to 7 are not used.
+AccountCodeInput ::= OCTET STRING (SIZE (1..18))
+-- This type is used to represent information, which is provided by the subscriber necessary for
+-- use by some services.
+-- a) bits 876: Encoding scheme
+-- 000 BCD even (even number of digits)
+-- 001 BCD odd (odd number of digits)
+-- 010 IA5 character
+-- 011 Binary coded
+-- 100
+-- ... spare
+-- 111
+--
+-- b) bits 54321: Type of digits
+-- 00000 reserved for account code
+-- 00001 reserved for authorization code
+-- 00010 reserved for private network travelling class mark
+-- 00011 reserved for business communication
+-- 00100
+-- ... spare for international use
+-- 01111
+-- 10000
+-- ... spare for national use
+-- 11111
+--
+-- c) Digits:
+-- Coding in accordance to the coding scheme and type of digits.
+AdditionalParticipantInfo ::= SET {
+physicalLineCode [0] PhysicalLineCode OPTIONAL,
+receivedDigits [1] ReceivedDigits OPTIONAL,
+operatorSpecific1AdditionalNumber [2] OperatorSpecific1AdditionalNumber OPTIONAL,
+operatorSpecific2AdditionalNumber [3] OperatorSpecific2AdditionalNumber OPTIONAL,
+operatorSpecific3AdditionalNumber [4] OperatorSpecific3AdditionalNumber OPTIONAL}
+Amount ::= SEQUENCE {
+currencyAmount [0] NumberOfUnits,
+multiplier [1] Multiplier}
+BearerService ::= SEQUENCE {
+capability ENUMERATED {
+speech (0),
+audio3dot1kHZ (1),
+uni64 (2),
+uni64withT-A (3),
+multipleRate (4),
+packetModeB-Ch (5) },
+multiplier INTEGER (2..30) OPTIONAL}
+-- Multiplier present only if capability = multipleRate
+B-PartyCategory ::= BIT STRING(SIZE(8))
+CallStatus ::= ENUMERATED {
+answered (0),
+notanswered (1) }
+CallDuration ::= SET {
+conversationTime [0] ConversationTime OPTIONAL,
+durationTimeACM [1] DurationTimeACM OPTIONAL,
+durationTimeB-ans [2] DurationTimeANM OPTIONAL,
+durationTimeNoANM [3] DurationTimeNoANM OPTIONAL }
+CalledPartyNumber ::= Number
+CallIdentificationNumber ::= OCTET STRING
+-- Octet string identifying the call.
+CallingPartyCategory ::= BIT STRING(SIZE(8))
+CallingPartyNumber ::= Number
+CallingPartyNumberNotScreened ::= Number
+CallingPartyType ::= ENUMERATED {
+analogue (0),
+customerLink (1), -- 2Mbit/s PSTN digital access
+basicAccess (2),
+primaryRateAccess (3) }
+CarrierId ::= VisibleString (SIZE(1..11))
+Cause ::= SEQUENCE {
+causeValue CauseValue,
+location Location}
+CauseValue ::= BIT STRING (SIZE(8))
+-- Coded according to ITU-T Recommendation Q.850, Table 1/Q.850
+CDRPurpose ::= BIT STRING {
+usagemetering (0),
+analysis (1) } (SIZE(2) )
+ChargedDirectoryNumber ::= Number
+ChargingInformation ::= CHOICE {
+recordedCurrency [0] RecordedCurrency,
+recordedUnitsList [1] RecordedUnitsList,
+freeOfCharge [2] NULL,
+chargeInfoNotAvailable [3] NULL}
+ChargedParticipant ::= ParticipantType
+ConfigurationMask ::= BIT STRING {
+exchangeInfo (0),
+relatedCallNumber (1),
+additionalParticipantInfo (2),
+callingPartyCategory (3),
+callingPartyType (4),
+progress (5),
+accessDelivery (6),
+trunkGroupOutgoing (7),
+trunkGroupIncoming (8),
+teleservice (9),
+standardExtensions (10),
+recordExtensions (11),
+b-partyCategory (12),
+iSUPPrefferred (13),
+networkManagementControls (14),
+glare (15) }
+ConversationTime ::= Duration
+Count ::= OCTET STRING (SIZE (1..3))
+-- A maximum 3-byte counter.
+CreateFileResponse ::= SEQUENCE {
+fileName GraphicString,
+fileSize INTEGER OPTIONAL }
+-- number of octets in file.
+CreationTriggerList ::= SET OF CreationTrigger
+CreationTrigger ::= ENUMERATED {
+seizure(0),
+firstDigitReceived(1),
+aCMReceived(2),
+aNMReceived(3),
+supplementaryServiceInvocation(4),
+supplementaryServiceInput(5) }
+-- ACMreceived is defined as the receipt of ACM for an external call. In the case of a
+-- terminating exchange the event ACM received will occur when the ACM is normally
+-- generated. This is either when a B-subscriber port is free (early ACM) or when
+-- a B-subscriber terminal is free (late ACM).
+-- The choice between early and late ACM is a network option in the terminating network.
+-- For local calls a corresponding time shall be used.
+DataValidity ::= ENUMERATED {
+possibleduplicated (0),
+requireddatamissing (1),
+other (2) }
+Duration ::= OCTET STRING (SIZE(1..3))
+-- Duration in centiseconds. Maximum value in centiseconds is approx. 46 hours.
+DurationTimeACM ::= Duration
+DurationTimeANM ::= Duration --fix to match reference syntax
+DurationTimeNoANM ::= Duration --fix to match reference syntax
+ExchangeInfo ::= SET {
+exchangeID [0] ExchangeID OPTIONAL,
+softwareVersion [1] SoftwareVersion OPTIONAL}
+ExchangeID ::= VisibleString (SIZE (1..11))
+FallbackBearerService ::= BearerService
+FileName ::= NameType
+FileCreationInfo ::= SEQUENCE{
+fileName FileName,
+reasonForOutput ReasonForOutput}
+Glare ::= BOOLEAN
+ImmediateNotification ::= BOOLEAN
+INServiceInformationList ::= SEQUENCE OF INServiceInformation
+INServiceInformation ::= SEQUENCE {
+inServiceCode [0] INServiceCode,
+queueInfo [1] QueueInfo OPTIONAL,
+serviceSpecificINInformation [2] OCTET STRING OPTIONAL}
+INSpecificInfo ::= SET {
+personalUserId [0] PersonalUserId OPTIONAL,
+chargedParticipant [1] ChargedParticipant OPTIONAL,
+chargedDirectoryNumber [2] ChargedDirectoryNumber OPTIONAL,
+percentageToBeBilled [3] PercentageToBeBilled OPTIONAL,
+accountCodeInput [4] AccountCodeInput OPTIONAL,
+iNServiceCode [5] INServiceCode OPTIONAL,
+queueInfo [6] QueueInfo OPTIONAL,
+serviceSpecificINInformation [7] ServiceSpecificINInformation OPTIONAL }
+INServiceCode ::= OCTET STRING (SIZE (2))
+ISUPPreferred ::= ENUMERATED {
+preferred (0),
+notrequired (1),
+required (2),
+notapplicable (3)}
+Location ::= INTEGER {
+user (0),
+localUserPrivateNetwork (1),
+localUserPublicNetwork (2),
+transitNetwork (3),
+remoteUserPublicNetwork (4),
+remoteUsePrivateNetwork (5),
+internationalNetwork (7),
+beyondInterworkPoint (10) }
+-- See ITU-T Recommendation Q.850, 2.2.3
+MaxBlockSize ::= INTEGER (0..32767)
+MaxTimeInterval ::= INTEGER (0..32767)
+-- time interval in seconds.
+ManagementExtensions ::= SET OF ManagementExtension
+-- A set of network/manufacturer specific extensions.
+Multiplier ::= ENUMERATED {
+oneThousandth (0),
+oneHundredth (1),
+oneTenth (2),
+one (3),
+ten (4),
+hundred (5),
+thousand (6)}
+NetworkManagementControls ::= ENUMERATED {
+acc (0),
+adc (1),
+cancelFrom (2),
+cancelRerouted (3),
+cancelTo (4),
+destinationCodeControl (5),
+scr (6),
+skip (7),
+tarfrom (8),
+tarto (9)}
+NetworkProviderId ::= VisibleString (SIZE(1..11))
+Number ::= OCTET STRING (SIZE (1 .. 14))
+-- This type is used to represent a number for addressing purposes. It is composed of:
+-- a) one octet for odd/even indicator and nature of address indicator:
+-- bits 8: Odd/even indicator
+-- 0 even number of address signals
+-- 1 odd number of address signals
+-- bits 7654321: Nature of address indicator
+-- 0000000 spare
+-- 0000001 subscriber number
+-- 0000010 unknown
+-- 0000011 national (significant) number
+-- 0000100 international number
+-- 0000101 (
+-- to ( spare
+-- 1101111 (
+-- 1110000 (
+-- to ( reserved for national use
+-- 1111110 (
+-- 1111111 spare
+-- b) one octet for numbering plan indicator:
+-- bits 765: numbering plan indicator
+-- 000 spare
+-- 001 ISDN (Telephony) Number Plan (ITU-T Recommendation E.164)
+-- 010 spare
+-- 011 data numbering plan (ITU-T Recommendation X.121)
+-- 100 telex numbering plan (ITU-T Recommendation F.69)
+-- 101 reserved for national use
+-- 110 reserved for national use
+-- 111 spare
+-- c) digits of the address encoded as TBCD String:
+-- The following octets representing digits of an address encoded as a TBCD-STRING.
+-- TBCD-STRING ::= OCTETSTRING
+-- This type (Telephony Binary Coded Decimal String) is used to represent dig its from 0
+-- through 9, *, #, a, b, c, two digits per octet, each digit encoded 0000 to 1001 (0 to 9),
+-- 1010 (*) 1011(#), 1100 (a), 1101 (b) or 1110 (c); 1111 (end of pulsing signal-ST); 0000 is
+-- used as a filler when there is an odd number of digits.
+-- The most significant address signal is sent first. Subsequent address signals are sent in
+-- successive 4-bit fields.
+NumberOfUnits ::= INTEGER (0..16777215)
+OperatorSpecific1AdditionalNumber ::= VisibleString
+OperatorSpecific2AdditionalNumber ::= VisibleString
+OperatorSpecific3AdditionalNumber ::= VisibleString
+OperatorSpecific1Number ::= Number
+OperatorSpecific2Number ::= Number
+OperatorSpecific3Number ::= Number
+OriginalCalledNumber ::= Number
+ParticipantId ::= CHOICE {
+callingPartyNumber [0] CallingPartyNumber,
+calledPartyNumber [1] CalledPartyNumber,
+redirectingNumber [2] RedirectingNumber,
+redirectionNumber [3] RedirectionNumber,
+originalCalledNumber [4] OriginalCalledNumber,
+callingPartyNumberNotScreened [5] CallingPartyNumberNotScreened,
+operatorSpecific1Number [6] OperatorSpecific1Number,
+operatorSpecific2Number [7] OperatorSpecific2Number,
+operatorSpecific3Number [8] OperatorSpecific3Number}
+ParticipantInfo ::= SET OF ParticipantId
+ParticipantType ::= ENUMERATED {
+callingPartyNumber (0),
+calledPartyNumber (1),
+redirectingNumber (2),
+redirectionNumber (3),
+originalCalledNumber (4),
+callingPartyNumberNotScreened (5),
+operatorSpecific1Number (6),
+operatorSpecific2Number (7),
+operatorSpecific3Number (8),
+operator (9),
+unknown(10)}
+PartialRecordNumber ::= BIT STRING (SIZE (8))
+-- A sequential number in the range 0-255 indicating the partial record generated for the same call
+PartialGeneration ::= SET {
+partialRecordNumber [0] PartialRecordNumber,
+partialRecordReason [1] PartialRecordReason}
+PartialRecordReason ::= ENUMERATED {
+timeLimit (0),
+-- This is used for long duration calls.
+serviceChange (1),
+overflow (2),
+networkInternalReasons (3),
+lastCDR (4),
+timeChange (5)}
+Period ::= INTEGER (0..512) -- Elapsed time in minutes
+PercentageToBeBilled ::= INTEGER (0..99)
+PersonalUserId ::= OCTET STRING (SIZE (1..10))
+-- This type is used to represent the Personal User Id. For UMT the Personal User Id is defined
+-- according to E.212 as an International Mobile Station Identity (IMSI). Accordingly only numerical
+-- characters (0-9) are used.
+-- The PersonalNumber type does however not exclude the use of other formats. These formats
+-- can be indicated in the numbering plan indicator.
+-- The type is composed of:
+-- a) one octet for odd/even indicator and numbering plan indicator:
+-- bits 8: Odd/even indicator
+-- 0 even number of address signals
+-- 1 odd number of address signals
+-- bits 765: numbering plan indicator
+-- 000 E.212 (IMSEI)
+-- 001 ISDN (Telephony) Number Plan (ITU-T Recommendation E.164)
+-- 010 spare
+-- 011 spare
+-- 100 spare
+-- b) digits of the address encoded as TBCD String:
+-- The following octets representing the personal number encoded as a TBCD-STRING.
+-- TBCD-STRING ::= OCTET STRING
+-- This type (Telephony Binary Coded Decimal String) is used to represent digits from 0
+-- through 9, *, #, a, b, c, two digits per octet, each digit encoded 0000 to 1001 (0 to 9),
+-- 1010 (*), 1011(#), 1100 (a), 1101 (b) or 1110 (c); 1111 (end of pulsing signal-ST); 0000 is
+-- used as a filler when there is an odd number of digits.
+-- The most significant address signal is sent first. Subsequent ad dress signals are sent in
+-- successive 4-bit fields.
+PhysicalLineCode ::= VisibleString
+Progress ::= SEQUENCE {
+description ProgressDescription,
+location Location }
+ProgressDescription ::= INTEGER {
+notEndToEndISDN (1),
+nonISDNDestination (2),
+nonISDNOrigination (3),
+returnedToISDN (4),
+interworkingServiceChange (5),
+inBandInfo (8) }
+QueueInfo ::= SEQUENCE{
+queueTimeStamp [0] StartDateTime,
+queueDuration [1] Duration}
+ReasonForOutput ::= ENUMERATED {
+absoluteTimeEvent (0),
+maxBlockSizeReached (1),
+maxTimeIntervalElapsed (2),
+internalSizeLimitReached (3),
+oSAction (4)}
+ReceivedDigits ::= OCTET STRING (SIZE (1 .. 18))
+-- This type is used to represent digits input by the subscriber. It is composed of:
+-- a) one octet for odd/even indicator:
+-- bits 8: Odd/even indicator
+-- 0 even number of address signals
+-- 1 odd number of address signals
+-- b) digits of the address encoded as TBCD String
+-- The following octets representing the received digits encoded as a TBCD-STRING.
+-- TBCD-STRING ::= OCTET STRING
+-- This type (Telephony Binary Coded Decimal String) is used to represent digits from 0
+-- through 9, *, #, a, b, c, two digits per octet, each digit encoded 0000 to 1001 (0 to 9),
+-- 1010 (*), 1011(#), 1100 (a), 1101 (b) or 1110 (c); 1111 (end of pulsing signal-ST);
+-- 0000 is used as a filler when there is an odd number of digits.
+-- The most significant address signal is sent first. Subsequent address signals are sent in
+-- successive 4-bit fields.
+RecordedCurrency ::= CHOICE {
+currency [0] IA5String (SIZE (1..10)),
+amount [1] Amount }
+RecordExtensions ::= ManagementExtensions
+RecordedUnitsList ::= SEQUENCE SIZE (1.. 32) OF RecordedUnits
+RecordedUnits ::= SEQUENCE{
+units CHOICE {
+recordedNumberOfUnits [0] NumberOfUnits,
+notAvailable [1] NULL },
+recordedTypeOfUnits INTEGER(1..16) OPTIONAL }
+RecordId ::= Count
+--The record Id is a sequence number that is incremented for each logged CDR,
+--it is generated by the log
+RecordType ::= INTEGER {
+call (0),
+supplServiceInputRecord(1) }
+RedirectingNumber ::= Number
+RedirectionNumber ::= Number
+RelatedCallNumber ::= CallIdentificationNumber
+ServiceSpecificINInformation ::= ManagementExtensions
+ServiceUser ::= ParticipantType
+SequenceNumber ::= Count
+-- The record block sequence number is incremented for each block generation
+SoftwareVersion ::= VisibleString (SIZE(1..12))
+StandardExtensions ::= ManagementExtensions
+StartTimeStamp ::= CHOICE {
+answerTime [0] StartDateTime,
+seizureTime [1] StartDateTime,
+-- For calls a choice between seizure time or answer time
+-- is dependent on the occurrence of a B-answer (ANM).
+partialTime [2] StartDateTime,
+-- Partial time is used for partial records.
+eventTime [3] StartDateTime}
+-- Event time is used in connection with supplementary service input records.
+StartDateTime ::= OCTET STRING (SIZE(7))
+-- YYMMDDHHmmSSCC (Year, Month, Day, Hour, Minute, Second, Centisecond),
+-- each field one digit, two digits per octet, the digits 0 through 9, encoded as
+-- 0000 to 1001 "hstring". 1st digit in the LSB.
+SupplementaryServices ::= SEQUENCE OF SupplementaryService
+SupplementaryService ::= SEQUENCE {
+supplementaryServiceCode SupplementaryServiceCode,
+supplementaryAction SupplementaryAction,
+supplementarytimestamp Duration OPTIONAL,
+functionalInformation ManagementExtensions OPTIONAL }
+SupplementaryServiceCode ::= OCTET STRING (SIZE (2))
+SupplementaryAction ::= ENUMERATED {
+provision (0),
+withdrawal (1),
+registration (2),
+erasure (3),
+activation (4),
+deactivation (5),
+invocation (6),
+disabling (7),
+interrogation (8)}
+Teleservice ::= BIT STRING (SIZE(8))
+TrunkGroupIncoming ::= TrunkGroupId
+TrunkGroupOutgoing ::= TrunkGroupId
+TrunkGroupId ::= SEQUENCE {
+trunkGroupId [0] NameType,
+trunkId [1] NameType OPTIONAL,
+pCMId [2] NameType OPTIONAL,
+channelNumber [3] INTEGER OPTIONAL}
+TimesOfDay ::= OCTET STRING (SIZE(2))
+-- HHmm (Hours, Minutes)
+-- each field one digit, two digits per octet, the digits o through 9 encoded as
+-- 0000 to 1001 "hstring", 1st digit in the LSB
+CallDetailDataId ::= NameType
+UUInfo ::= SET {
+uu1Info [0] UUxInfo OPTIONAL,
+uu2Info [1] UUxInfo OPTIONAL,
+uu3Info [2] UUxInfo OPTIONAL}
+UUxInfo ::= SET {
+receivedMessages [0] Count OPTIONAL,
+transmittedMessages [1] Count OPTIONAL,
+receivedOctets [2] Count OPTIONAL,
+transmittedOctets [3] Count OPTIONAL}
+--Subtype to use with permitted values for reporting triggers from usage metering
+-- PermittedReportingTriggers ::= ReportingTriggers ((WITH COMPONENT( WITH COMPONENTS {periodic PRESENT} )) (SIZE(0..1)))
+-- Default value for subtyped attribute
+reportingTriggersDefault PermittedReportingTriggers ::= { periodic : minutes : 30 }
+END -- of Q.825-CDR-ASN1Module
+--< ASN1.Version 1994 ASN1DefinedTypesModuleNew {ccitt(0) identified-organisation(4) etsi(0) usageMeteringInformationManagement(43321) informationModel(0) asn1Modules(2) ASN1DefinedTypesModuleNew(1)} >--
+-- APPENDIX I
+-- Alternative ASN.1 definitions
+-- I.1 Definition of ASN.1 modules for use of 1994 version of ASN.1
+-- The use of the 1994 version of ASN.1 (Recommendations X.680, X.681, X.682 and X.683) is
+-- illustrated by providing an ASN.1 module, ASN1DefinedTypesModuleNew, which defines the data
+-- types that are affected by the new notation in a way similar to the way they are defined in the
+-- ASN1DefinedTypesModule module in A.10.
+ASN1DefinedTypesModuleNew {ccitt(0) identified-organisation(4) etsi(0) usageMeteringInformationManagement(43321) informationModel(0) asn1Modules(2) ASN1DefinedTypesModuleNew(1)}
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- EXPORTS everything
+-- The following ASN.1 provides the means for extending records, record types, IN specific information
+-- and record block information. The Management Extension type is redefined using the useful
+-- information object class type TYPE-IDENTIFIER. The construct is equivalent to ITU-T Recommendation X.721:
+-- Attribute -ASN1Module ManagementExtension type and does not use the ANY DEFINED BY construct
+-- which is not supported any more by ITU-T Recommendation X.680.
+MANAGEMENT-EXTENSION ::= TYPE-IDENTIFIER
+AdditionalRecordType ::= INSTANCE OF MANAGEMENT-EXTENSION
+({AllowedAdditionalRecordTypes})
+-- The AllowedAdditionalRecordTypes is the constraint that allows only certain types to be set as
+-- AdditionalRecordType.
+AdditionalRecordTypes ::= SET OF AdditionalRecordType
+-- The AdditionalRecordTypes type is to be used in the RecordContent type of
+-- ASN1DefinedTypesModule module.
+BlockExtension ::= INSTANCE OF MANAGEMENT-EXTENSION ({AllowedBlockExtensions})
+-- The AllowedBlockExtensions is the constraint that allows only certain types to be set as BlockExtension.
+BlockExtensions ::= SET OF BlockExtension
+-- The BlockExtensions type is to be used in the BlockHeaderRecord type of
+-- ASN1DefinedTypesModule
+-- module
+RecordExtension ::= INSTANCE OF MANAGEMENT-EXTENSION ({AllowedRecordExtensions})
+-- The AllowedRecordExtensions is the constraint that allows only certain types to be set as
+-- RecordExtension
+RecordExtensions ::= SET OF RecordExtension
+-- The RecordExtensions type is to be used in the CallRecord type of
+-- ASN1DefinedTypesModule module
+ServiceSpecificINInformation ::= INSTANCE OF MANAGEMENT-EXTENSION
+({AllowedServiceSpecificINInformations})
+-- The AllowedServiceSpecificINInformations is the constraint that allows only certain types to be set as
+-- ServiceSpecificINInformation.
+ServiceSpecificINInformations ::= SET OF ServiceSpecificINInformation
+-- TheServiceSpecificINInformations type is to be used in the CallRecord type of
+-- ASN1DefinedTypesModule module.
+StandardAdditionalRecordType ::= INSTANCE OF MANAGEMENT-EXTENSION
+({AllowedStandardAdditionalRecordTypes})
+-- The AllowedStandardAdditionalRecordTypes is the constraint that allows only certain types to be set as
+-- StandardAdditionalRecordType.
+StandardAdditionalRecordTypes ::= SET OF StandardAdditionalRecordType
+-- TheStandardAdditionalRecordTypes type is to be used in the RecordContent type of
+-- ASN1DefinedTypesModule module.
+StandardExtension ::= INSTANCE OF MANAGEMENT-EXTENSION
+({AllowedStandardExtensions})
+-- The AllowedStandardExtensions is the constraint that allows only certain types to be
+-- set as StandardExtension.
+StandardExtensions ::= SET OF StandardExtension
+-- TheStandardExtensions type is to be used in the CallRecord type of
+-- ASN1DefinedTypesModule module
+-- Usually the constraint on the type to be used for extensions is not known and must be specified
+-- at implementation time (in the Protocol Implementation Conformance Statement, PICS).
+-- However, in the case of standard extensions the allowed types for the constraint may be already defined.
+-- Example:
+-- TypeA and TypeB types are to be used as a constraint to StandardAdditionalRecordTypes.
+-- The AllowedStandardAdditionalRecordType will be then:
+-- AllowedStandardAdditionalRecordTypes STANDARD-EXTENSION ::= {
+-- { TypeA IDENTIFIED BY objectIdentifierA } |
+-- { TypeB IDENTIFIED BY objectIdentifierB} }
+-- where objectIdentifierA and objectIdentifierB are the OBJECT IDENTIFIER values associated
+-- to TypeA and TypeB respectively.
+END -- End of ASN1DefinedTypesModuleNew
+-- I.2 Rules of extensibility
+-- NOTE  This paragraph substitutes the paragraph on rules of extensibility at the start of A.10.
+-- Recommendation X.680, Amendment 1, shall be used to extend the following types defined in
+-- ASN1UsageInformationModule module:
+-- " CallRecord.
+-- " RecordContent.
+-- " AdditionalParticipantInfo.
+-- " CreationTrigger.
+-- " INSpecificInfo.
+-- " ParticipantId.
+-- " ParticipantType.
+-- " PartialRecordReason.
+-- " ReasonForOutput.
+-- " StartTimeStamp.
+-- " TimeDuration.
+-- " CDRPurpose.
+-- I.3 Use of Management Extension
+-- The use of Management Extensions requires the definition of an object identifier that uniquely refers
+-- to the type being used for the extension. This definition avoids any ambiguity when receiving the
+-- type at the Q3 interface.
+-- Example
+-- The information model defined in this Annex is, for instance, to be used to collect usage information
+-- from ATM switches. An ATM connection record is standardized in an TMSwitchASN1Module in
+-- another document. The definition of this type in that document should be done as follows:
+-- ATMSwitchASN1Module { ccitt(0) identified-organisation(4) etsi(0) ATMSwitchStandard(XXX)
+-- informationModel(0) asn1Module(2) ATMSwitchASN1Module(0) }
+-- DEFINITIONS ....
+-- ...
+-- ExampleATMConnectionRecordType OBJECT IDENTIFIER ::=
+-- {ATMSwitchASN1Module ExampleATMConnectionRecordType(0) }
+-- This object identifier uniquely identifies type ExampleATMConnectionRecord.
+-- ...
+-- ExampleATMConnectionRecord ::= Type definition
+-- ...
+-- When the usage metering information management model with a ManagementExtension is used, the object identifier
+-- ExampleATMConnectionRecordType should be used so that the ANY DEFINED BY clause in the Management
+-- Extension unambiguously determines the ExampleATMConnectionRecord type.
+-- The ExampleATMConnectionRecord must be specified in the Protocol Implementation Conformance Statement (PICS)
+-- of the information model at the time of implementation.
+END
+--< GDMO.Document "ITU-T Rec. Q.825 (1998)" { itu-t(0) recommendation(0) q(17) q825(825) } >--

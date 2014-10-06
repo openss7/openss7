@@ -1,0 +1,614 @@
+#!/bin/bash
+# =============================================================================
+# 
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date$ by $Author$
+#
+# =============================================================================
+subpkg=base
+@package_archhdr@
+datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
+#
+# _pre_install_preloads() - Go looking for non-pkg or legacy preloads and remove them.  This includes all
+#   non-kernel-specific preloads techniques: modprobe.preload and modules but not modules-@kversion@
+#   files.
+#
+_pre_install_preloads () {
+    local prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$ \
+	  prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$ \
+	  prel_old m
+    for prel_old in ${sysconfdir}/modprobe.preload ${sysconfdir}/modules; do
+	if [ -f $prel_old ]; then
+	    cp -f -- $prel_old $prel_new
+	    sed -e '\|^[[:space:]]*(specfs|streams)|d' $prel_new >$prel_tmp
+	    mv -f -- $prel_tmp $prel_new
+	    for m in $modules $preloads; do
+		sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $prel_new >$prel_tmp
+		mv -f -- $prel_tmp $prel_new
+	    done
+	    if ! diff $prel_new $prel_old >/dev/null 2>&1; then
+		echo "warning: Removing non-pkg entries from preloads file, $prel_old" >&2
+		cp -f -b --suffix=.pacorig -- $prel_new $prel_old
+	    fi
+	    rm -f -- $prel_new || :
+	fi
+    done
+}
+#
+# _pre_install_initscripts() - Fresh install, go looking for non-pkg initscripts and remove them.
+#
+_pre_install_initscripts () {
+    local list reverse i
+    [ -z '@INSTALL_SYSVINIT_TRUE@' ] || return 0
+    if [ ! -r /proc/1/comm -o "`cat /proc/1/comm 2>/dev/null`" != systemd ]; then
+	list="$nonrpminit"
+	reverse=
+	for i in $list; do
+	    reverse="$i${reverse:+ }$reverse"
+	done
+	for i in $reverse; do
+	    if [ -f "${initrddir}/$i" ]; then
+		echo "warning: Stopping non-pkg init script, $i" >&2
+		[ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d  $i stop && continue || true; }
+		[ -x "`which service     2>/dev/null`" ] && { service      $i stop && continue || true; }
+		[ -x "${initrddir}/$i"                 ] && { ${initrddir}/$i stop && continue || true; }
+	    elif
+	    fi
+	done
+    fi
+    list="$initfiles $nonrpminit"
+    reverse=
+    for i in $list; do
+	reverse="$i${reverse:+ }$reverse"
+    done
+    for i in $reverse; do
+	if [ -f "${initrddir}/$i" ]; then
+	    echo "warning: Deregistering non-pkg init script, $i" >&2
+	    [ -x /sbin/insserv             ] && { /sbin/insserv -r          $i        2>&1 && continue || true; }
+	    [ -x /sbin/chkconfig           ] && { /sbin/chkconfig --del     $i        2>&1 && continue || true; }
+	    [ -x /usr/lib/lsb/remove_initd ] && { /usr/lib/lsb/remove_initd $i        2>&1 && continue || true; }
+	    [ -x /usr/sbin/update-rc.d     ] && { /usr/bin/update-rc.d      $i remove 2>&1 && continue || true; }
+	fi
+    done
+}
+#
+# preinst_remove_depmods() - A little recursive function to delete all modules dependent on an
+#   initial module set (in our case "streams.o").  The function echos the list of modules to remove
+#   to stdout.
+#
+preinst_remove_depmods () {
+    local t
+    [ $# -gt 0 ] || return 0
+    echo "$*"
+    for t in $@ ; do
+	prereq=prereq_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+	eval "preinst_remove_depmods \$$prereq"
+    done
+}
+#
+# _pre_install_modules() - When performing a fresh install we want to go looking for non-pkg
+#   installations of LiS or STREAMS or supplementary packages and perform what would otherwise have
+#   been the prerm or postrm actions.  Build a dependency tree from every dependency expression that
+#   can be found in each modules.dep file and remove all conflicting modules and their dependents.
+#
+_pre_install_modules () {
+    local dir m b modl_mods= dep line t target p prereq
+    for dir in /lib/modules/preferred /lib/modules/default /lib/modules/boot; do
+	[ -d $dir ] || continue
+	for m in `find $dir \( -name '*.o' -o -name '*.ko' -o -name '*.o.gz' -o -name '*.ko.gz' \) 2>/dev/null` ; do
+	    b=`echo $m | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)? , ,'`
+	    case " $modules " in (*" $b "*) modl_mods="$modl_mods${modl_mods:+ }$m" ;; esac
+	done
+	if [ -n "$modl_mods" -a -f $dir/modules.dep ] ; then
+	    dep=
+	    while read line; do
+		case $line in
+		    *\\) line="`echo $line | sed -e 's,\\$,,'`"
+			dep="$dep${dep:+ }$line" ; continue ;;
+		    *)  dep="$dep${dep:+ }$line" ;;
+		esac
+		if [ -n "$dep" ]; then
+		    set -- $dep
+		    if [ $# -ge 2 ]; then
+			t=`echo $1 | sed -e 's,:$,,'`
+			target=target_`echo $t | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
+			shift
+			for p in $@ ; do
+			    prereq=prereq_`echo $p | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
+			    eval "$prereq=\"\$$prereq\${$prereq:+ }$t\""
+			    eval "$target=\"\$$target\${$target:+ }$p\""
+			done
+		    fi
+		    dep=
+		fi
+	    done < $dir/modules.dep
+	    for m in $modl_mods; do
+		echo "warning: Removing non-pkg kernel module, $m" >&2
+		rm -f -- $m 2>/dev/null || :
+		prereq=prereq_`echo $m | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
+		eval "preinst_remove_depmods \$$prereq" | while read b; do
+		    echo "warning: Removing depednent non-pkg kernel module, $b" >&2
+		    rm -f -- $b 2>/dev/null || :
+		done
+	    done
+	    unset ${!prereq_*}
+	    unset ${!target_*}
+	fi
+    done
+}
+#
+# _pre_install_modconf() - For a fresh install make sure that there are no entries from a non-pkg
+#   installation in the modules directories nor in the modules.conf file that will interfere with
+#   our entries.  Especially older LiS entries.
+#
+#   Unfortunately davem starting copying our install procedure, so we need to root out all kinds of
+#   things from the modules.conf file, all prune statements, any if include statements.  The old
+#   style /BEGIN LiS/,/END LiS/ enclosure in the modules.conf file.  My newer technique with a prune
+#   and an if statement in the modules.conf file that was also used by davem in LiS-2.18.0.  Also,
+#   my newer latest technique with only an include statement in modules.conf and a modules.conf
+#   fragment in the archlinux update-modules directory @modutildir@ that includes the prune and if
+#   statements.  That works both for RH-style and Debian-style modules.conf.
+#
+#   Again, unfortunately, recent non-autoconf/dpkg releases of LiS have chosen to install their
+#   modconf files in a similar fashion to ours and in a similar location.  It even uses the prune
+#   modules line that we normally use, however, on Debian their modules.conf edits will be lost
+#   because the modules.conf file is generated from the modules/conf.d directory.
+#
+_pre_install_modconf () { |
+    local conf_old=${sysconfdir}/modules.conf \
+          conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$ \
+          conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$ \
+          suffix dir
+    [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
+    if [ -f $conf_old ]; then
+        cp -f -- $conf_old $conf_new
+        for suffix in $name LiS lis streams STREAMS strcompat strtty strxns strxnet strsock strinet strsctp strchan strx25 striso strisdn strss7 sigtran strvoip osr61
+        do
+            if ( grep -q -- "BEGIN $suffix" $conf_new && grep -q -- "END $suffix" $conf_new ) 2>/dev/null
+            then
+                sed -e '\|BEGIN '$suffix'|,\|END '$suffix'|d' $conf_new > $conf_tmp
+                mv -f -- $conf_tmp $conf_new
+            fi
+            for dir in /lib/modules/2.[456].* /lib/modules/preferred /lib/modules/default /lib/modules/boot
+            do
+                [ -d $dir ] || continue
+                if [ -f $dir/modules.$suffix ] ; then
+                    rm -f -- $dir/modules.$suffix
+                    sed -e '\|^prune[[:space:]].*modules.'$suffix'|d'        $conf_new > $conf_tmp
+                    sed -e '\|^if[[:space:]].*modules.'$suffix'|,\|^endif|d' $conf_tmp > $conf_new
+                    sed -e '\|^include[[:space:]].*modules.'$suffix'|d'      $conf_new > $conf_tmp
+                    mv -f -- $conf_tmp $conf_new
+                fi
+            done
+        done
+        for suffix in $name LiS lis streams STREAMS strcompat strtty strxns strxnet strsock strinet strsctp strchan strx25 striso strisdn strss7 sigtran strvoip osr61 ; do
+            if [ -f ${modutildir}/$suffix ] ; then
+                rm -f -- ${modutildir}/$suffix
+                sed -e '\|^include[[:space:]].*'${modutildir}/$suffix'|d' $conf_new > $conf_tmp
+                mv -f -- $conf_tmp $conf_new
+            fi
+        done
+        if ! diff $conf_old $conf_new >/dev/null 2>&1; then
+            echo "warning: Removing non-pkg entries from $conf_old" >&2
+            cp -f -b --suffix=.pacorig -- $conf_new $conf_old
+        fi
+        rm -f -- $conf_new || :
+    fi
+}
+#
+# _pre_install_remove_warn_file()
+#
+_pre_install_remove_warn_file () {
+    echo "$script: warning: Deleting non-pkg manual $1 file $2" >&2
+    rm -f -- $2 2?dev/null || :
+}
+#
+# _pre_install_manpages() - Old non-pkg distribution puts some man pages in the wrong
+#   place, clean them out on a fresh install.
+#
+_pre_install_manpages () { :
+    if [ -f /usr/man/man3/fattach.3 ] ; then
+        _pre_install_remove_warn_file "page" /usr/man/man3/fattach.3
+        _pre_install_remove_warn_file "page" /usr/man/man3/detach.3
+        _pre_install_remove_warn_file "page" /usr/man/man3/isastream.3
+        rmdir -p /usr/man/man3 2>/dev/null || :
+        _pre_install_remove_warn_file "page" /usr/man/man8/fattach.8
+        _pre_install_remove_warn_file "page" /usr/man/man8/fdetach.8
+        rmdir -p /usr/man/man8 2>/dev/null || :
+        _pre_install_remove_warn_file "page" /usr/man/man9/connld.9
+        _pre_install_remove_warn_file "page" /usr/man/man9/fifo.9
+        _pre_install_remove_warn_file "page" /usr/man/man9/pipemod.9
+        rmdir -p /usr/man/man9 2>/dev/null || :
+    fi
+}
+#
+# _pre_install_manrefs() - On a fresh installation, clean out reference database from
+#   old non-pkg distribution.
+#
+_pre_install_manrefs () {
+    for m in $manrefs; do
+	[ ! -f ${mandir}/$m     ] || _pre_install_remove_warn_file "macros" ${mandir}/$m
+	[ ! -f ${mandir}/$m.gz  ] || _pre_install_remove_warn_file "macros" ${mandir}/$m.gz
+	[ ! -f ${mandir}/$m.bz2 ] || _pre_install_remove_warn_file "macros" ${mandir}/$m.bz2
+    done
+}
+#
+# _pre_install_manmacros() - On a fresh installation, lean out macro files from old
+#   non-pkg distribution.
+#
+_pre_install_manmacros () {
+    for m in $manmacros; do
+	[ ! -f ${mandir}/$m     ] || _pre_install_remove_warn_file "references" ${mandir}/$m
+	[ ! -f ${mandir}/$m.gz  ] || _pre_install_remove_warn_file "references" ${mandir}/$m.gz
+	[ ! -f ${mandir}/$m.bz2 ] || _pre_install_remove_warn_file "references" ${mandir}/$m.bz2
+    done
+}
+#
+# _pre_install_base() - This is an initial installation of the base subpackage.  We need to check for
+#   non-pkg installations on the host and remove any entries that might later conflict with out
+#   entries.  We treat every fresh installation like an upgrade from non-pkg/deb/rpm install.
+#
+_pre_install_base () { :
+    _pre_install_preloads || :
+    _pre_install_initscripts || :
+    _pre_install_modules || :
+    _pre_install_modconf || :
+    _pre_install_manpages || :
+    _pre_install_manrefs || :
+    _pre_install_manmacros || :
+}
+#
+# _post_install_modconf() - Ensure that include line is added to the modules.conf file for old 2.4
+#	module systems.  This must remove lines before including them because it may also be run
+#	from reconfigure.
+#
+_post_install_modconf () { :
+    local conf_old=${sysconfdir}/modules.conf \
+          conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$ \
+          conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
+    [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
+    if [ -f $conf_old ] ; then
+        cp -f -- $conf_old $conf_new
+        ( sed -e '\|^include[[:space:]].*'${modutildir}'/@PACKAGE_LCNAME@|d' $conf_new
+          echo "include ${modutildir}/@PACKAGE_LCNAME@" ) > $conf_tmp
+        mv -f -- $conf_tmp $conf_new
+        if ! diff $conf_new $conf_old >/dev/null 2>&1; then
+            cp -f -b --suffix=.pacorig -- $conf_new $conf_old
+        fi
+        rm -f -- $conf_new || :
+    fi
+}
+#
+# _post_install_preloads() - At the end of a fresh install or upgrade, check that our preload
+#	modules have been added to the modprobe.preload file.  Note, however, that the
+#	modprobe.preload does not normally exist for Debian.  The -kernel subpackage is responsible
+#	for adding preloads to the debian /etc/modules-@kversion@ file.
+#
+_post_install_preloads () { :
+    local prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$ \
+	  prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$ \
+	  prel_old
+    for prel_old in ${sysconfdir}/modules ${sysconfdir}/modprobe.preload; do
+	if [ -f $prel_old ] ; then
+	    cp -f -- $prel_old $prel_new
+	    missing=no
+	    for m in $preloads ; do
+		if ! grep '^[[:space:]]*'"$m"'[[:space:]]*$' $prel_new >/dev/null 2>&1; then
+		    missing=yes
+		fi
+	    done
+	    if [ $missing = yes ]; then
+		for m in $preloads; do
+		    ( sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $prel_new;
+		      echo "$m" ) >$prel_tmp
+		    mv -f -- $prel_tmp $prel_new
+		done
+		cp -f -b --suffix=.pacorig -- $prel_new $prel_old
+	    fi
+	    rm -f -- $prel_new || :
+	fi
+    done
+}
+#
+# _post_install_initscripts() - At the end of an install or upgrade, add init scripts if we can.
+#	Note that the debhelper scriptlets are defeated because they are too disruptive in the 2.6
+#	environment.
+#
+_post_install_initscripts () {
+    local list i args r
+    [ -z '@INSTALL_SYSVINIT_TRUE@' ] || return 0
+    list="${initfiles}"
+    for i in $list; do
+	if [ -f ${initrddir}/$i ]; then
+	    [ -x /sbin/insserv              ] && { /sbin/insserv              $i       2>&1 && continue || true; }
+	    [ -x /sbin/chkconfig            ] && { /sbin/chkconfig --add      $i       2>&1 && continue || true; }
+	    [ -x /usr/lib/lsb/install_initd ] && { /usr/lib/lsb/install_initd $i       2>&1 && continue || true; }
+	    args="`grep '^#[[:space:]]*update-rc.d:' ${initrddir}/$i | sed -e 's,#[[:space:]]*update-rc.d:[[:space:]]*,,'`"
+	    [ -x /usr/sbin/update-rc.d      ] && { /usr/sbin/update-rc.d      $i $args 2>&1 && continue || true; }
+	fi
+    done
+}
+#
+# _post_install_manrefs() - Some systems compress our reference database but do not provide nor invoke
+#   the zrefer command necessary to use compressed reference databases.  Therefore, we always
+#   provide a decompressed copy of the reference database.
+#
+_post_install_manrefs () {
+    local m
+    for m in ${manrefs}; do
+	[ ! -f ${mandir}/$m.gz  ] || gzip  -dc ${mandir}/$m.gz  > ${mandir}/$m || :
+	[ ! -f ${mandir}/$m.bz2 ] || bzip2 -dc ${mandir}/$m.bz2 > ${mandir}/$m || :
+    done
+}
+#
+# _post_install_manmacros() - Some systems compress our man macros but do not provide nor invoke the
+#   zsoelim command necessary to use compressed man macros.  Therefore, we always provide a
+#   decompressed copy of the man macros.
+#
+_post_install_manmacros () {
+    local m
+    for m in ${manmacros}; do
+	[ ! -f ${mandir}/$m.gz  ] || gzip  -dc ${mandir}/$m.gz  > ${mandir}/$m || :
+	[ ! -f ${mandir}/$m.bz2 ] || bzip2 -dc ${mandir}/$m.bz2 > ${mandir}/$m || :
+    done
+}
+#
+# _post_install_manpages() - Add our manual pages to the aprospros database.  One problem with doing this
+#   is that even the oldest of debian policies and debhelper implementations will implement the
+#   debhelper code to do this.  Therefore, this function is shortcircuited for now.  (We install
+#   >3000 manual pages and it takes forever anyway.)  Failing to do this altogether is not critical
+#   because most machines run an evening cron job to update these.
+#
+_post_install_manpages () { :; return
+    if   [ -x "`which mandb      2>/dev/null`" ]; then
+	LANGUAGE= LANG= mandb      -p ${mandir} || :
+    elif [ -x "`which makewhatis 2>/dev/null`" ]; then
+	LANGUAGE= LANG= makewhatis -u ${mandir} || :
+    fi
+}
+_post_install_base () { :
+    [ -z '@WITH_KO_MODULES_TRUE@' ] || _post_install_modconf
+    _post_install_preloads
+    _post_install_initscripts
+    _post_install_manrefs
+    _post_install_manmacros
+    _post_install_manpages
+}
+_post_install_base_abort () { :
+    _post_install_initscripts
+}
+
+_pre_upgrade_base () { :
+}
+
+# _post_upgrade_preloads() - At the end of an upgrade, check that our preload modules have been
+#	added to the modprobe.preload file.  Note, however, that the modprobe.preload does not
+#	normally exists for Debian  The -kernel subpackage is responsible for adding preloads to the
+#	Debian /etc/modules-@kversion@ file.
+#
+_post_upgrade_preloads () { :
+    local prel_tmp prel_new prel_old
+    prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$
+    prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$
+    for prel_old in ${sysconfdir}/modules ${sysconfdir}/modprobe.preload; do
+	if [ -f $prel_old ] ; then
+	    cp -f -- $prel_old $prel_new
+	    missing=no
+	    for m in $preloads ; do
+		if ! grep '^[[:space:]]*'"$m"'[[:space:]]*$' $prel_new >/dev/null 2>&1; then
+		    missing=yes
+		fi
+	    done
+	    if [ $missing = yes ]; then
+		for m in $preloads; do
+		    ( sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $prel_new;
+		      echo "$m" ) >$prel_tmp
+		    mv -f -- $prel_tmp $prel_new
+		done
+		cp -f -b --suffix=.pacorig -- $prel_new $prel_old
+	    fi
+	    rm -f -- $prel_new || :
+	fi
+    done
+}
+#
+# _post_upgrade_initscripts() - At the end of an upgrade, add init scripts if we can.  Note that
+#	Archlinux does not use the same symbolic link mechanism that other distros do.  The init
+#	scripts need to be added to the DAEMONS line in /etc/rc.conf; however, it is bad practice to
+#	do so automatically.
+#
+_post_upgrade_initscripts () { :
+    local list i args r
+    [ -z '@INSTALL_SYSVINIT_TRUE@' ] || return 0
+    list="${initfiles}"
+    for i in $list; do
+	if [ -f ${initrddir}/$i ]; then
+	    [ -x /sbin/insserv              ] && { /sbin/insserv              $i       2>&1 && continue || true; }
+	    [ -x /sbin/chkconfig            ] && { /sbin/chkconfig --add      $i       2>&1 && continue || true; }
+	    [ -x /usr/lib/lsb/install_initd ] && { /usr/lib/lsb/install_initd $i       2>&1 && continue || true; }
+	    args="`grep '^#[[:space:]]*update-rc.d:' ${initrddir}/$i | sed -e 's,#[[:space:]]*update-rc.d:[[:space:]]*,,'`"
+	    [ -x /usr/sbin/update-rc.d      ] && { /usr/sbin/update-rc.d      $i $args 2>&1 && continue || true; }
+	    [ -s /etc/rc.conf               ] && { echo ">>>> Consider adding $i to DAEMONS in /etc/rc.conf"; continue; }
+	fi
+    done
+}
+
+_post_upgrade_base () { :
+    _post_upgrade_preloads
+    _post_upgrade_initscripts
+}
+
+# _pre_remove_preloads() - When removing for good (purging), make sure that the preload modules are
+#	no longer included in the preloads file.  Note that removing lines from the
+#	/etc/modules-@kversion@ file is the responsibility of the kernel modules subpackage.  On
+#	upgrade, the new package will add its own lines later.
+#
+_pre_remove_preloads () { :
+    local prel_tmp prel_new prel_old included p
+    prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$
+    prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$
+    for prel_old in ${sysconfdir}/modules ${sysconfdir}/modprobe.preload; do
+	if [ -f $prel_old ]; then
+	    cp -f -- $prel_old $prel_new
+	    included=no
+	    for p in ${preloads}; do
+		if grep '^[[:space:]]*'"$p"'[[:space:]]*$' $prel_new >/dev/null 2>&1; then
+		    included=yes
+		    break
+		fi
+	    done
+	    if [ $included = yes ]; then
+		for p in ${preloads}; do
+		    grep -v '^[[:space:]]*'"$p"'[[:space:]]*$' $prel_new >$prel_tmp
+		    mv -f -- $prel_tmp $prel_new
+		done
+		cp -f -b --suffix=.pacorig -- $prel_new $prel_old
+	    fi
+	    rm -f -- $prel_new || :
+	fi
+    done
+}
+#
+# _pre_remove_manrefs() - When removing or upgrading the package, remove the uncompressed manual
+#	references when there is a compressed version lying around from before.  One upgrade, the
+#	new version will provide its own one way or another.
+#
+_pre_remove_manrefs () { :
+    for m in $manrefs; do
+	if [ -f ${mandir}/$m.gz -o -f ${mandir}/$m.bz2 ]; then
+	    rm -f -- ${mandir}/$m 2>/dev/null || :
+	fi
+    done
+}
+#
+# _pre_remove_manmacros() - When removing or upgrading the package, remove the uncompressed manual
+#	references when there is a compressed version lying around from before.  One upgrade, the
+#	new version will provide its own one way or another.
+#
+_pre_remove_manmacros () { :
+    for m in $manmacros; do
+	if [ -f ${mandir}/$m.gz -o -f ${mandir}/$m.bz2 ]; then
+	    rm -f -- ${mandir}/$m 2>/dev/null || :
+	fi
+    done
+}
+
+_pre_remove_base () { :
+    _pre_remove_preloads || :
+    _pre_remove_manrefs || :
+    _pre_remove_manmacros || :
+}
+
+# _post_remove_oldmods() - As the subpackage is being removed, remove the line from the modules.conf
+#	file that points at the /etc/modutils/openss7 file that in turn includes the
+#	/lib/modules/@kversion@-modules.openss7 file when it exists.  Note that the files themselves
+#	are referenced from the modules.conf files are removed as a normal part of the course of
+#	removing the files in the kernel subpackage.
+#
+_post_remove_oldmods () { :
+    local conf_old conf_tmp conf_new
+    [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
+    conf_old=${sysconfdir}/modules.conf
+    conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$
+    conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
+    if [ -f $conf_old ] ; then
+        cp -f -- $conf_old $conf_new
+        if grep '^include[[:space:]].*'${modutildir}'/@PACKAGE_LCNAME@' $conf_new >/dev/null 2>&1; then
+            sed -e '\|^include[[:space:]].*'${modutildir}'/@PACKAGE_LCNAME@|d' $conf_new > $conf_tmp
+            mv -f -- $conf_tmp $conf_new
+            cp -f -b --suffix=.pacorig -- $conf_new $conf_old
+        fi
+        rm -f -- $conf_new || :
+    fi
+}
+#
+# _post_remove_manpages() - When removing the package, update the aprospros database.
+#
+_post_remove_manpages () { :
+    if   [ -x "`which mandb      2>/dev/null`" ]; then
+	LANGUAGE= LANG= mandb   -q -p ${mandir} || :
+    elif [ -x "`which makewhatis 2>/dev/null`" ]; then
+	LANGUAGE= LANG= makewhatis -u ${mandir} || :
+    fi
+}
+
+_post_remove_base () { :
+    _post_remove_oldmods
+    _post_remove_manpages
+}
+
+# -----------------------------------------------------------------------------
+# Primary functions:
+# -----------------------------------------------------------------------------
+pre_install() { :
+    _pre_install_base
+}
+post_install() { :
+    _post_install_base || { _post_install_base_abort; exit 1 }
+}
+pre_upgrade() { :
+    _pre_upgrade_base
+}
+post_upgrade() { :
+    _post_upgrade_base
+}
+pre_remove() { :
+    _pre_remove_base
+}
+post_remove() { :
+    _post_remove_base
+}
+
+# =============================================================================
+#
+# $Log$
+# =============================================================================
+# vim: ft=sh sw=4 noet nocin nosi formatoptions+=tcqlorn

@@ -1,0 +1,98 @@
+#!/usr/bin/awk -f
+
+function scanincludes(file)
+{
+    if (system("test -r " srcdir "/" file) == 0) {
+	file = srcdir "/" file
+    } else
+    if (system("test -r " file) != 0)
+	return
+    while((getline < file) == 1) {
+	if (/^@c[[:space:]]/)
+	    continue
+	if (/@(include|verbatiminclude)[[:space:]]+/) {
+	    sub(/.*@(include|verbatiminclude)[[:space:]]+/, "")
+	    if (/args\.texi/)
+		continue
+	    includes[$0] = 1
+	    if (/\.texi/)
+		scanincludes($0)
+	    continue
+	}
+	if (/@(image|tabfig|tabfigsized|figure|figuresized)\{/) {
+	    sub(/.*@(image|tabfig|tabfigsized|figure|figuresized)\{/, "")
+	    sub(/[,\}].*/, "")
+	    figures[$0] = 1
+	    continue
+	}
+    }
+    close(file)
+}
+
+BEGIN {
+    LINT = "yes"
+    if ("srcdir" in ENVIRON)
+	srcdir = EINVRON["srcdir"]
+    if ("top_srcdir" in ENVIRON)
+	top_srcdir = EINVRON["top_srcdir"]
+    suffixes["ps"  ] = ".eps"; depends["ps"  ] = ".dvi"
+    suffixes["dvi" ] = ".eps"; depends["dvi" ] = ".texi"
+    suffixes["pdf" ] = ".pdf"; depends["pdf" ] = ".texi"
+    suffixes["html"] = ".png"; depends["html"] = ".texi"
+    suffixes["txt" ] = ".txt"; depends["txt" ] = ".texi"
+    suffixes["info"] = ".txt"; depends["info"] = ".texi"
+    suffixes["deps"] = ".txt"; depends["deps"] = ".texi"
+}
+{
+    f = $0
+    scanincludes(f)
+    t = f; sub(/\.texi/, "", t); sub(srcdir "/", "", t)
+    line["ps"  ] = t ".ps: "   "\\\n\t" t depends["ps"  ]
+    line["dvi" ] = t ".dvi: "  "\\\n\t" t depends["dvi" ]
+    line["pdf" ] = t ".pdf: "  "\\\n\t" t depends["pdf" ]
+    line["html"] = t ".html: " "\\\n\t" t depends["html"]
+    line["txt" ] = t ".txt: "  "\\\n\t" t depends["txt" ]
+    line["info"] = srcdir "/" t ".info: " "\\\n\t" t depends["info"]
+    line["deps"] = ".deps/info.Pd: " "\\\n\t" t depends["deps"]
+    for (p in figures) {
+	for (v in line ) {
+	    if (v == "deps") continue
+	    f0 = p suffixes[v]
+	    f1 = srcdir "/" f0
+	    f2 = top_srcdir "/scripts/" f0
+	    if (system("test -f " f0) == 0) {
+		pd = f0
+	    } else if (system("test -f " f2) == 0) {
+		pd = f2
+	    } else if (system("test -f " f1) == 0) {
+		pd = f1
+	    } else {
+		pd = f0
+	    }
+	    line[v] = line[v] " \\\n\t" pd
+	}
+    }
+    for (p in includes) {
+	f0 = p
+	f1 = srcdir "/" f0
+	f2 = top_srcdir "/scripts/" f0
+	if (system("test -f " f0) == 0) {
+	    pd = f0
+	} else if (system("test -f " f2) == 0) {
+	    pd = f2
+	} else if (system("test -f " f1) == 0) {
+	    pd = f1
+	} else {
+	    pd = f0
+	}
+	for (v in line) {
+	    if (v == "deps" && p!~/\.texi$/) continue
+	    line[v] = line[v] " \\\n\t" pd
+	}
+    }
+    for (v in line) {
+	print line[v]
+    }
+}
+
+# vim: ft=awk sw=4 nocin fo+=tcqlorn

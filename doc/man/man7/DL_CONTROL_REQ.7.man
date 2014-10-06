@@ -1,0 +1,614 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: DL_CONTROL_REQ.7.man,v 1.1.2.2 2011-02-07 02:18:15 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:15 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: DL_CONTROL_REQ.7.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:15  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH DL_CONTROL_REQ 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Data Link Provider Interface (DLPI)"
+.SH NAME
+.B DL_CONTROL_REQ (dl_control_req_t)
+\- control underlying driver
+.\"
+.\"
+.SH INTERFACE
+Data Link Provider Interface, DLPI,
+.[
+dlpi revision 2.0.0 draft 2
+.]
+.IR Solaris \(rg-specific.
+.[
+soldoc11
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+The message consists of one
+.BR M_PROTO (9)
+message block, that contains the following structure:
+.sp
+.nf
+\f(CW\s-1\
+#define _SUN_SOURCE
+#include <sys/dlpi.h>
+#include <sys/dlpi_sun.h>
+
+typedef struct {
+    t_uscalar_t dl_primitive;
+    t_uscalar_t dl_operation;
+    t_uscalar_t dl_type;
+    t_uscalar_t dl_key_offset;
+    t_uscalar_t dl_key_length;
+    t_uscalar_t dl_data_offset;
+    t_uscalar_t dl_data_length;
+} dl_control_req_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B DL_CONTROL_REQ
+is an extensible message to send down control information to the DLS provider.
+The response is a
+.BR DL_CONTROL_ACK "(7) or " DL_ERROR_ACK (7)
+primitive.
+This manual page contains definitions and structures needed for
+.BR DL_CONTROL_REQ "(7) and " DL_CONTROL_ACK (7)
+primitives.
+.\"
+.\"
+.SH PARAMETERS
+.PP
+The
+.B dl_control_req_t
+structure contains the following members:
+.TP
+.I dl_primitive
+conveys
+.BR DL_CONTROL_REQ .
+.TP
+.I dl_operation
+The operation to perform.  Each operation has diffent requirements as to the
+presence or absence of contents in the
+.IR dl_key_offset ", " dl_key_length
+fields,
+.RI < key >,
+and the
+.IR dl_data_offset ", " dl_data_length
+fields,
+.RI < data >.
+The
+.I dl_type
+field,
+.RI < type >,
+is always required.
+.RS
+.PP
+This field can have one of the following values:
+.TP
+.B DL_CO_ADD
+Add new entry matching for
+.RI < type >
+and
+.RI < key >.
+This operation requires the
+.RI < type >,
+.RI < key >
+and
+.RI < data >
+fields.
+When the
+.RI < type >
+and
+.RI < key >
+matches an already existing entry, a
+.BR DL_ERROR_ACK (7)
+primitive will be issued in response.
+.TP
+.B DL_CO_DELETE
+Delete the entry matching
+.RI < type >
+and
+.RI < key >.
+This operation requires only the
+.RI < type >
+and
+.RI < key >
+fields.
+When the
+.RI < type >
+and
+.RI < key >
+does not match an existing entry, a
+.BR DL_ERROR_ACK (7)
+primitive will be issued in response.
+.TP
+.B DL_CO_FLUSH
+Purge all entries matching
+.RI < type >
+and
+.RI < key >.
+This operation requires only the
+.RI < type >
+field.
+.TP
+.B DL_CO_GET
+Get the data for the
+.RI < type >
+and
+.RI < key >.
+This operation requires only the
+.RI < type >
+and
+.RI < key >
+fields.
+When the
+.RI < type >
+and
+.RI < key >
+does not match an existing entry, a
+.BR DL_ERROR_ACK (7)
+primitive will be issued in response.
+.TP
+.B DL_CO_UPDATE
+Updates the data for
+.RI < type >
+and
+.RI < key >.
+This operation requires the
+.RI < type >,
+.RI < key >
+and
+.RI < data >
+fields.
+.TP
+.B DL_CO_SET
+Add or update data for
+.RI < type >
+and
+.RI < key >
+as appropriate.
+This operation requires the
+.RI < type >,
+.RI < key >
+and
+.RI < data >
+fields.
+When the
+.RI < type >
+and
+.RI < key >
+already exists, an update is performed; when it does not
+exist, an add is performed.
+.RE
+.TP
+.I dl_type
+Specifies the
+.RI < type >
+of control.  This field can have one of the following
+values:
+.RS
+.TP
+.B DL_CT_IPSEC_AH
+The
+.RI < key >
+is the SPI and destination IP address using a
+.B dl_ct_ipsec_key_t
+structure, the
+.RI < data >
+is keyring material using a
+.B dl_ct_ipsec_t
+structure.
+.TP
+.B DL_CT_IPSEC_ESP
+The
+.RI < key >
+is the SPI and destination transport address using a
+.B dl_ct_ipsec_key_t
+structure, the
+.RI < data >
+is keyring material using a
+.B dl_ct_ipsec_t
+structure.
+.RE
+.TP
+.IR dl_key_offset ", " dl_key_length
+Describes an area in the
+.BR M_PROTO (9)
+messages block of length
+.I dl_key_length
+beginning
+.I dl_key_offset
+bytes from the beginning of the
+.BR M_PROTO (9)
+message block.
+This area defines the
+.RI < key >
+for the control.
+.RS
+.PP
+When
+.RI < type >
+is
+.BR DL_CT_IPSEC_AH " or " DL_CT_IPSEC_ESP
+this area contains a
+.B dl_ct_ipsec_key_t
+structure, formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+#define DL_CTL_IPSEC_ADDR_LEN   16
+
+typedef struct dl_ct_ipsec_key {
+    uint32_t dl_key_spi;
+    uint8_t dl_key_dest_addr[DL_CTL_IPSEC_ADDR_LEN];
+    uint32_t dl_key_addr_family;
+} dl_ct_ipsec_key_t;
+\s+1\fP
+.fi
+.PP
+The
+.B dl_ct_ipsec_key_t
+structure contains the following members:
+.TP
+.I dl_key_spi
+Conveys the Security Parameters Index (SPI) value.
+.TP
+.I dl_key_dest_addr
+Conveys the destination IP address or destination transport address.
+.TP
+.I dl_key_addr_family
+Conveys the address family:
+.B AF_INET
+for IPv4 or
+.B AF_INET6
+for IPv6.
+.RE
+.TP
+.IR dl_data_offset ", " dl_data_length
+Describes an area in the
+.BR M_PROTO (9)
+messages block of length
+.I dl_data_length
+beginning
+.I dl_data_offset
+bytes from the beginning of the
+.BR M_PROTO (9)
+message block.
+This area defines the
+.RI < data >
+for the control.
+.RS
+.PP
+When
+.RI < type >
+is
+.BR DL_CT_IPSEC_AH " or " DL_CT_IPSEC_ESP
+this area contains a
+.B dl_ct_ipsec_t
+structure, formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+#define DL_CT_IPSEC_MAX_KEY_LEN 512
+
+typedef struct dl_ct_ipsec {
+    uint8_t sadb_sa_auth;
+    uint8_t sadb_sa_encrypt;
+    uint32_t sadb_sa_flags;
+    uint16_t sadb_key_len_a;
+    uint16_t sadb_key_bits_a;
+    uint16_t sadb_key_data_a[DL_CT_IPSEC_MAX_KEY_LEN];
+    uint16_t sadb_key_len_e;
+    uint16_t sadb_key_bits_e;
+    uint16_t sadb_key_data_e[DL_CT_IPSEC_MAX_KEY_LEN];
+} dl_ct_ipsec_t;
+\s+1\fP
+.fi
+.PP
+The
+.B dl_ct_ipsec_t
+structure contains the following members:
+.TP
+.I sadb_sa_auth
+Conveys the authentication security algorithm.  This field can have one of the
+following values:
+.RS
+.TP
+.B DL_CAPAB_IPSEC_AUTH_NONE
+No authentication.
+.TP
+.B DL_CAPAB_IPSEC_AUTH_MD5HMAC
+Authentication using the MD5 HMAC.
+.TP
+.B DL_CAPAB_IPSEC_AUTH_SHA1HMAC
+Authentication using the SHA1 HMAC.
+.RE
+.TP
+.I sadb_sa_encrypt
+Conveys the encryption security algorithm.  This field can have one of the following
+values:
+.RS
+.TP
+.B DL_CAPAB_IPSEC_ENCR_NULL
+No encryption.
+.TP
+.B DL_CAPAB_IPSEC_ENCR_DES
+Encryption using DES.
+.TP
+.B DL_CAPAB_IPSEC_ENCR_3DES
+Encryption using triple-DES.
+.TP
+.B DL_CAPAB_IPSEC_ENCR_BLOWFISH
+Encryption using Blowfish.
+.TP
+.B DL_CAPAB_IPSEC_ENCR_AES
+Encryption using AES.
+.RE
+.TP
+.I sadb_sa_flags
+Conveys the security algorithm flags.  This field can have zero or more of the
+following flags:
+.RS
+.TP
+.B DL_CAPAB_ALG_ENABLE
+.RE
+.TP
+.I sadb_key_len_a
+Conveys the authentication key length in bytes.
+.TP
+.I sadb_key_bits_a
+Conveys the authentication key length in bits.
+.TP
+.I sadb_key_data_a
+Conveys the authentication key.
+.TP
+.I sadb_key_len_e
+Conveys the encryption key length in bytes.
+.TP
+.I sadb_key_bits_e
+Conveys the encryption key length in bits
+.TP
+.I sadb_key_data_e
+Conveys the encryption key.
+.RE
+.\"
+.\"
+.SH MODE
+This primitive is valid in
+any
+mode.
+.\"
+.\"
+.SH STATE
+.PP
+The message is valid in any state other than state
+.BR DL_UNATTACHED .
+.\"
+.\"
+.SH "NEW STATE"
+.PP
+The resulting state remains the same.
+.\"
+.\"
+.SH RESPONSE
+.PP
+If the request is successful,
+.BR DL_CONTROL_ACK (7)
+is issued to the DLS user.
+If the request fails, message
+.BR DL_ERROR_ACK (7)
+is returned and the resulting state is unchanged.
+.\"
+.\"
+.SH ERRORS
+.PP
+.TP 16
+.B DL_ACCESS
+The DLS user did not have proper permission to make the request.
+.TP
+.B DL_OUTSTATE
+The primitive was issued from an invalid state.
+.TP
+.B DL_SYSERR
+A system error has occurred and the Linux system error is indicated in the
+.BR DL_ERROR_ACK (7).
+.\"
+.\"
+.SH NOTICES
+.PP
+.B DL_CONTROL_REQ
+is a
+.IR Solaris \(rg-specific
+primitive.  It might be necessary to define C preprocessor symbol
+.BR _SUN_SOURCE
+before including the
+.RB < sys/dlpi.h >
+header file,
+or it might be necessary to include the
+.RB < sys/dlpi_sun.h >
+header file,
+to expose the declarations and structures associated with this primitive.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR DL_CONTROL_ACK (7),
+.BR DL_CAPABILITY_REQ (7),
+.BR DL_CAPABILITY_ACK (7),
+.BR DL_ERROR_ACK (7),
+.BR dlpi (7),
+.BR dlpi_ioctl (4),
+.BR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B DL_CONTROL_REQ
+is compatible with
+.IR Solaris \(rg,
+.[
+soldoc11
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B DL_CONTROL_REQ
+is a
+.IR Solaris \(rg-specific
+primitive that is not part of the DLPI standard.
+.[
+dlpi revision 2.0.0 draft 2
+.]
+It should not be used by portable DLPI programs.
+.IP \(em
+.B DL_CONTROL_REQ
+is provided by
+.B @PACKAGE_TITLE@
+for source compatibility with DLS Providers and Users written for use with
+.IR Solaris \(rg,
+and for porting DLS Providers and Users from
+.IR Solaris \(rg
+to
+.IR Linux \(rg.
+Binary compatibility is not attempted.  Any binary compatibility experienced may be
+removed from the next release.
+.PP
+See
+.BR dlpi (7),
+.BR dlpi_ioctl (4),
+.BR STREAMS (9),
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+None.
+.\"
+.\"
+.SH HISTORY
+.PP
+The Data Link Provider Interface
+.[
+dlpi revision 2.0.0 draft 2
+.]
+first appeared in SVR 4.
+.[
+svr4
+.]
+.PP
+.B DL_CONTROL_REQ
+was first documented in
+.IR Solaris \(rg .
+.[
+soldoc11
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.T2

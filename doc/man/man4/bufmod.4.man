@@ -1,0 +1,917 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH BUFMOD 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Modules"
+.\"
+.\"
+.SH NAME
+.B bufmod
+\- \fISTREAMS\fR buffer module
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 8
+.BI "int " fd ;
+.PD 0
+.HP
+.BI "int open(" \*(lq\fR/dev/nuls\fP\*(rq ", " \fR0\fP );
+.HP
+.BI "int ioctl(" fd ", " I_PUSH ", " \*(lqbufmod\*(rq );
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B bufmod
+is a
+.I STREAMS
+module that is pushed over any
+.IR Stream ,
+.IR STREAMS -based
+.BR pipe (4)
+or
+.IR STREAMS -based
+.BR fifo (4s).
+.PP
+Aside from being a
+.I STREAMS
+module,
+.B bufmod
+performs no actions (by default) other than to perform flow control and
+queueing of messages.
+All messages passed from the
+.I Stream head
+toward the
+.B bufmod
+module, (except
+.BR M_IOCTL (9)
+message with input-output controls recognized by the module),
+are passed on downstream from the
+.B bufmod
+write-side
+.B put
+procedures (with
+.BR putnext (9))
+when flow control conditions are not in effect.  When flow controlled,
+messages are placed on the write-side queue to be scheduled from the module's
+.B service
+procedure.
+All messages received from the driver are passed upstream from the read-side
+.B put
+procedure, or scheduled for the read-side
+.B service
+procedure under flow control.
+This is the default behaviour.
+.PP
+However, when the input-output controls recognized by the module are used to
+alter the behaviour of the module, it performs as follows:
+.\"
+.SS Read-Side Behaviour
+.PP
+The read side behaviour of the
+.B bufmod
+module is as follows:
+.TP
+.BR M_DATA (9)
+When an
+.BR M_DATA (9)
+message is received, and the snapshot length is set to a value greater than
+zero, the message is truncated to the snapshot length.
+.IP ""
+The total length of the message is then calculated considering whether
+headers are to be prepended and the message padded.  When the total size of
+the message added to the read queue would cause the read queue to be full
+(considering the high water mark setting for the queue), the message is
+dropped and counted.  This permits the module to always return true to
+.BR bcanputnext (9)
+tests made by the driver below, and to encourage the driver not to drop
+messages due to flow control.  When the queue would not become full, the read
+put procedure proceeds with the actions described in the paragraphs that
+follow.
+.IP ""
+When the
+.B SB_NO_HEADER
+flag is clear,
+a time-stamp is taken for the message,
+the message is padded to the size of a
+.B ulong
+for alignment and a packet header is prepended to the message.  The packet
+header is the
+.B sb_hdr
+structure, defined in
+.IR <sys/bufmod.h>,
+formatted as follows:
+.RS
+.RS
+.sp
+.nf
+\fC\s-1\
+struct sb_hdr {
+        uint_t sbh_origlen;
+        uint_t sbh_msglen;
+        uint_t sbh_totlen;
+        uint_t sbh_drops;
+#if defined(_LP64)  || defined (_I32LPx)
+        struct timeval32 sbh_timestamp;
+#else
+        struct timeval sbh_timestamp;
+#endif
+};
+\s+1\fP
+.fi
+.RE
+.PP
+The
+.B sb_hdr
+structure contains the following fields:
+.TP
+.I sbh_origlen
+The original length of the message, after
+.BR M_PROTO (9)
+conversion, before it was truncated to the snapshot length (if any).
+.TP
+.I sbh_msglen
+The length of the message, after
+.BR M_PROTO (9)
+conversion, but after truncation to the snapshot length (if any).
+.TP
+.I sbh_totlen
+The total length of this packet header, the truncated message length, and the
+padding necessary for alignment.  This is the offset from the start of
+the packet header of the next packet header within a chunk.
+.TP
+.I sbh_drops
+The number of messages that were dropped before this message was sent
+upstream.
+.TP
+.I sbh_timestamp
+The time-stamp that was taken when the message arrived at the module.  Note
+that this is always the 32-bit version of a
+.B timeval
+structure.  See
+.BR gettimeofday (3)
+for a description of this structure.
+.RE
+.IP ""
+When the
+.B SB_NO_HEADER
+flag is set, the header is not prepended and the message is not padded.  The
+truncated message is set as is.  In this case, the module does not trouble
+itself to take the time-stamp.
+.IP ""
+The adjusted
+.BR M_DATA (9)
+message is then placed on the read queue.  The read queue is no-enabled using
+the
+.BR noenable (9)
+.I STREAMS
+utility function, which means that the read queue's service procedure is not
+automatically enabled when normal priority messages are placed on the queue.
+.IP ""
+If there is sufficient normal data on the queue to form a complete chunk, the
+timer is cancelled and the queue is enabled with
+.BR qenable (9)
+to invoke the read service procedure.  Otherwise, if the timeout is set to a
+value greater than zero and the timer is not already running, it is started.
+If the
+.B SB_DEFER_CHUNK
+flag is set, and the first packet has not yet been received, the queue is
+enabled with
+.BR qenable (9)
+to deliver the first message of the timeout period.
+.IP ""
+When the read service procedure runs, messages are taken from the queue and
+delivered upstream as per normal and required for
+.I STREAMS
+modules; however, any consecutive
+.BR M_DATA (9)
+messages retrieved from the queue are concatenated into a single
+.BR M_DATA (9)
+message of no more than the chunk size.
+.TP
+.BR M_PROTO (9)
+When the
+.B SB_NO_PROTO_CVT
+flag is set, normal priority (band=0)
+.BR M_PROTO (9)
+messages are handled as described below under
+.RI \*(lq Other\ Data\ Block\ Types .\*(rq
+When the
+.B SB_NO_PROTO_CVT
+flag is clear, normal priority (band=0)
+.BR M_PROTO (9)
+messages are converted to
+.BR M_DATA (9)
+messages and handled as described above under
+.RI \*(lq M_DATA(9) .\*(rq
+.IP ""
+When the
+.B SB_HIPRI_OOB
+flag is clear, high priority (band>0)
+.BR M_PROTO (9)
+messages are treated the same as normal priority (band=0)
+.BR M_PROTO (9)
+messages (considering the setting of the
+.B SB_NO_PROTO_CVT
+flag).
+When the
+.B SB_HIPRI_OOB
+flag is set, high priority (band>0)
+.BR M_PROTO (9)
+messages are handled as described below under
+.RI \*(lq Other\ Data\ Block\ Types ,\*(rq
+(regardless of the setting of the
+.B SB_NO_PROTO_CVT
+flag).
+.BR
+.TP
+.BR M_FLUSH (9)
+.BR M_FLUSH (9)
+messages are handled in accordance with the requirements for
+.I STREAMS
+modules; however, whenever normal priority (band=0) messages are flushed, the timeout is
+cancelled and the internal state is reset.
+.TP
+.BR M_PCSIG (9)
+.BR M_PCSIG (9)
+messages are placed on the read queue (enabling its service procedure) by a
+timeout of the timer (when the set timeout is non-zero).  This enables the
+read service procedure on timeout, permitting it to deliver as much of a
+chunk of data as possible.
+.IP ""
+As these messages are placed directly onto the read queue, any
+.BR M_PCSIG (9)
+messages received from above are passed downstream directly from the read put
+procedure and will not disrupt the timer mechanism.
+.TP
+.B Other Data Block Types
+Other data block types are passed through the module in accordance with the
+requirements for
+.I STREAMS
+modules.
+However, whenever a normal priority (band=0) message is passed upstream, the timeout
+is cancelled and any accumulated
+.BR M_DATA (9)
+messages are immediately sent upstream (ahead of the normal priority (band=0)
+message).
+Priority control messages (such as
+.BR M_PCPROTO "(9) or " M_PCSIG (9)
+messages are always passed upstream, affecting neither the chunking nor
+delivery of
+.BR M_DATA (9)
+messages.
+.\"
+.SS Write-Side Behaviour
+.PP
+The write side behaviour of the
+.B bufmod
+module is as follows:
+When the
+.B SB_SEND_ON_WRITE
+flag is set, upon the arrival of any message to the write queue, the timer is
+cancelled (when the timeout is greater than zero) and the read queue is
+enabled with
+.BR qenable (9).
+The message is then handled as follows:
+.TP
+.BR M_IOCTL (9)/ M_IOCDATA (9)
+These input-output control messages as processed as normal for
+.I STREAMS
+modules.  Input-output control commands that are recognized by the module
+(listed below under
+.RI \*(lq IOCTLS \*(rq)
+are intercepted and processed.  All other input-output control commands are
+passed down to the driver.
+.TP
+.BR M_READ (9)
+When the
+.B SB_NO_MREAD
+flag is clear, the Stream head is set to deliver
+.BR M_READ (9)
+messages to the module.  Upon receipt of an
+.BR M_READ (9)
+message, the module remembers the message and enables the read queue with
+.BR qenable (9).
+When the read queue service procedure runs, the
+.BR M_READ (9)
+message is examined to determine the number of bytes upon which the Stream
+head has blocked (contained in the
+.B ulong
+in the
+.BR M_READ (9)
+message body), and consecutive
+.BR M_DATA (9)
+messages are chunked together to a maximum of the
+.BR M_READ (9)
+size, and delivered upstream.
+.TP
+.BR M_FLUSH (9)
+.BR M_FLUSH (9)
+messages on the write-side are handled in accordance with the requirements
+for
+.I STREAMS
+modules, without deviation.
+.TP
+.B Other Data Block Types
+Other data block types are passed along downstream to the driver in full
+accordance with the requirements for
+.I STREAMS
+modules, also considering flow control.
+.\"
+.\"
+.SH IOCTLS
+.PP
+The following subsections detail the
+.BR ioctl (2s)
+commands that are made available by pushing the
+.B bufmod
+module.
+.PP
+.B bufmod
+only supports the
+.I I_STR
+version of the IO controls and does not support transparent IO controls.  For
+more information, see the
+.IR I_STR (7)
+or the
+.I I_STR
+subsection of
+.BR streamio (7).
+.\"
+.\"
+.SS SBIOCSTIME (('B' << 8) + 1)
+.PP
+This input-output control is used to set the maximum interval of time that
+the
+.B bufmod
+module will await messages completing a chunk before delivering the
+incomplete chunk.  When specified as zero (0),
+.B bufmod
+will interpret the value as meaning an indefinite period of time, defeating
+the timeout mechanism.  That is, all chunks will be held until they are
+complete, or another mechanism (e.g. write side message, read-side
+.BR M_PCPROTO (9)
+message) causes the delivery of the chunk.
+.PP
+.I arg
+is a pointer to a (native sized)
+.B timeval
+structure specifying the duration of time to wait.
+See
+.BR gettimeofday (2)
+for a description of the
+.B timeval
+structure.
+See
+.BR M_IOCTL (9)
+for a description of how
+.I @PACKAGE_TITLE@
+handles 32-bit user space input-output controls to a 64-bit kernel.
+.\"
+.SS SBIOCGTIME (('B' << 8) + 2)
+.PP
+This input-output control is used to retrieve the maximum interval of time
+that the
+.B bufmod
+module will await messages completing a chunk before delivering an incomplete
+chunk.  This is the value that was set with
+.I SBIOCSTIME
+or cleared with
+.IR SBIOCCTIME .
+.PP
+.I arg
+is a pointer to a (native sized)
+.B timeval
+structure into which to retrieve the current duration of time to wait.
+See
+.BR gettimeofday (2)
+for a description of the
+.B timeval
+structure.
+.PP
+The initial value of the timeout is indefinite (disabled), so that chunks are
+only delivered when they are full.
+.\"
+.SS SBIOCCTIME (('B' << 8) + 3)
+.PP
+This input-output control clears to zero (0) the maximum interval of time
+that the
+.B bufmod
+module will await messages completing a chunk before delivering an incomplete
+chunk.  The value of zero (0) is interpreted by
+.B bufmod
+to mean an indefinite period of time and, therefore, this value defeats the
+time period mechanism altogether.
+Note that there is no usable non-zero default timeout period, and the module,
+when pushed, therefore defaults to zero (0).
+.PP
+Note that clearing the timeout to zero (0) using this input-output control
+will also force the chunk size to zero (0), defeating the buffering mechanism
+altogether.  The state of the buffer flags; however, remains the same (i.e.
+headers are prepended or
+.BR M_PROTO (9)
+blocks converted as before).
+.PP
+.I arg
+is unused and ignored.
+.\"
+.SS SBIOCSCHUNK (('B' << 8) + 4)
+.PP
+This input-output control is used to set the chunk size.  The chunk size is
+the maximum size to which
+.B bufmod
+will coalesce packets.  Any packet that, when added to an existing, partially
+filled chunk, will increase its size beyond this maximum will be delivered
+before further considering the received packet.  When set to zero (0), chunk
+accumulation is effectively disabled and each packet is delivered as soon as
+possible.
+.PP
+.I arg
+is a pointer to an
+.B unsigned int
+specifying the chunk size.
+.PP
+The initial chunk size is set to
+.BR SB_DFLT_CHUNK ,
+which is set to
+.B 8192
+in the
+.I <sys/bufmod.h>
+header file.
+.\"
+.SS SBIOCGCHUNK (('B' << 8) + 5)
+.PP
+This input-output control is used to retrieve the maximum chunk size, the
+maximum size to which
+.B bufmod
+will coalesce packets.
+.PP
+.I arg
+is a pointer to an
+.B unsigned int
+into which to retrieve the current chunk size.
+.\"
+.SS SBIOCSSNAP (('B' << 8) + 6)
+.PP
+This input-output control is used to set the snapshot length.  This is the
+maximum length of the packet (with or without a converted
+.BR M_PROTO (9)
+message block) that will be passed to the chunk and onward upstream.  Setting
+a snapshot length of zero (0) is interpreted as indefinite and equivalent to
+not truncating any message.
+.PP
+.I arg
+is a pointer to an
+.B unsigned long
+specifying the snapshot length.
+.PP
+The initial snapshot length is set to zero (0), meaning that no message
+truncation will occur.
+.\"
+.SS SBIOCGSNAP (('B' << 8) + 7)
+.PP
+This input-output control is used to retrieve the snapshot length.  This is
+the maximum length of the packet (with or without a converted
+.BR M_PROTO (9)
+message block) that will be passed to the chunk and onward upstream.  It is
+the value that was set with
+.IR SBIOCSSNAP .
+.PP
+.I arg
+is a pointer to an
+.B unsigned long
+into which to retrieve the current snapshot length.
+.\"
+.SS SBIOCSFLAGS (('B' << 8) + 8)
+.PP
+.I arg
+is a pointer to an
+.B unsigned long
+specifying the buffer flags.
+The buffer flags may be a bitwise OR of any of the following flags:
+.TP
+.I SB_SEND_ON_WRITE
+When this bit is set, it specifies that accumulated chunks are to be delivered
+immediately upon the reception of any
+.I STREAMS
+message on the write queue.
+.IP ""
+This feature permits the upper layer module or user to specify when packets
+should be collected on demand regardless of the state of the chunk and its
+associated timeouts.  It is possible to combine this mechanism with blocking
+reads using
+.BR read "(2s) and " readv (2s)
+by invoking read notifications using
+.BR M_READ (9)
+messages.
+.IP ""
+The original implementation of
+.B bufmod
+did not have this feature and it is, therefore, disabled by default.
+.TP
+.I SB_NO_HEADER
+When this bit is set, it specifies that headers are not to be prepended to
+accumulated messages.
+.IP ""
+When headers are disabled using this feature, the reader of chunks must have
+some other mechanism that may be used to determine where the concatenated
+packets begin and end, as well as the time-stamp associated with each message.
+(For example, a converted
+.BR M_PROTO (9)
+message block may contain the necessary information, or it might be contained
+in the message headers or pseudo header).
+.IP ""
+The original implementation of
+.B bufmod
+did not have this feature and it is, therefore, disabled by default.
+.TP
+.I SB_NO_PROTO_CVT
+When this bit is set, it specifies that
+.BR M_PROTO (9)
+message blocks are not to be converted to
+.BR M_DATA (9)
+message blocks.
+When enabled, and an
+.BR M_PROTO (9)
+message is received, it will be treated as other messages: i.e. causing the
+closure and dispatch of any accumulating chunk before the
+.BR M_PROTO (9)
+message itself is delivered upstream.
+.IP ""
+This feature is useful when it is known that data messages are received only
+in
+.BR M_DATA (9)
+message blocks and that any
+.BR M_PROTO (9)
+message needs to be delivered separated from the data stream.
+.IP ""
+The original implementation of
+.B bufmod
+did not have this feature and it is, therefore, disabled by default.
+.TP
+.I SB_DEFER_CHUNK
+When this bit is set, it specifies that the initial message received within
+the timeout period is to be delivered immediately, deferring chunk
+accumulation start until the second message arrival within the time interval.
+.IP ""
+This feature helps deliver packets immediately during extended periods of
+very low traffic.  When the traffic drops to one packet per timeout period,
+the packets will be delivered immediately regardless of the chunking
+mechanism.
+.IP ""
+The original implementation of
+.B bufmod
+did not have this feature and it is, therefore, disabled by default.
+.TP
+.I SB_NO_DROPS
+When this bit is set, the module will exert downstream flow control (when
+flow controlled from upstream) rather than dropping messages.  (In fact,
+Sun's implementation forces chunks upstream against flow control rather than
+exerting downstream flow control.)  Also, if a message block allocation
+fails, it will invoke bufcall procedures rather than discarding messages.
+(In fact, Sun's implementation drops messages on message block allocation
+failures regardless of the settings of the flag.)
+.IP ""
+The original implementation of
+.B bufmod
+did not have this feature and it is, therefore, disabled by default.
+.TP
+.I SB_HIPRI_OOB
+When this bit is set, the module will deliver high priority (band>0)
+.BR M_PROTO (9)
+messages in their priority band without conversion, regardless of the setting
+of the
+.B SB_NO_PROTO_CVT
+flag.
+.IP ""
+This is a
+.B @PACKAGE_TITLE@
+specific flag and should not be used by portable applications.
+.IP ""
+The original implementation of
+.B bufmod
+did not have this feature and it is, therefore, disabled by default.
+.TP
+.I SB_NO_MREAD
+When this bit is set, the module will not set the Stream head to deliver
+.BR M_READ (9)
+messages.
+.IP ""
+Delivery of
+.BR M_READ (9)
+messages helps to deliver packets at the rate at which the application can
+accept them rather than over-chunking when chunking is not required.  When
+the application would block, a
+.BR M_READ (9)
+message is sent downstream to signal the module to deliver what packets are
+available.
+.IP ""
+The original implementation of
+.B bufmod
+did not have this feature; however, it is compatible with the original
+implementation and is disabled by default (that is,
+.BR M_READ (9)
+messages are sent by default).
+.PP
+The initial value of all flags is clear (0).  This is equivalent to the old,
+flagless behavior of ancient
+.B bufmod
+implementations.  See
+.RI \*(lq HISTORY \*(rq,
+below.
+.\"
+.SS SBIOCGFLAGS (('B' << 8) + 9)
+.PP
+This input-output control is used to retrieve the user flags.  This is the
+value that was set with
+.IR SBIOCSFLAGS .
+.PP
+.I arg
+is a pointer to an
+.B unsigned long
+into which to retreive the current buffer flags.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+When a non-zero chunk size is set,
+.B bufmod
+sends a
+.BR M_SETOPTS (9)
+message to the Stream head to set the high water mark,
+.BR so_hiwat ,
+large enough to accommodate the chunk.  Otherwise, harmful interactions
+between flow control and message dropping could result.
+It also sets the maximum read packet size,
+.BR so_maxpsz ,
+large enough to accommodate the chunk so that parts of the chunk do not get
+truncated.
+.\"
+.\"
+.SH CAVEATS
+.PP
+Note that the setting of the read options at the Stream head can
+significantly affect performance when using
+.BR read "(2s) or " readv (2s)
+to read chunks from the Stream head.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR gettimeofday (2),
+.BR M_DATA (9),
+.BR M_PROTO (9),
+.BR M_PCPROTO (9),
+.BR M_IOCTL (9),
+.BR I_STR (7),
+.BR streamio (7),
+.BR pfmod (4),
+.BR dlpi (7).
+.\"
+.\"
+.SH BUGS
+.PP
+.B bufmod
+has been tested with the
+.BR test-bufmod (8)
+conformance test suite executable.
+.PP
+.B bufmod
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B bufmod
+is compatible with
+.BR SunOS \(rg,
+.BR Solaris \(rg,
+.[
+soldoc
+.]
+.BR AIX \(rg,
+.[
+aixdoc
+.]
+.BR HP-UX \(rg,
+.[
+hpuxdoc
+.]
+and systems based on Oracle Solaris\(rg, with the following portability
+considerations:
+.IP \(em \w'\(em\(em'u
+The version of
+.B bufmod
+documented in 1992 for SunOS\(rg 5.x did not have defined buffer flags and
+did not contain the
+.IR SBIOCSFLAGS " and " SBIOCGFLAGS
+input-output controls.  The
+.B bufmod
+documented without flags behaved as though the flags were set to the
+following values:
+.RS
+.TP \w'\fISB_SEND_ON_WRITE\(em'u
+.I SB_SEND_ON_WRITE
+clear.
+.PD 0
+.TP
+.I SB_NO_HEADER
+clear.
+.TP
+.I SB_NO_PROTO_CVT
+clear.
+.TP
+.I SB_DEFER_CHUNK
+clear.
+.TP
+.I SB_NO_DROPS
+clear.
+.TP
+.I SB_HIPRI_OOB
+clear.
+.TP
+.I SB_NO_MREAD
+set.
+.PD
+.RE
+.IP \(em
+The original
+.B nit_buf
+input-output controls were named:
+.RS
+.TP \w'\fBNIOCGCHUNK\(em'u
+.B NIOCSTIME
+equivalent to
+.IR SBIOCSTIME .
+.PD 0
+.TP
+.B NIOCGTIME
+equivalent to
+.IR SBIOCGTIME .
+.TP
+.B NIOCCTIME
+equivalent to
+.IR SBIOCCTIME .
+.TP
+.B NIOCSCHUNK
+equivalent to
+.IR SBIOCSCHUNK .
+.TP
+.B NIOCGCHUNK
+equivalent to
+.IR SBIOCGCHUNK .
+.PD
+.PP
+The implementation in
+.I @PACKAGE_TITLE@
+defines these older input-output controls for backwards compatibility.
+.RE
+.PP
+Compatibility is tested using the
+.BR test-bufmod (8)
+test case executable and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Network interface taps, raw sockets and DLPI drivers have never been an
+interesting subject for standards organizations such as IEEE and the
+OpenGroup, and these modules have never been subjected to formal
+standardization.
+.B bufmod
+conforms largely to the descriptions provided in the manual pages for
+Solaris and AIX.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B bufmod
+appears in SunOS\(rg 5.x in 1991-2.
+It was provided in SunOS\(rg 5.x to replace the
+.BR nit_buf
+component of the Network Interface Tap pseudo-device driver from SunOS\(rg
+4.x as SunOS\(rg 5.x moved to real, DLPI-based
+.[
+dlpi 2.0.0
+.]
+network device drivers.  The other two components were the
+.B nit_if
+pseudo device driver that was replaced by
+.BR dlpi (7),
+and the
+.B nit_pf
+packet filter module that was replaced by
+.BR pfmod (4).
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

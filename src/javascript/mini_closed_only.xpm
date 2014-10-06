@@ -1,0 +1,23 @@
+/* XPM */
+static char * mini_closed_only_xpm[] = {
+"16 16 4 1",
+" 	c None",
+"a	c black",
+"b	c gray50",
+"c	c white",
+"                  ",
+"                  ",
+"                  ",
+"    aaaaaaaaa     ",
+"    accccccca     ",
+"    acccaccca     ",
+"    acccaccca     ",
+"    acaaaaacabbbbb",
+"    acccaccca     ",
+"    acccaccca     ",
+"    accccccca     ",
+"    aaaaaaaaa     ",
+"                  ",
+"                  ",
+"                  ",
+"                  "};

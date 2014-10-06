@@ -1,0 +1,1782 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: DDI.9.man,v 1.1.2.3 2011-02-07 02:18:33 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:33 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: DDI.9.man,v $
+.\" Revision 1.1.2.3  2011-02-07 02:18:33  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH DDI 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B DDI/DKI
+\- Device Driver Interface/Driver Kernel Interface
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 12
+.B #include <sys/dki.h>
+.PD 0
+.HP 12
+.B #include <sys/stropts.h>
+.HP 12
+.B #include <sys/stream.h>
+.HP 12
+.B #include <sys/strconf.h>
+.HP 12
+.B #include <sys/kmem.h>
+.HP 12
+.B #include <sys/cmn_err.h>
+.HP 12
+.B #include <sys/ddi.h>
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR DDI/DKI .
+.\"
+.\"
+.SH OVERVIEW
+.PP
+The DDI is the Device Driver Interface.  It provides a set of utility
+functions that can be used by device drivers.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.SS "Linux Kernel API Functions"
+.PP
+.TP
+.BR add_timer "(9),
+.PD 0
+.TP
+.BR atomic_add "(9),
+.TP
+.BR atomic_dec "(9),
+.TP
+.BR atomic_dec_and_test "(9),
+.TP
+.BR atomic_inc "(9),
+.TP
+.BR atomic_read "(9),
+.TP
+.BR atomic_set "(9),
+.TP
+.BR atomic_sub "(9),
+.TP
+.BR check_region "(9),
+.TP
+.BR cli "(9),
+.TP
+.BR del_timer "(9),
+.TP
+.BR disable_irq "(9),
+.TP
+.BR do_fattach "(9),
+.TP
+.BR do_fdetach "(9),
+.TP
+.BR do_gettimeofday "(9),
+.TP
+.BR do_pipe "(9),
+.TP
+.BR do_settimeofday "(9),
+.TP
+.BR down_interruptible "(9),
+.TP
+.BR enable_irq "(9),
+.TP
+.BR free_dma "(9),
+.TP
+.BR free_irq "(9),
+.TP
+.BR interruptible_sleep_on "(9),
+.TP
+.BR ioremap "(9),
+.TP
+.BR ioremap_nocache "(9),
+.TP
+.BR iounmap "(9),
+.TP
+.BR jiffies "(9),
+.TP
+.BR kfree "(9),
+.TP
+.BR kill_pg "(9),
+.TP
+.BR kill_proc "(9),
+.TP
+.BR kmalloc "(9),
+.TP
+.BR kmem_free "(9),
+.TP
+.BR kmem_zalloc "(9),
+.TP
+.BR local_irq_restore "(9),
+.TP
+.BR local_irq_save "(9),
+.TP
+.BR MOD_DEC_USE_COUNT); "(9),
+.TP
+.BR MOD_INC_USE_COUNT); "(9),
+.TP
+.BR pci_alloc_consistent "(9),
+.TP
+.BR pcibios_find_class "(9),
+.TP
+.BR pcibios_find_device "(9),
+.TP
+.BR pcibios_init "(9),
+.TP
+.BR pcibios_present "(9),
+.TP
+.BR pcibios_read_config_byte "(9),
+.TP
+.BR pcibios_read_config_dword "(9),
+.TP
+.BR pcibios_read_config_word "(9),
+.TP
+.BR pcibios_write_config_byte "(9),
+.TP
+.BR pcibios_write_config_dword "(9),
+.TP
+.BR pcibios_write_config_word "(9),
+.TP
+.BR pci_dac_dma_supported "(9),
+.TP
+.BR pci_dac_dma_sync_single "(9),
+.TP
+.BR pci_dac_dma_to_page "(9),
+.TP
+.BR pci_dac_page_to_dma "(9),
+.TP
+.BR pci_dac_set_dma_mask "(9),
+.TP
+.BR pci_disable_device "(9),
+.TP
+.BR pci_dma_supported "(9),
+.TP
+.BR pci_dma_sync_sg "(9),
+.TP
+.BR pci_dma_sync_single "(9),
+.TP
+.BR pci_enable_device "(9),
+.TP
+.BR pci_find_class "(9),
+.TP
+.BR pci_find_device "(9),
+.TP
+.BR pci_find_slot "(9),
+.TP
+.BR pci_free_consistent "(9),
+.TP
+.BR pci_map_page "(9),
+.TP
+.BR pci_map_sg "(9),
+.TP
+.BR pci_map_single "(9),
+.TP
+.BR pci_module_init "(9),
+.TP
+.BR pci_read_config_byte "(9),
+.TP
+.BR pci_read_config_dword "(9),
+.TP
+.BR pci_read_config_word "(9),
+.TP
+.BR pci_set_dma_mask "(9),
+.TP
+.BR pci_set_master "(9),
+.TP
+.BR pci_unmap_page "(9),
+.TP
+.BR pci_unmap_sg "(9),
+.TP
+.BR pci_unmap_single "(9),
+.TP
+.BR pci_unregister_driver "(9),
+.TP
+.BR pci_write_config_byte "(9),
+.TP
+.BR pci_write_config_dword "(9),
+.TP
+.BR pci_write_config_word "(9),
+.TP
+.BR phys_to_virt "(9),
+.TP
+.BR printk "(9),
+.TP
+.BR read_lock "(9),
+.TP
+.BR read_lock_irq "(9),
+.TP
+.BR read_lock_irqsave "(9),
+.TP
+.BR read_unlock "(9),
+.TP
+.BR read_unlock_irq "(9),
+.TP
+.BR read_unlock_irqrestore "(9),
+.TP
+.BR release_region "(9),
+.TP
+.BR request_dma "(9),
+.TP
+.BR request_irq "(9),
+.TP
+.BR request_module "(9),
+.TP
+.BR request_region "(9),
+.TP
+.BR rwlock_init "(9),
+.TP
+.BR sema_init "(9),
+.TP
+.BR sg_dma_address "(9),
+.TP
+.BR sg_dma_len "(9),
+.TP
+.BR sleep_on "(9),
+.TP
+.BR spin_is_locked "(9),
+.TP
+.BR spin_lock "(9),
+.TP
+.BR spin_lock_init "(9),
+.TP
+.BR spin_lock_irq "(9),
+.TP
+.BR spin_lock_irqsave "(9),
+.TP
+.BR spin_trylock "(9),
+.TP
+.BR spin_unlock "(9),
+.TP
+.BR spin_unlock_irq "(9),
+.TP
+.BR spin_unlock_irqrestore "(9),
+.TP
+.BR sti "(9),
+.TP
+.BR sys_mknod "(9),
+.TP
+.BR sys_mount "(9),
+.TP
+.BR sys_umount "(9),
+.TP
+.BR sys_unlink "(9),
+.TP
+.BR udelay "(9),
+.TP
+.BR up "(9),
+.TP
+.BR verify_area "(9),
+.TP
+.BR vfree "(9),
+.TP
+.BR virt_to_phys "(9),
+.TP
+.BR vmalloc "(9),
+.TP
+.BR vsprintf "(9),
+.TP
+.BR wake_up "(9),
+.TP
+.BR wake_up_interruptible "(9),
+.TP
+.BR write_lock "(9),
+.TP
+.BR write_lock_irq "(9),
+.TP
+.BR write_lock_irqsave "(9),
+.TP
+.BR write_unlock "(9),
+.TP
+.BR write_unlock_irq "(9),
+.TP
+.BR write_unlock_irqrestore "(9).
+.PD
+.\"
+.\"
+.\".SH "RETURN VALUES"
+.\".PP
+.\"
+.\"
+.\".SH "ERROR HANDLING"
+.\".PP
+.\"
+.\"
+.SH CONTEXT
+.PP
+DDI functions can be called from various contexts.  See the paricular manual
+page for more information.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+All DDI functions are MP safe.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR STREAMS (9).
+.\"
+.\"
+.SH "COMPATIBILITY FUNCTIONS"
+.PP
+.SS "Linux Fast-STREAMS Compatibility Functions"
+.PP
+.B Implemented Functions
+.PP
+The following
+.I SVR 4
+functions are implemented in the base functionality of
+.B Linux Fast-STREAMS
+to support simple \fISTREAMS\fR programming techniques:
+.PP
+.TP
+.BR bcopy "(9),
+.PD 0
+.TP
+.BR bzero "(9),
+.TP
+.BR cmn_err "(9),
+.TP
+.BR copyin "(9),
+.TP
+.BR copyout "(9),
+.TP
+.BR delay "(9),
+.TP
+.BR drv_getparm "(9),
+.TP
+.BR drv_hztomsec "(9),
+.TP
+.BR drv_hztousec "(9),
+.TP
+.BR drv_msectohz "(9),
+.TP
+.BR drv_priv "(9),
+.TP
+.BR drv_usectohz "(9),
+.TP
+.BR drv_usecwait "(9),
+.TP
+.BR getmajor "(9),
+.TP
+.BR getminor "(9),
+.TP
+.BR kmem_alloc "(9),
+.TP
+.BR kmem_free "(9),
+.TP
+.BR kmem_zalloc "(9),
+.TP
+.BR makedevice "(9),
+.TP
+.BR max "(9),
+.TP
+.BR min "(9),
+.TP
+.BR timeout "(9),
+.TP
+.BR untimeout "(9),
+.PD
+.\"
+.\"
+.SS "SVR 4.2 MP DDI/DKI Compatibility Functions"
+.PP
+The following
+.IR "SVR 3" ,
+.I SVR 4
+and
+.I SVR 4.2
+functions are implemented when
+.I SVR 4.2
+compatibility is selected when building the kernel.
+.PP
+.B Implemented Functions
+.PP
+.PP
+.TP
+.BR ASSERT "(9),
+.PD 0
+.TP
+.BR itimeout "(9),
+.TP
+.BR LOCK "(9),
+.TP
+.BR LOCK_ALLOC "(9),
+.TP
+.BR LOCK_DEALLOC "(9),
+.TP
+.BR major "(9),
+.TP
+.BR makedev "(9),
+.TP
+.BR minor "(9),
+.TP
+.BR sleep "(9),
+.TP
+.BR spl "(9),
+.TP
+.BR spl0 "(9),
+.TP
+.BR spl1 "(9),
+.TP
+.BR spl2 "(9),
+.TP
+.BR spl3 "(9),
+.TP
+.BR spl4 "(9),
+.TP
+.BR spl5 "(9),
+.TP
+.BR spl6 "(9),
+.TP
+.BR spl7 "(9),
+.TP
+.BR splbase "(9),
+.TP
+.BR spldisk "(9),
+.TP
+.BR splhi "(9),
+.TP
+.BR splstr "(9),
+.TP
+.BR spltimeout "(9),
+.TP
+.BR spltty "(9),
+.TP
+.BR splx "(9),
+.TP
+.BR SV_ALLOC "(9),
+.TP
+.BR SV_BROADCAST "(9),
+.TP
+.BR SV_DEALLOC "(9),
+.TP
+.BR SV_SIGNAL "(9),
+.TP
+.BR SV_WAIT "(9),
+.TP
+.BR SV_WAIT_SIG "(9),
+.TP
+.BR TRYLOCK "(9),
+.TP
+.BR UNLOCK "(9),
+.TP
+.BR wakeup "(9).
+.PD
+.PP
+.B Unimplemented Functions
+.PP
+The following
+.I SVR 4
+functions are not implemented here although they are
+mentioned in the \fISTREAMS\fR Programming Guide for
+.IR "SVR 4" .
+.[
+svr4spg
+.]
+Each of these
+functions has a suitable
+.B Linux
+Kernel API function.  Use the 
+.B Linux
+Kernel API function were possible instead:
+.PP
+.TP
+.BR biodone "(),
+.PD 0
+.TP
+.BR biowait "(),
+.TP
+.BR bp_mapin "(),
+.TP
+.BR bp_mapout "(),
+.TP
+.BR brelse "(),
+.TP
+.BR btop "(),
+.TP
+.BR btopr "(),
+.TP
+.BR clrbuf "(),
+.TP
+.BR freerbuf "(),
+.TP
+.BR geterror "(),
+.TP
+.BR getrbuf "(),
+.TP
+.BR page_numtopp "(),
+.TP
+.BR page_pptonum "(),
+.TP
+.BR ptob "(),
+.TP
+.BR rmalloc "(),
+.TP
+.BR rmfree "(),
+.TP
+.BR rminit "(),
+.TP
+.BR rmsetwant "(),
+.TP
+.BR rmwant "(),
+.TP
+.BR uiomove "(),
+.TP
+.BR ureadc "(),
+.TP
+.BR useracc "(),
+.TP
+.BR uwritec "(),
+.TP
+.BR vtop "().
+.PD
+.\"
+.\"
+.SS "AIX\(rg 5L Version 5.1 Compatibility Functions"
+.PP
+.IR "SVR 4.2 MP DDI/DKI"
+compatible functions should be selected above for AIX
+\fISTREAMS\fR compatibility.
+.\"
+.\"
+.SS "HP-UX\(rg 11.0i v2 Compatibility Functions"
+.PP
+.IR "SVR 4.2 MP DDI/DKI"
+compatible functions should be selected above for HP-UX
+\fISTREAMS\fR compatibility.
+.\"
+.\"
+.SS "OSF/1 1.2\(emDigial UNIX\(rg Compatibility Functions"
+.PP
+.IR "SVR 4.2 MP DDI/DKI"
+compatible functions should be selected above for OSF
+\fISTREAMS\fR compatibility.
+.\"
+.\"
+.SS "UnixWare\(rg 7.1.3 (OpenUnix 8) Compatibility Functions"
+.PP
+.PP
+.B Implemented Functions
+.PP
+.TP
+.BR ATOMIC_INT_ADD "(9),
+.PD 0
+.TP
+.BR ATOMIC_INT_ALLOC "(9),
+.TP
+.BR ATOMIC_INT_DEALLOC "(9),
+.TP
+.BR ATOMIC_INT_DECR "(9),
+.TP
+.BR ATOMIC_INT_INCR "(9),
+.TP
+.BR ATOMIC_INT_INIT "(9),
+.TP
+.BR ATOMIC_INT_READ "(9),
+.TP
+.BR ATOMIC_INT_SUB "(9),
+.TP
+.BR ATOMIC_INT_WRITE "(9),
+.TP
+.BR emajor "(9),
+.TP
+.BR eminor "(9),
+.TP
+.BR etoimajor "(9),
+.TP
+.BR getemajor "(9),
+.TP
+.BR geteminor "(9),
+.TP
+.BR itoemajor "(9),
+.TP
+.BR LOCK_OWNED "(9),
+.TP
+.BR RW_ALLOC "(9),
+.TP
+.BR RW_DEALLOC "(9),
+.TP
+.BR RW_RDLOCK "(9),
+.TP
+.BR RW_TRYRDLOCK "(9),
+.TP
+.BR RW_TRYWRLOCK "(9),
+.TP
+.BR RW_UNLOCK "(9),
+.TP
+.BR RW_WRLOCK "(9),
+.TP
+.BR SLEEP_ALLOC "(9),
+.TP
+.BR SLEEP_DEALLOC "(9),
+.TP
+.BR SLEEP_LOCK "(9),
+.TP
+.BR SLEEP_LOCKAVAIL "(9),
+.TP
+.BR SLEEP_LOCKOWNED "(9),
+.TP
+.BR SLEEP_LOCK_SIG "(9),
+.TP
+.BR SLEEP_TRYLOCK "(9),
+.TP
+.BR SLEEP_UNLOCK "(9),
+.TP
+.BR strcat "(9),
+.TP
+.BR strchr "(9),
+.TP
+.BR strcmp "(9),
+.TP
+.BR strcpy "(9),
+.TP
+.BR strlen "(9),
+.TP
+.BR strncat "(9),
+.TP
+.BR strncmp "(9),
+.TP
+.BR strncpy "(9),
+.TP
+.BR strtoul "(9),
+.PD
+.PP
+.PP
+.B Unimplemented Functions
+.PP
+.TP
+.BR add_intr_handler "(),
+.PD 0
+.TP
+.BR add_nmi_handler "(),
+.TP
+.BR all_io "(),
+.TP
+.BR archtobus "(),
+.TP
+.BR atomic "(),
+.TP
+.BR bcb_alloc "(),
+.TP
+.BR bcb_free "(),
+.TP
+.BR bcb_prep "(),
+.TP
+.BR bcmp "(),
+.TP
+.BR bdistributed "(),
+.TP
+.BR biocanblock "(),
+.TP
+.BR bioerror "(),
+.TP
+.BR bioreset "(),
+.TP
+.BR biowait_sig "(),
+.TP
+.BR bs_getval "(),
+.TP
+.BR btoc "(),
+.TP
+.BR buf_breakup "(),
+.TP
+.BR calldebug "(),
+.TP
+.BR call_demon "(),
+.TP
+.BR can_doio "(),
+.TP
+.BR cdistributed "(),
+.TP
+.BR clockb "(),
+.TP
+.BR cm_abort_trans "(),
+.TP
+.BR cm_addval "(),
+.TP
+.BR cm_AT_putconf "(),
+.TP
+.BR cm_begin_trans "(),
+.TP
+.BR cm_delkey "(),
+.TP
+.BR cm_delval "(),
+.TP
+.BR cm_devconfig_size "(),
+.TP
+.BR cm_end_trans "(),
+.TP
+.BR cm_getbrdkey "(),
+.TP
+.BR cm_getnbrd "(),
+.TP
+.BR cm_getval "(),
+.TP
+.BR cm_getversion "(),
+.TP
+.BR cm_intr_attach "(),
+.TP
+.BR cm_intr_detach "(),
+.TP
+.BR cm_newkey "(),
+.TP
+.BR cm_read_devconfig "(),
+.TP
+.BR cm_read_devconfig16 "(),
+.TP
+.BR cm_read_devconfig32 "(),
+.TP
+.BR cm_read_devconfig8 "(),
+.TP
+.BR cm_write_devconfig "(),
+.TP
+.BR cm_write_devconfig16 "(),
+.TP
+.BR cm_write_devconfig32 "(),
+.TP
+.BR cm_write_devconfig8 "(),
+.TP
+.BR copyio "(),
+.TP
+.BR cpass "(),
+.TP
+.BR db_alloc "(),
+.TP
+.BR db_read "(),
+.TP
+.BR db_write "(),
+.TP
+.BR deverr "(),
+.TP
+.BR devmem_mapin "(),
+.TP
+.BR devmem_mapout "(),
+.TP
+.BR devmem_ppid "(),
+.TP
+.BR devmem_size "(),
+.TP
+.BR disksort "(),
+.TP
+.BR dma_alloc "(),
+.TP
+.BR dma_breakup "(),
+.TP
+.BR dma_cascade "(),
+.TP
+.BR dma_disable "(),
+.TP
+.BR dma_enable "(),
+.TP
+.BR dma_free_buf "(),
+.TP
+.BR dma_free_cb "(),
+.TP
+.BR dma_get_best_mode "(),
+.TP
+.BR dma_get_buf "(),
+.TP
+.BR dma_get_cb "(),
+.TP
+.BR dma_pageio "(),
+.TP
+.BR dma_param "(),
+.TP
+.BR dma_physreq "(),
+.TP
+.BR dma_prog "(),
+.TP
+.BR dma_relse "(),
+.TP
+.BR dma_resid "(),
+.TP
+.BR dma_start "(),
+.TP
+.BR dma_stop "(),
+.TP
+.BR dma_swsetup "(),
+.TP
+.BR dma_swstart "(),
+.TP
+.BR do_biostart "(),
+.TP
+.BR do_devinfo "(),
+.TP
+.BR do_drvctl "(),
+.TP
+.BR do_ioctl "(),
+.TP
+.BR drv_attach "(),
+.TP
+.BR drv_callback "(),
+.TP
+.BR drv_close "(),
+.TP
+.BR drv_detach "(),
+.TP
+.BR drv_gethardware "(),
+.TP
+.BR drv_mmap "(),
+.TP
+.BR drv_munmap "(),
+.TP
+.BR drv_open "(),
+.TP
+.BR drv_setparm "(),
+.TP
+.BR drv_shutdown "(),
+.TP
+.BR dtimeout "(),
+.TP
+.BR eisa_parse_devconfig "(),
+.TP
+.BR emdupmap "(),
+.TP
+.BR emunmap "(),
+.TP
+.BR flushtlb "(),
+.TP
+.BR fubyte "(),
+.TP
+.BR fuword "(),
+.TP
+.BR getbsvalue "(),
+.TP
+.BR getc "(),
+.TP
+.BR getchar "(),
+.TP
+.BR getcpages "(),
+.TP
+.BR geteblk "(),
+.TP
+.BR get_intr_arg "(),
+.TP
+.BR getnextpg "(),
+.TP
+.BR getpl "(),
+.TP
+.BR hat_getkpfnum "(),
+.TP
+.BR hat_getppfnum "(),
+.TP
+.BR idistributed "(),
+.TP
+.BR ifstats_attach "(),
+.TP
+.BR ifstats_detach "(),
+.TP
+.BR ilockb "(),
+.TP
+.BR inb "(),
+.TP
+.BR ind "(),
+.TP
+.BR inl "(),
+.TP
+.BR intralloc "(),
+.TP
+.BR inw "(),
+.TP
+.BR iobitmapctl "(),
+.TP
+.BR iodone "(),
+.TP
+.BR iomove "(),
+.TP
+.BR iopolldistributed "(),
+.TP
+.BR iowait "(),
+.TP
+.BR ismpx "(),
+.TP
+.BR kmem_alloc_phys "(),
+.TP
+.BR kmem_alloc_physcontig "(),
+.TP
+.BR kmem_alloc_physreq "(),
+.TP
+.BR kmem_free_physcontig "(),
+.TP
+.BR kmem_zalloc_physreq "(),
+.TP
+.BR KS_HOLD0LOCKS "(),
+.TP
+.BR kthread_exit "(),
+.TP
+.BR kthread_spawn "(),
+.TP
+.BR kthread_wait "(),
+.TP
+.BR kvtoppid "(),
+.TP
+.BR ldistributed "(),
+.TP
+.BR lockb "(),
+.TP
+.BR memget "(),
+.TP
+.BR met_ds_alloc_stats "(),
+.TP
+.BR met_ds_dealloc_stats "(),
+.TP
+.BR met_ds_dequeued "(),
+.TP
+.BR met_ds_hist_stats "(),
+.TP
+.BR met_ds_iodone "(),
+.TP
+.BR met_ds_queued "(),
+.TP
+.BR mod_drvattach "(),
+.TP
+.BR mod_drvdetach "(),
+.TP
+.BR msgscgth "(),
+.TP
+.BR ngeteblk "(),
+.TP
+.BR numtos "(),
+.TP
+.BR outb "(),
+.TP
+.BR outl "(),
+.TP
+.BR outw "(),
+.TP
+.BR ovbcopy "(),
+.TP
+.BR pci_buspresent "(),
+.TP
+.BR pci_findclass "(),
+.TP
+.BR pci_finddevice "(),
+.TP
+.BR pci_read "(),
+.TP
+.BR pci_search "(),
+.TP
+.BR pci_specialcycle "(),
+.TP
+.BR pci_transbase "(),
+.TP
+.BR pci_write "(),
+.TP
+.BR phalloc "(),
+.TP
+.BR phfree "(),
+.TP
+.BR physio "(),
+.TP
+.BR physiock "(),
+.TP
+.BR physmap "(),
+.TP
+.BR physmap_free "(),
+.TP
+.BR physreq_alloc "(),
+.TP
+.BR physreq_free "(),
+.TP
+.BR physreq_prep "(),
+.TP
+.BR phystokv "(),
+.TP
+.BR phystoppid "(),
+.TP
+.BR pio_breakup "(),
+.TP
+.BR pollwakeup "(),
+.TP
+.BR pptophys "(),
+.TP
+.BR printcfg "(),
+.TP
+.BR printf "(),
+.TP
+.BR pr_intr_adderr "(),
+.TP
+.BR pr_intr_rmerr "(),
+.TP
+.BR proc_ref "(),
+.TP
+.BR proc_signal "(),
+.TP
+.BR proc_unref "(),
+.TP
+.BR proc_valid "(),
+.TP
+.BR psignal "(),
+.TP
+.BR putc "(),
+.TP
+.BR putchar "(),
+.TP
+.BR rdma_filter "(),
+.TP
+.BR remap_driver_cpu "(),
+.TP
+.BR remove_intr_handler "(),
+.TP
+.BR remove_nmi_handler "(),
+.TP
+.BR repins "(),
+.TP
+.BR repinsb "(),
+.TP
+.BR repinsd "(),
+.TP
+.BR repinsw "(),
+.TP
+.BR repoutsb "(),
+.TP
+.BR repoutsd "(),
+.TP
+.BR repoutsw "(),
+.TP
+.BR rmallocmap "(),
+.TP
+.BR rmalloc_wait "(),
+.TP
+.BR rmfreemap "(),
+.TP
+.BR run_ld "(),
+.TP
+.BR scgth_free "(),
+.TP
+.BR sdistributed "(),
+.TP
+.BR select "(),
+.TP
+.BR seterror "(),
+.TP
+.BR signal "(),
+.TP
+.BR sptalloc "(),
+.TP
+.BR sptfree "(),
+.TP
+.BR startio "(),
+.TP
+.BR subyte "(),
+.TP
+.BR surf "(),
+.TP
+.BR suser "(),
+.TP
+.BR suspend "(),
+.TP
+.BR suword "(),
+.TP
+.BR tc_tlock "(),
+.TP
+.BR TICKS "(),
+.TP
+.BR ttiocom "(),
+.TP
+.BR tty "(),
+.TP
+.BR uiobuf "(),
+.TP
+.BR ups "(),
+.TP
+.BR vas "(),
+.TP
+.BR video "(),
+.PD
+.PP
+.\"
+.\"
+.SS "Solaris\(rg 9/SunOS 5.9 Compatibility Functions"
+.PP
+.B Implemented Functions
+.PP
+.PP
+.B Unimplemented Functions
+.PP
+.TP
+.BR ddi_add_intr "(9),
+.PD 0
+.TP
+.BR ddi_add_softintr "(9),
+.TP
+.BR ddi_binding_name "(9),
+.TP
+.BR ddi_btop "(9),
+.TP
+.BR ddi_btopr "(9),
+.TP
+.BR ddi_check_acc_handle "(9),
+.TP
+.BR ddi_check_dma_handle "(9),
+.TP
+.BR ddi_copyin "(9),
+.TP
+.BR ddi_copyout "(9),
+.TP
+.BR ddi_create_minor_node "(9),
+.TP
+.BR ddi_device_copy "(9),
+.TP
+.BR ddi_device_zero "(9),
+.TP
+.BR ddi_devid_compare "(9),
+.TP
+.BR ddi_devid_free "(9),
+.TP
+.BR ddi_devid_init "(9),
+.TP
+.BR ddi_devid_register "(9),
+.TP
+.BR ddi_devid_sizeof "(9),
+.TP
+.BR ddi_devid_str_decode "(9),
+.TP
+.BR ddi_devid_str_encode "(9),
+.TP
+.BR ddi_devid_str_free "(9),
+.TP
+.BR ddi_devid_unregister "(9),
+.TP
+.BR ddi_devid_valid "(9),
+.TP
+.BR ddi_dev_is_needed "(9),
+.TP
+.BR ddi_dev_is_sid "(9),
+.TP
+.BR ddi_devmap_segmap "(9),
+.TP
+.BR ddi_dev_nintrs "(9),
+.TP
+.BR ddi_dev_nregs "(9),
+.TP
+.BR ddi_dev_regsize "(9),
+.TP
+.BR ddi_dev_report_fault "(9),
+.TP
+.BR ddi_dma_addr_bind_handle "(9),
+.TP
+.BR ddi_dma_addr_setup "(9),
+.TP
+.BR ddi_dma_alloc_handle "(9),
+.TP
+.BR ddi_dma_buf_bind_handle "(9),
+.TP
+.BR ddi_dma_buf_setup "(9),
+.TP
+.BR ddi_dma_burstsizes "(9),
+.TP
+.BR ddi_dma_coff "(9),
+.TP
+.BR ddi_dma_curwin "(9),
+.TP
+.BR ddi_dma_devalign "(9),
+.TP
+.BR ddi_dmae_1stparty "(9),
+.TP
+.BR ddi_dmae "(9),
+.TP
+.BR ddi_dmae_alloc "(9),
+.TP
+.BR ddi_dmae_disable "(9),
+.TP
+.BR ddi_dmae_enable "(9),
+.TP
+.BR ddi_dmae_getattr "(9),
+.TP
+.BR ddi_dmae_getcnt "(9),
+.TP
+.BR ddi_dmae_getlim "(9),
+.TP
+.BR ddi_dmae_prog "(9),
+.TP
+.BR ddi_dmae_release "(9),
+.TP
+.BR ddi_dmae_stop "(9),
+.TP
+.BR ddi_dma_free "(9),
+.TP
+.BR ddi_dma_free_handle "(9),
+.TP
+.BR ddi_dma_get_attr "(9),
+.TP
+.BR ddi_dma_getwin "(9),
+.TP
+.BR ddi_dma_htoc "(9),
+.TP
+.BR ddi_dma_mem_alloc "(9),
+.TP
+.BR ddi_dma_mem_free "(9),
+.TP
+.BR ddi_dma_movwin "(9),
+.TP
+.BR ddi_dma_nextcookie "(9),
+.TP
+.BR ddi_dma_nextseg "(9),
+.TP
+.BR ddi_dma_nextwin "(9),
+.TP
+.BR ddi_dma_numwin "(9),
+.TP
+.BR ddi_dma_segtocookie "(9),
+.TP
+.BR ddi_dma_set_sbus64 "(9),
+.TP
+.BR ddi_dma_setup "(9),
+.TP
+.BR ddi_dma_sync "(9),
+.TP
+.BR ddi_dma_unbind_handle "(9),
+.TP
+.BR ddi_driver_major "(9),
+.TP
+.BR ddi_driver_name "(9),
+.TP
+.BR ddi_enter_critical "(9),
+.TP
+.BR ddi_exit_critical "(9),
+.TP
+.BR ddi_ffs "(9),
+.TP
+.BR ddi_fls "(9),
+.TP
+.BR ddi_get16 "(9),
+.TP
+.BR ddi_get32 "(9),
+.TP
+.BR ddi_get64 "(9),
+.TP
+.BR ddi_get8 "(9),
+.TP
+.BR ddi_getb "(9),
+.TP
+.BR ddi_get_cred "(9),
+.TP
+.BR ddi_get_devstate "(9),
+.TP
+.BR ddi_get_driver_private "(9),
+.TP
+.BR ddi_get_iblock_cookie "(9),
+.TP
+.BR ddi_getiminor "(9),
+.TP
+.BR ddi_get_instance "(9),
+.TP
+.BR ddi_get_kt_did "(9),
+.TP
+.BR ddi_getl "(9),
+.TP
+.BR ddi_get_lbolt "(9),
+.TP
+.BR ddi_getll "(9),
+.TP
+.BR ddi_getlongprop "(9),
+.TP
+.BR ddi_getlongprop_buf "(9),
+.TP
+.BR ddi_get_name "(9),
+.TP
+.BR ddi_get_parent "(9),
+.TP
+.BR ddi_get_pid "(9),
+.TP
+.BR ddi_getprop "(9),
+.TP
+.BR ddi_getproplen "(9),
+.TP
+.BR ddi_get_soft_iblock_cookie "(9),
+.TP
+.BR ddi_get_soft_state "(9),
+.TP
+.BR ddi_get_time "(9),
+.TP
+.BR ddi_getw "(9),
+.TP
+.BR ddi_in_panic "(9),
+.TP
+.BR ddi_intr_hilevel "(9),
+.TP
+.BR ddi_io_get16 "(9),
+.TP
+.BR ddi_io_get32 "(9),
+.TP
+.BR ddi_io_get64 "(9),
+.TP
+.BR ddi_io_get8 "(9),
+.TP
+.BR ddi_io_getb "(9),
+.TP
+.BR ddi_io_getl "(9),
+.TP
+.BR ddi_io_getw "(9),
+.TP
+.BR ddi_iomin "(9),
+.TP
+.BR ddi_iopb_alloc "(9),
+.TP
+.BR ddi_iopb_free "(9),
+.TP
+.BR ddi_io_put16 "(9),
+.TP
+.BR ddi_io_put32 "(9),
+.TP
+.BR ddi_io_put64 "(9),
+.TP
+.BR ddi_io_put8 "(9),
+.TP
+.BR ddi_io_putb "(9),
+.TP
+.BR ddi_io_putl "(9),
+.TP
+.BR ddi_io_putw "(9),
+.TP
+.BR ddi_io_rep_get16 "(9),
+.TP
+.BR ddi_io_rep_get32 "(9),
+.TP
+.BR ddi_io_rep_get64 "(9),
+.TP
+.BR ddi_io_rep_get8 "(9),
+.TP
+.BR ddi_io_rep_getb "(9),
+.TP
+.BR ddi_io_rep_getl "(9),
+.TP
+.BR ddi_io_rep_getw "(9),
+.TP
+.BR ddi_io_rep_put16 "(9),
+.TP
+.BR ddi_io_rep_put32 "(9),
+.TP
+.BR ddi_io_rep_put64 "(9),
+.TP
+.BR ddi_io_rep_put8 "(9),
+.TP
+.BR ddi_io_rep_putb "(9),
+.TP
+.BR ddi_io_rep_putl "(9),
+.TP
+.BR ddi_io_rep_putw "(9),
+.TP
+.BR ddi_log_sysevent "(9),
+.TP
+.BR ddi_mapdev "(9),
+.TP
+.BR ddi_mapdev_intercept "(9),
+.TP
+.BR ddi_mapdev_nointercept "(9),
+.TP
+.BR ddi_map_regs "(9),
+.TP
+.BR ddi_mem_alloc "(9),
+.TP
+.BR ddi_mem_free "(9),
+.TP
+.BR ddi_mem_get16 "(9),
+.TP
+.BR ddi_mem_get32 "(9),
+.TP
+.BR ddi_mem_get64 "(9),
+.TP
+.BR ddi_mem_get8 "(9),
+.TP
+.BR ddi_mem_getb "(9),
+.TP
+.BR ddi_mem_getl "(9),
+.TP
+.BR ddi_mem_getll "(9),
+.TP
+.BR ddi_mem_getw "(9),
+.TP
+.BR ddi_mem_put16 "(9),
+.TP
+.BR ddi_mem_put32 "(9),
+.TP
+.BR ddi_mem_put64 "(9),
+.TP
+.BR ddi_mem_put8 "(9),
+.TP
+.BR ddi_mem_putb "(9),
+.TP
+.BR ddi_mem_putl "(9),
+.TP
+.BR ddi_mem_putll "(9),
+.TP
+.BR ddi_mem_putw "(9),
+.TP
+.BR ddi_mem_rep_get16 "(9),
+.TP
+.BR ddi_mem_rep_get32 "(9),
+.TP
+.BR ddi_mem_rep_get64 "(9),
+.TP
+.BR ddi_mem_rep_get8 "(9),
+.TP
+.BR ddi_mem_rep_getb "(9),
+.TP
+.BR ddi_mem_rep_getl "(9),
+.TP
+.BR ddi_mem_rep_getll "(9),
+.TP
+.BR ddi_mem_rep_getw "(9),
+.TP
+.BR ddi_mem_rep_put16 "(9),
+.TP
+.BR ddi_mem_rep_put32 "(9),
+.TP
+.BR ddi_mem_rep_put64 "(9),
+.TP
+.BR ddi_mem_rep_put8 "(9),
+.TP
+.BR ddi_mem_rep_putb "(9),
+.TP
+.BR ddi_mem_rep_putl "(9),
+.TP
+.BR ddi_mem_rep_putll "(9),
+.TP
+.BR ddi_mem_rep_putw "(9),
+.TP
+.BR ddi_mmap_get_model "(9),
+.TP
+.BR ddi_model_convert_from "(9),
+.TP
+.BR ddi_node_name "(9),
+.TP
+.BR ddi_peek16 "(9),
+.TP
+.BR ddi_peek32 "(9),
+.TP
+.BR ddi_peek64 "(9),
+.TP
+.BR ddi_peek8 "(9),
+.TP
+.BR ddi_peek "(9),
+.TP
+.BR ddi_peekc "(9),
+.TP
+.BR ddi_peekd "(9),
+.TP
+.BR ddi_peekl "(9),
+.TP
+.BR ddi_peeks "(9),
+.TP
+.BR ddi_poke16 "(9),
+.TP
+.BR ddi_poke32 "(9),
+.TP
+.BR ddi_poke64 "(9),
+.TP
+.BR ddi_poke8 "(9),
+.TP
+.BR ddi_poke "(9),
+.TP
+.BR ddi_pokec "(9),
+.TP
+.BR ddi_poked "(9),
+.TP
+.BR ddi_pokel "(9),
+.TP
+.BR ddi_pokes "(9),
+.TP
+.BR ddi_prop_create "(9),
+.TP
+.BR ddi_prop_exists "(9),
+.TP
+.BR ddi_prop_free "(9),
+.TP
+.BR ddi_prop_get_int64 "(9),
+.TP
+.BR ddi_prop_get_int "(9),
+.TP
+.BR ddi_prop_lookup "(9),
+.TP
+.BR ddi_prop_lookup_byte_array "(9),
+.TP
+.BR ddi_prop_lookup_int64_array "(9),
+.TP
+.BR ddi_prop_lookup_int_array "(9),
+.TP
+.BR ddi_prop_lookup_string "(9),
+.TP
+.BR ddi_prop_lookup_string_array "(9),
+.TP
+.BR ddi_prop_modify "(9),
+.TP
+.BR ddi_prop_op "(9),
+.TP
+.BR ddi_prop_remove "(9),
+.TP
+.BR ddi_prop_remove_all "(9),
+.TP
+.BR ddi_prop_undefine "(9),
+.TP
+.BR ddi_prop_update "(9),
+.TP
+.BR ddi_prop_update_byte_array "(9),
+.TP
+.BR ddi_prop_update_int64 "(9),
+.TP
+.BR ddi_prop_update_int64_array "(9),
+.TP
+.BR ddi_prop_update_int "(9),
+.TP
+.BR ddi_prop_update_string "(9),
+.TP
+.BR ddi_prop_update_string_array "(9),
+.TP
+.BR ddi_ptob "(9),
+.TP
+.BR ddi_put16 "(9),
+.TP
+.BR ddi_put32 "(9),
+.TP
+.BR ddi_put64 "(9),
+.TP
+.BR ddi_put8 "(9),
+.TP
+.BR ddi_putb "(9),
+.TP
+.BR ddi_putl "(9),
+.TP
+.BR ddi_putll "(9),
+.TP
+.BR ddi_putw "(9),
+.TP
+.BR ddi_regs_map_free "(9),
+.TP
+.BR ddi_regs_map_setup "(9),
+.TP
+.BR ddi_remove_intr "(9),
+.TP
+.BR ddi_remove_minor_node "(9),
+.TP
+.BR ddi_remove_softintr "(9),
+.TP
+.BR ddi_removing_power "(9),
+.TP
+.BR ddi_rep_get16 "(9),
+.TP
+.BR ddi_rep_get32 "(9),
+.TP
+.BR ddi_rep_get64 "(9),
+.TP
+.BR ddi_rep_get8 "(9),
+.TP
+.BR ddi_rep_getb "(9),
+.TP
+.BR ddi_rep_getl "(9),
+.TP
+.BR ddi_rep_getll "(9),
+.TP
+.BR ddi_rep_getw "(9),
+.TP
+.BR ddi_report_dev "(9),
+.TP
+.BR ddi_rep_put16 "(9),
+.TP
+.BR ddi_rep_put32 "(9),
+.TP
+.BR ddi_rep_put64 "(9),
+.TP
+.BR ddi_rep_put8 "(9),
+.TP
+.BR ddi_rep_putb "(9),
+.TP
+.BR ddi_rep_putl "(9),
+.TP
+.BR ddi_rep_putll "(9),
+.TP
+.BR ddi_rep_putw "(9),
+.TP
+.BR ddi_root_node "(9),
+.TP
+.BR ddi_segmap "(9),
+.TP
+.BR ddi_segmap_setup "(9),
+.TP
+.BR ddi_set_driver_private "(9),
+.TP
+.BR ddi_slaveonly "(9),
+.TP
+.BR ddi_soft_state "(9),
+.TP
+.BR ddi_soft_state_fini "(9),
+.TP
+.BR ddi_soft_state_free "(9),
+.TP
+.BR ddi_soft_state_init "(9),
+.TP
+.BR ddi_soft_state_zalloc "(9),
+.TP
+.BR ddi_trigger_softintr "(9),
+.TP
+.BR ddi_umem_alloc "(9),
+.TP
+.BR ddi_umem_free "(9),
+.TP
+.BR ddi_umem_lock "(9),
+.TP
+.BR ddi_umem_unlock "(9),
+.TP
+.BR ddi_unmap_regs "(9),
+.PD
+.PP
+.\"
+.\"
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+Where possible,
+.B @PACKAGE_TITLE@
+provides the DDI/DKI functions of
+.IR "SVR 4.2" ,
+.[
+svr42spg
+.]
+and the
+.IR "USL DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2" ,
+.[
+svr42spg
+.]
+.IR "USL DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The DDI/DKI functions first appear in
+.IR "SVR 4" .
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

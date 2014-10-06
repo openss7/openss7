@@ -1,0 +1,431 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: adjmsg.9.man,v 1.1.2.2 2011-02-07 02:18:36 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:36 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: adjmsg.9.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:36  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH ADJMSG 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B adjmsg
+\- trim bytes from the front or back of a \fISTREAMS\fR message
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "int adjmsg(mblk_t *" mp ", ssize_t " len );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I mp
+a pointer to the
+.I STREAMS
+message to adjust.
+.PD 0
+.TP
+.I len
+the number of bytes and direction from which to trim.
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
+.\"
+.\"
+.SH DESCRIPTION
+.\".PP
+.\".BR adjmsg ()
+.\"trims bytes from either the head or tail of the message specified by
+.\".IR mp .
+.\"If
+.\".I len
+.\"is greater than zero, it removes
+.\".I len
+.\"bytes from the beginning of
+.\".IR mp .
+.\"If
+.\".I len
+.\"is less than zero, it removes
+.\".I -len
+.\"bytes from the end of
+.\".IR mp .
+.\"If
+.\".I len
+.\"is zero,
+.\".BR adjmsg ()
+.\"does nothing.
+.\".PP
+.\".BR adjmsg ()
+.\"only trims bytes across message blocks of the same type.  It fails if
+.\".I mp
+.\"points to a message containing fewer than
+.\".I len
+.\"bytes of similar type at the message position indicated.
+.\".PP
+.\".BR adjmsg ()
+.\"returns
+.\".RB "true (" 1 )
+.\"on success and
+.\".RB "false (" 0 )
+.\"on failure.
+.PP
+.BR adjmsg ()
+trims
+.RI abs( len )
+bytes from a
+.I STREAMS
+message pointed to by
+.IR mp .
+.PP
+If
+.I len
+is greater than zero,
+.BR adjmsg ()
+will trim bytes from the head of the message.
+.PP
+If
+.I len
+is less than zero,
+.BR adjmsg ()
+will trim bytes from the tail of the message.
+.PP
+If
+.I len
+is zero,
+.BR adjmsg ()
+succeeds but does nothing.
+.PP
+During the trimming process, blocks are trimmed by advancing the
+.I b_rptr
+for head trims
+.RI ( len " > 0),
+or decreasing the
+.I b_wptr
+for tail trims
+.RI ( len " < 0),
+by the number of bytes trimmed from the block.  If an entire block is trimmed
+(its
+.I b_rptr
+meets its
+.IR b_wptr ),
+the block is not removed from the chain, but is left as a zero length block.
+This makes
+.BR adjmsg ()
+suitable for use on messages that have data blocks with a
+.I db_ref
+count greater than one
+.RB ( 1 ).
+.\"
+.\"
+.SH USAGE
+.PP
+.BR adjmsg ()
+is typically used to trim headers and footers off of protocol messages on the
+read side of a 
+.I STREAMS
+module.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR adjmsg ()
+trims the requested number of bytes from the head or tail of the message and
+returns true (1).
+Upon failure,
+.BR adjmsg ()
+returns false (0),
+and the passed in message remains unchanged.
+.\"
+.\"
+.SH ERRORS
+.PP
+If
+.I mp
+is a null pointer,
+the absolute value of
+.I len
+is greater that the message size, or if the bytes to trim crosses message blocks of
+differing types,
+.BR adjmsg ()
+will fail and return false (0).
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR adjmsg ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR adjmsg ()
+is MP-safe; however, the caller must ensure exclusive access to the passed in
+message,
+.IR mp .
+However, the passed in message,
+.IR mp ,
+can contain data blocks with a reference count
+.RI ( db_ref )
+greater than one
+.RB ( 1 ).
+.\"
+.\"
+.SH NOTICES
+.PP
+Note that
+.BR adjmsg ()
+will not fail due to allocation errors.  Failures depend only on the
+characteristics of the passed in message referenced by
+.I mp
+and the provided
+.IR len .
+.PP
+If the passed in length,
+.IR len ,
+is zero,
+.BR adjmsg ()
+will not alter the passed in message and will return true (1).
+.PP
+Any message blocks that are completely trimmed by
+.BR adjmsg ()
+are not removed from the message, but have their
+.IR b_wptr 's
+set to their
+.IR b_rptr 's;
+that is, the length of the data they contain is set to zero (0).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR msgpullup (9),
+.BR pullupmsg (9),
+.BR datab (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR adjmsg ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR adjmsg ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and systems based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR adjmsg ()
+will fail and return false (0) when passed a
+.B NULL
+message pointer,
+.IR mp ;
+or, if
+.BI | len |
+bytes does not exist at the head or the tail of the message within a contiguous range of like typed
+message blocks;
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will not pass
+.B NULL
+or invalid message pointers to
+.BR adjmsg ().
+The return value from
+.BR adjmsg ()
+should always be examined to determine whether the operation was successful.
+.IP \(em
+.BR adjmsg ()
+does nothing and returns success (1) if the passed in length,
+.IR len ,
+is zero (0).
+.IR AIX \(rg
+.[
+aixdoc
+.]
+does nothing if
+.I len
+is zero.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will not pass a zero (0) length to
+.BR adjmsg ().
+.IP \(em
+.BR adjmsg ()
+does not free zero length message blocks created or encountered during the
+trimming process.
+.IR Solaris \(rg
+may free zero length message blocks created or encountered during the trimming process.
+.[
+soldoc
+.]
+.IR IRIX \(rg
+and
+.IR UnixWare \(rg
+do not free zero length message blocks encountered during the trimming
+process.
+.[
+irixdoc
+.]
+.[
+uw7doc
+.]
+.IP ""
+Portable
+.I STREAMS
+drivers and modules should be designed so that they will not be affected if message blocks are
+freed, or left as zero-length message blocks, interior to the message.
+.IP \(em
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR adjmsg ()
+appears as part of
+.I "SVR 4.0 STREAMS" .
+.[
+svr4spg
+.]
+.PP
+.BR adjmsg ()
+first appeared in
+.IR "SVR 3" .
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

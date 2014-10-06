@@ -1,0 +1,1025 @@
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
+## =============================================================================
+## 
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU Affero General Public License as published by the Free
+## Software Foundation; version 3 of the License.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+## details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+## write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+## 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date$ by $Author$
+##
+## =============================================================================
+
+##
+## These are the rules that I use for building ArchLinux source and binary packages using automake.
+## As a maintainer I need to package releases using makepkg.  The following rules accomplish that
+## for all packages.
+##
+
+if MAINTAINER_MODE
+## MAINTAINER_MODE
+
+##
+## For better speed when building package binaries, we skip these rules to invoke package building.
+## There is not (yet) a need to build packages when building packages...  We use maintainer mode to
+## distinguish whether these rules are necessary or not.
+##
+
+if BUILD_PKGS
+## BUILD_PKGS
+
+##
+## ArchLinux builds are a little different from rpm and deb builds.  We use the same bootstrapping
+## as we do for RPM and DPKG in that a distributed tarball has all of the targets necessary for
+## building .src.tar.gz and .pkg.tar.gz built in, however, the PKGBUILD file does not have the
+## powerful macro capabilities of an RPM spec file.  Therefore, one ArchLinux source package cannot
+## be used for building all binary packages as we do for RPM.  The ArchLinux build process here
+## consists of unpacking the distribution and configuring it.  Then the .src.tar.gz and .pkg.tar.gz
+## packages are built from the already configured source.
+##
+
+PKGOPTS			= -f -L
+
+PKGBOPTS		= $(PKGOPTS) -A --check
+PKGSOPTS		= $(PKGOPTS) -S
+PKGGOPTS		= $(PKGOPTS) -g
+PKGCOPTS		= $(PKGOPTS) -c
+
+PKGENVIRONMENT		= kversion='$(kversion)' \
+			  SRCDEST=$(mpkgsrcdest) \
+			  BUILDDIR=$(mpkgbuilddir) \
+			  PKGDEST=$(mpkgpkgdest) \
+			  SRCPKGDEST=$(mpkgsrcpkgdest)
+
+mpkg_directories	= $(mpkgsrcdest) \
+			  $(mpkgbuilddir) \
+			  $(mpkgpkgdest) \
+			  $(mpkgsrcpkgdest)
+
+
+
+## Because we *are* the upstream source, we always use version @PACKAGE_PACRELEASE@ and pack the
+## release number onto the upstream version.
+##
+mpkgpkg			= $(PACKAGE_LCNAME)-$(VERSION)-$(PACKAGE_PACRELEASE)
+
+mpkg_base_file		= $(mpkgpkg).pkg.tar.gz
+
+pkg_build_file		= arch/PKGBUILD
+pkg_tarsrc_file		= arch/$(PACKAGE)-$(VERSION).tar.xz
+
+archpkg			= $(PACKAGE)-$(VERSION)
+pkg_dir			= $(mpkgtopdir)/$(PACKAGE)-$(VERSION)
+pkg_dir_stamp		= $(mpkgtopdir)/stamp-$(PACKAGE)-$(VERSION)
+pkg_cache_files		= $(mpkgtopdir)/*config.cache \
+			  $(mpkgtopdir)/*config.site \
+			  $(mpkgtopdir)/*modpost.cache
+
+pkg_repo_file		= $(PACKAGE)-repo-$(VERSION)-$(PACKAGE_PACRELEASE)-$(target_cpu).pkg.tar.xz
+pkg_base_file		= $(PACKAGE)-$(VERSION)-$(PACKAGE_PACRELEASE)-$(target_cpu).pkg.tar.xz
+pkg_devl_file		= $(PACKAGE)-devel-$(VERSION)-$(PACKAGE_PACRELEASE)-$(target_cpu).pkg.tar.xz
+pkg_kern_file		= $(PACKAGE)-*-$(VERSION).*-$(PACKAGE_PACRELEASE).*-$(target_cpu).pkg.tar.xz
+pkg_kdev_file		= $(PACKAGE)-*-devel-$(VERSION).*-$(PACKAGE_PACRELEASE).*-$(target_cpu).pkg.tar.xz
+pkg_java_file		= $(PACKAGE)-java-$(VERSION)-$(PACKAGE_PACRELEASE)-$(target_cpu).pkg.tar.xz
+pkg_srcs_file		= $(PACKAGE)-$(VERSION)-$(PACKAGE_PACRELEASE).src.tar.gz
+
+pkg_repo_file_sig	= $(pkg_repo_file).sig
+pkg_base_file_sig	= $(pkg_base_file).sig
+pkg_devl_file_sig	= $(pkg_devl_file).sig
+pkg_kern_file_sig	= $(pkg_kern_file).sig
+pkg_kdev_file_sig	= $(pkg_kdev_file).sig
+pkg_java_file_sig	= $(pkg_java_file).sig
+pkg_srcs_file_sig	= $(pkg_srcs_file).sig
+
+pkg_source_pkgs		= $(mpkgsrcpkgdest)/$(pkg_srcs_file)
+pkg_source_sigs		= $(mpkgsrcpkgdest)/$(pkg_srcs_file_sig)
+pkg_source_files	= $(pkg_source_pkg) $(pkg_source_sigs)
+pkg_update_pkgs		= $(mpkgpkgdest)/$(pkg_kern_file) \
+			  $(mpkgpkgdest)/$(pkg_kdev_file)
+pkg_update_sigs		= $(mpkgpkgdest)/$(pkg_kern_file_sig) \
+			  $(mpkgpkgdest)/$(pkg_kdev_file_sig)
+pkg_update_files	= $(pkg_update_pkgs) $(pkg_update_sigs)
+pkg_binary_pkgs		= $(mpkgpkgdest)/$(pkg_repo_file) \
+			  $(mpkgpkgdest)/$(pkg_base_file) \
+			  $(mpkgpkgdest)/$(pkg_devl_file) \
+			  $(mpkgpkgdest)/$(pkg_java_file) \
+			  $(pkg_update_pkgs)
+pkg_binary_sigs		= $(mpkgpkgdest)/$(pkg_repo_file_sig) \
+			  $(mpkgpkgdest)/$(pkg_base_file_sig) \
+			  $(mpkgpkgdest)/$(pkg_devl_file_sig) \
+			  $(mpkgpkgdest)/$(pkg_java_file_sig) \
+			  $(pkg_update_sigs)
+pkg_binary_files	= $(pkg_binary_pkgs) $(pkg_binary_sigs)
+
+pkgtop_tar_file		= $(pacdir)/source/$(archpkg).tar.gz
+pkgtop_sig_file		= $(pacdir)/source/$(archpkg).tar.gz.sig
+pkgtop_source_files	= $(pkgtop_tar_file) $(pkgtop_sig_file)
+pkgtop_update_files	= $(pacdir)/*/$(pkg_kern_file) \
+			  $(pacdir)/*/$(pkg_kern_file_sig) \
+			  $(pacdir)/*/$(pkg_kdev_file) \
+			  $(pacdir)/*/$(pkg_kdev_file_sig)
+pkgtop_binary_files	= $(pacdir)/*/$(pkg_repo_file) \
+			  $(pacdir)/*/$(pkg_repo_file_sig) \
+			  $(pacdir)/*/$(pkg_base_file) \
+			  $(pacdir)/*/$(pkg_base_file_sig) \
+			  $(pacdir)/*/$(pkg_devl_file) \
+			  $(pacdir)/*/$(pkg_devl_file_sig) \
+			  $(pacdir)/*/$(pkg_java_file) \
+			  $(pacdir)/*/$(pkg_java_file_sig) \
+			  $(pkgtop_update_files)
+pkgtop_signed_files	= $(pkgtop_sig_file)
+
+$(pkg_tarsrc_file): $(tardir)/$(PACKAGE)-$(VERSION).tar.xz
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(LN_S) -f $< $@
+
+RELEASECLEANFILES += $(pkg_tarsrc_file)
+
+checksummed-PKGBUILD: $(pkg_build_file) $(pkg_tarsrc_file)
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(AM_V_GEN)\
+	grep md5sums $(pkg_build_file) >/dev/null 2>&1 || \
+	( \
+		cd $(mpkgtopdir); \
+		BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS) $(AM_PKGGOPTS) $(AM_PKGXOPTS)' \
+			$(PKGENVIRONMENT) \
+			$(MAKEPKG) $(PKGGOPTS) $(PKGXOPTS) >>PKGBUILD; \
+	)
+
+MY_PHONY		+= checksummed-PKGBUILD
+
+#!
+#! ArchLinux Build Targets:
+#! ------------------------
+#!
+#! On ArchLinux systems, or systems sporting pacman packaging tools, the
+#! following targets are used to generate archlinux release packages.  The
+#! release number can be controlled in the contents of the .pacrelease file, or
+#! with the --with-pac-release=RELEASENUMBER option to 'configure'.  See
+#! 'configure --help' for more information on options.
+#!
+
+pkg_src_file		= $(mpkgsrcpkgdest)/$(pkg_srcs_file)
+pkg_sig_file		= $(mpkgsrcpkgdest)/$(pkg_srcs_file_sig)
+
+#! srcs:
+#!     This target generates the source pkg for the package (without signing the
+#!     source pkg).  The source package does not contain the entire source
+#!     tarball although this might change in the future. The source pkg will be
+#!     named: @PACKAGE@-@VERSION@-@PACKAGE_PACRELEASE@.src.tar.gz
+#!
+srcs: $(pkg_src_file)
+
+$(pkg_src_file): checksummed-PKGBUILD
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(MAKE) $(AM_MAKEFLAGS) -- $(mpkg_directories)
+	test ":$(FORCE)" != :force -a -f "$@" || \
+	( \
+		cd $(mpkgtopdir); \
+		BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS) $(AM_PKGSOPTS) $(AM_PKGXOPTS)' \
+			$(PKGENVIRONMENT) \
+			$(MAKEPKG) $(PKGSOPTS) $(PKGXOPTS); \
+	)
+
+#! ssig:
+#!	This target signs the .src.tar.gz ABS/AUR source package.  You will be
+#!	prompted for a password, unless you specify it to make with the
+#!	GNUPGPASS variable.
+#!
+ssig:
+	@$(ECHO_V) "D: Making $@ in `pwd`" ; \
+	list="$(pkg_source_pkgs)"; for f in $$list; do \
+		test -f $$f || continue; \
+		a="$$f.sig"; $(am__gpg_binary_sign_file); \
+	done
+
+release-clean-srcs:
+
+RELEASE_DIRECTORIES	+= $(mpkg_directories)
+RELEASE			+= all-srcs
+RELEASE_SIGN		+= all-ssig
+RELEASE_CLEAN_LOCAL	+= release-clean-srcs
+RELEASECLEANFILES	+= $(pkg_src_file) $(pkg_sig_file)
+
+
+each-pkg: checksummed-PKGBUILD
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(MAKE) $(AM_MAKEFLAGS) -- $(mpkg_directories)
+	( \
+		cd $(mpkgtopdir); \
+		case ' $(AM_PKGBOPTS) ' in \
+		(*" --without-arch "*) \
+			exit 0 ;; \
+		(*" --without-indep "*) \
+			case ' $(AM_PKGXOPTS) ' in \
+			(*" --without-modules "*) \
+				packages="-pkg $(PACKAGE) $(PACKAGE)-devel" ;; \
+			(*" --without-tools "*) \
+				packages="-pkg $(PACKAGE)-$(kversion) $(PACKAGE)-$(kversion)-devel" ;; \
+			esac ;; \
+		(*) \
+			packages= ;; \
+		esac ; \
+		BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS) $(AM_PKGBOPTS) $(AM_PKGXOPTS)' \
+			$(PKGENVIRONMENT) \
+			$(MAKEPKG) $(PKGXOPTS) $(PKGBOPTS) $$packages; \
+	)
+
+noa-pkg: AM_PKGBOPTS = --without-arch
+noa-pkg: PKGTARGET = "any"
+noa-pkg: each-pkg
+
+one-pkg: AM_PKGBOPTS = --without-indep
+one-pkg: each-pkg
+
+one-t-pkg: AM_PKGXOPTS = --without-modules
+one-t-pkg: one-pkg
+
+one-k-pkg: AM_PKGXOPTS = --without-tools
+one-k-pkg: one-pkg
+
+all-pkg: AM_PKGBOPTS =
+all-pkg: each-pkg
+
+#! pkgs:
+#!     This target is responsible for generating all of the package binary pkgs
+#!     for the architecture.  The binary pkgs will be named:
+#!
+#!         @PACKAGE@-*@VERSION@-@PACKAGE_PACRELEASE@.*.pkg.txz
+#!
+#!     Where the stars indicate the subpackage and the architecture.  Both the
+#!     architecture specific subpackages (binary objects) and the architecture
+#!     independent (.any.) subpackages will be build unless the former was
+#!     disabled with the option `--disable-arch', or the later with the option
+#!     `--disable-indep', passed to `configure'.
+#!
+pkgs:
+	@$(ECHO) "D: $@: rebuild complete package"; \
+	$(MAKE) $(AM_MAKEFLAGS) PKGXOPTS='$(PKGXOPTS)' kversion='$(kversion)' PKGTARGET="$(PKGTARGET)" all-pkg || :
+
+### Another sneaky trick
+all-one-k-pkg:	ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+all-one-t-pkg:	ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+all-one-pkg:	ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+all-noa-pkg:	ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+all-any-pkg:	ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+all-src-pkg:	ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+all-all-pkg:	ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+all-srcs:	ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+all-pkgs:	ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+
+#! psig:
+#!	This target signs the .pkg.tar.xz binary packages.  You will be prompted
+#!	for a password, unless you specify it to make with the GNUPGPASS
+#!	variable.
+#!
+psig:
+	@$(ECHO_V) "D: Making $@ in `pwd`" ; \
+	list="$(pkg_binary_pkgs)"; for f in $$list; do \
+		test -f $$f || continue; \
+		a="$$f.sig"; $(am__gpg_binary_sign_file); \
+	done
+
+$(pkg_sigs): %.sig: %
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(am__gpg_binary_sign)
+
+#! remakepkg:
+#!	This target searchs out a list of kernel names from the
+#!	@DESTDIR@/lib/modules directory and builds pkgs for those kernels and
+#!	for each of a set of architectures gvien in the AM_PKGTARGETS variable
+#!	to make.  This is a convenience target for building a group of pkgs on a
+#!	given build machine.
+#!
+remakepkg: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' PKGXOPTS='$(PKGXOPTS)'
+remakepkg:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@pkgs="`(find $(pacdir) -name '$(pkg_base_file)' | LANG= sort -u | grep 'any.pkg.tar.xz$$') 2>/dev/null`"; \
+	if test -z "$$pkgs" -o -n '$(FORCE)'; then \
+		$(ECHO) "D: $@: rebuild binary-indep"; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH=\"noarch\" noa-pkg" ; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH=\"noarch\" noa-pkg || :; \
+	else \
+		$(ECHO) "D: $@: skipped binary-indep"; \
+	fi; \
+	targets="$(target_arch) $(AM_PKGTARGETS)"; \
+	for t in $$targets; do \
+		a=`$(ECHO) "$$t" | sed 's,-.*$$,,'`; \
+		test \( "$$a" != 'noarch' -a "$$a" != 'any' \) || continue; \
+		kernels="`( find $(DESTDIR)$(rootdir)/lib/modules -maxdepth 1 -type d \( -name '2.[46].[0-9]*' -o -name '3.[0-9]*' \) | $(rpmsort) ) 2>/dev/null`"; \
+		for k in $$kernels; do \
+			k=`basename $$k`; \
+			test -e $(DESTDIR)$(rootdir)/boot/System.map-$$k || { $(ECHO) "D: $@: skpping $$k (no system map)"; continue; }; \
+			test -n '$(DESTDIR)$(rootdir)' || ks=`$(PACMAN) -Qo /lib/modules/$$k/build/vmlinux 2>/dev/null` || { $(ECHO) "D: $@: skipping $$k (no build provides)"; continue; }; \
+			ks=`echo "$$ks" | awk '{print$$5}'`; \
+			pkgs=$$((find $(pacdir) -name "$(PACKAGE)-$$k-$(VERSION)-$(PACKAGE_PACRELEASE)-$$t.pkg.tar.xz" | LANG= sort -u | grep -v '-any\.pkg\.tar\.xz$$') 2>/dev/null); \
+			if test -z "$$pkgs" -o -n '$(FORCE)'; then \
+				$(ECHO) "D: $@: rebuild $$k"; \
+				$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion=\"$$k\" ARCH=\"$$t\" one-k-pkg"; \
+				$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion="$$k" ARCH="$$t" one-k-pkg || :; \
+			else \
+				$(ECHO) "D: $@: skipped $$k"; \
+			fi; \
+		done; \
+		pkgs="`(find $(pacdir) -name '$(pkg_base_file)' | LANG= sort -u | grep -v '-any\.pkg\.tar\.xz$$') 2>/dev/null`"; \
+		if test -z "$$pkgs" -o -n '$(FORCE)'; then \
+			$(ECHO) "D: $@: rebuild $$a"; \
+			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH=\"$$t\" one-t-pkg"; \
+			$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH="$$t" one-t-pkg || :; \
+		else \
+			$(ECHO) "D: $@: skipped $$a"; \
+		fi; \
+	done ; \
+	$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) src-pkg"; \
+	$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) src-pkg || :
+
+release-clean-pkgs:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	test -d '$(mpkgbuilddir)/pkg' && rm -rf -- $(mpkgbuilddir)/pkg || :
+	test -d '$(mpkgbuilddir)/src' && rm -rf -- $(mpkgbuilddir)/src || :
+	test -d '$(mpkgtopdir)/bld' && rm -rf -- $(mpkgtopdir)/bld || :
+
+RELEASECLEANFILES	+= $(mpkgtopdir)/*.log* \
+			   $(mpkgtopdir)/*.list \
+			   $(mpkgtopdir)/$(PACKAGE).changelog \
+			   $(mpkgtopdir)/*.pkg.tar.xz \
+			   $(mpkgtopdir)/*.src.tar.gz
+
+## Because the build directory is in the autoconf top build directory on the local machine, it needs
+## to be cleaned when a distclean is performed.  We use makepkg to do this for us, and makepkg will
+## complain if the directory does not exist, so we ignore errors.  The PKGBUILD file must still
+## exist for use to do this too.  The same is true for build files.
+##
+distclean-pkg: release-clean-pkgs
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	test -d '$(mpkgbuilddir)' && rm -rf -- $(mpkgbuilddir)
+
+
+DISTCLEAN_LOCAL		+= distclean-pkg
+DISTCLEANFILES		+= $(pkg_cache_files) \
+			   $(pkg_dir_stamp) \
+			   $(pkg_source_files) \
+			   $(pkg_binary_files)
+
+
+
+RELEASE_DIRECTORIES	+= $(mpkgtopdir) $(mpkg_directories)
+RELEASE			+= all-pkgs
+RELEASE_SIGN		+= all-psig
+RELEASE_CLEAN_LOCAL	+= release-clean-pkgs
+RELEASECLEANFILES	+= $(pkg_dir_stamp) \
+			   $(pkg_source_files) \
+			   $(pkg_binary_files)
+
+MY_PHONY		+= srcs pkgs each-pkg one-t-pkg one-k-pkg one-pkg noa-pkg any-pkg src-pkg all-pkg ssig psig remakepkg
+
+ALL_RECURSIVE_TARGETS	+= all-srcs all-pkgs all-one-t-pkg all-one-k-pkg all-one-pkg all-noa-pkg all-any-pkg all-src-pkg all-all-pkg all-ssig all-psig all-remakepkg
+
+update-clean-pkg:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	rm -rf $(arch_dir)
+# FIXME: more
+
+UPDATE_DIRECTORIES	+= $(mpkgtopdir) $(mpkg_directories)
+UPDATE			+= all-update-srcs all-update-pkgs
+UPDATE_SIGN		+= all-update-ssig all-update-psig
+UPDATE_CLEAN_LOCAL	+= update-clean-pkg
+UPDATECLEANFILES	+= $(pkg_dir_stamp) \
+			   $(pkg_source_files) \
+			   $(pkg_binary_files)
+
+
+
+## Copy release pkg files from the distribution directory to the repository (if required), but
+## ensure that the release pkg files are signed before transferring them.  Existing files in the
+## repository are not overwritten unless force is specified and the new file is newer than the
+## existing file.  Rebuilding of repository metadata is performed by other targets.
+##
+release-install-pkgs:
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
+	test '$(DISTDIR)' != '$(REPODIR)' || exit 0; \
+	list="$(pkg_source_files) $(pkg_binary_files)"; for f in $$list ; do \
+		test -s $$f || continue ; \
+		case "$$f" in (*.pkg.tar.xz) ;; (*.src.tar.gz) ;; (*) continue ;; esac ; \
+		a="$$f.sig" ; $(am__gpg_binary_sign_file) ; \
+	done ; \
+	list="$(pkg_source_files) $(pkg_binary_files)"; for f in $$list ; do \
+		test -s $$f || continue ; \
+		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+		test $$f -ef $$t && continue ; \
+		if test ! -f $$t -o \( "$(FORCE)" = force -a $$f -nt $$t \) ; then \
+			$(ECHO) " $(INSTALL_DATA) -T -D -p -- $$f $$t" ; \
+			$(INSTALL_DATA) -T -D -p -- $$f $$t ; \
+		fi ; \
+	done
+
+## Remove release pkg files from the repository.  Files that have a different timestamp than that in
+## the repository are not removed unless force is specified.  When files are removed, an attempt is
+## made to remove empty directories.  Rebuilding of repository metadata is performed by other
+## targets.
+##
+release-uninstall-pkgs:
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
+	test '$(DISTDIR)' != '$(REPODIR)' || exit 0; \
+	$(ECHO) "D: $@: removing pkgs" ; \
+	list="$(pkg_source_files) $(pkg_binary_files)"; for f in $$list ; do \
+		test -e $$f || { $(ECHO) "D: $@: missing $$f" ; continue ; } ; \
+		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+		test -f $$t || { $(ECHO) "D: $@: missing $$t" ; continue ; } ; \
+		if test -f $$t -a \( "$(FORCE)" = force -o \( ! \( $$f -nt $$t \) -a ! \( $$f -ot $$t \) \) \) ; then \
+			$(ECHO) "  rm -f -- $$t" ; \
+			rm -f -- $$t ; \
+		else \
+			$(ECHO) "D: $@: not removing $$t" ; \
+		fi ; \
+	done ; \
+	list="$(pkg_source_files) $(pkg_binary_files)"; for f in $$list ; do \
+		test -e $$f || continue ; \
+		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+		echo "`dirname $$t`" ; \
+	done | LANG= sort -u | while read d ; do \
+		if test -d $$d ; then \
+			$(ECHO) "  rmdir -pv -- $$d" ; \
+			rmdir -pv -- $$d || : ; \
+		fi ; \
+	done
+
+RELEASE_INSTALL		+= release-install-pkgs
+RELEASE_UNINSTALL	+= release-uninstall-pkgs
+
+## Copy update pkg files from the distribution directory to the repository (if required), but ensure
+## that the update pkg files are signed before transferring them.  Existing files in the repository
+## are not overwritten unless force is specified and the new file is newer than the existing file.
+## Rebuilding of repository metadata is performed by other targets.
+##
+update-install-pkgs:
+	@$(ECHO_V) "D: Making $@ in `pwd`" ; \
+	test '$(DISTDIR)' != '$(REPODIR)' || exit 0 ; \
+	list="$(pkg_update_files)"; for f in $$list ; do \
+		test -s $$f || continue ; \
+		t=`echo "$$f" | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
+		if test ! -f $$t -o \( "$(FORCE)" = force -a $$f -nt $$t \) ; then \
+			$(ECHO) "  $(INSTALL_DATA) -T -D -p -- $$f $$t" ; \
+			$(INSTALL_DATA) -T -D -p -- $$f $$t ; \
+		fi ; \
+	done
+
+## Remove update pkg files from the repository.  Files that have a different timestamp than that in
+## the repository are not removed unless force is specified.  When files are removed, an attempt is
+## made to remove empty directories.  Rebuilding of repository metadata is performed by other
+## targets.
+##
+update-uninstall-pkgs:
+	@$(ECHO_V) "D: Making $@ in `pwd`" ; \
+	test '$(DISTDIR)' != '$(REPODIR)' || exit 0 ; \
+	list="$(pkg_update_files)"; for f in $$list ; do \
+		test -s $$f || continue ; \
+		t=`echo "$$f" | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
+		test -s $$t || continue ; \
+		if test -f $$t -a \( "$(FORCE)" = force -o \( ! $$f -nt $$t -a !  $$f -ot $$t \) \) ; then \
+			$(ECHO) "  rm -f -- $$t" ; \
+			rm -f -- $$t ; \
+		fi ; \
+	done ; \
+	list="$(pkg_update_files)"; for f in $$list ; do \
+		test -s $$f || continue ; \
+		t=`echo "$$f" | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
+		echo "`dirname $$t`" ; \
+	done | LANG= sort -u | while read d ; do \
+		if test -d $$d ; then \
+			$(ECHO) "  rmdir -pv -- $$d" ; \
+			rmdir -pv -- $$d || : ; \
+		fi ; \
+	done
+
+UPDATE_INSTALL		+= update-install-pkgs
+UPDATE_UNINSTALL	+= update-uninstall-pkgs
+
+## Repository organization:
+##
+## Standard archlinux repository organization is:
+##
+## 	archlinux/$repo/os/$arch
+##
+## 	Note that both '$arch' and 'any' packages are included in the same repository at the same
+## 	level.  '$repo' is something like 'core', 'extra', 'testing'...  Note that the database in
+## 	the directory must have the same root name as '$repo'.  Archlinux just uses 'os' where other
+## 	distros use a version number due to rolling release.
+##
+## OpenSS7 repository organization is as follows:
+##
+## 	https://www.openss7.org/repo/pkgs/arch/os/$arch/$repo
+##
+## 	Note that both '$arch' and 'any' packages are included in the same repository at the same
+## 	level.  '$repo' can be:
+##
+## 		openss7
+## 		openss7-debug
+## 		openss7-devel
+## 		openss7-source
+##
+## 	For extras, updates and testing we also have
+##
+## 		openss7-extras
+## 		openss7-extras-debug
+## 		openss7-extras-devel
+## 		openss7-extras-source
+##
+## 		openss7-updates
+## 		openss7-updates-debug
+## 		openss7-updates-devel
+## 		openss7-updates-source
+##
+## 		openss7-testing
+## 		openss7-testing-debug
+## 		openss7-testing-devel
+## 		openss7-testing-source
+##
+## 	This organization is complex to provide separate authenticated access to the various
+## 	repositories and components within the repositories.
+##
+## 	We have an openss7-mirrors file that resides in /etc/pacman.d that contains repository
+## 	definitions for inclusion from the opensss7.defs file as:
+##
+## 	Server = https://www.openss7.org/repo/pkgs/arch/os/$arch/$repo
+##
+## 	We have an openss7.defs file that resides in /etc/pacman.d that contains repository
+## 	definitions for inclusion into /etc/pacman.conf.  They look like:
+##
+## 	[openss7]
+## 	Include = /etc/pacman.d/openss7-mirrors
+##
+
+if BUILD_REPO_PACMAN
+## BUILD_REPO_PACMAN
+
+##
+## The following builds pacman repositories.
+##
+
+pacman_databases	= $(pacfulldir)/$(PACKAGE)*.db \
+			  $(pacmaindir)/$(PACKAGE)*.db \
+			  $(pacdebgdir)/$(PACKAGE)*.db \
+			  $(pacdevldir)/$(PACKAGE)*.db \
+			  $(pacsrcsdir)/$(PACKAGE)*.db \
+			  $(pacfulldir)/$(PACKAGE)*.db.tar \
+			  $(pacmaindir)/$(PACKAGE)*.db.tar \
+			  $(pacdebgdir)/$(PACKAGE)*.db.tar \
+			  $(pacdevldir)/$(PACKAGE)*.db.tar \
+			  $(pacsrcsdir)/$(PACKAGE)*.db.tar \
+			  $(pacfulldir)/$(PACKAGE)*.db.tar.gz \
+			  $(pacmaindir)/$(PACKAGE)*.db.tar.gz \
+			  $(pacdebgdir)/$(PACKAGE)*.db.tar.gz \
+			  $(pacdevldir)/$(PACKAGE)*.db.tar.gz \
+			  $(pacsrcsdir)/$(PACKAGE)*.db.tar.gz \
+			  $(pacfulldir)/$(PACKAGE)*.db.tar.bz2 \
+			  $(pacmaindir)/$(PACKAGE)*.db.tar.bz2 \
+			  $(pacdebgdir)/$(PACKAGE)*.db.tar.bz2 \
+			  $(pacdevldir)/$(PACKAGE)*.db.tar.bz2 \
+			  $(pacsrcsdir)/$(PACKAGE)*.db.tar.bz2 \
+			  $(pacfulldir)/$(PACKAGE)*.db.tar.xz \
+			  $(pacmaindir)/$(PACKAGE)*.db.tar.xz \
+			  $(pacdebgdir)/$(PACKAGE)*.db.tar.xz \
+			  $(pacdevldir)/$(PACKAGE)*.db.tar.xz \
+			  $(pacsrcsdir)/$(PACKAGE)*.db.tar.xz
+
+pacman_database_sigs	= $(pacfulldir)/$(PACKAGE)*.db.sig \
+			  $(pacmaindir)/$(PACKAGE)*.db.sig \
+			  $(pacdebgdir)/$(PACKAGE)*.db.sig \
+			  $(pacdevldir)/$(PACKAGE)*.db.sig \
+			  $(pacsrcsdir)/$(PACKAGE)*.db.sig \
+			  $(pacfulldir)/$(PACKAGE)*.db.tar.sig \
+			  $(pacmaindir)/$(PACKAGE)*.db.tar.sig \
+			  $(pacdebgdir)/$(PACKAGE)*.db.tar.sig \
+			  $(pacdevldir)/$(PACKAGE)*.db.tar.sig \
+			  $(pacsrcsdir)/$(PACKAGE)*.db.tar.sig \
+			  $(pacfulldir)/$(PACKAGE)*.db.tar.gz.sig \
+			  $(pacmaindir)/$(PACKAGE)*.db.tar.gz.sig \
+			  $(pacdebgdir)/$(PACKAGE)*.db.tar.gz.sig \
+			  $(pacdevldir)/$(PACKAGE)*.db.tar.gz.sig \
+			  $(pacsrcsdir)/$(PACKAGE)*.db.tar.gz.sig \
+			  $(pacfulldir)/$(PACKAGE)*.db.tar.bz2.sig \
+			  $(pacmaindir)/$(PACKAGE)*.db.tar.bz2.sig \
+			  $(pacdebgdir)/$(PACKAGE)*.db.tar.bz2.sig \
+			  $(pacdevldir)/$(PACKAGE)*.db.tar.bz2.sig \
+			  $(pacsrcsdir)/$(PACKAGE)*.db.tar.bz2.sig \
+			  $(pacfulldir)/$(PACKAGE)*.db.tar.xz.sig \
+			  $(pacmaindir)/$(PACKAGE)*.db.tar.xz.sig \
+			  $(pacdebgdir)/$(PACKAGE)*.db.tar.xz.sig \
+			  $(pacdevldir)/$(PACKAGE)*.db.tar.xz.sig \
+			  $(pacsrcsdir)/$(PACKAGE)*.db.tar.xz.sig
+
+pacman_sources_defs	= $(pacfulldir)/$(PACKAGE).defs \
+			  $(pacfulldir)/$(PACKAGE)-local.defs \
+			  $(pacdistdir)/$(PACKAGE).defs \
+			  $(pacdistdir)/$(PACKAGE)-local.defs
+
+pacman_files		= $(pacman_databases) \
+			  $(pacman_sources_defs)
+
+pacman_signs		= $(pacman_database_sigs)
+
+pacman_keys		=
+
+
+#!
+#! PACMAN Build Targets:
+#! ---------------------
+#!
+#! On pacman systems, or systems supporting pacman packaging and repository
+#! metadata creation tools, the following targets are used to manage pacman
+#! source repository meta data files.
+#!
+$(pacfulldir)/$(PACKAGE).defs:: Makefile
+	$(AM_V_GEN)\
+	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
+	for b in "$$rb" ; do \
+		for r in main debug devel source '' ; do \
+			d="$(pacdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
+			n="$(PACKAGE)$${b:+-$$b}$${r:+-$$r}" ; \
+			p= ; test -f $$d/$$n.db.tar.xz || p='#' ; \
+			$(ECHO) "$${p}[ $$n ]" ; \
+			$(ECHO) "$${p}SigLevel = PackageRequired" ; \
+			$(ECHO) "$${p}Server = "'$(reposerv)://$(repobase)/$(reporoot)/pkgs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r}" ; \
+		done ; \
+	done >$@
+
+$(pacfulldir)/$(PACKAGE)-local.defs:: Makefile
+	$(AM_V_GEN)\
+	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
+	for b in "$$rb" ; do \
+		for r in main debug devel source '' ; do \
+			d="$(pacdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
+			n="$(PACKAGE)$${b:+-$$b}$${r:+-$$r}" ; \
+			p= ; test -f $$d/$$n.db.tar.xz || p='#' ; \
+			$(ECHO) "$${p}[ $$n ]" ; \
+			$(ECHO) "$${p}SigLevel = PackageRequired" ; \
+			$(ECHO) "$${p}Server = "'file://$(DISTDIR)/pkgs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r}" ; \
+		done ; \
+	done >$@
+
+$(pacdistdir)/$(PACKAGE).defs:: Makefile
+	$(AM_V_GEN)\
+	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
+	case "$$rb" in (updates|extras|testing) rb= ;; esac ; \
+	for b in '' updates extras testing $$rb ; do \
+		for r in main debug devel source '' ; do \
+			d="$(pacdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
+			n="$(PACKAGE)$${b:+-$$b}$${r:+-$$r}" ; \
+			p= ; test -f $$d/$$n.db.tar.xz || p='#' ; \
+			$(ECHO) "$${p}[ $$n ]" ; \
+			$(ECHO) "$${p}SigLevel = PackageRequired" ; \
+			$(ECHO) "$${p}Server = "'$(reposerv)://$(repobase)/$(reporoot)/pkgs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r}" ; \
+		done ; \
+	done >$@
+
+$(pacdistdir)/$(PACKAGE)-local.defs:: Makefile
+	$(AM_V_GEN)\
+	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
+	case "$$rb" in (updates|extras|testing) rb= ;; esac ; \
+	for b in '' updates extras testing $$rb ; do \
+		for r in main debug devel source '' ; do \
+			d="$(pacdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
+			n="$(PACKAGE)$${b:+-$$b}$${r:+-$$r}" ; \
+			p= ; test -f $$d/$$n.db.tar.xz || p='#' ; \
+			$(ECHO) "$${p}[ $$n ]" ; \
+			$(ECHO) "$${p}SigLevel = PackageRequired" ; \
+			$(ECHO) "$${p}Server = "'file://$(DISTDIR)/pkgs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r}" ; \
+		done ; \
+	done >$@
+
+
+## Update pkg and src files that have been added to or removed from the distribution repository:
+## update the pacman meta data for the distribution repository.  This one does not sign packages or
+## databases.
+##
+repo-pacman:
+	@$(ECHO_V) "D: Making $@ in `pwd`" ; \
+	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
+	for b in "$$rb" ; do \
+		bd="$(pacdistdir)$${b:+/$$b}" ; \
+		$(ECHO_V) "D: $@: testing directory $$bd" ; \
+		test -d $$bd || continue ; \
+		tadds=; trmvs=; \
+		for r in main debug devel source ; do \
+			d="$(pacdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
+			$(ECHO_V) "D: $@: testing directory $$d" ; \
+			test -d $$d || continue ; \
+			$(ECHO_V) "D: $@: processing directory $$d" ; \
+			n="$(PACKAGE)$${b:+-$$b}$${r:+-$$r}.db" ; \
+			db="$$d/$$n" ; dbt="$$db.tar.xz" ; \
+			npkgs="`find $$bd -maxdepth 1 -follow -name '*.pkg.tar.xz' 2>/dev/null | case $$r in \
+				main)	grep -v -- '\(-debug\|-devel\|source-\|\.src\.tar\.gz$$\)' ;; \
+				debug)  grep -v -- '\(-devel\|source-\|\.src\.tar\.gz$$\)' | grep -- '-debug' ;; \
+				devel)  grep -v -- '\(-debug\|source-\|\.src\.tar\.gz$$\)' | grep -- '-devel' ;; \
+				source) grep -- '\(source-\|\.src\.tar\.gz$$\)' ;; \
+			esac | LANG= sort -u | sed 's,.*/,,'`" ; \
+			$(ECHO_V) "D: $@: npkgs=\"$$npkgs\"" ; \
+			nsrcs="`find $$bd -maxdepth 1 -follow -name '*.src.tar.gz' 2>/dev/null | case $$r in \
+				main)	grep -v -- '\(-debug\|-devel\|source-\|\.src\.tar\.gz$$\)' ;; \
+				debug)  grep -v -- '\(-devel\|source-\|\.src\.tar\.gz$$\)' | grep -- '-debug' ;; \
+				devel)  grep -v -- '\(-debug\|source-\|\.src\.tar\.gz$$\)' | grep -- '-devel' ;; \
+				source) grep -- '\(source-\|\.src\.tar\.gz$$\)' ;; \
+			esac | LANG= sort -u | sed 's,.*/,,'`" ; \
+			$(ECHO_V) "D: $@: nsrcs=\"$$nsrcs\"" ; \
+			opkgs="`find $$d -maxdepth 1 -follow -name '*.pkg.tar.xz' 2>/dev/null | LANG= sort -u | sed 's,.*/,,'`" ; \
+			$(ECHO_V) "D: $@: opkgs=\"$$opkgs\"" ; \
+			osrcs="`find $$d -maxdepth 1 -follow -name '*.src.tar.gz' 2>/dev/null | LANG= sort -u | sed 's,.*/,,'`" ; \
+			$(ECHO_V) "D: $@: osrcs=\"$$osrcs\"" ; \
+			adds=; rmvs=;  \
+			for p in $$npkgs ; do \
+				if test -L $$d/$$p -a $$dbt -nt $$bd/$$p -a \( ! -e $$bd/$$p.sig -o \( -L $$d/$$p.sig -a $$dbt -nt $$bd/$$p.sig \) \) ; then continue ; fi ; \
+				( cd $$d; ln -sf ../$$p $$p ; test ! -e ../$$p.sig || ln -sf ../$$p.sig $$p.sig ) ; \
+				$(ECHO_V) "D: $@: will add $$d/$$p" ; \
+				adds="$$adds$${adds:+ }$$d/$$p" ; \
+				case " $$tadds " in *" $$bd/$$p "*) ;; *) tadds="$$tadds$${tadds:+ }$$bd/$$p" ;; esac ; \
+			done ; \
+			for p in $$opkgs ; do \
+				if test -e $$bd/$$p ; then continue ; fi ; \
+				rm -f -- $$d/$$p $$d/$$p.sig ; \
+				n="`echo $$p | sed 's,-[^-]*-[^-]*-[^-]*$$,,'`" ; \
+				$(ECHO_V) "D: $@: will remove $$n" ; \
+				rmvs="$$rmvs$${rmvs:+ }$$n" ; \
+				case " $$trmvs " in *" $$n "*) ;; *) trmvs="$$trmvs$${trmvs:+ }$$n" ;; esac ; \
+			done ; \
+			for s in $$nsrcs ; do \
+				if test -L "$$d/$$s" ; then continue ; fi ; \
+				( cd $$d; ln -sf ../$$s $$s ; test ! -e ../$$s.sig || ln -sf ../$$s.sig $$s.sig ) ; \
+			done ; \
+			for s in $$osrcs ; do \
+				if test -e $$bd/$$s ; then continue ; fi ; \
+				rm -f -- $$d/$$s $$d/$$s.sig ; \
+			done ; \
+			if test -n "$$adds" ; then \
+				$(ECHO) " $(REPO_ADD) -f $$dbt $$adds" ; \
+				$(REPO_ADD) -f $$dbt $$adds ; \
+			fi ; \
+			if test -n "$$rmvs" ; then \
+				$(ECHO) " $(REPO_REMOVE) $$dbt $$rmvs" ; \
+				$(REPO_REMOVE) $$dbt $$rmvs ; \
+			fi ; \
+		done ; \
+		n="$(PACKAGE)$${b:+-$$b}.db" ; \
+		db="$$bd/$$n" ; dbt="$$db.tar.xz" ; \
+		tpkgs="`find $$bd -follow -maxdepth 1 -name '*.pkg.tar.xz' 2>/dev/null | LANG= sort -u | sed 's,.*/,,'`" ; \
+		tsrcs="`find $$bd -follow -maxdepth 1 -name '*.src.tar.gz' 2>/dev/null | LANG= sort -u | sed 's,.*/,,'`" ; \
+		for p in $$tpkgs ; do \
+			if test $$dbt -nt $$bd/$$p -a \( ! -e $$bd/$$p.sig -o $$dbt -nt $$bd/$$p.sig \) ; then continue ; fi ; \
+			$(ECHO_V) "D: $@: will add $$bd/$$p" ; \
+			case " $$tadds " in *" $$bd/$$p "*) ;; *) tadds="$$tadds$${tadds:+ }$$bd/$$p" ; esac ; \
+		done ; \
+		if test -n "$$tadds" ; then \
+			$(ECHO) " $(REPO_ADD) -f $$dbt $$tadds" ; \
+			$(REPO_ADD) -f $$dbt $$tadds ; \
+		fi ; \
+		if test -n "$$trmvs" ; then \
+			$(ECHO) " $(REPO_REMOVE) $$dbt $$trmvs" ; \
+			$(REPO_REMOVE) $$dbt $$trmvs ; \
+		fi ; \
+	done
+
+## Update pkg and src files that have been added to or removed from the distribution repository:
+## update the pacman meta data for the distribution repository.  This one signs packages and
+## databases as required.
+##
+repo-sign-pacman: repo-pacman
+	@$(ECHO_V) "D: Making $@ in `pwd`" ; \
+	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
+	for b in "$$rb" ; do \
+		for r in main debug devel source '' ; do \
+			d="$(pacdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
+			test -d $$d || continue ; \
+			n="$(PACKAGE)$${b:+-$$b}$${r:+-$$r}.db" ; \
+			f="$$d/$$n.tar.xz" ; a="$$f.sig" ; \
+			if test -s $$f ; then \
+				$(am__gpg_binary_sign_file) ; \
+				( cd "$$d"; $(LN_S) -f $$n.tar.xz.sig $$n.sig ) ; \
+			fi ; \
+		done ; \
+	done
+
+repo-clean-pacman:
+
+REPO_DIRECTORIES	+= $(pacdir) $(pacfulldir) $(pacmaindir) $(pacdebgdir) $(pacdevldir) $(pacsrcsdir)
+REPO			+= repo-pacman
+REPO_SIGN		+= repo-sign-pacman
+REPO_CLEAN		+= repo-clean-pacman
+REPOCLEANFILES		+= $(pacman_files) $(pacman_signs) $(pacman_keys)
+
+RELEASE_DIRECTORIES	+= $(pacdir) $(pacfulldir) $(pacmaindir) $(pacdebgdir) $(pacdevldir) $(pacsrcsdir)
+RELEASE			+= repo-pacman
+RELEASE_SIGN		+= repo-sign-pacman
+RELEASE_CLEAN_LOCAL	+= repo-clean-pacman
+RELEASECLEANFILES	+= $(pacman_files) $(pacman_signs) $(pacman_keys)
+
+UPDATE_DIRECTORIES	+= $(pacdir) $(pacfulldir) $(pacmaindir) $(pacdebgdir) $(pacdevldir) $(pacsrcsdir)
+UPDATE			+= repo-pacman
+UPDATE_SIGN		+= repo-sign-pacman
+UPDATE_CLEAN_LOCAL	+= repo-pacman repo-sign-pacman
+UPDATECLEANFILES	+=
+
+
+## Release or update pkg files have been added to or removed from the repository: update the pacman
+## metadata for the repository.
+##
+release-update-pacman:
+	@$(ECHO_V) "D: Making $@ in `pwd`" ; \
+	test '$(DISTDIR)' != '$(REPODIR)' || exit 0 ; \
+	empty_repo=yes ; \
+	repodir=`echo '$(pacdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+	rb=`echo '$(repobranch)' | sed -e 's,^//*,,'` ; \
+	for b in '' updates extras testing $$rb ; do \
+		bd="$${repodir}$${b:+/$$b}" ; \
+		$(ECHO_V) "D: $@: testing directory $$bd" ; \
+		test -d $$bd || continue ; \
+		empty_subrepo=yes ; \
+		for r in main debug devel source ; do \
+			d="$${repodir}$${b:+/$$b}$${r:+/$$r}" ; \
+			$(ECHO_V) "D: $@: testing directory $$d" ; \
+			test -d $$d || mkdir -p -- $$d ; \
+			$(ECHO_V) "D: $@: processing directory $$d" ; \
+			n="$(PACKAGE)$${b:+=$$b}$${r:+-$$r}.db" ; \
+			db="$$d/$$n" ; dbt="$$db.tar.xz" ; \
+			empty_database=yes ; \
+			pkgs="`find $$bd -maxdepth 1 -follow -name '*.pkg.tar.xz' 2>/dev/null | case $$r in \
+				main)	grep -v -- '\(-debug\|-devel\|source-\|\.src\.tar\.gz$$\)' ;; \
+				debug)  grep -v -- '\(-devel\|source-\|\.src\.tar\.gz$$\)' | grep -- '-debug' ;; \
+				devel)  grep -v -- '\(-debug\|source-\|\.src\.tar\.gz$$\)' | grep -- '-devel' ;; \
+				source) grep -- '\(source-\|\.src\.tar\.gz$$\)' ;; \
+			esac | LANG= sort -u | sed 's,.*/,,'`" ; \
+			$(ECHO_V) "D: $@: pkgs=\"$$pkgs\"" ; \
+			srcs="`find $$bd -maxdepth 1 -follow -name '*.src.tar.gz' 2>/dev/null | case $$r in \
+				main)	grep -v -- '\(-debug\|-devel\|source-\|\.src\.tar\.gz$$\)' ;; \
+				debug)  grep -v -- '\(-devel\|source-\|\.src\.tar\.gz$$\)' | grep -- '-debug' ;; \
+				devel)  grep -v -- '\(-debug\|source-\|\.src\.tar\.gz$$\)' | grep -- '-devel' ;; \
+				source) grep -- '\(source-\|\.src\.tar\.gz$$\)' ;; \
+			esac | LANG= sort -u | sed 's,.*/,,'`" ; \
+			$(ECHO_V) "D: $@: srcs=\"$$srcs\"" ; \
+			$(ECHO) "rm -f -- $$db $$db.tar $$db.tar.gz $$db.tar.bz2 $$db.tar.xz" ; \
+			rm -f -- $$db $$db.tar $$db.tar.gz $$db.tar.bz2 $$db.tar.xz ; \
+			$(ECHO) "rm -f -- $$d/*.pkg.tar.xz $$d/*.pkg.tar.xz.sig" ; \
+			rm -f -- $$d/*.pkg.tar.xz $$d/*.pkg.tar.xz.sig ; \
+			$(ECHO) "rm -f -- $$d/*.src.tar.gz $$d/*.src.tar.gz.sig" ; \
+			rm -f -- $$d/*.src.tar.gz $$d/*.src.tar.gz.sig ; \
+			for p in $$pkgs ; do \
+				( cd $$d; ln -sf ../$$p $$p ; test ! -e ../$$p.sig || ln -sf ../$$p.sig $$p.sig ) ; \
+			done ; \
+			for s in $$srcs ; do \
+				( cd $$d; ln -sf ../$$s $$s ; test ! -e ../$$s.sig || ln -sf ../$$s.sig $$s.sig ) ; \
+			done ; \
+			if test -n "$$pkgs" ; then \
+				$(ECHO) " $(REPO_ADD) -f $$dbt $$pkgs" ; \
+				( cd $$d ; $(REPO_ADD) -f $$dbt $$pkgs ) ; \
+				empty_database=no ; \
+			fi ; \
+			if test -n "$$srcs" ; then \
+				if test -n '$(ABS_ADD)' ; then \
+					$(ECHO) " $(ABS_ADD) -f $$dbt $$srcs" ; \
+					( cd $$d ; $(ABS_ADD) -f $$dbt $$srcs ) ; \
+				fi ; \
+			fi ; \
+			if test $${empty_database:-yes} = no ; then \
+				f="$$dbt"; a="$$dbt.sig" ; \
+				$(am__gpg_binary_sign_file) ; \
+				$(ECHO) " $(LN_S) -f $$n.tar.xz.sig $$n.sig" ; \
+				( cd "$$d"; $(LN_S) -f $$n.tar.xz.sig $$n.sig ) ; \
+				empty_subrepo=no ; \
+			else \
+				$(ECHO) "  rmdir -pv $$d" ; \
+				rmdir -pv -- $$d || : ; \
+			fi ; \
+		done ; \
+		n="$(PACKAGE)$${b:+-$$b}.db" ; \
+		db="$$bd/$$n" ; dbt="$$db.tar.xz" ; \
+		pkgs="`find $$bd -follow -maxdepth 1 -name '*.pkg.tar.xz' 2>/dev/null | LANG= sort -u | sed 's,.*/,,'`" ; \
+		srcs="`find $$bd -follow -maxdepth 1 -name '*.src.tar.gz' 2>/dev/null | LANG= sort -u | sed 's,.*/,,'`" ; \
+		$(ECHO) "rm -f -- $$db $$db.tar $$db.tar.gz $$db.tar.bz2 $$db.tar.xz" ; \
+		rm -f -- $$db $$db.tar $$db.tar.gz $$db.tar.bz2 $$db.tar.xz ; \
+		if test -n "$$pkgs" ; then \
+			$(ECHO) " $(REPO_ADD) -f $$dbt $$pkgs" ; \
+			( cd $$bd ; $(REPO_ADD) -f $$dbt $$pkgs ) ; \
+			empty_subrepo=no ; \
+		fi ; \
+		if test -n "$$srcs" ; then \
+			empty_subrepo=no ; \
+		fi ; \
+		f="$$bd/$(PACKAGE)" ; \
+		$(ECHO) "rm -f -- $$f.defs $$f-local.defs" ; \
+		if test $${empty_subrepo:-yes} = no ; then \
+			$(ECHO) "  GEN   $$(basename $$f.defs)" ; \
+			for r in main debug devel source '' ; do \
+				d="$$repodir$${b:+/$$b}$${r:+/$$r}" ; \
+				n="$(PACKAGE)$${b:+-$$b}$${r:+-$$r}" ; \
+				p= ; test -f $$d/$$n.db.tar.xz || p='#' ; \
+				$(ECHO) "$${p}[ $$n ]" ; \
+				$(ECHO) "$${p}SigLevel = PackageRequired" ; \
+				$(ECHO) "$${p}Server = "'$(reposerv)://$(repobase)/$(reporoot)/pkgs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r}" ; \
+			done >$$f.defs ; \
+			$(ECHO) "  GEN   $$(basename $$f-local.defs)" ; \
+			for r in main debug devel source '' ; do \
+				d="$$repodir$${b:+/$$b}$${r:+/$$r}" ; \
+				n="$(PACKAGE)$${b:+-$$b}$${r:+-$$r}" ; \
+				p= ; test -f $$d/$$n.db.tar.xz || p='#' ; \
+				$(ECHO) "$${p}[ $$n ]" ; \
+				$(ECHO) "$${p}SigLevel = PackageRequired" ; \
+				$(ECHO) "$${p}Server = "'file://$(REPODIR)/pkgs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r}" ; \
+			done >$$f-local.defs ; \
+			empty_repo=no ; \
+		else \
+			$(ECHO) "  rmdir -pv $$bd" ; \
+			rmdir -pv -- $$bd || : ; \
+		fi ; \
+	done ; \
+	f="$$repodir/$(PACKAGE)" ; \
+	$(ECHO) "rm -f -- $$f.defs $$f-local.defs" ; \
+	rm -f -- $$f.defs $$f-local.defs ; \
+	if test $${empty_repo:-yes} = no ; then \
+		$(ECHO) "  GEN   $$(basename $$f.defs)" ; \
+		for b in '' updates extras testing $$rb ; do \
+			for r in main debug devel source '' ; do \
+				d="$$repodir$${b:+/$$b}$${r:+/$$r}" ; \
+				n="$(PACKAGE)$${b:+-$$b}$${r:+-$$r}" ; \
+				p= ; test -f $$d/$$n.db.tar.xz || p='#' ; \
+				$(ECHO) "$${p}[ $$n ]" ; \
+				$(ECHO) "$${p}SigLevel = PackageRequired" ; \
+				$(ECHO) "$${p}Server = "'$(reposerv)://$(repobase)/$(reporoot)/pkgs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r}" ; \
+			done ; \
+		done >$$f.defs ; \
+		$(ECHO) " GEN   $$(basename $$f-local.defs)" ; \
+		for b in '' updates extras testing $$rb ; do \
+			for r in main debug devel source '' ; do \
+				d="$$repodir$${b:+/$$b}$${r:+/$$r}" ; \
+				n="$(PACKAGE)$${b:+-$$b}$${r:+-$$r}" ; \
+				p= ; test -f $$d/$$n.db.tar.xz || p='#' ; \
+				$(ECHO) "$${p}[ $$n ]" ; \
+				$(ECHO) "$${p}SigLevel = PackageRequired" ; \
+				$(ECHO) "$${p}Server = "'file://$(REPODIR)/pkgs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r}" ; \
+			done ; \
+		done >$$f-local.defs ; \
+	else \
+		$(ECHO) "  rmdir -pv $$repodir" ; \
+		rmdir -pv -- $$repodir || : ; \
+	fi
+
+RELEASE_INSTALL		+= release-update-pacman
+RELEASE_UNINSTALL	+= release-update-pacman
+
+UPDATE_INSTALL		+= release-update-pacman
+UPDATE_UNINSTALL	+= release-update-pacman
+
+## BUILD_REPO_PACMAN
+endif
+
+## BUILD_PKGS
+endif
+
+## MAINTAINER_MODE
+endif
+
+## =============================================================================
+##
+## $Log$
+## =============================================================================
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

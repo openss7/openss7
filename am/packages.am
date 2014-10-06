@@ -1,0 +1,189 @@
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
+## =============================================================================
+## 
+# @(#) $RCSfile: packages.am,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-03-17 07:01:27 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU Affero General Public License as published by the Free
+## Software Foundation; version 3 of the License.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+## details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+## write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+## 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2011-03-17 07:01:27 $ by $Author: brian $
+##
+## =============================================================================
+
+##
+## This automake file fragment includes rules for generating external source and binary
+## compatibility packages.
+##
+
+-include $(STRCONF_PKGRULE)
+
+DISTCLEANFILES		+= $(PACKAGE_WRAPPERS)
+
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
+if PKG_BUILD_KERNEL
+## PKG_BUILD_KERNEL
+##
+noinst_LIBRARIES		+= libBCMpkgs.a
+
+if AMDEP
+## AMDEP
+-include $(DEPDIR)/packages.Ph
+
+$(DEPDIR)/packages.Ph: Makefile
+	$(AM_V_at)test -d $(DEPDIR) || $(MKDIR_P) $(DEPDIR)
+	@$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "Creating $@ dependencies..." ; \
+	( \
+		objs= ; \
+		list="$(PACKAGE_OBJECTS)" ; for obj in $$list ; do \
+			a=`echo "$$obj" | sed 's,\<lib.*_a-,$(kpre),'` ; \
+			s=`echo "$$obj" | sed 's,\<lib.*_a-,,;s,\<$(kpre),,;s,\.o$$,,'` ; \
+			if test -f "$$s" ; then d= ; else d="$(srcdir)/" ; fi ; \
+			if test -f "$$d$$s" ; then s="$$s.c" ; else s= ; fi ; \
+			if test "$$a" = "$$obj" ; then \
+				echo "$$a: $$s" ; echo "" ; \
+			else \
+				echo "$$a: $$obj $$s" ; echo "" ; \
+			fi ; \
+			objs="$${objs:+$${objs} }$$obj" ; \
+		done ; \
+		echo "stamp-pkgobjs: $$objs" ; echo "" ; \
+	) >$(DEPDIR)/packages.Tph || { rm -f -- $(DEPDIR)/packages.Tph ; exit 1 ; } ; \
+	$(am__mv) $(DEPDIR)/packages.Tph $@
+
+DISTCLEANFILES += $(DEPDIR)/packages.Tph $(DEPDIR)/packages.Ph
+
+distclean-packages_Ph:
+	@( \
+		echo "$(DEPDIR)/packages.Tph" ; \
+		echo "$(DEPDIR)/packages.Ph" ; \
+		list="$(PACKAGE_SRCFILES)" ; for s in $$list ; do \
+			r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
+			echo "$(DEPDIR)/libBCMpkgs_a-$$r.Tpo" ; \
+			echo "$(DEPDIR)/libBCMpkgs_a-$$r.Po" ; \
+		done \
+	) | $(am__base_remove)
+
+DISTCLEAN_LOCAL += distclean-packages_Ph
+## AMDEP
+endif
+
+libBCMpkgs_a_SOURCES		= $(PACKAGE_SRCFILES)
+libBCMpkgs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+libBCMpkgs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
+libBCMpkgs_a_CFLAGS		= $(KERNEL_CFLAGS)
+$(libBCMpkgs_a_OBJECTS):	$(libBCMpkgs_a_SOURCES) $(libBCMpkgs_a_DEPENDENCIES)
+
+if am__fastdepCC
+## am__fastdepCC
+stamp-pkgobjs: $(PACKAGE_SRCFILES)
+	@list="$(PACKAGE_SRCFILES)" ; for s in $$list ; do \
+		if test -f "$$s" ; then d=; else d="$(srcdir)/" ; fi ; \
+		r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
+		if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) -DKBUILD_BASENAME=$$r $(libBCMpkgs_a_CPPFLAGS) $(CPPFLAGS) $(libBCMpkgs_a_CFLAGS) $(CFLAGS) -MT libBCMpkgs_a-$$r.o -MD -MP -MF "$(DEPDIR)/libBCMpkgs_a-$$r.Tpo" -c -o libBCMpkgs_a-$$r.o $$d$$s ; \
+		then $(am__mv) "$(DEPDIR)/libBCMpkgs_a-$$r.Tpo" "$(DEPDIR)/libBCMpkgs_a-$$r.Po" ; else rm -f -- "$(DEPDIR)/libBCMpkgs_a-$$r.Tpo" ; exit 1 ; fi ; \
+	done ; \
+	touch stamp-pkgobjs
+## am__fastdepCC
+else
+## !am__fastdepCC
+if AMDEP
+## AMDEP
+stamp-pkgobjs: $(PACKAGE_SRCFILES)
+	@list"$(PACKAGE_SRCFILES)" ; for s in $$list ; do \
+		if test -f "$$s" ; then d=; else d="$(srcdir)/" ; fi ; \
+		r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
+		source="$$s" object="libBCMpkgs_a-$$r.o" libtool=no \
+		DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) -DKBUILD_BASENAME=$$r $(libBCMpkgs_a_CPPFLAGS) $(CPPFLAGS) $(libBCMpkgs_a_CFLAGS) $(CFLAGS) -c -o libBCMpkgs_a-$$r.o $$d$$s ; \
+	done ; \
+	touch stamps-pkgobjs
+## AMDEP
+else
+## !AMDEP
+stamp-pkgobjs: $(PACKAGE_SRCFILES)
+	@list"$(PACKAGE_SRCFILES)" ; for s in $$list ; do \
+		if test -f "$$s" ; then d=; else d="$(srcdir)/" ; fi ; \
+		r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
+		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) -DKBUILD_BASENAME=$$r $(libBCMpkgs_a_CPPFLAGS) $(CPPFLAGS) $(libBCMpkgs_a_CFLAGS) $(CFLAGS) -c -o libBCMpkgs_a-$$r.o $$d$$s ; \
+	done ; \
+	touch stamps-pkgobjs
+## !AMDEP
+endif
+## !am__fastdepCC
+endif
+
+clean-pkgobjs:
+	@objs=`echo " $(PACKAGE_SRCFILES) " | sed 's, *  , ,g;s, [^[:space:]]*/, libBCMpkgs_a-,g;s,\.c ,.o ,g'` ; \
+	list="stamp-pkgobjs $$objs" ; $(am__list_remove)
+
+CLEAN_LOCAL		+= clean-pkgobjs
+
+## PKG_BUILD_KERNEL
+endif
+## PKG_BUILD_ARCH
+endif
+
+## =============================================================================
+##
+## $Log: packages.am,v $
+## Revision 1.1.2.5  2011-03-17 07:01:27  brian
+## - build and repo system improvements
+##
+## Revision 1.1.2.4  2009-07-21 11:06:11  brian
+## - changes from release build
+##
+## Revision 1.1.2.3  2009-07-13 07:13:26  brian
+## - changes for multiple distro build
+##
+## Revision 1.1.2.2  2009-06-29 07:35:35  brian
+## - improvements to build process
+##
+## Revision 1.1.2.1  2009-06-21 10:26:00  brian
+## - added files to new distro
+##
+## =============================================================================
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

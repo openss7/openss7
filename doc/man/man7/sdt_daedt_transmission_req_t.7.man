@@ -1,0 +1,1 @@
+.so man7/SDT_DAEDT_TRANSMISSION_REQ.7.man

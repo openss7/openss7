@@ -1,0 +1,1 @@
+.so man3/XMP.3.man

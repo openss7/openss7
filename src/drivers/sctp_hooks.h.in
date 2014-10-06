@@ -1,0 +1,283 @@
+/*****************************************************************************
+
+ @(#) $Id: sctp_hooks.h.in,v 1.1.2.7 2011-04-07 15:24:03 brian Exp $
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation; version 3 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2011-04-07 15:24:03 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sctp_hooks.h.in,v $
+ Revision 1.1.2.7  2011-04-07 15:24:03  brian
+ - weak reference corrections
+
+ Revision 1.1.2.6  2011-04-05 16:35:13  brian
+ - weak module design
+
+ Revision 1.1.2.5  2011-03-26 04:28:47  brian
+ - updates to build process
+
+ Revision 1.1.2.4  2011-01-12 04:10:30  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
+ Revision 1.1.2.3  2010-11-28 14:32:25  brian
+ - updates to support debian squeeze 2.6.32 kernel
+
+ Revision 1.1.2.2  2009-07-23 16:37:53  brian
+ - updates for release
+
+ Revision 1.1.2.1  2009-06-21 11:20:52  brian
+ - added files to new distro
+
+ Revision 0.9.2.15  2008-10-23 09:34:11  brian
+ - updates for release and compatibility
+
+ Revision 0.9.2.14  2008-10-13 04:12:20  brian
+ - handle exports rework strinet
+
+ Revision 0.9.2.13  2008-09-10 03:49:54  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
+ Revision 0.9.2.12  2008-08-02 07:26:44  brian
+ - recent Fedora kernel does not export secure_tcp_sequence_number
+
+ Revision 0.9.2.11  2007/08/14 06:22:22  brian
+ - GPLv3 header update
+
+ *****************************************************************************/
+
+#ifndef __LOCAL_SCTP_HOOKS_H__
+#define __LOCAL_SCTP_HOOKS_H__
+
+#include "ip_hooks.h"
+
+#undef UNUSED
+#define UNUSED 0
+
+#if UNUSED
+#undef HAVE_TCP_MEMORY_ALLOCATED_SYMBOL
+#ifdef HAVE_TCP_MEMORY_ALLOCATED_SYMBOL
+#undef HAVE_TCP_MEMORY_ALLOCATED_SUPPORT
+#if defined HAVE_TCP_MEMORY_ALLOCATED_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern atomic_t tcp_memory_allocated;
+#else
+extern atomic_t tcp_memory_allocated;
+#endif
+#endif
+#endif
+
+#if UNUSED
+#undef HAVE_TCP_SOCKETS_ALLOCATED_SYMBOL
+#ifdef HAVE_TCP_SOCKETS_ALLOCATED_SYMBOL
+#undef HAVE_TCP_SOCKETS_ALLOCATED_SUPPORT
+#if defined HAVE_TCP_SOCKETS_ALLOCATED_SUPPORT || !defined CONFIG_KERNEL_WEAK_SUPPORT
+extern atomic_t tcp_sockets_allocated;
+#else
+extern atomic_t tcp_sockets_allocated;
+#endif
+#endif
+#endif
+
+#if UNUSED
+#undef HAVE_TCP_SOCKETS_ALLOCATED_SYMBOL
+#ifdef HAVE_TCP_SOCKETS_ALLOCATED_SYMBOL
+#undef HAVE_TCP_SOCKETS_ALLOCATED_SUPPORT
+#if defined HAVE_TCP_SOCKETS_ALLOCATED_SUPPORT || !defined CONFIG_KERNEL_WEAK_SUPPORT
+extern atomic_t tcp_orphan_count;
+#else
+extern atomic_t tcp_orphan_count;
+#endif
+#endif
+#endif
+
+#if UNUSED
+#undef HAVE_TCP_TW_COUNT_SYMBOL
+#ifdef HAVE_TCP_TW_COUNT_SYMBOL
+#undef HAVE_TCP_TW_COUNT_SUPPORT
+#if defined HAVE_TCP_TW_COUNT_SUPPORT || !defined CONFIG_KERNEL_WEAK_SUPPORT
+extern int tcp_tw_count;
+#else
+extern int tcp_tw_count;
+#endif
+#endif
+#endif
+
+#if UNUSED
+#undef HAVE_IP_CMSG_RECV_SYMBOL
+#ifdef HAVE_IP_CMSG_RECV_SYMBOL
+#undef HAVE_IP_CMSG_RECV_SUPPORT
+#if defined HAVE_IP_CMSG_RECV_SUPPORT || !defined CONFIG_KERNEL_WEAK_SUPPORT
+extern void ip_cmsg_recv(struct msghdr *msg, struct sk_buff *skb);
+#else
+extern void ip_cmsg_recv(struct msghdr *msg, struct sk_buff *skb);
+#endif
+#endif
+#endif
+
+#if UNUSED
+#undef HAVE_INET_BIND_SYMBOL
+#ifdef HAVE_INET_BIND_SYMBOL
+#undef HAVE_INET_BIND_SUPPORT
+#if defined HAVE_INET_BIND_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern int inet_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len);
+#else
+extern int inet_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len);
+#endif
+#endif
+#endif
+
+#if UNUSED
+#undef HAVE_INET_IOCTL_SYMBOL
+#ifdef HAVE_INET_IOCTL_SYMBOL
+#undef HAVE_INET_IOCTL_SUPPORT
+#if defined HAVE_INET_IOCTL_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern int inet_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg);
+#else
+extern int inet_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg);
+#endif
+#endif
+#endif
+
+#if UNUSED
+#undef HAVE_INET_GETNAME_SYMBOL
+#ifdef HAVE_INET_GETNAME_SYMBOL
+#undef HAVE_INET_GETNAME_SUPPORT
+#if defined HAVE_INET_GETNAME_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern int inet_getname(struct socket *sock, struct sockaddr *uaddr, int *uaddr_len, int peer);
+#else
+extern int inet_getname(struct socket *sock, struct sockaddr *uaddr, int *uaddr_len, int peer);
+#endif
+#endif
+#endif
+
+#if UNUSED
+#undef HAVE_INET_MULTI_GETNAME_SYMBOL
+#ifdef HAVE_INET_MULTI_GETNAME_SYMBOL
+#undef HAVE_INET_MULTI_GETNAME_SUPPORT
+#if defined HAVE_INET_MULTI_GETNAME_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern int inet_multi_getname(struct socket *sock, struct sockaddr *uaddr, int *uaddr_len, int peer);
+#else
+extern int inet_multi_getname(struct socket *sock, struct sockaddr *uaddr, int *uaddr_len, int peer);
+#endif
+#endif
+#endif
+
+#if UNUSED
+#undef HAVE_SOCKET_GET_INFO_SYMBOL
+#ifdef HAVE_SOCKET_GET_INFO_SYMBOL
+#undef HAVE_SOCKET_GET_INFO_SUPPORT
+#if defined HAVE_SOCKET_GET_INFO_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern int socket_get_info(char *buffer, char **start, off_t offset, int length);
+#else
+extern int socket_get_info(char *buffer, char **start, off_t offset, int length);
+#endif
+#endif
+#endif
+
+#if UNUSED
+#undef HAVE_AFINET_GET_INFO_SYMBOL
+#ifdef HAVE_AFINET_GET_INFO_SYMBOL
+#undef HAVE_AFINET_GET_INFO_SUPPORT
+#if defined HAVE_AFINET_GET_INFO_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern int afinet_get_info(char *buffer, char **start, off_t offset, int length);
+#else
+extern int afinet_get_info(char *buffer, char **start, off_t offset, int length);
+#endif
+#endif
+#endif
+
+#if UNUSED
+#undef HAVE_TCP_PROT_SYMBOL
+#ifdef HAVE_TCP_PROT_SYMBOL
+#undef HAVE_TCP_PROT_SUPPORT
+#if defined HAVE_TCP_PROT_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern struct proto tcp_prot;
+#else
+extern struct proto tcp_prot;
+#endif
+#endif
+#endif
+
+#if UNUSED
+#undef HAVE_UDP_PROT_SYMBOL
+#ifdef HAVE_UDP_PROT_SYMBOL
+#undef HAVE_UDP_PROT_SUPPORT
+#if defined HAVE_UDP_PROT_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern struct proto udp_prot;
+#else
+extern struct proto udp_prot;
+#endif
+#endif
+#endif
+
+#if UNUSED
+#undef HAVE_RAW_PROT_SYMBOL
+#ifdef HAVE_RAW_PROT_SYMBOL
+#undef HAVE_RAW_PROT_SUPPORT
+#if defined HAVE_RAW_PROT_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern struct proto raw_prot;
+#else
+extern struct proto raw_prot;
+#endif
+#endif
+#endif
+
+#undef HAVE_SECURE_TCP_SEQUENCE_NUMBER_SYMBOL
+#ifdef HAVE_SECURE_TCP_SEQUENCE_NUMBER_SYMBOL
+#undef HAVE_SECURE_TCP_SEQUENCE_NUMBER_SUPPORT
+#if defined HAVE_SECURE_TCP_SEQUENCE_NUMBER_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern __u32 secure_tcp_sequence_number(__u32 saddr, __u32 daddr, __u16 sport, __u16 dport);
+#else
+extern __u32 secure_tcp_sequence_number(__u32 saddr, __u32 daddr, __u16 sport, __u16 dport);
+#endif
+#else
+#error Need a way to get a secure tcp sequence number.
+#endif
+
+#undef UNUSED
+
+#endif				/* __LOCAL_SCTP_HOOKS_H__ */

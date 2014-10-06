@@ -1,0 +1,297 @@
+@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
+@c =========================================================================
+@c
+@c @(#) $Id: compat.texi,v 1.1.2.7 2011-08-07 11:14:38 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to copy, distribute and/or modify this document
+@c under the terms of the GNU Free Documentation License, Version 1.3 or
+@c any later version published by the Free Software Foundation; with no
+@c Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+@c copy of the license is included in the section entitled "GNU Free
+@c Documentation License".
+@c
+@c Permission to use, copy and distribute this documentation without
+@c modification, for any purpose and without fee or royalty is hereby
+@c granted, provided that both the above copyright notice and this
+@c permission notice appears in all copies and that the name of OpenSS7
+@c Corporation not be used in advertising or publicity pertaining to
+@c distribution of this documentation or its contents without specific,
+@c written prior permission.  OpenSS7 Corporation makes no representation
+@c about the suitability of this documentation for any purpose.  It is
+@c provided "as is" without express or implied warranty.
+@c 
+@c Permission is granted to process this file through Tex and print the
+@c results, provided the printed document carries copying permission notice
+@c identical to this one except for the removal of this paragraph (this
+@c paragraph not being relevant to the printed manual).
+@c 
+@c OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+@c DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+@c FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+@c CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+@c IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+@c PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+@c OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+@c CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+@c USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+@c OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+@c THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+@c THEREOF.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not have
+@c taken the same level of care in the production of this manual, which is
+@c licensed free of charge, as they might when working professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by the
+@c source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2011-08-07 11:14:38 $ by $Author: brian $
+@c
+@c =========================================================================
+
+@c ----------------------------------------------------------------------------
+
+@node GNU/Linux Distributions
+@subsection GNU/Linux Distributions
+@cindex GNU/Linux Distributions
+
+@dfn{@value{PACKAGE_TITLE}} is compatible with the following @dfn{Linux}
+distributions:@footnote{Items marked as @samp{TBD} are scheduled to have support deprecated.  That
+is, in a future release, the distributions marked @samp{TBD} will not longer be validated before
+release.}
+
+@itemize @bullet
+@item CentOS Enterprise Linux 3.4 (centos34) TBD
+@item CentOS Enterprise Linux 4.0 (centos4) TBD
+@item CentOS Enterprise Linux 4.92 (centos49) TBD
+@item CentOS Enterprise Linux 5.0 (centos5)
+@item CentOS Enterprise Linux 5.1 (centos51)
+@item CentOS Enterprise Linux 5.2 (centos52)
+@item CentOS Enterprise Linux 5.3 (centos53)
+@item CentOS Enterprise Linux 5.4 (centos54)
+@item CentOS Enterprise Linux 5.5 (centos55)
+@item CentOS Enterprise Linux 5.6 (centos56)
+@item CentOS Enterprise Linux 5.7 (centos57) (untested)
+@item CentOS Enterprise Linux 6.0 (centos60)
+@item CentOS Enterprise Linux 6.1 (centos61) (untested)
+@item Debian 3.0r2 Woody (deb3.0) TBD
+@item Debian 3.1r0a Sarge (deb3.1) TBD
+@item Debian 4.0r1 Etch (deb4.0)
+@item Debian 4.0r2 Etch (deb4.0)
+@item Debian 4.0r3 Etch (deb4.0)
+@item Debian 5.0 Lenny (deb5.0)
+@item Debian 6.0 Squeeze (deb6.0)
+@item Debian 7.0 Wheezy (deb7.0)
+@item Fedora Core 1 (FC1) TBD
+@item Fedora Core 2 (FC2) TBD
+@item Fedora Core 3 (FC3) TBD
+@item Fedora Core 4 (FC4) TBD
+@item Fedora Core 5 (FC5) TBD
+@item Fedora Core 6 (FC6) TBD
+@item Fedora 7 (FC7)
+@item Fedora 8 (FC8)
+@item Fedora 9 (FC9)
+@item Fedora 10 (FC10)
+@item Fedora 11 (FC11)
+@item Fedora 12 (FC12)
+@item Fedora 13 (FC13)
+@item Fedora 14 (FC14)
+@item Fedora 15 (FC15)
+@item Gentoo 2006.1 (untested) TBD
+@item Gentoo 2007.1 (untested) TBD
+@item Lineox 4.026 (LEL4) TBD
+@item Lineox 4.053 (LEL4) TBD
+@item Mandrakelinux 9.2 (MDK92) TBD
+@item Mandrakelinux 10.0 (MDK100) TBD
+@item Mandrakelinux 10.1 (MDK101) TBD
+@item Mandriva Linux LE2005 (MDK102) TBD
+@item Mandriva Linux LE2006 (MDK103) TBD
+@item Mandriva One (untested)
+@item Mandriva 2010.2 (MDV2010)
+@item Mandriva Enterprise Server 5.2 (MES52)
+@item Oracle Linux Server 5.4 (OLS5)
+@item Oracle Linux Server 5.5 (OLS5)
+@item Oracle Linux Server 5.6 (OLS5)
+@item Oracle Linux Server 5.7 (OLS5)
+@item Oracle Linux Server 6.0 (OLS6)
+@item Oracle Linux Server 6.1 (OLS6)
+@item PUIAS Linux 5.4 (PUIAS5)
+@item PUIAS Linux 5.5 (PUIAS5)
+@item PUIAS Linux 5.6 (PUIAS5)
+@item PUIAS Linux 5.7 (PUIAS5)
+@item PUIAS Linux 6.0 (PUIAS6)
+@item PUIAS Linux 6.1 (PUIAS6)
+@item RedHat Enterprise Linux 3.0 (EL3) TBD
+@item RedHat Enterprise Linux 4 (EL4) TBD
+@item RedHat Enterprise Linux 5 (EL5)
+@item RedHat Enterprise Linux 5.1 (EL5)
+@item RedHat Enterprise Linux 5.2 (EL5)
+@item RedHat Enterprise Linux 5.3 (EL5)
+@item RedHat Enterprise Linux 5.4 (EL5)
+@item RedHat Enterprise Linux 5.5 (EL5)
+@item RedHat Enterprise Linux 5.6 (EL5)
+@item RedHat Enterprise Linux 5.7 (EL5)
+@item RedHat Enterprise Linux 6 (EL6)
+@item RedHat Enterprise Linux 6.1 (EL6)
+@item RedHat Linux 7.2 (RH7)
+@item RedHat Linux 7.3 (RH7)
+@item RedHat Linux 8.0 (RH8) TBD
+@item RedHat Linux 9 (RH9) TBD
+@item Scientific Linux 5 (SL5)
+@item Scientific Linux 5.1 (SL5)
+@item Scientific Linux 5.2 (SL5)
+@item Scientific Linux 5.3 (SL5)
+@item Scientific Linux 5.4 (SL5)
+@item Scientific Linux 5.5 (SL5)
+@item Scientific Linux 5.6 (SL5)
+@item Scientific Linux 5.7 (SL5)
+@item Scientific Linux 6.0 (SL6)
+@item Scientific Linux 6.1 (SL6)
+@item SuSE 8.0 Professional (SuSE8.0) TBD
+@item SuSE 9.1 Personal (SuSE9.1) TBD
+@item SuSE 9.2 Professional (SuSE9.2) TBD
+@item SuSE OpenSuSE (SuSEOSS) TBD
+@item SuSE 10.0 (SuSE10.0) TBD
+@item SuSE 10.1 (SuSE10.1) TBD
+@item SuSE 10.2 (SuSE10.2) TBD
+@item SuSE 10.3 (SuSE10.3) TBD
+@item SuSE 11.0 (SuSE11.0)
+@item SuSE 11.1 (SuSE11.1)
+@item SuSE 11.2 (SuSE11.2)
+@item SuSE 11.3 (SuSE11.3)
+@item SuSE 11.4 (SuSE11.4)
+@item SLES 9 (SLES9) TBD
+@item SLES 9 SP2 (SLES9) TBD
+@item SLES 9 SP3 (SLES9) TBD
+@item SLES 10 (SLES10)
+@item SLES 10 SP1 (SLES10)
+@item SLES 10 SP2 (SLES10)
+@item SLES 11 (SLES11)
+@item SLES 11 SP1 (SLES11)
+@item Ubuntu 5.10 (ubu5.10) TBD
+@item Ubuntu 6.03 LTS (ubu6.03) TBD
+@item Ubuntu 6.10 (ubu6.10) TBD
+@item Ubuntu 7.04 (ubu7.04) TBD
+@item Ubuntu 7.10 (ubu7.10)
+@item Ubuntu 8.04 (ubu8.04)
+@item Ubuntu 8.04 LTS (ubu8.04)
+@item Ubuntu 8.10 (ubu8.10)
+@item Ubuntu 9.04 (ubu9.04)
+@item Ubuntu 9.10 (ubu9.10)
+@item Ubuntu 10.04 (ubu10.04)
+@item Ubuntu 10.04.2 LTS (ubu10.04)
+@item Ubuntu 10.04.3 LTS (ubu10.04)
+@item Ubuntu 10.10 (ubu10.10)
+@item Ubuntu 11.04 (ubu11.04)
+@item WhiteBox Enterprise Linux 3.0 (WBEL3) TBD
+@item WhiteBox Enterprise Linux 4 (WBEL4) TBD
+@end itemize
+
+When installing from the tarball (@pxref{Installing the Tar Ball}), this distribution is probably
+compatible with a much broader array of distributions than those listed above.  These are the
+distributions against which the current maintainer creates and tests builds.
+
+@node Linux Kernel
+@subsection Kernel
+@cindex Kernel
+
+The @cite{@value{PACKAGE_TITLE}} package compiles as @dfn{Linux} kernel modules.  It is not
+necessary to patch the @dfn{Linux} kernel to build or use the package.@footnote{At a later date, it
+is possible to move this package into the kernel, however, with continued resistance to STREAMS from
+within the @dfn{Linux} developer community, this is currently unlikely.} Nor do you have to
+recompile your kernel to build or use the package.  OpenSS7 packages use @manpage{autoconf(1)}
+scripts to adapt the package source to your existing kernel.  The package builds and runs nicely
+against production kernels from the distributions listed above.  Rather than relying on kernel
+versions, the @manpage{autoconf(1)} scripts interrogate the kernel for specific features and
+variants to better adapt to distribution production kernels that have had patches applied over the
+official @url{http://www.kernel.org/, kernel.org} sources.
+
+@subsubsection Compatible Kernels
+
+The @cite{@value{PACKAGE_TITLE}} package is compatible with 2.4 kernel series after 2.4.10 and has
+been tested up to and including 2.4.33.  It has been tested from 2.6.3 up to and including 2.6.38
+(with @cite{RHEL 6.0}, @cite{SLES 11.1} and @cite{Debian  6.0} patch sets).  Please note that your
+mileage may vary if you use a kernel more recent than 2.6.38: it is difficult to anticipate changes
+that kernel developers will make in the future.  Many kernels in the 2.6 and 3.x series now vary
+widely by release version and if you encounter problems, try a kernel within the supported series.
+
+@subsubheading SMP Kernels
+
+UP validation testing for kernels is performed on all supported architectures.  SMP validation
+testing was initially performed on UP machines, as well as on an Intel 3.0GHz Pentium IV 630 with
+HyperThreading enabled (2x).  Because HyperThreading is not as independent as multiple CPUs, SMP
+validation testing was limited.  Current releases have been tested on dual 1.8GHz Xeon HP servers
+(2x), 3.0GHz Pentium D (2x), dual quad-core SunFire (8x) servers and dual hex-core Xeon servers
+(12x).
+
+@subsubheading XEN Kernels
+
+It should be noted that, while the packages will configure, build and install against XEN kernels,
+that problems running validation test suites against XEN kernels has been reported.  @emph{XEN
+kernels are explicitly not supported.}  This may change at some point in the future if someone
+really requires running OpenSS7 under a XEN kernel.
+
+@subsubsection Linux Kernel Upgrades
+
+The @cite{@value{PACKAGE_TITLE}} package compiles as @dfn{Linux} kernel modules.  Previously, kernel
+modules for each and every installed kernel were required.  This is no longer the case.  The kernel
+modules installed by the @cite{@value{PACKAGE_TITLE}} package now support weak updates across a wide
+range of kernels in the series.  This means that it is normally only necessary to build and install
+the @cite{@value{PACKAGE_TITLE}} kernel modules for one kernel in a series.  This is true for all
+supported 2.6 and 3.x kernel distributions (and likely for others as well).
+
+@node Linux Architectures
+@subsection Architectures
+@cindex Architectures
+
+The @cite{@value{PACKAGE_TITLE}} package compiles and installs on a wide range of architectures.
+Although it is believed that the package will work on all architectures supported by the Linux
+kernel being used, validation testing has only been performed with the following architectures:
+
+@itemize
+@item ix86
+@item x86_64
+@item ppc (MPC 860)
+@item ppc64
+@end itemize
+
+32-bit compatibility validation testing is performed on all 64-bit architectures supporting 32-bit
+compatibility.  If you would like to validate an OpenSS7 package on a specific machine architecture,
+you are welcome to sponsor the project with a test machine.
+
+@c ----------------------------------------------------------------------------

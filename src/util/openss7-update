@@ -1,0 +1,536 @@
+#!/bin/bash
+#
+# The purpose of this script is to invoke the openss7-modules awk script with
+# the necessary arguments depending upon how it was called.
+
+cwd=`/bin/pwd`
+command=`echo "$0" | sed -e 's,^\.,'"$cwd"','`
+
+if [ -x /usr/sbin/openss7-modules ]
+then
+	script=/usr/sbin/openss7-modules
+elif [ -x /sbin/openss7-modules ]
+then
+	script=/sbin/openss7-modules
+elif [ -x `dirname $0`/../../scripts/openss7-modules ]
+then
+	script=`dirname $0`/../../scripts/openss7-modules
+else
+	exit 0
+fi
+
+if which gawk >/dev/null 2>&1
+then
+	awk=gawk
+elif which awk >/dev/null 2>&1
+then
+	awk=awk
+else
+	exit 0
+fi
+
+update="$awk -f $script --"
+
+
+openss7_update () { :
+    $update "$@"
+    return $?
+}
+
+#
+# Note that for 'install' there is nothing really to do here.  On an 'upgrade'
+# we should preserve our relinked modules somewhere in case the upgrade is
+# aborted.  Also, for a running kernel we might want to remove the modules and
+# re-depmod with them removed so that the running kernel will not attempt to
+# load the new kernel modules being installed.  On an 'abort-upgrade' we can
+# restore the kernel modules from where we saved them.
+#
+
+# All parameters are for the linux-image-2.6.M[.REV]-ABI-FLAVOR package.
+
+# new-preinst install		[old-version]
+ou_preinst_install () { :
+    local old_version=
+    [ $# -lt 2 ] || old_version="$2"
+    return 0
+}
+# new-preinst upgrade		old-version
+ou_preinst_upgrade () { :
+    return 0
+}
+# old-preinst abort-upgrade	new-version
+ou_preinst_abort_upgrade () { :
+    return 0
+}
+# never (RedHat's new-kernel-pkg only invokes postinst and prerm targets).
+ou_preinst_redhat () { :
+    return 0
+}
+ou_preinst () { :
+    local retval=0
+    operation="$1"; shift
+    case "${operation:-redhat}" in
+	(install)
+	    ou_preinst_install		"$@" || retval=$? ;;
+	(upgrade)
+	    ou_preinst_upgrade		"$@" || retval=$? ;;
+	(abort-upgrade)
+	    ou_preinst_abort_upgrade	"$@" || retval=$? ;;
+	(redhat)
+	    ou_preinst_redhat		"$@" || retval=$? ;;
+	(*)  : ;;
+    esac
+    return $retval
+}
+
+#
+# Add symbolic links to the openss7 weak-updates directories.  This consists of
+# calling:
+#		openss7-modules -- -v --add-kernel $1
+#
+# Note that this step is not completely necessary because it will be run when
+# the kernel boots (if ever).
+#
+# Technically it is possible to query the user at this point for some optional
+# actions.  We can even abort the installation process for a kernel using exit
+# status because Debian is smart enough to execute hooks before updating the
+# boot-loader.
+#
+# If we are updating the running kernel and openss7 kernel modules requiring
+# relinking are installed in the running kernel's modules directory, we must
+# signal that an immediate reboot is required. --add-kernel will not relink
+# modules for the running kernel because the modules could mismatch the running
+# kernel.  It takes the --boot-kernel option to do that on reboot.
+#
+# If weak-updates for the kernel being installed are not possible (i.e. there is
+# no "solution" for the kernel being installed), then the user should be
+# prompted as to whether they want to complete configuring the kernel without
+# openss7 module support.
+#
+# If the kernel being updated uses a different ABI or a different M[.REV] and a
+# solution is possible, the user should be prompted (because weak-updates are
+# dangerous in this case).
+#
+# openss7-modules exit status codes can be used to determine this information.
+# Also, a dry-run can be performed just to get the return status.
+#
+
+# All parameters are for the linux-image-2.6.M[.REV]-ABI-FLAVOR package.
+
+# xxx-postinst configure	[most-recently-configured-version]
+ou_postinst_configure () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --add-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update-${kversion} || :
+    fi
+    return $retval
+}
+# xxx-triggered			triggering-packages ...
+ou_postinst_triggered () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --add-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update-${kversion} || :
+    fi
+    return $retval
+}
+# old-postinst abort-upgrade	new-version
+ou_postinst_abort_upgrade () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --add-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update-${kversion} || :
+    fi
+    return $retval
+}
+# con-postinst abort-remove	'in-favor' package new-version
+# xxx-postinst abort-remove
+ou_postinst_abort_remove () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --add-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update-${kversion} || :
+    fi
+    return $retval
+}
+# dec-postinst abort-deconfigure
+#				'in-favor' failed-install-package version
+#				['removing' conflicting-package version]
+ou_postinst_abort_deconfigure () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --add-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update-${kversion} || :
+    fi
+    return $retval
+}
+# RedHat's new-kernel-pkg only invokes postinst and prerm targets.  When this
+# target is invoked, it is invoked without arguments.
+ou_postinst_redhat () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --add-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update-${kversion} || :
+    fi
+    return $retval
+}
+ou_postinst () { :
+    local retval=0
+    operation="$1"; shift
+    case "${operation:-redhat}" in
+	(configure)
+	    ou_postinst_configure		"$@" || retval=$? ;;
+	(triggered)
+	    ou_postinst_triggered		"$@" || retval=$? ;;
+	(abort-upgrade)
+	    ou_postinst_abort_upgrade		"$@" || retval=$? ;;
+	(abort-remove)
+	    ou_postinst_abort_remove		"$@" || retval=$? ;;
+	(abort-deconfigure)
+	    ou_postinst_abort_deconfigure	"$@" || retval=$? ;;
+	(redhat)
+	    ou_postinst_redhat			"$@" || retval=$? ;;
+	(*)  : ;;
+    esac
+    return $retval
+}
+
+# All parameters are for the linux-image-2.6.M[.REV]-ABI-FLAVOR package.
+
+# xxx-prerm remove
+# con-prerm remove		'in-favour' package new-version
+ou_prerm_remove () { :
+    return 0
+}
+# old-prerm upgrade		new-version
+ou_prerm_upgrade () { :
+    return 0
+}
+# new-prerm failed-upgrade	old-version
+ou_prerm_failed_upgrade () { :
+    return 0
+}
+# dec-prerm deconfigure		'in-favour' package-being-installed version
+#				['removing' conflicting-package version]
+ou_prerm_deconfigure () { :
+    return 0
+}
+# RedHat's new-kernel-pkg only invokes postinst and prerm targets.  When this
+# target is invoked, it is invoked without arguments.
+ou_prerm_redhat () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --remove-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update-${kversion} || :
+    fi
+    return 0
+}
+ou_prerm () { :
+    local retval=0
+    operation="$1"; shift
+    case "${operation:-redhat}" in
+	(remove)
+	    ou_prerm_remove			"$@" || retval=$? ;;
+	(upgrade)
+	    ou_prerm_upgrade			"$@" || retval=$? ;;
+	(failed-upgrade)
+	    ou_prerm_failed_upgrade		"$@" || retval=$? ;;
+	(deconfigure)
+	    ou_prerm_deconfigure		"$@" || retval=$? ;;
+	(redhat)
+	    ou_prerm_redhat			"$@" || retval=$? ;;
+	(*)  : ;;
+    esac
+    return $retval
+}
+
+#
+# Remove symbolic links from the openss7 weak-updates directories.  This
+# consists of calling:
+#
+#	openss7-modules -- -v --remove-kernel $1
+#
+# Not that this step is not completely necessary, some symbolic links will just
+# unnecessarily hang around if it is not performed.
+#
+# Technically it is possible to query the user at this point for some optional
+# actions.  We can even abort the removal process for a kernel using exit status
+# because Debian is smart enough to execute hooks before updating the
+# boot-loader.
+#
+# For 'remove' and 'purge' removing symbolic links is fine.  However, for
+# 'upgrade', where the 'new-version' is the same as a version that is already
+# installed, and even for the running kernel, the situation is more complex.
+#
+# Another thing that can be performed here is that when a kernel is removed, if
+# no other kernels requiring a set of openss7 modules remain, we can mark the
+# corresponding openss7 package for autoclean.
+#
+
+# All parameters are for the linux-image-2.6.M[.REV]-ABI-FLAVOR package.
+
+# xxx-postrm remove
+ou_postrm_remove () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --remove-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update-${kversion} || :
+    fi
+    return $retval
+}
+# xxx-postrm purge
+ou_postrm_purge () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --remove-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update-${kversion} || :
+    fi
+    return $retval
+}
+# old-postrm upgrade		new-version
+ou_postrm_upgrade () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --remove-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update-${kversion} || :
+    fi
+    return $retval
+}
+# new-postrm failed-upgrade	old-version
+ou_postrm_failed_upgrade () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --remove-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update-${kversion} || :
+    fi
+    return $retval
+}
+# new-postrm abort-install	[old-version]
+ou_postrm_abort_install () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --remove-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update-${kversion} || :
+    fi
+    return $retval
+}
+# new-postrm abort-upgrade	old-version
+ou_postrm_abort_upgrade () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --remove-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update-${kversion} || :
+    fi
+    return $retval
+}
+# dis-postrm disappear		overwriter overwriter-version
+ou_postrm_disappear () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --remove-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update-${kversion} || :
+    fi
+    return $retval
+}
+# never (RedHat's new-kernel-pkg only invokes postinst and prerm targets).
+ou_postrm_redhat () { :
+    return 0
+}
+ou_postrm () { :
+    local retval=0
+    operation="$1"; shift
+    case "${operation:-redhat}" in
+	(remove)
+	    ou_postrm_remove			"$@" || retval=$? ;;
+	(purge)
+	    ou_postrm_purge			"$@" || retval=$? ;;
+	(upgrade)
+	    ou_postrm_upgrade			"$@" || retval=$? ;;
+	(failed-upgrade)
+	    ou_postrm_failed_upgrade		"$@" || retval=$? ;;
+	(abort-install)
+	    ou_postrm_abort_install		"$@" || retval=$? ;;
+	(abort-upgrade)
+	    ou_postrm_abort_upgrade		"$@" || retval=$? ;;
+	(disappear)
+	    ou_postrm_disappear			"$@" || retval=$? ;;
+	(redhat)
+	    ou_postrm_redhat			"$@" || retval=$? ;;
+	(*)  : ;;
+    esac
+    return $retval
+}
+
+#
+# All parameters are for the linux-headers-2.6.M[.REV]-ABI-FLAVOR package.
+#
+# openss7-modules -- -q -e --add-kernel ${kversion}
+#
+
+# xxx-postinst configure	[most-recently-configured-version]
+ou_hdr_postinst_configure () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --add-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update-${kversion} || :
+    fi
+    return $retval
+}
+# xxx-triggered			triggering-packages ...
+ou_hdr_postinst_triggered () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --add-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update-${kversion} || :
+    fi
+    return $retval
+}
+# old-postinst abort-upgrade	new-version
+ou_hdr_postinst_abort_upgrade () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --add-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update-${kversion} || :
+    fi
+    return $retval
+}
+# con-postinst abort-remove	'in-favor' package new-version
+# xxx-postinst abort-remove
+ou_hdr_postinst_abort_remove () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --add-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update-${kversion} || :
+    fi
+    return $retval
+}
+# dec-postinst abort-deconfigure
+#				'in-favor' failed-install-package version
+#				['removing' conflicting-package version]
+ou_hdr_postinst_abort_deconfigure () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --add-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update-${kversion} || :
+    fi
+    return $retval
+}
+# never (RedHat's new-kernel-pkg only invokes postinst and prerm targets).
+ou_hdr_postinst_redhat () { :
+    return 0
+}
+ou_hdr_postinst () { :
+    local retval=0
+    operation="$1"; shift
+    case "${operation:-redhat}" in
+	(configure)
+	    ou_hdr_postinst_configure		"$@" || retval=$? ;;
+	(triggered)
+	    ou_hdr_postinst_triggered		"$@" || retval=$? ;;
+	(abort-upgrade)
+	    ou_hdr_postinst_abort_upgrade	"$@" || retval=$? ;;
+	(abort-remove)
+	    ou_hdr_postinst_abort_remove	"$@" || retval=$? ;;
+	(abort-deconfigure)
+	    ou_hdr_postinst_abort_deconfigure	"$@" || retval=$? ;;
+	(redhat)
+	    ou_hdr_postinst_redhat		"$@" || retval=$? ;;
+	(*)  : ;;
+    esac
+    return $retval
+}
+
+#
+# All parameters are for the linux-source-2.6.M[.REV] package.
+#
+
+# xxx-postinst configure	[most-recently-configured-version]
+ou_src_postinst_configure () { :
+    return 0
+}
+# xxx-triggered			triggering-packages ...
+ou_src_postinst_triggered () { :
+    return 0
+}
+# old-postinst abort-upgrade	new-version
+ou_src_postinst_abort_upgrade () { :
+    return 0
+}
+# con-postinst abort-remove	'in-favor' package new-version
+# xxx-postinst abort-remove
+ou_src_postinst_abort_remove () { :
+    return 0
+}
+# dec-postinst abort-deconfigure
+#				'in-favor' failed-install-package version
+#				['removing' conflicting-package version]
+ou_src_postinst_abort_deconfigure () { :
+    return 0
+}
+# never (RedHat's new-kernel-pkg only invokes postinst and prerm targets).
+ou_src_postinst_redhat () { :
+    return 0
+}
+ou_src_postinst ()  { :
+    local retval=0
+    operation="$1"; shift
+    case "$operation" in
+	(configure)
+	    ou_src_postinst_configure		"$@" || retval=$? ;;
+	(triggered)
+	    ou_src_postinst_triggered		"$@" || retval=$? ;;
+	(abort-upgrade)
+	    ou_src_postinst_abort_upgrade	"$@" || retval=$? ;;
+	(abort-remove)
+	    ou_src_postinst_abort_remove	"$@" || retval=$? ;;
+	(abort-deconfigure)
+	    ou_src_postinst_abort_deconfigure	"$@" || retval=$? ;;
+	(redhat)
+	    ou_src_postinst_redhat		"$@" || retval=$? ;;
+	(*)  : ;;
+    esac
+    return $retval
+}
+
+RETVAL=0
+
+case "$command" in
+    (*/etc/kernel/preinst.d/openss7-update)
+	kversion="$1"; ou_preinst	$DEB_MAINT_PARAMS || RETVAL=$? ;;
+    (*/etc/kernel/postinst.d/openss7-update)
+	kversion="$1"; ou_postinst	$DEB_MAINT_PARAMS || RETVAL=$? ;;
+    (*/etc/kernel/prerm.d/openss7-update)
+	kversion="$1"; ou_prerm		$DEB_MAINT_PARAMS || RETVAL=$? ;;
+    (*/etc/kernel/postrm.d/openss7-update)
+	kversion="$1"; ou_postrm	$DEB_MAINT_PARAMS || RETVAL=$? ;;
+    (*/etc/kernel/header_postinst.d/openss7-update)
+	kversion="$1"; ou_hdr_postinst	$DEB_MAINT_PARAMS || RETVAL=$? ;;
+    (*/etc/kernel/src_postinst.d/openss7-update)
+	kversion="$1"; ou_src_postinst	$DEB_MAINT_PARAMS || RETVAL=$? ;;
+    (*/sbin/openss7-update | */usr/sbin/openss7-update | *)
+	openss7_update "$@" || RETVAL=$? ;;
+esac
+
+[ "${0##*/}" = "openss7-update" ] && exit $RETVAL
+
+# vim: tw=80 ft=sh sw=4 noet nocin nosi formatoptions+=tcqlorn

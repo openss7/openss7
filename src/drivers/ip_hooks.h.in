@@ -1,0 +1,783 @@
+/*****************************************************************************
+
+ @(#) $Id: ip_hooks.h.in,v 1.1.2.9 2011-09-20 09:51:35 brian Exp $
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation; version 3 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2011-09-20 09:51:35 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: ip_hooks.h.in,v $
+ Revision 1.1.2.9  2011-09-20 09:51:35  brian
+ - updates from git
+
+ Revision 1.1.2.8  2011-05-31 09:46:03  brian
+ - new distros
+
+ Revision 1.1.2.7  2011-04-07 15:24:02  brian
+ - weak reference corrections
+
+ Revision 1.1.2.6  2011-04-05 16:35:12  brian
+ - weak module design
+
+ Revision 1.1.2.5  2011-03-26 04:28:46  brian
+ - updates to build process
+
+ Revision 1.1.2.4  2011-01-12 04:10:29  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
+ Revision 1.1.2.3  2010-11-28 14:32:24  brian
+ - updates to support debian squeeze 2.6.32 kernel
+
+ Revision 1.1.2.2  2009-07-23 16:37:53  brian
+ - updates for release
+
+ Revision 1.1.2.1  2009-06-21 11:20:46  brian
+ - added files to new distro
+
+ Revision 0.9.2.7  2008-10-13 04:12:21  brian
+ - handle exports rework strinet
+
+ Revision 0.9.2.6  2008-09-10 03:50:07  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
+ Revision 0.9.2.5  2007/08/14 03:31:08  brian
+ - GPLv3 header update
+
+ Revision 0.9.2.4  2006/07/07 21:15:04  brian
+ - correct compile back to RH 7.2
+
+ Revision 0.9.2.3  2006/07/02 12:26:25  brian
+ - make inet tests compatible
+
+ Revision 0.9.2.2  2006/04/03 10:56:18  brian
+ - xfrm_policy_delete now returns int instead of void
+
+ Revision 0.9.2.1  2006/03/18 09:39:20  brian
+ - added ip driver headers
+
+ *****************************************************************************/
+
+#ifndef __LOCAL_IP_HOOKS_H__
+#define __LOCAL_IP_HOOKS_H__
+
+/* This symbol should be defined by newer kernels, however, since the protocol
+   value is always 132, we double check the definition for those kernels that
+   haven't defined it yet.  */
+#ifndef SOL_SCTP
+#define SOL_SCTP 132
+#endif
+
+/* This symbol should be defined by newer kernels, however, since the protocol
+   value is always 132, we double check the definition for those kernels that
+   haven't defined it yet.  */
+#ifndef IPPROTO_SCTP
+#define IPPROTO_SCTP 132
+#endif
+
+/* Define to 1 if the system has the type 'struct sockaddr_storage'. */
+#undef HAVE_KTYPE_STRUCT_SOCKADDR_STORAGE
+#ifndef HAVE_KTYPE_STRUCT_SOCKADDR_STORAGE
+#define _SS_MAXSIZE 128
+#define _SS_ALIGNSIZE (__alignof__ (struct sockaddr *))
+struct sockaddr_storage {
+	sa_family_t ss_family;
+	char __data[_SS_MAXSIZE - sizeof(sa_family_t)];
+} __attribute__ ((aligned(_SS_ALIGNSIZE)));
+#endif
+
+/* Symbol icmp_err_convert is available. */
+#undef HAVE_ICMP_ERR_CONVERT_SYMBOL
+#ifdef HAVE_ICMP_ERR_CONVERT_SYMBOL
+/* Symbol icmp_err_convert is supported. */
+#undef HAVE_ICMP_ERR_CONVERT_SUPPORT
+#if defined HAVE_ICMP_ERR_CONVERT_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+/* extern struct icmp_err icmp_err_convert[]; */ /* somebody made it const */
+#else
+extern struct icmp_err icmp_err_convert[];
+#endif
+#endif
+
+/* Symbol icmp_statistics is available. */
+#undef HAVE_ICMP_STATISTICS_SYMBOL
+#ifdef HAVE_ICMP_STATISTICS_SYMBOL
+/* Symbol icmp_statistics is supported. */
+#undef HAVE_ICMP_STATISTICS_SUPPORT
+#if defined HAVE_ICMP_STATISTICS_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern struct icmp_mib *icmp_statistics[];
+#else
+extern struct icmp_mib *icmp_statistics[];
+#endif
+#endif
+
+/* Symbol ip_route_output_flow is available. */
+#undef HAVE_IP_ROUTE_OUTPUT_FLOW_SYMBOL
+#ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_SYMBOL
+/* Define if function ip_route_output_flow takes 4 arguments which was
+   normally the case up to 2.6.20. */
+#undef HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_4_ARGS
+/* Define if function ip_route_output_flow takes 5 arguments which is the case
+   from 2.6.21. */
+#undef HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_5_ARGS
+/* Define if function ip_route_output_flow() returns a pointer to struct
+   rtable. */
+#undef HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_RTABLE_RETURN
+#if !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_4_ARGS && \
+    !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_5_ARGS && \
+    !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_RTABLE_RETURN
+#error Do not know how many arguments ip_route_output_flow() takes.
+#endif
+/* Symbol ip_route_output_flow is supported. */
+#undef HAVE_IP_ROUTE_OUTPUT_FLOW_SUPPORT
+#if defined HAVE_IP_ROUTE_OUTPUT_FLOW_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+#if defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_4_ARGS
+extern int ip_route_output_flow(struct rtable **rp, struct flowi *flp, struct sock *sk, int flags);
+#elif defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_5_ARGS
+extern int ip_route_output_flow(struct net *, struct rtable **rp, struct flowi *flp,
+				struct sock *sk, int flags);
+#elif defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_RTABLE_RETURN
+extern struct rtable *ip_route_output_flow(struct net *, struct flowi4 *, struct sock *);
+#endif
+#else
+#if defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_4_ARGS
+extern int ip_route_output_flow(struct rtable **rp, struct flowi *flp, struct sock *sk, int flags);
+#elif defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_5_ARGS
+extern int ip_route_output_flow(struct net *, struct rtable **rp, struct flowi *flp,
+				struct sock *sk, int flags);
+#elif defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_RTABLE_RETURN
+extern struct rtable *ip_route_output_flow(struct net *, struct flowi4 *, struct sock *);
+#endif
+#endif
+#endif
+
+#ifndef ip_rt_min_pmtu
+/* Symbol ip_rt_min_pmtu is available. */
+#undef HAVE_IP_RT_MIN_PMTU_SYMBOL
+#ifdef HAVE_IP_RT_MIN_PMTU_SYMBOL
+/* Symbol ip_rt_min_pmtu is supported. */
+#undef HAVE_IP_RT_MIN_PMTU_SUPPORT
+#if defined HAVE_IP_RT_MIN_PMTU_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern int ip_rt_min_pmtu;
+#define ip_rt_min_pmtu ip_rt_min_pmtu
+#else
+extern int ip_rt_min_pmtu __attribute__ ((__weak__));
+static inline int
+ip_rt_min_pmtu_(void)
+{
+	if (&ip_rt_min_pmtu)
+		return ip_rt_min_pmtu;
+	return 552;
+}
+#define ip_rt_min_pmtu ip_rt_min_pmtu_()
+#endif
+#else
+#define ip_rt_min_pmtu 552
+#endif
+#endif
+
+/* Symbol ip_rt_mtu_expires is available. */
+#undef HAVE_IP_RT_MTU_EXPIRES_SYMBOL
+#ifdef HAVE_IP_RT_MTU_EXPIRES_SYMBOL
+/* Symbol ip_rt_mtu_expires is supported. */
+#undef HAVE_IP_RT_MTU_EXPIRES_SUPPORT
+#if defined HAVE_IP_RT_MTU_EXPIRES_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern int ip_rt_mtu_expires;
+#else
+extern int ip_rt_mtu_expires;
+#endif
+#endif
+
+/* Symbol ip_rt_update_pmtu is available. */
+#undef HAVE_IP_RT_UPDATE_PMTU_SYMBOL
+#ifdef HAVE_IP_RT_UPDATE_PMTU_SYMBOL
+/* Symbol ip_rt_update_pmtu is supported. */
+#undef HAVE_IP_RT_UPDATE_PMTU_SUPPORT
+#if defined HAVE_IP_RT_UPDATE_PMTU_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern void ip_rt_update_pmtu(struct dst_entry *dst, unsigned mtu);
+#else
+extern void ip_rt_update_pmtu(struct dst_entry *dst, unsigned mtu);
+#endif
+#endif
+
+#ifndef sysctl_ip_dynaddr
+/* Symbol sysctl_ip_dynaddr is available. */
+#undef HAVE_SYSCTL_IP_DYNADDR_SYMBOL
+#ifdef HAVE_SYSCTL_IP_DYNADDR_SYMBOL
+/* Symbol sysctl_ip_dynaddr is supported. */
+#undef HAVE_SYSCTL_IP_DYNADDR_SUPPORT
+#if defined HAVE_SYSCTL_IP_DYNADDR_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern int sysctl_ip_dynaddr;
+#define sysctl_ip_dynaddr sysctl_ip_dynaddr
+#else
+extern int sysctl_ip_dynaddr __attribute__ ((__weak__));
+static inline int
+sysctl_ip_dynaddr_(void)
+{
+	if (&sysctl_ip_dynaddr)
+		return sysctl_ip_dynaddr;
+	return 0;
+}
+#define sysctl_ip_dynaddr sysctl_ip_dynaddr_()
+#endif
+#else
+#define sysctl_ip_dynaddr 0
+#endif
+#endif
+
+#ifndef sysctl_ip_nonlocal_bind
+/* Symbol sysctl_ip_nonlocal_bind is available. */
+#undef HAVE_SYSCTL_IP_NONLOCAL_BIND_SYMBOL
+#ifdef HAVE_SYSCTL_IP_NONLOCAL_BIND_SYMBOL
+/* Symbol sysctl_ip_nonlocal_bind is supported. */
+#undef HAVE_SYSCTL_IP_NONLOCAL_BIND_SUPPORT
+#if defined HAVE_SYSCTL_IP_NONLOCAL_BIND_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern int sysctl_ip_nonlocal_bind;
+#define sysctl_ip_nonlocal_bind sysctl_ip_nonlocal_bind
+#else
+extern int sysctl_ip_nonlocal_bind __attribute__ ((__weak__));
+static inline int
+sysctl_ip_nonlocal_bind_(void)
+{
+	if (&sysctl_ip_nonlocal_bind)
+		return sysctl_ip_nonlocal_bind;
+	return 0;
+}
+#define sysctl_ip_nonlocal_bind sysctl_ip_nonlocal_bind_()
+#endif
+#else
+#define sysctl_ip_nonlocal_bind 0
+#endif
+#endif
+
+#ifndef IPDEFTTL
+#define IPDEFTTL 64
+#endif
+
+#ifndef sysctl_ip_default_ttl
+/* Symbol sysctl_ip_default_ttl is available. */
+#undef HAVE_SYSCTL_IP_DEFAULT_TTL_SYMBOL
+#ifdef HAVE_SYSCTL_IP_DEFAULT_TTL_SYMBOL
+/* Symbol sysctl_ip_default_ttl is supported. */
+#undef HAVE_SYSCTL_IP_DEFAULT_TTL_SUPPORT
+#if defined HAVE_SYSCTL_IP_DEFAULT_TTL_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern int sysctl_ip_default_ttl;
+#define sysctl_ip_default_ttl sysctl_ip_default_ttl
+#else
+extern int sysctl_ip_default_ttl __attribute__ ((__weak__));
+static inline int
+sysctl_ip_default_ttl_(void)
+{
+	if (&sysctl_ip_default_ttl)
+		return sysctl_ip_default_ttl;
+	return IPDEFTTL;
+}
+#define sysctl_ip_default_ttl sysctl_ip_default_ttl_()
+#endif
+#else
+#define sysctl_ip_default_ttl IPDEFTTL
+#endif
+#endif
+
+#ifdef HAVE_SYSCTL_LOCAL_PORT_RANGE_SYMBOL
+extern int sysctl_local_port_range[2];
+#endif				/* HAVE_SYSCTL_LOCAL_PORT_RANGE_SYMBOL */
+
+
+/* Symbol __ip_route_output_key is available. */
+#undef HAVE___IP_ROUTE_OUTPUT_KEY_SYMBOL
+#ifdef HAVE___IP_ROUTE_OUTPUT_KEY_SYMBOL
+/* Define if function ip_route_output_key() takes 2 arguments. */
+#undef HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_2_ARGS
+/* Define if function ip_route_output_key() takes 3 arguments. */
+#undef HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
+/* Define if function ip_route-output_key() returns a pointer to struct
+   rtable. */
+#undef HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_RTABLE_RETURN
+#if !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_2_ARGS && \
+    !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS && \
+    !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_RTABLE_RETURN
+#error Do not know how many arguments ip_route_output_key() takes.
+#endif
+/* Symbol __ip_route_output_key is supported. */
+#undef HAVE___IP_ROUTE_OUTPUT_KEY_SUPPORT
+#if defined HAVE___IP_ROUTE_OUTPUT_KEY_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+#if defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_2_ARGS
+extern int __ip_route_output_key(struct rtable **rp, const struct flowi *flp);
+#elif defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
+extern int __ip_route_output_key(struct net *, struct rtable **, const struct flowi *flp);
+#elif defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_RTABLE_RETURN
+extern struct rtable *__ip_route_output_key(struct net *, struct flowi4 *flp);
+#endif
+#else
+#if defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_2_ARGS
+extern int __ip_route_output_key(struct rtable **rp, const struct flowi *flp);
+#elif defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
+extern int __ip_route_output_key(struct net *, struct rtable **, const struct flowi *flp);
+#elif defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_RTABLE_RETURN
+extern struct rtable *__ip_route_output_key(struct net *, struct flowi4 *flp);
+#endif
+#endif
+#endif
+
+#undef HAVE_KMEMB_STRUCT_RTABLE_U_DST
+#undef HAVE_KMEMB_STRUCT_RTABLE_DST
+
+#if   defined HAVE_KMEMB_STRUCT_RTABLE_U_DST
+#define rt_dst(__rt) (&(__rt)->u.dst)
+#elif defined HAVE_KMEMB_STRUCT_RTABLE_DST
+#define rt_dst(__rt) (&(__rt)->dst)
+#else
+#error Need to find the dst_entry from the rtable.
+#endif
+
+/* Define to 1 if 'path' is member of 'struct dst_entry'. */
+#undef HAVE_KMEMB_STRUCT_DST_ENTRY_PATH
+#ifdef HAVE_KMEMB_STRUCT_DST_ENTRY_PATH
+/* dst_pmtu should be already defined */
+static __inline__ void
+dst_update_pmtu(struct dst_entry *dst, uint32_t mtu)
+{
+	if (dst->ops->update_pmtu)
+		dst->ops->update_pmtu(dst, mtu);
+}
+#elif !defined dst_pmtu
+static __inline__ u32
+dst_pmtu(struct dst_entry *dst)
+{
+	return (dst->pmtu);
+}
+#else
+static __inline__ void
+dst_update_pmtu(struct dst_entry *dst, uint32_t mtu)
+{
+	dst->pmtu = mtu;
+}
+#endif
+
+/* Define to 1 if kernel function dst_mtu() exists. */
+#undef HAVE_KFUNC_DST_MTU
+#ifdef HAVE_KFUNC_DST_MTU
+/* Why do stupid people rename things like this? */
+#	undef dst_pmtu
+#	define dst_pmtu dst_mtu
+#endif
+
+/* Define to 1 if 'dev_base_head' is member of 'struct net'. */
+#undef HAVE_KMEMB_STRUCT_NET_DEV_BASE_HEAD
+
+/* Define if function ip_route_connect() returns a pointer to an rtable
+   structure, which is the case from 3.0.0. */
+#undef HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN
+#ifdef HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN
+#undef ip_route_connect
+#if 0
+static __inline__ int
+ip_route_connect_(struct rtable **rp, __be32 dst, __be32 src, u32 tos, int oif,
+		  u8 protocol, __be16 sport, __be16 dport, struct sock *sk, int flags)
+{
+	struct flowi4 fl4 = {
+		.flowi4_oif = oif,
+		.daddr = dst,
+		.saddr = src,
+		.flowi4_tos = tos,
+		.flowi4_proto = protocol,
+	};
+	struct rtable *rt;
+
+	rt = ip_route_connect(&fl4, dst, src, tos, oif, protocol, sport, dport, sk, 0);
+	if (IS_ERR(rt)) {
+		return PTR_ERR(rt);
+	}
+	if (rp != NULL) {
+		*rp = rt;
+	}
+	return (0);
+}
+#else
+static __inline__ int
+ip_route_connect_(struct rtable **rp, __be32 dst, __be32 src, u32 tos, int oif,
+		  u8 protocol, __be16 sport, __be16 dport, struct sock *sk, int flags)
+{
+	struct flowi4 fl4;
+	struct rtable *rt;
+
+	flowi4_init_output(&fl4, oif, 0, tos, RT_SCOPE_UNIVERSE, protocol, flags,
+			   dst, src, dport, sport);
+	if (!dst || !src) {
+		rt = __ip_route_output_key(&init_net, &fl4);
+		if (IS_ERR(rt)) {
+			return PTR_ERR(rt);
+		}
+		ip_rt_put(rt);
+		flowi4_update_output(&fl4, oif, tos, fl4.daddr, fl4.saddr);
+	}
+	rt = __ip_route_output_key(&init_net, &fl4);
+	if (IS_ERR(rt)) {
+		return PTR_ERR(rt);
+	}
+	if (rp != NULL) {
+		*rp = rt;
+	}
+	return (0);
+}
+#endif
+#define ip_route_connect(rp,dst,src,tos,oif,protocol,sport,dport,sk,flags) ip_route_connect_(rp,dst,src,tos,oif,protocol,sport,dport,sk,flags)
+#endif
+
+/* Define if function ip_route-output_key() returns a pointer to struct
+   rtable. */
+#undef HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_RTABLE_RETURN
+#ifdef HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_RTABLE_RETURN
+#undef ip_route_output
+static __inline__ int
+ip_route_output_(struct rtable **rp, u32 daddr, u32 saddr, u32 tos, int oif)
+{
+        struct rtable *rt;
+
+        rt = ip_route_output(&init_net, daddr, saddr, tos, oif);
+        if (IS_ERR(rt)) {
+                return PTR_ERR(rt);
+        }
+        if (rp != NULL) {
+                *rp = rt;
+        }
+        return (0);
+}
+#define ip_route_output(rp,daddr,saddr,tos,oif) ip_route_output_(rp,daddr,saddr,tos,oif)
+#else
+/* Define if you have the explicit version of ip_route_output. */
+#undef HAVE_IP_ROUTE_OUTPUT_EXPLICIT
+#ifndef HAVE_IP_ROUTE_OUTPUT_EXPLICIT
+static __inline__ int
+ip_route_output(struct rtable **rp, u32 daddr, u32 saddr, u32 tos, int oif)
+{
+	struct flowi fl = {.oif = oif,
+		.nl_u = {.ip4_u = {.daddr = daddr,
+				   .saddr = saddr,
+				   .tos = tos}},
+		.proto = IPPROTO_SCTP,
+		.uli_u = {.ports = {.sport = 0,.dport = 0}}
+	};
+
+/* Define if function ip_route_output_key() takes 3 arguments. */
+#undef HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
+#ifdef HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
+	return ip_route_output_key(&init_net, rp, &fl);
+#else
+/* Define if function ip_route_output_key() takes 2 arguments. */
+#undef HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_2_ARGS
+#ifdef HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_2_ARGS
+	return ip_route_output_key(rp, &fl);
+#else
+#error Do not know how many arguments ip_route_output_key() takes.
+#endif
+#endif
+}
+#endif
+#endif
+
+/* Symbol __xfrm_policy_check is available. */
+#undef HAVE___XFRM_POLICY_CHECK_SYMBOL
+#ifdef HAVE___XFRM_POLICY_CHECK_SYMBOL
+/* Symbol __xfrm_policy_check is supported. */
+#undef HAVE___XFRM_POLICY_CHECK_SUPPORT
+#if defined HAVE___XFRM_POLICY_CHECK_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb,
+			       unsigned short family);
+#else
+extern int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb,
+			       unsigned short family);
+#endif
+#endif
+
+/* Symbol xfrm_policy_delete is available. */
+#undef HAVE_XFRM_POLICY_DELETE_SYMBOL
+#ifdef HAVE_XFRM_POLICY_DELETE_SYMBOL
+/* Define if function xfrm_policy_delete returns int. */
+#undef HAVE_XFRM_POLICY_DELETE_RETURNS_INT
+/* Symbol xfrm_policy_delete is supported. */
+#undef HAVE_XFRM_POLICY_DELETE_SUPPORT
+#if defined HAVE_XFRM_POLICY_DELETE_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+#ifdef HAVE_XFRM_POLICY_DELETE_RETURNS_INT
+extern int xfrm_policy_delete(struct xfrm_policy *pol, int dir);
+#else
+extern void xfrm_policy_delete(struct xfrm_policy *pol, int dir);
+#endif
+#else
+#ifdef HAVE_XFRM_POLICY_DELETE_RETURNS_INT
+extern int xfrm_policy_delete(struct xfrm_policy *pol, int dir);
+#else
+extern void xfrm_policy_delete(struct xfrm_policy *pol, int dir);
+#endif
+#endif
+#endif
+
+/* Symbol snmp_get_info is available. */
+#undef HAVE_SNMP_GET_INFO_SYMBOL
+#ifdef HAVE_SNMP_GET_INFO_SYMBOL
+/* Symbol snmp_get_info is supported. */
+#undef HAVE_SNMP_GET_INFO_SUPPORT
+#if defined HAVE_SNMP_GET_INFO_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern int snmp_get_info(char *buffer, char **start, off_t offset, int length);
+#else
+extern int snmp_get_info(char *buffer, char **start, off_t offset, int length);
+#endif
+#endif
+
+/* Define if function ip_frag_nqueues() takes 1 argument. */
+#undef HAVE_KFUNC_IP_FRAG_NQUEUES_1_ARG
+#ifdef HAVE_KFUNC_IP_FRAG_NQUEUES_1_ARG
+extern int ip_frag_nqueues(struct net *net);
+#else
+/* Define if function ip_frag_nqueues() takes 0 arguments. */
+#undef HAVE_KFUNC_IP_FRAG_NQUEUES_0_ARGS
+#ifdef HAVE_KFUNC_IP_FRAG_NQUEUES_0_ARGS
+extern int ip_frag_nqueues(void);
+#else
+extern int ip_frag_nqueues;
+#endif
+#endif
+
+/* Define if function ip_frag_mem() takes 1 argument. */
+#undef HAVE_KFUNC_IP_FRAG_MEM_1_ARG
+#ifdef HAVE_KFUNC_IP_FRAG_MEM_1_ARG
+extern int ip_frag_mem(struct net *net);
+#else
+/* Define if function ip_frag_mem() takes 0 arguments. */
+#undef HAVE_KFUNC_IP_FRAG_MEM_0_ARGS
+#ifdef HAVE_KFUNC_IP_FRAG_MEM_0_ARGS
+extern int ip_frag_mem(void);
+#else
+extern atomic_t ip_frag_mem;
+#endif
+#endif
+
+#ifndef SK_WMEM_MAX
+#define SK_WMEM_MAX 65535
+#endif
+#ifndef SK_RMEM_MAX
+#define SK_RMEM_MAX 65535
+#endif
+
+#ifndef sysctl_rmem_default
+/* Symbol sysctl_rmem_default is available. */
+#undef HAVE_SYSCTL_RMEM_DEFAULT_SYMBOL
+#ifdef HAVE_SYSCTL_RMEM_DEFAULT_SYMBOL
+/* Symbol sysctl_rmem_default is supported. */
+#undef HAVE_SYSCTL_RMEM_DEFAULT_SUPPORT
+#if defined HAVE_SYSCTL_RMEM_DEFAULT_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern __u32 sysctl_rmem_default;
+#define sysctl_rmem_default sysctl_rmem_default
+#else
+extern __u32 sysctl_rmem_default __attribute__((__weak__));
+static inline __u32 sysctl_rmem_default_(void)
+{
+	if (&sysctl_rmem_default)
+		return sysctl_rmem_default;
+	return SK_RMEM_MAX;
+}
+#define sysctl_rmem_default sysctl_rmem_default_()
+#endif
+#else
+#define sysctl_rmem_default SK_RMEM_MAX
+#endif
+#endif
+
+#ifndef sysctl_wmem_default
+/* Symbol sysctl_wmem_default is available. */
+#undef HAVE_SYSCTL_WMEM_DEFAULT_SYMBOL
+#ifdef HAVE_SYSCTL_WMEM_DEFAULT_SYMBOL
+/* Symbol sysctl_wmem_default is supported. */
+#undef HAVE_SYSCTL_WMEM_DEFAULT_SUPPORT
+#if defined HAVE_SYSCTL_WMEM_DEFAULT_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern __u32 sysctl_wmem_default;
+#define sysctl_wmem_default sysctl_wmem_default
+#else
+extern __u32 sysctl_wmem_default __attribute__((__weak__));
+static inline __u32 sysctl_wmem_default_(void) {
+	if (&sysctl_wmem_default)
+		return sysctl_wmem_default;
+	return SK_WMEM_MAX;
+}
+#define sysctl_wmem_default sysctl_wmem_default_()
+#endif
+#else
+#define sysctl_wmem_default SK_WMEM_MAX
+#endif
+#endif
+
+#ifndef sysctl_rmem_max
+/* Symbol sysctl_rmem_max is available. */
+#undef HAVE_SYSCTL_RMEM_MAX_SYMBOL
+#ifdef HAVE_SYSCTL_RMEM_MAX_SYMBOL
+/* Symbol sysctl_rmem_max is supported. */
+#undef HAVE_SYSCTL_RMEM_MAX_SUPPORT
+#if defined HAVE_SYSCTL_RMEM_MAX_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern __u32 sysctl_rmem_max;
+#define sysctl_rmem_max sysctl_rmem_max
+#else
+extern __u32 sysctl_rmem_max __attribute__((weak));
+static inline __u32 sysctl_rmem_max_(void)
+{
+	if (&sysctl_rmem_max)
+		return sysctl_rmem_max;
+	return SK_RMEM_MAX;
+}
+#define sysctl_rmem_max sysctl_rmem_max_()
+#endif
+#else
+#define sysctl_rmem_max SK_RMEM_MAX
+#endif
+#endif
+
+#ifndef sysctl_wmem_max
+/* Symbol sysctl_wmem_max is available. */
+#undef HAVE_SYSCTL_WMEM_MAX_SYMBOL
+#ifdef HAVE_SYSCTL_WMEM_MAX_SYMBOL
+/* Symbol sysctl_wmem_max is supported. */
+#undef HAVE_SYSCTL_WMEM_MAX_SUPPORT
+#if defined HAVE_SYSCTL_WMEM_MAX_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern __u32 sysctl_wmem_max;
+#define sysctl_wmem_max sysctl_wmem_max
+#else
+extern __u32 sysctl_wmem_max __attribute__((weak));
+static inline __u32 sysctl_wmem_max_(void)
+{
+	if (&sysctl_wmem_max)
+		return sysctl_wmem_max;
+	return SK_WMEM_MAX;
+}
+#define sysctl_wmem_max sysctl_wmem_max_()
+#endif
+#else
+#define sysctl_wmem_max SK_WMEM_MAX
+#endif
+#endif
+
+#ifndef socklen_t
+typedef int socklen_t;
+
+#define socklen_t socklen_t
+#endif
+
+/* Define to 1 if kernel function skb_dst() exists. */
+#undef HAVE_KFUNC_SKB_DST
+#ifndef HAVE_KFUNC_SKB_DST
+static __inline__ struct dst_entry*
+skb_dst(struct sk_buff *skb)
+{
+    return skb->dst;
+}
+#endif
+
+/* Define to 1 if kernel function skb_dst_set() exists. */
+#undef HAVE_KFUNC_SKB_DST_SET
+#ifndef HAVE_KFUNC_SKB_DST_SET
+static __inline__ void
+skb_dst_set(struct sk_buff *skb, struct dst_entry *dst)
+{
+    skb->dst = dst;
+}
+#endif
+
+/* Define to 1 if kernel function skb_rtable() exists. */
+#undef HAVE_KFUNC_SKB_RTABLE
+#ifndef HAVE_KFUNC_SKB_RTABLE
+static __inline__ struct rtable*
+skb_rtable(struct sk_buff *skb)
+{
+    return (struct rtable *)skb->dst;
+}
+#endif
+
+/* Symbol __ip_select_ident is available. */
+#undef HAVE___IP_SELECT_IDENT_SYMBOL
+#ifdef HAVE___IP_SELECT_IDENT_SYMBOL
+#if !defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS && !defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+#error Cannot tell how many arguments function __ip_select_ident() takes.
+#endif
+/* Symbol __ip_select_ident is supported. */
+#undef HAVE___IP_SELECT_IDENT_SUPPORT
+#if defined HAVE___IP_SELECT_IDENT_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+#if defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
+extern void __ip_select_ident(struct iphdr *iph, struct dst_entry *dst);
+#define __ip_select_ident(a,b,c) __ip_select_ident(a,b)
+#elif defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+extern void __ip_select_ident(struct iphdr *iph, struct dst_entry *dst, int more);
+#define __ip_select_ident(a,b,c) __ip_select_ident(a,b,c)
+#endif
+#else
+#if defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
+extern void __ip_select_ident(struct iphdr *iph, struct dst_entry *dst)
+    __attribute__((__weak__));
+static inline void __ip_select_ident_(struct iphdr *iph, struct dst_entry *dst)
+{
+	if (__ip_select_ident)
+		return __ip_select_ident(iph, dst);
+	iph->id = (iph->daddr ^ -jiffies);
+	return;
+}
+#define __ip_select_ident(a,b,c) __ip_select_ident_(a,b)
+#elif defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+extern void __ip_select_ident(struct iphdr *iph, struct dst_entry *dst, int more)
+    __attribute__((__weak__));
+static inline void __ip_select_ident_(struct iphdr *iph, struct dst_entry *dst, int more)
+{
+	if (__ip_select_ident)
+		return __ip_select_ident(iph, dst, more);
+	iph->id = (iph->daddr ^ -jiffies);
+	return;
+}
+#define __ip_select_ident(a,b,c) __ip_select_ident_(a,b,c)
+#endif
+#endif
+#else
+#error Need a way of selecting an IP segmentation identifier.
+#endif
+
+
+#endif				/* __LOCAL_IP_HOOKS_H__ */

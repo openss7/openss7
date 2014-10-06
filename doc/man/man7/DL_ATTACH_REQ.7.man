@@ -1,0 +1,370 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: DL_ATTACH_REQ.7.man,v 1.1.2.2 2011-02-07 02:18:15 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:15 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: DL_ATTACH_REQ.7.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:15  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH DL_ATTACH_REQ 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Data Link Provider Interface (DLPI)"
+.SH NAME
+.B DL_ATTACH_REQ (dl_attach_req_t)
+\- requests the DLS provider associate a physical point of
+attachment (PPA) with astream.
+.\"
+.\"
+.SH INTERFACE
+Data Link Provider Interface, DLPI.
+.[
+dlpi revision 2.0.0 draft 2
+.]
+.\"
+.\"
+.SH SYNOPSIS
+The message consists of one M_PROTO message block, which contains the
+following structure.
+.sp
+.nf
+\f(CW\s-1\
+#include <sys/dlpi.h>
+
+typedef struct {
+    t_uscalar_t  dl_primitive;
+    t_uscalar_t  dl_ppa;
+} dl_attach_req_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+.B DL_ATTACH_REQ
+is needed for style 2 DLS providers to identify the physical
+medium over which communication will transpire.  The request may not be
+issued to a style 1 DLS provider; doing so may cause errors.
+.PP
+The DLS provider may initialize the physical line on receipt of this
+primitive or the
+.BR DL_BIND_REQ (7).
+Otherwise, the line must be initialized
+through some management mechanism before this request is issued by the DLS
+user.  Either way, the physical link must be initialized and ready for use
+on successful completion of the
+.BR DL_BIND_REQ (7).
+.\"
+.\"
+.SH PARAMETERS
+.PP
+The
+.B dl_attach_req_t
+structure contains the following members:
+.TP
+.I dl_primitive
+conveys
+.BR DL_ATTACH_REQ .
+.TP
+.I dl_ppa
+conveys the identifier of the physical point of attachment to be associated
+with the stream.  The format of the identifier is provider-specific, and it
+must contain sufficient information to distinguish the desired PPA from
+all possible PPAs on a system.  At a minimum, this must include
+identification of the physical medium over which communication will
+transpire.  For media that multiplex multiple channels over a single physical
+medium, this identifier should also specify a specific channel to be used
+for communication (where each channel on a physical medium is associated with
+a separate PPA).
+
+Because of the provider-specific nature of this value, DLS user software that
+is to be protocol independent should avoid hard-coding the PPA
+identifier.  The DLS user should retrieve the necessary PPA identifier from
+some other entity (such as a management entity) and insert it without
+inspection into the
+.BR DL_ATTACH_REQ .
+.\"
+.\"
+.SH MODE
+This primitive is valid in
+any
+mode.
+.\"
+.\"
+.SH STATE
+The message is valid in state
+.BR DL_UNATTACHED ,
+but only when local acknowledgement of a request or response primitive is not
+pending for the requesting Stream.
+.\"
+.\"
+.SH "NEW STATE"
+The resulting state is
+.BR DL_ATTACH_PENDING .
+.\"
+.\"
+.SH RESPONSE
+If the attach request is successful,
+.BR DL_OK_ACK (7)
+is sent to the DLS user
+resulting in state
+.BR DL_UNBOUND .
+If the request fails, message
+.BR DL_ERROR_ACK (7)
+is returned and the resulting state is unchanged.
+.\"
+.\"
+.SH ERRORS
+One of the following errors may be returned in the
+.B DL_ERROR_ACK (7)
+primitive:
+.TP
+.B DL_ACCESS
+The DLS user did not have proper permission to use the requested PPA.
+.TP
+.B DL_BADPPA
+The specified PPA is invalid.
+.TP
+.B DL_OUTSTATE
+The primitive was issued from an invalid state.
+.TP
+.B DL_INITFAILED
+Automatic initialization of the PPA failed.
+.TP
+.B DL_NOTINIT
+The PPA had not been initialized prior to this request.
+.TP
+.B DL_SYSERR
+A system error has occurred and the Linux system error is indicated in
+the
+.BR DL_ERROR_ACK (7).
+.PP
+See
+.BR DL_ERROR_ACK (7)
+for a description of specific Linux error codes applicable to DLPI.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B DL_ATTACH_REQ
+primitive is compatible with implementations based on DLPI Revision 2,
+.[
+dlpi revision 2.0.0 draft 2
+.]
+such as
+.IR AIX \(rg,
+.[
+aixdlpi
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdlpi
+.]
+.IR Solaris \(rg,
+.[
+soldoc11
+.]
+.IR Solstice \(rg,
+.[
+solx25pg
+.]
+and
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Each implementation of DLPI manages its own Physical Point of Attachment (PPA)
+address space in different ways.
+.B @PACKAGE_TITLE@
+encodes the framing and Linux system interface index in a composite PPA.  When
+porting programs from another implementation to
+.BR "@PACKAGE_TITLE@" ,
+it may be necessary to make modifications to the way in which the PPA is
+managed or passed to the application.
+.IP \(em
+.IR HP-UX \(rg
+.[
+hpuxdlpi
+.]
+provides a non-standard primitive,
+.BR DL_HP_PPA_REQ (7)
+that can be used to obtain a PPA.  It also provides a
+.BR lanscan ()
+utility that lists the available PPAs in the system.
+.IP \(em
+.IR HP-UX \(rg
+.[
+hpuxdlpi
+.]
+documents UNIX error codes (listed in the
+.BR DL_ERROR_ACK (7)
+reference page).  Other implementations do not document these codes.  Portable
+programs will not rely upon the specific value of a Linux error code for proper
+operation.
+.IP \(em
+The DLPI error codes
+.BR DL_NOTINIT " and " DL_INITFAILED
+are not documented by the DLPI standard,
+.[
+dlpi revision 2.0.0 draft 2
+.]
+but are implied by the text of the standard.  Portable DLPI applications should
+be prepared to receive any DLPI non-fatal error code in reply to any request or
+response primitive.
+.IP \(em
+.IR Solstice \(rg
+.[
+solx25pg
+.]
+documents that LAPB PPAs are defined at system configuration time using the
+.BR L_SETPPA (7)
+input-output control, whereas LLC2 PPAs are associated with the hardware at
+system boot time.
+.B @PACKAGE_TITLE@
+LLC2 driver,
+.BR llc2 (4),
+uses the Linux device index as the PPA.  The LAPB driver,
+.BR lapb (4),
+uses the Linux device index or input-output controls to establish the PPA.
+.IP \(em
+.IR AIX \(rg
+LAPB
+.[
+aixlink
+.]
+does not support this primitive.
+.PP
+See
+.BR dlpi (7),
+.BR dlpi_ioctl (4),
+.BR STREAMS (9),
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This interface conforms to DLPI Revision 2.
+.[
+dlpi revision 2.0.0 draft 2
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The Data Link Provider Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.\"
+.\"
+.XX
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.T2

@@ -1,0 +1,408 @@
+#!/bin/bash
+# @configure_input@
+# =============================================================================
+# 
+# @(#) $RCSfile: openss7-lib.postrm.in,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-05-15 12:01:18 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2011-05-15 12:01:18 $ by $Author: brian $
+#
+# =============================================================================
+subpkg=lib
+@openss7_header@
+datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
+#
+# postrm_libraries() - When complete removal, perform a ldconfig after the
+#   libraries have been removed to flush them from the ldconfig cache.  Note
+#   that this should not be done on upgrade, because building the ldconfig cache
+#   is up to the new-postinst "configure" stage or an appropriate trigger.
+#
+postrm_libraries () {
+    local d s
+    d="@libdir@"; s="@syslibdir@"
+    if   [ -x "`which libtool 2>/dev/null`" ]; then
+	[ -d "$d" ] && { libtool --mode=finish "$d" || :; }
+	[ -d "$s" ] && { libtool --mode=finish "$s" || :; }
+    elif [ -x "`which ldconfig 2>/dev/null`" ]; then
+	[ -d "$d" ] && { ldconfig -n "$d" || :; }
+	[ -d "$s" ] && { ldconfig -n "$s" || :; }
+    fi
+}
+#
+# postrm_netconfig_kill() - Kill all processes that are holding open the libxnsl library.  This is
+#   used in preparation for removing the netconfig database.  Note that because the library has been
+#   removed, these programs will fail if they attempt to reload.
+#
+postrm_netconfig_kill () {
+    local signal pid did_one
+    if [ -x "`which lsof 2>/dev/null`" ]; then
+	for signal in TERM KILL; do
+	    did_one=no
+	    lsof | awk '{if($NF~"^@libdir@/libxnsl"||$NF~"^@lib32dir@/libxnsl"){print$2}}' | \
+	    while read pid; do
+		kill -$signal $pid || :
+		did_one=yes
+	    done
+	    [ $did_one = no ] || sleep 1
+	done
+    fi
+}
+#
+# postrm_netconfig() - When removing or purging, rebuild the netconfig database after our files have
+#   been removed.  Note that on upgrade, this is the responsibility of the new version's postinst
+#   maintenance script.  When executed at remove instead of purge, the conffiles are still in place
+#   and need to be removed manually first.  If the netconfig database would be empty, it is removed
+#   altogether.  Note that it might be a good idea to kill any process that has the libxnsl library
+#   open.  Dpkg processes that are properly dependent upon this package will have been removed,
+#   however, non-deb programs or debs that do not properly rely upon this package will not be
+#   stopped, but will fail strangely due to the removal of the database even when the library is
+#   still loaded.
+#
+postrm_netconfig () {
+    local netc_fil netc_alt netc_dir netc_tmp found files f
+    netc_fil=@sysconfdir@/netconfig
+    netc_alt=@sysconfdir@/netconfig.xnsl
+    netc_dir=@sysconfdir@/nslconfig.d
+    netc_tmp=${tmppath:-/var/tmp}/netconfig.tmp.$$
+    found=no
+    files="$netc_dir/*"
+    postrm_netconfig_kill || :
+    for f in ${netconfig}; do rm -f -- $netc_dir/$f ||:; done
+    if [ -r $netc_fil ]; then
+	if ! grep '^# Generated from nslconfig.d' $netc_fil >/dev/null 2>&1; then
+	    netc_fil=$netc_alt
+	fi
+    else
+	if [ -r $netc_alt ]; then
+	    netc_fil=$netc_alt
+	fi
+    fi
+    (   echo '# Generated from nslconfig.d by @PACKAGE_LCNAME@'
+	echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
+	echo '# EDTI THE FILES IN nslconfig.d DIRECTORY INSTEAD'
+    ) >$netc_tmp
+    for f in $files; do
+	if [ -f $f -a $f = "$netc_dir/strnsl" ]; then
+	    case $f in
+		(*.dpkg-old|*.dpkg-new|*.dpkg-tmp) ;;
+		(*) (   echo '# Generated from nslconfig.d/'`basename $f`
+			sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+		    ) >>$netc_tmp
+		    found=yes ;;
+	    esac
+	fi
+    done
+    for f in $files; do
+	if [ -f $f -a $f != "$netc_dir/strnsl" ]; then
+	    case $f in
+		(*.dpkg-old|*.dpkg-new|*.dpkg-tmp) ;;
+		(*) (   echo '# Generated from nslconfig.d/'`basename $f`
+			sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+		    ) >>$netc_tmp
+		    found=yes ;;
+	    esac
+	fi
+    done
+    if [ $found = no ]; then
+	rm -f -- $netc_fil
+	rmdir $netc_dir 2>/dev/null || :
+    else
+	if ! diff $netc_tmp $netc_fil >/dev/null 2>&1; then
+	    cp -f -b --suffix=.dpkg-old -- $netc_tmp $netc_fil
+	fi
+    fi
+    rm -f -- $netc_tmp || :
+    if [ $netc_fil != $netc_alt ]; then
+	rm -f -- $netc_alt || :
+    fi
+}
+#
+# postrm_sock2path_kill() - Kill all processes that are holding open the libsocket library.  This is
+#   in prepration for removing the sock2path database.  Note that because the library has already
+#   been removed, these programs will fail if they attempt to reload.
+#
+postrm_sock2path_kill () {
+    local signal pid did_one
+    if [ -x "`which lsof 2>/dev/null`" ]; then
+	for signal in TERM KILL; do
+	    did_one=no
+	    lsof | awk '{if($NF~"^@libdir@/libsocket"||$NF~"^@lib32dir@/libsocket"){print$2}}' | \
+	    while read pid; do
+		kill -$signal $pid || :
+		did_one=yes
+	    done
+	    [ $did_one = no ] || sleep 1
+	done
+    fi
+}
+#
+# postrm_sock2path() - When removing or purging, rebuild the sock2path database after our files have
+#   been removed.  Note that on upgrade, this is the responsibility of the new version's postinst
+#   maintenance script.  When executed at remove instead of purge, the conffiles are still in place
+#   and need to be removed manually first.  If the sock2path database would be empty, it is removed
+#   altogether.  Note that it might be a good idea to kill any process that has the libsocket
+#   library open.  Dpkg processes that are properly dependent upon this package will have been
+#   removed, however, non-deb programs or debs that do not properly rely upon this package will not
+#   be stopped, but will fail strangely due to the removal of the database even when the library is
+#   still loaded.
+#
+postrm_sock2path () {
+    local s2pa_fil s2pa_dir s2pa_tmp found files f
+    s2pa_fil=@sysconfdir@/sock2path
+    s2pa_dir=@sysconfdir@/sock2path.d
+    s2pa_tmp=${tmppath:-/var/tmp}/sock2path.tmp.$$
+    found=no
+    files="$s2pa_dir/*"
+    postrm_sock2path_kill || :
+    for f in ${sock2path}; do rm -f -- $s2pa_dir/$f ||:; done
+    (   echo '# Generated from sock2path.d by @PACKAGE_LCNAME@'
+	echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
+	echo '# EDIT THE FILES IN THE sock2path.d DIRECTORY INSTEAD.'
+    ) >$s2pa_tmp
+    for f in $files; do
+	if [ -r $f ]; then
+	    case $f in
+		(*.dpkg-old|*.dpkg-new|*.dpkg-tmp) ;;
+		(*) (   echo '# Generated from sock2path.d/'`basename $f`
+			sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+		    ) >>$s2pa_tmp
+		    found=yes ;;
+	    esac
+	fi
+    done
+    if [ $found = no ]; then
+	rm -f -- $s2pa_fil
+	rmdir $s2pa_dir 2>/dev/null || :
+    else
+	if ! diff $s2pa_tmp $s2pa_fil >/dev/null 2>&1; then
+	    cp -f -b --suffix=.dpkg-old -- $s2pa_tmp $s2pa_fil
+	fi
+    fi
+    rm -f -- $s2pa_tmp || :
+}
+#
+# postrm_snmpconf() - When purging, rebuild the snmpd.local.conf file and reload the snmp daemon
+#   (when it is running) after our files have been removed.  Note that on upgrade, this is the
+#   responsibility of the new version's postinst.
+#
+postrm_snmpconf () {
+    local snmp_fil snmp_dir snmp_lcl snmp_tmp wrote_one changed_local files f
+    snmp_fil=@sysconfdir@/snmp/snmpd.local.conf
+    snmp_dir=@sysconfdir@/snmp/snmp.d
+    snmp_lcl=@sysconfdir@/snmp/snmp.d/00local
+    snmp_tmp=${tmppath:-/var/tmp}/snmpd.local.conf.tmp.$$
+    wrote_one=no
+    changed_local=no
+    files="$snmp_dir/*"
+    if [ ! -e @sysconfdir@/snmp/snmpd.conf -a -e @sysconfdir@/snmpd.conf ]; then
+	ln -L @sysconfdir@/snmpd.conf @sysconfdir@/snmp/snmpd.conf
+	touch @sysconfdir@/snmpd.local.conf
+    fi
+    if [ ! -e @sysconfdir@/snmsysconfdir@/snmpl.conf -a -e @sysconfdir@/snmpd.local.conf ]; then
+	ln -L @sysconfdir@/snmpd.local.conf @sysconfdir@/snmp/snmpd.conf
+    fi
+    if [ -s $snmp_fil ]; then
+	if grep '^# Generated from snmp.d' $snmp_fil >/dev/null 2>&1; then
+	    cp -f -b --suffix=.dpkg-old -- $snmp_fil $snmp_lcl
+	fi
+    fi
+    (   echo '# Generated from snmp.d by @PACKAGE_LCNAME@'
+	echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
+	echo '# EDIT THE FILES IN THE snmp.d DIRECTORY INSTEAD.'
+    ) >$snmp_tmp
+    for f in $files; do
+	if [ -f $f -a $f = $snmp_lcl ]; then
+	    case $f in
+		(*.dpkg-old|*.dpkg-new|*.dpkg-tmp) ;;
+		(*) (   echo '# Generated from snmp.d/'`basename $f`
+			sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+		    ) >>$snmp_tmp
+		    ;;
+	    esac
+	fi
+    done
+    for f in $files ; do
+	if [ -f $f -a $f != $snmp_lcl ]; then
+	    case $f in
+		(*.dpkg-old|*.dpkg-new|*.dpkg-tmp) ;;
+		(*) (   echo '# Generated from snmp.d/'`basename $f`
+			sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+		    ) >>$snmp_tmp
+		    wrote_one=yes
+		    ;;
+	    esac
+	fi
+    done
+    if [ $wrote_one = yes ]; then
+	if ! diff $snmp_tmp $snmp_fil >/dev/null 2>&1; then
+	    cp -f -b --suffix=.dpkg-old -- $snmp_tmp $snmp_fil
+	    changed_local=yes
+	fi
+    elif [ -f $snmp_lcl ]; then
+	cp -f -- $snmp_lcl $snmp_fil
+	rm -f -- $snmp_lcl
+	changed_local=yes
+    else
+	cat /dev/null > $snmp_fil
+	changed_local=yes
+    fi
+    rmdir $snmp_dir 2>/dev/null || :
+    rm -f -- $snmp_tmp || :
+    if [ $changed_local = yes ]; then
+	if [ -f @initrddir@/snmpd ]; then
+	    r="`runlevel | awk '{print$2}'`"
+	    start=no
+	    for l in @initrddir@/../rc${r}.d/S[0-9][0-9]snmpd @initrddir@/rc${r}.d/S[0-9][0-9]snmpd; do
+		if [ -L $l ]; then start=yes; break; fi
+	    done
+	    if [ $start = yes -o -e /var/lock/subsys/snmpd ]; then
+		[ -x "`which service     2>/dev/null`" ] && { service     snmpd reload || :; }
+		[ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d snmpd reload || :; }
+		[ -x "@initrddir@/snmpd"               ] && { @initrddir@/snmpd reload || :; }
+	    fi
+	else
+	    killall -HUP snmpd || :
+	fi
+    fi
+}
+#
+# postrm_tcllibs() - After removal or upgrade, the tcl module index files should
+#   be removed.  Note that after removal there are no tcl modules around and the
+#   directories can be removed as well.  For upgrade, however, the tcl modules
+#   still exist, but all index files for them can be removed.
+#
+#postrm_tcllibs () { :
+#    local files f d
+#    files="$pkgtcllibdir/pkgIndex.tcl $pkgtcllibdir/*/pkgIndex.tcl"
+#    for f in $files; do
+#	if [ -f $f ]; then
+#	    rm -f -- $f || :
+#	    d=`dirname $f`
+#	    if [ -d $d ]; then
+#		rmdir -p $d 2>/dev/null || :
+#	    fi
+#	fi
+#    done
+#}
+#
+# postrm_lib_remove() - After a removal, do a ldconfig and remove the indexes
+#   for the tcl libraries and modules.
+#
+postrm_lib_remove () { :
+    postrm_libraries
+    postrm_netconfig
+    postrm_sock2path
+    postrm_snmpconf
+#    postrm_tcllibs
+}
+#
+# postrm_lib_purge() - When purging library configuration files, kill all
+#   processes using the libraries and then purge the configuration databases
+#   used by those libraries.
+#
+postrm_lib_purge () { :
+    postrm_netconfig
+    postrm_sock2path
+    postrm_snmpconf
+}
+#
+# postrm_lib_upgrade() - During an upgrade, we should probably remove our tcl
+#   modules index files because dpkg does not know about them.  The new-postinst
+#   "configure" will generate new index files for any tcl modules that were
+#   also in the new version.
+#
+postrm_lib_upgrade () { :
+#    postrm_tcllibs
+}
+# -----------------------------------------------------------------------------
+# Primary functions:
+# -----------------------------------------------------------------------------
+# remove-postrm remove
+remove_postrm () { :
+    postrm_lib_remove
+}
+# remove-postrm purge
+purge_postrm () { :
+    postrm_lib_purge
+}
+# old-postrm upgrade new-version
+upgrade_postrm () { :
+    postrm_lib_upgrade
+}
+# old-postrm upgrade new-version ...FAILED
+# new-postrm failed-upgrade old-version
+failed_upgrade_postrm () { :
+}
+# new-preinst install [old-version] ...FAILED
+# new-postrm abort-install [old-version]
+abort_install_postrm () { :
+}
+# new-preinst upgrade old-version ...FAILED
+# new-postrm abort-upgrade old-version
+abort_upgrade_postrm () { :
+}
+# dis-postrm disappear overwriter overwriter-version
+disappear_postrm () { :
+}
+@mscript_postrm@
+@mscript_debhelper@
+#if [ "$1" = "remove" ]; then
+#    ldconfig
+#fi
+# =============================================================================
+#
+# $Log: openss7-lib.postrm.in,v $
+# Revision 1.1.2.2  2011-05-15 12:01:18  brian
+# - many build system refinements
+#
+# Revision 1.1.2.1  2011-05-10 13:45:29  brian
+# - weak modules workup
+#
+# =============================================================================
+# vim: ft=sh sw=4 noet nocin nosi formatoptions+=tcqlorn

@@ -1,0 +1,73 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+box center tab(:);
+cb1|cb1|cb1|cb
+l1|l1|l1|l.
+STATE:CDI STATE:DESCRIPTION:SERVICE
+:::TYPE
+_
+8) OUTCON PEND:CD_OUTCON_PENDING:T{
+.hy 0
+.ad l
+An outgoing connection is pending - the CDS provider is waiting for a
+CD_CONNECT_CON
+T}:CD_COCDS
+9) INCON PEND:CD_INCON_PENDING:T{
+.hy 0
+.ad l
+An incoming connection is pending - the CDS provider is waiting for a
+CD_CONNECT_RES
+T}:CD_COCDS
+10) CONN_RES PEND:CD_CONN_RES_PENDING:T{
+.hy 0
+.ad l
+The CDS user is waiting for an acknowledgement of a CD_CONNECT_RES
+T}:CD_COCDS
+11) DATAXFER:CD_DATAXFER:T{
+.hy 0
+.ad l
+Connection-mode data transfer may take place
+T}:CD_COCDS
+12) USER RESET PEND:CD_USER_RESET_PENDING:T{
+.hy 0
+.ad l
+A user-initiated reset is pending - the CDS user waiting for a CD_RESET_CON
+T}:CD_COCDS
+13) PROV RESET PEND:CD_PROV_RESET_PENDING:T{
+.hy 0
+.ad l
+A provider-initiated reset is pending - the CDS provider is waiting for a
+CD_RESET_RES
+T}:CD_COCDS
+14) RESET_RES PEND:CD_RESET_RES_PENDING:T{
+.hy 0
+.ad l
+The CDS user is waiting for an acknowledgement of a CD_RESET_RES
+T}:CD_COCDS
+.TE

@@ -1,0 +1,4833 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4 et
+-- =============================================================================
+-- 
+-- @(#) $RCSfile$ $Name$($Revision$) $Date$
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- Note well: nonwithstanding this AGPL license, you are not permitted to make 
+-- modifications under the OpenSS7 project's enterprise object identifier arc: 
+-- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
+-- identifier arc under your control.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date$ by $Author$
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log$
+-- =============================================================================
+
+OPENSS7-PROBE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    HCPerfCurrentCount, HCPerfIntervalCount, HCPerfInvalidIntervals, 
+    HCPerfTimeElapsed, HCPerfTotalCount, HCPerfValidIntervals
+        FROM HC-PerfHist-TC-MIB
+    openss7Modules
+        FROM OPENSS7-SMI
+    AdministrativeState, AvailabilityStatus, FullAction, IntervalsOfDay, 
+    LogCapacityAlarmThreshold, OperationalState, ProceduralStatus, 
+    SimpleNameType, UsageState, WeekMask
+        FROM OPENSS7-SMI-MIB
+    IfIndex
+        FROM SIP-MIB
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Counter32, Counter64, Gauge32, Integer32, MODULE-IDENTITY, 
+    OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString, MacAddress, RowStatus, StorageType, 
+    TEXTUAL-CONVENTION, TimeInterval, TimeStamp, TruthValue
+        FROM SNMPv2-TC
+    TransportAddress, TransportAddressType
+        FROM TRANSPORT-ADDRESS-MIB;
+
+probeMIB MODULE-IDENTITY
+    LAST-UPDATED "201212040307Z"
+    ORGANIZATION 
+        "The OpenSS7 Project"
+    CONTACT-INFO 
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Crescent
+         Edmonton AB  T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         E-Mail: bidulock@openss7.org"
+    DESCRIPTION 
+        "MIB Module for monitoring SS7, SIGTRAN and other communications 
+         protocols.
+         
+         Copyright (c) 2008-2012  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+         
+         All Rights Reserved.
+         
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+         
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+         
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+         
+         Note well: notwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
+    REVISION    "201212040307Z"
+    DESCRIPTION 
+        "First release of this module."
+    ::= { openss7Modules 82 }
+
+-- 
+-- This mib describes the necessary information for the host to perform 
+-- capture and live feeds of data for monitored interfaces.  It is 
+-- intended to provide monitoring for SS7 and SIGTRAN for the near term 
+-- and SIP, H.323, BICC, H.248 in the longer term.
+--
+
+-- ====================================================================
+-- TEXTUAL CONVENTIONS
+-- ====================================================================
+
+TimesOfDay ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d:1d,"
+    STATUS      current
+    DESCRIPTION 
+        "This textual convention specifies times of day by hour and 
+         minute and replaces the following ASN.1 syntax:
+         
+         TimesOfDay ::= SET OF Time24
+         
+         It consists of an octet string that is an integral multiple of 
+         2 octets.  Each 2 octet grouping is coded as a Time24 textual 
+         convention representing one time of day.  Each two-octet 
+         grouping represents as separate time of day."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+            Attribute-ASN1Module.IntervalsOfDay"
+    SYNTAX      OCTET STRING
+
+TimesOfWeek ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x"
+    STATUS      current
+    DESCRIPTION 
+        "This textual convention specifies intervals in the day for days 
+         of the week and replaces the following ASN.1 syntax:
+         
+         WeekMask ::= SET OF SEQUENCE {
+            daysOfWeek BIT STRING {
+                sunday(0),
+                monday(1),
+                tuesday(2),
+                wednesday(3),
+                thursday(4),
+                friday(5),
+                saturday(6) }(SIZE(7)),
+            timesOfDay TimesOfDay }
+         
+         The first octet of the octet string is a day of seek indicator 
+         that can have bit values: sunday(0), monday(1), tuesday(2), 
+         wednesday(3), thursday(4), friday(5) and saturday(6), with bit 
+         position 7 unused and set to zero.  The second octet of the 
+         string is an interval count indicating the number, 'n', of 
+         times of day (multiples of 2 octets) to follow.  The next nx2 
+         octets represent the times of day following the TimesOfDay 
+         textual convention.  The pattern is repeated again beginning 
+         with the week octet."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+            Attribute-ASN1Module.WeekMask"
+    SYNTAX      OCTET STRING
+
+DataLinkType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "This textual convention specifies the data link type of a 
+         capture file or interface in a capture file using the 
+         convention of the PCAP and PCAP-NG file formats."
+    REFERENCE   
+        "PCAP/PCAPNG file formst."
+    SYNTAX      INTEGER { null(0), ethernet(1), expether(2), ax25(3), 
+                    pronet(4), chaos(5), tokenring(6), arcnet(7), 
+                    slip(8), ppp(9), fddi(10), ppphdlc(50), pppether(51), 
+                    symantec(99), rfc1483(100), rawip(101), bsdslip(102), 
+                    bsdppp(103), ciscohdlc(104), ieee80211(105), 
+                    atmclip(106), frelay(107), loop(108), enc(109), 
+                    lane8023(110), hippi(111), hdlc(112), linuxsll(113), 
+                    ltalk(114), econet(115), ipfilter(116), pflog(117), 
+                    prism(119), aironet(120), hhdlc(121), rfc2825(122), 
+                    sunatm(123), rio(124), pcie(125), aurora(126), 
+                    ieee80211radio(127), tzsp(128), arcnetlinux(129), 
+                    ipieee1394(138), mtp2ph(139), mtp2(140), mtp3(141), 
+                    sccp(142), docsis(143), irda(144) }
+
+EuiAddr ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x:"
+    STATUS      current
+    DESCRIPTION 
+        "This textual convention represents an EUI-64 address 
+         represented in the order of transmission."
+    SYNTAX      OCTET STRING (SIZE(8))
+
+Uuid ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "4x-2x-2x-2x-6x"
+    STATUS      current
+    DESCRIPTION 
+        "This textual convention specifies a 128-bit unique user 
+         identifier (UUID)."
+    SYNTAX      OCTET STRING (SIZE(16))
+
+FilterType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "This textual convention specifies the filter types that are to 
+         be applied to a monitoring source to limit the number of 
+         packets collected."
+    SYNTAX      BITS { arp(0), rarp(1), lldp(2), dns(3), m2pa(4), 
+                    m2ua(5), m3ua(6), sua(7), iua(8), bicc(9), sip(10), 
+                    h323(11), h248(12), q931(13) }
+
+CaptureInterfaces ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d,"
+    STATUS      current
+    DESCRIPTION 
+        "Provides a list of capture interface numbers, where each octet 
+         in the OCTET STRING represents a separate capture interface.  
+         Each capture interface number also represents an index into the 
+         probeInterfaceTable for the same value of probeInterfaceIndex.  
+         Only 256 interfaces can be represented."
+    SYNTAX      OCTET STRING (SIZE(1..256))
+
+-- ====================================================================
+-- NOTIFICATIONS
+-- ====================================================================
+
+probeNotifications OBJECT IDENTIFIER
+    ::= { probeMIB 1 }
+
+-- ====================================================================
+-- OBJECTS
+-- ====================================================================
+
+probeObjects OBJECT IDENTIFIER
+    ::= { probeMIB 2 }
+
+-- =====================================================================
+-- probeMonitor group
+-- =====================================================================
+-- The probe monitor group is responsible for managing general aspects 
+-- of the probe.
+-- .....................................................................
+
+probeMonitor OBJECT IDENTIFIER
+    ::= { probeObjects 1 }
+
+probeMonitorName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the name of the probe.  The name of the probe can be 
+         changed by writing to this object.  Note that changes will not 
+         be effective in capture files until rotation."
+    ::= { probeMonitor 1 }
+
+probeMonitorUuid OBJECT-TYPE
+    SYNTAX      Uuid
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the randomly generated unique user identifier (UUID) 
+         associated with the probe,"
+    ::= { probeMonitor 2 }
+
+probeMonitorHardware OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides as description of the hardware of the probe.  This 
+         information will go in the shb_hardware option field of a 
+         PCAP-NG file captured from this probe."
+    ::= { probeMonitor 3 }
+
+probeMonitorOs OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the name of the operating system of the probe.  This 
+         information will go in the shb_os option field of a PCAP-NG 
+         section header in a file captured from this probe."
+    ::= { probeMonitor 4 }
+
+probeMonitorUserAppl OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the name of the application and version runnning on 
+         the probe.  This information will go in the shb_userappl option 
+         field of a PCAP-NG section header in a file captured from this 
+         probe."
+    ::= { probeMonitor 5 }
+
+-- =====================================================================
+-- probeInterface group
+-- =====================================================================
+-- The probe interface group is responsible for managing packet capture 
+-- from interfaces on a probe.
+-- .....................................................................
+
+probeInterface OBJECT IDENTIFIER
+    ::= { probeObjects 2 }
+
+probeInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ProbeInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a table of interfaces available for monitoring on this 
+         probe."
+    ::= { probeInterface 1 }
+
+probeInterfaceEntry OBJECT-TYPE
+    SYNTAX      ProbeInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the probeInterfaceTable provides a description of the 
+         characteristics of one interface that can be monitored."
+    INDEX       { probeInterfaceIndex }
+    ::= { probeInterfaceTable 1 }
+
+ProbeInterfaceEntry ::= SEQUENCE {
+    probeInterfaceIndex         Unsigned32,
+    probeInterfaceIfIndex       IfIndex,
+    probeInterfaceLinkType      DataLinkType,
+    probeInterfaceSnapLen       Unsigned32,
+    probeInterfaceName          SnmpAdminString,
+    probeInterfaceDescription   SnmpAdminString,
+    probeInterfaceMacAddr       MacAddress,
+    probeInterfaceEuiAddr       OCTET STRING,
+    probeInterfaceSpeed         Counter64,
+    probeInterfaceTsRes         INTEGER,
+    probeInterfaceTzone         Integer32,
+    probeInterfaceFilterType    FilterType,
+    probeInterfaceFilter        SnmpAdminString,
+    probeInterfaceOs            SnmpAdminString,
+    probeInterfaceFcsLen        Unsigned32,
+    probeInterfaceTsOffset      Counter64,
+    probeInterfaceAdminState    AdministrativeState,
+    probeInterfaceOpState       OperationalState,
+    probeInterfaceAvailStatus   AvailabilityStatus,
+    probeInterfaceProcStatus    ProceduralStatus,
+    probeInterfaceUsageState    UsageState
+}
+
+probeInterfaceIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a ordinal index (starting at zero) of the interface 
+         within the probeInterfaceTable.  This index corresponds to the 
+         interface identifier that will be used within a PCAP-NG capture 
+         file collecting packets from the interface."
+    ::= { probeInterfaceEntry 1 }
+
+probeInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      IfIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the corresponding valid of the index into the ifTable 
+         corresponding to the interface.  If the ifIndex value is 
+         unknown or not applicable to the interface, the value 0 will 
+         appear in this column."
+    ::= { probeInterfaceEntry 2 }
+
+probeInterfaceLinkType OBJECT-TYPE
+    SYNTAX      DataLinkType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the data link type of the interface.  The data link 
+         type has the same value as the PCAP/PCAP-NG formatted file data 
+         link type."
+    ::= { probeInterfaceEntry 3 }
+
+probeInterfaceSnapLen OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the snap length associated with capture performed on 
+         the interface."
+    ::= { probeInterfaceEntry 4 }
+
+probeInterfaceName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the name of the interface."
+    ::= { probeInterfaceEntry 5 }
+
+probeInterfaceDescription OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides a textual description of the interface."
+    ::= { probeInterfaceEntry 6 }
+
+probeInterfaceMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the MAC-48 address of the interface.  When no MAC-48 
+         address is associated with the interface, this value will be 6 
+         octets of zero (00:00:00:00:00:00)."
+    ::= { probeInterfaceEntry 7 }
+
+probeInterfaceEuiAddr OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the EUI-64 address of the interface.  When no EUI-64 
+         address is associated with the interface, this value will be 8 
+         octets of zero (00:00:00:00:00:00:00:00)."
+    ::= { probeInterfaceEntry 8 }
+
+probeInterfaceSpeed OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "bits per second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the speed of the interface in bits per second.  The 
+         value zero(0) is special and is used to indicate that the speed 
+         of the interface is unknown or not applicable."
+    ::= { probeInterfaceEntry 9 }
+
+probeInterfaceTsRes OBJECT-TYPE
+    SYNTAX      INTEGER { milli(3), micro(6), nano(9), pico(12) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the time resolution of collection from the interface.  
+         The time resolution is the minimum time granularity of the 
+         values used to timestamp collected packets."
+    ::= { probeInterfaceEntry 10 }
+
+probeInterfaceTzone OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "seconds from GMT"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the time zone for packets collected from the interface 
+         as the number of seconds of time offset from GMT."
+    ::= { probeInterfaceEntry 11 }
+
+probeInterfaceFilterType OBJECT-TYPE
+    SYNTAX      FilterType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the interface filter type used to filter packets from 
+         the interface.  The filter type is multi-valued."
+    ::= { probeInterfaceEntry 12 }
+
+probeInterfaceFilter OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the interface filter as a tcpdump formatted filter 
+         string."
+    ::= { probeInterfaceEntry 13 }
+
+probeInterfaceOs OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "TODO"
+    ::= { probeInterfaceEntry 14 }
+
+probeInterfaceFcsLen OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the default length of the frame check sequence (FCS) 
+         used in frames for packets on the interface."
+    ::= { probeInterfaceEntry 15 }
+
+probeInterfaceTsOffset OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the time offset (in seconds) of timestamps for packets 
+         collected from the interface."
+    ::= { probeInterfaceEntry 16 }
+
+probeInterfaceAdminState OBJECT-TYPE
+    SYNTAX      AdministrativeState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the administrative state of monitoring from the 
+         interface.
+         
+         - locked(0), monitoring of messages from this interface is 
+           administratively prohibited;
+           
+         - unlocked(1), monitoring of messages from this interface is 
+           administratively permitted;
+           
+         - shuttingDown(2), monitoring of the interface is shutting 
+           down: once it ceases generating messages it will move to the 
+           locked(0) state.
+           
+         The value shuttingDown(2) is only valid when read and not valid 
+         when written.  This object is used primarily to enable or 
+         disable monitoring of messages from the interface."
+    ::= { probeInterfaceEntry 17 }
+
+probeInterfaceOpState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the operational state of the interface.
+         
+         - enabled(0), the interface is enabled;
+         - disabled(1), the interface is disabled.
+           
+         When enabled(0), messages generated by the interface can be 
+         monitored; when disabled(1), they cannot."
+    ::= { probeInterfaceEntry 18 }
+
+probeInterfaceAvailStatus OBJECT-TYPE
+    SYNTAX      AvailabilityStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the availability status of the interface; it may 
+         contain:
+         
+         - inTest(0), the interface is in test; administrative state is 
+           locked(0), operational state is disabled(1);
+           
+         - failed(1), the interface has an internal fault that prevents 
+           it from operating; operation state disabled(1);
+           
+         - powerOff(2), the interface is not powered on;
+           
+         - offLine(3), the interface requires a routing operation;
+           
+         - offDuty(4),the interface is off duty per schedule;
+           
+         - dependency(5), the interface cannot operate due to a 
+           dependency;
+           
+         - degraded(6), the interface is operating with degraded 
+           performance;
+           
+         - notInstalled(7), the interface is not installed.
+           
+         - logFull(8), not used."
+    ::= { probeInterfaceEntry 19 }
+
+probeInterfaceProcStatus OBJECT-TYPE
+    SYNTAX      ProceduralStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the procedural status of the interface:
+         
+         - intializationRequired(0), hardware or firmware associated 
+           with the interface requires initialization and that 
+           initialization has not yet been performed; a manual or 
+           automatic action is required to initialize the interface;
+           
+         - notInitialized(1), hardware or firmware associated with the 
+           interface requires initialization and that initialization has 
+           not completed yet;
+           
+         - initializing(2), hardware or firmware associated with the 
+           interface requires initialization and that initialization is 
+           proceeding but has not yet completed;
+           
+         - reporting(3), the interface is reporting its results;
+           
+         - terminating(4), the interface is terminating.
+           
+         The procedural status for interfaces result from actions taken 
+         by the underlying device or device driver and not by actions 
+         taken within this MIB."
+    REFERENCE   
+        "OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2,
+            proceduralStatus."
+    ::= { probeInterfaceEntry 20 }
+
+probeInterfaceUsageState OBJECT-TYPE
+    SYNTAX      UsageState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the usage state of the interface:
+         
+         - idle(0), the interface is not currently in use;
+           
+         - active(1), the interface is in use and has sufficient 
+           operating capacity to provide for additional users 
+           simultaneously;
+           
+         - busy(2), the interface is in use and has no spare capacity.
+           
+         This usage state determines the use of the interface as a 
+         monitor and not any use of the interface in active 
+         communication.  For example, an ethernet interface could be 
+         idle(0) for monitoring, and busy(2) in active communication."
+    REFERENCE   
+        "OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2,
+            usageState."
+    ::= { probeInterfaceEntry 21 }
+
+-- =====================================================================
+-- probeStats group
+-- =====================================================================
+-- The probe statistics groups is responsible for collecting statistics 
+-- on packet capture.
+-- .....................................................................
+
+probeStats OBJECT IDENTIFIER
+    ::= { probeObjects 3 }
+
+probeStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ProbeStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a table of statistics for interfaces available for 
+         monitoring on this probe."
+    ::= { probeStats 1 }
+
+probeStatsEntry OBJECT-TYPE
+    SYNTAX      ProbeStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the probeStatsTable provides collection statistics 
+         associated with one interface that has been monitored."
+    INDEX       { probeInterfaceIndex }
+    ::= { probeStatsTable 1 }
+
+ProbeStatsEntry ::= SEQUENCE {
+    probeStatsTimeElapsed   HCPerfTimeElapsed,
+    probeStatsTimeStamp     Counter64,
+    probeStatsStartTime     Counter64,
+    probeStatsSEndTime      Counter64,
+    probeStatsIfRecv        HCPerfCurrentCount,
+    probeStatsIfDrop        HCPerfCurrentCount,
+    probeStatsFilterAccept  HCPerfCurrentCount,
+    probeStatsOsDrop        HCPerfCurrentCount,
+    probeStatsUserDeliv     HCPerfCurrentCount
+}
+
+probeStatsTimeElapsed OBJECT-TYPE
+    SYNTAX      HCPerfTimeElapsed
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a count of the number of seconds elapsed in the 
+         current interface collection statistics reporting interval."
+    ::= { probeStatsEntry 1 }
+
+probeStatsTimeStamp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the time for which this interface statistics report is 
+         valid.  A value of zero(0) indicates that the time of the 
+         report is unknown."
+    ::= { probeStatsEntry 2 }
+
+probeStatsStartTime OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the monitoring start time for this interface 
+         statistics report.  A value of zero(0) indicates that the start 
+         time is unknown."
+    ::= { probeStatsEntry 3 }
+
+probeStatsSEndTime OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the monitoring end time of this interface statistics 
+         report.  A value of zero(0) indicates that the end time is 
+         unknown."
+    ::= { probeStatsEntry 4 }
+
+probeStatsIfRecv OBJECT-TYPE
+    SYNTAX      HCPerfCurrentCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a count of the number of packets received from the 
+         physical interface since the beginning of the monitoring 
+         period.
+         
+         This is the number of packets received by the physical 
+         interface regardless of monitoring.  It is obtained directly 
+         from the device driver."
+    REFERENCE   
+        "PCAP-NG file format: isb_ifrecv."
+    ::= { probeStatsEntry 5 }
+
+probeStatsIfDrop OBJECT-TYPE
+    SYNTAX      HCPerfCurrentCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a count of the number of packets dropped by the 
+         interface due to lack of resources since the beginning of the 
+         monitoring period.
+         
+         This is the number of packets dropped by the interface 
+         regardless of monitoring.  It is obtained directly from the 
+         device driver."
+    REFERENCE   
+        "PCAP-NG file format: isb_drop."
+    ::= { probeStatsEntry 6 }
+
+probeStatsFilterAccept OBJECT-TYPE
+    SYNTAX      HCPerfCurrentCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a count of the number of packets accepted by the 
+         filter since the beginnning of the monitoring period.
+         
+         This is the bs_capt field of the BIOCGSTATS structure and the 
+         isb_filteraccept option in the PCAP-NG format."
+    REFERENCE   
+        "bpf(4) manual page: bs_capt.
+         PCAP-NG file format: isb_filteraccept."
+    ::= { probeStatsEntry 7 }
+
+probeStatsOsDrop OBJECT-TYPE
+    SYNTAX      HCPerfCurrentCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a count of the number of packets dropped by the 
+         operating system (i.e. the device driver) since the beginning 
+         of the monitoring period.
+         
+         This is the bs_drop field of the BIOCGSTATS structure and the 
+         isb_osdrop option in the PCAP-NG format."
+    REFERENCE   
+        "bpf(4) manual page: bs_drop.
+         PCAP-NG file format: isb_osdrop."
+    ::= { probeStatsEntry 8 }
+
+probeStatsUserDeliv OBJECT-TYPE
+    SYNTAX      HCPerfCurrentCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a count of the number of packets delivered to the 
+         monitoring application since the beginning of the monitoring 
+         period.  This value can be different from the value provided by 
+         probeStatsFilterAccept minus probeStatsOsDrop because some 
+         packets could still lay in the OS buffers at the monitoring 
+         period end time.
+         
+         This is related to the bs_recv field of the BIOCGSTATS 
+         structure except that it is that actual number of packets read 
+         by the user-space application, whereas bs_recv is the number of 
+         packets bufferred by the bpf(4) driver and available to be 
+         read.  It is the isb_usrdeliv option in the PCAP-NG format."
+    REFERENCE   
+        "bpf(4) manual page: bs_recv.
+         PCAP-NG file format: isb_usrdeliv."
+    ::= { probeStatsEntry 9 }
+
+probeHistTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ProbeHistEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a table of historical statistics for interfaces 
+         available for monitoring on this probe."
+    ::= { probeStats 2 }
+
+probeHistEntry OBJECT-TYPE
+    SYNTAX      ProbeHistEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the probeHistTable provides historical collection 
+         statistics associated with one collection interval for one 
+         interface that has been monitored."
+    INDEX       { probeInterfaceIndex, probeHistInterval }
+    ::= { probeHistTable 1 }
+
+ProbeHistEntry ::= SEQUENCE {
+    probeHistInterval       Integer32,
+    probeHistTimeElapsed    HCPerfTimeElapsed,
+    probeHistIfRecv         HCPerfIntervalCount,
+    probeHistIfDrop         HCPerfIntervalCount,
+    probeHistFilterAccept   HCPerfIntervalCount,
+    probeHistOsDrop         HCPerfIntervalCount,
+    probeHistUserDeliv      HCPerfIntervalCount
+}
+
+probeHistInterval OBJECT-TYPE
+    SYNTAX      Integer32 (0..96)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides an index of the historical collection statistics 
+         interval associated with this conceptual row.  Collection 
+         intervals are numbered from 0 to 96, representing the 
+         historical collection interval from the most recent to the 
+         least recent."
+    ::= { probeHistEntry 1 }
+
+probeHistTimeElapsed OBJECT-TYPE
+    SYNTAX      HCPerfTimeElapsed
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the number of seconds elapsed in the historical 
+         interval.  For a 15-minute collection interval, this will be 
+         900 seconds; for 5-minute, 300 seconds."
+    ::= { probeHistEntry 2 }
+
+probeHistIfRecv OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a count of the number of packets received from the 
+         physical interface during the collection interval.
+         
+         This is the number of packets received by the physical 
+         interface regardless of monitoring.  It is obtained directly 
+         from the device driver."
+    REFERENCE   
+        "PCAP-NG file format: isb_ifrecv."
+    ::= { probeHistEntry 3 }
+
+probeHistIfDrop OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a count of the number of packets dropped by the 
+         interface due to lack of resources during the collection 
+         interval.
+         
+         This is the number of packets dropped by the interface 
+         regardless of monitoring.  It is obtained directly from the 
+         device driver."
+    REFERENCE   
+        "PCAP-NG file format: isb_drop."
+    ::= { probeHistEntry 4 }
+
+probeHistFilterAccept OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a count of the number of packets accepted by the 
+         filter during the collection interval.
+         
+         This is the bs_capt field of the BIOCGSTATS structure and the 
+         isb_filteraccept option in the PCAP-NG format."
+    REFERENCE   
+        "bpf(4) manual page: bs_capt.
+         PCAP-NG file format: isb_filteraccept."
+    ::= { probeHistEntry 5 }
+
+probeHistOsDrop OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a count of the number of packets dropped by the 
+         operating system (i.e. the device driver) during the collection 
+         interval.
+         
+         This is the bs_drop field of the BIOCGSTATS structure and the 
+         isb_osdrop option in the PCAP-NG format."
+    REFERENCE   
+        "bpf(4) manual page: bs_drop.
+         PCAP-NG file format: isb_osdrop."
+    ::= { probeHistEntry 6 }
+
+probeHistUserDeliv OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a count of the number of packets delivered to the 
+         monitoring application during the collection interval.  This 
+         value can be different from the value provided by 
+         probeHistFilterAccept minus probeHistOsDrop because some 
+         packets could still aly in the OS buffers at the end of the 
+         collection interval.
+         
+         This is related to the bs_recv field of the BIOCGSTATS 
+         structure except that it is that actual number of packets read 
+         by the user-space application, whereas bs_recv is the number of 
+         packets bufferred by the bpf(4) driver and available to be 
+         read.  It is the isb_userdeliv option in the PCAP-NG format."
+    REFERENCE   
+        "bpf(4) manual page: bs_recv.
+         PCAP-NG file format: isb_usrdeliv."
+    ::= { probeHistEntry 7 }
+
+probeTotalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ProbeTotalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a table of totals of historical statistics for 
+         interfaces available for monitoring on this probe."
+    ::= { probeStats 3 }
+
+probeTotalEntry OBJECT-TYPE
+    SYNTAX      ProbeTotalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the probeTotalTable provides a total of historical 
+         collection statistics associated with one interface that has 
+         been monitored."
+    INDEX       { probeInterfaceIndex }
+    ::= { probeTotalTable 1 }
+
+ProbeTotalEntry ::= SEQUENCE {
+    probeTotalValidIntervals    HCPerfValidIntervals,
+    probeTotalInvalidIntervals  HCPerfInvalidIntervals,
+    probeTotalIfRecv            HCPerfTotalCount,
+    probeTotalIfDrop            HCPerfTotalCount,
+    probeTotalFilterAccept      HCPerfTotalCount,
+    probeTotalOsDrop            HCPerfTotalCount,
+    probeTotalUserDeliv         HCPerfTotalCount
+}
+
+probeTotalValidIntervals OBJECT-TYPE
+    SYNTAX      HCPerfValidIntervals
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a count (between 0 and 96 inclusive) of the number of 
+         valid historical collection intervals.  Valid collection 
+         intervals are intervals for which there is complete and valid 
+         information."
+    ::= { probeTotalEntry 1 }
+
+probeTotalInvalidIntervals OBJECT-TYPE
+    SYNTAX      HCPerfInvalidIntervals
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a count (between 0 and 96 inclusive) of the number of 
+         invalid historical collection intervals.  Invalid collection 
+         intervals are intervals for which there is incomplete or no 
+         information."
+    ::= { probeTotalEntry 2 }
+
+probeTotalIfRecv OBJECT-TYPE
+    SYNTAX      HCPerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a count of the total number of packets received from 
+         the physical interface during valid historical collection 
+         intervals.
+         
+         This is the number of packets received by the physical 
+         interface regardless of monitoring.  It is obtained directly 
+         from the device driver."
+    REFERENCE   
+        "PCAP-NG file format: isb_ifrecv"
+    ::= { probeTotalEntry 3 }
+
+probeTotalIfDrop OBJECT-TYPE
+    SYNTAX      HCPerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a count of the total number of packets dropped by the 
+         interface due to lack of resources during valid historical 
+         collection intervals.
+         
+         This is the number of packets dropped by the interface 
+         regardless of monitoring.  It is obtained directly from the 
+         device driver."
+    REFERENCE   
+        "PCAP-NG file format: isb_drop."
+    ::= { probeTotalEntry 4 }
+
+probeTotalFilterAccept OBJECT-TYPE
+    SYNTAX      HCPerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a count of the total number of packets accepted by the 
+         filter during valid historical collection intervals.
+         
+         This is the bs_capt field of the BIOCGSTATS structure and the 
+         isb_filteraccept option in the PCAP-NG format."
+    REFERENCE   
+        "bpf(4) manual page: bs_capt.
+         PCAP-NG file format: isb_filteraccept."
+    ::= { probeTotalEntry 5 }
+
+probeTotalOsDrop OBJECT-TYPE
+    SYNTAX      HCPerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a count of the total number of packets dropped by the 
+         operating system (i.e. the device driver) during valid 
+         historical collection intervals.
+         
+         This is the bs_drop field of the BIOCGSTATS structure and the 
+         isb_osdrop option in the PCAP-NG format."
+    REFERENCE   
+        "bpf(4) manual page: bs_drop.
+         PCAP-NG file format: isb_osdrop."
+    ::= { probeTotalEntry 6 }
+
+probeTotalUserDeliv OBJECT-TYPE
+    SYNTAX      HCPerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a count of the total number of packets delivered to 
+         the monitoring application during valid historical collection 
+         intervals.  This value can be different from the value provided 
+         by probeTotalFilterAccept minus probeTotalOsDrop because some 
+         packets could still lay in the OS buffers across the boundaries 
+         of the historical collection intervals.
+         
+         This is related to the bs_recv field of the BIOCGSTATS 
+         structure except that it is that actual number of packets read 
+         by the user-space application, whereas bs_recv is the number of 
+         packets bufferred by the bpf(4) driver and available to be 
+         read.  It is the isb_usrdeliv option in the PCAP-NG format."
+    REFERENCE   
+        "bpf(4) manual page: bs_recv.
+         PCAP-NG file format: isb_usrdeliv."
+    ::= { probeTotalEntry 7 }
+
+-- =====================================================================
+-- probeBuffer group
+-- =====================================================================
+-- The probeBuffer group is responsible for managing the capture buffer.  
+-- Live feeds take their packets from the buffer.
+-- .....................................................................
+
+probeBuffer OBJECT IDENTIFIER
+    ::= { probeObjects 4 }
+
+probeBufferAdminState OBJECT-TYPE
+    SYNTAX      AdministrativeState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Represents the administrative capability of the capture buffer 
+         to perform its function.  The following states are defined:
+         
+         - locked(0), use of the capture buffer has been prohibited by a 
+           managing system.  Information from subordinate records may be 
+           retreived but new records shall not be created.  Records may 
+           be deleted.
+           
+         - unlocked(1), use of the capture buffer has been permitted by 
+           a managing system.  Information from subordinate records may 
+           be retreived and, conditional on the vlaues of other state 
+           and status attributes, new records may be created.
+           
+         Whenever the administrative state of the capture buffer is 
+         changed, the state change notificaiton is generated."
+    REFERENCE   
+        "OPENSS7-SMI-MIB, ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 
+            1993, Section 8.1.1.1.3."
+    DEFVAL      { unlocked }
+    ::= { probeBuffer 1 }
+
+probeBufferOpState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Represents the operational capability of the capture buffer to 
+         perform its function.  The following states are defined:
+         
+         - enabled(0), the buffer is operational and ready for use.  
+           Information from subordinate records may be retrieved and, 
+           conditional on the values of other state and status 
+           attributes, new records may be created.
+         
+         - disabled(1), the buffer is not available for use.  New 
+           records cannot be created.
+         
+         A change in operational state shall generate a state changed 
+         notification."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+            Section 8.1.1.1.4."
+    DEFVAL      { enabled }
+    ::= { probeBuffer 2 }
+
+probeBufferAvailStatus OBJECT-TYPE
+    SYNTAX      AvailabilityStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflects the availability status of the buffer.  May indicate a 
+         'log-full' condition; indicating that records can be retrieved 
+         but that no new records can be added.
+         
+         The availability status package shall be present if any of the 
+         scheduling packages are instantiated.  This attribute reflects 
+         the availability status of the buffer.  When the resource has 
+         been made unavailable in accordance with a predetermined time 
+         schedule its value will be 'Off-Duty'.  The attribute is 
+         read-only.  The value on creation is determined by the 
+         scheduling parameters specified and the status of the resource.  
+         The required value set for this attribute in this package is 
+         'Off-Duty'.
+         
+         No state change notification is generated when this attribute 
+         changes value.  Note: the buffer makes use of the availability 
+         status to indicate the 'log-full' condition; the presence of 
+         this conditional package makes available the 'Off-Duty' value 
+         to the object."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+            Section 8.1.1.1.6.
+         ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+            Section 8.1.1.4.1."
+    DEFVAL      { {} }
+    ::= { probeBuffer 3 }
+
+probeBufferFullAction OBJECT-TYPE
+    SYNTAX      FullAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides a specification of the action to be taken when the 
+         maximum size of the log has been reached.  Options are:
+         
+         - wrap(0), the oldest records in the log, as determined by the 
+           record time stamp, will be deleted to free resources for the 
+           creation of new records;
+           
+         - halt(1), no more records will be logged; records already in 
+           the log will be retained.
+           
+         Both options are supported by every log."
+    DEFVAL      { wrap }
+    ::= { probeBuffer 4 }
+
+probeBufferMaxSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "octets"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the size of the buffer measured in number of octets.  
+         A buffer may have an indeterminate size.  A maximum buffer size 
+         of zero shall be used to specify that the buffer size has no 
+         predefined limit.
+         
+         Note: Since the buffer size is specified in octets, the actual 
+         amount of information that is contained in the buffer will be 
+         determined by the data representation in the buffer.  This data 
+         representation is not subject to standardization.  The maximum 
+         buffer size does not include the system overhead involved in 
+         establishing the buffer.  Thus, immediately after creation, the 
+         current buffer size should read zero."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993,
+            Section 8.1.1.2.1"
+    DEFVAL      { 0 }
+    ::= { probeBuffer 5 }
+
+probeBufferMaxMsgs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "messages"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the maximum number of messages that will be stored in 
+         the buffer before wrapping or halting occurs.  The value zero 
+         (0) specifies that wrapping or halting is not based on the 
+         number of messages in the buffer."
+    DEFVAL      { 0 }
+    ::= { probeBuffer 6 }
+
+probeBufferMaxTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the maximum time interval for which messages will be 
+         stored in the buffer before wrapping or halting occurs.  The 
+         value zero (0) is special and specifies that wrapping or 
+         halting is not based on the time interval buffered."
+    DEFVAL      { 0 }
+    ::= { probeBuffer 7 }
+
+probeBufferCurrentSize OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the current size of the buffer measured in octets.
+         
+         Note: Since the buffer size is specified in octets, the actual 
+         amount of information that is contained in the buffer will be 
+         determined by the data representation in the buffer.  This data 
+         representation is not subject to standardization.  The maximum 
+         buffer size does not include the system overhead involved in 
+         establishing the buffer.  Thus, immediately after creation, the 
+         current buffer size should read zero."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+            Section 8.1.1.2.2."
+    DEFVAL      { 0 }
+    ::= { probeBuffer 8 }
+
+probeBufferNumberOfRecords OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "messages"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute indicates the current number of records 
+         contained in the buffer."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+            Section 8.1.1.2.3."
+    DEFVAL      { 0 }
+    ::= { probeBuffer 9 }
+
+probeBufferCurrentInterval OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the current time interval (in seconds) over which 
+         messages are contained in the buffer."
+    DEFVAL      { 0 }
+    ::= { probeBuffer 10 }
+
+probeBufferAlarmThreshold OBJECT-TYPE
+    SYNTAX      LogCapacityAlarmThreshold
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The log alarm package provides for transmission of alarms when 
+         a buffer full condition approaches.  This package shall be 
+         present whenever a buffer is of finite size and halts buffering 
+         when the 'log-full' availability status occurs.
+         
+         This attribute specifies, as a percentage of maximum buffer 
+         size, the points at which an event will be generated to 
+         indicate that a 'log-full' or 'log-wrap' condition is 
+         approaching.  This attribute is set-valued.  Support of this 
+         attribute is mandatory for the halt behaviour.  When a buffer 
+         is created with the wrap option, the capacity threshold events 
+         are triggered as if couple to a gauge that counts from zero to 
+         the highest capacity threshold value defined and then resets to 
+         zero."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+            Section 8.1.1.3."
+    DEFVAL      { "\x64" }
+    ::= { probeBuffer 11 }
+
+probeBufferByteHiWaterMark OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "message bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the high watermark of the number of message bytes 
+         captured in the capture buffer.  This is the maximum number of 
+         message bytes that were in the buffer since the last reset.  
+         probeBufferReset can be used to reset this gauge to zero.
+         
+         This value can be used to properly size the capture buffer so 
+         that it is unlikely to wrap or halt."
+    DEFVAL      { 0 }
+    ::= { probeBuffer 12 }
+
+probeBufferByteLoWaterMark OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "message bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the low watermark of the number of message bytes 
+         captured in the capture buffer.  This is the minimum number of 
+         message bytes that were in the buffer since the high watermark 
+         was last set.  probeBufferReset can be used to reset this gauge to 
+         zero.
+         
+         This value can be used to properly size the capture buffer so 
+         that it is unlikely to wrap or halt."
+    DEFVAL      { 0 }
+    ::= { probeBuffer 13 }
+
+probeBufferMsgsHiWaterMark OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "messages"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the high watermark of the number of messages captured 
+         in the capture buffer.  This is the maximum number of messages 
+         that were in the buffer since the last reset.  probeBufferReset 
+         can be used to reset this gauge to zero.
+         
+         This value can be used to properly size the capture buffer so 
+         that it is unlikely to wrap or halt."
+    DEFVAL      { 0 }
+    ::= { probeBuffer 14 }
+
+probeBufferMsgsLoWaterMark OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "messages"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the low watermark of the number of messages captured 
+         in the capture buffer.  This is the minimum number of messages 
+         that were in the buffer since the high watermark was last set.  
+         probeBufferReset can be used to reset this gauge to zero.
+         
+         This value can be used to properly size the capture buffer so 
+         that it is unlikely to wrap or halt."
+    DEFVAL      { 0 }
+    ::= { probeBuffer 15 }
+
+probeBufferTimeHiWaterMark OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the high watermark of the duration of time, in 
+         seconds, between the first and last messages captured in the 
+         capture buffer.  This is the maximum duration of time of 
+         messages in the buffer since the last reset.  probeBufferReset can 
+         be used to reset this gauge to zero.
+         
+         This value can be used to properly size the capture buffer so 
+         that it is unlikely to wrap or halt."
+    DEFVAL      { 0 }
+    ::= { probeBuffer 16 }
+
+probeBufferTimeLoWaterMark OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the low watermark of the duration of time, in seconds, 
+         between the first and last messages captured in the capture 
+         buffer.  This is the minimum duration of time that was 
+         contained in the buffer since the high watermark was last set.  
+         probeBufferReset can be used to reset this gauge to zero.
+         
+         This value can be used to properly size the capture buffer so 
+         that it is unlikely to wrap or halt."
+    DEFVAL      { 0 }
+    ::= { probeBuffer 17 }
+
+probeBufferDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "messages dropped"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the number of messages dropped as a result of buffer 
+         wrap or buffer halt.  When the buffer is set for wrap(0), this 
+         is the number of messages dropped from the front of the buffer.  
+         When the buffer is set for halt(1), this is the number of 
+         messages dropped from the end of the buffer.  This number is 
+         reset by reading the first or last message in the buffer 
+         (respectively).  It may also be reset using probeBufferReset."
+    DEFVAL      { 0 }
+    ::= { probeBuffer 18 }
+
+probeBufferReset OBJECT-TYPE
+    SYNTAX      INTEGER { reset(0) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "When written, resets the buffer high and low watermarks to 
+         zero.  Also, reset the number of message buffer drops."
+    DEFVAL      { reset }
+    ::= { probeBuffer 19 }
+
+probeBufferInterfaces OBJECT-TYPE
+    SYNTAX      CaptureInterfaces
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the interfaces that are represented in the capture 
+         buffer.  Interfaces indicated in this list will also exist as 
+         an entry in the probeBufferIfTable."
+    ::= { probeBuffer 20 }
+
+probeBufferTimeElapsed OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the time interval covered by the buffer.  This may be 
+         different than the difference between timestamps of the first 
+         message and the last message captured, because there may have 
+         been a period of time after capture began for which no messages 
+         were yet captured.  The interval should equal the difference 
+         between the probeBufferEndTime and the probeBufferBegTime."
+    ::= { probeBuffer 21 }
+
+probeBufferBegTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the time (using the TimeStamp textual convention) 
+         that the capture buffer was opened (capture of messages to the 
+         buffer began)."
+    ::= { probeBuffer 22 }
+
+probeBufferEndTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the time (using the TimeStamp textual convention) 
+         that the capture buffer was closed (capturing of messages to 
+         the buffer ended)."
+    ::= { probeBuffer 23 }
+
+probeBufferIfRecv OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the total number of frames received from the 
+         interface contained in the buffer during its capture period.
+         
+         This is the number of packets received by the physical 
+         interface regardless of monitoring.  It is obtained directly 
+         from the device driver."
+    REFERENCE   
+        "PCAP-NG file format: isb_ifrecv."
+    ::= { probeBuffer 24 }
+
+probeBufferIfDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the total number of frames that were dropped by any 
+         interface contained in the buffer due to resource shortage 
+         during its capture period.
+         
+         This is the number of packets dropped by the interface 
+         regardless of monitoring.  It is obtained directly from the 
+         device driver."
+    REFERENCE   
+        "PCAP-NG file format: isb_drop."
+    ::= { probeBuffer 25 }
+
+probeBufferFilterAccept OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the total number of frames accepted by the filter on 
+         any interface contained in the buffer during its capture 
+         period.
+         
+         This is the bs_capt field of the BIOCGSTATS structure and the 
+         isb_filteraccept option in the PCAP-NG format."
+    REFERENCE   
+        "bpf(4) manual page: bs_capt.
+         PCAP-NG file format: isb_filteraccept."
+    ::= { probeBuffer 26 }
+
+probeBufferOsDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the total number of frame that were dropped by the 
+         operating system (i.e. the device driver) for any interface 
+         contained in the buffer during its capture period.
+         
+         This is the bs_drop field of the BIOCGSTATS structure and the 
+         isb_osdrop option in the PCAP-NG format."
+    REFERENCE   
+        "bpf(4) manual page: bs_drop.
+         PCAP-NG file format: isb_osdrop."
+    ::= { probeBuffer 27 }
+
+probeBufferUserDeliv OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the total number of frames that were delivered to the 
+         user-space capture application for any interface contained in 
+         the buffer during its capture period.
+         
+         This is related to the bs_recv field of the BIOCGSTATS 
+         structure except that it is that actual number of packets read 
+         by the user-space application, whereas bs_recv is the number of 
+         packets bufferred by the bpf(4) driver and available to be 
+         read.  It is the isb_usrdeliv option in the PCAP-NG format."
+    REFERENCE   
+        "bpf(4) manual page: bs_recv.
+         PCAP-NG file format: isb_usrdeliv."
+    ::= { probeBuffer 28 }
+
+probeBufferIfCompress OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the total number of frames that were compressed for 
+         any interface contianed in the buffer during its capture 
+         period."
+    ::= { probeBuffer 29 }
+
+probeBufferUserOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the total number of frame octets that were captured 
+         for any interface contained in the buffer during its capture 
+         period."
+    ::= { probeBuffer 30 }
+
+probeBufferActionResult OBJECT-TYPE
+    SYNTAX      INTEGER { success(0), failure(1), clear(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides actions and their results.  The action-result is 
+         single-valued and can assume one of the following values:
+         
+         - success(0), the last action was successful;
+         - failure(1), the last action failed;
+         - clear(2), clear the capture buffer.
+           
+         When written, only the value clear(2) is valid and represents 
+         the action to be performed.  When read, only the values 
+         success(0) or failure(1) will be returned and represent the 
+         result of the previous action."
+    ::= { probeBuffer 31 }
+
+probeBufferIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ProbeBufferIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a table of interfaces and interface statistics 
+         contained in the capture buffer."
+    ::= { probeBuffer 32 }
+
+probeBufferIfEntry OBJECT-TYPE
+    SYNTAX      ProbeBufferIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the probeBufferIfTable provides information 
+         concerning a single interface in the capture buffer.  Multiple 
+         interfaces can be represented."
+    INDEX       { probeInterfaceIndex }
+    ::= { probeBufferIfTable 1 }
+
+ProbeBufferIfEntry ::= SEQUENCE {
+    probeBufferIfTimeElapsed    TimeInterval,
+    probeBufferIfBegTime        TimeStamp,
+    probeBufferIfEndTime        TimeStamp,
+    probeBufferIfIfRecv         Counter64,
+    probeBufferIfIfDrop         Counter64,
+    probeBufferIfFilterAccept   Counter64,
+    probeBufferIfOsDrop         Counter64,
+    probeBufferIfUserDeliv      Counter64,
+    probeBufferIfIfCompress     Counter64,
+    probeBufferIfUserOctets     Counter64
+}
+
+probeBufferIfTimeElapsed OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the elasped time for capture from the indexed 
+         interface in the capture buffer."
+    ::= { probeBufferIfEntry 1 }
+
+probeBufferIfBegTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the start time for capture from the indexed interface 
+         in the capture buffer."
+    REFERENCE   
+        "PCAP-NG file format: isb_starttime."
+    ::= { probeBufferIfEntry 2 }
+
+probeBufferIfEndTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the end time for capture from the indexed interface in 
+         the capture buffer."
+    REFERENCE   
+        "PCAP-NG file format: isb_endtime."
+    ::= { probeBufferIfEntry 3 }
+
+probeBufferIfIfRecv OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the number of frames received at the indexed interface 
+         during the capture interval in the capture buffer.
+         
+         This is the number of packets received by the physical 
+         interface regardless of monitoring.  It is obtained directly 
+         from the device driver."
+    REFERENCE   
+        "PCAP-NG file format: isb_ifrecv."
+    ::= { probeBufferIfEntry 4 }
+
+probeBufferIfIfDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the number of frames that were dropped by the indexed 
+         interface due to resource shortage during the capture interval 
+         in the capture buffer.
+         
+         This is the number of packets dropped by the interface 
+         regardless of monitoring.  It is obtained directly from the 
+         device driver."
+    REFERENCE   
+        "PCAP-NG file format: isb_drop."
+    ::= { probeBufferIfEntry 5 }
+
+probeBufferIfFilterAccept OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the number of frames that were accepted by the filter 
+         associated with the indexed interface during the capture 
+         interval in the capture buffer.
+         
+         This is the bs_capt field of the BIOCGSTATS structure and the 
+         isb_filteraccept option in the PCAP-NG format."
+    REFERENCE   
+        "bpf(4) manual page: bs_capt.
+         PCAP-NG file format: isb_filteraccept."
+    ::= { probeBufferIfEntry 6 }
+
+probeBufferIfOsDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the number of frames that were dropped by the 
+         operating system (i.e. the device driver) for the indexed 
+         interface during the capture interval of the capture buffer.
+         
+         This is the bs_drop field of the BIOCGSTATS structure and the 
+         isb_osdrop option in the PCAP-NG format."
+    REFERENCE   
+        "bpf(4) manual page: bs_drop.
+         PCAP-NG file format: isb_osdrop."
+    ::= { probeBufferIfEntry 7 }
+
+probeBufferIfUserDeliv OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the number of frames that were delivered to the 
+         user-space capture application for the indexed interface during 
+         the capture interval of the capture buffer.
+         
+         This is related to the bs_recv field of the BIOCGSTATS 
+         structure except that it is that actual number of packets read 
+         by the user-space application, whereas bs_recv is the number of 
+         packets bufferred by the bpf(4) driver and available to be 
+         read.  It is the isb_usrdeliv option in the PCAP-NG format."
+    REFERENCE   
+        "bpf(4) manual page: bs_recv.
+         PCAP-NG file format: isb_usrdeliv."
+    ::= { probeBufferIfEntry 8 }
+
+probeBufferIfIfCompress OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the number of frames that were compressed (deleted due 
+         to redundant repetition) for the indexed interface during the 
+         capture interval of the capture buffer."
+    REFERENCE   
+        "PCAP-NG file format: isb_ifcompress."
+    ::= { probeBufferIfEntry 9 }
+
+probeBufferIfUserOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the number of frame octets that were captured for the 
+         indexed interface during the capture interval of the capture 
+         buffer."
+    REFERENCE   
+        "PCAP-NG file format: isb_octets."
+    ::= { probeBufferIfEntry 10 }
+
+
+-- =====================================================================
+-- probeCapture group
+-- =====================================================================
+-- The probeCapture group is responsible for managing the naming, 
+-- rotation, spooling, upload and archiving of capture files.
+-- .....................................................................
+
+probeCapture OBJECT IDENTIFIER
+    ::= { probeObjects 5 }
+
+probeCaptureNameString OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the file name as a printf-style string that specifies 
+         the base name of the file (without file extensions).  The 
+         following escape codes can be used to insert information into 
+         the file name:
+         
+         - %Y, the year as a 4-digit number;
+         - %M, the month of the year as a 2-digit number;
+         - %D, the day of the month as a 2-digit number;
+         - %h, the hour of the day as a 2-digit number;
+         - %m, the minute of the hour as a 2-digit number;
+         - %s, the the second of the minute as a 2-digit number;
+         - %I, the interface name;
+         - %U, the UUID of the probe.
+           
+         Note that for %I interface names, the interface name for all 
+         PCAP-NG formatted files is 'all', because they include all 
+         interfaces; for PCAP formatted files, the interface being 
+         captured is used.  The interface name may still be 'all' for 
+         PCAP formatted files when the LINUX-SLL data link type is used.
+         
+         This value should not normally be changed from its default 
+         value as some external programs may rely upon the default 
+         naming of capture files.  Note that none of the escape codes 
+         conflict with the use of '%' in a URL because none of the 
+         escape letters are hexadecimal digits."
+    DEFVAL      { "ss7mon-%I-%Y-%M-%D-%H" }
+    ::= { probeCapture 1 }
+
+probeCaptureFormat OBJECT-TYPE
+    SYNTAX      INTEGER { pcap(1), pcapng(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the capture file format.  When this attribute is 
+         written, the change may not be effective until the next file 
+         rotation.  The supported file formats are:
+         
+         - pcap(1), the traditional PCAP file format;
+           
+         - pcapng(2), the PCAP-NG file format.
+           
+         When the pcap(1) file format is specified, separate PCAP files 
+         will be written for each interface; when the pcapng(2) file 
+         format is specified, a single PCAP-NG file will be written that 
+         contains all of the captured interfaces.
+         
+         This setting can be overridden on an interface-by-interface 
+         basis."
+    DEFVAL      { pcapng }
+    ::= { probeCapture 2 }
+
+probeCaptureAdminState OBJECT-TYPE
+    SYNTAX      AdministrativeState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents the administrative capability of the 
+         capture archive to perform its function.  The following 
+         administrative states are defined:
+         
+         - locked(0), use of the capture archive has been prohibited by 
+           a managing system.  Information from subordinate files may be 
+           retrieved but new files shall not be created.  Files may be 
+           deleted;
+           
+         - unlocked(1), use of the capture archive has been permitted by 
+           a managing system.  Information from subordinate files may be 
+           retrieved and, conditional on the values of other state and 
+           status attributes, new files may be created.
+           
+         Whenever the administrative state of the capture archive is 
+         changed, a state change notification is generated."
+    REFERENCE   
+        "OPENSS7-SMI-MIB, ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 
+            1993, Section 8.1.1.1.3."
+    DEFVAL      { unlocked }
+    ::= { probeCapture 3 }
+
+probeCaptureOpState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents that operational capability of the 
+         capture archive to perform its function.  The following 
+         operational states are defined:
+         
+         - enabled(0), the log is operational and ready for use.  
+           Information from subordinate records may be retrieved and, 
+           conditional on the values of other state and status 
+           attributes, new records may be created.
+           
+         - disabled(1), the log is not available for use.  New records 
+           cannot be created.
+           
+         A change in operational state shall generate a state changed 
+         notification."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+            Section 8.1.1.1.4."
+    DEFVAL      { enabled }
+    ::= { probeCapture 4 }
+
+probeCaptureAvailStatus OBJECT-TYPE
+    SYNTAX      AvailabilityStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute reflects the availability status of the log.  
+         The attribute may indicate a 'log-full' condition; indicating 
+         that records can be retrieved but that no new records can be 
+         added.
+         
+         The availability status package shall be present if any of the 
+         scheduling packages are instantiated.  This attribute reflects 
+         the availability status of the log.  When the resource has been 
+         made unavailable in accordance with a predetermined time 
+         schedule its value will be 'Off-Duty'.  The attribute is 
+         read-only.  The value on creation is determined by the 
+         scheduling parameters specified and the status of the resource.  
+         The required value set for this attribute in this package is 
+         'Off-Duty'.
+         
+         No state change notification is generated when this attribute 
+         changes value.  Note: the log makes use of the availability 
+         status to indicate the 'log-full' condition; the presence of 
+         this conditional package makes available the 'Off-Duty' value 
+         to the object."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+            Section 8.1.1.1.6.
+         ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+            Section 8.1.1.4.1."
+    DEFVAL      { {} }
+    ::= { probeCapture 5 }
+
+probeCaptureFullAction OBJECT-TYPE
+    SYNTAX      FullAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides a specification of the action to be taken when the 
+         maximum size of the log has been reached.  Options are:
+         
+         - wrap(0), the oldest records in the log, as determined by the 
+           record time stamp, will be deleted to free resources for the 
+           creation of new records;
+           
+         - halt(1), no more records will be logged; records already in 
+           the log will be retained.
+           
+         Both options are supported by every log."
+    DEFVAL      { wrap }
+    ::= { probeCapture 6 }
+
+probeCaptureMaxSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "octets"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This attribute specifies the size of the log measured in number 
+         of octets.  A log may have an indeterminate size.  A maximum 
+         log size of zero shall be used to specify that the log size has 
+         no predefined limit.
+         
+         Note: Since the log size is specified in octets, the actual 
+         amount of information that is contained in a log will be 
+         determined by the data representation in the log.  This data 
+         representation is not subject to standardization.  The maximum 
+         log size does not include the system overhead involved in 
+         establishing the log.  Thus, immediately after creation, the 
+         current log size should read zero."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993,
+            Section 8.1.1.2.1"
+    DEFVAL      { 0 }
+    ::= { probeCapture 7 }
+
+probeCaptureMaxMsgs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "messages"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the maximum number of messages that will be stored in 
+         the capture archive before wrapping or halting occurs.  The 
+         value zero (0) specifies that wrapping or halting is not based 
+         on the number of messages in the capture archive."
+    DEFVAL      { 0 }
+    ::= { probeCapture 8 }
+
+probeCaptureMaxTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the maximum time interval for which messages will be 
+         stored in the capture archive before wrapping or halting 
+         occurs.  The value zero (0) specifies that wrapping or halting 
+         is not based on the time interval archived."
+    DEFVAL      { 0 }
+    ::= { probeCapture 9 }
+
+probeCaptureCurrentSize OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute indicates the current size of the log measured 
+         in octets.
+         
+         Note: Since the log size is specified in octets, the actual 
+         amount of information that is contained in a log will be 
+         determined by the data representation in the log.  This data 
+         representation is not subject to standardization.  The maximum 
+         log size does not include the system overhead involved in 
+         establishing the log.  Thus, immediately after creation, the 
+         current log size should read zero."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+            Section 8.1.1.2.2."
+    DEFVAL      { 0 }
+    ::= { probeCapture 10 }
+
+probeCaptureNumberOfRecords OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute indicates the current number of records 
+         contained in the log."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+            Section 8.1.1.2.3."
+    DEFVAL      { 0 }
+    ::= { probeCapture 11 }
+
+probeCaptureCurrentInterval OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the current time interval (in seconds) over which 
+         messages are contained in the capture archive."
+    DEFVAL      { 0 }
+    ::= { probeCapture 12 }
+
+probeCaptureAlarmThreshold OBJECT-TYPE
+    SYNTAX      LogCapacityAlarmThreshold
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The log alarm package provides for transmission of alarms when 
+         a log full condition approaches.  This package shall be present 
+         whenever a log is of finite size and halts logging when the log 
+         full availability status occurs.
+         
+         This attribute specifies, as a percentage of maximum log size, 
+         the points at which an event will be generated to indicate that 
+         a log full or log wrap condition is approaching.  This 
+         attribute is set-valued.  Support of this attribute is 
+         mandatory for the halt behaviour.  When a log is created with 
+         the wrap option the capacity threshold events are triggered as 
+         if coupled to a gauge that counts from zero to the highest 
+         capacity threshold value defined and then resets to zero."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+            Section 8.1.1.3."
+    DEFVAL      { "\x64" }
+    ::= { probeCapture 13 }
+
+probeCaptureByteHiWaterMark OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "message bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the high watermark of the number of message bytes 
+         captured in the capture archive.  This is the maximum number of 
+         message bytes that were in the capture archive since the last 
+         reset.  probeCaptureReset can be used to reset this gauge to 
+         zero.
+         
+         This value can be used to properly size the capture archive so 
+         that it is unlikely to wrap or halt."
+    DEFVAL      { 0 }
+    ::= { probeCapture 14 }
+
+probeCaptureByteLoWaterMark OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "message bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the low watermark of the number of message bytes 
+         captured in the capture archive.  This is the minimum number of 
+         message bytes that were in the buffer since the high watermark 
+         was last set.  probeCaptureReset can be used to reset this 
+         gauge to zero.
+         
+         This value can be used to properly size the capture archive so 
+         that it is unlikely to wrap or halt."
+    DEFVAL      { 0 }
+    ::= { probeCapture 15 }
+
+probeCaptureMsgsHiWaterMark OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "messages"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the high watermark of the number of messages captured 
+         in the capture archive.  This is the maximum number of messages 
+         that were in the buffer since the last reset.  
+         probeCaptureReset can be used to reset this gauge to zero.
+         
+         This value can be used to properly size the capture archive so 
+         that it is unlikely to wrap or halt."
+    DEFVAL      { 0 }
+    ::= { probeCapture 16 }
+
+probeCaptureMsgsLoWaterMark OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "messages"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the low watermark of the number of messages captured 
+         in the capture archive.  This is the minimum number of messages 
+         that were in the buffer since the high watermark was last set.  
+         probeCaptureReset can be used to reset this gauge to zero.
+         
+         This value can be used to properly size the capture archive so 
+         that it is unlikely to wrap or halt."
+    DEFVAL      { 0 }
+    ::= { probeCapture 17 }
+
+probeCaptureTimeHiWaterMark OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the high watermark of the duration of time, in 
+         seconds, between the first and last messages captured in the 
+         capture archive.  This is the maximum duration of time of 
+         messages in the archive since the last reset.  
+         probeCaptureReset can be used to reset this gauge to zero.
+         
+         This value can be used to properly size the capture archive so 
+         that it is unlikely to wrap or halt."
+    DEFVAL      { 0 }
+    ::= { probeCapture 18 }
+
+probeCaptureTimeLoWaterMark OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the low watermark of the duration of time, in seconds, 
+         between the first and last messages captured in the capture 
+         archive.  This is the minimum duration of time that was 
+         contained in the buffer since the high watermark was last set.  
+         probeCaptureReset can be used to reset this gauge to zero.
+         
+         This value can be used to properly size the capture archive so 
+         that it is unlikely to wrap or halt."
+    DEFVAL      { 0 }
+    ::= { probeCapture 19 }
+
+probeCaptureDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "messages dropped"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the number of messages dropped as a result of archive 
+         wrap or archive halt.  When the archive is set for wrap(0), 
+         this is the number of messages dropped from the the start of 
+         the archive.  When the archive is set for halt(1), this is the 
+         number of messages dropped from the end of the archive.  This 
+         number is reset be reading the first or last message in the 
+         archive (respectively).  It may also be reset using 
+         probeCaptureReset."
+    DEFVAL      { 0 }
+    ::= { probeCapture 20 }
+
+probeCaptureReset OBJECT-TYPE
+    SYNTAX      INTEGER { reset(0) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "When written, resets the archive high and low watermarks to 
+         zero.  Also, reset the number of message archive drops."
+    DEFVAL      { reset }
+    ::= { probeCapture 21 }
+
+probeCaptureStartTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The duration package provides the ability to automatically 
+         control the time that a managed object starts and stops 
+         functioning through the use of the start and stop time 
+         attributes.
+         
+         This attribute defines the date and time at which an unlocked 
+         and enabled managed object starts functioning.  If the value of 
+         the start time attribute is not specified in the create 
+         request, its value defaults to the time of creation of the 
+         managed object and thus causing it to function immediately.
+         
+         A change in the start time attribute results in an attribute 
+         change notification."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+            Section 8.1.1.4.2."
+    DEFVAL      { 0 }
+    ::= { probeCapture 22 }
+
+probeCaptureStopTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The duration package provides the ability to automatically 
+         control the time that a managed object starts and stops 
+         functioning through the use of the start and stop time 
+         attributes.
+         
+         This attribute defines the date and time at which a managed 
+         object stops functioning.  If the value of the stop time 
+         attribute is not specified in the create request, its value 
+         defaults to 'continuous operation'.  Continuous operation is 
+         represented by a null value for the stop time.
+         
+         A change in the stop time attribute results in an attribute 
+         change notification."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+            Section 8.1.1.4.2."
+    DEFVAL      { 6983120 }
+    ::= { probeCapture 23 }
+
+probeCaptureIntervalsOfDay OBJECT-TYPE
+    SYNTAX      IntervalsOfDay
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The daily scheduling conditional package provides the 
+         capability of scheduling logging with a periodicity of 
+         24 hours.
+         
+         This attribute defines the list of time intervals 
+         (interval-start and interval-end times of day) for which the 
+         logs will exhibit the logging-on condition.  During excluded 
+         intervals the log exhibits the logging-off condition.  If not 
+         specified in the create request, the value of this component 
+         defaults to a single interval encompassing the entire 24 hour 
+         period of a day."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+            Section 8.1.1.4.3."
+    DEFVAL      { "\x00\x00\x17\x3B" }
+    ::= { probeCapture 24 }
+
+probeCaptureWeekMask OBJECT-TYPE
+    SYNTAX      WeekMask
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The weekly scheduling conditional package provides the 
+         capability of scheduling logging with a periodicity of one 
+         week.  This structured attribute defines a set of mask 
+         components, each specifying a set of time intervals on a 
+         24-hour time-of-day clock, pertaining to selected days of the 
+         week.  The week mask attribute defaults to a scheduling 
+         criteria of 'always-on' at logs creation.
+         
+         The days of week component defines the days of the week on 
+         which the log's scheduling mechanism will allow the log to have 
+         intervals during which logging may occur.  This component, if 
+         not present is a create, will default to all seven days of the 
+         week.
+         
+         The intervals of day component defines the list of time 
+         intervals (interval-start and interval-end times of day) for 
+         which the log will exhibit the logging-on condition, if the 
+         current days is one of the days that is selected within the 
+         corresponding days of week.  
+         
+         During excluded intervals the log exhibits the logging-off 
+         condition.  If not specified in the create report, the value of 
+         this component defaults to a single interval encompassing the 
+         entire 24 hour period of a day."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+            Section 8.1.1.4.4."
+    DEFVAL      { "\x7F\x01\x00\x00\x17\x3B" }
+    ::= { probeCapture 25 }
+
+probeCaptureRotInterval OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the rotation of capture files based on the interval 
+         of time since the capture file was last rotated.  When the 
+         interval elapses since the last rotation, the file will be 
+         rotated.  The time interval of zero is special: it specifies to 
+         not rotate files based on interval."
+    ::= { probeCapture 26 }
+
+probeCaptureRotSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bytes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the rotation of capture files based on the file size 
+         in bytes.  The capture file size includes the bytes in captured 
+         messages as well as any overhead included in the record format.  
+         When the file exceeds the specified size, the file will be 
+         rotated.  The value zero (0) is special: it specifies to not 
+         rotate files based on the size of the file."
+    ::= { probeCapture 27 }
+
+probeCaptureRotNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "records"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the rotation of capture files based on the number of 
+         records (messages) contained within the capture file. When the 
+         number of messages matches the specified value, the file will 
+         be rotated.  The value zero (0) is special: it specifies to not 
+         rotate files based on the number of records."
+    DEFVAL      { 0 }
+    ::= { probeCapture 28 }
+
+probeCaptureCachePath OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the file system path to the directory where files are 
+         cached while they are being captured.  The default if not 
+         specified on row creation is '/var/local/openss7/cache'."
+    DEFVAL      { "/var/local/openss7/cache" }
+    ::= { probeCapture 29 }
+
+probeCaptureSpoolPath OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the file system path to the directory where files are 
+         spooled once they have been rotated.  The default if not 
+         specified on row creation is '/var/local/openss7/spool'."
+    DEFVAL      { "/var/local/openss7/spool" }
+    ::= { probeCapture 30 }
+
+probeCaptureArchivePath OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the file system path to the directory where files are 
+         archived once they have been uploaded.  The default if not 
+         specified on row creation is '/var/local/openss7/archive'"
+    DEFVAL      { "/var/local/openss7/archive" }
+    ::= { probeCapture 31 }
+
+probeCaptureArchiveSubdirs OBJECT-TYPE
+    SYNTAX      BITS { daily(0), weekly(1), monthly(2), yearly(3) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the subdirectories that will be used within the 
+         archive file system directory to organize archived files by 
+         date.  This object is set and can contain zero or more of the 
+         following values:
+         
+         - daily(0), collect files by day of generation within a daily 
+           subdirectory whose name is the date (YYYY-MM-DD);
+           
+         - weekly(1), collect files and daily subdirectories (if any) 
+           within a weekly subdirectory whose name is the date of the 
+           beginning of the week (YYYY-MM-DD);
+           
+         - monthly(2), collect files, daily and weekly subdirectories 
+           (if any) within a monthly subdirectory whose name is the year 
+           and month (YYYY-MM);
+           
+         - yearly(3), collect files, daily, weekly and monthly 
+           subdirectories (if any) within a yearly subdirectory whose 
+           name is the year (YYYY).
+           
+         The default value on row creation when no set is specified is 
+         daily(0) and monthly(2)."
+    DEFVAL      { {daily, monthly} }
+    ::= { probeCapture 32 }
+
+probeCaptureCompression OBJECT-TYPE
+    SYNTAX      INTEGER { none(0), gz(1), bz2(2), xz(3), zip(4) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "When an active capture or correlation file is rotated and 
+         spooled it is compressed.  Compression is maintained on the 
+         file when it is archived.  This object specifies what 
+         compression to use.  This object is single-valued and can have 
+         one of the following values:
+         
+         - none(0), no compression, no filename extension;
+         
+         - gz(1), gzip compression, .gz filename extension;
+         
+         - bz2(2), bzip2 compression, .bz2 filename extension;
+         
+         - xz(3), xz compression, .xz filename extension;
+         
+         - zip(4), zip archive, .zip filename extension.
+         
+         When a compression of other than none(0) is specified, the 
+         corresponding file extension will be added to the file name.  
+         Zip archive contain the single original file.  The default 
+         value if unspecified on row creation is xz(3) compression."
+    DEFVAL      { xz }
+    ::= { probeCapture 33 }
+
+probeCaptureFileSystemAlloc OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the percentage of the file system in which the 
+         probeCaptureArchivePath exists that is allocated to archival 
+         capture files.  The total amount of space occupied by archival 
+         capture files will not exceed this limit.
+         
+         When a row is created and this amount is not specified, the 
+         default value is 90%."
+    DEFVAL      { 90 }
+    ::= { probeCapture 34 }
+
+probeCaptureMaxDiskUsage OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the percentage of the allocation portion of the file 
+         system in which the probeCaptureArchivePath exists that is 
+         usable for archival capture files.  The total amount of space 
+         occupied by archival capture files will not exceed this limit.
+         
+         When a row is created and this amount is not specified, the 
+         efault value is 80%."
+    DEFVAL      { 80 }
+    ::= { probeCapture 35 }
+
+probeCaptureDiscardPolicy OBJECT-TYPE
+    SYNTAX      INTEGER { ignore(0), oldest(1), largest(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the discard policy for archival capture files when 
+         file system allocation and disk usage limits are exceeded and 
+         the probeCaptureFullAction is set to halt(1).  This object is 
+         single-valued as follows:
+         
+         - ignore(0), ignores file system and disk usage limits;
+           
+         - oldest(1), the oldest archival capture files are discarded;
+           
+         - largest(2), the largest archive capture files are discarded.
+           
+         When a row is created and this amount is not specified, the 
+         default value is oldest(1)."
+    DEFVAL      { oldest }
+    ::= { probeCapture 36 }
+
+probeCaptureUpload OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides an index into the probeUploadTable that defines the 
+         upload server to which to upload spooled files."
+    ::= { probeCapture 37 }
+
+probeArchiveTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ProbeArchiveEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a table of capture files."
+    ::= { probeCapture 38 }
+
+probeArchiveEntry OBJECT-TYPE
+    SYNTAX      ProbeArchiveEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the probeArchiveTable provides information 
+         concerning a single capture file and provides some actions that 
+         can be performed on the file."
+    INDEX       { probeArchiveIndex }
+    ::= { probeArchiveTable 1 }
+
+ProbeArchiveEntry ::= SEQUENCE {
+    probeArchiveIndex           Unsigned32,
+    probeArchiveName            SnmpAdminString,
+    probeArchiveFileFormat      INTEGER,
+    probeArchiveCompressed      INTEGER,
+    probeArchiveState           INTEGER,
+    probeArchiveSize            Counter64,
+    probeArchiveCompSize        Counter64,
+    probeArchiveInterfaces      CaptureInterfaces,
+    probeArchiveTimeElapsed     TimeInterval,
+    probeArchiveBegTime         TimeStamp,
+    probeArchiveEndTime         TimeStamp,
+    probeArchiveIfRecv          Counter64,
+    probeArchiveIfDrop          Counter64,
+    probeArchiveFilterAccept    Counter64,
+    probeArchiveOsDrop          Counter64,
+    probeArchiveUserDeliv       Counter64,
+    probeArchiveIfCompress      Counter64,
+    probeArchiveUserOctets      Counter64,
+    probeArchiveActionResult    INTEGER
+}
+
+probeArchiveIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a non-zero ordinal index into the capture file table 
+         that uniquely identifies the capture file.  Files do not obtain 
+         a new index as they are rotated.  Indices are not small integer 
+         numbers, and are reverse assigned (subsequent indices are 
+         smaller in value than previously assigned indices).  Indices 
+         are oridinal and monotonically decreasing.  The current capture 
+         file will, therefore, always be the smallest index and appear 
+         first when the table is walked.  Aside from this, the precise 
+         value of the ordinal index is of no significance and is 
+         assigned by the agent."
+    ::= { probeArchiveEntry 1 }
+
+probeArchiveName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the base name (without file system path or extensions) 
+         of the capture file.  The file name may be changed by writing 
+         to this object.  Note that files in the current(0) state cannot 
+         be renamed.  Also, an attempt to name a file to the same name 
+         as another existing file will fail."
+    ::= { probeArchiveEntry 2 }
+
+probeArchiveFileFormat OBJECT-TYPE
+    SYNTAX      INTEGER { pcap(1), pcapng(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the format of the file.  The format can be one of the 
+         following:
+         
+         - pcap(1), the file is formated in the traditional tcpdump PCAP 
+           format;
+           
+         - pcapng(2), the file is formatted in the PCAP-NG format.
+           
+         The value zero(0) can be used to indicate that the format of 
+         the file is unknown, unspecified or unapplicable."
+    DEFVAL      { pcapng }
+    ::= { probeArchiveEntry 3 }
+
+probeArchiveCompressed OBJECT-TYPE
+    SYNTAX      INTEGER { none(0), gz(1), bz2(2), xz(3), zip(4) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the compression applied to the file on the file 
+         system.  Compression is single-valued and can assume one of the 
+         following values:
+         
+         - none(0), the file is not compressed;
+         - gz(1), the file is gzip compressed;
+         - bz2(2), the file is bzip2 compressed;
+         - xz(3), the file is xz compressed;
+         - zip(4), the file is zip compressed.
+           
+         The file can be decompressed or recompressed by writing to this 
+         object.  Note that files in the current(0) or deleted(3) state 
+         cannot be compressed."
+    ::= { probeArchiveEntry 4 }
+
+probeArchiveState OBJECT-TYPE
+    SYNTAX      INTEGER { current(0), spooled(1), archived(2), 
+                    deleted(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the state of the file.  File state is single-valued 
+         and can be one of the following:
+         
+         - current(0), the file is a current capture file that is 
+           actively capturing frames; current files cannot be compressed 
+           or renamed;
+           
+         - spooled(1), the file has been rotated and is no longer 
+           capturing frames; however, it is awaiting upload or download;
+           
+         - archived(2), the file has been rotated and also uploaded or 
+           downloaded and is archived; archived files are subject to 
+           deletion;
+           
+         - deleted(3), the file has been removed form the archive; 
+           deleted files cannot be recompressed or decompressed.
+           
+         Management stations can change the state of the file using the 
+         probeArchiveActionResult object."
+    ::= { probeArchiveEntry 5 }
+
+probeArchiveSize OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the size of the uncompressed file in bytes.  When no 
+         compression is applied to the file, this value will be the same 
+         as the probeArchiveCompSize."
+    ::= { probeArchiveEntry 6 }
+
+probeArchiveCompSize OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the size of the compressed file in bytes.  When no 
+         compression is applied to the file, this value will be the same 
+         as the probeArchiveSize."
+    ::= { probeArchiveEntry 7 }
+
+probeArchiveInterfaces OBJECT-TYPE
+    SYNTAX      CaptureInterfaces
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the interfaces that are represented in the capture 
+         file.  For pcap(1) formatted files, there is only one interface 
+         per file; for pcapng(2) formatted files, there can be multiple 
+         interfaces per file.  Interfaces indicated in this list will 
+         also exist as an entry in the probeCaptureIfTable."
+    ::= { probeArchiveEntry 8 }
+
+probeArchiveTimeElapsed OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the time interval covered by the file.  This may be 
+         different than the difference between the timestamps of the 
+         first message captured and the last message captured, because 
+         there may have been a period of time after capture began for 
+         which no messages were yet captured.  The interval should equal 
+         the difference between the probeArchiveEndTime and the 
+         probeArchiveBegTime."
+    ::= { probeArchiveEntry 9 }
+
+probeArchiveBegTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the time (using the TimeStamp textual convention) 
+         that the capture file was opened (capture of message to the 
+         file began)."
+    ::= { probeArchiveEntry 10 }
+
+probeArchiveEndTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the time (using the TimeStamp textual convention) 
+         that the capture file was closed (capturing of messages to the 
+         file ended)."
+    ::= { probeArchiveEntry 11 }
+
+probeArchiveIfRecv OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the total number of frames that were received by 
+         any interface contained in the file during its capture period.
+         
+         This is the number of packets received by the physical 
+         interface regardless of monitoring.  It is obtained directly 
+         from the device driver."
+    REFERENCE   
+        "PCAP-NG file format: isb_ifrecv."
+    ::= { probeArchiveEntry 12 }
+
+probeArchiveIfDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the total number of frames that were dropped by any 
+         interface contained in the file due to resource shortage during 
+         its capture period.
+         
+         This is the number of packets dropped by the interface 
+         regardless of monitoring.  It is obtained directly from the 
+         device driver."
+    REFERENCE   
+        "PCAP-NG file format: isb_drop."
+    ::= { probeArchiveEntry 13 }
+
+probeArchiveFilterAccept OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the total number of frames that were accepted by the 
+         filter associated with any interface contained in the file 
+         during its capture period.
+         
+         This is the bs_capt field of the BIOCGSTATS structure and the 
+         isb_filteraccept option in the PCAP-NG format."
+    REFERENCE   
+        "bpf(4) manual page: bs_capt.
+         PCAP-NG file format: isb_filteraccept."
+    ::= { probeArchiveEntry 14 }
+
+probeArchiveOsDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the total number of frames that were dropped by the 
+         operating system (i.e. the device driver) for any interface 
+         contained in the file during its capture period.
+         
+         This is the bs_drop field of the BIOCGSTATS structure and the 
+         isb_osdrop option in the PCAP-NG format."
+    REFERENCE   
+        "bpf(4) manual page: bs_drop.
+         PCAP-NG file format: isb_osdrop."
+    ::= { probeArchiveEntry 15 }
+
+probeArchiveUserDeliv OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the total number of frames that were delivered to the 
+         user-space capture application for any interface contained in 
+         the file during its capture period.
+         
+         This is related to the bs_recv field of the BIOCGSTATS 
+         structure except that it is that actual number of packets read 
+         by the user-space application, whereas bs_recv is the number of 
+         packets bufferred by the bpf(4) driver and available to be 
+         read.  It is the isb_usrdeliv option in the PCAP-NG format."
+    REFERENCE   
+        "bpf(4) manual page: bs_recv.
+         PCAP-NG file format: isb_usrdeliv."
+    ::= { probeArchiveEntry 16 }
+
+probeArchiveIfCompress OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the total number of frames that were compressed for 
+         any interface contained in the file during its capture period."
+    ::= { probeArchiveEntry 17 }
+
+probeArchiveUserOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the total number of frame octets that were captured 
+         for any interface contained in the file during its capture 
+         period."
+    ::= { probeArchiveEntry 18 }
+
+probeArchiveActionResult OBJECT-TYPE
+    SYNTAX      INTEGER { success(0), failure(1), spool(2), archive(3), 
+                    delete(4), upload(5) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides actions and their results.  The action-result is 
+         single-valued and can assume one of the following values:
+         
+         - success(0), the last action was successful;
+         - failure(1), the last action failed;
+         - spool(2), changes the state of a file in the current or 
+           archived states to spooled; when successfully applied to a 
+           current capture file, the capture file is rotated; when to an 
+           archived file, the file is respooled;
+         - archive(3), change the state of a spooled file to archived; 
+           this action unspools and archives a spooled file;
+         - delete(4), delete the capture file; this action can only be 
+           applied to archived files;
+         - upload(5), initiate an upload of the file; this action can 
+           only be applied to spooled files; once upload is complete, 
+           the file will be archived.
+           
+         When written, only values spool(2), archive(3), delete(4) and 
+         upload(5) are valid and represent the action to be performed.  
+         When read, only values success(0) or failure(1) will be 
+         returned and represent the result of the previous action."
+    ::= { probeArchiveEntry 19 }
+
+probeCaptureIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ProbeCaptureIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a table of interfaces and interface statistics 
+         contained in capture files."
+    ::= { probeCapture 39 }
+
+probeCaptureIfEntry OBJECT-TYPE
+    SYNTAX      ProbeCaptureIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the probeCaptureIfTable provides information 
+         concerning a single interface in a capture file.  For PCAP 
+         formatted files, there is only a single interface represented; 
+         for PCAP-NG, multiple interfaces can be represented."
+    INDEX       { probeArchiveIndex, probeInterfaceIndex }
+    ::= { probeCaptureIfTable 1 }
+
+ProbeCaptureIfEntry ::= SEQUENCE {
+    probeCaptureIfTimeElapsed   TimeInterval,
+    probeCaptureIfBegTime       TimeStamp,
+    probeCaptureIfEndTime       TimeStamp,
+    probeCaptureIfIfRecv        Counter64,
+    probeCaptureIfIfDrop        Counter64,
+    probeCaptureIfFilterAccept  Counter64,
+    probeCaptureIfOsDrop        Counter64,
+    probeCaptureIfUserDeliv     Counter64,
+    probeCaptureIfIfCompress    Counter64,
+    probeCaptureIfUserOctets    Counter64
+}
+
+probeCaptureIfTimeElapsed OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the elasped time for capture from the indexed 
+         interface in the indexed capture file."
+    ::= { probeCaptureIfEntry 1 }
+
+probeCaptureIfBegTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the start time for capture from the indexed interface 
+         in the indexed capture file."
+    REFERENCE   
+        "PCAP-NG file format: isb_starttime."
+    ::= { probeCaptureIfEntry 2 }
+
+probeCaptureIfEndTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the end time for capture from the indexed interface in 
+         the indexed capture file."
+    REFERENCE   
+        "PCAP-NG file format: isb_endtime."
+    ::= { probeCaptureIfEntry 3 }
+
+probeCaptureIfIfRecv OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the number of frames received at the indexed interface 
+         during the capture interval in the indexed file."
+    REFERENCE   
+        "PCAP-NG file format: isb_ifrecv."
+    ::= { probeCaptureIfEntry 4 }
+
+probeCaptureIfIfDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the number of frames that were dropped by the indexed 
+         interface due to resource shortage during the capture interval 
+         in the indexed file."
+    REFERENCE   
+        "PCAP-NG file format: isb_drop."
+    ::= { probeCaptureIfEntry 5 }
+
+probeCaptureIfFilterAccept OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the number of frames that were accepted by the filter 
+         associated with the indexed interface during the capture 
+         interval in the indexed file."
+    REFERENCE   
+        "PCAP-NG file format: isb_filteraccept."
+    ::= { probeCaptureIfEntry 6 }
+
+probeCaptureIfOsDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the number of frames that were dropped by the 
+         operating system (i.e. the device driver) for the indexed 
+         interface during the capture interval of the indexed file."
+    REFERENCE   
+        "PCAP-NG file format: isb_osdrop."
+    ::= { probeCaptureIfEntry 7 }
+
+probeCaptureIfUserDeliv OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the number of frames that were delivered to the 
+         user-space capture application for the indexed interface during 
+         the capture interval of the indexed file."
+    REFERENCE   
+        "PCAP-NG file format: isb_usrdeliv."
+    ::= { probeCaptureIfEntry 8 }
+
+probeCaptureIfIfCompress OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the number of frames that were compressed (deleted due 
+         to redundant repetition) for the indexed interface during the 
+         capture interval of the indexed file."
+    REFERENCE   
+        "PCAP-NG file format: isb_ifcompress."
+    ::= { probeCaptureIfEntry 9 }
+
+probeCaptureIfUserOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the number of frame octets that were captured for the 
+         indexed interface during the capture interval of the indexed 
+         file."
+    REFERENCE   
+        "PCAP-NG file format: isb_octets."
+    ::= { probeCaptureIfEntry 10 }
+
+-- =====================================================================
+-- probeFeed group
+-- =====================================================================
+-- The probeFeed group is responsible for managing live feeds of 
+-- captured messages to remote collectors.
+-- .....................................................................
+
+probeFeed OBJECT IDENTIFIER
+    ::= { probeObjects 6 }
+
+probeFeedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ProbeFeedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The probe is capable of exporting captured packets to a 
+         collector.  In doing so, either end can establish the 
+         connection.  This probeFeedTable contains the transport 
+         addresses of the collectors to which this probe will transfer 
+         captured packets as live feeds."
+    ::= { probeFeed 1 }
+
+probeFeedEntry OBJECT-TYPE
+    SYNTAX      ProbeFeedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in this table describes one collector to which this 
+         probe will deliver captured packets."
+    INDEX       { probeFeedIndex }
+    ::= { probeFeedTable 1 }
+
+ProbeFeedEntry ::= SEQUENCE {
+    probeFeedIndex          Unsigned32,
+    probeFeedName           DisplayString,
+    probeFeedAddrType       TransportAddressType,
+    probeFeedAddr           TransportAddress,
+    probeFeedProfile        SimpleNameType,
+    probeFeedEstablish      INTEGER,
+    probeFeedAdminState     AdministrativeState,
+    probeFeedOperState      OperationalState,
+    probeFeedProcStatus     ProceduralStatus,
+    probeFeedUsageState     UsageState,
+    probeFeedConnState      INTEGER,
+    probeFeedStorageType    StorageType,
+    probeFeedRowStatus      RowStatus
+}
+
+probeFeedIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a non-zero ordinal index into the probeFeedTable.  
+         Aside from its use as an index, this attribute has no other 
+         significance."
+    ::= { probeFeedEntry 1 }
+
+probeFeedName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the specification of the the name of one transport 
+         endpoint to which to feed captured packets expressed typically 
+         as a hostname and port address sepcification; however, this 
+         hostname is not used for establishing connections.  To specify 
+         a hostname as a transport address, use the udpDns(14), 
+         tcpDns(15) or sctpDns(16) transport address type in the 
+         probeFeedAddrType and probeFeedAddr columns."
+    ::= { probeFeedEntry 2 }
+
+probeFeedAddrType OBJECT-TYPE
+    SYNTAX      TransportAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the transport address type.  The client supports most 
+         transport address types provided in the TRANSPORT-ADDRESS-MIB.
+         
+         Note well that a transport address in the UDP transport domain 
+         should only be used when tunnelled in a reliable transport; 
+         otherwise, captured packet loss may occur."
+    REFERENCE   
+        "TRANSPORT-ADDRESS-MIB, TransportAddressType."
+    ::= { probeFeedEntry 3 }
+
+probeFeedAddr OBJECT-TYPE
+    SYNTAX      TransportAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the transport address of the collector to which to 
+         transfer captured packets.  The address is of type 
+         probeFeedAddrType."
+    REFERENCE   
+        "TRANSPORT-ADDRESS-MIB, TransportAddress."
+    ::= { probeFeedEntry 4 }
+
+probeFeedProfile OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the transport protocol parameters profile that is to 
+         be used to supply protocol parameters, timers, and options for 
+         the connection.  The values of this object must be the same as 
+         the name of a row in the probeXportProfileTable.  Protocol 
+         profiles are only applicable transport addresses in the SCTP 
+         transport domain."
+    DEFVAL      { "" }
+    ::= { probeFeedEntry 5 }
+
+probeFeedEstablish OBJECT-TYPE
+    SYNTAX      INTEGER { initiator(1), responder(2), both(3) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the role that the probe will take in forming the 
+         conneciton with the remote host.  It is single-valued and can 
+         assume one of the following values:
+         
+         - initiator(1), the probe will initiate the transport 
+           connection to the collector;
+           
+         - responder(2), the probe will not initiate the transport 
+           connection, but will listen for and respond to incoming 
+           connections from the collector;
+           
+         - both(3), the probe will both attempt to initiate the 
+           transport connection and listen for and respond to incoming 
+           transport connections from the collector.
+           
+         The default for private network transport addresses is both(3).  
+         The default for public network transport addresses is 
+         initiator(1)."
+    DEFVAL      { both }
+    ::= { probeFeedEntry 6 }
+
+probeFeedAdminState OBJECT-TYPE
+    SYNTAX      AdministrativeState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the administrative state of the feed.  This attribute 
+         is single-valued and can assume one of the following:
+         
+         - locked(0), the feed is administratively prohibited;
+           
+         - unlocked(1), the feed is administratively permitted;
+           
+         - shuttingDown(2), the transport connection is shutting down: 
+           once the connection is released, the feed will move to the 
+           locked(0) state.
+           
+         The valud shuttingDown(2) is only valid when read and not valid 
+         when written.  This object is used primarily to enable or 
+         disable feeds to the collector."
+    REFERENCE   
+        "OPENSS7-SMI-MIB, ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 
+            1993, Section 8.1.1.1.3."
+    DEFVAL      { unlocked }
+    ::= { probeFeedEntry 7 }
+
+probeFeedOperState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Represents the operational capability of the transport 
+         connection to perform its function.  The following states are 
+         defined:
+         
+         - enabled(0), the transport connection is operational and ready 
+           for use, captured packets will be transferred;
+           
+         - disabled(1), the transport connection is not available for 
+           use; captured packets will be bufferred but cannot be 
+           transferred.
+           
+         A change in operational state shall generate a state changed 
+         notification for persistent rows."
+    REFERENCE   
+        "OPENSS7-SMI-MIB, ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 
+            1993, Section 8.1.1.1.4."
+    ::= { probeFeedEntry 8 }
+
+probeFeedProcStatus OBJECT-TYPE
+    SYNTAX      ProceduralStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the procedural status of the feed:
+         
+         - initializationRequired(0), the feed requires initialization 
+           and that initialization has not yet been performed; a manual 
+           or automatic action is required to initialize the feed;
+           
+         - notInitialized(1), the feed requires initialization and that 
+           initialization has not completed yet;
+           
+         - initializing(2), the feed requires initialization and that 
+           initialization is proceeding but has not yet completed;
+           
+         - reporting(3), the feed is reporting its results;
+           
+         - terminating(4), the feed is terminating.
+           
+         The procedural status for feeds result from actions taken by 
+         the agent and not by actions taken within this MIB."
+    REFERENCE   
+        "OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+            proceduralStatus."
+    ::= { probeFeedEntry 9 }
+
+probeFeedUsageState OBJECT-TYPE
+    SYNTAX      UsageState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the usage state of the feed:
+         
+         - idle(0), the feed is not currently in use;
+           
+         - active(1), the feed is in use and has sufficient operating 
+           capacity to provide for additional transfer of captured 
+           packets;
+           
+         - busy(2), the feed is in use and has no spare capacity to 
+           transfer additional captured packets.
+           
+         This usage state determines the use of the feed in transferring 
+         captured packets and not any other use of the transport 
+         connection."
+    REFERENCE   
+        "OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2,
+            usageState."
+    ::= { probeFeedEntry 10 }
+
+probeFeedConnState OBJECT-TYPE
+    SYNTAX      INTEGER { idle(0), ogConn(1), icConn(2), established(3), 
+                    shuttingDown(4) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the communications state of the transport connection:
+         
+         - idle(0), there is no transport connection; the probe is 
+           neither initiating nor responding to a connection request for 
+           this collector; the operational state is disabled(0), the 
+           usage state is idle(0) and the procedural status contains 
+           notInitialized(1);
+           
+         - ogConn(1), the probe is in the process of initiating an 
+           outgoing transport connection; the operational state is 
+           disabled(0), the usage state is idle(0) and the procedural 
+           status contains initializing(2);
+           
+         - icConn(2), the probe is responding to an incoming transport 
+           connection from the collector; the operational state is 
+           disabled(0), the usage state is idle(0) and the procedural 
+           status contains initializing(2);
+           
+         - established(3), the transport connection is established; the 
+           operational state is enabled(1) or disabled(0);
+           
+         - shuttingDown(4), the transport connection is being shut down 
+           by the local or remote end; the operational state is 
+           disabled(0) and the procedural status contains 
+           terminating(4).
+           
+         These values reflect the state of the transport connection.  
+         For connectionless transports, the connection state may move 
+         between idle(0) to established(3) without entering the other 
+         states."
+    ::= { probeFeedEntry 11 }
+
+probeFeedStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the storage type for this conceptual row.  On write, 
+         only storage types volatile(2) and nonVolatile(3) or 
+         permanent(4) are applicable.  volatile(2) rows do not persist 
+         across an agent reboot."
+    ::= { probeFeedEntry 12 }
+
+probeFeedRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may create and 
+         destroy rows in this table.
+         
+         The agent may autonomously create and destroy entries in this 
+         table.  The agent may permit collectors to establish feeds from 
+         this probe without a corresponding row in this table being 
+         present when a feed is established.  Once accepted, the agent 
+         should autonomously populate a corresponding entry in this 
+         table."
+    ::= { probeFeedEntry 13 }
+
+probeFeedStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ProbeFeedStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "For feed connections that have been established at some point 
+         in time, this table contains the transfer statistics for the 
+         connection."
+    ::= { probeFeed 2 }
+
+probeFeedStatsEntry OBJECT-TYPE
+    SYNTAX      ProbeFeedStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the probeFeedStatsTable corresponds to a collector 
+         to which this probe will feed captured packets.  Each row 
+         contains the transfer statistics for the current or most recent 
+         connections.
+         
+         Note that this information is not persistent across agent 
+         reboots."
+    INDEX       { probeFeedIndex, probeFeedConnIndex }
+    ::= { probeFeedStatsTable 1 }
+
+ProbeFeedStatsEntry ::= SEQUENCE {
+    probeFeedConnIndex      Unsigned32,
+    probeFeedTimeElapsed    TimeInterval,
+    probeFeedBegTime        TimeStamp,
+    probeFeedEndTime        TimeStamp,
+    probeFeedIfRecv         Counter64,
+    probeFeedIfDrop         Counter64,
+    probeFeedFilterAccept   Counter64,
+    probeFeedOsDrop         Counter64,
+    probeFeedUserDeliv      Counter64,
+    probeFeedIfCompress     Counter64,
+    probeFeedUserOctets     Counter64
+}
+
+probeFeedConnIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a non-zero ordinal index into this table in 
+         conjunction with the probeFeedIndex that identifies the 
+         collector.  This sub-index is used to identify the specific 
+         instance of transport connection.  Historical information will 
+         be retained; however, this table is not persistent and any 
+         information contained in it may be lost across and agent 
+         reboot."
+    ::= { probeFeedStatsEntry 1 }
+
+probeFeedTimeElapsed OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the time interval covered by the feed of captured 
+         packets.  This may be different that the difference between the 
+         time stamps of the first and last packet fed, because there may 
+         have been a period of time after the feed start for which no 
+         packets were captured.  The interval should equal the 
+         difference between probeFeedEndTime and probeFeedBegTime."
+    ::= { probeFeedStatsEntry 2 }
+
+probeFeedBegTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the time (using the TimeStamp textual convention) 
+         that the transport connection was opened (transfer of captured 
+         packets across the transport connection began)."
+    ::= { probeFeedStatsEntry 3 }
+
+probeFeedEndTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the time (using the TimeStamp textual convention) 
+         that the transport connection was closed (transfer of captured 
+         packets across the transport connection ended)."
+    ::= { probeFeedStatsEntry 4 }
+
+probeFeedIfRecv OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the total number of packets that were received from 
+         any physical interface since the beginning of the transfer 
+         period.  This is the number of packets received by any physical 
+         interface regardless of monitoring.  It is obtained directly 
+         from the device driver."
+    REFERENCE   
+        "PCAP-NG file format: isb_ifrecv."
+    ::= { probeFeedStatsEntry 5 }
+
+probeFeedIfDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the total number of packets dropped by any interface 
+         due to lack of resources since the beginning of the transfer 
+         period.  This is the number of packets dropped by any interface 
+         regardless of monitoring.  It is obtained directly from the 
+         device driver."
+    REFERENCE   
+        "PCAP-NG file format: isb_drop."
+    ::= { probeFeedStatsEntry 6 }
+
+probeFeedFilterAccept OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the total number of packets accepted by any interface 
+         filter since the beginning of the transfer period.  This is the 
+         bs_capt field of the BIOCGSTATS structure and the 
+         isb_filteraccept option in the PCAP-NG format."
+    REFERENCE   
+        "bpf(4) manual page: bs_capt.
+         PCAP-NG file format: isb_filteraccept."
+    ::= { probeFeedStatsEntry 7 }
+
+probeFeedOsDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the total number of packets dropped by the operating 
+         system for any interface since the beginning of the transfer 
+         period.  These packets were dropped because the capture 
+         application did not keep up with the rate at which the 
+         oeprating system was feeding captured packets.  This is the 
+         bs_drop field of the BIOCGSTATS structure and the isb_drop 
+         option in the PCAP-NG format."
+    REFERENCE   
+        "bpf(4) manual page: bs_drop
+         PCAP-NG file format: isb_osdrop."
+    ::= { probeFeedStatsEntry 8 }
+
+probeFeedUserDeliv OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the total number of packets delivered to the 
+         monitoring application for any interface since the beginning of 
+         the transfer period.  This value can be different from the 
+         value provided by probeFeedFilterAccept minus probeXferOsDrop 
+         because some packets could still lay in the OS buffers at the 
+         transfer period end time.  This count is established by the 
+         application reading packets from the operating system.  This is 
+         the isb_usrdeliv option in the PCAP-NG format."
+    REFERENCE   
+        "PCAP-NG file format: isb_usrdeliv."
+    ::= { probeFeedStatsEntry 9 }
+
+probeFeedIfCompress OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the total number of packets that were compressed for 
+         any interface since the beginning of the transfer period.  This 
+         statistic is primarily for SS7 monitoring in that it tracks 
+         FISU and LSSU compression."
+    ::= { probeFeedStatsEntry 10 }
+
+probeFeedUserOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the total number of packet payload octets that were 
+         transferred during the transfer period."
+    ::= { probeFeedStatsEntry 11 }
+
+-- =====================================================================
+-- probeUpload group
+-- =====================================================================
+-- The probeUpload group is responsible for managing the uploading of 
+-- archived capture files to central repository servers.
+-- .....................................................................
+
+probeUpload OBJECT IDENTIFIER
+    ::= { probeObjects 7 }
+
+probeUploadTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ProbeUploadEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a table of collectors to which the probe is to upload 
+         capture files on a regular schedule."
+    ::= { probeUpload 1 }
+
+probeUploadEntry OBJECT-TYPE
+    SYNTAX      ProbeUploadEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the table specifies a single collector to which to 
+         upload capture files on a regular schedule."
+    INDEX       { probeUploadIndex }
+    ::= { probeUploadTable 1 }
+
+ProbeUploadEntry ::= SEQUENCE {
+    probeUploadIndex            Unsigned32,
+    probeUploadSpec             SnmpAdminString,
+    probeUploadUsername         SnmpAdminString,
+    probeUploadPassword         SnmpAdminString,
+    probeUploadStartTime        TimeStamp,
+    probeUploadStopTime         TimeStamp,
+    probeUploadIntervalsOfDay   IntervalsOfDay,
+    probeUploadWeekMask         WeekMask,
+    probeUploadOnRotation       TruthValue,
+    probeUploadSelection        INTEGER,
+    probeUploadAdminState       AdministrativeState,
+    probeUploadUsageState       UsageState,
+    probeUploadProcStatus       ProceduralStatus,
+    probeUploadStorageType      StorageType,
+    probeUploadRowStatus        RowStatus
+}
+
+probeUploadIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a non-zero ordinal index into the probeUploadTable.  
+         Aside from being an index, this object has no other 
+         significance."
+    ::= { probeUploadEntry 1 }
+
+probeUploadSpec OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the method and path to which to upload files on the 
+         collector.  This string consists of the URL of a directory to 
+         which files will be uploaded.  Supported protocols are all 
+         protocols supported by curl(1).  A number of escape sequences 
+         can be included in the URL:
+         
+         - %I, the interface of the (PCAP) file;
+         - %Y, the 4-digit year of the file;
+         - %M, the 2-digit month of the file;
+         - %D, the 2-digit day of the file;
+         - %P, the UUID of the probe;
+         - %N, the name of the probe.
+           
+         Escape sequences will be substituted on a per-file basis as 
+         files are uploaded."
+    REFERENCE   
+        "curl(1) manual page."
+    ::= { probeUploadEntry 2 }
+
+probeUploadUsername OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the username for use with the upload string when 
+         required.  A username will not be provided unless demanded by 
+         the remote server."
+    DEFVAL      { "openss7" }
+    ::= { probeUploadEntry 3 }
+
+probeUploadPassword OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a password for use with the upload string when 
+         required.  A password will not be provided unless demanded by 
+         the remote server.  A read of this object will only return the 
+         number of '*' characters equal to the length of the password."
+    DEFVAL      { "openss7" }
+    ::= { probeUploadEntry 4 }
+
+probeUploadStartTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the ability to automatically control the time that 
+         uploading starts.  This attribute defines the date and time at 
+         which an unlocked(0) and enabled(1) upload starts functioning.  
+         If the value of the start time is not specified in the create 
+         request, it value defaults to the time of creation of the row 
+         causing it to function immediately."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+            Section 8.1.1.4.2."
+    DEFVAL      { 0 }
+    ::= { probeUploadEntry 5 }
+
+probeUploadStopTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the ability to automatically control the time that 
+         uploading stops.  This attribute defines the data and time at 
+         which an upload stops functioning.  If the value of the stop 
+         time is not specified in the create request, its value defaults 
+         to 'continuous operation'.  Continuous operation is represented 
+         by a null value for the stop time."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+            Section 8.1.1.4.2."
+    DEFVAL      { 0 }
+    ::= { probeUploadEntry 6 }
+
+probeUploadIntervalsOfDay OBJECT-TYPE
+    SYNTAX      IntervalsOfDay
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the capability of scheduling uploads on a daily 
+         schedule (scheduling with a periodicity of 24 hours).  This 
+         attribute defines the list of time intervals (interval-start 
+         and interval-end times of day) during which the uploads will 
+         occur.  During excluded intervals uploads will not occur. If 
+         not specified in the create request, the value of this object 
+         defaults to a single interval encompassing the entire 24-hour 
+         period of a day."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+            Section 8.1.1.4.3."
+    DEFVAL      { "\x00\x00\x17\x3B" }
+    ::= { probeUploadEntry 7 }
+
+probeUploadWeekMask OBJECT-TYPE
+    SYNTAX      WeekMask
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the capablity of scheduling uploads on a weekly 
+         schedule (scheduling with a periodicity of one week).  This 
+         attribute defines a set of mask components, each specifying a 
+         set of time intervals on a 24-hour time-of-day clock, 
+         pertaining to selected days of the week.  The week mask 
+         attribute defaults to a scheduling criteria of 'always-on' at 
+         row creation.
+         
+         The days of week component defines the days of the week on which 
+         uploads may occur.  This component, if not present during row 
+         creation, will default to all seven days of the week.
+         
+         The intervals of day component defines the list of time 
+         intervals (interval-start and interval-end times of day) during 
+         which uploads may occur when the current day is one of the days 
+         that is selected within the corresponding days of week 
+         component.  During excluded intervals uploads will not occur.  
+         If not specified during row creation, the value of this 
+         component defaults to a single interval encompassing the entire 
+         24 hour period of a day."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+            Section 8.1.1.4.4."
+    DEFVAL      { "\x7F\x01\x00\x00\x17\x3B" }
+    ::= { probeUploadEntry 8 }
+
+probeUploadOnRotation OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies whether to schedule uploads at packet capture archive 
+         file rotation events:
+         
+         - true(1), upload of a newly archived capture file will be 
+           initiated immediately upon rotation;
+           
+         - false(2), upload of a newly archived capture file will be 
+           initiated only in accordance with other scheduling 
+           attributes.
+           
+         When set to true(1), the agent will ignore all other upload 
+         scheduling parameters for uploading newly archived capture 
+         files."
+    ::= { probeUploadEntry 9 }
+
+probeUploadSelection OBJECT-TYPE
+    SYNTAX      INTEGER { new(1), rotated(2), sync(3), all(4) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies which files are to be uploaded during an upload 
+         cycle:
+         
+         - new(1), only files that have not previously been uploaded to 
+           this collector will be uploaded;
+           
+         - rotated(2), only rotated files that have not previously been 
+           uploaded to this collector will be uploaded;
+           
+         - sync(3), upload any files present on the probe that are not 
+           present on the collector;
+           
+         - all(4), upload all files present on the probe during each 
+           cycle.
+           
+         Only upload protocols that support synchronization will 
+         effect the sync(3) setting; those that do not will revert to 
+         new(1) behavior."
+    ::= { probeUploadEntry 10 }
+
+probeUploadAdminState OBJECT-TYPE
+    SYNTAX      AdministrativeState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the administrative state of uploads to the remote 
+         collector:
+         
+         - locked(0), the probe is prohibited from uploading files to 
+           the remote collector;
+           
+         - unlocked(1), the probe is permitted to upload files to the 
+           remote server according to the upload schedule;
+           
+         - shuttingDown(2), the probe is actively uploading files to the 
+           remote server and will move to the locked(0) state once the 
+           upload completes (whether successful or not).
+           
+         This is used to control the state of uploads.  Set to locked(0) 
+         to suppress uploading for a period of time.  Set to unlocked(1) 
+         to enable uploading."
+    DEFVAL      { unlocked }
+    ::= { probeUploadEntry 11 }
+
+probeUploadUsageState OBJECT-TYPE
+    SYNTAX      UsageState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the usage state of upload cycles:
+         
+         - idle(0), uploads are idle; no upload is in progress;
+           
+         - active(1), uploads are active and in progress; additional 
+           uploads may be initiated;
+           
+         - busy(2), uploads are active and in progress; no additional 
+           uploads may be initiated.
+           
+         This usage state determines the use of uploading by the agent 
+         and not as a result of any action performed within this MIB."
+    ::= { probeUploadEntry 12 }
+
+probeUploadProcStatus OBJECT-TYPE
+    SYNTAX      ProceduralStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the procedural status of uploads to the remote 
+         collector:
+         
+         - intializationRequired(0), not used;
+         - notInitialized(1), not used;
+         - initializing(2), an upload cycle requires initialization and 
+           that initialization is proceeding but has not yet completed;
+         - reporting(3), the upload cycle is reporting its results;
+         - terminating(4), the upload cycle is terminating.
+           
+         The procedural status for upload cycles result from scheduling 
+         and operation of the upload cycle and not by actions taken 
+         within this MIB."
+    REFERENCE   
+        "OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2,
+            proceduralStatus."
+    ::= { probeUploadEntry 13 }
+
+probeUploadStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the storage type for this conceptual row.  On write, 
+         only storage types volatile(2) and nonVolatile(3) or 
+         permanent(4) are applicable.  volatile(2) rows do not persist 
+         across an agent reboot."
+    ::= { probeUploadEntry 14 }
+
+probeUploadRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may create and 
+         destroy rows in this table."
+    ::= { probeUploadEntry 15 }
+
+-- =====================================================================
+-- probeCollector group
+-- =====================================================================
+-- The probeCollector group is responsible for managing the collection of 
+-- archived capture files.
+-- .....................................................................
+
+probeCollector OBJECT IDENTIFIER
+    ::= { probeObjects 8 }
+
+probeCollectorExtensions OBJECT-TYPE
+    SYNTAX      BITS { any(0), pcap(1), pcapng(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the filename extensions to be downloaded.  This 
+         object is set-valued and can contain the following:
+         
+         - any(0), download files with any extension;
+           
+         - pcap(1), download files with the .pcap extension;
+           
+         - pcapng(2), download files with the .pcapng extension.
+           
+         Only the extensions specified will be downloaded."
+    ::= { probeCollector 1 }
+
+probeCollectorAdminState OBJECT-TYPE
+    SYNTAX      AdministrativeState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Represents the administrative capability of the collector to 
+         perform its function as follows:
+         
+         - locked(0), downloading and archiving of capture files to the 
+           repository has been prohibited by a managing system; all 
+           download activities cease;
+           
+         - unlocked(1), downloading and archiving of capture files to 
+           the repository has been permitted by a managing system; the 
+           downloading and archiving of capture files continues based on 
+           the values of other state and status attributes;
+           
+         - shuttingDown(2), downloading and archiving of capture files 
+           to the repository has been prohibited by a managing system; 
+           however, a download is in progress and must complete before 
+           the state moves to the locked(0) state.
+           
+         The value shuttingDown(2) is only valid on read and is invalid 
+         on write."
+    REFERENCE   
+        "OPENSS7-SMI-MIB, ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 
+            1993, Section 8.1.1.1.3."
+    DEFVAL      { unlocked }
+    ::= { probeCollector 2 }
+
+probeCollectorOpState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the operational capability of the collector to 
+         perform its function as follows:
+         
+         - enabled(0), the repository is operational and ready for use;
+           
+         - disabled(1), the repository is not available for use; new 
+           downloads will not be initiated.
+           
+         A changed in operational state shall generate a state changed 
+         notification."
+    REFERENCE   
+        "OPENSS7-SMI-MIB, ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 
+            1993, Section 8.1.1.1.4."
+    DEFVAL      { enabled }
+    ::= { probeCollector 3 }
+
+probeCollectorAvailStatus OBJECT-TYPE
+    SYNTAX      AvailabilityStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the availability status of the collector.  The 
+         attribute may indicate a 'log-full' condition; indicating that 
+         capture files can be retrieved but that no new capture files 
+         can be added.  When the resource has been made unavailable in 
+         accordance with a predetermined time schedule its value will be 
+         'Off-Duty'."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+            Section 8.1.1.1.6.
+         ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+            Section 8.1.1.4.1."
+    DEFVAL      { {} }
+    ::= { probeCollector 4 }
+
+probeCollectorFullAction OBJECT-TYPE
+    SYNTAX      FullAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides a specification of the action to be taken when the 
+         maximum size of the archive has been reached.  Options are:
+         
+         - wrap(0), the oldest files in the archive, as determined by 
+           the file time stamp, will be deleted to free resources for 
+           the addition of newly downloaded files; but see also 
+           probeCollectorDiscardPolicy;
+           
+         - halt(1), no more files will be added to the archive; files 
+           already in the archive will be retained.
+           
+         Both options are supported by the collector archive."
+    ::= { probeCollector 5 }
+
+probeCollectorAlarmThreshold OBJECT-TYPE
+    SYNTAX      LogCapacityAlarmThreshold
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The log alarm package provides for transmission of alarms when 
+         a buffer full condition approaches.  This package shall be 
+         present whenever a buffer is of finite size and halts buffering 
+         when the 'log-full' availability status occurs.
+         
+         This attribute specifies, as a percentage of maximum buffer 
+         size, the points at which an event will be generated to 
+         indicate that a 'log-full' or 'log-wrap' condition is 
+         approaching.  This attribute is set-valued.  Support of this 
+         attribute is mandatory for the halt behaviour.  When a buffer 
+         is created with the wrap option, the capacity threshold events 
+         are triggered as if couple to a gauge that counts from zero to 
+         the highest capacity threshold value defined and then resets to 
+         zero."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+            Section 8.1.1.3."
+    DEFVAL      { "\x64" }
+    ::= { probeCollector 6 }
+
+probeCollectorCachePath OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the file system path to the directory where files are 
+         cached while they are being downloaded.  The default if not 
+         specified is '/var/local/openss7/cache/%U'."
+    DEFVAL      { "/var/local/openss7/cache/%U" }
+    ::= { probeCollector 7 }
+
+probeCollectorSpoolPath OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the file system path to the directory where files are 
+         spooled once they have been downloaded.  The default if not 
+         specified is '/var/local/openss7/spool/%U'."
+    DEFVAL      { "/var/local/openss7/spool/%U" }
+    ::= { probeCollector 8 }
+
+probeCollectorArchivePath OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the file system path to the directory where files are 
+         archived once they have been uploaded.  The default if not 
+         specified is '/var/local/openss7/archive/%U'."
+    DEFVAL      { "/var/local/openss7/spool/%U" }
+    ::= { probeCollector 9 }
+
+probeCollectorArchiveSubdirs OBJECT-TYPE
+    SYNTAX      BITS { daily(0), weekly(1), monthly(2), yearly(3) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the subdirectories that will be used within the 
+         archive file system directory to organize archived files by 
+         date.  This object is set and can contain zero or more of the 
+         following values:
+         
+         - daily(0), collect files by day of download within a daily 
+           subdirectory whose name is the date (YYYY-MM-DD);
+           
+         - weekly(1), collect files and daily subdirectories (if any) 
+           within a weekly subdirectory whose name is the date of the 
+           beginning of the week (YYYY-MM-DD);
+           
+         - monthly(2), collect files, daily and weekly subdirectories 
+           (if any) within a monthly subdirectory whose name is the year 
+           and month (YYYY-MM);
+           
+         - yearly(3), collect files, daily, weekly and mothly 
+           subdirectories (if any) within a yearly subdirectory whose 
+           name is the year (YYYY).
+           
+         The default value on row creation when not specified is 
+         daily(0) and monthly(2)."
+    DEFVAL      { {daily, monthly} }
+    ::= { probeCollector 10 }
+
+probeCollectorCompression OBJECT-TYPE
+    SYNTAX      INTEGER { none(0), gz(1), bz2(2), xz(3), zip(4) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "When a capture file is downloaded and spooled it is compressed.  
+         Compression is maintained on the file when it is archived.  
+         This object specifies what compression to use.  This object is 
+         single-valued as follows:
+         
+         - none(0), no compression, maintain whatever compression of the 
+           file was performed by the probe;
+           
+         - gz(1), gzip compression, .gz file extension;
+           
+         - bz2(2), bzip2 compression, .bz2 file extension;
+           
+         - xz(3), xz compression, .xz filename extension;
+           
+         - zip(4), zip archive, .zip filename extension.
+           
+         When a compression of other than none(0) is specified, the 
+         corresponding file extension will be added to the file name.  
+         The file will be decompressed and recompressed in the new 
+         format if the downloaded format does not match that specified 
+         by this object.  Zip archives contain a single original file.  
+         The default value if unspecified is xz(3) compression."
+    DEFVAL      { xz }
+    ::= { probeCollector 11 }
+
+probeCollectorFileSystemAlloc OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the percentage of the file system in which the 
+         probeCollectorArchivePath exists that is allocated to archival 
+         capture files.  The total amount of space occupied by archival 
+         capture files will not exceed this limit.
+         
+         The default value is 90%."
+    DEFVAL      { 90 }
+    ::= { probeCollector 12 }
+
+probeCollectorMaxDiskUsage OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the percentage of the allocation portion of the file 
+         system in which the probeCollectorArchivePath exists that is 
+         usable for archival capture files.  The total amount of space 
+         occupied by archival capture files will not exceed this limit.
+         
+         The default value is 80%."
+    DEFVAL      { 80 }
+    ::= { probeCollector 13 }
+
+probeCollectorDiscardPolicy OBJECT-TYPE
+    SYNTAX      INTEGER { ignore(0), oldest(1), largest(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the discard policy for archival capture files when 
+         file system allocation and disk usage limits are exceeded and 
+         the probeDownloadFullAction is set to halt(1).  This object is 
+         single-valued as follows:
+         
+         - ignore(0), ignores file system and disk usage limits;
+           
+         - oldest(1), the oldest archival capture files are discarded;
+           
+         - largest(2), the largest archival capture files are discared.
+           
+         The default value is ignore(0)."
+    DEFVAL      { ignore }
+    ::= { probeCollector 14 }
+
+-- =====================================================================
+-- probeDownload group
+-- =====================================================================
+-- The probeDownload group is responsible for managing the collection of 
+-- archived capture files from specific probes.
+-- .....................................................................
+
+probeDownload OBJECT IDENTIFIER
+    ::= { probeObjects 9 }
+
+probeDownloadTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ProbeDownloadEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a table of probes from which the collector is to 
+         download capture files on a regular schedule."
+    ::= { probeDownload 1 }
+
+probeDownloadEntry OBJECT-TYPE
+    SYNTAX      ProbeDownloadEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the table specifies a single probe from which to 
+         download capture files on a regular schedule."
+    INDEX       { probeDownloadIndex }
+    ::= { probeDownloadTable 1 }
+
+ProbeDownloadEntry ::= SEQUENCE {
+    probeDownloadIndex              Unsigned32,
+    probeDownloadSpec               SnmpAdminString,
+    probeDownloadUsername           SnmpAdminString,
+    probeDownloadPassword           SnmpAdminString,
+    probeDownloadInterval           TimeInterval,
+    probeDownloadStartTime          TimeStamp,
+    probeDownloadStopTime           TimeStamp,
+    probeDownloadIntervalsOfDay     IntervalsOfDay,
+    probeDownloadWeekMask           WeekMask,
+    probeDownloadOnRotation         TruthValue,
+    probeDownloadSelection          INTEGER,
+    probeDownloadAdminState         AdministrativeState,
+    probeDownloadUsageState         UsageState,
+    probeDownloadProcStatus         ProceduralStatus,
+    probeDownloadStorageType        StorageType,
+    probeDownloadRowStatus          RowStatus
+}
+
+probeDownloadIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a non-zero ordinal index of the rows in this table."
+    ::= { probeDownloadEntry 1 }
+
+probeDownloadSpec OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the method and path from which to download files on 
+         the probe.  This string constists of the URL of a directory 
+         from which files will be downloaded.  Supported protocols are 
+         all protocols supported by curl(1).  A number of escape 
+         sequences can be included in the URL:
+         
+         - %I, the interface of the (PCAP) file;
+         - %Y, the 4-digit year of the file;
+         - %M, the 2-digit month of the file;
+         - %D, the 2-digit day of the file;
+         - %P, the UUID of the probe;
+         - %N, the name of the probe.
+           
+         Escape sequences will be substituted on a per-file basis as 
+         files are uploaded."
+    REFERENCE   
+        "curl(1) manual page."
+    ::= { probeDownloadEntry 2 }
+
+probeDownloadUsername OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the username for use with the download string when 
+         required.  A username will not be provided unless demanded by 
+         the remote server."
+    DEFVAL      { "unexicon" }
+    ::= { probeDownloadEntry 3 }
+
+probeDownloadPassword OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a password for use with the download string when 
+         required.  A password will not be provided unless demanded by 
+         the remote server.  A read of this object will only return the 
+         number of '*' characters equal to the length of the password."
+    DEFVAL      { "unexicon" }
+    ::= { probeDownloadEntry 4 }
+
+probeDownloadInterval OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the ability to automatically control the frequency at 
+         which downloading occurs.  This attribute defines the amount of 
+         time that the collector will wait since the last download 
+         before another is attempted.  The special value zero (0) 
+         specifies that downloading is not to be attempted periodically 
+         but based on the other scheduling parameters in this row.
+         
+         This object can be used to attempt near-real-time downloads; 
+         however, downloading files on a frequent basis (e.g. every 5 
+         minutes) could place a high load on the probe for some 
+         protocols.  For rsync this is likely not a problem.  The 
+         default is every 15 minutes."
+    DEFVAL      { 90000 }
+    ::= { probeDownloadEntry 5 }
+
+probeDownloadStartTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the ability to automatically control the time that 
+         downloading starts.  This attribute defines the date and time 
+         at which an unlocked(0) and enabled(1) download starts 
+         functioning.  If the value of the start time is not specified 
+         in the create request, its value defaults to the time of 
+         creation of the row causing it to function immediately."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+            Section 8.1.1.4.2."
+    DEFVAL      { 0 }
+    ::= { probeDownloadEntry 6 }
+
+probeDownloadStopTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the ablity to automatically control the time that 
+         downloading stops.  This attribte defines the date and time 
+         at which downloading stops functioning.  If the value of the 
+         stop time is not specified in the create request, its value 
+         defaults to 'continuous operation'.  Continuous operation is 
+         represented by a null value for the stop time."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+            Section 8.1.1.4.2."
+    DEFVAL      { 0 }
+    ::= { probeDownloadEntry 7 }
+
+probeDownloadIntervalsOfDay OBJECT-TYPE
+    SYNTAX      IntervalsOfDay
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the capability of scheduling uploads on a daily 
+         schedule (scheduling with a periodicity of 24 hours).  This 
+         attribute defines the list of time intervals (interval-start 
+         and interval-end times of day) during which the downloads will 
+         occur.  During excluded intervals downloads will not occur. If 
+         not specified in the create request, the value of this object 
+         defaults to a single interval encompassing the entire 24-hour 
+         period of a day."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+            Section 8.1.1.4.3."
+    DEFVAL      { "\x00\x00\x17\x3B" }
+    ::= { probeDownloadEntry 8 }
+
+probeDownloadWeekMask OBJECT-TYPE
+    SYNTAX      WeekMask
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the capablity of scheduling downloads on a weekly 
+         schedule (scheduling with a periodicity of one week).  This 
+         attribute defines a set of mask components, each specifying a 
+         set of time intervals on a 24-hour time-of-day clock, 
+         pertaining to selected days of the week.  The week mask 
+         attribute defaults to a scheduling criteria of 'always-on' at 
+         row creation.
+         
+         The days of week component defines the days of the week on which 
+         downloads may occur.  This component, if not present during row 
+         creation, will default to all seven days of the week.
+         
+         The intervals of day component defines the list of time 
+         intervals (interval-start and interval-end times of day) during 
+         which downloads may occur when the current day is one of the days 
+         that is selected within the corresponding days of week 
+         component.  During excluded intervals downloads will not occur.  
+         If not specified during row creation, the value of this 
+         component defaults to a single interval encompassing the entire 
+         24 hour period of a day."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+            Section 8.1.1.4.4."
+    DEFVAL      { "\x7F\x01\x00\x00\x17\x3B" }
+    ::= { probeDownloadEntry 9 }
+
+probeDownloadOnRotation OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies whether to schedule downloads at packet capture 
+         archive file rotation events:
+         
+         - true(1), download of a newly archived capture file will be 
+           initiated immediately upon rotation;
+           
+         - false(2), download of a newly archived capture file will be 
+           initiated only in accordance with other scheduling 
+           attributes.
+           
+         When set to true(1), the agent will ignore all other download 
+         scheduling parameters for downloading newly archived capture 
+         files."
+    ::= { probeDownloadEntry 10 }
+
+probeDownloadSelection OBJECT-TYPE
+    SYNTAX      INTEGER { new(1), rotated(2), sync(3), all(4) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies which files are to be downloaded during an download 
+         cycle:
+         
+         - new(1), only files that have not previously been downloaded 
+           to this collector will be downloaded;
+           
+         - rotated(2), only rotated files that have not previously been 
+           downloaded to this collector will be downloaded;
+           
+         - sync(3), download any files present on the probe that are not 
+           present on the collector;
+           
+         - all(4), download all files present on the probe during each 
+           cycle.
+           
+         Only download protocols that support synchronization will 
+         effect the sync(3) setting; those that do not will revert to 
+         new(1) behavior."
+    ::= { probeDownloadEntry 11 }
+
+probeDownloadAdminState OBJECT-TYPE
+    SYNTAX      AdministrativeState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the administrative state of downloads from the remote 
+         probe:
+         
+         - locked(0), the probe is prohibited from downloading files 
+           from the remote probe;
+           
+         - unlocked(1), the probe is permitted to download files from 
+           the remote server according to the download schedule;
+           
+         - shuttingDown(2), the collector is actively downloading files 
+           from the remote server and will move to the locked(0) state 
+           once the download completes (whether successful or not).
+           
+         This is used to control the state of downloads.  Set to 
+         locked(0) to suppress downloading for a period of time.  Set to 
+         unlocked(1) to enable downloading."
+    DEFVAL      { unlocked }
+    ::= { probeDownloadEntry 12 }
+
+probeDownloadUsageState OBJECT-TYPE
+    SYNTAX      UsageState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the usage state of download cycles:
+         
+         - idle(0), downloads are idle; no download is in progress;
+           
+         - active(1), downloads are active and in progress; additional 
+           downloads may be initiated;
+           
+         - busy(2), downloads are active and in progress; no additional 
+           downloads may be initiated.
+           
+         This usage state determines the use of downloading by the agent 
+         and not as a result of any action performed within this MIB."
+    ::= { probeDownloadEntry 13 }
+
+probeDownloadProcStatus OBJECT-TYPE
+    SYNTAX      ProceduralStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the procedural status of downloads to the remote 
+         collector:
+         
+         - intializationRequired(0), not used;
+         - notInitialized(1), not used;
+         - initializing(2), a download cycle requires initialization and 
+           that initialization is proceeding but has not yet completed;
+         - reporting(3), the download cycle is reporting its results;
+         - terminating(4), the download cycle is terminating.
+           
+         The procedural status for download cycles result from 
+         scheduling and operation of the download cycle and not by 
+         actions taken within this MIB."
+    REFERENCE   
+        "OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2,
+            proceduralStatus."
+    ::= { probeDownloadEntry 14 }
+
+probeDownloadStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the storage type for this conceptual row.  On write, 
+         only storage types volatile(2) and nonVolatile(3) or 
+         permanent(4) are applicable.  volatile(2) rows do not persist 
+         across an agent reboot."
+    ::= { probeDownloadEntry 15 }
+
+probeDownloadRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may create and 
+         destroy rows in this table."
+    ::= { probeDownloadEntry 16 }
+
+
+-- ====================================================================
+-- COMPLIANCE
+-- ====================================================================
+
+probeGroups OBJECT IDENTIFIER
+    ::= { probeMIB 3 }
+
+probeCompliances OBJECT IDENTIFIER
+    ::= { probeMIB 4 }
+
+probeMonitorGroup OBJECT-GROUP
+    OBJECTS     { probeMonitorName, probeMonitorUuid, 
+                  probeMonitorHardware, probeMonitorOs, 
+                  probeMonitorUserAppl }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects providing general management of the 
+         probe."
+    ::= { probeGroups 1 }
+
+probeInterfaceGroup OBJECT-GROUP
+    OBJECTS     { probeInterfaceIfIndex, probeInterfaceLinkType, 
+                  probeInterfaceSnapLen, probeInterfaceName, 
+                  probeInterfaceDescription, probeInterfaceMacAddr, 
+                  probeInterfaceEuiAddr, probeInterfaceSpeed, 
+                  probeInterfaceTsRes, probeInterfaceTzone, 
+                  probeInterfaceFilterType, probeInterfaceFilter, 
+                  probeInterfaceOs, probeInterfaceFcsLen, 
+                  probeInterfaceTsOffset, probeInterfaceAdminState, 
+                  probeInterfaceOpState, probeInterfaceAvailStatus, 
+                  probeInterfaceProcStatus, probeInterfaceUsageState }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects providing general management of the 
+         capture of packets from interfaces supported by a probe."
+    ::= { probeGroups 2 }
+
+probeStatsGroup OBJECT-GROUP
+    OBJECTS     { probeStatsTimeElapsed, probeStatsTimeStamp, 
+                  probeStatsStartTime, probeStatsSEndTime, 
+                  probeStatsIfRecv, probeStatsIfDrop, 
+                  probeStatsFilterAccept, probeStatsOsDrop, 
+                  probeStatsUserDeliv }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects providing current statistics on packet 
+         capture."
+    ::= { probeGroups 3 }
+
+probeStatsHistGroup OBJECT-GROUP
+    OBJECTS     { probeHistTimeElapsed, probeHistIfRecv, probeHistIfDrop, 
+                  probeHistFilterAccept, probeHistOsDrop, 
+                  probeHistUserDeliv }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects providing historical statistics on 
+         packet capture."
+    ::= { probeGroups 4 }
+
+probeStatsTotalGroup OBJECT-GROUP
+    OBJECTS     { probeTotalValidIntervals, probeTotalInvalidIntervals, 
+                  probeTotalIfRecv, probeTotalIfDrop, 
+                  probeTotalFilterAccept, probeTotalOsDrop, 
+                  probeTotalUserDeliv }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects providing historical total statistics 
+         on packet capture."
+    ::= { probeGroups 5 }
+
+probeBufferGroup OBJECT-GROUP
+    OBJECTS     { probeBufferAdminState, probeBufferOpState, 
+                  probeBufferAvailStatus, probeBufferFullAction, 
+                  probeBufferMaxSize, probeBufferMaxMsgs, 
+                  probeBufferMaxTime, probeBufferCurrentSize, 
+                  probeBufferNumberOfRecords, probeBufferCurrentInterval, 
+                  probeBufferAlarmThreshold, probeBufferByteHiWaterMark, 
+                  probeBufferByteLoWaterMark, probeBufferMsgsHiWaterMark, 
+                  probeBufferMsgsLoWaterMark, probeBufferTimeHiWaterMark, 
+                  probeBufferTimeLoWaterMark, probeBufferDrops, 
+                  probeBufferReset, probeBufferInterfaces, 
+                  probeBufferTimeElapsed, probeBufferBegTime, 
+                  probeBufferEndTime, probeBufferIfRecv, 
+                  probeBufferIfDrop, probeBufferFilterAccept, 
+                  probeBufferOsDrop, probeBufferUserDeliv, 
+                  probeBufferIfCompress, probeBufferUserOctets, 
+                  probeBufferActionResult }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects providing general management of the 
+         capture buffer."
+    ::= { probeGroups 6 }
+
+probeBufferIfGroup OBJECT-GROUP
+    OBJECTS     { probeBufferIfTimeElapsed, probeBufferIfBegTime, 
+                  probeBufferIfEndTime, probeBufferIfIfRecv, 
+                  probeBufferIfIfDrop, probeBufferIfFilterAccept, 
+                  probeBufferIfOsDrop, probeBufferIfUserDeliv, 
+                  probeBufferIfIfCompress, probeBufferIfUserOctets }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects providing management of interfaces 
+         feeding the capture buffer."
+    ::= { probeGroups 7 }
+
+probeCaptureGroup OBJECT-GROUP
+    OBJECTS     { probeCaptureNameString, probeCaptureFormat, 
+                  probeCaptureAdminState, probeCaptureOpState, 
+                  probeCaptureAvailStatus, probeCaptureFullAction, 
+                  probeCaptureMaxSize, probeCaptureMaxMsgs, 
+                  probeCaptureMaxTime, probeCaptureCurrentSize, 
+                  probeCaptureNumberOfRecords, 
+                  probeCaptureCurrentInterval, 
+                  probeCaptureAlarmThreshold, 
+                  probeCaptureByteHiWaterMark, 
+                  probeCaptureByteLoWaterMark, 
+                  probeCaptureMsgsHiWaterMark, 
+                  probeCaptureMsgsLoWaterMark, 
+                  probeCaptureTimeHiWaterMark, 
+                  probeCaptureTimeLoWaterMark, probeCaptureDrops, 
+                  probeCaptureReset, probeCaptureStartTime, 
+                  probeCaptureStopTime, probeCaptureIntervalsOfDay, 
+                  probeCaptureWeekMask, probeCaptureRotInterval, 
+                  probeCaptureRotSize, probeCaptureRotNumber, 
+                  probeCaptureCachePath, probeCaptureSpoolPath, 
+                  probeCaptureArchivePath, probeCaptureArchiveSubdirs, 
+                  probeCaptureCompression, probeCaptureFileSystemAlloc, 
+                  probeCaptureMaxDiskUsage, probeCaptureDiscardPolicy, 
+                  probeCaptureUpload }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects providing general management of the 
+         capture archive."
+    ::= { probeGroups 8 }
+
+probeArchiveGroup OBJECT-GROUP
+    OBJECTS     { probeArchiveName, probeArchiveFileFormat, 
+                  probeArchiveCompressed, probeArchiveState, 
+                  probeArchiveSize, probeArchiveCompSize, 
+                  probeArchiveInterfaces, probeArchiveTimeElapsed, 
+                  probeArchiveBegTime, probeArchiveEndTime, 
+                  probeArchiveIfRecv, probeArchiveIfDrop, 
+                  probeArchiveFilterAccept, probeArchiveOsDrop, 
+                  probeArchiveUserDeliv, probeArchiveIfCompress, 
+                  probeArchiveUserOctets, probeArchiveActionResult }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects providing management of individual 
+         files in the capture archive."
+    ::= { probeGroups 9 }
+
+probeArchiveIfGroup OBJECT-GROUP
+    OBJECTS     { probeCaptureIfTimeElapsed, probeCaptureIfBegTime, 
+                  probeCaptureIfEndTime, probeCaptureIfIfRecv, 
+                  probeCaptureIfIfDrop, probeCaptureIfFilterAccept, 
+                  probeCaptureIfOsDrop, probeCaptureIfUserDeliv, 
+                  probeCaptureIfIfCompress, probeCaptureIfUserOctets }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects providing information on the interfaces 
+         contained in a capture archive file."
+    ::= { probeGroups 10 }
+
+probeFeedGroup OBJECT-GROUP
+    OBJECTS     { probeFeedName, probeFeedAddrType, probeFeedAddr, 
+                  probeFeedProfile, probeFeedEstablish, 
+                  probeFeedAdminState, probeFeedOperState, 
+                  probeFeedProcStatus, probeFeedUsageState, 
+                  probeFeedConnState, probeFeedStorageType, 
+                  probeFeedRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects providing management of live feeds to 
+         remote collectors."
+    ::= { probeGroups 11 }
+
+probeFeedStatsGroup OBJECT-GROUP
+    OBJECTS     { probeFeedTimeElapsed, probeFeedBegTime, 
+                  probeFeedEndTime, probeFeedIfRecv, probeFeedIfDrop, 
+                  probeFeedFilterAccept, probeFeedOsDrop, 
+                  probeFeedUserDeliv, probeFeedIfCompress, 
+                  probeFeedUserOctets }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects providing statistics on live feeds."
+    ::= { probeGroups 12 }
+
+probeUploadGroup OBJECT-GROUP
+    OBJECTS     { probeUploadSpec, probeUploadUsername, 
+                  probeUploadPassword, probeUploadStartTime, 
+                  probeUploadStopTime, probeUploadIntervalsOfDay, 
+                  probeUploadWeekMask, probeUploadOnRotation, 
+                  probeUploadSelection, probeUploadAdminState, 
+                  probeUploadUsageState, probeUploadProcStatus, 
+                  probeUploadStorageType, probeUploadRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects providing management of uploading of 
+         archived capture files."
+    ::= { probeGroups 13 }
+
+probeCollectorGroup OBJECT-GROUP
+    OBJECTS     { probeCollectorExtensions, probeCollectorAdminState, 
+                  probeCollectorOpState, probeCollectorAvailStatus, 
+                  probeCollectorFullAction, probeCollectorAlarmThreshold, 
+                  probeCollectorCachePath, probeCollectorSpoolPath, 
+                  probeCollectorArchivePath, 
+                  probeCollectorArchiveSubdirs, 
+                  probeCollectorCompression, 
+                  probeCollectorFileSystemAlloc, 
+                  probeCollectorMaxDiskUsage, 
+                  probeCollectorDiscardPolicy }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects providing management of downloading of 
+         archived capture files."
+    ::= { probeGroups 14 }
+
+probeDownloadGroup OBJECT-GROUP
+    OBJECTS     { probeDownloadSpec, probeDownloadUsername, 
+                  probeDownloadPassword, probeDownloadInterval, 
+                  probeDownloadStartTime, probeDownloadStopTime, 
+                  probeDownloadIntervalsOfDay, probeDownloadWeekMask, 
+                  probeDownloadOnRotation, probeDownloadSelection, 
+                  probeDownloadAdminState, probeDownloadUsageState, 
+                  probeDownloadProcStatus, probeDownloadStorageType, 
+                  probeDownloadRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects providing management of downloading of 
+         capture files from specific probes."
+    ::= { probeGroups 15 }
+
+probeBasicCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "Provides basic module compliance requirements for the probe 
+         MIB."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { probeMonitorGroup, probeCaptureGroup, 
+                  probeArchiveGroup, probeUploadGroup }
+
+        GROUP   probeFeedGroup
+        DESCRIPTION   
+              "Conditional items when a live probe is implemented."
+
+        GROUP   probeBufferGroup
+        DESCRIPTION   
+              "Conditional items when a live probe is implemented."
+
+--        OBJECT  probeInterfaceAdminState
+--        SYNTAX  AdministrativeState { locked(0), unlocked(1), 
+--                    shuttingDown(2) }
+--        WRITE-SYNTAX    AdministrativeState { locked(0), unlocked(1) }
+--        DESCRIPTION   
+--            "This object has a different read and write syntax."
+
+        OBJECT  probeBufferAdminState
+        SYNTAX  AdministrativeState { locked(0), unlocked(1), 
+                    shuttingDown(2) }
+        WRITE-SYNTAX    AdministrativeState { locked(0), unlocked(1) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  probeCaptureAdminState
+        SYNTAX  AdministrativeState { locked(0), unlocked(1), 
+                    shuttingDown(2) }
+        WRITE-SYNTAX    AdministrativeState { locked(0), unlocked(1) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  probeFeedAdminState
+        SYNTAX  AdministrativeState { locked(0), unlocked(1), 
+                    shuttingDown(2) }
+        WRITE-SYNTAX    AdministrativeState { locked(0), unlocked(1) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  probeUploadAdminState
+        SYNTAX  AdministrativeState { locked(0), unlocked(1), 
+                    shuttingDown(2) }
+        WRITE-SYNTAX    AdministrativeState { locked(0), unlocked(1) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  probeFeedRowStatus
+        SYNTAX  RowStatus { active(1), notInService(2), notReady(3), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        WRITE-SYNTAX    RowStatus { active(1), notInService(2), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  probeUploadRowStatus
+        SYNTAX  RowStatus { active(1), notInService(2), notReady(3), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        WRITE-SYNTAX    RowStatus { active(1), notInService(2), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  probeBufferActionResult
+        SYNTAX  INTEGER { success(0), failure(1) }
+        WRITE-SYNTAX    INTEGER { clear(2) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  probeArchiveActionResult
+        SYNTAX  INTEGER { success(0), failure(1) }
+        WRITE-SYNTAX    INTEGER { spool(2), archive(3), delete(4), 
+                    upload(5) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+    ::= { probeCompliances 1 }
+
+probeProbeCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "Provides the module compliance requirements for the probe MIB 
+         when the implementation is a probe only.  A probe is a network 
+         element that captures messages and archives them in files that 
+         are uploaded to a collector according to a schedule.
+         
+         The probe may also provide its monitoring sources as live feeds 
+         to a network management station or to collectors that will 
+         capture their own files from the live feed."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { probeMonitorGroup, probeInterfaceGroup, 
+                  probeBufferGroup, probeCaptureGroup, probeArchiveGroup }
+
+        GROUP   probeFeedGroup
+        DESCRIPTION   
+              "Conditional items to support probe initiation of live 
+               feeds.  Not required when the collector is capable of 
+               initiating connections to the probe."
+
+        GROUP   probeUploadGroup
+        DESCRIPTION   
+              "Conditional items to support probe initiated upload of 
+               archival capture files.  Not required when the collector 
+               is capable of initiating downloads from the probe."
+
+        GROUP   probeStatsGroup
+        DESCRIPTION   
+              "Conditional items to support current probe capture 
+               statistics."
+
+        GROUP   probeStatsHistGroup
+        DESCRIPTION   
+              "Conditional items to support historical probe capture 
+               statustics."
+
+        GROUP   probeStatsTotalGroup
+        DESCRIPTION   
+              "Conditional items to support historical total probe 
+               capture statistics."
+
+        GROUP   probeBufferIfGroup
+        DESCRIPTION   
+              "Conditional items to support capture buffer interface 
+               statistics."
+
+        GROUP   probeArchiveIfGroup
+        DESCRIPTION   
+              "Conditional items to suport capture archive interface 
+               statistics."
+
+        GROUP   probeFeedStatsGroup
+        DESCRIPTION   
+              "Conditional items to support live capture feed 
+               statistics."
+
+        -- TODO add object with different read and write syntaxes
+
+    ::= { probeCompliances 2 }
+
+probeCollectorCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "Provides the module compliance requirements for the probe MIB 
+         when the implementation is a collector only."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { probeCollectorGroup, 
+                  probeDownloadGroup }
+
+        GROUP   probeCaptureGroup
+        DESCRIPTION   
+              "Conditional items when the collector is to capture from 
+               live monitor feeds."
+
+        GROUP   probeArchiveGroup
+        DESCRIPTION   
+              "Conditional items when the collector is to archive 
+               capture from live monitor feeds."
+
+        GROUP   probeArchiveIfGroup
+        DESCRIPTION   
+              "Conditional items when the collector is to archive 
+               capture from live monitor feeds and retain interface 
+               statistics from archival data."
+
+        -- TODO add object with different read and write syntaxes
+
+    ::= { probeCompliances 3 }
+
+END -- end of module OPENSS7-PROBE-MIB.
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4 et

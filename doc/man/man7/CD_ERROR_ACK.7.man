@@ -1,0 +1,402 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: CD_ERROR_ACK.7.man,v 1.1.2.2 2011-02-07 02:18:14 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:14 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: CD_ERROR_ACK.7.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:14  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH CD_ERROR_ACK 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Communications Device Interface (CDI)"
+.SH NAME
+.B CD_ERROR_ACK
+\- error acknowledgment
+.SH SYNOPSIS
+This primitive consists of one
+.BR M_PCPROTO (9)
+message block structured as follows:
+.sp
+.nf
+\f(CW\s-1\
+typedef struct {
+    cd_ulong cd_primitive;
+    cd_ulong cd_state;
+    cd_ulong cd_error_primitive;
+    cd_ulong cd_errno;
+    cd_ulong cd_explanation;
+} cd_error_ack_t;
+\fR\s+1
+.fi
+.SH DESCRIPTION
+This provider originated primitives acknowledges that the previously received
+primitive requiring an acknowledgment was received in error.  The primitive to
+which the error acknowledgment applies and the error code are indicated.
+.SS Parameters
+This primitive contains the following parameters:
+.TP
+.I cd_primitive
+Indicates the primitives type.
+.TP
+.I cd_state
+Indicates the current state of the interface.
+.I cd_state
+can be one of the following values:
+.RS
+.TP \w'[\fBCD_LAN_COLLISIONS\fP]\(em'u
+.B CD_UNATTACHED
+No PPA attached.
+.PD 0
+.TP
+.B CD_UNUSABLE
+PPA cannot be used.
+.TP
+.B CD_DISABLED
+PPA attached.
+.TP
+.B CD_ENABLE_PENDING
+Waiting ack of enable req.
+.TP
+.B CD_ENABLED
+Awaiting use.
+.TP
+.B CD_READ_ACTIVE
+Input section enabled; disabled after data arrives.
+.TP
+.B CD_INPUT_ALLOWED
+Input section permanently enabled.
+.TP
+.B CD_DISABLE_PENDING
+Waiting ack of disable req.
+.TP
+.B CD_OUTPUT_ACTIVE
+Output section active only.
+.TP
+.B CD_XRAY
+Xray-ing another ppa.
+.PD
+.RE
+.TP
+.I cd_error_primitive
+Indicates the primitive that was received in error.
+.I cd_error_primitive
+can be one of the following values:
+.RS
+.TP \w'[\fBCD_LAN_COLLISIONS\fP]\(em'u
+.BR CD_ABORT_OUTPUT_REQ (7)
+.PD 0
+.TP
+.BR CD_ALLOW_INPUT_REQ (7)
+.TP
+.BR CD_ATTACH_REQ (7)
+.TP
+.BR CD_DETACH_REQ (7)
+.TP
+.BR CD_DISABLE_REQ (7)
+.TP
+.BR CD_ENABLE_REQ (7)
+.TP
+.BR CD_HALT_INPUT_REQ (7)
+.TP
+.BR CD_INFO_REQ (7)
+.TP
+.BR CD_MODEM_SIG_REQ (7)
+.TP
+.BR CD_MUX_NAME_REQ (7)
+.TP
+.BR CD_READ_REQ (7)
+.TP
+.BR CD_UNITDATA_REQ (7)
+.TP
+.BR CD_WRITE_READ_REQ (7)
+.PD
+.RE
+.TP
+.I cd_errno
+Indicates the reason for the error.
+.I cd_errno
+can be one of the following values:
+.RS
+.TP \w'[\fBCD_LAN_COLLISIONS\fP]\(em'u
+.RB [ CD_BADADDRESS ]
+Address was invalid.
+.PD 0
+.TP
+.RB [ CD_BADADDRTYPE ]
+Invalid address type.
+.TP
+.RB [ CD_BADDIAL ]
+Dial information was invalid.
+.TP
+.RB [ CD_BADDIALTYPE ]
+Invalid dial information type.
+.TP
+.RB [ CD_BADDISPOSAL ]
+Invalid disposal parameter.
+.TP
+.RB [ CD_BADFRAME ]
+Defective SDU received.
+.TP
+.RB [ CD_BADPPA ]
+Invalid PPA identifier.
+.TP
+.RB [ CD_BADPRIM ]
+Unrecognized primitive.
+.TP
+.RB [ CD_DISC ]
+Disconnected.
+.TP
+.RB [ CD_EVENT ]
+Protocol-specific event occurred.
+.TP
+.RB [ CD_FATALERR ]
+Device has become unusable.
+.TP
+.RB [ CD_INITFAILED ]
+Line initialization failed.
+.TP
+.RB [ CD_NOTSUPP ]
+Primitive not supported by this device.
+.TP
+.RB [ CD_OUTSTATE ]
+Primitive was issued from an invalid state.
+.TP
+.RB [ CD_PROTOSHORT ]
+M_PROTO block too short.
+.TP
+.RB [ CD_READTIMEOUT ]
+Read request timed out before data arrived.
+.TP
+.RB [ CD_SYSERR ]
+UNIX system error.
+.TP
+.RB [ CD_WRITEFAIL ]
+Unitdata request failed.
+.PD
+.RE
+.TP
+.I cd_explanation
+Indicates a further explanation of the error.  When \fIcd_errno\fP is
+[\fBCD_SYSERR\fP], this field contains the UNIX system error as described in
+\fIerrno\fP(3).  Otherwise, \fIcd_explanation\fP may contain one of the
+following values:
+.RS
+.TP \w'[\fBCD_LAN_COLLISIONS\fP]\(em'u
+.RB [ CD_CRCERR ]
+CRC or FCS error.
+.PD 0
+.TP
+.RB [ CD_DLE_EOT ]
+DLE EOT detected.
+.TP
+.RB [ CD_FORMAT ]
+Format error detected.
+.TP
+.RB [ CD_HDLC_ABORT ]
+Aborted frame detected.
+.TP
+.RB [ CD_OVERRUN ]
+Input overrun.
+.TP
+.RB [ CD_TOOSHORT ]
+Frame too short.
+.TP
+.RB [ CD_INCOMPLETE ]
+Partial frame received.
+.TP
+.RB [ CD_BUSY ]
+Telephone was busy.
+.TP
+.RB [ CD_NOANSWER ]
+Connection went unanswered.
+.TP
+.RB [ CD_CALLREJECT ]
+Connection rejected.
+.TP
+.RB [ CD_HDLC_IDLE ]
+HDLC line went idle.
+.TP
+.RB [ CD_HDLC_NOTIDLE ]
+HDLC line no longer idle.
+.TP
+.RB [ CD_QUIESCENT ]
+Line being reassigned.
+.TP
+.RB [ CD_RESUMED ]
+Line has been reassigned.
+.TP
+.RB [ CD_DSRTIMEOUT ]
+Did not see DSR in time.
+.TP
+.RB [ CD_LAN_COLLISIONS ]
+LAN excessive collisions.
+.TP
+.RB [ CD_LAN_REFUSED ]
+LAN message refused.
+.TP
+.RB [ CD_LAN_NOSTATION ]
+LAN no such station.
+.TP
+.RB [ CD_LOSTCTS ]
+Lost Clear to Send signal.
+.TP
+.RB [ CD_DEVERR ]
+Start of device-specific codes.
+.PD
+.PP
+In addition, when the explanation is [\fBCD_DEVERR\fP] or greater, the
+explanation may be a device-specific explanation code.
+.RE
+.SS State
+This primitive is valid in any state where a local acknowledgment is pending
+in response to one of the following primitives:
+.BR CD_ABORT_OUTPUT_REQ (7),
+.BR CD_ALLOW_INPUT_REQ (7),
+.BR CD_ATTACH_REQ (7),
+.BR CD_DETACH_REQ (7),
+.BR CD_DISABLE_REQ (7),
+.BR CD_ENABLE_REQ (7),
+.BR CD_HALT_INPUT_REQ (7),
+.BR CD_INFO_REQ (7),
+.BR CD_MODEM_SIG_REQ (7),
+.BR CD_MUX_NAME_REQ (7),
+.BR CD_READ_REQ (7),
+.BR CD_UNITDATA_REQ (7),
+.BR CD_WRITE_READ_REQ (7).
+The new state remains unchanged from the state in which the request primitive
+was issued that illicited the error acknowledgment.
+.SH FILES
+<sys/cdi.h>
+.SH "SEE ALSO"
+.BR CD_ABORT_OUTPUT_REQ (7),
+.BR CD_ALLOW_INPUT_REQ (7),
+.BR CD_ATTACH_REQ (7),
+.BR CD_DETACH_REQ (7),
+.BR CD_DISABLE_REQ (7),
+.BR CD_ENABLE_REQ (7),
+.BR CD_HALT_INPUT_REQ (7),
+.BR CD_INFO_REQ (7),
+.BR CD_MODEM_SIG_REQ (7),
+.BR CD_MUX_NAME_REQ (7),
+.BR CD_READ_REQ (7),
+.BR CD_UNITDATA_REQ (7),
+.BR CD_WRITE_READ_REQ (7).
+.SH HISTORY
+.PP
+The Communications Device Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.SH CONFORMANCE
+.PP
+This interface conforms to CDI with Gcom extensions.
+.XX
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,44 @@
+# =============================================================================
+# @configure_input@
+# @(#) $RCSfile: mscript_postinst.in,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-05-10 13:45:29 $
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# This software is licensed under the GNU Affero General Public License (AGPL)
+# Version 3, 19 November 2007, available at <http://www.gnu.org/licenses/>.
+# -----------------------------------------------------------------------------
+eval "echo '${package}: \"$@\"'" >&2
+case "$1" in
+    (configure) : # postinstallation configuration
+	# configure-postinst configure [most-recently-configured-version]
+	if [ $# -gt 1 ]
+	then
+	    reconfigure_postinst "$@"
+	else
+	    configure_postinst "$@"
+	fi
+	;;
+    (triggered) : # postinst triggered triggered-packages
+	triggered_postinst "$@"
+	;;
+    (abort-upgrade) :
+	# old-prerm upgrade new-version ... failed
+	# new-prerm failed-upgrade new-version ... failed
+	# old-posinst abort-upgrade new-version
+	abort_upgrade_postinst "$@"
+	;;
+    (abort-remove) :
+	# conflict-prerm remove in-favour package new-version ... failed
+	# conflict-postinst abort-remove in-favour package new-version
+	abort_remove_postinst "$@"
+	;;
+    (abort-deconfigure) :
+	# deconfigure-prerm deconfigure in-favour package-being-installed version removing conflicting-package version .. failed
+	# deconfigure-postinst abort-deconfigurein-favour package-being-installed-but-failed version removing conflicting-package version
+	abort_deconfigure_postinst "$@"
+	;;
+esac
+# -----------------------------------------------------------------------------
+# vim: ft=sh sw=4 noet
+# @configure_input@
+# =============================================================================

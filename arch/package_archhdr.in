@@ -1,0 +1,38 @@
+@install_header@
+# =============================================================================
+# @configure_input@
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+# Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# This software is licensed under the GNU Affero General Public License (AGPL)
+# Version 3, 19 November 2007, available at <http://www.gnu.org/licenses/>.
+# -----------------------------------------------------------------------------
+preloads=@preloads@
+KERNEL_MODULES=""
+KERNEL_PRELOADS=""
+modules="specfs streams streams-aixcompat streams-clone streams-connld streams-echo streams-fifo streams-hpuxcompat streams-log streams-nsdev streams-nuls streams-osfcompat streams-pipe streams-pipemod streams-sad streams-sc streams-sth streams-suncompat streams-svr4compat streams-uw7compat"
+nonrpmmods="LiS lis streams STREAMS strbcm strcompat strutil strtty strchan strxns strxnet strnsl strsock strinet strsctp strisdn strvoip strss7 sigtran stratm"
+preloads="specfs streams"
+libraries="streams"
+tools="ldltest strtst thrtst timetst fattach fdetach ldlconfig oc pafd psfd rwf streams strmakenodes mkfifo"
+manuals="openss7 ATM carrier cci cdi chi cnam dlpi dlpi_porting FR hlr INET ISDN lab libxnet libxnsl lli mapi MG mg mtpi mxi nli npi npi_mtp npi_sccp OSI PHYS porting sbc sccpi sdli sdti sg sgp SIGTRAN sli SPG2 SPG SS7 ssg ss STREAMS_FAQ STREAMS tci tpi tpi_sccp tri TTY VOIP voip wan X25 x25_porting x400p xcc xmap XNS xti_sccp"
+infofiles=
+initfiles="specfs streams strerr strace ${base}"
+unitfiles="streams.target streams-shutdown.target"
+conffiles='*.conf'
+mibfiles='*.mib'
+snmpmods="strMIB"
+snmpconf="strMIB.conf"
+nonrpminit="strms_up strms_dn"
+mknods="@sbindir@/@STRCONF_DEVICES@"
+rmnods="@sbindir@/@STRCONF_DEVICES@ --remove"
+netconfig="${base}"
+sock2path="${base}"
+manrefs="${base}.refs"
+manmacros="${base}.macros"
+testscripts="testsuite"
+# -----------------------------------------------------------------------------
+# vim: ft=sh sw=4 noet
+# @configure_input@
+# =============================================================================

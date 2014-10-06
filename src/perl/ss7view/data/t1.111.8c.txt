@@ -1,0 +1,71 @@
+# ANSI T1.111.8 Point Code Blocks
+# Table B3/T1.111.8 -  List of Signalling Point Code Blocks
+# Organization by state
+17	US	AL	Alabama
+18	US	AK	Alaska
+19	US	AZ	Arizona
+20	US	AR	Arkansas
+21	US	CA	California
+22	US	CO	Colorado
+23	US	CT	Connecticut
+24	US	DE	Delaware
+25	US	DC	District of Columbia
+26	US	FL	Florida
+27	US	GA	Georgia
+28	US	HI	Hawaii
+29	US	ID	Idaho
+30	US	IL	Illinois
+31	US	IN	Indiana
+32	US	IA	Iowa
+33	US	KS	Kansas
+34	US	KY	Kentucky
+35	US	LA	Louisiana
+36	US	ME	Maine
+37	US	MD	Maryland
+38	US	MA	Massachusetts
+39	US	MI	Michigan
+40	US	MN	Minnesota
+41	US	MS	Mississippi
+42	US	MO	Missouri
+43	US	MT	Montana
+44	US	NE	Nebraska
+45	US	NV	Nevada
+46	US	NH	New Hampshire
+47	US	NJ	New Jersey
+48	US	NM	New Mexico
+49	US	NY	New York
+50	US	NC	North Carolina
+51	US	ND	North Dakota
+52	US	OH	Ohio
+53	US	OK	Oklahoma
+54	US	OR	Oregon
+55	US	PA	Pennsylavania
+56	US	RI	Rhode Island
+57	US	SC	South Carolina
+58	US	SD	South Dakota
+59	US	TN	Tennessee
+60	US	TX	Texas
+61	US	UT	Utah
+62	US	VT	Vermont
+63	US	VA	Virginia
+64	US	WV	West Virginia
+65	US	WA	Washington
+66	US	WI	Wisconsin
+67	US	WY	Wyoming
+68	CA	AB	Alberta
+69	CA	BC	British Columbia
+70	CA	MB	Manitoba
+71	CA	NB	New Brunswick
+72	CA	NL	Newfoundland
+73	CA	NT	Northwest Territories
+74	CA	NS	Nova Scotia
+75	CA	ON	Ontario
+76	CA	PE	Prince Edward Island
+77	CA	QC	Quebec
+78	CA	SK	Saskatchewan
+79	CA	YT	Yukon
+80	ZZ	AT	Atlantic and Caribbean Islands (U.S. Territories)
+81	ZZ	PA	Pacific Islands (U.S. Territories)
+82	US	TX	Texas
+83	US	CA	California
+84	US	NY	New York

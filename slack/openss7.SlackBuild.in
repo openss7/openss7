@@ -1,0 +1,906 @@
+#!/bin/bash
+# =============================================================================
+#
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date$ by $Author$
+#
+# =============================================================================
+
+@openss7_header@
+
+PKGNAM=@PACKAGE@
+VERSION=${VERSION:-@VERSION@}
+BUILD=${BUILD:-@PACKAGE_TXZRELEASE@}
+
+if [ -z "$ARCH" ]; then
+    ARCH="`uname -m`"
+    case "$ARCH" in
+	(amd64)	    ARCH=x86_64 ;;
+	(ia32e)	    ARCH=x86_64 ;;
+	(athlon)    ARCH=i486 ;;
+	(i?86)	    ARCH=i486 ;;
+	(arm*)	    ARCH=arm ;;
+    esac
+fi
+export ARCH
+
+CWD=`pwd`
+[ -n "$TMP" ] || TMP=/tmp
+PKG=$TMP/package-$PKGNAM
+
+case "$ARCH" in
+    (amd64)	SLKCFLAGS="-O2 -g" ;;
+    (athlon)	SLKCFLAGS="-O2 -g -march=athlon" ;;
+    (geode)	SLKCFLAGS="-O2 -g -march=geode" ;;
+    (i686)	SLKCFLAGS="-O2 -g -march=i686" ;;
+    (i?86)	SLKCFLAGS="-O2 -g -march=i486 -mtune=i686" ;;
+    (ia32e)	SLKCFLAGS="-O2 -g" ;;
+    (pentium3)	SLKCFLAGS="-O2 -g -march=pentium3" ;;
+    (pentium4)	SLKCFLAGS="-O2 -g -march=pentium4" ;;
+    (s390)	SLKCFLAGS="-O2 -g" ;;
+    (x86_64)	SLKCFLAGS="-O2 -g" ;;
+    (*)		SLKCFLAGS="-O2 -g" ;;
+esac
+
+rm -fr $PKG
+mkdir -p $TMP $PKG
+tar xvf $CWD/$PKGNAM-$VERSION.tar.?z || exit 1
+cd $PKGNAM-$VERSION || exit 1
+
+CACHE_FILE=$CWD/$PKGNAM-$VERSION/$ARCH-$KVERSION-config.cache
+CSITE_FILE=$CWD/$PKGNAM-$VERSION/$ARCH-config.site
+MPOST_FILE=$CWD/$PKGNAM-$VERSION/$ARCH-$KVERSION-modpost.cache
+
+BLD=$CWD/$PKGNAM-$VERSION
+INS=$CWD/$PKGNAM-$VERSION/_install
+cd $BLD
+./configure \
+    --build=$ARCH-slackware-linux \
+    --prefix='/usr' \
+    --includedir='${prefix}/include' \
+    --datarootdir='${prefix}' \
+    --datadir='${prefix}' \
+    --mandir='${prefix}/man' \
+    --infodir='${prefix}/info' \
+    --docdir='${prefix}/doc' \
+    --sysconfdir='/etc' \
+    --localstatedir='/var' \
+    --libexecdir='${prefix}/lib/@PACKAGE@' \
+    --disable-maintainer-mode \
+    --disable-dependency-tracking
+
+./configure \
+    --build=$ARCH-debian-linux \
+    --prefix=/usr \
+    --includedir='${prefix}/include' \
+    --mandir='${prefix}/share/man' \
+    --infodir='${prefix}/share/info' \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --libexecdir='${prefix}/lib/@PACKAGE@' \
+    --disable-maintainer-mode \
+    --disable-dependency-tracking \
+make
+make check || exit 1
+make install-strip DESTDIR=$INS
+
+# I hate building as root and Patrick should too.  This is a trick to get makepkg
+# to change owner and group to root on all files and directories.
+cat >$PKG/tar-1.13 <<SBEOF
+#!/bin/sh
+/bin/tar-1.13 --owner=root --group=root $*
+SBEOF
+chmod +x $PKG/tar-1.13
+export PATH="$PKG:$PATH"
+
+install_files() {
+    sort -u | \
+    while read x; do
+	[ -e "$x" ] || {
+	    echo "File '$x' does not exist."
+	    continue
+	}
+	y=`echo "$x" | sed -r 's,^'$CWD/$PKGNAM-$VERSION'(/_install)?/,,;s,/[^/]*$,,'`
+	[ -d $y ] || mkdir -p $y
+	cp -av $x $y
+    done
+}
+
+install_conf_files() {
+    sort -u | \
+    while read x; do
+	[ -e "$x" ] || {
+	    echo "File '$x' does not exist."
+	    continue
+	}
+	y=`echo "$x" | sed -r 's,^'$CWD/$PKGNAM-$VERSION'(/_install)?/,,;s,$,.new,'`
+	[ -d $y ] || mkdir -p $y
+	cp -av $x $y
+    done
+}
+
+install_doc_files() {
+    sort -u | \
+    while read x; do
+	[ -e "$x" ] || {
+	    echo "File '$x' does not exist."
+	    continue
+	}
+	y=`echo "$x" | sed -r 's,^'$CWD/$PKGNAM-$VERSION'(/_install)?/,,;s,/[^/]*$,,'`
+	y=usr/doc/$PKGNAM-$VERSION${y:+/$y}
+	[ -d $y ] || mkdir -p $y
+	case "$x" in
+	    (*ChangeLog*)
+		head -n 1000 $x > $y/`basename $x` ;;
+	    (*)
+		cp -av $x $y ;;
+	esac
+    done
+}
+
+install_install() {
+    for f in slack-desc slack-required slack-conflicts slack-suggests; do
+	(
+	    if [ -r $BLD/slack/$f ]; then
+		cat $BLD/slack/$f
+	    fi
+	    if [ -r $BLD/slack/$f.$SUBPKGNAM ]; then
+		cat $BLD/slack/$f.$SUBPKGNAM
+	    fi
+	) >install/$f
+    done
+    for f in doinst.sh; do
+	(
+	    if [ -r $BLD/slack/$f]; then
+		cat $BLD/slack/$f
+	    fi
+	    if [ -r $BLD/slack/$f-$SUBPKGNAM ]; then
+		cat $BLD/slack/$f-$SUBPKGNAM
+	    fi
+	) >install/$f
+    done
+}
+
+SUBPKG=$PKG/main
+SUBPKGNAME=$PKGNAM
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
+cd $SUBPKG
+rm -fr install
+mkdir install
+#         |-----handy-ruler------------------------------------------------------|
+cat >install/slack-desc <<SBEOF
+$SUBPKGNAM: openss7 (Linux Fast-STREAMS and OpenSS7 protocol suites)
+$SUBPKGNAM:
+$SUBPKGNAM: OpenSS7 provides Linux Fast-STREAMS for Slackware Linux.
+$SUBPKGNAM:
+$SUBPKGNAM: This package includes kernel modules, STREAMS drivers, modules,
+$SUBPKGNAM: libraries, utilities, test programs, daemons, and development
+$SUBPKGNAM: environment for the development and execution of OpenSS7 drivers,
+$SUBPKGNAM: components and applications for the STREAMS environment.  This
+$SUBPKGNAM: distribution is currently applicable to 2.4, 2.6 and 3.x kernels and
+$SUBPKGNAM: is validated for ix86, x86_64, ppc and ppc64 architectures, but should
+$SUBPKGNAM: build and install well for other architectures.
+SBEOF
+cat >install/slack-required <<SBEOF
+openss7-repo = $VERSION-$BUILD
+SBEOF
+cat >install/slack-conflicts <<SBEOF
+SBEOF
+cat >install/slack-suggests <<SBEOF
+openss7-base
+SBEOF
+install_install
+( echo ${BLD}/AUTHORS
+  [ ! -f ${BLD}/ANNOUNCE	] || echo ${BLD}/ANNOUNCE
+  [ ! -f ${BLD}/ABOUT-NLS	] || echo ${BLD}/ABOUT-NLS
+  [ ! -f ${BLD}/BUGS		] || echo ${BLD}/BUGS
+				     echo ${BLD}/COPYING
+				     echo ${BLD}/ChangeLog
+				     echo ${BLD}/INSTALL
+				     echo ${BLD}/INSTALL-@PACKAGE@
+  [ ! -f ${BLD}/LICENSES	] || echo ${BLD}/LICENSES
+				     echo ${BLD}/LSM
+				     echo ${BLD}/MANUAL
+				     echo ${BLD}/NEWS
+  [ ! -f ${BLD}/NOTES		] || echo ${BLD}/NOTES
+  [ ! -f ${BLD}/NOTES.cos53	] || echo ${BLD}/NOTES.cos53
+  [ ! -f ${BLD}/NOTES.kmod	] || echo ${BLD}/NOTES.kmod
+  [ ! -f ${BLD}/NOTES.kmp	] || echo ${BLD}/NOTES.kmp
+  [ ! -f ${BLD}/NOTES.ksyms	] || echo ${BLD}/NOTES.ksyms
+  [ ! -f ${BLD}/NOTES.repo	] || echo ${BLD}/NOTES.repo
+  [ ! -f ${BLD}/NOTES.rpm	] || echo ${BLD}/NOTES.rpm
+  [ ! -f ${BLD}/NOTES.sles	] || echo ${BLD}/NOTES.sles
+				     echo ${BLD}/PROBLEMS
+				     echo ${BLD}/README
+  [ ! -f ${BLD}/README-alpha	] || echo ${BLD}/README-alpha
+				     echo ${BLD}/README-cvs
+				     echo ${BLD}/README-make
+  [ ! -f ${BLD}/RELEASE-NOTES	] || echo ${BLD}/RELEASE-NOTES
+				     echo ${BLD}/THANKS
+				     echo ${BLD}/TODO
+				     echo ${BLD}/@PACKAGE@-@VERSION@.lsm
+) | install_doc_files
+
+SUBPKG=$PKG/repo
+SUBPKGNAM=$PKGNAM-repo
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
+mkdir -p $SUBPKG
+cd $SUBPKG
+# copy files into the repo package
+rm -fr install
+mkdir install
+#         |-----handy-ruler------------------------------------------------------|
+cat >install/slack-desc <<SBEOF
+$SUBPKGNAM: openss7-repo (OpenSS7 repository definitions)
+$SUBPKGNAM:
+$SUBPKGNAM: OpenSS7 provides Linux Fast-STREAMS for Slackware Linux.
+$SUBPKGNAM:
+$SUBPKGNAM: This subpackage contains the repository source and package updater
+$SUBPKGNAM: information necessary to properly establish the OpenSS7 repository
+$SUBPKGNAM: definitions for installing the other subpackages in the set.
+$SUBPKGNAM:
+$SUBPKGNAM:
+$SUBPKGNAM:
+$SUBPKGNAM:
+SBEOF
+cat >install/slack-required <<SBEOF
+SBEOF
+cat >install/slack-conflicts <<SBEOF
+SBEOF
+cat >install/slack-suggests <<SBEOF
+openss7-base
+SBEOF
+cat >install/doinst.sh <<SBEOF
+SBEOF
+sysconfdir=@sysconfdir@
+aptsourceslistdir=${sysconfdir}/apt/sources.list.d
+( [ ! -d ${INS}${aptsourceslistdir} ] || find ${INS}${aptsourceslistdir} -type f -name *.list
+) | install_conf_files
+
+SUBPKG=$PKG/base
+SUBPKGNAME=$PKGNAM-base
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
+cd $SUBPKG
+mkdir install
+#         |-----handy-ruler------------------------------------------------------|
+cat >install/slack-desc <<SBEOF
+$SUBPKGNAM: openss7-base (OpenSS7 base scripts package)
+$SUBPKGNAM:
+$SUBPKGNAM: OpenSS7 provides Linux Fast-STREAMS for Slackware Linux.
+$SUBPKGNAM:
+$SUBPKGNAM: This subpackage contains the init scripts, test scripts maintenance
+$SUBPKGNAM: scripts and base system configuration files necessary for the
+$SUBPKGNAM: operation of the protocol suites contained in the OpenSS7 package.  It
+$SUBPKGNAM: contains user and administration documentation in INFO, PDF and HTML
+$SUBPKGNAM: formats as well as sections 1, 4, 5 and 8 of the manual pages.  This
+$SUBPKGNAM: binary package is required for any installation of the OpenSS7
+$SUBPKGNAM: package.
+SBEOF
+cat >install/slack-required <<SBEOF
+openss7 = $VERSION-$BUILD
+SBEOF
+cat >install/slack-conflicts <<SBEOF
+SBEOF
+cat >install/slack-suggests <<SBEOF
+openss7-lib
+openss7-compat
+SBEOF
+install_install
+( [ ! -d ${INS}${sysconfdir}					] || find ${INS}${sysconfdir} -type f -name *.conf
+) | install_conffiles
+( [ ! -f ${INS}${sbindir}/${STRCONF_DEVICES}			] || echo ${INS}${sbindir}/${STRCONF_DEVICES}
+  [ ! -d ${INS}${snmpmibdir}					] || echo ${INS}${snmpmibdir}/*
+  [ ! -f ${INS}${pkglibexecdir}/aclocal				] || echo ${INS}${pkglibexecdir}/aclocal
+  [ ! -d ${INS}${pkglibexecdir}					] || echo ${INS}${pkglibexecdir}/testsuite*
+  [ ! -f ${INS}${pkglibexecdir}/send-pr				] || echo ${INS}${pkglibexecdir}/send-pr
+  [ ! -f ${INS}${pkglibexecdir}/send-pr.config			] || echo ${INS}${pkglibexecdir}/send-pr.config
+  [ ! -f ${INS}${sysconfdir}/kernel/postinst.d/@PACKAGE@-update	] || echo ${INS}${sysconfdir}/kernel/postinst.d/@PACKAGE@-update
+  [ ! -f ${INS}${sysconfdir}/kernel/postrm.d/@PACKAGE@-update	] || echo ${INS}${sysconfdir}/kernel/postrm.d/@PACKAGE@-update
+  [ ! -f ${INS}${sbindir}/@PACKAGE@-modules			] || echo ${INS}${sbindir}/@PACKAGE@-modules
+  [ ! -f ${INS}${sbindir}/@PACKAGE@-update			] || echo ${INS}${sbindir}/@PACKAGE@-update
+  [ ! -f ${INS}${mandir}/@PACKAGE@.refs				] || echo ${INS}${mandir}/@PACKAGE@.refs
+  [ ! -f ${INS}${mandir}/@PACKAGE@.macros			] || echo ${INS}${mandir}/@PACKAGE@.macros
+  [ ! -d ${INS}${mandir} ] || find ${INS}${mandir} \( -type f -or -type l \) -name *.[1458]*
+) | install_files
+
+
+SUBPKG=$PKG/doc
+SUBPKGNAME=$PKGNAM-doc
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
+cd $SUBPKG
+mkdir install
+#         |-----handy-ruler------------------------------------------------------|
+cat >install/slack-desc <<SBEOF
+$SUBPKGNAM: openss7-doc (OpenSS7 documentation package)
+$SUBPKGNAM:
+$SUBPKGNAM: OpenSS7 provides Linux Fast-STREAMS for Slackware Linux.
+$SUBPKGNAM:
+$SUBPKGNAM: This subpackage contains the documentation used in the development of
+$SUBPKGNAM: applications and programs that use the package.  It contains developer
+$SUBPKGNAM: and programmer manuals in info, pdf and html formats as well as
+$SUBPKGNAM: sections 2, 3, 7 and 9 of the manual pages.  Install this package if
+$SUBPKGNAM: you are interested in developing STREAMS drivers or modules or
+$SUBPKGNAM: applications programs for the protocol suites contained in the OpenSS7
+$SUBPKGNAM: package.
+SBEOF
+cat >install/slack-required <<SBEOF
+openss7-base = $VERSION-$BUILD
+SBEOF
+cat >install/slack-conflicts <<SBEOF
+SBEOF
+cat >install/slack-suggests <<SBEOF
+openss7-devel
+SBEOF
+cat >install/doinst.sh <<SBEOF
+SBEOF
+install_install
+( [ ! -d ${INS}${docdir}/@PACKAGE@-@VERSION@	] || find ${INS}${docdir}/@PACKAGE@-@VERSION@ -type f -name *.txt
+  [ ! -d ${INS}${dvidir}/@PACKAGE@-@VERSION@	] || find ${INS}${dvidir}/@PACKAGE@-@VERSION@ -type f -name *.dvi
+  [ ! -d ${INS}${psdir}/@PACKAGE@-@VERSION@	] || find ${INS}${psdir}/@PACKAGE@-@VERSION@ -type f -name *.ps
+  [ ! -d ${INS}${pdfdir}/@PACKAGE@-@VERSION@	] || find ${INS}${pdfdir}/@PACKAGE@-@VERSION@ -type f -name *.pdf
+  [ ! -d ${INS}${htmldir}/@PACKAGE@-@VERSION@	] || find ${INS}${htmldir}/@PACKAGE@-@VERSION@ -type f -name *.html
+  [ ! -d ${INS}${htmldir}/@PACKAGE@-@VERSION@	] || find ${INS}${htmldir}/@PACKAGE@-@VERSION@ -type f -name *.png
+  [ ! -d ${INS}${htmldir}/@PACKAGE@-@VERSION@	] || find ${INS}${htmldir}/@PACKAGE@-@VERSION@ -type f -name *.css
+  [ ! -d ${INS}${infodir}			] || find ${INS}${infodir} -type f -name *.info*
+  [ ! -d ${INS}${mandir}			] || find ${INS}${mandir} \( -type f -or -type l \) -name *.[2379]*
+) | install_files
+
+SUBPKG=$PKG/lib
+SUBPKGNAME=$PKGNAM-lib
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
+cd $SUBPKG
+mkdir install
+#         |-----handy-ruler------------------------------------------------------|
+cat >install/slack-desc <<SBEOF
+$SUBPKGNAM: openss7-lib (OpenSS7 run-time shared object libraries)
+$SUBPKGNAM:
+$SUBPKGNAM: OpenSS7 provides Linux Fast-STREAMS for Slackware Linux.
+$SUBPKGNAM:
+$SUBPKGNAM: This subpackage contains the run-time (shared object) libraries
+$SUBPKGNAM: necessary to run applications programs and utilities developed for
+$SUBPKGNAM: OpenSS7.  Also included are the libtool .la files describing the
+$SUBPKGNAM: shared object libraries.  The subpackage also provides administrative
+$SUBPKGNAM: and configuration test utilities and commands associated with the
+$SUBPKGNAM: OpenSS7 package.  Note that these uilities are needed for running the
+$SUBPKGNAM: validation test suites contained in the openss7-base subpackage.
+SBEOF
+cat >install/slack-required <<SBEOF
+openss7-base = $VERSION-$BUILD
+SBEOF
+cat >install/slack-conflicts <<SBEOF
+SBEOF
+cat >install/slack-suggests <<SBEOF
+openss7-kernel
+openss7-compat
+SBEOF
+cat >install/doinst.sh <<SBEOF
+SBEOF
+install_install
+( [ ! -d ${INS}${snmpconfdir}				] || find ${INS}${snmpconfdir} \( -type f -o -type l \)
+  [ ! -f ${INS}${sysconfdir}/nslconfig.d/@PACKAGE@	] || echo ${INS}${sysconfdir}/nslconfig.d/@PACKAGE@
+  [ ! -f ${INS}${sysconfdir}/sock2path			] || echo ${INS}${sysconfdir}/sock2path
+  [ ! -f ${INS}${sysconfdir}/sock2path.d/@PACKAGE@	] || echo ${INS}${sysconfdir}/sock2path.d/@PACKAGE@
+) | install_conf_files
+( [ ! -d ${INS}${bindir}				] || echo ${INS}${bindir}/*
+  [ ! -d ${INS}${sbindir}				] || echo ${INS}${sbindir}/*
+  [ ! -d ${INS}${sysbindir}				] || echo ${INS}${sysbindir}/*
+  [ ! -d ${INS}${syssbindir}				] || echo ${INS}${syssbindir}/*
+  [ ! -d ${INS}${libdir}				] || echo ${INS}${libdir}/*.so*
+  [ ! -d ${INS}${libdir}				] || echo ${INS}${libdir}/*.la
+  [ ! -d ${INS}${syslibdir}				] || echo ${INS}${syslibdir}/*.so*
+  [ ! -d ${INS}${syslibdir}				] || echo ${INS}${syslibdir}/*.la
+  [ ! -d ${INS}${perldir}/auto/Xti			] || echo ${INS}${perldir}/auto/Xti/*
+  [ ! -f ${INS}${pkgtcllibdir}/pkgIndex.tcl		] || echo ${INS}${pkgtcllibdir}/pkgIndex.tcl
+  [ ! -d ${INS}${pkgtcllibdir}/xti			] || echo ${INS}${pkgtcllibdir}/xti/*.tcl
+  [ ! -d ${INS}${pkgtcllibdir}/xti			] || echo ${INS}${pkgtcllibdir}/xti/*.so
+  [ ! -d ${INS}${pkgtcllibdir}/xti			] || echo ${INS}${pkgtcllibdir}/xti/*.la
+  [ ! -d ${INS}${pkgtcllibdir}/tcap			] || echo ${INS}${pkgtcllibdir}/tcap/*.tcl
+  [ ! -d ${INS}${pkgtcllibdir}/tcap			] || echo ${INS}${pkgtcllibdir}/tcap/*.so
+  [ ! -d ${INS}${pkgtcllibdir}/tcap			] || echo ${INS}${pkgtcllibdir}/tcap/*.la
+  [ ! -d ${INS}${pkgtcllibdir}/streams			] || echo ${INS}${pkgtcllibdir}/streams/*.tcl
+  [ ! -d ${INS}${pkgtcllibdir}/streams			] || echo ${INS}${pkgtcllibdir}/streams/*.so
+  [ ! -d ${INS}${pkgtcllibdir}/streams			] || echo ${INS}${pkgtcllibdir}/streams/*.la
+  [ ! -d ${INS}${localedir}				] || find ${INS}${localedir} -type f -name *.mo
+  [ ! -f ${INS}${pkglibexecdir}/gdmo			] || echo ${INS}${pkglibexecdir}/gdmo
+  [ ! -d ${INS}${pkglibexecdir}				] || echo ${INS}${pkglibexecdir}/*test*
+  [ ! -d ${INS}${snmpdlmoddir}				] || echo ${INS}${snmpdlmoddir}/*
+) | install_files
+
+if [ -z '@WITH_32BIT_LIBS_TRUE@' ]; then
+SUBPKG=$PKG/compat
+SUBPKGNAME=$PKGNAM-compat
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
+cd $SUBPKG
+mkdir install
+#         |-----handy-ruler------------------------------------------------------|
+cat >install/slack-desc <<SBEOF
+$SUBPKGNAM: openss7-compat (OpenSS7 compatability libraries)
+$SUBPKGNAM:
+$SUBPKGNAM: OpenSS7 provides Linux Fast-STREAMS for Slackware Linux.
+$SUBPKGNAM:
+$SUBPKGNAM: This subpackage contains the 32-bit run-time (shared object libaries)
+$SUBPKGNAM: necessary to run 32-bit applications programs and utilities developed
+$SUBPKGNAM: for OpenSS7.  Also included are 32-bit test utilities for the OpenSS7
+$SUBPKGNAM: package.  Note that these utilities are needed for running the 32-bit
+$SUBPKGNAM: validation test suites contained in the openss7-base subpackage.
+$SUBPKGNAM:
+$SUBPKGNAM:
+SBEOF
+cat >install/slack-required <<SBEOF
+openss7-lib = $VERSION-$BUILD
+SBEOF
+cat >install/slack-conflicts <<SBEOF
+SBEOF
+cat >install/slack-suggests <<SBEOF
+SBEOF
+cat >install/doinst.sh <<SBEOF
+SBEOF
+install_install
+includedir=@includedir@
+pkgincludedir=${includedir}/@PACKAGE@
+( [ ! -d ${INS}${lib32dir}        ] || echo ${INS}${lib32dir}/*.so*
+  [ ! -d ${INS}${lib32dir}        ] || echo ${INS}${lib32dir}/*.la
+  [ ! -d ${INS}${syslib32dir}     ] || echo ${INS}${syslib32dir}/*.so*
+  [ ! -d ${INS}${syslib32dir}     ] || echo ${INS}${syslib32dir}/*.la
+  [ ! -d ${INS}${pkglibexec32dir} ] || echo ${INS}${pkglibexec32dir}/*test*
+) | install_files
+fi
+
+SUBPKG=$PKG/devel
+SUBPKGNAME=$PKGNAM-devel
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
+cd $SUBPKG
+mkdir install
+#         |-----handy-ruler------------------------------------------------------|
+cat >install/slack-desc <<SBEOF
+$SUBPKGNAM: openss7-devel (OpenSS7 development files)
+$SUBPKGNAM:
+$SUBPKGNAM: OpenSS7 provides Linux Fast-STREAMS for Slackware Linux.
+$SUBPKGNAM:
+$SUBPKGNAM: This subpackage contains static library archives and header files.
+$SUBPKGNAM: These static libraries and header files are required to compile
+$SUBPKGNAM: OpenSS7 applications programs.  This binary package does not contain
+$SUBPKGNAM: developer nor programmer documentation.  See the openss7-doc
+$SUBPKGNAM: subpackage for that information.
+$SUBPKGNAM:
+$SUBPKGNAM:
+SBEOF
+cat >install/slack-required <<SBEOF
+openss7-lib = $VERSION-$BUILD
+SBEOF
+cat >install/slack-conflicts <<SBEOF
+SBEOF
+cat >install/slack-suggests <<SBEOF
+openss7-kernel-devel
+SBEOF
+cat >install/doinst.sh <<SBEOF
+SBEOF
+install_install
+if [ -z '@WITH_32BIT_LIBS_TRUE@' ]; then
+( [ ! -d ${INS}${pkgincludedir}	] || echo ${INS}${pkgincludedir}/*
+  [ ! -d ${INS}${libdir}	] || echo ${INS}${libdir}/*.a
+  [ ! -d ${INS}${syslibdir}	] || echo ${INS}${syslibdir}/*.a
+  [ ! -d ${INS}${lib32dir}	] || echo ${INS}${lib32dir}/*.a
+  [ ! -d ${INS}${syslib32dir}	] || echo ${INS}${syslib32dir}/*.a
+) | install_files
+else
+( [ ! -d ${INS}${pkgincludedir}	] || echo ${INS}${pkgincludedir}/*
+  [ ! -d ${INS}${libdir}	] || echo ${INS}${libdir}/*.a
+  [ ! -d ${INS}${syslibdir}	] || echo ${INS}${syslibdir}/*.a
+) | install_files
+fi
+
+SUBPKG=$PKG/debuginfo
+SUBPKGNAME=$PKGNAM-debuginfo
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
+cd $SUBPKG
+mkdir install
+#         |-----handy-ruler------------------------------------------------------|
+cat >install/slack-desc <<SBEOF
+$SUBPKGNAM: openss7-debuginfo (OpenSS7 debugging information)
+$SUBPKGNAM:
+$SUBPKGNAM: OpenSS7 provides Linux Fast-STREAMS for Slackware Linux.
+$SUBPKGNAM:
+$SUBPKGNAM: This subpackage contains debugging symbols for libraries and
+$SUBPKGNAM: applications programs.  This package provides debug information for
+$SUBPKGNAM: package openss7-lib and openss7-compat.  Debug information is useful
+$SUBPKGNAM: when developing applications that use this package or when debugging
+$SUBPKGNAM: this package.  THIS SUBPACKAGE IS NEVER BUILT FOR SLACKWARE LINUX AND
+$SUBPKGNAM: ALL THE DEBUGGING INFORMATION (AND SOURCE) IS STRIPPED FROM ALL
+$SUBPKGNAM: BINARIES.
+SBEOF
+cat >install/slack-required <<SBEOF
+openss7-lib = $VERSION-$BUILD
+SBEOF
+cat >install/slack-conflicts <<SBEOF
+SBEOF
+cat >install/slack-suggests <<SBEOF
+openss7-kernel-debuginfo
+SBEOF
+cat >install/doinst.sh <<SBEOF
+SBEOF
+install_install
+if [ -z '@WITH_32BIT_LIBS_TRUE@' ]; then
+( [ ! -d ${debtmpdir}${lib32dir}/debug	 ] ||	find ${debtmpdir}${lib32dir}/debug -type f \! -name *.ko \! -name *.ko.debug
+  [ ! -d ${debtmpdir}${lib32dir}/debug	 ] || { find ${debtmpdir}${lib32dir}/debug -type l | while read f ; do
+						case `readlink $f` in (*.ko|*.ko.debug) ;; (*) echo "$f" ;; esac ; done ; }
+) | install_files
+else
+( [ ! -d ${debtmpdir}${libdir}/debug	 ] ||	find ${debtmpdir}${libdir}/debug -type f \! -name *.ko \! -name *.ko.debug
+  [ ! -d ${debtmpdir}${libdir}/debug	 ] || { find ${debtmpdir}${libdir}/debug -type l | while read f ; do
+						case `readlink $f` in (*.ko|*.ko.debug) ;; (*) echo "$f" ;; esac ; done ; }
+) | install_files
+fi
+
+SUBPKG=$PKG/debugsource
+SUBPKGNAME=$PKGNAM-debugsource
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
+cd $SUBPKG
+mkdir install
+#         |-----handy-ruler------------------------------------------------------|
+cat >install/slack-desc <<SBEOF
+$SUBPKGNAM: openss7-debugsource (OpenSS7 debugging source)
+$SUBPKGNAM:
+$SUBPKGNAM: OpenSS7 provides Linux Fast-STREAMS for Slackware Linux.
+$SUBPKGNAM:
+$SUBPKGNAM: This subpackage contains source code for debugging libraries and
+$SUBPKGNAM: applications programs.  This subpackage provides debug information for
+$SUBPKGNAM: subpackage openss7-lib and openss7-compat.  Debug information is
+$SUBPKGNAM: useful when developing applications that use this package or when
+$SUBPKGNAM: debugging this package.  THIS SUBPACKAGE IS NEVER BUILT FOR SLACKWARE
+$SUBPKGNAM: LINUX AND ALL THE DEBUGGING INFORMATION (AND SOURCE) IS STRIPPED FROM
+$SUBPKGNAM: ALL BINARIES.
+SBEOF
+cat >install/slack-required <<SBEOF
+openss7-debuginfo = $VERSION-$BUILD
+SBEOF
+cat >install/slack-conflicts <<SBEOF
+SBEOF
+cat >install/slack-suggests <<SBEOF
+openss7-kernel-debugsource
+SBEOF
+cat >install/doinst.sh <<SBEOF
+SBEOF
+install_install
+( [ ! -d ${INS}/usr/src/debug	] || echo ${INS}/usr/src/debug/*
+) | install_files
+
+SUBPKG=$PKG/kernel
+SUBPKGNAME=$PKGNAM-kernel
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
+cd $SUBPKG
+mkdir install
+#         |-----handy-ruler------------------------------------------------------|
+cat >install/slack-desc <<SBEOF
+$SUBPKGNAM: openss7-kernel (OpenSS7 kernel modules)
+$SUBPKGNAM:
+$SUBPKGNAM: OpenSS7 provides Linux Fast-STREAMS for Slackware Linux.
+$SUBPKGNAM:
+$SUBPKGNAM: This subpackage contains the kernel modules that provide the Linux
+$SUBPKGNAM: kernel STREAMS drivers and modules.  This includes assorted drivers
+$SUBPKGNAM: and modules for STREAMS.  This binary package also includes modprobe
+$SUBPKGNAM: configuration files for the associated kernel modules.  This package
+$SUBPKGNAM: is tied to the kernel for which it and dependent components were
+$SUBPKGNAM: compiled.  This package applies to kernel @kernel_version@.
+$SUBPKGNAM:
+SBEOF
+cat >install/slack-required <<SBEOF
+openss7-lib = $VERSION-$BUILD
+SBEOF
+cat >install/slack-conflicts <<SBEOF
+SBEOF
+cat >install/slack-suggests <<SBEOF
+openss7-compat
+openss7-kernel-devel
+SBEOF
+cat >install/doinst.sh <<SBEOF
+SBEOF
+install_install
+if [ -z @WITH_KO_MODULES_TRUE@ ]; then
+( [ ! -d ${INS}${kmoduledir}/${ksubdir} ] || echo ${INS}${kmoduledir}/${ksubdir}/*.ko
+  [ ! -d ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/System.symvers ] || \
+    echo ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/System.symvers
+  [ ! -f ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/Module.symvers ] || \
+    echo ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/Module.symvers
+) | install_files
+else
+( [ ! -f ${INS}${kmoduledir}/modules.@PACKAGE@ ] || echo ${INS}${kmoduledir}/modules.@PACKAGE@
+) | install_conf_files
+( [ ! -d ${INS}${kmoduledir}/${ksubdir} ] || echo ${INS}${kmoduledir}/${ksubdir}/*.o
+) | install_files
+fi
+
+SUBPKG=$PKG/kernel-devel
+SUBPKGNAME=$PKGNAM-kernel-devel
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
+cd $SUBPKG
+mkdir install
+#         |-----handy-ruler------------------------------------------------------|
+cat >install/slack-desc <<SBEOF
+$SUBPKGNAM: openss7-kernel-devel (OpenSS7 kernel module development files)
+$SUBPKGNAM:
+$SUBPKGNAM: OpenSS7 provides Linux Fast-STREAMS for Slackware Linux.
+$SUBPKGNAM:
+$SUBPKGNAM: This subpackage contains the kernel modules symbol information for
+$SUBPKGNAM: development of additional STREAMS kernel modules against the core
+$SUBPKGNAM: kernel modules included in the openss7-kernel subpackage.  This
+$SUBPKGNAM: package is tied to the core kernel modules and kernel for which it was
+$SUBPKGNAM: compiled.  This package applies to core kernel modules @kversion@.
+$SUBPKGNAM:
+$SUBPKGNAM:
+SBEOF
+cat >install/slack-required <<SBEOF
+openss7-kernel = $VERSION-$BUILD
+openss7-devel = $VERSION-$BUILD
+SBEOF
+cat >install/slack-conflicts <<SBEOF
+SBEOF
+cat >install/slack-suggests <<SBEOF
+openss7-kernel-debuginfo
+SBEOF
+cat >install/doinst.sh <<SBEOF
+SBEOF
+install_install
+if [ -z @WITH_KO_MODULES_TRUE@ ]; then
+( [ ! -f ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/Module.mkvars ] || \
+    echo ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/Module.mkvars
+  [ ! -f ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/${ARCH}-${kversion}-config.cache ] || \
+    echo ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/${ARCH}-${kversion}-config.cache
+  [ ! -f ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/${ARCH}-config.site ] || \
+    echo ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/${ARCH}-config.site
+  [ ! -f ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/abi-${kversion} ] || \
+    echo ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/abi-${kversion}
+  [ ! -f ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/symvers-${kversion}.gz ] || \
+    echo ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/symvers-${kversion}.gz
+  [ ! -f ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/symsets-${kversion}.tar.gz ] || \
+    echo ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/symsets-${kversion}.tar.gz
+  [ ! -f ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/Modules.map ] || \
+    echo ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/Modules.map
+  [ ! -f ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/${ARCH}-${kversion}-modpost.cache ] || \
+    echo ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/${ARCH}-${kversion}-modpost.cache
+  [ ! -d ${INS}/boot ] || echo ${INS}/boot/*
+) | install_files
+else
+( [ ! -d ${INS}${pkgincludedir}/${kversion} ] || echo ${INS}${pkgincludedir}/${kversion}/*
+  [ ! -f ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/Module.mkvars ] || \
+    echo ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/Module.mkvars
+  [ ! -f ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/${ARCH}-${kversion}-config.cache ] || \
+    echo ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/${ARCH}-${kversion}-config.cache
+  [ ! -f ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/${ARCH}-config.site ] || \
+    echo ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/${ARCH}-config.site
+) | install_files
+fi
+
+SUBPKG=$PKG/kernel-debuginfo
+SUBPKGNAME=$PKGNAM-kernel-debuginfo
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
+cd $SUBPKG
+mkdir install
+#         |-----handy-ruler------------------------------------------------------|
+cat >install/slack-desc <<SBEOF
+$SUBPKGNAM: openss7-kernel-debuginfo (OpenSS7 kernel module debug info)
+$SUBPKGNAM:
+$SUBPKGNAM: OpenSS7 provides Linux Fast-STREAMS for Slackware Linux.
+$SUBPKGNAM:
+$SUBPKGNAM: This subpackage contains debugging symbols for kernel modules.  This
+$SUBPKGNAM: package provides debug information for subpackage openss7-kernel.
+$SUBPKGNAM: Debug information is useful when developing kernel modules that use
+$SUBPKGNAM: this package or when debugging this package.
+$SUBPKGNAM:
+$SUBPKGNAM: THIS SUBPACKAGE IS NEVER BUILT FOR SLACKWARE LINUX AND ALL THE
+$SUBPKGNAM: DEBUGGING INFORMATION (AND SOURCE) IS STRIPPED FROM ALL BINARIES.
+SBEOF
+cat >install/slack-required <<SBEOF
+openss7-kernel = $VERSION-$BUILD
+openss7-debuginfo = $VERSION-$BUILD
+SBEOF
+cat >install/slack-conflicts <<SBEOF
+SBEOF
+cat >install/slack-suggests <<SBEOF
+openss7-kernel-debugsource
+SBEOF
+cat >install/doinst.sh <<SBEOF
+SBEOF
+install_install
+if [ -z '@WITH_32BIT_LIBS_TRUE@' ] ; then
+( [ ! -d ${INS}${lib32dir}/debug ] ||	find ${INS}${lib32dir}/debug -type f \( -name '*.ko' -o -name '*.ko.debug' \)
+  [ ! -d ${INS}${lib32dir}/debug ] || { find ${INS}${lib32dir}/debug -type l | while read f ; do
+						case `readlink $f` in (*.ko|*.ko.debug) echo "$f" ;; esac ; done ; }
+) | install_files
+else
+( [ ! -d ${INS}${libdir}/debug	 ] ||	find ${INS}${libdir}/debug -type f \( -name '*.ko' -o -name '*.ko.debug' \)
+  [ ! -d ${INS}${libdir}/debug	 ] || { find ${INS}${libdir}/debug -type l | while read f ; do
+						case `readlink $f` in (*.ko|*.ko.debug) echo "$f" ;; esac ; done ; }
+) | install_files
+fi
+
+SUBPKG=$PKG/kernel-debugsource
+SUBPKGNAME=$PKGNAM-kernel-debugsource
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
+cd $SUBPKG
+mkdir install
+#         |-----handy-ruler------------------------------------------------------|
+cat >install/slack-desc <<SBEOF
+$SUBPKGNAM: openss7-kernel-debugsource (OpenSS7 kernel module debug source)
+$SUBPKGNAM:
+$SUBPKGNAM: OpenSS7 provides Linux Fast-STREAMS for Slackware Linux.
+$SUBPKGNAM:
+$SUBPKGNAM: This subpackage contains source code for debugging kernel modules.
+$SUBPKGNAM: This package provides debug information for subpackage openss7-kernel.
+$SUBPKGNAM: Debug information is useful when developing kernel modules that use
+$SUBPKGNAM: this package or when debugging this package.
+$SUBPKGNAM:
+$SUBPKGNAM: THIS SUBPACKAGE IS NEVER BUILT FOR SLACKWARE LINUX AND ALL THE
+$SUBPKGNAM: DEBUGGING INFORMATION (AND SOURCE) IS STRIPPED FROM ALL BINARIES.
+SBEOF
+cat >install/slack-required <<SBEOF
+openss7-kernel-debuginfo = $VERSION-$BUILD
+openss7-debugsource = $VERSION-$BUILD
+SBEOF
+cat >install/slack-conflicts <<SBEOF
+SBEOF
+cat >install/slack-suggests <<SBEOF
+openss7-kernel-source
+SBEOF
+cat >install/doinst.sh <<SBEOF
+SBEOF
+install_install
+( [ ! -d ${INS}/usr/src/debug ] || echo ${INS}/usr/src/debug/*
+) | install_files
+
+if [ -z '@WITH_K_PACKAGE_TRUE@' ] ; then
+SUBPKG=$PKG/kernel-source
+SUBPKGNAME=$PKGNAM-kernel-source
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
+cd $SUBPKG
+mkdir install
+#         |-----handy-ruler------------------------------------------------------|
+cat >install/slack-desc <<SBEOF
+$SUBPKGNAM: openss7-kernel-source (OpenSS7 Slackware configured source code)
+$SUBPKGNAM:
+$SUBPKGNAM: OpenSS7 provides Linux Fast-STREAMS for Slackware Linux.
+$SUBPKGNAM:
+$SUBPKGNAM: This subpackage contains the source code necessary for building the
+$SUBPKGNAM: OpenSS7 release for the kernel version @kversion@.  It also includes
+$SUBPKGNAM: the autoconf configuration utilities necessary to create and
+$SUBPKGNAM: distribute txz packages.  However, to develop on the package, it would
+$SUBPKGNAM: be better to use the tarball release.  Load this package if you need
+$SUBPKGNAM: some files from the build that are not present in the
+$SUBPKGNAM: openss7-kernel-devel subpackage.
+SBEOF
+cat >install/slack-required <<SBEOF
+openss7 = $VERSION-$BUILD
+SBEOF
+cat >install/slack-conflicts <<SBEOF
+SBEOF
+cat >install/slack-suggests <<SBEOF
+openss7-kernel
+SBEOF
+cat >install/doinst.sh <<SBEOF
+SBEOF
+install_install
+( [ ! -f ${INS}/usr/src/@PACKAGE@-@VERSION@.tar.gz ] || echo ${INS}/usr/src/@PACKAGE@-@VERSION@.tar.gz
+) | install_files
+fi
+
+SUBPKG=$PKG/java
+SUBPKGNAME=$PKGNAM-java
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
+cd $SUBPKG
+mkdir install
+#         |-----handy-ruler------------------------------------------------------|
+cat >install/slack-desc <<SBEOF
+$SUBPKGNAM: openss7-java (OpenSS7 Java files)
+$SUBPKGNAM:
+$SUBPKGNAM: OpenSS7 provides Linux Fast-STREAMS for Slackware Linux.
+$SUBPKGNAM:
+$SUBPKGNAM: This subpackage contains JAIN implementations for OpenSS7.  It
+$SUBPKGNAM: includes jar files, JNI and CNI libraries, and gcj native compiled
+$SUBPKGNAM: libraries.  It also includes SWIG implementations of Java interfaces
+$SUBPKGNAM: for OpenSS7 API libraries.
+$SUBPKGNAM:
+$SUBPKGNAM:
+$SUBPKGNAM:
+SBEOF
+cat >install/slack-required <<SBEOF
+openss7-lib = $VERSION-$BUILD
+SBEOF
+cat >install/slack-conflicts <<SBEOF
+SBEOF
+cat >install/slack-suggests <<SBEOF
+openss7-javadoc
+SBEOF
+cat >install/doinst.sh <<SBEOF
+SBEOF
+install_install
+( [ ! -d ${INS}${jnidir}	] || echo ${INS}${jnidir}/*
+  [ ! -d ${INS}${pkggcjdir}	] || echo ${INS}${pkggcjdir}/*.so
+  [ ! -d ${INS}${pkggcjdir}	] || echo ${INS}${pkggcjdir}/*.la
+  [ ! -d ${INS}${pkggcjdir}	] || echo ${INS}${pkggcjdir}/*.db
+  [ ! -d ${INS}${javadir}	] || echo ${INS}${javadir}/*
+) | install_files
+
+SUBPKG=$PKG/javadoc
+SUBPKGNAME=$PKGNAM-javadoc
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
+cd $SUBPKG
+mkdir install
+#         |-----handy-ruler------------------------------------------------------|
+cat >install/slack-desc <<SBEOF
+$SUBPKGNAM: openss7-javadoc (OpenSS7 Javadoc files)
+$SUBPKGNAM:
+$SUBPKGNAM: OpenSS7 provides Linux Fast-STREAMS for Slackware Linux.
+$SUBPKGNAM:
+$SUBPKGNAM: This subpackage contains Javadoc documentation for OpenSS7.  Install
+$SUBPKGNAM: this subpackage if you are interested in developing JAIN applications
+$SUBPKGNAM: or resource adapters.  This package is not normally required on other
+$SUBPKGNAM: than a development system.
+$SUBPKGNAM:
+$SUBPKGNAM:
+$SUBPKGNAM:
+SBEOF
+cat >install/slack-required <<SBEOF
+openss7 = $VERSION-$BUILD
+SBEOF
+cat >install/slack-conflicts <<SBEOF
+SBEOF
+cat >install/slack-suggests <<SBEOF
+openss7-java
+SBEOF
+cat >install/doinst.sh <<SBEOF
+SBEOF
+install_install
+( [ ! -d ${INS}${pkgjavadocdir} ] || find ${INS}${pkgjavadocdir} -type f
+) | install_files
+
+
+# =============================================================================
+#
+# $Log$
+# =============================================================================
+# vim: ft=sh sw=4 noet tw=82 comments+=b\:\$SUBPKGNAM\:

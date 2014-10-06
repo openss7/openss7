@@ -1,0 +1,861 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH PFMOD 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Modules"
+.\"
+.\"
+.SH NAME
+.B pfmod
+\- \fISTREAMS\fR packet filter module
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _AIX_SOURCE /* optional */
+.PP
+.B #include <stropts.h>
+.br
+.B #include <sys/pfmod.h>
+.HP 8
+.BI "int " fd ;
+.PD 0
+.HP
+.BI "int open(" \*(lq\fR/dev/nuls\fP\*(rq ", " \fR0\fP );
+.HP
+.BI "int ioctl(" fd ", " I_PUSH ", " \*(lqpfmod\*(rq );
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B pfmod
+is a
+.I STREAMS
+module that subjects messages arriving on its read queue to a packet filter
+and passes only those messages that the filter accepts on to its upstream
+neighbour.  Such filtering can be very useful for user-level protocol
+implementations and for networking monitoring programs that wish to view only
+specific types of events.
+.\"
+.SS Read-side Behaviour
+.PP
+.B pfmod
+applies the current packet filter to all
+.BR M_DATA "(9) and " M_PROTO (9)
+messages arriving on its read queue  The module prepares these messages for
+examination by first skipping over all leading
+.BR M_PROTO (9)
+message blocks to arrive at the beginning of the message's data portion.  If
+there is not data portion,
+.B pfmod
+accepts the message and passes it along to its upstream neighbour.
+Otherwise, the module ensures that the part of the messages's data that the
+packet filter might examine lies in contiguous memory, calling the
+.BR msgpullup (9)
+utility routing if necessary to force contiguity.  (Note: this action
+destroys any sharing relationships that the subject message might have had
+with other messages.)  Finally, it applies the packet filter to the message's
+data, passing the entire message upstream to the next module if the filter
+accepts, and discarding the message otherwise.  See
+.RI \*(lq PACKET\ FILTERS \*(rq,
+below, for details on how the filter works.
+.PP
+If there is no packet filter yet in effect, the module acts as if the filter
+exists but does nothing, implying that all incoming messages are accepted.
+.RI \*(lq IOCTLS \*(rq,
+below, describes how to associate a packet filter with an instance of
+.BR pfmod .
+.PP
+.B pfmod
+passes all other messages through unaltered to its upper neighbour.
+.\"
+.SS Write-side Behaviour
+.PP
+.B pfmod
+intercepts
+.BR M_IOCTL (9)
+messages for the input-output controls described below.
+The module passes all other messages through unaltered to its lower
+neighbour.
+.PP
+The
+.B pfmod
+module implements a programmable packet filter facility that may be pushed
+over any stream.  Every data message that
+.B pfmod
+receives on it read side is subjected to a filter program.  If the filter
+program accepts a message, it will be passed along upstream, and will
+otherwise be freed.  If no filter program has been set (as is the case when
+.B pfmod
+is first pushed), all messages are accepted.  Non-data messages (for example,
+.BR M_FLUSH "(9), " M_PCPROTO "(9), " M_IOCACK (9))
+are never examined and always accepted.  The write side is not filtered.
+.PP
+Data messages are defined as either
+.BR M_PROTO "(9) or " M_DATA (9).
+If an
+.BR M_PROTO (9)
+message is received,
+.B pfmod
+will skip over all the leading blocks until it finds an
+.BR M_DATA (9)
+block.  If none is found, the message is accepted.  The
+.BR M_DATA (9)
+portion of the message is thn made contiguous with
+.BR pullupmsg (9),
+if necessary, to ensure the data area referenced by the filter program can be
+accessed in a single
+.BR mblk_t (9).
+.\"
+.\"
+.SH IOCTLS
+.PP
+.B pfmod
+response to the input-output control.
+.SS PFIOCSETF
+.PP
+This intput-output control directs the module the replace its current packet
+filter, if any, with the filter specified by the
+.B struct packetfilt
+pointer named by its final argument.  This structure is defined in
+.I <sys/pfmod.h>
+as:
+.sp
+.RS
+.nf
+\s-1\fC\
+struct packetfilt {
+    u_char  Pf_Priority;             /* priority of filter */
+    u_char  Pf_FilterLen;            /* length of filter cmd list */
+    u_short Pf_Filter[ENMAXFILTERS]; /* filter command list */
+};
+\s+1\fP
+.fi
+.RE
+.PP
+The
+.I Pf_Priority
+field is included only for compatibility with other packet fliter
+implementations and is otherwise ignored.  The packet filter itself is
+specified in the
+.I Pf_Filter
+array as a sequence of two-byte commands, with the
+.I Pf_FilterLen
+field giving the number of commands in the sequence.  This implementation
+restricts the maximum number of commands in a filter
+.RB ( ENMAXFILTERS )
+to 255.  The next section describes the available commands and their
+semantics.
+.\"
+.\"
+.SH IOCTLS
+.PP
+The following input-output controls commands are defined for this module.
+All other input-output control commands are passed downstream without
+examination.
+.\"
+.SS PFIOSETF
+.PP
+Install a new filter program, replacing any previous program.  It uses the
+following data structure:
+.sp
+.RS
+.nf
+\s-1\fC\
+typedef struct packetfilt {
+    uchar   Pf_Priority;
+    uchar   Pf_FilterLen;
+    ushort  Pf_Filter[MAXFILTERS];
+} pfilter_t;
+\s+1\fP
+.fi
+.RE
+.TP \w'\fIPf_FilterLen\ \(em'u
+.I Pf_Priority
+is currently ignored, and should be set to zero.
+.PD 0
+.TP
+.I Pf_FilterLen
+indicates the number of short-words in the
+.I Pf_Filter
+array.
+.TP
+.I Pf_Filter
+is an array of short-words that comprise the filter program.
+.PD
+.PP
+See
+.RI \*(lq FILTERS \*(rq,
+below, for details on how to write filter programs.
+.PP
+This input-output control command may be issued either transparently or as an
+.IR I_STR (9).
+It will return zero (0) on success, or minus one (-1) on failure, and set
+.IR errno (3)
+to one of:
+.TP \w'[\fBERANGE\fP]\ \(em'u
+.RB [ ERANGE ]
+The length of the
+.BR M_IOCTL (9)
+message data was not exactly the size of
+.BR pfilter_t .
+The data structure is not variable in length, although the filter program is.
+.TP
+.RB [ EFAULT ]
+The input-output control argument points out of bounds.
+.\"
+.\"
+.SH "PACKET FILTERS"
+.PP
+A packet filter consists of the filter command list length (in units of
+.BR u_shorts ),
+and the filter command list itself.  (The priority field mentioned above is
+ignored in this implementation.)  Each filter command list specifies a
+sequence of actions that operate on an internal stack of
+.B ushort_t
+(\*(lqshort-words\*(rq) or an offset register.
+The offset register is initially zero.
+
+Each short-word of the command list specifies an action and a binary
+operator.  Using
+.I n
+as shorthand for the next short-word of the instruction stream and
+.I %oreg
+for the offset register,
+the list of actions is:
+.sp
+.TS
+tab(:);
+lclss
+lbnlss.
+COMMAND:WORDS:ACTION
+_
+ENF_PUSHLIT:2:T{
+Push \fIn\fP on the stack.
+T}
+ENF_PUSHZERO:1:T{
+Push zero on the stack.
+T}
+ENF_PUSHONE:1:T{
+Push one on the stack.
+T}
+ENF_PUSHFFFF:1:T{
+Push 0xffff on the stack.
+T}
+ENF_PUSHFF00:1:T{
+Push 0xff00 on the stack.
+T}
+ENF_PUSH00FF:1:T{
+Push 0x00ff on the stack.
+T}
+ENF_LOAD_OFFSET:2:T{
+Load \fIn\fP into \fI%oreg\fP.
+T}
+ENF_BRTR:2:T{
+Branch forward \fIn\fP short-words if the top eleemnt of the stack is non-zero.
+T}
+ENF_BRFL:2:T{
+Branch forward \fIn\fP short-words if the top eleemnt of the stack is zero.
+T}
+ENF_POP:1:T{
+Pop the top element from the stack.
+T}
+ENF_PUSHWORD+\fIm\fP:1:T{
+Push the value of shortword (\fIm\fP + \fI%oreg\fP) of the packet onto the
+stack.
+T}
+ENF_PUSHLEN:1:T{
+push the length of the packet onto the stack.  Packets with a length longer
+than 65,535 bytes will have 0xffff pushed onto the stack.
+(This is an \fB@PACKAGE@\fP extension.)
+T}
+ENF_PUSHOFFSET:1:T{
+push the offset register \fI%oreg\fR onto the stack.
+(This is an \fB@PACKAGE@\fP extension.)
+T}
+ENF_POPOFFSET:1:T{
+pop the offset register \fI%oreg\fR from the stack.
+(This is an \fB@PACKAGE@\fP extension.)
+T}
+_
+.TE
+.PP
+The binary operators can be from the set
+.RB { ENF_EQ ", " ENF_NEQ ", " ENF_LT ", " ENF_LE ", " ENF_GT ", " ENF_GE ", " ENF_AND ", " ENF_OR ", " ENF_XOR }
+which then operates on the top two elements of the stack and replaces them
+with its result.
+.PP
+When both an action and operator are specified in the same
+short-word, the action is performed followed by the operation.
+.PP
+The binary operator can also be from the set
+.RB { ENF_COR ", " ENF_CAND ", " ENF_CNOR ", " ENF_CNAND }.
+These are \*(lqshort-circuit\*(rq operators, in that they terminate the
+execution of the filter immediately if the condition they are checking for is
+found, and continues otherwise.  All pop two elements from the stack and
+compare them for equality;
+.B ENF_CAND
+returns false if the result is false;
+.B ENF_COR
+returns true if the result is true;
+.B ENF_CNAND
+returns true if the result is false;
+.BR ENF_CNOR
+returns false if the result is true.
+Unlike other binary operators, these four do not leave a result on the stack,
+even when they continue.
+.PP
+The short-circuit operators should be used when possible, to reduce the
+amount of time spent evaluating filters.  When they are used, you should also
+arrange the order of the tests so that the filter will succeed or fail as
+soon as possible; for example, checking the IP destination field of an UDP
+packet is more likely to indicate failure than the packet type field.
+.PP
+The special action,
+.BR ENF_NOPUSH ,
+and the special operator,
+.BR ENF_NOP ,
+can be used to only perform the binary operation or to only push a value on
+the stack.  Since both are (conveniently) defined to be zero, indicating only
+an action actually specifies the action followed by
+.BR ENF_NOP ,
+and indicating that only an operation actually specifies
+.BR ENF_NOPUSH
+followed by the operation.
+.PP
+After executing the filter command list, a non-zero value (true) left on top
+of the stack (or an empty stack) causes the incoming packet to be rejected.
+(if the filter exists as the result of a short-circuit operator, the
+top-of-stack value is ignored.)  Specifying an undefined operation or action
+in the command list or performing an illegal operation or action (such as
+pushing a short-word offset past the end of the packet or executing a binary
+operator with fewer than two short-words on the stack) causes a filter to
+reject the packet.
+.\"
+.\"
+.SH FILTERS
+.PP
+A filter program consists of a linear array of short-word instructions.
+These instructions operate upon a stack of short-words.  Flow of control is
+strictly linear; there are no branches or loops.  When the filter program
+completes, the top of the stack is examined.  If it is non-zero, or if the
+stack is empty, the packet being examined is passed upstream (accepted),
+otherwise the packet is freed (rejected).
+.PP
+Instructions are composed of three portions: push command,
+.BR PF_CMD() ,
+argument,
+.BR PF_ARG() ,
+and operation,
+.BR PF_OP() .
+Each instruction optionally pushes a short-word onto the stack, then
+optionally performs a binary operation on the top two elements of the stack,
+leaving its result on the stack.  If there are not at least two elements on
+the stack, the operation will immediately fail and the packet will be
+rejected.  The argument portion is used only by certain push commands, as
+documented below.
+.PP
+The following push commands are defined:
+.TP \w'\fIPF_LOAD_OFFSET\ \(em'u
+.B PF_NOPUSH
+nothing is pushed onto the stack.
+.PD 0
+.TP
+.B PF_PUSHZERO
+0x0000 is pushed on the stack.
+.TP
+.B PF_PUSHONE
+0x0001 is pushed on the stack.
+.TP
+.B PF_PUSHFFFF
+0xffff is pushed on the stack.
+.TP
+.B PF_PUSHFF00
+0xff00 is pushed on the stack.
+.TP
+.B PF_PUSH00FF
+0x00ff is pushed on the stack.
+.PD
+.TP
+.B PF_PUSHLIT
+the next short-word in the filter program is pushed on the stack as literal
+data.  Execution resumes with the next short-word after the literal data.
+.TP
+.B PF_PUSHWORD+\fIN\fP
+pushes short-word
+.I N + z
+of the message onto the data stack, where
+.I z
+is the contents of the offset register.
+.I N
+must be in the range 0-255, as enforced by the macro
+.BR PF_ARG() .
+.TP
+.B PF_LOAD_OFFSET
+the next short-word in the filter program is loaded into the offset register.
+.TP
+.B PF_BRTR
+when the short-word on the top of the stack is true (non-zero), branch forward by
+the number of short-words contained in the next short-word in the filter
+program.
+.TP
+.B PF_BRFL
+when the short-word on the top of the stack is false (zero), branch forward
+by the number of short-words contained in the next short-word in the filter
+program.
+.TP
+.B PF_POP
+pop one short-word off of the stack.
+.PP
+The following operations are defined.  Each operation pops the top two
+elements from the stack, and pushes the result of the operation onto the
+stack.  The operations below are described in terms of
+.IR v1 " and " v2 .
+The top of stack is popped into
+.IR v2 ,
+then the new top of stack is popped into
+.IR v1 .
+The result of
+.IB v1 " op " v2
+is then pushed onto the stack.
+.TP \w'\fBPF_NOP\ \(em'u
+.B PF_NOP
+The stack is unchanged; nothing is popped.
+.TP
+.B PF_EQ
+.I "v1 == v2
+.PD 0
+.TP
+.B PF_NEQ
+.I "v1 != v2
+.TP
+.B PF_LT
+.I "v1 <  v2
+.TP
+.B PF_LE
+.I "v1 <= v2
+.TP
+.B PF_GT
+.I "v1 >  v2
+.TP
+.B PF_GE
+.I "v1 >= v2
+.TP
+.B PF_AND
+.IR "v1 &  v2" ;
+bitwise.
+.TP
+.B PF_OR
+.IR "v1 |  v2" ;
+bitwise
+.TP
+.B PF_XOR
+.IR "v1 ^  v2" ;
+bitwise
+.PD
+.PP
+The remaining operations are \*(lqshort-circuit\*(rq operations.  If the
+condition checked for is found, then the filter program terminates
+immediately, either accepting or rejecting the packet as specified, without
+examining the top of stack.  If the condition is not found, the filter
+program continues.  These operations do not push any result onto the stack.
+.TP \w'\fBPF_CNAND\fP\ \(em'u
+.B PF_COR
+if
+.IR "v1 == v2" ,
+accept
+.PD 0
+.TP
+.B PF_CNOR
+if
+.IR "v1 == v2" ,
+reject
+.TP
+.B PF_CAND
+if
+.IR "v1 != v2" ,
+reject
+.TP
+.B PF_CNAND
+if
+.IR "v1 != v2" ,
+accept
+.PD
+.PP
+If an unknown push command or operation is specified, the filter program
+terminates immediately and the packet is rejected.
+.\"
+.\"
+.SH CONFIGURATION
+.PP
+Before using
+.BR pfmod ,
+it must be loaded into the kernel.  This may be accomplished with the
+.BR strload (8)
+command, using the following syntax:
+.sp
+.RS
+.nf
+\s-1\fC\
+>$ strload -m pfmod
+\s+1\fP
+.fi
+.RE
+.PP
+This command will load the
+.B pfmod
+into the kernel and make it available to
+.IR I_PUSH (7).
+Note that attempting to
+.IR I_PUSH (7)
+.B pfmod
+before loading it will result in an
+.RB [ EINVAL ]
+error code.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+The following program fragment will push
+.B pfmod
+on a stream, then program it to only accept messages with an Ethertype of
+0x8137.  This example assumes the stream is a promiscuous DLPI ethernet
+stream (see
+.BR dpli (4)
+for details).
+.sp
+.RS
+.nf
+\s-1\fC\
+#include <stddef.h>
+#include <sys/types.h>
+#include <netinet/if_ether.h>
+#define scale(x) ((x)/sizeof(ushort))
+setfilter(int fd)
+{
+    pfilter_t filter;
+    ushort *fp, offset;
+
+    if (ioctl(fd, I_PUSH, \*(lqpfmod\*(rq))
+        return -1;
+    offset = scale(offsetof(struct ether_header, ether_type));
+    fp = filter.Pf_Filter;
+
+    /* the filter program */
+    *fp++ = PF_PUSHLIT;
+    *fp++ = 0x8137;
+    *fp++ = PF_PUSHWORD + offset;
+    *fp++ = PF_EQ;
+
+    filter.Pf_Filterlen = fp - filter.Pf_Filter;
+
+    if (ioctl(fd, PFIOSETF, &filter))
+        return -1;
+    return 0;
+}
+\s+1\fP
+.fi
+.RE
+.PP
+This program may be shortened by combining the operation with the push
+command:
+.sp
+.RS
+.nf
+\s-1\fC\
+*fp++ = PF_PUSHLIT;
+*fp++ = 0x8137;
+*fp++ = (PF_PUSHWORD + offset) | PF_EQ;
+\s+1\fP
+.fi
+.RE
+.PP
+The following filter will accept 802.3 frames addressed to either the Network
+raw sap 0xff or the 802.2 sap 0xe0:
+.sp
+.RS
+.nf
+\s-1\fC\
+*fp++ = PF_PUSHWORD + offset; /* get ssap, dsap */
+*fp++ = PF_PUSH00FF | PF_AND; /* keep only dsap */
+*fp++ = PF_PUSH00FF | PF_COR; /* is dsap == 0xff? */
+*fp++ = PF_PUSHWORD + offset; /* get ssap, dsap again */
+*fp++ = PF_PUSH00FF | PF_AND; /* keep only dsap */
+*fp++ = PF_PUSHLIT  | PF_CAND; /* is dsap == 0xe0? */
+*fp++ = 0x00e0;
+\s+1\fP
+.fi
+.RE
+.PP
+Note the use of
+.B PF_COR
+in this example.  If the
+.I dsap
+is
+.BR 0xff,
+then the frame is accepted immediately, without continuing the filter
+program.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.\"
+.\"
+.SH CAVEATS
+.PP
+Note that setting of the read options at the Stream head can significantly
+affect performance when using
+.BR read "(2s) or " readv (2s)
+to read chunks from the Stream head.
+.B pfmod
+is intended on having
+.BR bufmod (4)
+pushed over it for live capture.
+.PP
+.IR AIX \(rg
+exposes a different set of symbol names for commands, actions and operators.
+It may require setting C preprocessor variable
+.B _AIX_SOURCE
+before including
+.I <sys/pfmod.h>
+to expose these symbols.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR pullupmsg (9),
+.BR msgpullup (9),
+.BR M_DATA (9),
+.BR M_PROTO (9),
+.BR M_IOCTL (9),
+.BR I_STR (7),
+.BR streamio (7),
+.BR bufmod (4),
+.BR nit_pf (4),
+.BR dlpi (7).
+.\"
+.\"
+.SH BUGS
+.PP
+.B pfmod
+is a complete reimplementation of the module and is not bug-for-bug
+compatible with SunOS, Solaris, AIX and HP-UX implementations of
+.BR pfmod .
+.PP
+.B pfmod
+has been tested with the
+.BR test-pfmod (8)
+conformance test suite executable.
+.PP
+.B pfmod
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B pfmod
+is compatible with
+.BR SunOS \(rg,
+.BR Solaris \(rg,
+.[
+soldoc
+.]
+.BR AIX \(rg,
+.[
+aixdoc
+.]
+.BR HP-UX \(rg,
+.[
+hpuxdoc
+.]
+and systems based on Oracle Solaris\(rg, with the following portability
+consideratins:
+.IP \(em \w'\(em\(em'u
+The version of
+.B pfmod
+documented in 1992 for SunOS\(rg 5.x did not have the
+.BR ENF_LOAD_OFFSET ", " ENF_BRTR ", " ENF_BRFL " or " ENF_POP
+flags.
+.IP \(em
+.BR AIX \(rg,
+.[
+aixdoc
+.]
+only supports the SunOS 4.x commands.  Also, they are renamed to begin with
+.I PF_
+where the equivalent SunOS 4.x command begins with
+.IR ENF_ .
+.RI (\*(lq PF \*(rq
+seems to refer to Packet Filter, whereas
+.RI \*(lq ENF \*(rq
+seems to refer to Extended NIT Filter.)
+.IP \(em
+.B @PACKAGE_TITLE@
+extends the functionality of
+.B pfmod
+with the intent of efficiently processing
+.I Signalling System No. 7 
+messages.  These extensions are as follows:
+.RS
+.IP \(bu \w'\(bu\(em'u
+The ability to push the length of the packet onto the stack is added to
+permit filtering based on packet length.
+.IP \(bu
+.IP \(bu
+.IP \(bu
+.IP \(bu
+.IP \(bu
+.IP \(bu
+.RE
+.IP \(em
+.IP \(em
+.IP \(em
+.IP \(em
+.PP
+Compatibility is tested using the
+.BR test-pfmod (8)
+test case executable and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Network interface taps and raw sockets and DLPI drivers have never been an
+interesting subject for standards organizations such as IEEE and the
+OpenGroup, and these modules have never been subjected to formal
+standardization.
+.B pfmod
+conforms largely to the descriptions provided in the manual pages for
+Solaris and AIX.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B pfmod
+appears in SunOS\(rg 5.x to replace the
+.BR nit_pf
+component of the Network Interface Tap pseudo-device driver from SunOS\(rg
+4.x as SunOS\(rg 5.x moved to read, DLPI-based
+.[
+dlpi 2.0.0
+.]
+network device drviers.  The other two components were the
+.B nit_if
+pseudo device driver that was replaced by
+.BR dlpi (7),
+and the
+.B nit_buf
+buffer module that was replaced by
+.BR bufmod (4).
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
+

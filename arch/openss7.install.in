@@ -1,0 +1,1799 @@
+#!/bin/bash
+# =============================================================================
+# 
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date$ by $Author$
+#
+# =============================================================================
+subpkg=
+_set_vars() {
+@package_archhdr@
+datarootdir=@datarootdir@
+}
+
+_remove_warn_file() {
+    if [ -f "$2" ] ; then
+	echo ">>> WARNING: removing conflicting $1 file $2" >&2
+	rm -f -- "$2" 2>/dev/null || :
+    fi
+}
+_remove_warn_files() {
+    local f t
+    t="$1"
+    shift
+    for f in "$@" ; do
+	_remove_warn_file "$t" "$f"
+    done
+}
+_remove_warn_dir() {
+    if [ -d "$2" ] ; then
+	if [ "`(cd $2; pwd)`" != "/"  ] ; then
+	    if [ -L "$2" ] ; then
+		echo ">>> WARNING: removing conflicting $1 symbolic link $2" >&2
+		rm -f -- "$2"
+	    else
+		echo ">>> WARNING: removing conflicting $1 directory $2" >&2
+		rm -rf -- "$2"
+	    fi
+	fi
+    fi
+}
+_remove_warn_dirs() {
+    local d t
+    t="$1"
+    shift
+    for d in "$@" ; do
+	_remove_warn_dir "$t" "$d"
+    done
+}
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# REPOSITORY CREDENTIALS
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# _pre_install_repo_creds() - When we go to install this subpackage fresh, we
+#   need to acquire a username and password from the user and get credentials
+#   for this machine.  When reinstalling (previous package was not purged), this
+#   function gets the existing credentials from the persistent configuration
+#   file.  Even when a package is purged, we like to keep a copy of the
+#   credentials lying around in a .pacorig file so that the machine credentials
+#   don't get lost.
+#
+#   Note that because the credentials are really machine credentials, we should
+#   really be saving them in /boot so that installations of other distros can
+#   also see the same machine credentials.
+#
+_pre_install_repo_creds() { :
+    local d un pw o f s ext u p m
+    return 0
+    echo ">>> Checking credentials..." >&2
+    for s in '' .pacorig .pacnew; do
+    for p in credentials; do
+    for d in $localstatedir/lib/$name/; do
+        o=$d$p$s
+        [ -r $o ] || continue
+        un=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $o`
+        pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $o`
+        [ -n "$un" -a -n "$pw" ] || continue
+        break 3
+    done
+    done
+    for p in $PACKAGE sources; do
+    for d in $aptrepodir/ $aptconfdir/; do
+        o=$d$p.list$s
+        [ -r $o ] || continue
+        un=`sed -n -r 's,^[#]?(deb|rpm|urpm|repomd)(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\3,p;t end;b;: end q' $o`
+        pw=`sed -n -r 's,^[#]?(deb|rpm|urpm|repomd)(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\5,p;t end;b;: end q' $o`
+        [ -n "$un" -a -n "$pw" ] || continue
+        break 3
+    done
+    done
+    done
+    [ -n "$un" -a -n "$pw" ] || { un=; pw=; }
+    d=$localstatedir/lib/$name; n=credentials
+    o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
+    [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
+    ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+&un=}${un}${pw:+&pw=}${pw}"
+    ext="$ext`echo /$reposubdir | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
+    key="${un:+${un}${pw:+:}${pw}@}"
+    url="$reposerv://$key$repobase/$reporoot/`basename $f`$ext"
+    if ! echo "$url" | wget -i - -O $f 2>/dev/null ; then
+        if echo "$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then
+            u='anonymous'; p=
+            m='Authorization required for repository access.'
+            if [ -n "$DISPLAY" -a -x "`which zenity 2>/dev/null`" ]; then
+                zenity --info --text="$m" --no-wrap || return 1
+                while true; do
+                    u=`zenity --entry --text='Username: ' --entry-text="$u" || exit 1` || return 1; u=${u:-anonymous}
+                    [ "$u" != anonymous ] || break
+                    p=`zenity --entry --text="Password for '$u': " --hide-text || exit 1` || continue
+                    [ -z "$p" ] || break
+                done
+            elif [ "${DISPLAY+set}" = set -a -x "`which whiptail 2>/dev/null`" ]; then
+                whiptail --msgbox "$m" 7 50 >/dev/tty </dev/tty || return 1
+                while true; do
+                    u=`whiptail --inputbox 'Username: ' 8 40 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || return 1; u=${u:-anonymous}
+                    [ "$u" != anonymous ] || break
+                    p=`whiptail --passwordbox "Password for '$u': " 8 40 2>&1 >/dev/tty </dev/tty || exit 1` || continue
+                    [ -z "$p" ] || break
+                done
+            elif [ "${DISPLAY+set}" = set -a -x "`which dialog 2>/dev/null`" ]; then
+                dialog --msgbox "$m" 5 50 >/dev/tty </dev/tty || return 1
+                while true; do
+                    u=`dialog --inputbox 'Username: ' 0 0 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || return 1; u=${u:-anonymous}
+                    [ "$u" != anonymous ] || break
+                    p=`dialog --passwordbox "Password for '$u': " 0 0 2>&1 >/dev/tty </dev/tty || exit 1` || continue
+                    [ -z "$p" ] || break
+                done
+            else
+                echo "$m" >/dev/tty
+                while true; do
+                    d="$u"
+                    read -e  -p "Username ($u): " u </dev/tty >/dev/tty || { echo '' >/dev/tty; return 1; }; u=${u:-$d}
+                    [ "$u" != anonymous ] || break
+                    read -es -p "Password ($u): " p </dev/tty >/dev/tty || { echo '' >/dev/tty; continue; }
+                    echo '' >/dev/tty
+                    [ -z "$p" ] || break
+                done
+            fi
+            key="${u:+${u}${p:+:}${p}@}"
+            url="$reposerv://$key$repobase/$reporoot/`basename $f`$ext"
+            rm -f -- $f
+            if ! echo "$url" | wget -i - -O $f 2>/dev/null; then
+                rm -f -- $f
+                m='Authorization failed.'
+                if [ -n "$DISPLAY" -a -x "`which zenity 2>/dev/null`" ]; then
+                    zenity --error --text="$m" --no-wrap
+                elif [ "${DISPLAY+set}" = set -a -x "`which whiptail 2>/dev/null`" ]; then
+                    whiptail --msgbox "$m" 7 50 >/dev/tty </dev/tty
+                elif [ "${DISPLAY+set}" = set -a -x "`which dialog 2>/dev/null`" ]; then
+                    dialog --msgbox "$m" 5 50 >/dev/tty </dev/tty
+                else
+                    echo "$m" >/dev/tty
+                fi
+                [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
+                return 1
+            fi
+        fi
+    fi
+    if [ ! -e $f ]; then
+        [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
+        return 1
+    fi
+    [ "$o" != "$f" ] || rm -f -- $o.$$
+    chmod 0600 $f
+    [ -e $libdir/apt/methods/$reposerv ] || return 0
+    un=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $f`
+    pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $f`
+    [ -n "$un" -a -n "$pw" ] || return 1
+    key="${un:+${un}${pw:+:$pw}@}"
+    ext="`echo /$reposubdir | sed 's,//,/,g;s,/,?distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
+    d=$aptrepodir; n=$PACKAGE.list
+    o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
+    [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
+    url="$reposerv://$key$repobase/$reporoot/$n$ext"
+    if ! echo "$url" | wget -i - -O $f 2>/dev/null || [ ! -e $f ]; then
+        [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
+        return 1
+    fi
+    [ "$o" != "$f" ] || rm -f -- $o.$$
+    d=$aptvenddir; n=$PACKAGE.vendor.list
+    o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
+    [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
+    url="$reposerv://$key$repobase/$reporoot/$n$ext"
+    if ! echo "$url" | wget -i - -O $f 2>/dev/null || [ ! -e $f ]; then
+        [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
+    fi
+    [ "$o" != "$f" ] || rm -f -- $o.$$
+    return 0
+}
+# _post_install_repo_creds() - After we install this repository package, we need
+#   to adjust whatever definitions are required in either the
+#   /etc/yum/yum-plugins.d/kmod.conf or /etc/zypp/zypp.conf files.
+#
+_post_install_repo_creds() { :
+}
+# _pre_remove_repo_creds() - Before removing, we need to save whatever
+#   definitions are required in common configuration files.
+#
+#   FIXME: For the rpm version this is much more than this.  It is moving common
+#	configuration files that were altered by the installation.  Short
+#	circuited for now.
+#
+_pre_remove_repo_creds() {
+    local d f
+    return 0
+    echo ">>> Preparing credentials..." >&2
+    d=$aptrepodir
+    for f in openss7.list; do
+	f="$d/$f"
+	if [ -r $f ]; then
+	    mv -f -- $f $f.pacorig
+	fi
+	rm -f -- $f
+    done
+    :
+    return 0
+}
+# _post_remove_repo_creds() - After we remove (and purge) this repository
+#   package, we need to adjust whatever definitions are required in
+#   configuration files.  When we changed them on installation, we save an
+#   original copy in $f.pacorig  Therefore, if $f.pacorig exists, copy it back.
+#
+#   FIXME: For the rpm version this is much more than this.  It is moving back
+#	common configuration files that were altered by the installation.  Short
+#	circuited for now.
+#
+_post_remove_repo_creds() {
+    local d f
+    return 0
+    echo ">>> Removing credentials..." >&2
+    d=$aptrepodir
+    for f in openss7.list ; do f="$d/$f"
+        if [ -f $f -a -f $f.pacorig ] ; then
+            if ! diff $f $f.pacorig >/dev/null 2>&1 ; then
+                mv -f -- $f.pacorig $f || true
+            fi
+        fi
+        rm -f -- $f.pacorig || true
+    done
+}
+# -----------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# MODULES
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# _remove_depends() - A little recursive function to delete all modules
+#   dependent on an initial module set (in our case "streams.o").  The function
+#   echos the list of modules to remove to stdout.
+#
+_remove_depends() {
+    local t
+    [ $# -gt 0 ] || return 0
+    echo "$*"
+    for t in $@ ; do
+	prereq=prereq_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+	eval "_remove_depends \$$prereq"
+    done
+}
+# _pre_install_base_modules() - When performing a fresh install we want to go
+#   looking for non-pkg installations of LiS or STREAMS or supplementary
+#   packages and perform what would otherwise have been the prerm or postrm
+#   actions.  Build a dependency tree from every dependency expression that can
+#   be found in each modules.dep file and remove all conflicting modules and
+#   their dependents.  This is never performed on upgrade, but only before
+#   initial installation.
+#
+#   Note that the base routine differs from the kernel routine of similar name
+#   and function.  This base routine only removes modules from
+#   non-kernel-specific directories.  The _pre_install_kernel_modules() routine
+#   removes from kernel-specific directories.
+#
+_pre_install_base_modules() {
+    local dir m b modl_mods dep line t target p prereq
+    echo ">>> Removing conflicting modules..." >&2
+    modl_mods=
+    for dir in /lib/modules/preferred /lib/modules/default /lib/modules/boot; do
+	[ -d $dir ] || continue
+	for m in `find $dir \( -name '*.o' -o -name '*.ko' -o -name '*.o.gz' -o -name '*.ko.gz' \) 2>/dev/null` ; do
+	    b=`echo $m | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)? , ,'`
+	    case " $modules " in (*" $b "*) ;; (*) continue ;; esac
+	    modl_mods="$modl_mods${modl_mods:+ }$m"
+	done
+	if [ -n "$modl_mods" -a -f $dir/modules.dep ] ; then
+	    xtrace=`set -o | sed -n 's,xtrace[[:space:]]*on,set +o xtrace,p;t;s,xtrace[[:space:]]*off,set -o xtrace,p;t'`
+	    set +x
+	    dep=
+	    while read line; do
+		case $line in
+		    (*\\)   line="`echo $line | sed -e 's,\\$,,'`"
+			    dep="$dep${dep:+ }$line" ; continue ;;
+		    (*)	    dep="$dep${dep:+ }$line" ;;
+		esac
+		if [ -n "$dep" ]; then
+		    set -- $dep
+		    if [ $# -ge 2 ]; then
+			t=`echo $1 | sed -e 's,:$,,'`
+			target=target_`echo $t | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
+			shift
+			for p in $@ ; do
+			    prereq=prereq_`echo $p | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
+			    eval "$prereq=\"\$$prereq\${$prereq:+ }$t\""
+			    eval "$target=\"\$$target\${$target:+ }$p\""
+			done
+		    fi
+		    dep=
+		fi
+	    done < $dir/modules.dep
+	    eval "$xtrace"
+	    for m in $modl_mods; do
+		echo ">>> WARNING: Removing conflicting kernel module, $m" >&2
+		rm -f -- $m 2>/dev/null || :
+		prereq=prereq_`echo $m | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
+		eval "_remove_depends \$$prereq" | while read b; do
+		    echo ">>> WARNING: Removing conflicting dependent kernel module $b" >&2
+		    rm -f -- $b 2>/dev/null || :
+		done
+	    done
+	    unset ${!prereq_*}
+	    unset ${!target_*}
+	fi
+    done
+}
+# ---------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# MODULE CONFIGURATION
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# _pre_install_base_modconf() - For a fresh install make sure that there are no
+#   entries from a non-pkg installation in the modules directories nor in the
+#   modules.conf file that will interfere with our entries.  Especially older
+#   LiS entries.
+#
+#   Unfortunately davem starting copying our install procedure, so we need to
+#   root out all kinds of things from the modules.conf file, all prune
+#   statements, any if include statements.  The old style /BEGIN LiS/,/END LiS/
+#   enclosure in the modules.conf file.  My newer technique with a prune and an
+#   if statement in the modules.conf file that was also used by davem in
+#   LiS-2.18.0.  Also, my newer latest technique with only an include statement
+#   in modules.conf and a modules.conf fragment in the debian update-modules
+#   directory @modutildir@ that includes the prune and if statements.  That
+#   works both for RH-style and Debian-style modules.conf.
+#
+#   Again, unfortunately, recent non-autoconf/dpkg releases of LiS have chosen
+#   to install their modconf files in a similar fashion to ours and in a similar
+#   location.  It even uses the prune modules line that we normally use,
+#   however, on Debian their modules.conf edits will be lost because the
+#   modules.conf file is generated from the modules/conf.d directory.
+#
+_pre_install_base_modconf() {
+    local conf_old conf_tmp conf_new suffix dir
+    [ -z '@WITH_KO_MODULES_FALSE@' ] || return
+    echo ">>> Updating @sysconfdir@/modules.conf..." >&2
+    conf_old=@sysconfdir@/modules.conf
+    conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$
+    conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
+    if [ -f $conf_old ]; then
+        cp -f -- $conf_old $conf_new
+        for suffix in $name LiS lis streams STREAMS strcompat strtty strxns strxnet strsock strinet strsctp strchan strx25 striso strisdn strss7 sigtran strvoip osr61
+        do
+            if ( grep -q -- "BEGIN $suffix" $conf_new && grep -q -- "END $suffix" $conf_new ) 2>/dev/null
+            then
+                sed -e '\|BEGIN '$suffix'|,\|END '$suffix'|d' $conf_new > $conf_tmp
+                mv -f -- $conf_tmp $conf_new
+            fi
+            for dir in /lib/modules/2.[456].* /lib/modules/preferred /lib/modules/default /lib/modules/boot
+            do
+                [ -d $dir ] || continue
+                if [ -f $dir/modules.$suffix ] ; then
+                    rm -f -- $dir/modules.$suffix
+                    sed -e '\|^prune[[:space:]].*modules.'$suffix'|d'        $conf_new > $conf_tmp
+                    sed -e '\|^if[[:space:]].*modules.'$suffix'|,\|^endif|d' $conf_tmp > $conf_new
+                    sed -e '\|^include[[:space:]].*modules.'$suffix'|d'      $conf_new > $conf_tmp
+                    mv -f -- $conf_tmp $conf_new
+                fi
+            done
+        done
+        for suffix in $name LiS lis streams STREAMS strcompat strtty strxns strxnet strsock strinet strsctp strchan strx25 striso strisdn strss7 sigtran strvoip osr61 ; do
+            if [ -f @modutildir@/$suffix ] ; then
+                rm -f -- @modutildir@/$suffix
+                sed -e '\|^include[[:space:]].*'@modutildir@/$suffix'|d' $conf_new > $conf_tmp
+                mv -f -- $conf_tmp $conf_new
+            fi
+        done
+        if ! diff $conf_old $conf_new >/dev/null 2>&1; then
+            echo ">>> warning: Removing non-pkg entries from $conf_old" >&2
+            cp -f -b --suffix=.pacorig -- $conf_new $conf_old
+        fi
+        rm -f -- $conf_new || :
+    fi
+}
+# _post_base_modconf() - Ensure that our include line is added to the
+#   modules.conf file for old 2.4 module systems.  This must remove lines before
+#   including them because it may also be run from upgrade.
+#
+_post_base_modconf() { :
+    local conf_old conf_tmp conf_new
+    [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
+    echo ">>> Updating @sysconfdir@/modules.conf..." >&2
+    conf_old=@sysconfdir@/modules.conf
+    conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$
+    conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
+    if [ -f $conf_old ] ; then
+        cp -f -- $conf_old $conf_new
+        ( sed -e '\|^include[[:space:]].*'@modutildir@/@PACKAGE_LCNAME@'|d' $conf_new
+          echo "include @modutildir@/@PACKAGE_LCNAME@" ) > $conf_tmp
+        mv -f -- $conf_tmp $conf_new
+        if ! diff $conf_new $conf_old >/dev/null 2>&1; then
+            cp -f -b --suffix=.pacorig -- $conf_new $conf_old
+        fi
+        rm -f -- $conf_new || :
+    fi
+}
+_post_install_base_modconf() {
+    _post_base_modconf		|| :
+}
+_post_upgrade_base_modconf() {
+    _post_base_modconf		|| :
+}
+# _pre_base_modconf() - The package is about to be removed for good, so remove
+#   our lines from the modules.conf file.  This can also be performed on upgrade
+#   before the old package files are removed or overwritten.
+#
+_pre_base_modconf() {
+    local conf_old conf_tmp conf_new
+    [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
+    echo ">>> Updating @sysconfdir@/modules.conf..." >&2
+    conf_old=@sysconfdir@/modules.conf
+    conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$
+    conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
+    if [ -f $conf_old ] ; then 
+        cp -f -- $conf_old $conf_new
+        sed -e '
+\|^include[[:space:]].*'@modutildir@/@PACKAGE_LCNAME@'[[:space:]]*$|!b
+N
+s|^include[[:space:]].*'@modutildir@/@PACKAGE_LCNAME@'[[:space:]]*\
+||
+: loop
+n
+b loop' $conf_new >$conf_tmp
+        mv -f -- $conf_tmp $conf_new
+        if ! diff $conf_new $conf_old >/dev/null 2>&1; then
+            cp -f -b --suffix=.pacorig -- $conf_new $conf_old
+        fi
+        rm -f -- $conf_new || :
+    fi
+}
+_pre_remove_base_modconf() {
+    _pre_base_modconf		|| :
+}
+_pre_upgrade_base_modconf() {
+    _pre_base_modconf		|| :
+}
+# _post_remove_base_modconf() - As the subpackage is being purged, remove the
+#   line from the modules.conf file that points at the /etc/modutils/openss7
+#   file that in turn includes the /lib/modules/@kversion@/modules.openss7 file
+#   when it exists.  Note that the files themselves referenced from the
+#   modules.conf files are removed as a normal part of the course of removing
+#   the files in the -kernel sub-packages.
+#
+#   Note that the line should have been removed by _pre_remove_base_modconf(),
+#   but this ensures that it was removed.
+#
+_post_remove_base_modconf() {
+    local conf_old conf_tmp conf_new
+    [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
+    echo ">>> Updating @sysconfdir@/modules.conf..." >&2
+    conf_old=@sysconfdir@/modules.conf
+    conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$
+    conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
+    if [ -f $conf_old ] ; then
+        cp -f -- $conf_old $conf_new
+        if grep '^include[[:space:]].*'@modutildir@/@PACKAGE_LCNAME@ $conf_new >/dev/null 2>&1; then
+            sed -e '\|^include[[:space:]].*'@modutildir@/@PACKAGE_LCNAME@'|d' $conf_new > $conf_tmp
+            mv -f -- $conf_tmp $conf_new
+            cp -f -b --suffix=.pacorig -- $conf_new $conf_old
+        fi
+        rm -f -- $conf_new || :
+    fi
+}
+# ---------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# MODULE PRELOADS
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# _pre_install_base_preloads() - Go looking for non-pkg or legacy preloads and
+#   remove them.  This includes all non-kernel-specific preloads techniques:
+#   modprobe.preload and modules but not modules-@kversion@ files.
+#
+_pre_install_base_preloads() {
+    local prel_tmp prel_new prel_old m
+    echo ">>> Updating @sysconfdir@/modprobe.preload..." >&2
+    prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$
+    prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$
+    for prel_old in @sysconfdir@/modprobe.preload @sysconfdir@/modules; do
+	if [ -f $prel_old ]; then
+	    cp -f -- $prel_old $prel_new
+	    sed -e '\|^[[:space:]]*(specfs|streams)|d' $prel_new >$prel_tmp
+	    mv -f -- $prel_tmp $prel_new
+	    for m in $modules $preloads; do
+		sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $prel_new >$prel_tmp
+		mv -f -- $prel_tmp $prel_new
+	    done
+	    if ! diff $prel_new $prel_old >/dev/null 2>&1; then
+		echo ">>> warning: Removing non-pkg entries from preloads file, $prel_old" >&2
+		cp -f -b --suffix=.pacorig -- $prel_new $prel_old
+	    fi
+	    rm -f -- $prel_new || :
+	fi
+    done
+}
+# _post_base_preloads() - At the end of a fresh install or upgrade,
+#   check that our preload modules have been added to the modprobe.preload file.
+#   Note, however, that the modprobe.preload does not normally exist for
+#   Archlinux.  The -kernel subpackage is responsible for adding preloads to the
+#   debian /etc/modules-@kversion@ file.
+#
+_post_base_preloads() {
+    local prel_tmp prel_new prel_old
+    echo ">>> Updating @sysconfdir@/modprobe.preload..." >&2
+    prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$
+    prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$
+    for prel_old in @sysconfdir@/modules @sysconfdir@/modprobe.preload; do
+	if [ -f $prel_old ] ; then
+	    cp -f -- $prel_old $prel_new
+	    missing=no
+	    for m in $preloads ; do
+		if ! grep '^[[:space:]]*'"$m"'[[:space:]]*$' $prel_new >/dev/null 2>&1; then
+		    missing=yes
+		fi
+	    done
+	    if [ $missing = yes ]; then
+		for m in $preloads; do
+		    ( sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $prel_new;
+		      echo "$m" ) >$prel_tmp
+		    mv -f -- $prel_tmp $prel_new
+		done
+		cp -f -b --suffix=.pacorig -- $prel_new $prel_old
+	    fi
+	    rm -f -- $prel_new || :
+	fi
+    done
+}
+_post_install_base_preloads() {
+    _post_base_preloads		|| :
+}
+_post_upgrade_base_preloads() {
+    _post_base_preloads		|| :
+}
+# _pre_base_preloads() - When removing for good (purging), make sure that
+#   the preload modules are no longer included in the preloads file.  Note that
+#   removing lines from the /etc/modules-@kversion@ file is the responsibility
+#   of the kernel modules subpackage.  On upgrade, the new package will add its
+#   own lines later.
+#
+_pre_base_preloads() {
+    local prel_tmp prel_new prel_old included p
+    echo ">>> Updating @sysconfdir@/modprobe.preload..." >&2
+    prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$
+    prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$
+    for prel_old in @sysconfdir@/modules @sysconfdir@/modprobe.preload; do
+	if [ -f $prel_old ]; then
+	    cp -f -- $prel_old $prel_new
+	    included=no
+	    for p in ${preloads}; do
+		if grep '^[[:space:]]*'"$p"'[[:space:]]*$' $prel_new >/dev/null 2>&1; then
+		    included=yes
+		    break
+		fi
+	    done
+	    if [ $included = yes ]; then
+		for p in ${preloads}; do
+		    grep -v '^[[:space:]]*'"$p"'[[:space:]]*$' $prel_new >$prel_tmp
+		    mv -f -- $prel_tmp $prel_new
+		done
+		cp -f -b --suffix=.pacorig -- $prel_new $prel_old
+	    fi
+	    rm -f -- $prel_new || :
+	fi
+    done
+}
+_pre_remove_base_preloads() {
+    _pre_base_preloads		|| :
+}
+_pre_upgrade_base_preloads() {
+    _pre_base_preloads		|| :
+}
+# ---------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# INITSCRIPTS
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# _pre_install_base_initscripts() - Fresh install, go looking for non-pkg
+#   initscripts and remove them.
+#
+_pre_install_base_initscripts() {
+    local list reverse i
+    return 0 # far too invasive for Archlinux
+    [ -z '@INSTALL_SYSVINIT_TRUE@' ] || return 0
+    echo ">>> Updating initscripts..." >&2
+    list="$nonrpminit"
+    reverse=
+    for i in $list; do
+	reverse="$i${reverse:+ }$reverse"
+    done
+    if [ ! -r /proc/1/comm -o "`cat /proc/1/comm 2>/dev/null`" != systemd ]; then
+	for i in $reverse; do
+	    if [ -f "@initrddir@/$i" ]; then
+		echo ">>> warning: Stopping non-pkg init script, $i" >&2
+		[ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i stop && continue || true; }
+		[ -x "`which service     2>/dev/null`" ] && { service     $i stop && continue || true; }
+		[ -x "@initrddir@/$i"                  ] && { @initrddir@/$i stop && continue || true; }
+	    fi
+	done
+    fi
+    list="$initfiles $nonrpminit"
+    reverse=
+    for i in $list; do
+	reverse="$i${reverse:+ }$reverse"
+    done
+    for i in $reverse; do
+	if [ -f "@initrddir@/$i" ]; then
+	    echo ">>> warning: Deregistering non-pkg init script, $i" >&2
+	    [ -x /sbin/insserv             ] && { /sbin/insserv -r          $i        2>&1 && continue || true; }
+	    [ -x /sbin/chkconfig           ] && { /sbin/chkconfig --del     $i        2>&1 && continue || true; }
+	    [ -x /usr/lib/lsb/remove_initd ] && { /usr/lib/lsb/remove_initd $i        2>&1 && continue || true; }
+	    [ -x /usr/sbin/update-rc.d     ] && { /usr/bin/update-rc.d      $i remove 2>&1 && continue || true; }
+	fi
+    done
+}
+# _post_install_base_initscripts() - At the end of an install or upgrade, add
+#   init scripts if we can.  Note that the debhelper scriptlets are defeated
+#   because they are too disruptive in the 2.6 environment.
+#
+_post_install_base_initscripts() {
+    local list i args r
+    [ -z '@INSTALL_SYSVINIT_TRUE@' ] || return 0
+    echo ">>> Updating initscripts..." >&2
+    list="${initfiles}"
+    for i in $list; do
+	if [ -f @initrddir@/$i ]; then
+	    [ -x /sbin/insserv              ] && { /sbin/insserv              $i       2>&1 && continue || true; }
+	    [ -x /sbin/chkconfig            ] && { /sbin/chkconfig --add      $i       2>&1 && continue || true; }
+	    [ -x /usr/lib/lsb/install_initd ] && { /usr/lib/lsb/install_initd $i       2>&1 && continue || true; }
+	    args="`grep '^#[[:space:]]*update-rc.d:' @initrddir@/$i | sed -e 's,#[[:space:]]*update-rc.d:[[:space:]]*,,'`"
+	    [ -x /usr/sbin/update-rc.d      ] && { /usr/sbin/update-rc.d      $i $args 2>&1 && continue || true; }
+	fi
+    done
+}
+# _post_remove_base_sysvinit() - When purging the package, remove the init
+#   scripts.
+#
+_post_remove_base_sysvinit () {
+    local reverse list i
+    return 0 # far too invasive for Archlinux
+    echo ">>> Removing initscripts..." >&2
+    reverse=
+    list="${initfiles}"
+    for i in $list; do
+	reverse="$i${reverse:+ }$reverse"
+    done
+    if [ ! -r /proc/1/comm -o "`cat /proc/1/comm 2>/dev/null`" != systemd ]; then
+	for i in $reverse; do
+	    if [ -f @initrddir@/$i ]; then
+		[ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i stop && continue || :; }
+		[ -x "`which service     2>/dev/null`" ] && { service     $i stop && continue || :; }
+		[ -x @initrddir@/$i                    ] && { @initrddir@/$i stop && continue || :; }
+	    fi
+	done
+    fi
+    for i in $reverse; do
+	if [ -f @initrddir@/$i ]; then
+	    [ -x /sbin/insserv             ] && { /sbin/insserv -r          $i        2>&1 && continue || :; }
+	    [ -x /sbin/chkconfig           ] && { /sbin/chkconfig --del     $i        2>&1 && continue || :; }
+	    [ -x /usr/lib/lsb/remove_initd ] && { /usr/lib/lsb/remove_initd $i        2>&1 && continue || :; }
+	    [ -x /usr/sbin/update-rc.d     ] && { /usr/sbin/update-rc.d     $i remove 2>&1 && continue || :; }
+	fi
+    done
+}
+# _post_remove_base_systemd() - When purging the package, disable the systemd
+#   unit files.
+#
+_post_remove_base_systemd () {
+    local reverse list i
+    echo ">>> Removing unit files..." >&2
+    reverse=
+    list="${unitfiles}"
+    for i in $list; do
+	case "$i" in
+	(*-shutdown.target)
+	    reverse="$i${reverse:+ }$reverse" ;;
+	(*.target)
+	    ;;
+	esac
+    done
+    if [ -r /proc/1/comm -o "`cat /proc/1/comm 2>/dev/null`" != systemd ]; then
+	systemctl --system daemon-reload
+	for i in $reverse; do
+	    if [ -f "@systemdsysdir@/$i" ]; then
+		[ -x "`which systemctl 2>/dev/null`" ] && { systemctl start $i 2>&1 && continue || true; }
+	    fi
+	done
+    fi
+}
+# _post_remove_base_initscripts() - When purging the package, remove the
+#   symbolic links associated with the init scripts before they are purged.
+#   Note that the debhelper scriptlets are too disruptive in some stages and are
+#   therefore disabled.  Because some time could have elapsed between package
+#   removal and package purge, unlike debhelper, we also stop any running
+#   initscripts.
+#
+#   Archlinux does not have symbolic links and need not perform the removal step
+#   because it does not use sysv init scripts.  We should check that the scripts
+#   have been removed from the DAEMONS line, otherwise warn the user.  We can
+#   stop the scripts on removal.
+#
+_post_remove_base_initscripts () {
+    [ -n '@INSTALL_SYSVINIT_TRUE@' ] || _post_remove_base_sysvinit
+    [ -n '@INSTALL_SYSTEMD_TRUE@'  ] || _post_remove_base_systemd
+}
+# ---------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# MANPAGES
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# _pre_install_base_manpages() - Old tarball distribution puts some man pages in
+#   the wrong place, clean them out on a fresh install.
+#
+_pre_install_base_manpages() { :
+    echo ">>> Removing conflicting manual pages..." >&2
+    _remove_warn_files "manual page" @mandir@/man8/fattach.8*
+    _remove_warn_files "manual page" @mandir@/man8/fdetach.8*
+    rmdir -p @mandir@/man8 2>/dev/null || :
+}
+# _post_base_manpages() - Add our manual pages to the aprospros
+#   database.  One problem with doing this is that even the oldest of debian
+#   policies and debhelper implementations will implement the debhelper code to
+#   do this.  Therefore, this function is shortcircuited for now.  (We install
+#   >3000 manual pages and it takes forever anyway.)  Failing to do this
+#   altogether is not critical because most machines run an evening cron job to
+#   update these.
+#
+_post_base_manpages() {
+    echo ">>> Consider issuing 'mandb -c' or its equivalent." >&2
+    return 0
+    echo ">>> Updating aprospros database..." >&2
+    if   [ -x "`which mandb      2>/dev/null`" ]; then
+	LANGUAGE= LANG= mandb   -q -p @mandir@ || :
+    elif [ -x "`which makewhatis 2>/dev/null`" ]; then
+	LANGUAGE= LANG= makewhatis -u @mandir@ || :
+    fi
+}
+_post_install_base_manpages() {
+    _post_base_manpages		|| :
+}
+_post_upgrade_base_manpages() {
+    _post_base_manpages		|| :
+}
+_post_remove_base_manpages() {
+    _post_base_manpages		|| :
+}
+# ---------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# MANREFS
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# _pre_install_base_manrefs() - On a fresh installation, clean out reference
+#   database from old non-pkg distribution.
+#
+_pre_install_base_manrefs() {
+    local m e
+    echo ">>> Correcting man references..." >&2
+    for m in $manmacros; do
+	for e in '' '.gz' '.bz2' '.lzma' '.xz' ; do
+	    [ ! -f @mandir@/$m$e ] || _remove_warn_file "macros" @mandir@/$m$e
+	done
+    done
+}
+# _post_install_base_manrefs() - Some systems compress our reference database
+#   but do not provide nor invoke the zrefer command necessary to use compressed
+#   reference databases.  Therefore, we always provide a decompressed copy of
+#   the reference database.
+#
+_post_install_base_manrefs() {
+    local m
+    echo ">>> Correcting man references..." >&2
+    for m in ${manrefs}; do
+	[ ! -f @mandir@/$m.gz   ] || gzip  -dc @mandir@/$m.gz   > @mandir@/$m || :
+	[ ! -f @mandir@/$m.bz2  ] || bzip2 -dc @mandir@/$m.bz2  > @mandir@/$m || :
+	[ ! -f @mandir@/$m.lzma ] || lzma  -dc @mandir@/$m.lzma > @mandir@/$m || :
+	[ ! -f @mandir@/$m.xz   ] || xz    -dc @mandir@/$m.xz   > @mandir@/$m || :
+    done
+}
+# _post_upgrade_base_manrefs() - Some systems compress our reference database
+#   but do not provide nor invoke the zrefer command necessary to use compressed
+#   reference databases.  Therefore, we always provide a decompressed copy of
+#   the reference database.
+#
+_post_upgrade_base_manrefs() {
+    _post_install_base_manrefs		|| :
+}
+# _pre_remove_base_manrefs() - When removing or upgrading the package, remove
+#   the uncompressed manual references when there is a compressed version lying
+#   around from before.  On upgrade, the new version will provide its own one
+#   way or another.
+#
+_pre_remove_base_manrefs() {
+    local m
+    echo ">>> Correcting man references..." >&2
+    for m in $manrefs; do
+	if [ -f @mandir@/$m.gz   -o -f @mandir@/$m.bz2 -o \
+	     -f @mandir@/$m.lzma -o -f @mandir@/$m.xz ]; then
+	    rm -f -- @mandir@/$m 2>/dev/null || :
+	fi
+    done
+}
+# _pre_upgrade_base_manrefs() - When removing or upgrading the package, remove
+#   the uncompressed manual references when there is a compressed version lying
+#   around from before.  On upgrade, the new version will provide its own one
+#   way or another.
+#
+_pre_upgrade_base_manrefs() {
+    _pre_remove_base_manrefs		|| :
+}
+# _pre_install_base_manmacros() - On a fresh installation, lean out macro files
+#   from old non-pkg distribution.
+#
+_pre_install_base_manmacros() {
+    local m e
+    echo ">>> Correcting man references..." >&2
+    for m in $manrefs; do
+	for e in '' '.gz' '.bz2' '.lzma' '.xz' ; do
+	    [ ! -f @mandir@/$m$e ] || _remove_warn_file "references" @mandir@/$m$e
+	done
+    done
+}
+# ---------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# MANMACROS
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# _post_install_base_manmacros() - Some systems compress our man macros but do
+#   not provide nor invoke the zsoelim command necessary to use compressed man
+#   macros.  Therefore, we always provide a decompressed copy of the man macros.
+#
+_post_install_base_manmacros() {
+    local m
+    echo ">>> Correcting man macros..." >&2
+    for m in ${manmacros}; do
+	[ ! -f @mandir@/$m.gz   ] || gzip  -dc @mandir@/$m.gz   > @mandir@/$m || :
+	[ ! -f @mandir@/$m.bz2  ] || bzip2 -dc @mandir@/$m.bz2  > @mandir@/$m || :
+	[ ! -f @mandir@/$m.lzma ] || lzma  -dc @mandir@/$m.lzma > @mandir@/$m || :
+	[ ! -f @mandir@/$m.xz   ] || xz    -dc @mandir@/$m.xz   > @mandir@/$m || :
+    done
+}
+# _post_upgrade_base_manmacros() - Some systems compress our man macros but do
+#   not provide nor invoke the zsoelim command necessary to use compressed man
+#   macros.  Therefore, we always provide a decompressed copy of the man macros.
+#
+_post_upgrade_base_manmacros() {
+    _post_install_base_manmacros	|| :
+}
+# _pre_remove_base_manmacros() - When removing or upgrading the package, remove
+#   the uncompressed manual references when there is a compressed version lying
+#   around from before.  One upgrade, the new version will provide its own one
+#   way or another.
+#
+_pre_remove_base_manmacros() {
+    local m
+    echo ">>> Correcting man macros..." >&2
+    for m in $manmacros; do
+	if [ -f @mandir@/$m.gz   -o -f @mandir@/$m.bz2 -o \
+	     -f @mandir@/$m.lzma -o -f @mandir@/$m.xz ]; then
+	    rm -f -- @mandir@/$m 2>/dev/null || :
+	fi
+    done
+}
+# _pre_upgrade_base_manmacros() - When removing or upgrading the package, remove
+#   the uncompressed manual references when there is a compressed version lying
+#   around from before.  One upgrade, the new version will provide its own one
+#   way or another.
+#
+_pre_upgrade_base_manmacros() {
+    _pre_remove_base_manmacros		|| :
+}
+# ---------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# TOOLS
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# _pre_install_lib_tools() - On a fresh installation, look for and remove any
+#   non-pkg or old tarball release tools.  On reinstallations this step can (and
+#   should) be skipped.
+#
+_pre_install_lib_tools() {
+    local tool location
+    echo ">>> Removing conflicting tools..." >&2
+    for tool in $tools ; do
+        location="`which $tool 2>/dev/null`"
+        while [ -n "$location" -a -x "$location" ] ; do
+	    echo ">>> warning: Deleting old non-pkg tool $location" >&2
+            rm -f -- $location || :
+            location="`which $tool 2>/dev/null`"
+        done
+    done
+}
+# ---------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# LIBRARIES
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# _pre_install_lib_libraries() - On a fresh installation, look for an remove any
+#   non-pkg, old tarball release, or other conflicting libraries.  On
+#   reinstallations this step can (and should) be skipped.  Unfortunately,
+#   non-autoconf releases of LiS placed libraries all over the place.  On an
+#   initial installation, this checks for other libraries with the same name and
+#   deletes them.
+#
+#   Note that a KDE search utility was stupid enough to name its library
+#   libstreams.  This pre function will remove that library and it will fail
+#   unless it is reinstalled.  KDE places the library in /usr/lib, so we place
+#   ours in /lib so that it will not overwrite ours.
+#
+_pre_install_lib_libraries() {
+    local lib l
+    echo ">>> Removing conflicting libraries..." >&2
+    if [ -x "`which ldconfig 2>/dev/null`" ]; then
+	for lib in $libraries ; do
+	    ( ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null | \
+	    while read l; do
+		echo ">>> WARNING: Deleting conflicting library, $l" >&2
+		rm -f -- $l || :
+	    done
+	done
+    fi
+}
+# _post_lib_libraries() - After a fresh installation, upgrade or reinstall, or
+#   removal, do a ldconfig.  We use libtool if it is available.
+#
+_post_lib_libraries() {
+    local v d s
+    echo ">>> Updating library load cache..." >&2
+    d="@libdir@"; s="@syslibdir@"
+    if   [ -x "`which libtool 2>/dev/null`" ]; then
+        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+	[ -d "$d" ] && { libtool --mode=finish $v "$d" || :; }
+	[ -d "$s" ] && { libtool --mode=finish $v "$s" || :; }
+    elif [ -x "`which ldconfig 2>/dev/null`" ]; then
+	[ -d "$d" ] && { ldconfig -n "$d" || :; }
+	[ -d "$s" ] && { ldconfig -n "$s" || :; }
+    fi
+}
+_post_install_lib_libraries() {
+    _post_lib_libraries		|| :
+}
+_post_upgrade_lib_libraries() {
+    _post_lib_libraries		|| :
+}
+_post_remove_lib_libraries() {
+    _post_lib_libraries		|| :
+}
+# ---------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# NETCONFIG
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# _post_lib_netconfig() - Rebuild the netconfig database, but only if it
+#   was built by us or does not exist.  This is indempotent and can be called
+#   from configure or reconfigure.  It is important that the new database be
+#   compatible with the old libxnsl library.  This should always be the case
+#   anyway.  If it were not the case, we should have to kill processes holding
+#   open the libxnsl library so that they will load the new library on respawn.
+#
+_post_lib_netconfig() {
+    local netc_fil netc_alt netc_dir netc_tmp found files f
+    echo ">>> Updating @sysconfdir@/netconfig.xnsl..." >&2
+    netc_fil=@sysconfdir@/netconfig
+    netc_alt=@sysconfdir@/netconfig.xnsl
+    netc_dir=@sysconfdir@/nslconfig.d
+    netc_tmp=${tmppath:-/var/tmp}/netconfig.tmp.$$
+    found=no
+    files="$netc_dir/*"
+    if [ -r $netc_fil ]; then
+	if ! grep '^# Generated from nslconfig.d' $netc_fil >/dev/null 2>&1; then
+	    netc_fil=$netc_alt
+	fi
+    else
+	if [ -r $netc_alt ]; then
+	    netc_fil=$netc_alt
+	fi
+    fi
+    (   echo '# Generated from nslconfig.d by @PACKAGE_LCNAME@'
+	echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
+	echo '# EDIT THE FILES IN THE nslconfig.d DIRECTORY INSTEAD.'
+    ) >$netc_tmp
+    for f in $files; do
+	if [ -f $f -a $f = "$netc_dir/strnsl" ]; then
+	    case $f in
+		(*.pacorig|*.pacnew) ;;
+		(*) (   echo '# Generated from nslconfig.d/'`basename $f`
+			sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+		    ) >>$netc_tmp
+		    found=yes ;;
+	    esac
+	fi
+    done
+    for f in $files; do
+	if [ -f $f -a $f != "$netc_dir/strnsl" ]; then
+	    case $f in
+		(*.pacorig|*.pacnew) ;;
+		(*) (   echo '# Generated from nslconfig.d/'`basename $f`
+			sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+		    ) >>$netc_tmp
+		    found=yes ;;
+	    esac
+	fi
+    done
+    if [ $found = no ]; then
+	rm -f -- $netc_fil
+	rmdir $netc_dir 2>/dev/null || :
+    else
+	if ! diff $netc_tmp $netc_fil >/dev/null 2>&1; then
+	    cp -f -b --suffix=.pacorig -- $netc_tmp $netc_fil
+	fi
+    fi
+    rm -f -- $netc_tmp || :
+    if [ $netc_fil != $netc_alt ]; then
+	rm -f -- $netc_alt || :
+    fi
+}
+_post_install_lib_netconfig() {
+    _post_lib_netconfig		|| :
+}
+_post_upgrade_lib_netconfig() {
+    _post_lib_netconfig		|| :
+}
+# _post_remove_netconfig_kill() - Kill all processes that are holding open the
+#   libxnsl library.  This is used in preparation for removing the netconfig
+#   database.  Note that because the library has been removed, these programs
+#   will fail if they attempt to reload.
+#
+_post_remove_netconfig_kill() {
+    local signal pid did_one
+    echo ">>> Updating @sysconfdir@/netconfig.xnsl..." >&2
+    if [ -x "`which lsof 2>/dev/null`" ]; then
+	for signal in TERM KILL; do
+	    did_one=no
+	    lsof | awk '{if($NF~"^'@libdir@'/libxnsl"||$NF~"^'@lib32dir@'/libxnsl"){print$2}}' | \
+	    while read pid; do
+		echo ">>> WARNING: killing process, $pid with signal, $signal" >&2
+		kill -$signal $pid || :
+		did_one=yes
+	    done
+	    [ $did_one = no ] || sleep 1
+	done
+    fi
+}
+# _post_remove_lib_netconfig() - When removing or purging, rebuild the netconfig
+#   database after our files have been removed.  Note that on upgrade, this is
+#   the responsibility of the new version's postinst maintenance script.  When
+#   executed at remove instead of purge, the conffiles are still in place and
+#   need to be removed manually first.  If the netconfig database would be
+#   empty, it is removed altogether.  Note that it might be a good idea to kill
+#   any process that has the libxnsl library open.  Dpkg processes that are
+#   properly dependent upon this package will have been removed, however,
+#   non-pkg programs or debs that do not properly rely upon this package will
+#   not be stopped, but will fail strangely due to the removal of the database
+#   even when the library is still loaded.
+#
+_post_remove_lib_netconfig () {
+    local netc_fil netc_alt netc_dir netc_tmp found files f signal pid did_one
+    echo ">>> Updating @sysconfdir@/netconfig.xnsl..." >&2
+    netc_fil=@sysconfdir@/netconfig
+    netc_alt=@sysconfdir@/netconfig.xnsl
+    netc_dir=@sysconfdir@/nslconfig.d
+    netc_tmp=${tmppath:-/var/tmp}/netconfig.tmp.$$
+    found=no
+    files="$netc_dir/*"
+    _post_remove_netconfig_kill || :
+    for f in ${netconfig}; do rm -f -- $netc_dir/$f ||:; done
+    if [ -r $netc_fil ]; then
+	if ! grep '^# Generated from nslconfig.d' $netc_fil >/dev/null 2>&1; then
+	    netc_fil=$netc_alt
+	fi
+    else
+	if [ -r $netc_alt ]; then
+	    netc_fil=$netc_alt
+	fi
+    fi
+    (   echo '# Generated from nslconfig.d by @PACKAGE_LCNAME@'
+	echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
+	echo '# EDTI THE FILES IN nslconfig.d DIRECTORY INSTEAD'
+    ) >$netc_tmp
+    for f in $files; do
+	if [ -f $f -a $f = "$netc_dir/strnsl" ]; then
+	    case $f in
+		(*.pacorig|*.pacnew) ;;
+		(*) (   echo '# Generated from nslconfig.d/'`basename $f`
+			sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+		    ) >>$netc_tmp
+		    found=yes ;;
+	    esac
+	fi
+    done
+    for f in $files; do
+	if [ -f $f -a $f != "$netc_dir/strnsl" ]; then
+	    case $f in
+		(*.pacorig|*.pacnew) ;;
+		(*) (   echo '# Generated from nslconfig.d/'`basename $f`
+			sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+		    ) >>$netc_tmp
+		    found=yes ;;
+	    esac
+	fi
+    done
+    if [ $found = no ]; then
+	rm -f -- $netc_fil
+	rmdir $netc_dir 2>/dev/null || :
+    else
+	if ! diff $netc_tmp $netc_fil >/dev/null 2>&1; then
+	    cp -f -b --suffix=.pacorig -- $netc_tmp $netc_fil
+	fi
+    fi
+    rm -f -- $netc_tmp || :
+    if [ $netc_fil != $netc_alt ]; then
+	rm -f -- $netc_alt || :
+    fi
+}
+# ---------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# SOCK2PATH
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# _post_lib_sock2path() - Rebuild the sock2path database.  This is
+#   indempotent and can be called from configure or reconfigure.  It is
+#   important that the new database be compatible with the old sock2path
+#   library.  This should always be the case anyway.  If it were not the case,
+#   we should have to kill processes holding open the libsocket library so that
+#   they will load the new library on respawn.
+#
+_post_lib_sock2path() {
+    local s2pa_fil s2pa_dir s2pa_tmp found files f
+    echo ">>> Updating @sysconfdir@/sock2path..." >&2
+    s2pa_fil=@sysconfdir@/sock2path
+    s2pa_dir=@sysconfdir@/sock2path.d
+    s2pa_tmp=${tmppath:-/var/tmp}/sock2path.tmp.$$
+    found=no
+    files="$s2pa_dir/*"
+    (   echo '# Generated from sock2path.d by @PACKAGE_LCNAME@'
+	echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
+	echo '# EDIT THE FILES IN THE sock2path.d DIRECTORY INSTEAD.'
+    ) >$s2pa_tmp
+    for f in $files; do
+	if [ -f $f ]; then
+	    case $f in
+		(*.pacorig|*.pacnew) ;;
+		(*) (   echo '# Generated from sock2path.d/'`basename $f`
+			sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+		    ) >>$s2pa_tmp
+		    found=yes ;;
+	    esac
+	fi
+    done
+    if [ $found = no ]; then
+	rm -f -- $s2pa_fil
+	rmdir $s2pa_dir 2>/dev/null || :
+    else
+	if ! diff $s2pa_tmp $s2pa_fil >/dev/null 2>&1; then
+	    cp -f -b --suffix=.pacorig -- $s2pa_tmp $s2pa_fil
+	fi
+    fi
+    rm -f -- $s2pa_tmp || :
+}
+_post_install_lib_sock2path() {
+    _post_lib_sock2path		|| :
+}
+_post_upgrade_lib_sock2path() {
+    _post_lib_sock2path		|| :
+}
+# _post_remove_sock2path_kill() - Kill all processes that are holding open the
+#   libsocket library.  This is in prepration for removing the sock2path
+#   database.  Note that because the library has already been removed, these
+#   programs will fail if they attempt to reload.
+#
+_post_remove_sock2path_kill () {
+    local signal pid did_one
+    echo ">>> Updating @sysconfdir@/sock2path..." >&2
+    if [ -x "`which lsof 2>/dev/null`" ]; then
+	for signal in TERM KILL; do
+	    did_one=no
+	    lsof | awk '{if($NF~"^'@libdir@'/libsocket"||$NF~"^'@lib32dir@'/libsocket"){print$2}}' | \
+	    while read pid; do
+		echo ">>> WARNING: killing process, $pid with signal, $signal" >&2
+		kill -$signal $pid || :
+		did_one=yes
+	    done
+	    [ $did_one = no ] || sleep 1
+	done
+    fi
+}
+# _post_remove_lib_sock2path() - When removing or purging, rebuild the sock2path
+#   database after our files have been removed.  Note that on upgrade, this is
+#   the responsibility of the new version's postinst maintenance script.  When
+#   executed at remove instead of purge, the conffiles are still in place and
+#   need to be removed manually first.  If the sock2path database would be
+#   empty, it is removed altogether.  Note that it might be a good idea to kill
+#   any process that has the libsocket library open.  Dpkg processes that are
+#   properly dependent upon this package will have been removed, however,
+#   non-pkg programs or debs that do not properly rely upon this package will
+#   not be stopped, but will fail strangely due to the removal of the database
+#   even when the library is still loaded.
+#
+_post_remove_lib_sock2path () {
+    local s2pa_fil s2pa_dir s2pa_tmp found files f
+    echo ">>> Updating @sysconfdir@/sock2path..." >&2
+    s2pa_fil=@sysconfdir@/sock2path
+    s2pa_dir=@sysconfdir@/sock2path.d
+    s2pa_tmp=${tmppath:-/var/tmp}/sock2path.tmp.$$
+    found=no
+    files="$s2pa_dir/*"
+    _post_remove_sock2path_kill || :
+    for f in ${sock2path}; do rm -f -- $s2pa_dir/$f ||:; done
+    (   echo '# Generated from sock2path.d by @PACKAGE_LCNAME@'
+	echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
+	echo '# EDIT THE FILES IN THE sock2path.d DIRECTORY INSTEAD.'
+    ) >$s2pa_tmp
+    for f in $files; do
+	if [ -f $f ]; then
+	    case $f in
+		(*.pacorig|*.pacnew) ;;
+		(*) (   echo '# Generated from sock2path.d/'`basename $f`
+			sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+		    ) >>$s2pa_tmp
+		    found=yes ;;
+	    esac
+	fi
+    done
+    if [ $found = no ]; then
+	rm -f -- $s2pa_fil
+	rmdir $s2pa_dir 2>/dev/null || :
+    else
+	if ! diff $s2pa_tmp $s2pa_fil >/dev/null 2>&1; then
+	    cp -f -b --suffix=.pacorig -- $s2pa_tmp $s2pa_fil
+	fi
+    fi
+    rm -f -- $s2pa_tmp || :
+}
+# ---------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# SNMP CONFIGURATION
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# _post_lib_snmpconf() - Configure @sysconfdir@/snmp/snmpd.local.conf in
+#   the target directory.  First we check if snmpd.local.conf exists.  If
+#   snmpd.local.conf exists we check if it has already been configured by
+#   checking for our 'Generated' statement.  If it has, we regenerate the file
+#   from the snmp.d directory components.  If it hasn't, we move it to
+#   @sysconfdir@/snmp/snmp.d/00local if 00local does not already exist.  If
+#   00local already exists, we abort with a warning.  When snmpd.local.conf does
+#   not exist, we create an empty /etc/snmp/snmp.d/00local if one does not
+#   already exist.  If 00local already exists, we abort with a warning.
+#
+#   When we have not aborted as part of previous operations, we rebuild
+#   /etc/snmp/snmp.local.conf from the files available in the snmp.d directory
+#   (skipping any with the .pacorig or .pacnew suffixes), placing our 'Generation' lines in the
+#   file, starting with 00local, and continuing through with the remaining files
+#   in snmp.d in lexical order.  If 00local is the only file causing
+#   snmp.local.conf to be regenerated, 00local is moved back to snmp.local.conf.
+#   After rebuilding the file, we tell the snmp daemon to reread its
+#   configuration files if it is running.
+#
+#   Unfortunately, SuSE does things a little different: the snmpd.conf file is
+#   in /etc instead of /etc/snmp and the persistent data file is in
+#   /var/run/net-snmp instead of /var/net-snmp.  This can be detected and
+#   repaired by symbolic linking /etc/snmp/snmpd.conf to /etc/snmpd.conf and
+#   linking /etc/snmpd.local.conf to /etc/snmp/snmpd.local.conf.
+#
+#   Note for Archlinux (and slackware for that matter) that this script will not
+#   attempt to restart the snmp daemon because their is no SysV initscript
+#   directory structure.
+#
+_post_lib_snmpconf() {
+    local snmp_fil snmp_dir snmp_lcl snmp_tmp wrote_one changed_local files f
+    echo ">>> Updating @sysconfdir@/snmp/snmpd.conf..." >&2
+    snmp_fil=@sysconfdir@/snmp/snmpd.local.conf
+    snmp_dir=@sysconfdir@/snmp/snmp.d
+    snmp_lcl=@sysconfdir@/snmp/snmp.d/00local
+    snmp_tmp=${tmppath:-/var/tmp}/snmpd.local.conf.tmp.$$
+    wrote_one=no
+    changed_local=no
+    files="$snmp_dir/*"
+    if [ ! -e @sysconfdir@/snmp/snmpd.conf -a -e @sysconfdir@/snmpd.conf ]; then
+	ln -L @sysconfdir@/snmpd.conf @sysconfdir@/snmp/snmpd.conf
+	touch @sysconfdir@/snmpd.local.conf
+    fi
+    if [ ! -e @sysconfdir@/snmp/snmpd.local.conf -a -e @sysconfdir@/snmpd.local.conf ]; then
+	ln -L @sysconfdir@/snmpd.local.conf @sysconfdir@/snmp/snmpd.conf
+    fi
+    if [ -s $snmp_fil ]; then
+	if ! grep '^# Generated from snmp.d' $snmp_fil >/dev/null 2>&1; then
+	    cp -f -b --suffix=.pacorig -- $snmp_fil $snmp_lcl
+	fi
+    fi
+    (   echo '# Generated from snmp.d by @PACKAGE_LCNAME@'
+	echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
+	echo '# EDIT THE FILES IN THE snmp.d DIRECTORY INSTEAD.'
+    ) >$snmp_tmp
+    for f in $files; do
+	if [ -f $f -a $f = $snmp_lcl ]; then
+	    case $f in
+		(*.pacorig|*.pacnew) ;;
+		(*) (   echo '# Generated from snmp.d/'`basename $f`
+			sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+		    ) >>$snmp_tmp
+		    ;;
+	    esac
+	fi
+    done
+    for f in $files ; do
+	if [ -f $f -a $f != $snmp_lcl ]; then
+	    case $f in
+		(*.pacorig|*.pacnew) ;;
+		(*) (   echo '# Generated from snmp.d/'`basename $f`
+			sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+		    ) >>$snmp_tmp
+		    wrote_one=yes
+		    ;;
+	    esac
+	fi
+    done
+    if [ $wrote_one = yes ]; then
+	if ! diff $snmp_tmp $snmp_fil >/dev/null 2>&1; then
+	    cp -f -b --suffix=.pacorig -- $snmp_tmp $snmp_fil
+	    changed_local=yes
+	fi
+    elif [ -f $snmp_lcl ]; then
+	cp -f -- $snmp_lcl $snmp_fil
+	rm -f -- $snmp_lcl
+	changed_local=yes
+    elif [ -s $snmp_fil ]; then
+	cat /dev/null > $snmp_fil
+	changed_local=yes
+    fi
+    rmdir $snmp_dir 2>/dev/null || :
+    rm -f -- $snmp_tmp || :
+    if [ $changed_local = yes ]; then
+	if [ -f @initrddir@/snmpd ]; then
+	    r="`runlevel | awk '{print$2}'`"
+	    start=no
+	    for l in @initrddir@/../rc${r}.d/S[0-9][0-9]snmpd @initrddir@/rc${r}.d/S[0-9][0-9]snmpd; do
+		if [ -L $l ]; then start=yes; break; fi
+	    done
+	    if [ $start = yes -o -e /var/lock/subsys/snmpd ]; then
+		[ -x "`which service     2>/dev/null`" ] && { service     snmpd reload || :; }
+		[ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d snmpd reload || :; }
+		[ -x "@initrddir@/snmpd"               ] && { @initrddir@/snmpd reload || :; }
+	    fi
+	else
+	    killall -HUP snmpd || :
+	fi
+    fi
+}
+_post_install_lib_snmpconf() {
+    _post_lib_snmpconf		|| :
+}
+_post_upgrade_lib_snmpconf() {
+    _post_lib_snmpconf		|| :
+}
+# _post_remove_lib_snmpconf() - When purging, rebuild the snmpd.local.conf file
+#   and reload the snmp daemon (when it is running) after our files have been
+#   removed.  Note that on upgrade, this is the responsibility of the new
+#   version's postinst.
+#
+_post_remove_lib_snmpconf () {
+    local snmp_fil snmp_dir snmp_lcl snmp_tmp wrote_one changed_local files f
+    echo ">>> Updating @sysconfdir@/snmp/snmpd.conf..." >&2
+    snmp_fil=@sysconfdir@/snmp/snmpd.local.conf
+    snmp_dir=@sysconfdir@/snmp/snmp.d
+    snmp_lcl=@sysconfdir@/snmp/snmp.d/00local
+    snmp_tmp=${tmppath:-/var/tmp}/snmpd.local.conf.tmp.$$
+    wrote_one=no
+    changed_local=no
+    files="$snmp_dir/*"
+    if [ ! -e @sysconfdir@/snmp/snmpd.conf -a -e @sysconfdir@/snmpd.conf ]; then
+	ln -L @sysconfdir@/snmpd.conf @sysconfdir@/snmp/snmpd.conf
+	touch @sysconfdir@/snmpd.local.conf
+    fi
+    if [ ! -e @sysconfdir@/snmp/snmpd.local.conf -a -e @sysconfdir@/snmpd.local.conf ]; then
+	ln -L @sysconfdir@/snmpd.local.conf @sysconfdir@/snmp/snmpd.local.conf
+    fi
+    if [ -s $snmp_fil ]; then
+	if grep '^# Generated from snmp.d' $snmp_fil >/dev/null 2>&1; then
+	    if [ -d $snmp_dir ]; then
+		cp -f -b --suffix=.pacorig -- $snmp_fil $snmp_lcl
+	    fi
+	fi
+    fi
+    (   echo '# Generated from snmp.d by @PACKAGE_LCNAME@'
+	echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
+	echo '# EDIT THE FILES IN THE snmp.d DIRECTORY INSTEAD.'
+    ) >$snmp_tmp
+    for f in $files; do
+	if [ -f $f -a $f = $snmp_lcl ]; then
+	    case $f in
+		(*.pacorig|*.pacnew) ;;
+		(*) (   echo '# Generated from snmp.d/'`basename $f`
+			sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+		    ) >>$snmp_tmp
+		    ;;
+	    esac
+	fi
+    done
+    for f in $files ; do
+	if [ -f $f -a $f != $snmp_lcl ]; then
+	    case $f in
+		(*.pacorig|*.pacnew) ;;
+		(*) (   echo '# Generated from snmp.d/'`basename $f`
+			sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+		    ) >>$snmp_tmp
+		    wrote_one=yes
+		    ;;
+	    esac
+	fi
+    done
+    if [ $wrote_one = yes ]; then
+	if ! diff $snmp_tmp $snmp_fil >/dev/null 2>&1; then
+	    cp -f -b --suffix=.pacorig -- $snmp_tmp $snmp_fil
+	    changed_local=yes
+	fi
+    elif [ -f $snmp_lcl ]; then
+	cp -f -- $snmp_lcl $snmp_fil
+	rm -f -- $snmp_lcl
+	changed_local=yes
+    else
+	cat /dev/null > $snmp_fil
+	changed_local=yes
+    fi
+    rmdir $snmp_dir 2>/dev/null || :
+    rm -f -- $snmp_tmp || :
+    if [ $changed_local = yes ]; then
+	if [ -f @initrddir@/snmpd ]; then
+	    r="`runlevel | awk '{print$2}'`"
+	    start=no
+	    for l in @initrddir@/../rc${r}.d/S[0-9][0-9]snmpd @initrddir@/rc${r}.d/S[0-9][0-9]snmpd; do
+		if [ -L $l ]; then start=yes; break; fi
+	    done
+	    if [ $start = yes -o -e /var/lock/subsys/snmpd ]; then
+		[ -x "`which service     2>/dev/null`" ] && { service     snmpd reload || :; }
+		[ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d snmpd reload || :; }
+		[ -x "@initrddir@/snmpd"               ] && { @initrddir@/snmpd reload || :; }
+	    fi
+	else
+	    killall -HUP snmpd || :
+	fi
+    fi
+}
+# ---------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# TCL LIBRARIES
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+_post_lib_tcllibs () {
+    local d
+    echo ">>> Updating TCL libraries..." >&2
+    if [ -x "`which tclsh 2>/dev/null`" ]; then
+	for d in `find $pkgtcllibdir -mindepth 1 -maxdepth 1 -type d` ; do
+	    echo -e "pkg_mkIndex $d\\nexit" | tclsh || :
+	done
+    fi
+}
+_post_install_lib_tcllibs () {
+    _post_lib_tcllibs		|| :
+}
+_post_upgrade_lib_tcllibs () {
+    _post_lib_tcllibs		|| :
+}
+# _post_remove_lib_tcllibs() - After removal or upgrade, the tcl module index
+#   files should be removed.  Note that after removal there are no tcl modules
+#   around and the directories can be removed as well.  For upgrade, however,
+#   the tcl modules still exist, but all index files for them can be removed.
+#
+_post_remove_lib_tcllibs () {
+    local files f d
+    echo ">>> Updating TCL libraries..." >&2
+    files="$pkgtcllibdir/pkgIndex.tcl $pkgtcllibdir/*/pkgIndex.tcl"
+    for f in $files; do
+	if [ -f $f ]; then
+	    rm -f -- $f || :
+	    d=`dirname $f`
+	    if [ -d $d ]; then
+		rmdir -p $d 2>/dev/null || :
+	    fi
+	fi
+    done
+}
+# ---------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 32-BIT COMPATIBILITY LIBRARIES
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# _post_compat_libraries() - After a fresh installation, upgrade or
+#   reinstall, do a ldconfig.
+#
+_post_compat_libraries() {
+    local v d s
+    echo ">>> Updating 32-bit library load cache..." >&2
+    d="@lib32dir@"; s="@syslib32dir@"
+    if   [ -x "`which libtool  2>/dev/null`" ]; then
+        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+	[ -d "$d" ] && { libtool --mode=finish $v "$d" || :; }
+	[ -d "$s" ] && { libtool --mode=finish $v "$s" || :; }
+    elif [ -x "`which ldconfig 2>/dev/null`" ]; then
+	[ -d "$d" ] && { ldconfig -n "$d" || :; }
+	[ -d "$s" ] && { ldconfig -n "$s" || :; }
+    fi
+}
+_post_install_compat_libraries() {
+    _post_compat_libraries		|| :
+}
+_post_upgrade_compat_libraries() {
+    _post_compat_libraries		|| :
+}
+_post_remove_compat_libraries() {
+    _post_compat_libraries		|| :
+}
+# ---------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# PRE INSTALL
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# In general, pre_install needs to make any adjustments to the system that would
+# otherwise conflict with the installation.  These actions typically only need
+# to be performed once on initial installation.
+# -----------------------------------------------------------------------------
+_pre_install_repo() {
+    _pre_install_repo_creds		|| return $?
+}
+_pre_install_base() {
+    _pre_install_base_modconf		|| :
+    _pre_install_base_preloads		|| :
+    _pre_install_base_initscripts	|| :
+    _pre_install_base_modules		|| :
+    _pre_install_base_manpages		|| :
+    _pre_install_base_manrefs		|| :
+    _pre_install_base_manmacros		|| :
+}
+_pre_install_lib() {
+    _pre_install_lib_tools		|| :
+    _pre_install_lib_libraries		|| :
+}
+_pre_install_compat() {
+    [ -z '@WITH_32BIT_LIBS_TRUE@' ]	|| return 0
+    :
+}
+# pre_install($new_version) - script is run right before files are extracted.
+#   One argument is passed: new pakage version.
+#
+pre_install() {
+    _set_vars
+    #_pre_install_repo			|| return $?
+    _pre_install_base			|| :
+    _pre_install_lib			|| :
+    _pre_install_compat			|| :
+}
+# -----------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# POST INSTALL
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# In general, post_install needs to create or reconfigure any files that are
+# not simply installed.  In general, the same actions should be performed also
+# by the post_upgrade procedures.
+# -----------------------------------------------------------------------------
+_post_install_repo() {
+    _post_install_repo_creds		|| :
+}
+_post_install_base() {
+    _post_install_base_modconf		|| :
+    _post_install_base_preloads		|| :
+    _post_install_base_initscripts	|| :
+    _post_install_base_manrefs		|| :
+    _post_install_base_manmacros	|| :
+    _post_install_base_manpages		|| :
+}
+_post_install_lib() {
+    _post_install_lib_libraries		|| :
+    _post_install_lib_netconfig		|| :
+    _post_install_lib_sock2path		|| :
+    _post_install_lib_snmpconf		|| :
+    _post_install_lib_tcllibs		|| :
+}
+_post_install_compat() {
+    [ -z '@WITH_32BIT_LIBS_TRUE@' ]	|| return 0
+    _post_install_compat_libraries	|| :
+}
+# post_install($new_version) - script is run right after files are extracted.
+#   One argument is passed: new package version.
+#
+post_install() {
+    _set_vars
+    #_post_install_repo			|| :
+    _post_install_base			|| :
+    _post_install_lib			|| :
+    _post_install_compat		|| :
+}
+# -----------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# PRE REMOVE
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# In general, pre_remove needs to remove any files that we added or reconfigured
+# as a result of a post_install operation that pacman will not know about or
+# remove otherwise.  In general, the same actions should be performed also by
+# the pre_upgrade procedures.
+# -----------------------------------------------------------------------------
+_pre_remove_repo() {
+    _pre_remove_repo_creds		|| :
+}
+_pre_remove_base() {
+    _pre_remove_base_modconf		|| :
+    _pre_remove_base_preloads		|| :
+    _pre_remove_base_initscripts	|| :
+    _pre_remove_base_manrefs		|| :
+    _pre_remove_base_manmacros		|| :
+}
+_pre_remove_lib() { :
+}
+_pre_remove_compat() {
+    [ -z '@WITH_32BIT_LIBS_TRUE@' ]	|| return 0
+    :
+}
+# pre_remove($old_version) - script is run right before files are removed.  One
+#   argument is passed: old package version.
+#
+pre_remove() {
+    _set_vars
+    #_pre_remove_repo			|| :
+    _pre_remove_base			|| :
+    _pre_remove_lib			|| :
+    _pre_remove_compat			|| :
+}
+# -----------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# POST REMOVE
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# In general, post_remove needs to tidy up and remnants of the package that
+# might otherwise be left behind.  These actions typically are only performed
+# when the package is finally removed.
+# -----------------------------------------------------------------------------
+_post_remove_repo() {
+    _post_remove_repo_creds		|| :
+}
+_post_remove_base() {
+    _post_remove_base_modconf		|| :
+    _post_remove_base_initscripts	|| :
+    _post_remove_base_manpages		|| :
+}
+_post_remove_lib() {
+    _post_remove_lib_libraries		|| :
+    _post_remove_lib_netconfig		|| :
+    _post_remove_lib_sock2path		|| :
+    _post_remove_lib_snmpconf		|| :
+    _post_remove_lib_tcllibs		|| :
+}
+_post_remove_compat() {
+    [ -z '@WITH_32BIT_LIBS_TRUE@' ]	|| return 0
+    _post_remove_compat_libraries	|| :
+}
+# post_remove($old_version) - script is run right after files are removed.  One
+#   argument is passed: old package version.
+#
+post_remove() {
+    _set_vars
+    #_post_remove_repo			|| :
+    _post_remove_base			|| :
+    _post_remove_lib			|| :
+    _post_remove_compat			|| :
+}
+# -----------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# PRE UPGRADE
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+_pre_upgrade_repo() {
+    _pre_install_repo			|| return $?
+}
+_pre_upgrade_base() {
+    _pre_upgrade_base_modconf		|| :
+    _pre_upgrade_base_preloads		|| :
+    _pre_upgrade_base_manrefs		|| :
+    _pre_upgrade_base_manmancros	|| :
+}
+_pre_upgrade_lib() { :
+}
+_pre_upgrade_compat() {
+    [ -z '@WITH_32BIT_LIBS_TRUE@' ]	|| return 0
+    _post_upgrade_compat_libraries	|| :
+}
+# pre_upgrade($new_version,$old_version) - script is run right before files are
+#   extracted.  Two arguments are passed in the following order: new package
+#   version, old package version.  (I can't find documentation that states this,
+#   but I believe that the old package files are still in tree.)
+#
+pre_upgrade() {
+    _set_vars
+    #_pre_upgrade_repo			|| return $?
+    _pre_upgrade_base			|| :
+    _pre_upgrade_lib			|| :
+    _pre_upgrade_compat			|| :
+}
+# -----------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# POST UPGRADE
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+_post_upgrade_repo() {
+    _post_install_repo			|| return $?
+}
+_post_upgrade_base() {
+    _post_upgrade_base_modconf		|| :
+    _post_upgrade_base_preloads		|| :
+    _post_upgrade_base_manrefs		|| :
+    _post_upgrade_base_manmacros	|| :
+    _post_upgrade_base_manpages		|| :
+}
+_post_upgrade_lib() {
+    _post_upgrade_lib_libraries		|| :
+    _post_upgrade_lib_netconfig		|| :
+    _post_upgrade_lib_sock2path		|| :
+    _post_upgrade_lib_snmpconf		|| :
+    _post_upgrade_lib_tcllibs		|| :
+}
+_post_upgrade_compat() {
+    [ -z '@WITH_32BIT_LIBS_TRUE@' ]	|| return 0
+    _post_install_compat		|| :
+}
+# post_upgrade($new_version,$old_version) - script is run right after files are
+#   extracted.  Two arguments are passed in the following order: new package
+#   version, old package version.  (I can't find documentation that states this,
+#   but I believe that the old package files have been removed.)
+#
+post_upgrade() {
+    _set_vars
+    #_post_upgrade_repo			|| return $?
+    _post_upgrade_base			|| :
+    _post_upgrade_lib			|| :
+    _post_upgrade_compat		|| :
+}
+# -----------------------------------------------------------------------------
+
+# =============================================================================
+#
+# $Log$
+# =============================================================================
+# vim: sw=4 tw=80

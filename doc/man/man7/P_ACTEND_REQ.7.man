@@ -1,0 +1,411 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: P_ACTEND_REQ.7.man,v 1.1.2.2 2011-02-07 02:18:23 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:23 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: P_ACTEND_REQ.7.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:23  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH P_ACTEND_REQ 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "X/Open ASCE/Presentation (XAP)"
+.\"
+.\"
+.SH NAME
+.B P_ACTEND_REQ
+\-  used to request the end of an activity
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xap.h>
+.HP
+.B int ap_snd(
+.br
+.BI "int " fd ,
+.br
+.BI "unsigned long " sptype ,
+.br
+.BI "ap_cdata_t *" cdata ,
+.br
+.BI "ap_osi_vbuf_t *" ubuf ,
+.br
+.BI "int " flags ,
+.br
+.BI "unsigned long *" aperrno_p );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B P_ACTEND_REQ
+primitive is used in conjunction with
+.BR ap_snd (3)
+and the XAP Library environment to provide the user with access to the S-ACTIVITY-END session
+service.
+.[
+x215
+.]
+The S-ACTIVITY-END session service allows the user to indicate the end of an activity.
+.PP
+Refer to the table in the manual page description for
+.BR ap_snd (3)
+for information concerning the effects of sending the
+.B P_ACTEND_REQ
+primitive and restrictions on its use.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+To send a
+.B P_ACTEND_REQ
+primitive, the arguments to
+.BR ap_snd (3)
+must be set as described below:
+.TP \w'\fIaperrno_p\fP\(em'u
+.I fd
+This argument identifies the APLI/XAP Library instance being used.
+.TP
+.I sptype
+This argument must be set to
+.BR AP_P_ACTEND_REQ .
+.TP
+.I cdata
+The following members of
+.I cdata
+are used for this primitive:
+.RS
+.RS 4
+.PP
+.nf
+\f(CW\s-1\
+long udata_length;     /* length of user-data field       */
+long sync_p_sn;        /* serial number (set by provider) */
+unsigned long tokens;  /* surrendered tokens              */
+\s+1\fP
+.fi
+.RE
+.PP
+Where this primitive is to be sent using a series of calls to
+.BR ap_snd (3)
+with the
+.B AP_MORE
+flag set,
+.I cdata->udata_length
+should be set to the total number of octets of encoded user data that will be
+sent with this primitive.  If the total number of octets of encoded user-data
+is not known this field may be set to minus one
+.RB ( -1 ).
+However, in some XAP implementations, setting this field to minus one
+.RB ( -1 )
+may significantly degrade performance as it requires the implementation to
+buffer data until a complete SPDU can be transmitted.
+.PP
+The total number of octets of encoded user-data that can be sent with this
+primitive may be subject to an implementation dependent restriction.  Any such
+restriction will be stated in the CSQ for an implementation.
+.PP
+.I cdata->sync_p_sn
+is the serial number assigned to this synchronization point.  This field is set by the provider.
+When the XAP Library is being used asynchronously,
+.BR ap_snd (3)
+may return before the value of the synchronization point serial number is received from the
+underlying session provider.  In this case, the service returns the
+.RB [ AP_AGAIN ]
+error code.  The use must call
+.BR ap_snd (3)
+repeatedly, with the same
+.I cdata->sync_p_sn
+argument indicates the value assigned to the synchronization point by the session provider.
+.PP
+.I cdata->tokens
+identifies the token(s) surrendered.  Tokens are identified by OR'ing together one or more of the
+following values:
+.TP \w'\fBAP_SYNCMINOR_TOK\fP\(em'u
+.B AP_DATA_TOK
+Data token.
+.PD 0
+.TP
+.B AP_MAJACT_TOK
+Synchronize-major/activity token.
+.TP
+.B AP_SYNCMINOR_TOK
+Synchronize-minor token.
+.TP
+.B AP_RELEASE_TOK
+Release token.
+.PD
+.RE
+.TP
+.I ubuf
+Use of the
+.I ubuf
+argument is described in the manual page for
+.BR ap_snd (3).
+.TP
+.I flags
+The
+.I flags
+argument is used to control certain aspects of primitive processing as defined
+in the manual page for
+.BR ap_snd (3).
+.RS
+.PP
+When issuing the
+.B P_ACTEND_REQ
+primitive via multiple
+.BR ap_snd (3)
+calls (using the
+.B AP_MORE
+bit feature), one or more octets of data must be sent on the final
+.BR ap_snd (3)
+call of the sequence.
+.RE
+.TP
+.I aperrno_p
+This must point to a location which will be set to an error code if a failure
+occurs.
+.\"
+.\"
+.SH MODES
+.PP
+This primitive is valid both in
+.RI \(lq Normal \(rq
+and
+.RI \(lq X.410-1984 \(rq
+mode.
+.[
+x410 1984
+.]
+.\"
+.\"
+.SH ENVIRONMENT
+.PP
+.PP
+The following attributes may change as a result of issuing the primitive:
+.BR AP_STATE ,
+.BR AP_TOKENS_OWNED .
+.\"
+.\"
+.SH ORIGINATOR
+.PP
+This primitive is originated by the XAP interface client.
+.\"
+.\"
+.SH STATES
+.PP
+This primitive is valid in state
+.BR AP_DATA_XFER .
+The next state is
+.BR AP_WACTEcnf_ACTEreq .
+.\"
+.\"
+.SH RETURN
+.PP
+Refer to the manual page for
+.BR ap_snd (3)
+in the referenced APLI
+.[
+apli unix international
+.]
+or XAP
+.[
+xap c303
+.]
+specifications.
+.\"
+.\"
+.SH ERRORS
+.PP
+Refer to the manual page for
+.BR ap_snd (3)
+in the referenced APLI
+.[
+apli unix international
+.]
+or XAP
+.[
+xap c303
+.]
+specifications.
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR ap_snd (3),
+.BR APLI (3),
+.BR XAP (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.B P_ACTEND_REQ
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B P_ACTEND_REQ
+is compatible with APLI
+.[
+apli unix international
+.]
+and XAP,
+.[
+xap c303
+.]
+and implementations based on APLI and XAP, such as
+.IR "Solaris SunLink" \(rg
+.[
+sunlink-apli
+.]
+and
+.IR "HP-UX OTS/9000" \(rg,
+.[
+hpuxapli
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.PP
+See
+.BR APLI (3)
+and
+.BR XAP (3)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+APLI,
+.[
+apli unix international
+.]
+XAP.
+.[
+xap c303
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B P_ACTEND_REQ
+first appeared in APLI.
+.[
+apli unix international
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 APLI/XAP Library under the OpenSS7
+Project.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4

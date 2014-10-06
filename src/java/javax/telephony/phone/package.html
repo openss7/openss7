@@ -1,0 +1,402 @@
+<HTML>
+<HEAD>
+<TITLE>
+The Java Telephony API Phone Package
+</TITLE>
+<!-- Changed by: , 22-Sep-1996 -->
+<!-- Changed by: Jordan M. Slott, 22-Jan-1997 -->
+<!-- Changed by: Gary Adams - SMI Software Development,  4-May-1999 -->
+<!-- Changed by: Alexey Roytman, Marc Petit-Huguenin, Juan Bernabó, Bob Andreasen, Daniel Petrie, Rich Pennenga - JTAPI 1.4 team,  28-July-2001 -->
+</HEAD>
+
+
+<BODY BGCOLOR="#ffffff">
+
+The JTAPI Phone package provides objects that model the physical 
+characteristics of the terminal, such as,
+speakerphone,microphone, display, buttons, ringer, handset, and
+lamp.
+
+<H2>
+Introduction
+</H2>
+
+<P>
+This document provides an overview of the <EM>Phone Extension Package</EM> to
+the Java<SUP><FONT SIZE=-2>TM</FONT></SUP> Telephony API.
+The Phone Extension Package permits implementations
+to describe physical Terminals in terms of standardized components.
+Applications may query each Terminal, using this package, for the components
+of which it is made and control certain attributes of these components.
+</P>
+
+<P>
+<HR>
+<STRONG>Note:</STRONG>
+<EM>
+The Phone Extension Package was previously named the <STRONG>Set Extension
+Package</STRONG> in Version 1.0 of this specification. Because of overwelming
+feedback on this specification, the Java<SUP><FONT SIZE=-2>TM</FONT></SUP>
+Telephony Specification working
+partners decided the term <STRONG>Set</STRONG> was ambiguous and has many
+meanings. Additionally, backwards compatability to the name <STRONG>Set</STRONG>
+will <STRONG>NOT</STRONG> be maintained. We apologize for any inconvienience this
+may have caused.
+</EM>
+<HR>
+</P>
+
+<P>
+The Phone Extension Package defines a number of components standard to
+traditional telephone-set hardware. These components include speakerphone,
+microphone, display, buttons, ringer, handset, and
+lamp. Each component exports a standard interface to control its attributes.
+For example, the ringer permits applications to control its volume, while
+the buttons permit applications to simulate pressing buttons.
+</P>
+
+<BR>
+
+<H3>Overview Document Organization</H3>
+
+<P>
+This overview document is organized into the following sections:
+</P>
+
+<TABLE CELLPADDING=10 WIDTH="100%">
+<TR>
+<TD WIDTH="30%">
+<A HREF="#ARCHITECTURE">Phone Package Architecture</A>
+</TD>
+<TD WIDTH="70%">
+This section summarizes the architecture used by the Phone Extension Package
+to describe Terminals in term of the standard telephone-set components.
+</TD>
+</TR>
+
+<TR>
+<TD WIDTH="30%">
+<A HREF="#TERMINAL">Extending the Terminal interface</A>
+</TD>
+<TD WIDTH="70%">
+The section summarizes the <STRONG><EM>java.telephony.PhoneTerminal</EM></STRONG>
+interface. This interface extends the core Terminal interfaces to permit
+applications to query for the number and kinds of components of which it is
+composed.
+</TD>
+</TR>
+
+<TR>
+<TD WIDTH="30%">
+<A HREF="#COMPONENTS">Phone Package Standard Components</A>
+</TD>
+<TD WIDTH="70%">
+This section describes the standard components in this package used to
+described traditional telephone-set hardware.
+</TD>
+</TR>
+
+</TABLE>
+
+
+<H2>
+<A NAME="ARCHITECTURE">Phone Package Architecture.</A>
+</H2>
+
+<P>
+This section explains how the Phone package describes Terminals in terms of
+their individual components.
+</P>
+
+<H3>
+Component Interface
+</H3>
+
+<P>
+The Phone package consists of a set of interfaces, each
+modelling some physical feature of a traditional telephone hardware set. There
+exists interfaces to model buttons, displays, lamps, ringers, hookswitches,
+speakers, and microphones. Each of these distinct interfaces provide methods
+to control the attributes inherent to each component type.
+</P>
+<P>
+Each individual component extends the <STRONG>Component</STRONG> interface. These
+corresponding individual component interfaces are: <STRONG>PhoneButton</STRONG>,
+<STRONG>PhoneDisplay</STRONG>, <STRONG>PhoneLamp</STRONG>, <STRONG>PhoneRinger</STRONG>,
+<STRONG>PhoneHookswitch</STRONG>, <STRONG>PhoneSpeaker</STRONG>, and
+<STRONG>PhoneMicrophone</STRONG>. Each component is identified by its type and
+a string name.
+</P>
+<H3>
+ComponentGroup Interface
+</H3>
+
+<P>
+One or more individual components are organized into component groups. These
+component groups represent an association between components as they exist
+on the actual, physical hardware. Applications obtain an array of the
+components associated with a component group via the <EM>getComponents()</EM>
+method on this interface.
+</P>
+
+<P>
+There may be more than one ComponentGroup associated with a single Terminal
+object. Applications obtain an array of the component groups associated with
+a Terminal via the <EM>getComponentGroups()</EM> method on the
+<STRONG>PhoneTerminal</STRONG> interface.
+</P>
+
+<P>
+Terminals may have more than one ComponentGroup for the following reasons: at
+times an implementation may want to model a physical endpoint (i.e. Terminal)
+with two groups of components. One of these groups may model a telephone
+hardware set sitting on a person's desktop, while the other group may model
+a "virtual" telephone set drawn on the person's workstation's display.
+</P>
+
+<P>
+Only a single ComponentGroup may be "activated" on a Terminal at a time. The
+act of activating a ComponentGroup enables its components to become actively
+part of the telephone call. For example, if a speaker component is part of
+a ComponentGroup which is activated, that speaker will receive all of the
+media sent to it. Applications activated a ComponentGroup with the
+<EM>activate()</EM> method and deactivate a group with the <EM>deactivate()</EM>
+method.
+</P>
+
+<BR><BR>
+
+<H2>
+<A NAME="TERMINAL">Extending the Terminal Interface</A>
+</H2>
+
+<P>
+The Phone Extension Package extends the core Terminal interface with the
+<STRONG>PhoneTerminal</STRONG> interface. This interface permits
+applications to query for the components which make up the Terminal object.
+</P>
+
+<P>
+As described in the previous section, each Terminal is composed of zero or
+more <EM>ComponentGroups</EM>. These groups are obtained via the
+<STRONG>PhoneTerminal.getComponentGroups()</STRONG> method. The following code
+segment queries for the Terminal named "5551212" and for the groups of
+components associated with this Terminal.
+</P>
+
+<PRE>
+try {
+  Terminal terminal = myprovider.getTerminal("5551212");
+
+  ComponentGroup groups[];
+  if (terminal instanceof PhoneTerminal) {
+    groups = ((PhoneTerminal)terminal).getComponentGroups();
+  }
+} catch (Exception excp) {
+  // Handle exceptions
+}
+</PRE>
+
+<P>
+Once an application obtains a list of groups, it may choose to activate one
+of these groups. The meaning of activating and deactivating a group of
+components was described in the previous section. The following code segment
+chooses the first group and activates it.
+</P>
+
+<PRE>
+if (groups != null &amp;&amp; groups.length &gt;= 1) {
+  try {
+    groups[0].activate();
+  } catch (Exception excp) {
+    // Handle exceptions
+  }
+}
+</PRE>
+
+<P>
+Next, applications may query for the array of individual components in the
+component group. An application may iterate through this array and control the
+attributes of each component-type. In the code sample below, the application
+looks for the microphone component and sets it on the maximum volume.
+</P>
+
+<PRE>
+Component components[] = groups[0].getComponents();
+
+ for (int i = 0; i &lt components.length; i++) {
+  if (components[i] instanceof PhoneMicrophone) {
+    PhoneMicrophone mic = (PhoneMicrophone)components[i];
+
+    mic.setVolume(PhoneMicrophone.FULL);
+  }
+}
+</PRE>
+
+<BR><BR>
+
+<H2>
+<A NAME="COMPONENTS">Phone Package Standard Components</A>
+</H2>
+
+<P>
+The Phone Extension Package defines a number of standard components found on
+traditional telephone hardware. Each component exports its own interfaces and
+controls over its attributes. Each component also has specific events 
+indicating when its attributes change. This section briefly describes each
+component, the methods available on its interfaces, and the event associated
+with them.
+</P>
+
+<H3>
+Button Component
+</H3>
+
+<OL>
+<P>
+The <STRONG>PhoneButton</STRONG> component models a button on a telephone keypad.
+Applications may "press" this button via the <EM>buttonPress()</EM> on the
+PhoneButton interface. Each button has an indentifying piece of information
+associated with it (e.g. the text label on the telephone keypad button).
+Applications may obtain and set this information via the <EM>getinfo()</EM>
+and <EM>setInfo()</EM> methods, repsectively. Additionally, there may be
+a lamp-component associated with a button, obtained via the
+<EM>getAssociatedPhoneLamp()</EM> method.
+</P>
+<P>
+Applications receive the <EM>ButtonPressEv</EM> event when the button component
+has been pressed and the <EM>ButtonInfoEv</EM> when the identifying
+information on the button has changed.
+</P>
+</OL>
+
+
+<H3>
+Display Component
+</H3>
+
+<OL>
+<P>
+The <STRONG>PhoneDisplay</STRONG> component models the display on the
+telephone hardware set. This display is composed of a certain number of
+rows and columns. Applications may set and obtain the text displayed at
+a particular coordinate via the <EM>setDisplay()</EM> and <EM>getDisplay()</EM>
+methods, respectively.
+</P>
+<P>
+When any information on the display has changed, the application receives the
+<EM>DisplayUpdateEv</EM>.
+</P>
+</OL>
+
+
+<H3>
+Hookswitch Component
+</H3>
+
+<OL>
+<P>
+The <STRONG>PhoneHookswitch</STRONG> component models the physical hookswitch on
+a telephone hardware set. (A <EM>hookswitch</EM> is the level component on the
+telephone set on which the handset rests, which is depressed when the phone
+is on-hook.) The Hookswitch component can either be in an ON_HOOK state or an
+OFF_HOOK state. The application may set and obtain the hookswitch state via
+the <EM>setHookswitchState()</EM>) and <EM>getHookswitchState()</EM> methods,
+respectively.
+</P>
+<P>
+Applications receive the <EM>HookswitchStateEv</EM> event when the state of
+a hookswitch changes.
+</P>
+</OL>
+
+<H3>
+Lamp Component
+</H3>
+
+<OL>
+<P>
+The <STRONG>PhoneLamp</STRONG> component models a light-indicator on the telephone
+hardware set. Often, this lamp is a single green-color or red-color LED. Lamp
+components have a "mode" attribute which indicate the pattern of its flashing
+light. For example, the lamp mode can be LAMPMODE_FLUTTER, LAMPMODE_STEADY,
+or LAMPMODE_WINK, to name a few. Applications may set and obtain the lamp
+mode via the <EM>setMode()</EM> and <EM>getMode()</EM> methods, respectively.
+Additionally, lamp components may be associated with a button component. This
+button component is obtained via the <EM>getAssociatedPhoneButton()</EM> method.
+</P>
+<P>
+Applications receive the <EM>LampModeEv</EM> when the mode of the lamp component
+has changed.
+</P>
+</OL>
+
+
+<H3>
+Microphone Component
+</H3>
+
+<OL>
+<P>
+The <STRONG>PhoneMicrophone</STRONG> component represents the audio input device
+on a telephone hardware set. The microphone has a single attribute: its gain.
+Applications may set or obtain the microphone's gain via the <EM>setGain()</EM>
+and <EM>getGain()</EM> methods, respectively.
+</P>
+<P>
+Applications receive the <EM>MicrophoneGainEv</EM> event when the gain of a
+microphone component has changed.
+</P>
+</OL>
+
+
+<H3>
+Ringer Component
+</H3>
+
+<OL>
+<P>
+The <STRONG>PhoneRinger</STRONG> component represents the audible ringing device
+on a telephone hardware set. The ringer component has several attributes.
+First, applications may control the ringing pattern of the ringer component.
+In order to control the ringing pattern, applications obtain the number of
+ringing patterns via the <EM>getNumberOfRingPatterns()</EM> method. Applications
+then set the ringing pattern via the <EM>setRingerPattern()</EM>. It uses an
+integer index value between zero and the number of ringing patterns minus
+one. Applications may obtain the current ringing pattern via the
+<EM>getRingingPattern()</EM> method, and the number of rings which have already
+happened via the <EM>getNumberOfRings()</EM> method.
+</P>
+<P>
+The ringer component also has a volume attribute that may be set or obtained
+via the <EM>setRingerVolume()</EM> and <EM>getRingerVolume()</EM> methods,
+respectively.
+</P>
+<P>
+Applications receive the <EM>RingerPatternEv</EM> when the ringing pattern has
+changed on the ringer component and the <EM>RingerVolumeEv</EM> when the ringer
+volume has changed.
+</P>
+</OL>
+
+
+<H3>
+Speaker Component
+</H3>
+
+<OL>
+<P>
+The <STRONG>PhoneSpeaker</STRONG> component represents the audio output device
+on a telephone hardware set. The speaker has a single attribute: its volume.
+Applications may set or obtain the speaker's volume via the <EM>setVolume()</EM>
+and <EM>getVolume()</EM> methods, respectively.
+</P>
+<P>
+Applications receive the <EM>SpeakerVolumeEv</EM> event when the volume of a
+speaker component has changed.
+</P>
+</OL>
+
+
+</BODY>
+</HTML>

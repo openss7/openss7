@@ -1,0 +1,652 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: ss7.7.man,v 1.1.2.2 2011-02-07 02:18:29 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:29 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ss7.7.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:29  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH SS7 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Signalling System No. 7" 
+.SH "NAME"
+ss7 \- Signalling System No. 7 for STREAMS
+.SH "SYNOPSIS"
+.nf
+.B #include <ss7/ss7.h>
+.HP
+.BI "int " fd " = open(" /dev/module ", " flags );
+.HP
+.BI "int " ret " = ioctl(" fd ", " cmd ", ... /* " arg " */ );"
+.fi
+.SH "DESCRIPTION"
+
+The \fIOpenSS7\fR STREAMS package for SS7 consists of a number of loadable
+drivers and modules for Linux which are based on the
+.B Linux Fast-STREAMS
+package.  These drivers and modules implement the traditional SS7 stack as
+well as providing some IETF SIGTRAN and other SS7 over IP components.
+
+\fIOpenSS7\fR protocol layers and levels are implemented as STREAMS drivers, modules and
+multiplexors.  The \fIOpenSS7\fR package provides an open specification of the
+interface to each of these drivers, modules and multiplexors to permit the
+mixing and matching of components in the SS7 stack as well as driver and
+module development at various levels.
+
+Also included in \fIOpenSS7\fR is an SS7 Conifguration Daemon
+.BR ss7d (8)
+which is responsible for configuration and intialization of the SS7 stack on
+the target host.  This daemon is normally run from system initialization
+scripts reads an SS7 configuration file and opens drivers, pushes modules and
+links the resulting streams under multiplexors to form the entire SS7 stack
+for a particular configuration.  The
+.BR ss7d (8)
+is also responsible for
+interfacing with system level utilitities for collecting statistics and
+performing maintenance and manual configuration of a running SS7 stack.
+
+This man page describes some of the features which are common to the
+\fIOpenSS7\fR
+streasms drivers, modules and multiplexors which are defined in the header
+file \fI<ss7/ss7.h>\fR.
+
+.SS Protocol Configuration
+.PP
+Each \fIOpenSS7\fR module defines a configuration structure (e.g.
+\fBsl_conf_t\fR) which contains the following two members:
+.RS
+.sp
+.nf
+typedef struct module_config {
+    ss7_ulong   pvar;   /* protocol variant */
+    ss7_ulong   popt;   /* protocol options */
+    \fI...\fR
+    \fI/* additional level specific options */\fR
+    \fI...\fR
+} module_config_t;
+.fi
+.RE
+.TP
+.I pvar
+The \fIOpenSS7\fR stack provides the capability to run many SS7 protocol
+variants simultaneously.  Therefore, all \fIOpenSS7\fR stack modules contain a
+\fIpvar\fR configuration parameter which contains the selected protocol
+variant.  Currently defined protocol variants are as follows:
+.IP
+.B SS7_PVAR_ITUT_88
+ITU-T Q.700 Series Blue Book
+.br
+.B SS7_PVAR_ITUT_93
+ITU-T Q.700 Series White Book
+.br
+.B SS7_PVAR_ITUT_96
+ITU-T Q.700 Series Grey Book
+.br
+.B SS7_PVAR_ITUT_00
+ITU-T Q.700 Series Black Book
+.br
+.B SS7_PVAR_ETSI_88
+ETSI ETS 300 Series (based on Blue Book)
+.br
+.B SS7_PVAR_ETSI_93
+ETSI ETS 300 Series (based on White Book)
+.br
+.B SS7_PVAR_ETSI_96
+ETSI ETS 300 Series (based on Grey Book)
+.br
+.B SS7_PVAR_ETSI_00
+ETSI ETS 300 Series (based on Black Book)
+.br
+.B SS7_PVAR_ANSI_88
+ANSI T1.111-1988
+.br
+.B SS7_PVAR_ANSI_92
+ANSI T1.111-1992
+.br
+.B SS7_PVAR_ANSI_96
+ANSI T1.111-1996
+.br
+.B SS7_PVAR_ANSI_00
+ANSI T1.111-2000
+.br
+.B SS7_PVAR_JTTC_94
+Japan TTC JQ.700 Series (based on Blue Book)
+.IP
+These protocol variant parameters are defined in such a way that they can be
+tested against the following to find the major variant:
+.IP
+.B SS7_PVAR_ITUT
+ITU-T Q.700 Series
+.br
+.B SS7_PVAR_ETSI
+ETSI ETS 300 Series (based on ITU-T)
+.br
+.B SS7_PVAR_ANSI
+ANSI T1.111
+.br
+.B SS7_PVAR_JTTC
+TTC JQ.700 Series
+.TP
+.I popt
+In addition, each \fIOpenSS7\fR module can enable or disable a number of major options
+which are described in the standards specifications.  Each \fIOpenSS7\fR module has a
+\fIpopt\fR configuration parameter which contains a bit vector of the enabled
+protocol options for that module.  For a definition of the options at each
+level, see the man page for the specific interface.
+.PP
+Each \fIOpenSS7\fR module recognizes protocol management primitives for
+configuration.  These primitives are invoked by protocol layer management to
+configure or request configuratoin information from the layer service
+provider.  Any \fBM_DATA\fR block attached to the primitives contains a
+\fBmodule_conf_t\fR structure (see above) which represents the configuration
+parameters.  Configuration request should normally be sent as \fBM_PCPROTO\fR
+messages.
+.TP
+.B MGMT_CONFIG_SETUP
+Test if the configuration parameters provided in the attached \fBM_DATA\fR
+block are settable and correct.  Any values set to \fI0xffffffff\fR in the
+configuration parameters should not be tested for change by the layer service
+provider.  When successful, this request also write locks the configuration
+until a successful \fBMGMT_CONFIG_COMMIT\fR is executed.
+This primitive contains only the \fImgmt_primitive\fR member.
+.TP
+.B MGMT_CONFIG_COMMIT
+Commits the changes of a previous successful \fBMGMT_CONFIG_TEST\fR operation.
+No configuration data is associated with this request and any attached
+\fBM_DATA\fR is ignored.  When successful, this request also releases the
+write locks on the configuration.
+This primitive contains only the \fImgmt_primitive\fR member.
+.TP
+.B MGMT_CONFIG_SET
+Sets the configuration parameters to the values provided in the attached
+\fBM_DATA\fR block.  This request will fail if the configuration is write
+locked.
+This primitive contains only the \fImgmt_primitive\fR member.
+.TP
+.B MGMT_CONFIG_GET
+Get the configuration parameters.  Any attached \fBM_DATA\fR is ignored.  If
+the configuration is write locked, this request will only return the values
+which have been setup for a commit and not necessarily the current values.
+This primitive contains only the \fImgmt_primitive\fR member.
+.TP
+.B MGMT_OK_ACK
+Upon success, the layer service provider will return a \fBMGMT_OK_ACK\fR to
+confirm a successful configuration request.  The provider attached a
+\fBM_DATA\fR block which contains the \fImodule_conf_t\fR structure with
+the results of the configuration request.  This primitive uses the
+\fBmgmt_ok_ack_t\fR structure as follows:
+.RS
+.sp
+.nf
+typedef struct {
+    mgmt_ulong  mgmt_primitive; /* MGMT_OK_ACK */
+    mgmt_ulong  mgmt_state;
+    mgmt_ulong  mgmt_correct_primitive;
+} mgmt_ok_ack_t;
+.fi
+.TP
+.I mgmt_state
+Contains the management state of the interface.
+.TP
+.I mgmt_correct_primitive
+Contains the request primitive which this response is acknowledging.
+.RE
+.TP
+.B MGMT_ERROR_ACK
+Upon failure, the layer service provider will return a \fBMGMT_ERROR_ACK\fR to
+reject the configuration request due to an error.  The provider attaches a
+\fBM_DATA\fR block which contains a \fBmodule_conf_t\fR structure with
+\fI0xffffffff\fR in any values which are in error.  This primitive uses the
+\fBmgmt_error_ack_t\fR structure as follows:
+.RS
+.sp
+.nf
+typedef struct {
+    mgmt_ulong  mgmt_primitive; /* MGMT_ERROR_ACK */
+    mgmt_ulong  mgmt_state;
+    mgmt_ulong  mgmt_error_primitive;
+    mgmt_ulong  mgmt_errno;
+    mgmt_ulong  mgmt_reason;
+} mgmt_error_ack_t;
+.fi
+.TP
+.I mgmt_state
+Contains the management state of the interface.
+.TP
+.I mgmt_error_primitive
+Contains the request primitive which this response is acknowledging.
+.TP
+.I mgmt_errno
+The error number indicating which error occured.
+.TP
+.I mgmt_reason
+An additional error reason code.
+.RE
+.IP
+Error numbers which are specific to a configuration request rejection are as
+follows:
+.RS
+.TP
+.B MGMT_CONFLOCKED
+The request attempted to perform an illegal operation on a locked
+configuration.
+.TP
+.B MGMT_NOCONFDATA
+The request was missing configuration data (i.e. missing \fBM_DATA\fR block or
+\fBM_DATA\fR block too short.
+.TP
+.B MGMT_BADCONFDATA
+Some configuration data was invalid.  The attached \fBM_DATA\fR block contains
+\fI0xffffffff\fR in the data elements which are considered invalid.
+.RE
+
+
+.SH "SS7 STREAMS INTERFACES"
+
+The \fIOpenSS7\fR stack provides drivers and modules at all levels of the SS7
+stack below ISUP and TCAP.  That is, it provides SS7 Level 2 (Link), SS7 Level
+3 (Network), and SCCP (Signalling Connection Control Part) functionality.
+These protocol components have been broken into a number of sublevels,
+starting from the bottom-most, as follows:
+.TP 8
+.BR sdli (7)
+The \fISignalling Data Link Interface (SDLI)\fR implements SS7 Level 1 [Q702].
+SDLI allows real and emulated transmission channels to be implemented for use
+under the
+.BR sdt (8)
+module.  It provides access to the DAEDT and DAEDR
+functions of the SS7 Signalling Link [Q703].  Header file \fI<sys/sdli.h>\fR
+provides definitions for the interface.  \fIOpenSS7\fR drivers planned or
+released at this interface include:
+.RS
+.TP 12
+.BR sdl (8)
+SDL module for use by SDLI compliant drivers.
+.TP
+.BR sdl_eth (4)
+SDL emulation using raw Ethernet (IEEE 802.2/802.3).
+.TP
+.BR sdl_ip (4)
+SDL emulation using raw Internet Protocol (IP).
+.TP
+.BR sdl_udp (4)
+SDL emulation using User Datagram Protocol (UDP).
+.TP
+.BR sdl_tcp (4)
+SDL emulation using Transmission Control Protocol (TCP).
+.TP
+.BR sdl_rtp (4)
+SDL emulation using Real-Time Transport Protocol (RTP).
+.TP
+.BR sdl_sctp (4)
+SDL emulation using Strean Control Transport Protocol (SCTP).
+.RE
+.TP
+.BR sdti (7)
+The \fISignalling Data Terminal Interface (SDTI)\fR implements partial SS7
+Level 2 [Q703].  SDTI allows real and emulated data terminals to be
+implemented for use under the
+.BR sl (8)
+module.  It provides access to the
+AERM, SUERM, EIM, DAEDR and DAEDT functions of the SS7 Signalling Link [Q703].
+Header file \fI<sys/sdti.h>\fR provides definitions for the interface.
+\fIOpenSS7\fR drivers planned or released at this interface include:
+.RS
+.TP 12
+.BR sdt (8)
+SDT module for use with SDLI compliant streams.
+.TP
+.BR acb56t (8)
+SDT driver for the SeaLevel ACB56 ISA card.
+.TP
+.BR m2tp (8)
+SDT driver for the MTP Level 2 Tunneling Protocol (M2TP).
+.TP
+.BR soip (8)
+SDT driver for SS7 over IP.
+.RE
+.TP
+.BR sli (7)
+The \fISignalling Link Interface (SLI)\fR implements complete SS7 Level 2
+[Q703].  SLI allows real and emulated signalling links to be implemented for
+use under the
+.BR sls (4)
+module.  It provides access to all SS7 Level 2
+state machine functions of the SS7 Signalling Link [Q703].  Header file
+\fI<sys/sli.h>\fR provides definitions for the interface.  \fIOpenSS7\fR
+drivers planned or released at this interface include:
+.RS
+.TP 12
+.BR sl (8)
+SL module for use with SDTI compliant streams.
+.TP
+.BR acb56 (4)
+SL driver for the SeaLevel ACB56 ISA card.
+.TP
+.BR m2pa (8)
+SL driver for the MTP Level 2 Peer Adaptation (M2PA).
+.TP
+.BR m2ua (8)
+SL driver for the MTP Level User Adaptation (M2UA).
+.RE
+.TP
+.BR slsi (7)
+The \fISignalling Link Set Interface (SLSI)\fR implements partial SS7 Level 3
+[Q704].  SLSI allows real and emulated signalling link sets to be implemented
+for use under the
+.BR mtp (8)
+multipexor.  It provides access to SS7 Level 3
+Link Set state machine functions of the SS7 Message Transfer Part [Q704].
+Header file \fI<sys/slsi.h>\fR provides definitions for the interface.
+\fIOpenSS7\fR drivers planned or released at this interface include:
+.RS
+.TP 12
+.BR sls (4)
+SLS multiplexor for use with SLI compliant streams.
+.TP
+.BR m3tp (8)
+SLS driver for the MTP Level 3 Tunelling Protocol (M3TP).
+.RE
+.TP
+.BR mtpi (7)
+The \fIMessage Transfer Part Interface (MTPI)\fR implements complete SS7 Level
+3 [Q704].  MTPI allows real and virtual signalling points and signalling
+transfer points to be implemented for use under the
+.BR sccp (8)
+and
+.BR tcap (4)
+modules.  It provides access to all SS7 Level 3 state machines
+and functions of SS7 Message Transfer Part [Q704].  Header file
+\fI<sys/mtpi.h>\fR provides definitions for the interface.  \fIOpenSS7\fR
+drivers planned or released at this interface include:
+.RS
+.TP 12
+.BR mtp (4)
+MTP multiplexor for use with SLSI compliant streams.
+.TP
+.BR m3pa (4)
+MTP module for the MTP Level 3 Peer Adaptation (M3PA).
+.TP
+.BR m3ua (4)
+MTP module for the MTP Level 3 User Adaptation (M3UA).
+.RE
+.TP
+.BR sccpi (7)
+The \fISignalling Connection Control Part Interface (SCCPI)\fR implements
+complete SS7 Level 4 [Q711].  SCCPI allows real and virtual subsystems and
+global title translations to be implemented for use under the
+.BR tcap (4)
+module.  It provides access to all SS7 Level 4 state machines of the SS7
+Signalling Connnection Control Part [Q711].  Header file \fI<sys/sccpi.h>\fR
+provides definitions for the interface.  \fIOpenSS7\fR drivers planned or
+released at this interface include:
+.RS
+.TP 12
+.BR sccp (4)
+SCCP module for use with MTPI compliant streams.
+.TP
+.BR sua (4)
+SCCP module for the SCCP User Adaptation (SUA).
+.RE
+.TP
+.BR isupi (7)
+The \fIIntegrated Services Digital Network (ISDN) User Part Interface (ISUPI)\fR
+implements partial SS7 ISUP [Q767].  ISUPI allows call processing agents to
+attach to specific PC-PC-CIC ranges in control of trunk groups.  It provides
+some basis low-level ISUP state machines (e.g. Unequipped CIC) of the SS7
+ISUP [Q767].  Header file \fI<sys/isupi.h>\fR provides definitions for the
+interface.  \fIOpenSS7\fR drivers planned or released at this interface
+include:
+.RS
+.TP 12
+.BR isup (4)
+ISUP module for use with MTPI compliant streams.
+.TP
+.BR iua (4)
+ISUP module for the ISDN User Adaptation (IUA).
+.RE
+.TP
+.BR tcapi (7)
+The \fITransaction Capabilities Application Part Interface (TCAPI)\fR
+implements partion SS7 TCAP [Q7??].  TCAPI allows transaction processing
+agents to attach to specific subsystem instances in control of database
+queries.  It provides the TC state machines of the SS7 TCAP [Q???].  Header
+file \fI<sys/tcapi.h>\fR provides definitions for the interface.
+\fIOpenSS7\fR drivers planned or released at this interface include:
+.RS
+.TP 12
+.BR tcap (4)
+TCAP module for use with SCCPI compliant streams.
+.RE
+.\" .SH "CONFIGURATION"
+.\" .SH "ERROR HANDLING"
+.SH "SEE ALSO"
+.BR isupi (7),
+.BR mtpi (7),
+.BR sccpi (7),
+.BR sdli (7),
+.BR sdti (7),
+.BR sli (7),
+.BR slsi (7),
+.BR tcapi (7),
+.BR acb56 (4),
+.BR isup (4),
+.BR iua (4),
+.BR m2pa (4),
+.BR m2tp (4),
+.BR m2ua (4),
+.BR m3pa (4),
+.BR m3tp (4),
+.BR m3ua (4),
+.BR mtp (4),
+.BR sccp (4),
+.BR sdl_eth (4),
+.BR sdl_ip (4),
+.BR sdl_rtp (4),
+.BR sdl_sctp (4),
+.BR sdl_tcp (4),
+.BR sdl_udp (4),
+.BR sdt (8),
+.BR sl (8),
+.BR sls (4),
+.BR soip (8),
+.BR ss7d (8),
+.BR sua (4),
+.BR tcap (4).
+.SH "BUGS"
+Too many to mention.
+.SH "AUTHOR"
+.PP
+Brian F. G. Bidulock,
+.IR "" < bidulock@openss7.org >.
+.SH "HISTORY"
+This STREAMS interface for SS7 is an orignal part of the \fIOpenSS7\fR
+package.
+.XX
+.[
+q702
+.]
+.[
+q703
+.]
+.[
+q704
+.]
+.[
+t1.111
+.]
+.[
+q711
+.]
+.[
+q712
+.]
+.[
+q713
+.]
+.[
+q714
+.]
+.[
+q715
+.]
+.[
+t1.112
+.]
+.[
+q761
+.]
+.[
+q762
+.]
+.[
+q763
+.]
+.[
+q764
+.]
+.[
+q766
+.]
+.[
+q767
+.]
+.[
+t1.113
+.]
+.[
+isupv4-1
+.]
+.[
+q771
+.]
+.[
+q772
+.]
+.[
+q773
+.]
+.[
+q774
+.]
+.[
+q775
+.]
+.[
+t1.114
+.]
+.[
+q751-1
+.]
+.[
+q751-2
+.]
+.[
+q752
+.]
+.[
+t1.116.2
+.]
+.[
+$LIST$
+.]
+.TI

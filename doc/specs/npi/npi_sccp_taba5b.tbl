@@ -1,0 +1,65 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS H
+box center tab(:);
+ciss|cis
+li|li|li|li|li
+l|l|l|l|l.
+Q.711 Primitive:NPI Primitive
+_
+Generic:Specific:Parameter:Type:Field
+=
+.TH
+N-INFORM:request:Conn. Id:N_OPTMGMT_REQ:(implied)
+::Reason::\*-
+::QOS parms::QOS_length/offset
+::_:_:_
+::Conn. Id:N_RESET_REQ:(implied)
+::Reason::RESET_reason
+::QOS parms::\*-
+::_:_:_
+::Conn. Id:N_DISCON_REQ:(implied)
+::Reason::DISCON_reason
+::QOS parms::\*-
+:_:_:_:_
+:indicate:Conn. Id:N_RESET_IND:(implied)
+::Reason::RESET_reason
+::QOS parms::\*-
+::_:_:_
+::Conn. Id:N_DISCON_IND:(implied)
+::Reason::DISCON_reason
+::QOS parms::\*-
+::_:_:_
+::Conn. Id:N_INFO_ACK:(implied)
+::Reason::\*-
+::QOS parms::QOS_range_length/offset
+::_:_:_
+::Conn. Id:M_HANGUP:(implied)
+::Reason::\*-
+::QOS parms::\*-
+.TE

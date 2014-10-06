@@ -1,0 +1,270 @@
+#International	0	00	0
+Afghanistan	93	00	0	9 digits	+4.30
+Albania	355	00	0	3 to 9 digits	+1/+2
+Algeria	213	00	0	8, 9 digits	+1
+American Samoa	1	011	1	(684)+7 digits	-11
+Andorra	376	00	...	6, 8, 9 digits	+1/+2
+Angola	244	00	0	9 digits	+1
+Anguilla	1	011	1	(264)+7 digits	-4
+Antigua and Barbuda	1	011	1	(268)+7 digits	-4
+Argentina	54	00	0	10 digits	-3
+Armenia	374	00	0	8 digits	+4/+5
+Aruba	297	00	...	7 digits	-4
+Australia	61	0011	0	5 to 15 digits	+10/+11	12
+Australian External Territories	672	00	0	6 digits	+11.30	8
+Austria	43	00	0	4 to 13 digits	+1/+2
+Azerbaijan	994	00	0	8 to 9 digits	+4/+5
+Bahamas	1	011	1	(242)+7 digits	-5/-4
+Bahrain	973	00	...	8 digits	+3
+Bangladesh	880	00	0	6 to 10 digits	+6
+Barbados	1	011	1	(246)+7 digits	-4
+Belarus	375	810	8	9 to 10 digits	+2/+3
+Belgium	32	00	0	8 to 9 digits	+1/+2	2
+Belize	501	00	...	7 digits	-6
+Benin	229	00	...	8 digits	+1
+Bermuda	1	011	1	(441)+7 digits	-4/-3
+Bhutan	975	00	...	7 to 8 digits	+6
+Bolivia (Plurinational State of)	591	00	0	8 digits	-4
+Bonaire, Sint Eustatius and Saba	599	00	0	7 digits	-4
+Bosnia and Herzegovina	387	00	0	8 digits	+1/+2
+Botswana	267	00	...	7 to 8 digits	+2
+Brazil	55	00	0	10 digits	-3/-2	18
+British Virgin Islands	1	011	1	(284)+7 digits	-4
+Brunei Darussalam	673	00	...	7 digits	+8
+Bulgaria	359	00	0	7 to 9 digits	+2/+3	2
+Burkina Faso	226	00	...	8 digits	UTC
+Burundi	257	00	...	8 digits	+2
+Cambodia	855	001, 007	0	8 digits	+7
+Cameroon	237	00	...	8 digits	+1
+Canada	1	011	1	10 digits	-5/-4	11
+Cape Verde	238	00	...	7 digits	-1
+Cayman Islands	1	011	1	(345)+7 digits	-5
+Central African Rep.	236	00	...	8 digits	+1
+Chad	235	00	...	8 digits	+1
+Chile	56	1YZ0	1YZ	8 to 9 digits	-4/-3	14
+China	86	00	0	5 to 12 digits	+8
+Colombia	57	009/007/005	09/07/05 8, 10 digits	-5	1
+Comoros	269	00	...	7 digits	+3
+Congo	242	00	...	9 digits	+1
+Cook Islands	682	00	...	5 digits	-10
+Costa Rica	506	00	...	8 digits	-6
+Côte d'Ivoire	225	00	...	8 digits	UTC
+Croatia	385	00	0	8 to 12 digits	+1/+2
+Cuba	53	119	0	6 to 8 digits	-5/-4
+Curaçao	599	00	0	7 to 8 digits	-4
+Cyprus	357	00	...	8, 11 digits	+2/+3	20
+Czech Rep.	420	00	...	4 to 12 digits	+1/+2
+Dem. People's Rep. of Korea	850	00	0	6 to 17 digits	+9
+Dem. Rep. of the Congo	243	00	0	5 to 9 digits	+1
+Denmark	45	00	...	8 digits	+1/+2
+Diego Garcia	246	00	...	7 digits	+6
+Djibouti	253	00	...	6 digits	+3
+Dominica	1	011	1	(767)+7 digits	-4
+Dominican Rep.	1	011	1	(809/829/849)+7 digits	-4
+Ecuador	593	00	0	8 digits	-5
+Egypt	20	00	0	7 to 9 digits	+2/+3
+El Salvador	503	00	...	7, 8, 11 digits	-6	15
+Equatorial Guinea	240	00	...	9 digits	+1
+Eritrea	291	00	0	7 digits	+3
+Estonia	372	00	...	7 to 10 digits	+2/+3
+Ethiopia	251	00	0	9 digits	+3
+Falkland Islands (Malvinas)	500	00	...	5 digits	-4/-3
+Faroe Islands	298	00	...	6 digits	UTC/+1
+Fiji	679	00	...	7 digits	+12/+13
+Finland	358	00,99X	0	5 to 12 digits	+2/+3
+France	33	00	0	9 digits	+1/+2	2
+French Departments and Territories in the Indian Ocean	262	00	...	9 digits	+3, +4
+French Guiana	594	00	...	9 digits	-3
+French Polynesia	689	00	...	6 digits	-10
+Gabon	241	00	...	6, 7 digits	+1
+Gambia	220	00	...	7 digits	UTC
+Georgia	995	00	0	9 digits	+4
+Germany	49	00	0	6 to 13 digits	+1/+2
+Ghana	233	00	0	5 to 9 digits	UTC
+Gibraltar	350	00	...	8 digits	+1/+2
+Global Mobile Satellite System (GMSS), shared code	881
+Greece	30	00	0	10 digits	+2/+3	2
+Greenland	299	00	...	6 digits	-3/-2
+Grenada	1	011	1	(473)+7 digits	-4
+Group of countries, shared code	388
+Guadeloupe	590	00	...	9 digits	-4
+Guam	1	011	1	(671)+7 digits	+10
+Guatemala	502	00	...	8 digits	-6
+Guinea	224	00	...	8 digits	UTC
+Guinea-Bissau	245	00	...	7 digits	UTC
+Guyana	592	001	...	7 digits	-4
+Haiti	509	00	...	8 digits	-5
+Honduras	504	00	...	8 digits	-6
+Hong Kong, China	852	001	...	4, 8 to 9 digits	+8
+Hungary	36	00	06	8 to 9 digits	+1/+2	7
+Iceland	354	00	...	7, 9 digits	UTC
+India	91	00	0	7 to 10 digits	+5.30
+Indonesia	62	001,008	0	5 to 10 digits	+7	6
+Inmarsat SNAC	870	00	...	9 digits
+International Freephone Service	800	...	...	8 digits
+International Networks, shared code	882
+International Networks, shared code	883
+International Premium Rate Service (IPRS)	979	...	...	9 digits
+International Shared Cost Service (ISCS)	808	...	...	8 digits
+Iran (Islamic Republic of)	98	00	0	6 to 10 digits	+3.30/+4.30
+Iraq	964	00	0	8 to 10 digits	+3
+Ireland	353	00	0	7 to 11 digits	UTC/+1	3
+Israel	972	00,012,013, 014	0	8 to 9 digits	+2/+3
+Italy	39	00	...	up to 11 digits	+1/+2	5
+Jamaica	1	011	1	(876)+7 digits	-5
+Japan	81	010	0	5 to 13 digits	+9
+Jordan	962	00	0	5 to 9 digits	+2/+3
+Kazakhstan	7	810	8	10 digits	+6
+Kenya	254	000	0	6 to 10 digits	+3	19
+Kiribati	686	00	...	5 digits	+12
+Korea (Rep. of)	82	001,002	0,082	8 to 11 digits	+9
+Kuwait	965	00	...	7, 8 digits	+3
+Kyrgyzstan	996	00	0	9 digits	+6
+Lao P.D.R.	856	00	0	8 to 10 digits	+7
+Latvia	371	00	...	7, 8 digits	+2/+3
+Lebanon	961	00	0	7 to 8 digits	+2/+3
+Lesotho	266	00	...	8 digits	+2
+Liberia	231	00	...	7 to 8 digits	UTC
+Libya	218	00	0	8 to 9 digits	+2
+Liechtenstein	423	00	...	7 to 9 digits	+1/+2
+Lithuania	370	00	0	8 digits	+2/+3
+Luxembourg	352	00	...	4 to 11 digits	+1/+2
+Macao, China	853	00	...	7 to 8 digits	+8
+Madagascar	261	00	...	9 to 10 digits	+3
+Malawi	265	00	...	7, 8 digits	+2
+Malaysia	60	00	0	7 to 9 digits	+8	9
+Maldives	960	00	...	7 digits	+5
+Mali	223	00	...	8 digits	UTC
+Malta	356	00	...	8 digits	+1/+2
+Marshall Islands	692	011	1	7 digits	+12
+Martinique	596	00	...	9 digits	-4
+Mauritania	222	00	...	7 digits	UTC
+Mauritius	230	00	...	7 digits	+4	22
+Mexico	52	00	01	10 digits	-6/-5	10
+Micronesia	691	011	1	7 digits	+11
+Moldova (Republic of)	373	00	0	8 digits	+2/+3
+Monaco	377	00	...	5 to 9 digits	+1/+2
+Mongolia	976	001	0	7 to 8 digits	+8
+Montenegro	382	00	0	4 to 12 digits	+1/+2
+Montserrat	1	011	1	(664)+7 digits	-4
+Morocco	212	00	0	9 digits	UTC	2
+Mozambique	258	00	...	8 to 9 digits	+2
+Myanmar	95	00	0	7 to 9 digits	+6.30
+Namibia	264	00	0	6 to 10 digits	+1/+2
+Nauru	674	00	...	4, 7 digits	+12
+Nepal	977	00	0	8 to 9 digits	+5.45
+Netherlands	31	00	0	9 digits	+1/+2
+New Caledonia	687	00	...	6 digits	+11
+New Zealand	64	00	0	3 to 10 digits	+12/+13
+Nicaragua	505	00	...	8 digits	-6
+Niger	227	00	...	8 digits	+1
+Nigeria	234	009	0	7 to 10 digits	+1
+Niue	683	00	...	4 digits	-11
+Northern Marianas	1	011	1	(670)+7 digits	+10
+Norway	47	00	...	5, 8 digits	+1/+2
+Oman	968	00	...	7 to 8 digits	+4
+Pakistan	92	00	0	8 to 11 digits	+5
+Palau	680	011	...	7 digits	+9
+Panama	507	00	...	7, 8 digits	-5	23
+Papua New Guinea	675	00	...	4 to 11 digits	+10
+Paraguay	595	00	0	5 to 9 digits	-4/-3
+Peru	51	00	0	8 to 11 digits	-5
+Philippines	63	00	0	8 to 10 digits	+8
+Poland	48	00	0	6 to 9 digits	+1/+2
+Portugal	351	00	...	9, 11 digits	UTC/+1
+Puerto Rico	1	011	1	(787/939)+7 digits	-4
+Qatar	974	00	...	3 to 8 digits	+3
+Romania	40	00	0	9 digits	+2/+3
+Russian Federation	7	810	8	10 digits	+4	17
+Rwanda	250	00	...	9 digits	+2
+Saint Helena, Ascension and Tristan da Cunha	247	00	...	4 digits	UTC
+Saint Helena, Ascension and Tristan da Cunha	290	00	...	4 digits	UTC	4
+Saint Kitts and Nevis	1	011	1	(869)+7 digits	-4
+Saint Lucia	1	011	1	(758)+7 digits	-4
+Saint Pierre and Miquelon	508	00	...	6 digits	-3/-2
+Saint Vincent and the Grenadines	1	011	1	(784)+7 digits	-4
+Samoa	685	0	...	3 to 7 digits	-11/-10
+San Marino	378	00	...	6 to 10 digits	+1/+2	5
+Sao Tome and Principe	239	00	...	7 digits	UTC
+Saudi Arabia	966	00	0	8 to 9 digits	+3
+Senegal	221	00	...	9 digits	UTC
+Serbia	381	00	0	4 to 12 digits	+1/+2
+Seychelles	248	00	...	7 digits	+4
+Sierra Leone	232	00	0	8 digits	UTC
+Singapore	65	001,008	...	8 to 12 digits	+8	9
+Sint Maarten (Dutch part)	1	011	1	(721) + 7 digits	-4
+Slovakia	421	00	0	4 to 9 digits	+1/+2
+Slovenia	386	00	0	8 digits	+1/+2
+Solomon Islands	677	00	...	5 digits	+11
+Somalia	252	00	...	5 to 8 digits	+3
+South Africa	27	00	0	9 digits	+2	2
+South Sudan	211	00	0		+3
+Spain	34	00	...	9 digits	+1/+2
+Sri Lanka	94	00	0	9 digits	+5.30
+Sudan	249	00	0	9 digits	+3
+Suriname	597	00	0	6 to 7 digits	-3
+Swaziland	268	00	...	7 to 8 digits	+2
+Sweden	46	00	0	7 to 13 digits	+1/+2
+Switzerland	41	00	0	4 to 12 digits	+1/+2	2
+Syrian Arab Republic	963	00	0	8 to 10 digits	+2/+3
+Taiwan, China	886	002	0	8 to 9 digits	+8
+Tajikistan	992	810	8	9 digits	+5
+Tanzania	255	000	0	9 digits	+3	19
+Telecommunications for Disaster Relief (TDR)	888
+Thailand	66	001	0	8, 9 digits	+7	2
+The Former Yugoslav Republic of Macedonia	389	00	0	8 digits	+1/+2
+Timor-Leste	670	00	...	7 digits	+9
+Togo	228	00	...	8 digits	UTC
+Tokelau	690	00	...	4 digits	-10
+Tonga	676	00	...	5, 7 digits	+13
+Trial of a proposed new international service, shared code	991
+Trinidad and Tobago	1	011	1	(868)+7 digits	-4
+Tunisia	216	00	...	8 digits	+1
+Turkey	90	00	0	10 digits	+2/+3
+Turkmenistan	993	810	8	8 digits	+5
+Turks and Caicos Islands	1	0	1	(649)+7 digits	-5/-4
+Tuvalu	688	00	...	5, 6 digits	+12
+Uganda	256	000	0	9 digits	+3	19
+Ukraine	380	00	0	9 digits	+2/+3
+United Arab Emirates	971	00	0	8 to 9 digits	+4
+United Kingdom	44	00	0	7 to 10 digits	UTC/+1
+United States	1	011	1	10 digits	-5/-4	21
+United States Virgin Islands	1	011	1	(340)+7 digits	-4
+Universal Personal Telecommunication (UPT)	878
+Uruguay	598	00	0	4 to 11 digits	-3/-2
+Uzbekistan	998	810	8	9 digits	+5
+Vanuatu	678	00	...	5, 7 digits	+11
+Vatican	379	...				16
+Vatican	39	00	...	up to 11 digits	+1/+2
+Venezuela (Bolivarian Republic of)	58	00	0	10 digits	-4.30
+Viet Nam	84	00	0	7 to 10 digits	+7
+Wallis and Futuna	681	00	...	6 digits	+12
+Yemen	967	00	0	6 to 9 digits	+3
+Zambia	260	00	0	9 digits	+2
+Zimbabwe	263	00	0	5 to 10 digits	+2
+Reserved	970					13
+
+	Dialling Procedures Notes
+	1	The length of the national (significant) number N(S)N is 8 digits for geographic numbering and 10 digits for non-geographic numbering (networks and services).
+	2	The '0' is used on all domestic calls, including in the same city, but is omitted when dialling from other countries.
+	3	When dialling from Ireland to Northern Ireland, the area code used should be '048' instead of '0044 28'.
+	4	Country code 247 Ascension and country code 290 Saint Helena and Tristan da Cunha. Numbers commencing with the initial digit 8 will be assigned to Tristan da Cunha, whilst national numbers commencing with the initial digits 1, 2, 3, 4, 5, 6, 7 and 9 will remain assigned to Saint Helena.
+	5	When dialling from Italy to San Marino, the subscriber number must be prefixed by '0549' instead of '00378'.  When dialling from San Marino to Italy, the complete national subscriber number must be used, without prefixing the number by '0039'.
+	6	Western Indonesia including Sumatra, Java, Madura and Bali UTC+7; Central Indonesia including Kalimantan (Borneo), Sulawesi (Celebes) and Nusatengarra (Lesser Sunda) UTC+8; Eastern Indonesia including Maluku (Moluccas) and Irianjaya (Irian) UTC+9.
+	7	Subscriber numbers on PSTN and analogue mobile network consist of 8 digits and those on the mobile network consist of 9 digits.
+	8	Including Australia Antartic Territory Bases and Norfolk Island (UTC+11.30)(international prefix for Norfolk Island is '0101').
+	9	When dialling from Singapore to Malaysia, the area code and subscriber number must be prefixed by '020' instead of '00160'. When dialling from Malaysia to Singapore, the subscriber number must be prefixed by '02' instead of '0065'.
+	10	Baja California Norte UTC-8/DST-7; Baja California Sur, Chihuahua, Nayarit UTC-7/DST-6.
+	11	Alberta UTC-7/DST-6; British Columbia UTC-8/DST-7; Manitoba UTC-6/DST-5; New Brunswick, Nova Scotia UTC-4/DST-3;Newfoundland UTC-3.30/DST-2.30; Ontario, Quebec UTC-5/DST-4.
+	12	Includes Cocos-Keeling Islands(UTC+6.30) and Christmas Island (UTC+7). Western Australia (UTC+8).
+	13	Reserved for the Palestinian Authority.
+	14	YZ : long-distance operator code.
+	15	The seven and eleven digit schemes are solely for numbers that do not entail any charge for the subscriber making the call (800) or for numbers that involve a surcharge for subscriber A (900). All other numbers have a fixed eight digit scheme.
+	16	The country code listed is for future use (Vatican is currently using country code '39').
+	17	Kaliningrad UTC +2/DST+3; Moscow, St. Petersburg, Astrakhan, Izhevsk, Samara UTC+3/DST+4; Perm, Nizhnevartovsk UTC+5/DST+6; Novosibirsk, Omsk UTC+6/DST+7; Norilsk, Kyzyl UTC+7/DST+8; Bratsk, Ulan-Ude UTC+8/DST+9; Chita, Yakutsk UTC+9/DST+10; Khabarovsk, Vladivostok, Yuzhno-Sakhalinsk UTC+10/DST+11; Magadan, Kamchatka UTC+11/DST+12.
+	18	Other states UTC-3 (no change).
+	19	When dialling between Kenya, Tanzania and Uganda the national (significant) number must be prefixed by 005 for Kenya, by 006 for Uganda and by 007 for Tanzania.
+	20	11 digits for voice-mail services only.
+	21	Eastern Time UTC-5/DST-4; Central Time UTC-6/DST-5; Mountain Time UTC-7; Pacific Time UTC-8/DST-7; Alaska UTC-9/DST-8; Hawaiian UTC-10.
+	22	Carrier pre-selection has been introduced in Mauritius since 1 January 2005.  The international prefix "00" may be used only by those subscribers who have pre-selected an International Long Distance (ILD) carrier.  For subscribers who have not pre-selected any carrier, their international calls made using the prefix "00" are not allowed through.  All subscribers may however select the ILD carrier of their choice on a Call-by-Call basis by using the carrier prefix assigned to the selected carrier, by the ICTA (ILD Carrier Prefix: 020, 022, 030, 033, 040, 050, 060, 070).
+	23	Seven digits for the fixed network and eight digits for the mobile network.

@@ -1,0 +1,463 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: M_DATA.9.man,v 1.1.2.2 2011-02-07 02:18:34 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:34 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: M_DATA.9.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:34  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH M_DATA 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B M_DATA
+\- \fISTREAMS\fP data message
+.\"
+.\"
+.SH FORMAT
+.PP
+The
+.B M_DATA
+message block is a
+.BR datab (9)
+structure and associated data buffer that contains unstructured data.  (With a few exceptions, any
+structure imposed on the
+.B M_DATA
+data buffer is defined outside of
+.IR STREAMS .)
+.PP
+An
+.B M_DATA
+message is a normal priority message that consists of one or more
+.B M_DATA
+message blocks.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B M_DATA
+message is intended to contain ordinary data.  Messages allocated by the
+.BR allocb (9)
+utility are type
+.B M_DATA
+by default.
+.B M_DATA
+messages are generally sent upstream or downstream on a
+Stream
+and their contents can be passed between a process and the
+Stream head.
+.PP
+An
+.B M_DATA
+message consists of one or more
+.B M_DATA
+blocks.
+.B M_DATA
+messages are generally sent in both the downstream and upstream directions on a Stream.
+.B M_DATA
+message sent upstream and arriving at the Stream head are available to be read by user level
+processes using the
+.BR read (2s),
+.BR getmsg (2s),
+or
+.BR getpmsg (2s)
+system calls.
+.B M_DATA
+messages can be sent downstream from the Stream head by a user level process using the
+.BR write (2s),
+.BR putmsg (2s),
+or
+.BR putpmsg (2s)
+system calls.
+.PP
+When describing
+.IR STREAMS -specific
+system calls, the contents of an
+.B M_DATA
+messsage are referred to collectively as the
+.IR "data part" .
+For the
+.BR getmsg (2s),
+.BR getpmsg (2s),
+.BR putmsg (2s),
+and
+.BR putpmsg (2s)
+system calls, the control and data parts are passed separately.  Only a
+.BR putmsg (2s)
+or
+.BR putpmsg (2s)
+call that does not contain a control part will generate
+.BR M_DATA
+messages.
+(For the messages resulting from calls to these system calls with a control part specified, see
+.BR M_PROTO (9)
+and
+.BR M_PCPROTO (9).)
+For the
+.BR read (2s)
+and
+.BR write (2s)
+system calls, only the data part is passed.
+.PP
+.B M_DATA
+messages can be formulated using multiple
+.B M_DATA
+message blocks.  The minimum and maximum packet sizes associated with the upstream module read-side
+queue (that is, the
+.I q_minpsz
+and
+.I q_maxpsz
+fields of the upstream
+.BR queue (9)
+structure),
+provide advise to the module on the minimum and maximum amounts of data that a given
+.B M_DATA
+block in an
+.B M_DATA
+message should contain.
+The
+Stream head
+will compact multiple
+.B M_DATA
+blocks into a single data part, when passing them to the user process.  The
+.BR write (2s),
+.BR putmsg (2s),
+and
+.BR putpmsg (2s)
+system calls use the
+.I q_minpsz
+and
+.I q_maxpsz
+fields of the write-side queue of the topmost downstream module when determining the size and number
+of
+.B M_DATA
+blocks placed in the resulting downstream
+.B M_DATA
+messages.  For a description of this procedure, see
+.BR write (2s).
+.PP
+.B M_DATA
+messages,
+by nature of the initial message block type,
+are normal (or priority) messages, and are, therefore, subject to flow control restrictions with a
+Stream.  In contrast, the non-standard
+.BR M_HPDATA (9)
+message is a high priority message serving the same purpose, that is not subject to flow control
+restrictions.
+.B M_DATA
+messages can have an assigned priority.  The priorty of an
+.B M_DATA
+message contained in the
+.I b_band
+member of the
+.BR msgb (9)
+structure of the initial
+.B M_DATA
+message block 
+in the message.
+.PP
+.B M_DATA
+messages passed upstream to be read by a user level process, or passed downstream as a result of
+being written by a user level process can support both a byte-stream view of the data path, where
+there are no message boundaries, or a packet (delimited) view, where message boundaries are
+preserved.
+To support the delimited view,
+.B M_DATA
+message blocks can optionally contain the
+.BR MSGDELIM
+flag in the
+.I b_flag
+member of the intial message block to indicate that the last byte of the message represents a
+message boundary.
+A driver or module can request that the
+Stream head
+support the delimited view of
+.B M_DATA
+messages using the
+.B MSGDELIM
+flag, by sending an
+.BR M_SETOPTS (9)
+message to the Stream head with the
+.B SO_DELIM
+flag set.
+For details, see
+.RI \(lq SO_DELIM \(rq
+in
+.BR M_SETOPTS (9),
+.BR read (2s)
+and
+.BR write (2s).
+Because a driver or module has no mechanism to examine Stream head options (only a mechanism to set
+them), drivers and modules should both generate and respect the
+.BR MSGDELIM
+flag in
+.B M_DATA
+messages when appropriate.
+.PP
+Messages composed of multiple message blocks will typically have
+.B M_DATA
+as the message type for all message blocks following the first.
+Examples are
+.BR M_PROTO (9),
+.BR M_PCPROTO (9),
+.BR M_IOCTL (9),
+.BR M_IOCDATA (9),
+and
+.BR M_CTL (9),
+messages.
+In the
+.BR getmsg (2s),
+.BR getpmsg (2s),
+.BR putmsg (2s),
+and
+.BR putpmsg (2s)
+system calls, the contents of the
+.B M_DATA
+message blocks,
+when attached to a
+.BR M_PROTO (9)
+or
+.BR M_PCPROTO (9)
+initial message block,
+are also referred to as the
+.IR "data part" .
+Rules governing the creation and form of
+.B M_DATA
+messages also applies to the
+.BR M_DATA (9)
+blocks attached to
+.BR M_PROTO (9)
+and
+.BR M_PCPROTO (9)
+messages.
+See
+.BR M_PROTO (9)
+and
+.BR M_PCPROTO (9)
+for details.
+.\"
+.B M_DATA
+messages can be generated by user level processes using the
+.BR write (2s),
+.BR putmsg (2s),
+.BR putpmsg (2s),
+and
+.BR I_FDINSERT (7)
+.BR ioctl (2s)
+system calls.
+.B M_DATA
+message arriving at the
+Stream head
+are made available to the user level process for reading with
+.BR read (2s),
+.BR getmsg (2s),
+.BR getpmsg (2s)
+and
+.BR I_PEEK (7)
+.BR ioctl (2s)
+system calls.
+.B M_DATA
+messages may be generated by drivers and modules.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR M_DATA ,
+.BR M_PROTO (9)
+and
+.BR M_PCPROTO (9)
+messages are the work horses of a service interface under
+.IR STREAMS .
+They are generated both by user level processes as well as drivers and modules.  These messages
+normally represent a default service primitive within a service interface definition at a message
+passing boundary within a Stream.
+An
+.B M_DATA
+message is normally equivalent to a
+.BR M_PROTO (9)
+message, but with default control information associated with the message.
+The
+.B M_DATA
+message contains unstructured service interface user data.
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR datab (9),
+.BR allocb (9),
+.BR read (2s),
+.BR getmsg (2s),
+.BR getpmsg (2s),
+.BR write (2s),
+.BR putmsg (2s),
+.BR putpmsg (2s),
+.BR M_PROTO (9),
+.BR M_PCPROTO (9),
+.BR queue (9),
+.BR M_HPDATA (9),
+.BR msgb (9),
+.BR M_SETOPTS (9),
+.BR M_IOCTL (9),
+.BR M_IOCDATA (9),
+.BR M_CTL (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B M_DATA
+.I STREAMS
+message is compatible with
+.IR "SVR 4.2 MP STREAMS" ,
+and implementations based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+The
+.B M_DATA
+message is standard across
+.I STREAMS
+implementations, and has no portability issues.
+.IP \(em
+Binary compatibiltiy is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP STREAMS" .
+.[
+svr42spg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B M_DATA
+message first appeared in
+.IR "SVR 3" .
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

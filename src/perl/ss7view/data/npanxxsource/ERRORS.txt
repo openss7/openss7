@@ -1,0 +1,21 @@
+:vim ft=mail
+NPA: 268, NXX: 734, 788
+CLLI: SNJHANAHCM0
+V: 07456, H: -3721
+Lat: 17.099743822318, Lon: -61.085324334245
+This location is out in the ocean.  The proper
+location of the wire center is:
+V: 07649, H: -3599
+Lat: 17.12609, Lon: -61.82161
+
+clli: VLDVPQ59
+wcvh: 02140,04096 <- reversed should be 04096,02140
+wcll: 46.022973,-74.20731  (04096,02140)
+rcvh: 04096,02140
+rcll: 46.030668,-74.206268 (04095,02141)
+
+clli: AGANGU01
+wcll: 13.475733,144.75314
+wcvh: 04238,26639 (corrected)
+rcll: 13.471123696885,-215.246909987590
+rcvh: 04239,26640

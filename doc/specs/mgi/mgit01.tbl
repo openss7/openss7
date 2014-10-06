@@ -1,0 +1,97 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+box center tab(:);
+cbw(1.0i)|cbw(1.0i)|cbw(3.0i)
+l|l|l.
+Phase:Service:Primitives
+=
+T{
+.hy 0
+.ad l
+Local Management
+T}:T{
+.hy 0
+.ad l
+Acknowledgement
+T}:T{
+.hy 0
+.ad l
+MG_OK_ACK, MG_ERROR_ACK
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+Information Reporting
+T}:T{
+.hy 0
+.ad l
+MG_INFO_REQ, MG_INFO_ACK
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+PPA Attachment
+T}:T{
+.hy 0
+.ad l
+MG_ATTACH_REQ, MG_DETACH_REQ, MG_OK_ACK
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+Initialization
+T}:T{
+.hy 0
+.ad l
+MG_ENABLE_REQ, MG_ENABLE_CON, MG_DISABLE_REQ, MG_DISABLE_CON
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+Options Management
+T}:T{
+.hy 0
+.ad l
+MG_OPTMGMT_REQ, MG_OPTMGMT_ACK
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+Event Reporting
+T}:T{
+.hy 0
+.ad l
+MG_ERROR_IND, MG_STATS_IND, MG_EVENT_IND
+T}
+.TE

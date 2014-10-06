@@ -1,0 +1,280 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: ms_delete.3.man,v 1.1.2.2 2011-02-07 02:18:03 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:03 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ms_delete.3.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:03  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH MS_DELETE 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B ms_delete
+\- remove selected entries from an information base
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xms.h>
+.sp
+.HP
+.BI "MS_status ms_delete(OM_private_object " session ", OM_object " delete_argument ", MS_invoke_id *" invoke_id_return );
+.\"
+.\"
+.SH INTERFACE
+.PP
+XMS
+.[
+XMS
+.]
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function is used to delete selected entries from an information base.  A
+main-entry and all its dependent child-entries may only be deleted together.
+This is acheived by specifying just the main-entry as an argument.  The
+function will only be successful when operating on those information-bases
+permitted by the security-context and the security-policy in force.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.IR session "\0\fBSession\fP(Object(Session))
+Specifies the MS session over which this function is performed.
+.TP
+.IR delete_argument "\0\fBDelete-Argument\fP(Object(Delete-Argument))
+Specifies the argument for the
+.BR ms_delete ()
+function.  It comprises:
+.RS
+.IP \(em \w'\(em\(em'u
+.B Information-Base-Type
+.br
+Specifies which information base type is being addressed (see Section 6.4.1 in
+reference X.413).
+.[
+x413
+.]
+Its value must be one of the following:
+.RS
+.IP \(em \w'\(em\(em'u
+.BR stored-messages " {" MS_STORED_MESSAGES }
+.br
+Specifies the repository containing entries for delivered messages and reports
+(see Section 6.4 in reference X.413).
+.[
+x413
+.]
+.IP \(em
+.BR inlog " {" MS_INLOG }
+.br
+.IP \(em
+.BR outlog " {" MS_OUTLOG }
+.br
+.RE
+.IP \(em
+.B Items
+.br
+Specifies the entries to be deleted.
+.RE
+.\"
+.\"
+.SH RETURN
+.PP
+.TP
+.IR status "\0\fBStatus\fP(Status)
+Indicates whether the function succeeded or not, if used synchronously; or
+whether the function has been initiated, if use asynchronously.
+.TP
+.IR invoke_id_return "\0\fBInvoke-ID\fP(Integer)
+Specifies the invoke-ID of the asynchronous operation.
+.\"
+.\"
+.SH ERRORS
+.PP
+This function can return a System-Error or one of the following Library-Errors:
+bad-argument, bad-session, bad-class, no-such-class, asynchrony-not-supported,
+feature-unavailable, feature-not-negotiated, out-of-memory, msicellaneous,
+too-many-operations.
+.PP
+The following Message Store errors may be returned:
+delete-error, invalid-parameter-error, no-workspace, range-error,
+security-error, sequence-number-error, service-error.
+.PP
+This function can return a Communications-Error.
+.\"
+.\"
+.\".SH USAGE
+.\".PP
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.\".SH IMPLEMENTATION
+.\".PP
+.\"
+.\"
+.\".SH FILES
+.\".PP
+.\"
+.\"
+.SH BUGS
+.PP
+.BR ms_delete ()
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR XMS (3),
+.BR XOM (3).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+This implementation is compatible with other implementations of the XMS.
+.[
+XMS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XMS.
+.[
+XMS
+.]
+Conformance is validated using an
+.BR autotest (1)
+script.
+.\"and the
+.\".BR test-xms (8)
+.\"test suite executable.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ms_delete ()
+was first part of the
+.BR XMS .
+.[
+XMS
+.]
+.\"
+.\"
+.XX
+.[
+xom c607
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

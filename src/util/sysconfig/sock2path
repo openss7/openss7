@@ -1,0 +1,157 @@
+##
+# @(#) $RCSfile: sock2path,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:48:00 $
+# Copyright (c) 2008-2009  Monavacon Limited.
+# All Rights Reserved.
+## 
+## Socket Path Configuration Database.
+## for the Socksys driver and the socklib library.
+##
+## See sock2path(5) for more information.
+##
+# <family>	<type>		<protocol>	<path>
+# ------------- --------------- --------------- ------------------------
+PF_X25		SOCK_SEQPACKET	X25PROTO_PLP	/dev/plp
+PF_X25		SOCK_SEQPACKET	X25PROTO_XOT	/dev/xot
+# ------------- --------------- --------------- ------------------------
+# <family>	<type>		<protocol>	<path>
+# ------------- --------------- --------------- ------------------------
+PF_ATM		SOCK_SEQPACKET	ATMPROTO_AAL2	/dev/aal2
+PF_ATM		SOCK_SEQPACKET	ATMPROTO_AAL5	/dev/aal5
+# ------------- --------------- --------------- ------------------------
+# <family>	<type>		<protocol>	<path>
+# ------------- --------------- --------------- ------------------------
+##PF_INET	SOCK_STREAM	IPPROTO_TCP	/dev/tcp
+##PF_INET	SOCK_STREAM	0		/dev/tcp
+PF_INET         SOCK_DGRAM      IPPROTO_UDP     /dev/udp2
+PF_INET         SOCK_DGRAM      0               /dev/udp2
+PF_INET         SOCK_RAW        IPPROTO_IP      /dev/rawip2
+PF_INET         SOCK_RAW        0               /dev/rawip2
+PF_INET		SOCK_SEQPACKET	IPPROTO_SCTP	/dev/sctp
+PF_INET		SOCK_SEQPACKET	0		/dev/sctp
+# ------------- --------------- --------------- ------------------------
+# <family>	<type>		<protocol>	<path>
+# ------------- --------------- --------------- ------------------------
+PF_OSI		SOCK_SEQPACKET	0		/dev/tp0
+PF_OSI		SOCK_SEQPACKET	OSIPROTO_TP0	/dev/tp0
+PF_OSI		SOCK_SEQPACKET	OSIPROTO_TP1	/dev/tp1
+PF_OSI		SOCK_SEQPACKET	OSIPROTO_TP2	/dev/tp2
+PF_OSI		SOCK_SEQPACKET	OSIPROTO_TP3	/dev/tp3
+PF_OSI		SOCK_SEQPACKET	OSIPROTO_TP4	/dev/tp4
+PF_OSI		SOCK_DGRAM	0		/dev/clts
+PF_OSI		SOCK_DGRAM	OSIPROTO_CLTS	/dev/clts
+PF_OSI		SOCK_RAW	0		/dev/clns
+PF_OSI		SOCK_RAW	OSIPROTO_CLNS	/dev/clns
+PF_OSI		SOCK_SEQPACKET	OSIPROTO_CONS	/dev/cons
+PF_X25		SOCK_SEQPACKET	X25PROTO_PLP	/dev/plp
+PF_X25		SOCK_SEQPACKET	X25PROTO_XOT	/dev/xot
+PF_OSI		SOCK_SEQPACKET	OSIPROTO_ISOT	/dev/isot
+PF_OSI		SOCK_SEQPACKET	OSIPROTO_ITOT	/dev/itot
+PF_OSI		SOCK_SEQPACKET	OSIPROTO_ISOS	/dev/isos
+PF_OSI		SOCK_SEQPACKET	OSIPROTO_ITOS	/dev/itos
+# ------------- --------------- --------------- ------------------------
+# <family>	<type>		<protocol>	<path>
+# ------------- --------------- --------------- ------------------------
+PF_INET		SOCK_SEQPACKET	IPPROTO_SCTP	/dev/sctp_t
+PF_INET		SOCK_SEQPACKET	0		/dev/sctp_t
+# ------------- --------------- --------------- ------------------------
+# <family>	<type>		<protocol>	<path>
+# ------------- --------------- --------------- ------------------------
+## PF_INET	SOCK_STREAM	IPPROTO_TCP	/dev/tcp
+## PF_INET	SOCK_STREAM	0		/dev/tcp
+## PF_INET	SOCK_DGRAM	IPPROTO_UDP	/dev/udp
+## PF_INET	SOCK_DGRAM	0		/dev/udp
+## PF_INET	SOCK_SEQPACKET	IPPROTO_SCTP	/dev/sctp
+## PF_INET	SOCK_SEQPACKET	0		/dev/sctp
+## PF_INET6	SOCK_STREAM	IPPROTO_TCP	/dev/tcp6
+## PF_INET6	SOCK_STREAM	0		/dev/tcp6
+## PF_INET6	SOCK_DGRAM	IPPROTO_UDP	/dev/udp6
+## PF_INET6	SOCK_DGRAM	0		/dev/udp6
+## PF_INET6	SOCK_SEQPACKET	IPPROTO_SCTP	/dev/sctp6
+## PF_INET6	SOCK_SEQPACKET	0		/dev/sctp6
+## ------------- --------------- --------------- ------------------------
+##
+# Lines beginning with a '#' (after an arbitraty amount of whitespace)
+# form a comment.  Blank lines (or lines consisting entirely of
+# whitespace) are ignored.  Any other line consists of 4 whitespace
+# separated fields described below.  Any information past the 4th field
+# is ignored.
+#
+# <family>	Protocol family.  This is technically supposed to be a
+#		bare number.  The OpenSS7 implementation also permits a
+#		restricted set of AF_ or PF_ symbols.
+#
+# <type>	Socket type.  This is, again, supposed to be a bare
+#		number.  The OpenSS7 implemetnation also permits a
+#		restricted set of SOCK_ symbols: SOCK_STREAM,
+#		SOCK_DGRAM, SOCK_RDM and SOCK_SEQPACKET.
+#
+# <protocol>	Protocol within the protocol family.  This, again, is
+#		supposed to be a bare number.  The OpenSS7
+#		implementation also permits a limited set of xxPROTO_xx
+#		symbols.
+#
+# <path>	This is the full path to a STREAMS device supporting the
+#		Transport Provider Interface providing the requested
+#		protocol and type.
+#
+# Any additional information past the <path> field is ignored.
+
+## =============================================================================
+## 
+# @(#) $RCSfile: sock2path,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:48:00 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU Affero General Public License as published by the Free
+## Software Foundation; version 3 of the License.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+## details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+## write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+## 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2009-06-21 11:48:00 $ by $Author: brian $
+##
+## -----------------------------------------------------------------------------
+##
+## $Log: sock2path,v $
+## Revision 1.1.2.1  2009-06-21 11:48:00  brian
+## - added files to new distro
+##
+## =============================================================================
+## vim: ft=config comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

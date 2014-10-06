@@ -1,0 +1,392 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: WR.9.man,v 1.1.2.2 2011-02-07 02:18:36 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:36 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: WR.9.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:36  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH WR 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B WR
+\- return the write queue of a \fISTREAMS\fR queue pair
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "queue_t *WR(" q );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+a pointer to either the read or write queue of a queue pair.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR WR ()
+returns the write queue associated with the queue pair indicated by the queue
+pointer
+.IR q ,
+regardless of whether
+.I q
+points to the write queue or the write queue of the queue pair.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR WR ()
+is typically and often used to find the write queue from a pointer to one of
+the queues in a queue pair.
+.PP
+See also
+.BR RD (9)
+for finding the read queue in the pair, and
+.BR OTHERQ (9)
+for finding the other queue in the pair.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR WR ()
+returns a pointer to the write queue of the queue pair referenced by
+.IR q .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR WR ()
+always succeeds.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR WR ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR WR ()
+is MP-safe; however,
+the caller is responsible for the validity of the reference
+.IR q .
+References to
+.I q
+from a procedure, call-out or callback predicated on the queue pair to which
+.I q
+belongs
+are guaranteed valid.
+The caller must guarantee validity from call-outs, callbacks, soft interrupts
+and interrupt service routines not predicated on the queue pair to which
+.I q
+belongs.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR queue (9)
+structures are always allocated in pairs as an array of two
+.BR queue (9)
+structure elements.  The first structure in the array is always the read queue and has
+.B QREADR
+set in
+.IR q_flag ;
+the second, the write queue, with
+.B QREADR
+clear.
+Because of this relationship between queues in a pair,
+.BR WR ()
+is easily implemented as a macro as follows:
+.PP
+.nf
+\fC\s-1\
+#define WR(q) ((q->q_flag & QREADR) ? (q+1) : (q))
+\s+1\fP
+.fi
+.\"
+.\"
+.SH NOTICES
+.PP
+If
+.I q
+is invalid, the result is undefined.
+.PP
+If
+.I q
+is
+.BR NULL ,
+a kernel panic may occur.
+.PP
+If
+.I q
+points to a write queue,
+.I q
+will be returned.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR WR (9),
+.BR OTHERQ (9),
+.BR SAMESTR (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR WR ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR WR ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and systems based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR SUPER-UX \(rg,
+.[
+suxspg
+.]
+.IR UnixWare \(rg,
+.[
+uw7spg
+.]
+permit both a read or write queue pointer to be passed
+as the
+.I q
+argument to
+.BR WR ().
+If a write queue pointer is passed to
+.BR WR (),
+then the passed in write queue pointer is returned.
+.IP \(em
+.IR AIX \(rg,
+.[
+aixspg
+.]
+.IR OSF/1 \(rg,
+.[
+osfspg
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR UXP/V \(rg,
+.[
+uxpspg
+.]
+permit only a read queue to be passed as the
+.I q
+argument to
+.BR WR ().
+Passing a write queue to
+.BR WR ()
+on these implementations can cause a kernel panic.
+On these systems
+.BR WR ()
+is often defined as:
+.sp
+.nf
+\fC\s-2\
+#define WR(__q) ((__q)+1)
+\s+2\fP
+.fi
+.IP \(em
+.BR WR ()
+is implemented on
+.B Linux Fast-STREAMS
+as both an
+.B extern inline
+function as well as a macro.
+It accepts either read or write queue pointer and returns the passed in write
+queue pointer when called with a write queue.
+.I WR(q) == WR(WR(q))
+and
+.I WR(RD(q)) == (RD(q) + 1)
+are invariantly true.
+.sp
+.nf
+\fC\s-2\
+#undef WR
+#define WR(__q) ((__q)+1)
+\s+2\fP
+.fi
+.sp
+is a valid alternative implementation if the
+.I STREAMS
+programmer wishes the more restrictive
+.BR WR ()
+behavior.
+.IP \(em
+Portable
+.I STREAMS
+drivers and modules should not
+call
+.BR WR ()
+with a queue other than the read queue;
+nor
+rely upon
+.BR WR ()
+being defined as a macro or a function.
+.IP \(em
+Because the size and members of the
+.BR queue (9)
+structure vary from implementation to implementation,
+binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI"
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR WR ()
+appears as part of
+.IR "SVR 4.0 STREAMS" .
+.[
+svr4spg
+.]
+.PP
+.BR WR ()
+first appeared in
+.IR "SVR 3" ,
+.[
+svr3spg
+.]
+where it was defined as a macro.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

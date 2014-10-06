@@ -1,0 +1,192 @@
+#!/bin/bash
+# @configure_input@
+# =============================================================================
+# 
+# @(#) $RCSfile: openss7-kernel.preinst.in,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-05-15 12:01:18 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2011-05-15 12:01:18 $ by $Author: brian $
+#
+# =============================================================================
+subpkg=kernel
+@openss7_header@
+datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
+#
+# preinst_preloads() - This is a fresh install of this version of the kernel modules package.
+#   Remove any non-deb preloads from the kernel-specific preloads file.
+#
+preinst_preloads () {
+    local prel_old prel_tmp prel_new m
+    prel_old=@sysconfdir@/modules-@kversion@
+    prel_tmp=${tmppath:-/var/tmp}/modules-@kversion@.tmp.$$
+    prel_new=${tmppath:-/var/tmp}/modules-@kversion@.new.$$
+    if [ -f $prel_old ]; then
+	cp -f -- $prel_old $prel_new
+	sed -e '\|^[[:space:]]*(specfs|streams)|d' $prel_new >$prel_tmp
+	mv -f -- $prel_tmp $prel_new
+	for m in $modules $preloads; do
+	    sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $prel_new >$prel_tmp
+	    mv -f -- $prel_tmp $prel_new
+	done
+	if ! diff $prel_new $prel_old >/dev/null 2>&1; then
+	    echo "$script: warning: Removing non-deb lines from preload file, $prel_old" >&2
+	    cp -f -b --suffix=.dpkg-old -- $prel_new $prel_old
+	fi
+	rm -f -- $prel_new || :
+    fi
+}
+#
+# preinst_remove_depmods() - A little recursive function to delete all modules dependent
+#   on an initial module set (in our case "streams.o").  The function echos the
+#   list of modules to remove to stdout.
+#
+preinst_remove_depmods () {
+    local t
+    [ $# -gt 0 ] || return 0
+    echo "$*"
+    for t in $@ ; do
+	prereq=prereq_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+	eval "preinst_remove_depmods \$$prereq"
+    done
+}
+#
+# preinst_modules() - This is a fresh install of this version of the kernel modules package.  Make
+#   sure that there are no tarball installed kernel modules hanging around for this kernel version.
+#   Because kernel module packages are named differently for different kernels, it is important that
+#   this function not be too zealous and remove kernel modules from our other installed packages.
+#
+preinst_modules () { :
+    local dir m b modl_mods line dep t target p prereq
+    modl_mods=
+    for dir in @kmoduledir@; do
+	[ -d $dir ] || continue
+	for m in `find $dir \( -name '*.o' -o -name '*.ko' -o -name '*.o.gz' -o -name '*.ko.gz' \) 2>/dev/null` ; do
+		b=`echo $m | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?,,'`
+		case " $modules " in (*" $b "*) ;; (*) continue ;; esac
+		modl_mods="$modl_mods${modl_mods:+ }$m"
+	done
+	if [ -n "$modl_mods" -a -f $dir/modules.dep ] ; then
+	    xtrace=`set -o | sed -n 's,xtrace[[:space:]]*on,set +o xtrace,p;t;s,xtrace[[:space:]]*off,set -o xtrace,p;t'`
+	    set +x
+	    dep=
+	    while read line ; do
+		case $line in
+		    (*\\)   line="`echo $line | sed -e 's,\\$,,'`"
+			    dep="$dep${dep:+ }$line"; continue ;;
+		    (*)     dep="$dep${dep:+ }$line" ;;
+		esac
+		if [ -n "$dep" ]; then
+		    set -- $dep
+		    if [ $# -ge 2 ] ; then
+			t=`echo $1 | sed -e 's,:$,,'`
+			target=target_`echo $t | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
+			shift
+			for p in $@ ; do
+			    prereq=prereq_`echo $p | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
+			    eval "$prereq=\"\$$prereq\${$prereq:+ }$t\""
+			    eval "$target=\"\$$target\${$target:+ }$p\""
+			done
+		    fi
+		    dep=
+		fi
+	    done < $dir/modules.dep
+	    eval "$xtrace"
+	    for m in $modl_mods; do
+		echo "$script: warning: Removing non-deb kernel module, $m" >&2
+		rm -f -- "$m" 2>/dev/null || :
+		prereq=prereq_`echo $m | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
+		eval "preinst_remove_depmods \$$prereq" | while read b; do
+		    echo "$script: warning: Removing non-deb dependent kernel module $b" >&2
+		    rm -f -- "$b" 2>/dev/null || :
+		done
+	    done
+	    unset ${!prereq_*}
+	    unset ${!target_*}
+	fi
+    done
+}
+#
+# preinst_install() - We are installing the kernel modules package for the first time.  Rout out any
+#   preloads from the kernel-specific preloads file and remove any conflicting kernel modules.
+#
+preinst_install () {
+    preinst_preloads || :
+    preinst_modules || :
+}
+# -----------------------------------------------------------------------------
+# Primary functions:
+# -----------------------------------------------------------------------------
+# new-preinst install
+install_preinst () { :
+    preinst_install
+}
+# new-preinst install old-version
+reinstall_preinst () { :
+}
+# new-preinst upgrade old-version
+upgrade_preinst () { :
+}
+# old-postrm upgrade new-version ...FAILED
+# new-postrm failed-upgrade old-version ...FAILED
+# old-preinst abort-upgrade new-version
+abort_upgrade_preinst () { :
+}
+@mscript_preinst@
+@mscript_debhelper@
+# =============================================================================
+#
+# $Log: openss7-kernel.preinst.in,v $
+# Revision 1.1.2.2  2011-05-15 12:01:18  brian
+# - many build system refinements
+#
+# Revision 1.1.2.1  2011-05-10 13:45:28  brian
+# - weak modules workup
+#
+# =============================================================================
+# vim: ft=sh sw=4 noet nocin nosi formatoptions+=tcqlorn

@@ -1,0 +1,109 @@
+#!/usr/bin/awk -f
+
+BEGIN {
+    hdrfile = "manhdr.man"
+}
+{
+    manfile = $0
+    tmpfile = manfile ".tmp"
+
+    state = 0
+    gotone = 0
+    inxref = 0
+    while ((getline < manfile) == 1) {
+	if (state == 0) {
+	    if (gotone == 0 && /^\.so/)
+		break
+	    if (/^'\\"/) {
+		gotone = 1
+		continue
+	    }
+	    if (/^\.\\"/) {
+		gotone = 1
+		continue
+	    }
+	    save = $0
+	    while ((getline < hdrfile) == 1)
+		print $0 > tmpfile
+	    close(hdrfile)
+	    state = 1
+	    $0 = save
+	}
+	if (state == 1) {
+	    if (/search-ignore/) {
+		$0 = "search-ignore CGIQOSTU"
+	    } else if (/search-truncate/) {
+		$0 = "search-truncate 40"
+	    } else if (/^\.hy 0/) {
+		$0 = ".nh"
+	    } else if (/^\.hy/) {
+		$0 = ".hy 6"
+	    } else if (/^\.[[]/) {
+		inxref = 1
+	    } else if (/^\.[]]/) {
+		inxref = 0
+	    } else if (inxref == 1) {
+		if ($1 ~ /^mxi$/) {
+		    $0 = "mxi revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@"
+		} else
+		if ($1 ~ /^npi$/) {
+		    $0 = "npi revision 2.0.0 draft 2"
+		} else
+		if ($1 ~ /^dlpi$/) {
+		    $0 = "dlpi revision 2.0.0 draft 2"
+		} else
+		if ($1 ~ /^DLPI$/) {
+		    $0 = "dlpi revision 2.0.0 draft 2"
+		} else
+		if ($1 ~ /^h247/) {
+		    $0 = "h248.1 2005"
+		} else
+		if ($1 ~ /^chi$/) {
+		    $0 = "chi revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@"
+		} else
+		if ($1 ~ /^cdi$/) {
+		    $0 = "cdi revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@"
+		} else
+		if ($1 ~ /^mtpi$/) {
+		    $0 = "mtpi revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@"
+		} else
+		if ($1 ~ /^TPI$/) {
+		    $0 = "tpi revision 2.0.0 draft 2"
+		} else
+		if ($1 ~ /^tpi$/) {
+		    $0 = "tpi revision 2.0.0 draft 2"
+		} else
+		if ($1 ~ /^xns$/) {
+		    $0 = "xns98"
+		} else
+		if ($1 ~ /^t1\.116$/) {
+		    $0 = "t1.116.1"
+		} else
+		if ($1 ~ /^T1\.BICC$/) {
+		    $0 = "t1bicc"
+		} else
+		if ($1 ~ /^iso8473$/) {
+		    $0 = "iso8473_1"
+		} else
+		if ($1 ~ /^isua$/) {
+		    $0 = "isua04"
+		} else
+		if ($1 ~ /^gr303ua$/) {
+		    $0 = "gr303ua00"
+		} else
+		if ($1 ~ /^iua$/) {
+		    $0 = "iuarfc"
+		}
+	    }
+	    print $0 > tmpfile
+	}
+    }
+    close(manfile)
+    close(tmpfile)
+    if (state != 0)
+	system("mv -fv " tmpfile " " manfile)
+    else
+	print "Skipping " manfile
+}
+
+# vim: ft=awk tw=80 sw=4 nocin nosi fo+=tcqlorn

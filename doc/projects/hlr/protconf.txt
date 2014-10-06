@@ -1,0 +1,59 @@
+                                                                                
+      ,_ _ _ _ _ _ _ , ,_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _,  
+      :              :=:                                                     :  
+   U  :              :=:                  In-Memory HLR                      :  
+   s  :     SS7      :=:             TS 21060 (GPRS) Application             :  
+   e  :  Operations  :=:_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _:  
+   r  : Maintenance  :  oooooooooooooooooooooooooooooooooooooooooooooooooooooo  
+      :     and      : ,_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _,  
+   ^  :Administration:=:                                                     :  
+   |  :              :=:                  MAP TS 21002 Rel 4                 :  
+  - - + - - - - - - -+-+- - - - - - - -Mobile Application Part- - - - - - - -+- 
+   |  :              :=:_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _:  
+   v  :              :  xxxxxxxxxxxxxxxxxxxxxxxxxx   ooooooooooooooooooooooooo  
+      :              : ,_________________________,  ,________________________,  
+   K  :              :x|                         |  |                        |  
+   e  :              :x| Transaction Capabilities|  |      SCCP-GTT          |  
+   r  :              :x|   Applicat Part (TCAP)  |  |Global Title Translation|  
+   n  :              :x|_________________________|  |________________________|  
+   e  :              :  xxxxxxxxxxxxxxxxxxxxxxxxxx   xxxxxxxxxxxxxxxxxxxxxxxxx  
+   l  :              : ,_____________________________________________________,  
+      :              :x|                                                     |  
+      :              :x|                         SCCP                        |  
+      :              :x|          Signalling Connection Ccntrol Part         |  
+      :              :x|_____________________________________________________|  
+      :              :  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx    xxxxxxxxxxxxxxxx  
+      :              : ,__________________________________,  ,_______________,  
+      :              :x|                                  |  |               |  
+      :              :x|               MTP                |  |               |  
+      :              :x|      Message Transfer Part       |  |               |  
+      :              :x|__________________________________|  |    M3UA       |  
+      :              :  xxxxxxxxxxxxxxxx   xxxxxxxxxxxxxxxx  |  MTP3 User    |  
+      :              : ,_______________,  ,_______________,  |  Adaptation   |  
+      :              :x|               |  |               |  |    Layer      |  
+      :              :x|      SL       |  |     M2UA      |  |               |  
+      :              :x|   Sign. Link  |  |MTP2 User Adapt|  |               |  
+      :              :x|_______________|  |_______________|  |_______________|  
+      :              :  xxxxxxxxxxxxxxxx   xxxxxxxxxxxxxxxx   xxxxxxxxxxxxxxxx  
+      :              : ,_______________,  ,__________________________________,  
+      :              :x|               |  |                                  |  
+      :              :x|   X400P-SS7   |  |               SCTP               |  
+      :              :x| Channel Drvr. |  |Stream Control Transmission Proto.|  
+      :_ _ _ _ _ _ _ :x|_______________|  |__________________________________|  
+                        xxxxxxxxxxxxxxxx   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  
+                       ,_____________________________________________________,  
+                       |                                                     |  
+                       |                     Linux STREAMS                   |  
+                       |                    LiS-2.16.18-22                   |  
+                       |_____________________________________________________|  
+                        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  
+                       ,_____________________________________________________,  
+                       |                                                     |  
+                       |                      Linux 2.4.21                   |  
+                       |                         Kernel                      |  
+                       |_____________________________________________________|  
+                                                                                
+                                                                                
+      xxxxxxxxx -- Developed Interface      -----------  -- Developed Module    
+      ooooooooo -- Proposed  Interface      - - - - - -  -- Planned   Module    
+                                                                                

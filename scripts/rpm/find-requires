@@ -1,0 +1,409 @@
+#!/bin/bash
+
+# This script reads from stdin and outputs any relevant information that need to
+# be included in the package.
+
+ulimit -c 0
+
+# First, find out where we are so that we can include other scripts.
+
+args=("$@")
+script=$(basename $0)
+where=`(cd $(dirname $0); pwd)`
+vendor=`(rpm --showrc | grep ' _host_vendor' | awk '{print$3}') 2>/dev/null`
+
+which_tool() {
+    old_PATH="$PATH"
+    PATH="$PATH:$where:$where/find-requires.d:/usr/lib/rpm/${vendor:-redhat}/find-requires.d:/usr/lib/rpm/${vendor:-redhat}:/usr/lib/rpm"
+    which $1
+    PATH="$old_PATH"
+}
+
+what_tool() {
+    old_PATH="$PATH"
+    PATH="$PATH:/usr/lib/rpm/${vendor:-redhat}/find-requires.d:/usr/lib/rpm/${vendor:-redhat}:/usr/lib/rpm:$where/find-requires.d:$where"
+    which $1
+    PATH="$old_PATH"
+}
+
+remove_unprovided() {
+    awk '
+	(NF == 1) {
+	    if (!($1 in requiredcaps))
+		requiredcaps[$1] = 1
+	    next
+	}
+	(NF == 3) {
+	    requiredcaps[$1] = 0
+	    requiredvers[$0] = 1
+	    next
+	}
+	END {
+	    for (cap in requiredcaps) {
+		whatprovides = "rpm -q --qf '"'"'%{NAME}\\n'"'"' --whatprovides '"'"'" cap "'"'"' 2>/dev/null"
+		while ((whatprovides | getline)) {
+		    if (/no package/)
+			break;
+		    providedpkgs[$1] = 1
+		    providedcaps[$1] = pkg
+		}
+		close(whatprovides)
+	    }
+	    for (pkg in providedpkgs) {
+		provides = "rpm -q --provides " pkg " 2>/dev/null"
+		while ((provides | getline)) {
+		    if (NF == 1) {
+			if (!($1 in providedcaps))
+			    providedcaps[$1] = pkg
+			continue
+		    }
+		    if (NF == 3) {
+			providedcaps[$1] = ""
+			providedvers[$0] = pkg
+			continue
+		    }
+		}
+		close(provides)
+	    }
+	    j = 1
+	    k = 1
+	    for (cap in requiredcaps) {
+		if (!requiredcaps[cap])
+		    continue
+		if (cap in providedcaps) {
+		    if (!providedcaps[cap])
+			continue
+		    result[j] = cap
+		    j++
+		    continue
+		}
+		unprovided[k] = cap
+		k++
+	    }
+	    for (ver in requiredvers) {
+		if (ver in providedvers) {
+		    result[j] = ver
+		    j++
+		    continue
+		}
+		unprovided[k] = ver
+		k++
+	    }
+	    n = asort(result)
+	    for (i = 1; i <= n; i++)
+		print result[i]
+	    n = asort(unprovided)
+	    if (n) {
+		print "W: Warning: unprovided requirements:" > "/dev/stderr"
+		for (i = 1; i <= n; i++)
+		    print "W:    " unprovided[i] > "/dev/stderr"
+	    }
+	}
+    '
+}
+
+searchlist=($where /usr/lib/rpm /usr/lib/rpm/redhat)
+
+exelist=()
+scriptlist=()
+solist=()
+libtoolist=()
+perllist=()
+pythonlist=()
+tcllist=()
+kmodlist=()
+jarlist=()
+pkgconfiglist=()
+executables=()
+others=()
+
+while read f ; do
+    case "$f" in
+	(*.la)
+	    libtoollist=("${libtoollist[@]}" "$f")
+	    continue
+	    ;;
+	(*.pm|*.pl|*.ph)
+	    perllist=("${perllist[@]}" "$f")
+	    continue
+	    ;;
+	(*.ko)
+	    kmodlist=("${kmodlist[@]}" "$f")
+	    continue
+	    ;;
+	(*.jar|*.zip|*.war)
+	    jarlist=("${jarlist[@]}" "$f")
+	    continue
+	    ;;
+	(*.pc)
+	    pkgconfiglist=("${pkgconfiglist[@]}" "$f")
+	    continue
+	    ;;
+	(*.py)
+	    pythonlist=("${pythonlist[@]}" "$f")
+	    continue
+	    ;;
+	(*.tcl)
+	    tcllist=("${tcllist[@]}" "$f")
+	    continue
+	    ;;
+	(*.so|*.so.*)
+	    solist=("${solist[@]}" "$f")
+	    continue
+	    ;;
+    esac
+    if [ -x "$f" ] ; then
+	executables=("${executables[@]}" "$f")
+    fi
+done
+
+#classify executables
+echo "D: Building: exelist" >&2
+exelist=("${exelist[@]}" \
+	$(printf "%s\0" "${executables[@]}" | xargs -0 -r file | \
+	egrep -v ':.* (commands|script) ' | grep ':.*executable' | \
+	cut -d: -f1))
+
+echo "D: Building: scriptlist" >&2
+scriptlist=("${scriptlist[@]}" \
+	$(printf "%s\0" "${executables[@]}" | xargs -0 -r file | \
+	egrep ':.* (commands|script) ' | \
+	cut -d: -f1))
+
+echo "D: Building: solist" >&2
+solist=("${solist[@]}" \
+	$(printf "%s\0" "${executables[@]}" | xargs -0 -r file | \
+	grep ':.*shared object' | \
+	cut -d: -f1))
+
+
+# # --- Executables.
+# if [ -n "$exelist" ] ; then
+#     tool=$(which_tool "find-requires.exe")
+#     if [ -n "$tool" -a -x "$tool" ] ; then
+# 	  printf "%s\n" "${solist[@]}" "${exelist[@]}" | \
+# 	  $tool "${args[@]}" | sort -bu
+#     fi
+# fi
+
+# --- Shared objects.
+if [ -n "$solist" -o -n "$exelist" ] ; then
+    tool=$(which_tool "find-requires.so")
+    if [ -n "$tool" -a -x "$tool" ] ; then
+	echo "D: Executing: $tool" >&2
+	printf "%s\n" "${solist[@]}" "${exelist[@]}" | \
+	$tool "${args[@]}" | sort -bu
+    fi
+fi
+
+# --- libtool
+if [ -n "$libtoollist" ] ; then
+    tool=$(which_tool "find-requires.libtool")
+    if [ -n "$tool" -a -x "$tool" ] ; then
+	echo "D: Executing: $tool" >&2
+	printf "%s\n" "${libtoollist[@]}" | \
+	$tool "${args[@]}" | remove_unprovided
+    fi
+fi
+
+# --- Scripts.
+if [ -n "$scriptlist" ] ; then
+    for f in "${scriptlist[@]}" ; do
+	if [ -r "$f" ] ; then
+	    interp=$(awk '
+		(FNR == 1) {
+		    if (/^#!/) {
+			sub("^#![[:space:]]*", "")
+			sub("[[:space:]]+.*", "")
+			print
+		    }
+		    nextfile
+		}' "$f")
+	    if [ -n "$interp" ] ; then
+		printf "%s\n" "$interp"
+		case $interp in
+		    (*/perl) perllist=("${perllist[@]}" "$f")
+			;;
+		    (*/wish) tcllist=("${tcllist[@]}" "$f")
+			;;
+		    (*/python) pythonlist=("${pythonlist[@]}" "$f")
+			;;
+		    (*/sh|*/bash)
+			wish=$(awk '
+			    (FNR == 6) {
+				nextfile
+			    }
+			    /^exec[[:space:]]+wish[[:space:]]/ {
+				print "wish"
+				nextfile
+			    }' "$f")
+			if [ :$wish = :wish ] ; then
+			    tcllist=("${tcllist[@]}" "$f")
+			fi
+			;;
+		    (*)
+			;;
+		esac
+	    fi
+	fi
+    done | sort -bu
+fi
+
+# --- Perl modules.
+if [ -n "$perllist" ] ; then
+    tool=$(which_tool "perl.req")
+    if [ -n "$tool" -a -x "$tool" ] ; then
+	echo "D: Executing: $tool" >&2
+	printf "%s\n" "${perllist[@]}" | \
+	$tool "${args[@]}" | sort -bu
+    fi
+fi
+
+# --- Python modules.
+if [ -n "$pythonlist" ] ; then
+    tool=$(which_tool "python.req")
+    if [ -n "$tool" -a -x "$tool" ] ; then
+	echo "D: Executing: $tool" >&2
+	printf "%s\n" "${pythonlist[@]}" | \
+	$tool "${args[@]}" | sort -bu
+    fi
+fi
+
+# --- Tcl modules.
+if [ -n "$tcllist" ] ; then
+    tool=$(which_tool "find-requires.tcl")
+    if [ -n "$tool" -a -x "$tool" ] ; then
+	echo "D: Executing: $tool" >&2
+	printf "%s\n" "${tcllist[@]}" | \
+	$tool "${args[@]}" | sort -bu
+    fi
+fi
+
+# --- pkgconfig
+if [ -n "$pkgconfiglist" ] ; then
+    tool=$(which_tool "find-requires.pkgconfig")
+    if [ -n "$tool" -a -x "$tool" ] ; then
+	echo "D: Executing: $tool" >&2
+	printf "%s\n" "${pkgconfiglist[@]}" | \
+	$tool "${args[@]}" | sort -u
+    fi
+fi
+
+# --- Kernel module imported symbols.
+if [ -n "$kmodlist" ] ; then
+    tool=$(which_tool "find-requires.kmod")
+    if [ -n "$tool" -a -x "$tool" ] ; then
+	echo "D: Executing: $tool" >&2
+	printf "%s\n" "${kmodlist[@]}" | \
+	$tool "${args[@]}" | remove_unprovided
+    else
+	tool=$(which_tool "find-requires.ksyms")
+	if [ -n "$tool" -a -x "$tool" ] ; then
+	    echo "D: Executing: $tool" >&2
+	    printf "%s\n" "${kmodlist[@]}" | \
+	    $tool "${args[@]}" | remove_unprovided
+	fi
+    fi
+fi
+
+# -- Java jar files
+if [ -n "$jarlist" ] ; then
+    tool=$(which_tool "find-requires.java")
+    if [ -n "$tool" -a -x "$tool" ] ; then
+	echo "D: Executing: $tool" >&2
+	printf "%s\n" "${jarlist[@]}" | \
+	$tool "${args[@]}" | remove_unprovided
+    fi
+    # we built them, so anything unprovided is a false positive 
+fi
+
+exit 0
+
+# =============================================================================
+#
+# @(#) $RCSfile: find-requires,v $ $Name:  $($Revision: 1.1.2.12 $) $Date: 2011-09-20 09:51:34 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2011-09-20 09:51:34 $ by $Author: brian $
+#
+# -----------------------------------------------------------------------------
+#
+# $Log: find-requires,v $
+# Revision 1.1.2.12  2011-09-20 09:51:34  brian
+# - updates from git
+#
+# Revision 1.1.2.11  2011-05-31 09:46:02  brian
+# - new distros
+#
+# Revision 1.1.2.10  2011-05-15 12:01:21  brian
+# - many build system refinements
+#
+# Revision 1.1.2.9  2011-05-10 13:45:32  brian
+# - weak modules workup
+#
+# Revision 1.1.2.8  2011-03-17 07:01:29  brian
+# - build and repo system improvements
+#
+# Revision 1.1.2.7  2011-02-17 18:34:11  brian
+# - repository and rpm build updates
+#
+# Revision 1.1.2.6  2011-02-07 04:48:33  brian
+# - updated configure and build scripts
+#
+# Revision 1.1.2.5  2009-07-24 13:49:45  brian
+# - updates for release build
+#
+# Revision 1.1.2.4  2009-07-05 12:02:24  brian
+# - updated scripts
+#
+# Revision 1.1.2.3  2009-07-04 13:28:10  brian
+# - conversion to pure awk
+#
+# Revision 1.1.2.2  2009-07-04 03:51:33  brian
+# - updates for release
+#
+# =============================================================================
+# vim: tw=80 sw=4 nocin nosi

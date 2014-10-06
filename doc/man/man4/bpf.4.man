@@ -1,0 +1,2372 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR,\fB "
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH BPF 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Modules"
+.\"
+.\"
+.SH NAME
+.B bpf
+\-\fI STREAMS\fR Berkeley Packet Filter device
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <stropts.h>
+.br
+.B #include <net/bpf.h>
+.HP 8
+.BI "int " fd ;
+.PD 0
+.HP
+.BI "int open(" \*(lq\fR/dev/streams/bpf/\fP\fIxxxx\fP\*(rq ", " \fR0\fP );
+.HP
+.BI "int ioctl(" fd ", " I_PUSH ", " \*(lqbpfmod\*(rq );
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The Berkeley Packet Filter provides a raw interface to data link layers in a
+protocol independent fashion.  All packets on the network, even those destined
+for other hosts, are accessible through this mechanism.
+.PP
+The packet filter appears as a character special device,
+.BR /dev/bpf ,
+.BR /dev/bpf\fIn\fP  " or " /dev/streams/bpf/\fIxxxx\fP ,
+where
+.I xxxx
+is the name of a
+.I STREAMS
+driver supporting BPF.
+.\"This special device is an alias for
+.\".BR /dev/dlpi " or " /dev/streams/clone/dlpi
+.\"that has an
+.\".BR autopush (8)
+.\"specification that includes this module,
+.\".BR bpfmod .
+Because the
+.BR /dev/bpf ,
+.BR /dev/bpf\fIn\fP " or " /dev/streams/bpf/\fIxxxx\fP
+devices are clone devices, each time that an application opens the device, a
+new character device special file is created just for that opener.
+.PP
+After opening the device, or pushing the module, the file descriptor must be
+bound to a specific network interface with the
+.I BIOCSETIF
+command if it has not already been bound on the
+stream before pushing the module.
+A given interface can be shared with multiple
+listeners, and the filter underlying each descriptor will see a identical
+packet stream.
+.PP
+Associated with each open instance of a BPF file is a user-settable packet
+filter.  The packet filter will support any link level protocol that has
+fixed length headers.  Whenever a packet is received by an interface, all
+file descriptors listening on that interface apply their filter.  Each
+descriptor that accepts the packet receives it own copy.
+.PP
+Reads from these files return the next group of packets that have matched the
+filter.  To improve performance, the buffer passed to read must be the same
+size as the buffers used internally by BPF.  This size is returned by the
+.I BIOCGBLEN
+command (see below), and can be set with
+.IR BIOCSBLEN .
+Note that an individual packet larger than this size is necessarily
+truncated.
+.PP
+A packet can be sent out on the network by writing to a BPF file descriptor.
+The writes are unbuffered, meaning only one packet can be processed per
+write.  Currently, only writes to Ethernets and SLIP links are supported.
+.\"
+.\"
+.SH USAGE
+.PP
+The\fB libpcap\fP functions (part of\fB tcpdump\fP(1)) for BPF provide
+excellent examples of the traditional usage of BPF across a very wide range
+of operating systems and provides many insights into usage for different
+implementations.  The steps taken by\fB libcap\fP to prepare a device and
+activate capture are as follows:
+.\"
+.SS "Finding All Devices"
+.PP
+.B libpcap
+finds as many devices as it can by opening a socket and using
+the
+.BR netdevice (7)
+socket input-output control commands:
+.BR SIOCGIFNUM " and " SIOCGIFCONF ,
+or
+.BR SIOCGLIFNUM " and " SIOCGLIFCONF ,
+when available.  This lists, by name and transport address, all of the IPv4
+(and IPv6 with the later pair) interface available.
+.B libpcap
+then tests each interface using the
+.BR SIOCGIFFLAGS " or " SIOCGLIFFLAGS
+commands to determine which interfaces advertise the
+.I IFF_UP
+flag indicating that the address is up.
+The resulting list of interfaces is used as a list from which to select.
+(For example,
+.B wireshark
+uses this list to display to the user a selection of interfaces.)
+.\"
+.\"
+.SS "Initiating Capture"
+.PP
+.IP \ 1. \w'00.\(em'u
+When the OS supports a cloning interface (such as AIX and some versions of
+MAC), open the\fB /dev/bpf\fP device.  Otherwise, start opening devices
+\fB/dev/bpf\fP\fIn\fP starting at\fB /dev/bpf\fP\fI0\fP until it is possible
+to open a free device, or the device does not exist.
+.IP ""
+The lesson here is to provide both a\fB /dev/bpf\fP and\fB /dev/bpf\fP\fIn\fP
+devices, where\fI n\fP is, say, from 0 to 8.  All these devices ultimately
+link to (or have the device numbers of)\fB /dev/streams/bpf/ldl\fP.
+.IP ""
+The\fB @PACKAGE@\fP version of\fB libpcap\fP will also open devices
+\fB/dev/streams/bpf/\fP\fIxxxx\fP, where\fI xxxx\fP is the name of a BPF
+registered driver such as\fB x400p-ss7\fP.
+.IP \ 2.
+.IP \ 3.
+.IP \ 4.
+.IP \ 5.
+.IP \ 6.
+.IP \ 7.
+.IP \ 8.
+.IP \ 9.
+.IP \10.
+.IP \11.
+.IP \12.
+.IP \13.
+.IP \14.
+.IP \15.
+.IP \16.
+.PP
+Use of the BPF device consists of the following steps:
+.IP \ 1. \w'00.\(em'u
+Select an appropriate device.
+For an OpenSS7 SS7 signalling link, use\fI /dev/streams/bpf/x400p-ss7\fP.
+\fBlibpcap\fP opens the\fB /dev/bpf\fP device if the system supports cloning
+(AIX, MAC), otherwise, it starts walking down the list of
+\fB/dev/bpf\fP\fIn\fP devices start at\fI n\fP=0 until it finds an
+appropriate device.
+.IP \ 2.
+Open the device using the\fB open\fP(2s) system call.  It is not necessary to
+push the\fB bpfmod\fP(4) module because an autopush specification will do
+this as the device is opened.
+When opening the device with the\fB O_RDWR\fP flag is denied [\fBEACCES\fP],
+try opening the device with the\fB O_RDONLY\fP flag.
+.IP \ 3.
+Set the interface.   The interface can be set with the\fB BIOCSETIF\fP
+command and subsequently examined using the
+\fBBIOCGETIF\fP input output control command.  The [\fBENXIO\fP] or
+[\fBENETDOWN\fP] errors are considered spearately by\fB libpcap\fP.
+.IP \ 4.
+\fBlibpcap\fP checks whether the\fB BIOCGDLTLIST\fP command is available and
+can be used on the interface for later reference.  It checks whether any
+wireless DLTs are available to determine whether RF monitoring modes are
+available.
+.IP \ 5.
+Try to set up zero-copy buffer mode using the\fB BIOCSETBUFMODE\fP command.
+If it fails, zero-copy buffer mode is not available.  If available, get the
+maximum zero-copy buffer size using the\fB BIOCGETZMAX\fP command.  If no
+buffer maximum specified or the request fails, use the minimum of the buffer
+size returned by the\fB BIOCGBLEN\fP command and the value of
+\fBBPF_DFLTBUFSIZE\fP.
+.IP \ 6.
+Check the BPF version.  The version is checked using the\fB BIOCVERSION\fP
+command.  The default major version is\fB 1\R and the
+device minor version is\fB 1\fP also.
+.IP \ 7.
+Set the buffer size.  The buffer size is checked using the\fB BIOCGBLEN\fP
+command and can be set using the\fB BIOCSBLEN\fP
+command.  The default size is\fB 1M\fP byte; the
+minimum size\fB 32\fP, the maximum\fB 16M\fP.
+.IP \ 8.
+Set the read mode.  The read mode can be set using the\fB BIOCIMMEDIATE\fP
+command.  The default setting is false (immediate
+mode disabled).
+.IP \ 9.
+Set the read timeout.  The read timeout can be checked using the
+\fBBIOCGRTIMEOUT\fP command and set using the
+\fBBIOCSRTIMEOUT\fP command.  The default setting is
+zero (0) which disables the read timeout.
+.IP \11.
+Set the filter program.  The filter program can be set using the
+\fBBIOCSETF\fP command.  Setting a program with a
+program length of zero (0) disables the program.  The default filter
+disposition for a disabled program is to pass all packets.
+.IP \12.
+Set the data link type.  The data link type cannot be set  or examined until
+after the interface is set.  One way to avoid unwanted traffic flowing is to
+set a filter program that discards all messages.  The data link types
+available for the specified interface can be checked using the
+\fBBIOCGDLTLIST\fP command, set using the\fB BIOCSDLT\fP
+command, and examined using the\fB BIOCGDLT\fP
+command.
+.IP \13.
+Set promiscuous mode.  If promiscuous mode capture is desired, set
+promiscuous mode on the interface using the\fB BIOCPROMISC\fP 
+command.  Note that the command may return
+[\fBEOPNOTSUPP\fP] or [\fBEINVAL\fP] when the interface does not support the
+concept of a promiscuous mode.
+.IP \14.
+Flush the stream.  If some settings have changed since the interface was set,
+or the interface has changed, flush the stream using the\fB BIOCFLUSH\fP
+command.  As the file descriptor is a\fI STREAMS\fP file
+descriptor, the\fI I_FLUSH\fP(7) command may also be
+used.  Note that the\fB BIOCFLUSH\fP command only flushes the read queues.
+Flushing the read queue using either approach also zeros the BPF statistics
+counters.
+.IP \15.
+Start reading.
+The stream is read using the\fB read\fP(2s) system call with an\fI nbytes\fP
+argument that is greater than or equal to the buffer size returned by
+\fBBIOCGBLEN\fP.  The application can perform blocking reads, or can await
+the signal specified by\fB BIOCSRSIG\fP, either with a signal handler, with
+\fBwait\fP(2),\fB select\fP(2) or\fB poll\fP(2s).  The fact that this is a
+\fISTREAMS\fP that the user control signals using the\fI I_SETSIG\fP(7)
+command, or the\fB TIOCSPGRP\fP or\fB SIOCSPGRP\fP
+commands, or the\fB F_SETOWN\fP option to
+\fBfcntl\fP(2).
+.IP \16.
+Close the file when done.
+.\"
+.\"
+.SH IOCTLS
+.PP
+The
+.BR ioctl (2s)
+command codes below are defined in
+.IR <net/bpf.h> .
+All commands required these includes:
+.sp
+.RS
+.nf
+\s-1\f(C\
+.B #include <sys/types.h>
+.B #include <sys/time.h>
+.B #include <sys/ioctl.h>
+.B #include <net/bpf.h>
+\s+1\fP
+.fi
+.RE
+.PP
+Additionally,
+.IR BIOCGETIF " and " BIOCSETIF
+require:
+.sp
+.RS
+.nf
+\s-1\f(C\
+.B #include <sys/socket.h>
+.B #include <net/if.h>
+\s+1\fP
+.fi
+.RE
+.PP
+In addition to
+.IR FIONREAD ,
+the following commands may be applied to any open
+.B bfp
+file.  The (third) argument to
+.BR ioctl (2s)
+should be a pointer to the type indicated.
+.PP
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.B BIOCGBLEN
+.RB ( uint )
+Returns the required buffer length for reads on
+.B bpf
+files.
+.IP ""
+The default value, defined in
+.I <net/bpf.h>
+is
+.B BPF_DFLTBUFSIZE
+which has the value
+.BR (1<<16) " or " 1,048,576 ( 1M ") bytes.
+.IP ""
+(4.4BSD)
+This is one of the original commands from the 4.4BSD implementation set.
+.IP ""
+Under
+.BR "Linux Fast-STREAMS" ,
+this command is implemented by
+.BR bpfmod (4).
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.B BIOCSBLEN
+.RB ( uint )
+Sets the buffer length for reads on
+.B bpf
+files.  The buffer must be set before the file is attached to an interface
+with
+.BR BIOCSETIF .
+If the requested buffer size cannot be accommodated, the closest allowable
+size will be set and returned in the argument.  A read call will result in
+.RB [ EIO ]
+if it is passed a buffer that is not this size.
+.IP ""
+The minimum and maximum values, defined in
+.I <net/bpf.h>
+are
+.BR BPF_MINBUFSIZE " and " BPF_MAXBUFSIZE ,
+which have the values
+.BR 32 " and " 16M " bytes.
+.IP ""
+(4.4BSD)
+This is one of the original commands from the 4.4BSD implementation set.
+.IP ""
+Under
+.BR "Linux Fast-STREAMS" ,
+this command is implemented by
+.BR bpfmod (4).
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.B BIOCGDLT
+.RB ( uint )
+Returns the type of data link layer underlying the attached interface.
+.RB [ EINVAL ]
+is returned if no interface has yet been specified with
+.BR BIOCSETIF " or " BIOCSETLIF .
+The device types, prefixed with
+.RB \(lq DLT_ \(rq,
+are defined in
+.IR <net/bpf.h> .
+The (third) argument to
+.BR ioctl (2s)
+is a pointer to an
+.B unsigned int
+into which to place the value of the data link type.
+.IP ""
+(4.4BSD)
+This is one of the original commands from the 4.4BSD implementation set.
+.IP ""
+Under
+.BR "Linux Fast-STREAMS" ,
+the
+.BR bpfdrv (4)
+must support this command so that the capture application can determine the
+data link type of the capture.
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.B BIOCSDLT
+.RB ( uint )
+Used to specify the type of data link layer of the interface attached to the
+.B bpf
+descriptor.  If the current interface is not of the given type, then the
+descriptor will be reattached to an interface of the given type.  If the
+descriptor has promiscuous mode set, the new interface will be moved to the
+promiscuous mode.
+.RB [ EINVAL ]
+is returned if no interface has been specified with
+.BR BIOCSETIF " or " BIOCSETLIF .
+The device types, prefixed with
+.RB \(lq DLT_ \(rq,
+are defined in
+.IR <net/bpf.h> .
+The (third) argument to
+.BR ioctl (2s)
+is a pointer to an
+.B unsigned int
+that provides the requested data link type.
+.IP ""
+(NetBSD, Not in 4.4BSD)
+This is one of the original commands from the extended 4.4BSD implementation
+set and is provided by all recent implementations.
+.IP ""
+Under
+.BR "Linux Fast-STREAMS" ,
+the
+.BR bpfdrv (4)
+must support this command so that the capture application can select the data
+link type of the capture.
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.B BIOCGDLTLIST
+.RB ( "struct bpf_dltlist" )
+Returns a list of data link types of the given interface.  A user allocated
+buffer to hold the list and length of the expected list should be provided in
+the
+.B bpf_dltlist
+structure, defined in
+.IR <net/bpf.h> .
+.RB [ EINVAL ]
+is returned if no interface has been specified.  The device types, prefixed
+with
+.RB \(lq DLT_ \(rq,
+are defined in
+.IR <net/bpf.h> .
+The (third) argument to
+.BR ioctl (2s)
+is a pointer to a
+.B bpf_dltlist
+structure that will contain the available data link types.  The
+.B bpf_dltlist
+structure is defined as follows:
+.sp
+.RS
+.nf
+\s-1\fC\
+struct bpf_dltlist {
+    uint bfl_len;    /* number of bfl_list array elements */
+    uint *bfl_list;  /* array of data link types */
+};
+\s+1\fP
+.fi
+.PP
+The
+.B bpf_dltlist
+structure contains the following members:
+.TP \w'\fIbfl_list\fP\(em'u
+.I bfl_len
+The unsigned integer number of array elements in the array pointed to by the
+.I bfl_list
+member.  On call, this is the size of the array pointed to by the
+.I bfl_list
+member.  On return, this is the number of elements in the array that were
+populated by the driver.
+.TP
+.I bfl_list
+Points to an array of unsigned integers that will contain the available data
+link types.  On call, this array must contain at least
+.I bfl_len
+elements.  On return, the array will contain
+.I bfl_len
+valid elements.  All other elements in the array will contain the same values
+as were provided on call.  Because there is no data link type value of zero
+(0), the caller should zero the entire array before the call as another
+mechanism to detect the number of elements returned.
+.PP
+(NetBSD, Not in 4.4BSD)
+This is one of the original commands from the extended 4.4BSD implementation
+set and is provided by all recent implementations.
+.PP
+Under
+.BR "Linux Fast-STREAMS" ,
+the
+.BR bpfdrv (4)
+must support this command so that the capture application can determine the
+possible data link types for capture.
+.RE
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.B BIOCPROMISC
+Forces the interface into promiscuous mode.  All packets, not just those
+destined for the local host, are processed.  Since more than one file can be
+listening on a given interface, a listener that opened its interface
+non-promiscuously may still receive packets promiscuously.  This problem can
+be remedied with an appropriate filter.
+The (third) argument to
+.BR ioctl (2s)
+is ignored.
+.IP ""
+(4.4BSD)
+This is one of the original commands from the 4.4BSD implementation set.
+.IP ""
+Under
+.BR "Linux Fast-STREAMS" ,
+the
+.BR bpfdrv (4)
+must support this command if promiscuous capture is permitted.  The response
+in the case that promiscuous capture is not permitted is not well documented.
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.B BIOCFLUSH
+Flushes the buffer of incoming packets, and resets the statistics that are
+returned by
+.BR BIOCGSTATS " and " BIOCGSTATSOLD .
+The equivalent function can be performed using the
+.IR I_FLUSH (7)
+.I STREAMS
+command.
+The (third) argument to
+.BR ioctl (2s)
+is ignored.
+.IP ""
+(4.4BSD)
+This is one of the original commands from the 4.4BSD implementation set.
+.IP ""
+Under
+.BR "Linux Fast-STREAMS" ,
+the
+.BR bpfdrv (4)
+must support this command.  The response to the command is to flush its own
+read queue and reset its counts and issue an
+.BR M_FLUSH (9)
+message upstream flushing the read queues so that the equivalent action is
+performed by the
+.BR bpfmod (4)
+module and the Stream head.
+.BR bpfmod (4)
+expects that the driver will issue a
+.BR M_FLUSH (9)
+message upstream to flush the read queue when the driver receives this
+command.
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.B BIOCGETIF
+.RB ( "struct ifreq" )
+Returns the name of the hardware interface that the file is listening on.
+The name is returned in the
+.I ifr_name
+field of the
+.B ifreq
+structure.  All other fields are undefined.
+.RS
+.PP
+The (third) argument to
+.BR ioctl (2s)
+is a pointer to an
+.B ifreq
+structure.
+The
+.B ifreq
+structure is defined in
+.I <net/if.h>
+and documented in
+.BR netdevice (7).
+Only the
+.I ifr_name
+field of the structure is used: all other fields are undefined.
+.PP
+The
+.B ifreq
+structure is formatted as follows:
+.sp
+.nf
+\s-1\fC\
+#define IFNAMSIZ 16
+
+struct ifreq {
+    char ifr_name[IFNAMSIZ]; /* Interface name */
+    union {
+        struct sockaddr ifr_addr;
+        struct sockaddr ifr_dstaddr;
+        struct sockaddr ifr_broadaddr;
+        struct sockaddr ifr_netmask;
+.\"        struct sockaddr ifr_hwaddr;
+        short           ifr_flags;
+.\"        int             ifr_ifindex;
+.\"        int             ifr_metric;
+.\"        int             ifr_mtu;
+.\"        struct ifmap    ifr_map;
+.\"        char            ifr_slave[IFNAMSIZ];
+.\"        char            ifr_newname[IFNAMSIZE];
+.\"        char            *ifr_data;
+    };
+};
+\s+1\fP
+.fi
+.sp
+The fields of interest are:
+.TP \w'\fIifr_broadaddr\fP\(em'u
+.I ifr_name
+the interface name.
+.PD 0
+.TP
+.I ifr_addr
+the interface address.
+.TP
+.I ifr_dstaddr
+the p2p interface destination address.
+.TP
+.I ifr_broadaddr
+the broadcast address.
+.TP
+.I ifr_netmask
+the network mask.
+.\".TP
+.\".I ifr_hwaddr
+.\"the hardware address.
+.TP
+.I ifr_flags
+the interface flags.
+.\".TP
+.\".I ifr_ifindex
+.\"the interface index.
+.\".TP
+.\".I ifr_metric
+.\"the interface metric.
+.\".TP
+.\".I ifr_mtu
+.\"the interface mtu.
+.\".TP
+.\".I ifr_map
+.\"the device map.
+.\".TP
+.\".I ifr_slave
+.\"the slave interface name.
+.\".TP
+.\".I ifr_newname
+.\"the new interface name.
+.\".TP
+.\".I ifr_data
+.\"device specific data.
+.\".TP
+.\".I ifr_bandwidth
+.\"the interface bandwidth.
+.\".TP
+.\".I ifr_qlen
+.\"the interface queue length.
+.PD
+.PP
+(4.4BSD)
+This is one of the original commands from the 4.4BSD implementation set.
+.PP
+Under
+.BR "Linux Fast-STREAMS" ,
+the
+.BR bpfdrv (4)
+may support this command to permit the capture application to determine the
+current interface setting.  (It is not that important, because it will return
+.RB [ EINVAL ]
+if it has not already been set by the application.)
+.RE
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.B BIOCSETIF
+.RB ( "struct ifreq" )
+Sets the hardware interface associated with the file.  This command must be
+performed before any packets can be read.  The device is indicated by name
+using the
+.I ifr_name
+field of the
+.B ifreq
+structure.
+Additionally, the actions of
+.I BIOCFLUSH
+are performed.
+.IP ""
+The (third) argument to
+.BR ioctl (2s)
+is a pointer to an
+.B ifreq
+structure.
+The
+.B ifreq
+structure is defined in
+.I <net/if.h>
+and documented in
+.BR netdevice (7).
+Only the
+.I ifr_name
+field of the structure is used: all other fields are undefined.
+.IP ""
+(4.4BSD)
+This is one of the original commands from the 4.4BSD implementation set.
+.IP ""
+Under
+.BR "Linux Fast-STREAMS" ,
+the
+.BR bpfdrv (4)
+must support this command to permit capture to occur at all.  When this
+command is issued, the driver should attach, bind and enable capture on a
+valid interface.  When the interface was previously set, the driver should
+first disable, unbind and detach the old interface.  Whether this normally
+moves the interface to the
+.I IFF_UP
+or down state is not well documented.
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.BR BIOCGETLIF ", " BIOCSETLIF
+.RB ( "struct lifreq" )
+Gets or sets the hardware interface associated with the file.  This command
+must be performed before any packets can be read.  The device is indicate by
+name using the
+.I lifr_name
+field of the
+.B lifreq
+structure.
+Additionally, performs the action of
+.BR BIOCFLUSH .
+.RS
+.PP
+The (third) argument to
+.BR ioctl (2s)
+is a pointer to an
+.B lifreq
+structure.
+The
+.B lifreq
+structure is defined in
+.I <net/if.h>
+and documented in
+.BR netdevice (7).
+Only the
+.I lifr_name
+field of the structure is used: all other fields are undefined.
+.PP
+The
+.B lifreq
+structure is formatted as follows:
+.sp
+.nf
+\s-1\fC\
+#define LIFNAMSIZ 32
+.\"typedef int zoneid_t;
+
+struct lifreq {
+    char lifr_name[LIFNAMSIZ];
+    union {
+        int  lifr_addrlen;
+        uint lifr_ppa;
+    };
+    uint lifr_type;
+    union {
+        struct sockaddr_storage lifr_addr;
+        struct sockaddr_storage lifr_dstaddr;
+        struct sockaddr_storage lifr_broadaddr;
+.\"        struct sockaddr_storage lifr_token;
+        struct sockaddr_storage lifr_subnet;
+        int                     lifr_index;
+        uint64_t                lifr_flags;
+.\"        int                     lifr_metric;
+.\"        uint                    lifr_mtu;
+        int                     lifr_muxid[2];
+#define lifr_ip_muxid           lifr_muxid[0]
+#define lifr_arp_muxid          lifr_muxid[1]
+.\"        struct lif_nd_req       lifr_nd;
+.\"        struct lif_ifinfo_req   lifr_ifinfo;
+.\"        char                    lifr_groupname[LIFGRNAMSIZ];
+.\"        char                    lifr_binding[LIFNAMSIZ];
+.\"        zoneid_t                lifr_zoneid;
+.\"        uint                    lifr_dadstate;
+    };
+};
+\s+1\fP
+.fi
+.sp
+The fields of interest are:
+.TP \w'\fIlifr_broadaddr\fP\(em'u
+.I lifr_name
+the interface name.
+.PD 0
+.TP
+.I lifr_addr
+the interface address.
+.TP
+.I lifr_dstaddr
+the p2p interface destination address.
+.TP
+.I lifr_broadaddr
+the broadcast address.
+.TP
+.I lifr_subnet
+the sub-network prefix.
+.\".TP
+.\".I lifr_hwaddr
+.\"the hardware address.
+.TP
+.I lifr_flags
+the interface flags.
+.\".TP
+.\".I lifr_ifindex
+.\"the interface index.
+.\".TP
+.\".I lifr_metric
+.\"the interface metric.
+.\".TP
+.\".I lifr_mtu
+.\"the interface mtu.
+.\".TP
+.\".I lifr_map
+.\"the device map.
+.\".TP
+.\".I lifr_slave
+.\"the slave interface name.
+.\".TP
+.\".I lifr_newname
+.\"the new interface name.
+.\".TP
+.\".I lifr_data
+.\"device specific data.
+.\".TP
+.\".I lifr_bandwidth
+.\"the interface bandwidth.
+.\".TP
+.\".I lifr_qlen
+.\"the interface queue length.
+.PD
+.PP
+(Solaris only.)
+These are Solaris-only commands (because Solaris only has the
+.B lifreq
+structure).
+.PP
+Under
+.BR "Linux Fast-STREAMS" ,
+these commands are implemented by
+.BR bpfdrv (4)
+for compatibility and to allow 32-character instead of 16-character interface
+names.
+.RE
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.BR BIOCSRTIMEOUT ", " BIOCGRTIMEOUT
+.RB ( "struct timeval" )
+Sets or gets the read timeout parameter.  The argument specifies the length of time
+to wait before timing out on a read request.  This parameter is initialized
+to zero (0) by
+.BR open (2s),
+indicating no timeout.
+.IP ""
+(4.4BSD)
+These are two of the original commands from the 4.4BSD implementation set.
+.IP ""
+Under
+.BR "Linux Fast-STREAMS" ,
+these commands are implemented by
+.BR bpfmod (4).
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.B BIOCGSTATS
+.RB ( "struct bpf_stat" )
+Returns the following structure of packet statistics:
+.sp
+.RS
+.nf
+\s-1\fC\
+struct bpf_stat {
+    uint64 bs_recv;        /* number of packets received */
+    uint64 bs_drop;        /* number of packets dropped */
+    uint64 bs_capt;        /* number of packets captured */
+    uint64 bs_padding[13]; /* padding */
+};
+\s+1\fP
+.fi
+.PP
+The fields are:
+.TP \w'\fIbs_padding\fP\(em'u
+.I bs_recv
+the number of packets received by the descriptor since opened or reset
+(including any buffered since the last read call);
+.TP
+.I bs_drop
+the number of packets that were accepted by the filter but dropped by the
+kernel because of buffer overflows (i.e., the application's reads are not
+keeping up with the packet traffic);
+.TP
+.I bs_capt
+the number of packets that were captured after any filtering was applied;
+and,
+.TP
+.I bs_padding
+padding for the structure to pad it out to 16 64-bit counts.
+.PP
+This is the newer structure that contains 64-bit counts and also calculates
+the number of packets captured after filtering.
+.PP
+(NetBSD, OpenBSD, Solaris.)
+Many recent implementations (FreeBSD being the notable exception) implement
+the 64-bit extended statistics including the
+.I bs_capt
+field.  The original 4.4BSD command is renamed to
+.BR BIOCGSTATSOLD .
+.PP
+Under
+.BR "Linux Fast-STREAMS" ,
+this command is implemented by both
+.BR bpfdrv "(4) and " bfpmod (4).
+.BR bpfmod (4)
+will intercept the command on its way from the driver and will add its own
+counts into the statistics.  It adds its drops to those of the driver in
+.IR bs_drop ,
+and sets the number of packets that passed the filter in
+.IR bs_capt .
+.RE
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.B BIOCGSTATSOLD
+.RB ( "struct bpf_stat_old" )
+Returns the following structure of packet statistics:
+.sp
+.RS
+.nf
+\s-1\fC\
+struct bpf_stat_old {
+    uint bs_recv; /* number of packets received */
+    uint bs_drop; /* number of packets dropped */
+};
+\s+1\fP
+.fi
+.PP
+The fields are:
+.TP \w'\fIbs_padding\fP\(em'u
+.I bs_recv
+the number of packets received by the descriptor since opened or reset
+(including any buffered since the last read call); and,
+.TP
+.I bs_drop
+the number of packets that were accepted by the filter but dropped by the
+kernel because of buffer overflows (i.e., the application's reads are not
+keeping up with the packet traffic).
+.PP
+This is the older structure that only contains 32-bit counts and does not
+calculate the number of packets captured after filtering.
+.PP
+(4.4BSD, FreeBSD, OpenBSD)
+This is the original 32-bit command from the 4.4BSD basic command set.  It
+lacks the
+.I bs_capt
+field of the newer structure.  Not all implementations use the newer
+structure, and in that case this command is named
+.BR BIOCGSTATS .
+.PP
+Under
+.BR "Linux Fast-STREAMS" ,
+this command is implemented by both
+.BR bpfdrv "(4) and " bpfmod (4).
+.BR bpfmod (4)
+will intercept the command on its way from the driver and will add its own
+counts into the statistics.  It adds its drops to those of the driver in
+.IR bs_drop .
+.RE
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.BR BIOCGFILDROP ", " BIOCSFILDROP
+.RB ( uint )
+Get or set the status of the \(lqfilter drop\(rq flag.  When non-zero,
+packets matching any filters will be reported to the associated interface so
+that they can be dropped.
+.IP ""
+(OpenBSD only.)
+The rationale for these commands is that OpenBSD does not support the newer
+.B BIOCGSTATS
+structure, and therefore, the number of packets dropped by the filter are not
+otherwise discernable.  Setting this flag adds filter drops to the
+.I bs_drop
+field of the
+.B bpf_stat_old
+structure.
+.IP ""
+Under
+.BR "Linux Fast-STREAMS" ,
+these commands are implemented by
+.BR bpfmod (4),
+(by adding packets dropped by the filter to
+.IR bs_drop ),
+and need not be implemented by the driver.  The counts are added to the
+.I bs_drop
+member of
+.B bpf_stat_old
+by intercepting the response to the
+.BR BIOCGSTATSOLD
+command.
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.B BIOCIMMEDIATE
+.RB ( uint )
+Enable or disable \*(lqimmediate mode\*(rq, based on the truth value of the
+argument.  When immediate mode is enabled, reads return immediately upon
+packet reception.  Otherwise, a read will block until either the kernel
+buffer becomes full or a timeout occurs.  This is useful for programs like
+.BR rarpd (8)
+that must respond to messages in real time.  The default for a new file is
+off.
+.IP ""
+(4.4BSD)
+This is one of the original commands from the 4.4BSD implementation set.
+.IP ""
+Under
+.BR "Linux Fast-STREAMS" ,
+this command is implemented by
+.BR bpfmod (4),
+and need not be implemented by the driver.
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.BR BIOCSETF ", " BIOCSETFNR
+.RB ( "struct bpf_program" )
+Sets the filter program used by the kernel to discard uninteresting packets.
+An array of instructions and its length are passed in using the following
+structure:
+.sp
+.RS
+.nf
+\s-1\fC\
+struct bpf_program {
+    int bf_len;
+    struct bpf_insn *bf_insns;
+};
+\s+1\fP
+.fi
+.RE
+.IP ""
+The filter program is pointed to by the
+.I bf_insns
+field while its length in units of
+.B bpf_insn
+structures is given by the
+.I bpf_len
+field.  Also, the actions of
+.B BIOCFLUSH
+are performed.  See section
+.RI \*(lq "FILTER MACHINE" \*(rq,
+below, for an explanation of the filter language.
+The maximum value for\fI bf_len\fP is\fB BPF_MAXINSNS\fP defined in
+\fI<net/bpf.h>\fP and has the value\fB 512\fP.
+The maximum number of memory store locations available for use by the BPF
+program defined in\fI <net/bpf.h>\fP is\fB BPF_MEMWORDS\fP and has the value
+\fB16\fP.
+The only difference between\fB BIOCSETF\fP and\fB BIOCSETFNR\fP is
+\fBBIOCSETF\fP performs the actions of\fB BIOCFLUSH\fP while\fB BIOCSETFNR\fP
+does not.
+.IP ""
+(4.4BSD)
+.B BIOCSETF
+is one of the original commands from the 4.4BSD implementation set.
+(FreeBSD only)
+.B BIOCSETFNR
+is a FreeBSD-only command.
+.IP ""
+Under
+.BR "Linux Fast-STREAMS" ,
+these commands are implemented by
+.BR bpfmod (4),
+and need not be implemented by the driver.
+There is some consternation with having to generate a
+.BR M_FLUSH (9)
+message for the
+.B BIOCSETFNR
+command from
+.BR bpfmod (4),
+when the flushing action is normally performed by the driver.
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.B BIOCSETWF
+.RB ( "struct bpf_program" )
+Sets the write filter program used by the kernel to control what type of
+packets can be written to the interface.  See the\fB BIOCSETF\fP command for
+more information on the\fB bpf\fP filter program.
+Note that the filter operates on the packet data written to the descriptor.
+If the \(lqheader complete\(rq flag is not set, the kernel sets the
+link-layer source address of the packet after filtering.
+See also,\fB BIOCLOCK\fP.
+.IP ""
+(FreeBSD, OpenBSD.)
+This commands is implemented to handle another security problem addressed by
+.BR BIOCLOCK .
+.IP ""
+Under
+.BR "Linux Fast-STREAMS" ,
+this command is implemented by
+.BR bpfmod (4).
+There is some consternation as before it was unnecessary for
+.BR bpfmod (4)
+to process
+.BR M_DATA (9)
+messages on the write side.
+See
+.BR bpfmod (4).
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.B BIOCVERSION
+.RB ( "struct bpf_version" )
+Returns the major and minor version numbers of the filter language currently
+recognized by the kernel.  Before installing a filter, applications must
+check that the current version is compatible with the running kernel.
+Version number are compatible if the major numbers match and the application
+minor is less than or equal to the kernel minor.  The kernel version number
+is returned in the following structure:
+.sp
+.RS
+.nf
+\s-1\fC\
+struct bpf_version {
+    ushort bv_major;
+    ushort bv_minor;
+};
+\s+1\fP
+.fi
+.RE
+.IP ""
+The current version numbers are given by
+.BR BPF_MAJOR_VERSION " and " BPF_MINOR_VERSION
+from
+.IR <net/bpf.h> ,
+and both have the value one (\fB1\fP).  In fact, the version numbers for BPF
+have never changed.
+An incompatible filter may result in undefined behaviour (most likely, an
+error returned by
+.BR ioctl (2s)
+or haphazard packet matching.
+.IP ""
+(4.4BSD)
+This is one of the original commands from the 4.4BSD implementation set.
+.IP ""
+Under
+.BR "Linux Fast-STREAMS" ,
+because the version is related to the filter program format,
+this command is implemented by
+.BR bpfmod (4).
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.BR BIOCSHDRCMPLT ", " BIOCGHDRCMPLT
+.RB ( uint )
+Set or get the status of the \*(lqheader complete\*(rq flag.  Set to zero if
+the link level source address should be filled in automatically by the
+interface output routine.  Set to one if the link level source address will
+be written, as provided, to the wire.  This flag is initialized to zero by
+default.
+.IP ""
+(4.4BSD)
+These are two of the original commands from the 4.4BSD implementation set.
+.IP ""
+Under
+.BR "Linux Fast-STREAMS" ,
+these commands are not necessarily supported by
+.BR bpfdrv (4).
+Support also depends on whether the driver supports sending packets at all.
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.BR BIOCSSEESENT ", " BIOCGSEESENT
+.RB ( uint )
+These commands are obsolete but left for compatibility.  User
+\fBBIOCSDIRECTION\fP and\fB BIOCGDIRECTION\fP instead.
+Set or get the flag determining whether locally generated packets on the
+interface should be returned by
+.BR bpf .
+Set to zero to see only incoming packets on the interface.  Set to one to see
+packets originating locally and remotely on the interface.  This flag is
+initialized to one by default.
+.IP ""
+(4.4BSD)
+These are two of the original commands from the 4.4BSD implementation set.
+.IP ""
+Under
+.BR "Linux Fast-STREAMS" ,
+these commands are implemented by
+.BR bpfdrv (4).
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.BR BIOCGRSIG ", " BIOCSRSIG
+.RB ( uint )
+Gets or sets the signal that will be sent to a process waiting on the
+.B bpf
+descriptor upon packet reception.  The default is
+.RI { SIGIO },
+known on SYSV systems as
+.RI { SIGPOLL }.
+The signal will be sent to the process group specified by \fBFIOSETOWN\fP.
+.IP ""
+(Mac OS, FreeBSD, OpenBSD, not NetBSD.)
+These commands are implemented by some BSDs and not others.  It seems to be
+more a matter of whether proper
+.B FIOSETOWN
+behaviour is respected by the character device.
+.IP ""
+Under
+.BR "Linux Fast-STREAMS" ,
+the function of this command is handled by the Stream head
+and is not required to be implemented by driver nor module.
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.BR BIOCLOCK
+()
+Set the locked flag on the\fB bpf\fR descriptor.  This prevents the execution
+of ioctl commands which could change the underlying operating parameters of
+the device.
+.IP ""
+This command is designed to prevent the security issues associated with an
+open\fB bpf\fP descriptor in unprivileged programs.  Even with dropped
+privileges, an open\fB bpf\fP descritpr can be abused by a rogue program to
+listen on any interface on the system, send packets on these interfaces if
+the descriptor was opened read-write and send signals to arbitrary processes
+using the signaling mechanism of\fB bpf\fP.  By allowing only \(lqknown
+safe\(rq commands, the\fB BIOCLOCK\fP command prevents this abuse.  The
+allowable commands are\fB BIOCGBLEN\fP,\fB BIOCFLUSH\fP,\fB BIOCGDLT\fP,\fB
+BIOCGETIF\fP,\fB BIOCGRTIMEOUT\fP,\fB BIOCSRTIMEOUT\fP,\fB
+BIOCIMMEDIATE\fP,\fB BIOCGSTATS\fP,\fP BIOCVERSION\fP,\fB BIOCGRSIG\fP,\fP
+BIOCGHDRCMPLT\fP,\fB TIOCGPGRP\fP and\fB FIONREAD\fP.  Use of any other
+command is denied with error
+.RB [ EPERM ].
+Once a descriptor is locked, it is not possible to unlock it.  A process with
+root privileges is not affected by the lock.
+.IP ""
+A privileged program can open a\fB bpf\fP device, drop privileges, set the
+interface, filters and modes on the descriptor, and lock it.  Once the
+descriptor is locked, the system is safe from further abuse through the
+descriptor.  Locking a descriptor does not prevent writes.  If the
+applications does not need to send packets through\fB bpf\fP, it can open the
+device read-only to prevent writing.  If sending packets is necessary, a
+write-filter can be set before locking the descriptor to prevent arbitrary
+packets from being sent out.
+.IP ""
+(FreeBSD, OpenBSD.)
+This is a security measure that is implemented in recent implementations of
+BPF.
+.IP ""
+Under
+.BR "Linux Fast-STREAMS" ,
+this command is implemented by
+.BR bpfmod (4).
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.BR BIOCSDIRECTION ", " BIOCGDIRECTION
+.RB ( uint )
+Set of get the setting determining whether incoming, outgoing, or all packets
+on the interface should be returned by BPF.  Set to\fB BPF_D_IN\fP to see
+only incoming packets on the interface.  Set to\fB BPF_D_INOUT\fP to see
+packets originating locally and remotely on the interface.  Set to
+\fBBPF_D_OUT\fP to see only outgoing packets on the interface.  This setting
+is initialized to\fB BPF_D_INOUT\fP by default.
+.IP ""
+(FreeBSD only.)
+These are FreeBSD-only commands that further address the security problem
+addressed by
+.BR BIOCLOCK ,
+by restricting the direction of data.
+.IP ""
+Under
+.BR "Linux Fast-STREAMS" ,
+these commands are implemented by
+.BR bpfdrv (4).
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.BR BIOCGDIRFILT ", " BIOCSDIRFILT
+.RB ( uint )
+Get or set the status of the \(lqdirection filter\(rq flag.  When non-zero,
+packets matching the specified direction (either
+.BR BPF_DIRECTION_IN " or " BPF_DIRECTION_OUT )
+will be ignored.
+.IP ""
+(OpenBSD only.)
+The rationale for these commands is that OpenBSD does not support the FreeBSD
+.BR BIOCSDIRECTION " and " BIOCGDIRECTION
+commands, so these commands perform a similar action.
+.IP ""
+Under
+.BR "Linux Fast-STREAMS" ,
+these commands are implemented both by
+.BR bpfmod "(4) and " bpfdrv (4).
+.BR bpfmod (4)
+observes the commands as they are passed on to the driver.
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.BR BIOCSTSTAMP ", " BIOCGTSTAMP
+.RB ( uint )
+Set or get the format and resolution of the time stamps returned by BPF.
+.IP ""
+Set to
+.BR BPF_T_MICROTIME ,
+.BR BPF_T_MICROTIME_FAST ,
+.BR BPF_T_MICROTIME_MONOTONIC ,
+.BR BPF_T_MICROTIME_MONOTONIC_FAST ,
+to get time stamps in 64-bit
+.B struct timeval
+format.
+.IP ""
+Set to
+.BR BPF_T_NANOTIME ,
+.BR BPF_T_NANOTIME_FAST ,
+.BR BPF_T_NANOTIME_MONOTONIC ,
+.BR BPF_T_NANOTIME_MONOTONIC_FAST ,
+to get time stamps in 64-bit
+.B struct timespec
+format.
+.IP ""
+Set to
+.BR BPF_T_BINTIME ,
+.BR BPF_T_BINTIME_FAST ,
+.BR BPF_T_BINTIME_MONOTONIC ,
+.BR BPF_T_BINTIME_MONOTONIC_FAST ,
+to get time stamps in 64-bit
+.B struct bintime
+format.
+.IP ""
+Set to
+.B BPF_T_NONE
+to ignore time stamp.  All 64-bit time stamp formats are wrapped in
+.BR "struct bpf_ts" .
+.iP ""
+The
+.BR BPF_T_MICROTIME_FAST ,
+.BR BPF_T_NANOTIME_FAST ,
+.BR BPF_T_BINTIME_FAST ,
+.BR BPF_T_MICROTIME_MONOTONIC_FAST ,
+.BR BPF_T_NANOTIME_MONOTONIC_FAST ,
+.BR BPF_T_BINTIME_MONOTONIC_FAST ,
+are analogs of corresponding formats without the
+.B _FAST
+suffix but do not perofrm a full time counter query, so thier accuracy is one
+timer tick.
+.IP ""
+The
+.BR BPF_T_MICROTIME_MONOTONIC ,
+.BR BPF_T_NANOTIME_MONOTONIC ,
+.BR BPF_T_BINTIME_MONOTONIC ,
+.BR BPF_T_MICROTIME_MONOTONIC_FAST ,
+.BR BPF_T_NANOTIME_MONOTONIC_FAST ,
+.BR BPF_T_BINTIME_MONOTONIC_FAST ,
+store the time elapsed since kernel boot.  This setting is intialized to
+.B BPF_T_MICROTIME
+by default.
+.IP ""
+(FreeBSD only.)
+These are FreeBSD-only commands that deviate wildly from other
+implementations, but the ability to set a
+.B _FAST
+time stamp are attractive, particularly with tick clocks accurate to the
+millisecond.
+.IP ""
+Under
+.BR "Linux Fast-STREAMS" ,
+these commands are implemented by
+.BR bpfdrv (4).
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.BR BIOCFEEDBACK
+.RB ( uint )
+Set packet feedback mode.  This allows injected packets to be fed back as
+input to the interface when output via the interface is successful.  When
+\fBBPF_D_INOUT\fP direction is set, injected outgoing packet is not returned
+by BPF to avoid duplication.  This flag is initialized to zero by default.
+.IP ""
+(FreeBSD, NetBSD.)
+This is the original FreeBSD command implemented by NetBSD for compatibility
+with FreeBSD.
+.IP ""
+Under
+.BR "Linux Fast-STREAMS" ,
+this command is implemented by
+.BR bpfdrv (4).
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.BR BIOCSFEEDBACK ", " BIOCGFEEDBACK
+.RB ( uint )
+Sets or gets packet feedback mode.  This is the OpenBSD versions of the
+FreeBSD command\fB BIOCFEEDBACK\fP, which cannot reset feedback mode once
+set.
+.IP ""
+(OpenBSD, NetBSD.)
+These are the FreeBSD workalikes that also permit examining the setting.
+.IP ""
+Under
+.BR "Linux Fast-STREAMS" ,
+these commands are implemented by
+.BR bpfdrv (4).
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.BR BIOCGETBUFMODE ", " BIOCSETBUFMODE
+.RB ( uint )
+Get or set the current\fB bpf\fP buffering mode; possible values are
+\fBBPF_BUFMODE_BUFFER\fP , buffered read mode, and\fB BPF_BUFMODE_ZBUF\fP,
+zero-copy buffer mode.
+.IP ""
+(FreeBSD only.)
+This command appears to try to avoid double-buffering in the clist of a BSD
+character special device driver.
+.IP ""
+Under
+.BR "Linux Fast-STREAMS" ,
+these commands would be implemented by
+.BR bpfmod (4);
+however,
+.I STREAMS
+performance does not require them.
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.B BIOCSETZBUF
+.RB ( "struct bpf_zbuf" )
+Set the current zero-copy buffer locations; buffer locations may be set only
+once zero-copy buffer mode has been selected, and prior to attaching to an
+interface.  Buffers must be of identical size, page-aligned, and an integer
+multiple of pages in size.  The three fields\fI bz_bufa\fP,\fI bz_bufb\fP and
+\fIbz_buflen\fP must be filled out.  If buffers have already been set for
+this device, the ioctl will fail.
+.IP ""
+(FreeBSD only.)
+This command appears to try to avoid double-buffering in the clist of a BSD
+character special device driver.
+.IP ""
+Under
+.BR "Linux Fast-STREAMS" ,
+these commands would be implemented by
+.BR bpfmod (4);
+however,
+.I STREAMS
+performance does not require them.
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.B BIOCGETZMAX
+.RB ( size_t )
+Get the largest individual zero-copy buffer size allowed.  As two buffers are
+used in zero-copy buffer mode, the limit (in practice) is twice the returned
+size.  As zero-copy buffers consume kernel address space, conservative
+selection of buffer size is suggested, especially when there are multiple
+\fBbpf\fP descriptors in use on 32-bit systems.
+.IP ""
+(FreeBSD only.)
+This command appears to try to avoid double-buffering in the clist of a BSD
+character special device driver.
+.IP ""
+Under
+.BR "Linux Fast-STREAMS" ,
+these commands would be implemented by
+.BR bpfmod (4);
+however,
+.I STREAMS
+performance does not require them.
+.\"
+.\" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+.TP
+.B BIOCROTZBUF
+Force ownership of the next buffer to be assigned to userspace, if any data
+present in the buffer.  If no data is present, the buffer will remain owned
+by the kernel.  This allows consumers of zero-copy buffering to implement
+timeouts and retrieve partially filled buffers.  To handle the case where no
+data is present in the buffer and therefore ownership is not assigned, the
+user process must check\fI bzh_kernel_gen\fP against\fI bzh_user_gen\fP.
+.IP ""
+(FreeBSD only.)
+This command appears to try to avoid double-buffering in the clist of a BSD
+character special device driver.
+.IP ""
+Under
+.BR "Linux Fast-STREAMS" ,
+these commands would be implemented by
+.BR bpfmod (4);
+however,
+.I STREAMS
+performance does not require them.
+.\"
+.\"
+.SS Standard Commands
+.PP
+.B bpf
+now supports several standard input-output control commands that allow the
+user to do asynchronous or blocking input-output to an open
+.B bpf
+file descriptor.
+.\"
+.TP
+.B FIONREAD
+.RB ( int )
+Returns the number of bytes that are immediately available for reading.
+.\"
+.TP
+.B SIOCGIFADDR
+.RB ( "struct ifreq" )
+Returns the addresses associated with the interface.
+.\"
+.TP
+.B FIONBIO
+.RB ( int )
+Set or clear non-blocking input-output.  If the argument is non-zero, enable
+non-blocking input-output.  If the argument is zero, disable non-blocking
+input-output.  When non-blocking input-output is enabled, the return value of
+a read while no data is available will be zero (0).  The non-blocking read
+behaviour is different from performing nonblocking reads on other file
+descriptors, which will return
+.B -1
+and set
+.I errno
+to
+.RB [ EAGAIN ]
+if no data is available.  Note: setting this overrides the timeout set by
+.BR BIOCSRTIMEOUT .
+.\"
+.TP
+.B FIOASYNC
+.RB ( int )
+Enable or disable asynchronous input-output.  When enabled (argument is
+non-zero), the process or process group specified by
+.B FIOSETOWN
+will start receiving
+.RI { SIGIO }
+or
+.RI { SIGPOLL }
+signals when packets arrive.  Note that you must perform a
+.B FIOSETOWN
+command for this to take effect, as the system will not do it by default.
+The signal may be changed via
+.BR BIOCSRSIG .
+.\"
+.TP
+.BR FIOSETOWN ", " FIOGETOWN
+.RB ( int )
+Set or get the process or process group (when negative) that should receive
+.RI { SIGIO }
+or
+.RI { SIGPOLL }
+when packets are available.  The signal may be changed using
+.B BIOCSRSIG
+(see above).
+.\"
+.\"
+.\"
+.SH ERRORS
+.PP
+The commands fail for the following general conditions:
+.TP \w'[\fBEADDRNOTAVAIL\fP]\(em'u
+.RB [ EINVAL ]
+A command or argument was specified in error.
+.PD 0
+.TP
+.RB [ ENETDOWN ]
+The underlying interface or network is down.
+.TP
+.RB [ ENXIO ]
+The underlying interface is not found.
+.TP
+.RB [ ENOBUFS ]
+Insufficient memory to process request.
+.TP
+.RB [ EEXIST ]
+The BPF device already exists.
+.TP
+.RB [ ENODEV ]
+The BPF device could not be set up.
+.TP
+.RB [ EINTR ]
+A signal was caught during a command.
+.TP
+.RB [ EACCES ]
+The permission was denied for the command. 
+.TP
+.RB [ EADDRNOTAVAIL ]
+The specified address not available for interface.
+.TP
+.RB [ ENOMEM ]
+The available memory is insufficient.
+.TP
+.RB [ ESRCH ]
+Such a process does not exist.
+.PD
+.\"
+.\"
+.SH "BUFFER MODES"
+.PP
+.B bpf
+devices deliver packet data to the application via memory buffers provided by
+the application.  The buffer mode is set using the\fB BIOCSETBUFMODE\fP ioctl,
+and read using the\fB BIOCGETBUFMODE\fP ioctl.
+.\"
+.SS "Buffered read mode"
+.PP
+By default,\fB bpf\fP devices operate in the\fB BPF_BUFMODE_BUFFER\fP mode,
+in which packet data is copied explicitly from kernel to user memory using
+the\fB read\fP(2s) system call.  The user process will declare a fixed buffer
+size that will be used both for sizing internal buffers and for all
+\fBread\fP(2s) operations on the file.  This size is queried using the
+\fBBIOCGBLEN\fP ioctl, and is set using the\fB BIOCSBLEN\fP ioctl.  Note that
+an individual packet larger than the buffer size is necessarily truncated.
+.\"
+.SS "Zero-copy buffer mode"
+.PP
+\fBbpf\fP devices may also operate in the\fB BPF_BUFMODE_ZEROCOPY\fP mode, in
+which packet data is written directly into two user memory buffers by the
+kernel, avoiding both system call and copying overhead.  Buffers are of fixed
+fixed (and equal) size, page-aligned, and an even multiple of the page size.
+The maximum zero-copy buffer size is returned by the\fB BIOCGETZMAX\fP ioctl.
+Note that an individual packet larger than the buffer size is necessarily
+truncated.
+.PP
+The user process registers two memory buffers using the\fB BIOCSETZBUF\fP
+ioctl, which accepts a\fB struct bpf_zbuf\fP pointer as an argument:
+.sp
+.nf
+\s-1\fC\
+struct bpf_zbuf {
+    void *bz_bufa;
+    void *bz_bufb;
+    size_t bz_buflen;
+};
+.fi
+.PP
+\fIbz_bufa\fP is a pointer to the userspace address of the first buffer that
+will be filled, and\fI bz_bufb\fP is a pointer to the second buffer.
+\fBbpf\fP will then cycle between the two buffers as they fill and are
+acknowledged.
+.PP
+Each buffer begins with a fixed-length header to hold synchronization and
+data length information for the buffer:
+.sp
+.nf
+\s-1\fC\
+struct bpf_zbuf_header {
+    volatile u_int bzh_kernel_gen;
+    volatile u_int bzh_kernel_len;
+    volatile u_int bzh_user_gen;
+    /* ..padding for future use... */
+};
+\s+1\fP
+.fi
+.PP
+The header structure of each buffer, including all padding, should be zeroed
+before it is configured using\fB BIOCSETZBUF\fP.  Remaining space in the
+buffer will be used by the kernel to store packet data, laid out in the same
+format as with buffered read mode.
+.PP
+The kernel and the user process follow a simple acknowledgement protocol via
+the buffer header to synchronize access to the buffer: when the header
+generation number,\fI bzh_kernel_gen\fP and\fI bzh_user_gen\fP, hold the same
+value, the kernel owns the buffer, and when they differ, userspace owns the
+buffer.
+.PP
+While the kernel owns the buffer, the contents are unstable and may change
+asyncrhonously; while the user process owns the buffer, its contents are
+stable and will not be changed until the buffer has been acknowledged.
+.PP
+Initializing the buffer headers to all zeroes before registering the buffer
+has the effect of assigning initial ownership of both buffers to the kernel.
+The kernel signals that a buffer has been assigned to userspace by modifying
+\fIbzh_kernel_gen\fP, and userspace acknowledges the buffer and returns it to
+the kernel by setting the value of\fI bzh_user_gen\fP to the value of
+\fIbzh_kernel_gen\fP.
+.PP
+To avoid caching and memory re-ordering effects, the user process must use
+atomic operations and memory barriers when checking for and acknowledging
+buffers:
+.sp
+.nf
+\s-1\fC\
+#include <machine/atomic.h>
+
+/* Return ownershipt to kernel. */
+static void buffer_acknowledge(stuct bpf_zbuf_header *bzh)
+{
+    atomic_store_rel_int(&bzh->bzh_user_gen, bzh->bzh_kernel_gen);
+}
+
+/* Check whether userspace now owns buffer. */
+static int buffer_check(struct bpf_zbuf_header *bzh)
+{
+    return (bzh->bzh_user_gen !=
+	atomic_load_acq_int(&bzh->bzh_kernel_gen));
+}
+\s+1\fP
+.fi
+.PP
+The user process may force the assignment of the next buffer, it any data is
+pending, to userspace using the\fB BIOCROTZBUF\fP ioctl.  This allows the
+user process to retrieve data in a partially filled buffer before the buffer
+is full, such as following a timeout; the process must recheck for buffer
+ownership using the header generation numbers, as the buffer will not be
+assigned to userspace if no data was present.
+.PP
+As in the buffered read mode,\fB kqueue\fP(2),\fB poll\fP(2), adn
+\fBselect\fP(2) may be used to sleep awaiting the availability of a completed
+buffer.  They will return a readable file descriptor when ownership of the
+next buffer is assigned to user space.
+.PP
+In the current implementation, the kernel may assign zero, one, or both
+buffers to the user process; however, an earlier implementation maintained
+the invariant that at most one buffer could be assigned to the user process
+at a time.  To both ensure process and high performance, user processes
+should acknowledge a completely processed buffer as quickly as possible,
+returning it for reuse, and not block waiting on a second buffer while
+holding another buffer.
+.\"
+.\"
+.SH "BPF HEADER"
+.PP
+One of the following structures is prepended to each packet returned by
+.BR read (2s)
+or via a zero-copy buffer:
+.sp
+.nf
+\s-1\fC\
+struct bpf_xhdr {
+    struct bpf_ts bh_tstamp;   /* time stamp */
+    uint32_t bh_caplen;        /* length of captured portion */
+    uint32_t bh_datalen;       /* original length of packet */
+    ushort bh_hdrlen;          /* length of bpf header (this struct
+                                  plus alignment padding. */
+};
+\s+1\fP
+.fi
+.sp
+.nf
+\s-1\fC\
+struct bpf_hdr {
+    struct timeval bh_tstamp;  /* time stamp */
+    ulong bh_caplen;           /* length of captured portion */
+    ulong bh_datalen;          /* original length of packet */
+    ulong bh_hdrlen;           /* length of bpf header (this struct
+                                  plus alignment padding. */
+};
+\s+1\fP
+.fi
+.PP
+The fields, whose values are stored in host order, are:
+.TP \w'\fIbh_datalen\fR\ \(em'u
+.I bh_tstamp
+The time at which the packet was processed by the packet filter.
+.TP
+.I bh_caplen
+The length of the captured portion of the packet.  This is the minimum of the
+truncation amount specified by the filter and the length of the packet.
+.TP
+.I bh_datalen
+The length of the packet off the wire.  This value is independent of the
+truncation amount specified by the filter.
+.TP
+.I bh_hdrlen
+The length of the
+.B bpf
+header, which may not be equal to
+.BI sizeof( "struct bpf_xhdr" )
+or
+.BI sizeof( "struct bpf_hdr" ).
+.PP
+The
+.I bh_hdrlen
+field exists to account for padding between the header and the link level
+protocol.  The purpose here is to guarantee proper alignment of the packet
+data structures, which is required on alignment sensitive architectures and
+improves performance on many other architectures.  The packet filter ensures
+that the
+.BR bpf_xhdr ,
+.B bpf_hdr
+and the network layer header will be word aligned.
+Currently,
+.B bpf_hdr
+is used when the time stamp is set to
+.BR BPF_T_MICROTIME ,
+.BR BPF_T_MICROTIME_FAST ,
+.BR BPF_T_MICROTIME_MONOTONIC ,
+.BR BPF_T_MICROTIME_MONOTONIC_FAST ,
+or
+.BR BPF_T_NONE
+for backward compatibility reasons.  Otherwise,
+.B bpf_xhdr
+is used.  However,
+.B bpf_hdr
+may be deprecated in the near future.
+Suitable precautions must be taken when accessing the link layer protocol
+fields on alignment restricted machines.  (This is not a problem on an
+Ethernet, since the type field is a short falling on an even offset, and the
+addresses are probably accessed in a bytewise fashion).
+.PP
+For\fB Linux Fast-STREAMS\fP the implementation is split between the
+\fBbpf\fP driver and the\fB bpfmod\fP module.  The\fB bpf\fP driver signals
+the amount of header padding to use for a given message by placing the number
+of bytes to be padded into the\fI b_csum\fP field of the first message block
+in the\fB M_DATA\fP(9) message delivered upstream.
+.PP
+Additionally, individual packets are padded so that each starts on a word
+boundary.  This requires that an application has some knowledge of how to get
+from packet to packet.  The macro
+.B BPF_WORDALIGN
+is defined in
+.I <net/bpf.h>
+to facilitate this process.  It rounds up its argument to the nearest word
+aligned value (where a word is
+.B BPF_ALIGNMENT
+bytes wide).
+.PP
+For example, if
+.RB \*(lq p \*(rq
+points to the start of a packet, this expression will advance it to the next
+packet:
+.sp
+.RS
+.nf
+\s-1\fC\
+p = (char *)p + BPF_WORDALIGN(p->bh_hdrlen + p->bh_caplen);
+\s+1\fP
+.fi
+.RE
+.PP
+For the alignment mechanisms to work properly, the buffer passed to
+.BR read (2s)
+must itself be word aligned.  The
+.BR malloc (3)
+function will always return an aligned buffer.
+.\"
+.\"
+.SH "FILTER MACHINE"
+.PP
+A filter program is an array of instructions, with all branches forwardly
+directed, terminated by a
+.I return
+instruction.  Each instruction performs some action on the pseudo-machine
+state, which consists of an accumulator, index register, scratch memory
+store, and implicit program counter.
+.PP
+The following structure defines the instruction format:
+.sp
+.nf
+\s-1\fC\
+struct bpf_insn {
+    ushort code;
+    uchar jt;
+    uchar jf;
+    ulong k;
+};
+\s+1\fP
+.fi
+.PP
+The
+.I k
+field is used in different ways by different instructions, and the
+.I jt
+and
+.I jf
+fields are used as offsets by the branch instructions.  The opcodes are
+encoded in a semi-hierarchical fashion.  There are eight classes of
+instructions:
+.BR BPF_LD ", " BPF_ST ", " BPF_STX ", " BPF_ALU ", " BPF_JMP ", " BPF_RET ", and " BPF_MISC .
+Various other mode and operator bits are OR'd into the class to give the
+actual instructions.  The classes and modes are defined in
+.IR <net/bpf.h> .
+.PP
+Below are the semantics for each defined
+.B bpf
+instruction.  We use the convention that
+.I A
+is the accumulator,
+.I X
+is the index register,
+.I P[]
+is the packet data, and
+.I M[]
+scratch memory store.
+.I P[i:n]
+gives the data at byte offset
+.RI \*(lq i \*(rq
+in the packet, interpreted as a word
+.RB ( n=4 ),
+unsigned halfword
+.RB ( n=2 ),
+or unsigned byte
+.RB ( n=1 ).
+.I M[i]
+gives the
+.IR i 'th
+word in the scratch memory store, which is only addressed in word units.  The
+memory store is indexed from 0 to
+.BR "BPF_MEMWORDS - 1" .
+.IR k ", " jt ", and " jf
+are the corresponding fields in the instruction definition.
+.I len
+refers to the length of the packet.
+.TP \w'\fBBPF_MISC\fR\(em'u
+.B BPF_LD
+These instructions copy a value into the accumulator.  The type of the source
+operand is specified by an addressing mode and can be a constant
+.RB ( BPF_IMM ),
+packet data at a fixed offset
+.RB ( BPF_ABS ),
+packet data at a variable offset
+.RB ( BPF_IND ),
+the packet length
+.RB ( BPF_LEN ),
+or a word in the scratch memory store
+.RB ( BPF_MEM ).
+For
+.BR BPF_IND " and " BPF_ABS ,
+the data size must be specified as a word
+.RB ( BPF_W ),
+halfword
+.RB ( BPF_H ),
+or byte
+.RB ( BPF_B ).
+The semantics of all the recognized
+.B BPF_LD
+instructions follow.
+.sp
+.RS
+.nf
+\s-1\fC\
+BPF_LD+BPF_W+BPF_ABS  A <- P[k:4]
+BPF_LD+BPF_H+BPF_ABS  A <- P[k:2]
+BPF_LD+BPF_B+BPF_ABS  A <- P[k:1]
+BPF_LD+BPF_W+BPF_IND  A <- P[X+k:4]
+BPF_LD+BPF_H+BPF_IND  A <- P[X+k:2]
+BPF_LD+BPF_B+BPF_IND  A <- P[X+k:1]
+BPF_LD+BPF_W+BPF_LEN  A <- len
+BPF_LD+BPF_IMM        A <- k
+BPF_LD+BPF_MEM        A <- M[k]
+\s+1\fP
+.fi
+.RE
+.TP
+.B BPF_LDX
+These instructions load a value into the index register.  Note that the
+addressing modes are more restrictive than those of the accumulator loads,
+but they include
+.BR BPF_MSH ,
+a hack for efficiently loading the IP header length.
+.sp
+.RS
+.nf
+\s-1\fC\
+BPF_LDX+BPF_W+BPF_IMM  X <- k
+BPF_LDX+BPF_W+BPF_MEM  X <- M[k]
+BPF_LDX+BPF_W+BPF_LEN  X <- len
+BPF_LDX+BPF_B+BPF_MSH  X <- 4*(P[k:1]&0xf)
+\s+1\fP
+.fi
+.RE
+.TP
+.B BPF_ST
+This instruction stores the accumulator into the scratch memory.  We do not
+need an addressing mode since there is only one possibility for the
+destination.
+.sp
+.RS
+.nf
+\s-1\fC\
+BPF_ST  M[k] <- A
+\s+1\fP
+.fi
+.RE
+.TP
+.B BPF_STX
+This instruction stores the index register in the scratch memory store.
+.sp
+.RS
+.nf
+\s-1\fC\
+BPF_STX  M[k] <- X
+\s+1\fP
+.fi
+.RE
+.TP
+.B BPF_ALU
+The alu instructions perform operations between the accumulator and index
+register or constant, and store the result back in the accumulator.  For
+binary operations, a source mode is requires
+.BR ( BPF_K " or " BPF_X ).
+.sp
+.RS
+.nf
+\s-1\fC\
+BPF_ALU+BPF_ADD+BPF_K  A <- A + k
+BPF_ALU+BPF_SUB+BPF_K  A <- A - k
+BPF_ALU+BPF_MUL+BPF_K  A <- A * k
+BPF_ALU+BPF_DIV+BPF_K  A <- A / k
+BPF_ALU+BPF_AND+BPF_K  A <- A & k
+BPF_ALU+BPF_OR+BPF_K   A <- A | k
+BPF_ALU+BPF_LSH+BPF_K  A <- A << k
+BPF_ALU+BPF_RSH+BPF_K  A <- A >> k
+BPF_ALU+BPF_ADD+BPF_X  A <- A + X
+BPF_ALU+BPF_SUB+BPF_X  A <- A - X
+BPF_ALU+BPF_MUL+BPF_X  A <- A * X
+BPF_ALU+BPF_DIV+BPF_X  A <- A / X
+BPF_ALU+BPF_AND+BPF_X  A <- A & X
+BPF_ALU+BPF_OR+BPF_X   A <- A | X
+BPF_ALU+BPF_LSH+BPF_X  A <- A << X
+BPF_ALU+BPF_RSH+BPF_X  A <- A >> X
+BPF_ALU+BPF_NEG        A <- -A
+\s+1\fP
+.fi
+.RE
+.TP
+.B BPF_JMP
+The jump instructions alter flow of control.  Conditional jumps compare the
+accumulator against a constant
+.RB ( BPF_K )
+or the index register
+.RB ( BPF_X ).
+If the result is true (or non-zero), the true branch is taken, otherwise the
+false branch is taken.  Jump offsets are encoded in 8 bits so the longest
+jump is 256 instructions.  However, the jump always
+.RB ( BPF_JA )
+opcode uses the 32-bit
+.I k
+field as the offset, allowing an arbitrarily distant destination.  All
+conditionals use unsigned comparison conventions.
+.sp
+.RS
+.nf
+\s-1\fC\
+BPF_JMP+BPF_JA         pc += k
+BPF_JMP+BPF_JGT+BPF_K  pc += (A >  k) ? jt : jf
+BPF_JMP+BPF_JGE+BPF_K  pc += (A >= k) ? jt : jf
+BPF_JMP+BPF_JEQ+BPF_K  pc += (A == k) ? jt : jf
+BPF_JMP+BPF_JSET+BPF_K pc += (A &  k) ? jt : jf
+BPF_JMP+BPF_JGT+BPF_X  pc += (A >  X) ? jt : jf
+BPF_JMP+BPF_JGE+BPF_X  pc += (A >= X) ? jt : jf
+BPF_JMP+BPF_JEQ+BPF_X  pc += (A == X) ? jt : jf
+BPF_JMP+BPF_JSET+BPF_X pc += (A &  X) ? jt : jf
+\s+1\fP
+.fi
+.RE
+.TP
+.B BPF_RET
+The return instructions terminate the filter program and specify the amount
+of packet to accept (i.e., they return the truncation amount).  A return
+value of zero indicates that the packet should be ignored.  The return value
+is either a constant
+.RB ( BPF_K )
+or the accumulator
+.RB ( BPF_A ).
+.sp
+.RS
+.nf
+\s-1\fC\
+BPF_RET+BPF_A  accept A bytes
+BPF_RET+BPF_K  accept K bytes
+\s+1\fP
+.fi
+.RE
+.TP
+.B BPF_MISC
+The miscellaneous category was created for anything that does not fit into
+the above classes, and for any new instructions that might need to be added.
+Currently, these are the register transfer instructions that copy the index
+register to the accumulator or vice versa.
+.sp
+.RS
+.nf
+\s-1\fC\
+BPF_MISC+BPF_TAX  X <- A
+BPF_MISC+BPF_TXA  A <- X
+\s+1\fP
+.fi
+.RE
+.PP
+The
+.B bpf
+interface provides the following macros to facilitate array initializers:
+.BI BPF_STMT( "opcode, operand" ),
+and
+.BI BPF_JUMP( "opcode, operand, true_offset, false_offset" ).
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+Note that\fB Linux\fP uses SYSV job control, which is quite different from
+that of BSD.  To obtain a signal at a specific process requires the use of
+the\fI I_SETSIG\fP(7)\fB streamio\fR(7), the\fB TIOCSPGRP\fP or
+\fBSIOCSPGRP\fP\fB ioctl\fP(2s), or the\fB F_SETOWN\fP option to
+\fBfcntl\fP(2).  Note that the\fB Linux Fast-STREAMS\fP Stream head accepts
+the\fB TIOCGPGRP\fP,\fB TIOCSPGRP\fP,\fB SIOCGPGRP\fP and\fB SIOC_SPGRP\fI
+commands.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR tcpdump (1),
+.BR ioctl (2s).
+.\"
+.\"
+.SH FILES
+.PP
+.TP 12
+.BI /dev/bpf n
+the packet filter device.
+.TP
+.BI /dev/streams/bpf/ xxxx
+a specific driver interface packet filter device.
+.\"
+.\"
+.SH BUGS
+.PP
+The read buffer must be of a fixed size (returned by the
+.BR BIOCGBLEN
+command).
+.PP
+A file that does not request promiscuous mode may receive promiscuously
+received packets as a side effect of another file requesting this mode on the
+same hardware interface.  This could be fixed in the kernel with additional
+processing overhead.  However, we favor the model where all files must assume
+that the interface is promiscuous, and if so desired, must utilize a filter
+to reject foreign packets.
+.PP
+Data link protocols with variable length headers are not currently supported.
+.\"
+.\"
+.SH COMPATABILITY
+.PP
+.B bpfmod
+is compatible with
+.BR OpenBSD ", " FreeBSD " and " Mac\ OS\ X
+.[
+macotr
+.]
+and systems based on BSD, with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Under BSD, BPF is implemented as an integrated driver: under\fB Linux
+Fast-STREAMS\fP, BPF is implemented as a\fB bpf\fP compatible driver that
+autopushes a cooperating\fB bpfmod\fP module.  Nevertheless, the
+implementations as viewed at the file descriptor are otherwise compatible.
+.IP \(em
+Under BSD, the\fB /dev/bpf\fP\fIn\fP device is opened to get the\fI n\fP'th
+instance of BPF.  Under\fB Linux Fast-STREAMS\fP the appropriate device,
+\fB/dev/streams/bpf/\fP\fIxxxxx\fP, must be opened to get an instance of BPF,
+where\fI xxxxx\fP is the underlying driver implementing the BPF driver
+component.  For IP supporting-interfaces,\fB /dev/bpf\fP\fIn\fP is a link to
+\fB/dev/streams/bpf/ldl\fP to exhibit behaviour compatible with BSD.
+.IP \(em
+The names returned by and provided to the\fB BIOCGETIF\fP and\fB BIOCSETIF\fP
+commands may be different for\fB BSD\fP and\fB Linux\fP.
+.IP \(em
+No other\fI STREAMS\fP implementation known to the authors (with the possible
+exception of\fI Mac OS 9/OTP\fP) implements the BPF.
+.IP \(em
+The original 4.4BSD commands are:
+.BR BIOCGBLEN ,
+.BR BIOCSBLEN ,
+.BR BIOCGDLT ,
+.BR BIOCPROMISC ,
+.BR BIOCFLUSH ,
+.BR BIOCGETIF ,
+.BR BIOCSETIF ,
+.BR BIOCGRTIMEOUT ,
+.BR BIOCSRTIMEOUT ,
+.BR BIOCGSTATS "(OLD) ,
+.BR BIOCIMMEDIATE ,
+.BR BIOCSETF ,
+.BR BIOCVERSION ,
+.BR BIOCGHDRCMPLT ,
+.BR BIOCSHDRCMPLT ,
+.BR BIOCGSEESENT " and 
+.BR BIOCSSEESENT .
+This is the minimal set that is implemented for compatibility.
+.BR BIOCSDLT " and
+.BR BIOCGDLTLIST .
+are later enhancements that are also implemented by everyone.
+.IP \(em
+Solaris recently implements the newer
+.BR BIOCGSTATS
+command.
+It also adds the Solaris-only
+.BR BIOCGETLIF " and
+.BR BIOCSETLIF
+commands that use the Solaris
+.BR "struct lifreq" .
+.IP \(em
+Recent OpenBSD implements the OpenBSD-only
+.BR BIOCGFILDROP " and
+.BR BIOCSFILDROP
+commands to handle some of the issues with the old
+.B bpf_stat
+structure.
+Recent OpenBSD implements the OpenBSD-only
+.BR BIOCGDIRFILT " and
+.BR BIOCSDIRFILT
+commands to handle some of the same issues as FreeBSD handles with the
+FreeBSD-only
+.BR BIOCSDIRECTION " and
+.BR BIOCGDIRECTION
+commands.
+OpenBSD also implements the
+.BR BIOCGRSIG " and
+.BR BIOCSRSIG
+commands.
+.IP \(em
+Recent FreeBSD has wildly added the set:
+.BR BIOCSETFNR ,
+.BR BIOCGDIRECTION ,
+.BR BIOCSDIRECTION ,
+.BR BIOCFEEDBACK ,
+.BR BIOCGETBUFMODE ,
+.BR BIOCSETBUFMODE ,
+.BR BIOCSETZBUF ,
+.BR BIOCGETZMAX ,
+.BR BIOCROTZBUF ,
+.BR BIOCGTSTAMP " and
+.BR BIOCSTSTAMP
+commands.  No other implementations have picked these up.
+.IP \(em
+NetBSD and OpenBSD also implement the
+.BR BIOCGRSIG ,
+.BR BIOCSRSIG ,
+.BR BIOCFEEDBACK ,
+.BR BIOCGFEEDBACK " and
+.BR BIOCSFEEDBACK
+commands.
+.IP \(em
+NetBSD, OpenBSD and FreeBSD have implemented the
+.BR BIOCLOCK ,
+.BR BIOCSETWF
+commands and one or the other of the direction controls for security
+purposes.
+.IP \(em
+.B Linux Fast-STREAMS
+implementation of these wildly diverging commands are
+documented against the specific command in the text and will not be repeated
+here.
+.PP
+Compatibility is tested using the
+.BR test-bpfmod (8)
+test case executable and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Network interface taps, raw sockets and DLPI drivers have never been an
+interesting subject for standards organizations such as IEEE and the
+OpenGroup, and these modules have never been subjected to formal
+standardization.
+.B bpfmod
+conforms largely to the descriptions provided in the manual pages for
+OpenBSD, FreeBSD and Mac OSX.
+.\"
+.\"
+.SH HISTORY
+.PP
+The Enet packet filter was created in 1980 by Mike Accetta and Rick Rashid at
+Carnegie-Mellon University.  Jeffery Mogul, at Stanford, ported the code to
+BSD and continued its development from 1983 on.  Since then, it has evolved
+into the Ultrix Packet Filter at DEC, a STREAMS NIT module under SunOS 4.1,
+and BPF.
+.PP
+.B @PACKAGE_TITLE@
+implemented the STREAMS NIT module, the ported
+.BR bufmod "(4) and " pfmod (4)
+STREAMS modules from SunOS 5.x, and this STREAMS implementation of the BPF in
+release
+.BR @PACKAGE@-1.1.1 .
+.\"
+.\"
+.SH AUTHORS
+.PP
+Steven McCanne, of Lawrence Berkeley Laboratory, implemented BPF in Summer
+1990.  Much of the design is due to Van Jacobson.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

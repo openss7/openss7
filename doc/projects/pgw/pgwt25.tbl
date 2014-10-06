@@ -1,0 +1,134 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+box center tab(:);
+lbss|lbss|cb|cb
+lss|lss|c|c.
+Q.850:Description:ITU:IETF
+=
+\s-2CC_CAUS_UNALLOCATED_NUMBER\s+2:T{
+.ad l
+.hy 0
+\fIunallocated (unassigned) number\fP
+T}:\fC404\fP:\fC404\fP
+\s-2CC_CAUS_NO_ROUTE_TO_TRANSIT_NETWORK\s+2:T{
+.ad l
+.hy 0
+\fIno route to network\fP
+T}:\fC500\fP:\fC404\fP
+\s-2CC_CAUS_NO_ROUTE_TO_DESTINATION\s+2:T{
+.ad l
+.hy 0
+\fIno route to destination\fP
+T}:\fC500\fP:\fC404\fP
+\s-2CC_CAUS_SEND_SPECIAL_INFO_TONE\s+2:T{
+.ad l
+.hy 0
+\fIsend special information tone\fP
+T}:\fC500\fP:\-
+\s-2CC_CAUS_MISDIALLED_TRUNK_PREFIX\s+2:T{
+.ad l
+.hy 0
+\fImisdialled trunk prefix\fP
+T}:\fC404\fP:\-
+\s-2CC_CAUS_PREEMPTION\s+2:T{
+.ad l
+.hy 0
+\fIpreemption\fP
+T}:\fC500\fP:\-
+\s-2CC_CAUS_PREEMPTION_CCT_RESERVED\s+2:T{
+.ad l
+.hy 0
+\fIpreemption-circuit reserved for reuse\fP
+T}:\fC500\fP:\-
+\s-2CC_CAUS_NORMAL_CALL_CLEARING\s+2:T{
+.ad l
+.hy 0
+\fInormal call clearing\fP
+T}:\-:\-
+\s-2CC_CAUS_USER_BUSY\s+2:T{
+.ad l
+.hy 0
+\fIuser busy\fP
+T}:\fC486\fP:\fC486\fP
+\s-2CC_CAUS_NO_USER_RESPONDING\s+2:T{
+.ad l
+.hy 0
+\fIno user responding\fP
+T}:\fC480\fP:\fC408\fP
+\s-2CC_CAUS_NO_ANSWER\s+2:T{
+.ad l
+.hy 0
+\fIno answer from the user\fP
+T}:\fC480\fP:\fC480\fP
+\s-2CC_CAUS_SUBSCRIBER_ABSENT\s+2:T{
+.ad l
+.hy 0
+\fIsubscriber absent\fP
+T}:\fC480\fP:\fC480\fP
+\s-2CC_CAUS_CALL_REJECTED\s+2:T{
+.ad l
+.hy 0
+\fIcall rejected\fP
+T}:\fC480\fP:\fC403/603\fP
+\s-2CC_CAUS_NUMBER_CHANGED\s+2:T{
+.ad l
+.hy 0
+\fInumber changed\fP
+T}:\fC410\fP:\fC301\fP
+\s-2CC_CAUS_REDIRECT\s+2:T{
+.ad l
+.hy 0
+\fIredirection to new destination\fP
+T}:\-
+\s-2CC_CAUS_EXCHANGE_ROUTING_ERROR\s+2:T{
+.ad l
+.hy 0
+\fIexchange routing error\fP
+T}:\fC480\fP:\fC410\fP
+\s-2CC_CAUS_OUT_OF_ORDER\s+2:T{
+.ad l
+.hy 0
+\fIdestination out of order\fP
+T}:\fC502\fP:\fC502\fP
+\s-2CC_CAUS_ADDRESS_INCOMPLETE\s+2:T{
+.ad l
+.hy 0
+\fIinvalid number format (address incomplete)\fP
+T}:\fC484\fP:\fC484\fP
+\s-2CC_CAUS_FACILITY_REJECTED\s+2:T{
+.ad l
+.hy 0
+\fIfacility rejected\fP
+T}:\fC500\fP:\fC501\fP
+\s-2CC_CAUS_NORMAL_UNSPECIFIED\s+2:T{
+.ad l
+.hy 0
+\fInormal unspecified\fP
+T}:\fC480\fP:\fC480\fP
+.TE

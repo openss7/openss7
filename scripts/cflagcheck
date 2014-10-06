@@ -1,0 +1,191 @@
+#!/usr/bin/make -skf
+# =============================================================================
+#
+# @(#) $RCSfile: cflagcheck,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-05-31 09:46:02 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2011-05-31 09:46:02 $ by $Author: brian $
+#
+# =============================================================================
+
+KERNEL_TOPDIR ?= /usr/src/linux
+KERNEL_CONFIG = /usr/src/linux/.config
+KCONFIG_CONFIG = $(KERNEL_CONFIG)
+KERNELRELEASE = $(shell uname -r)
+
+.SILENT:
+
+.DEFAULT: cflag-check
+
+.PHONY: cflag-check
+cflag-check:
+	kflags='$(KBUILD_CFLAGS)' ; if test -n "$$kflags" -a -n '$(KBUILD_CPPFLAGS)' ; then \
+		kflags=`echo "$$kflags" | sed -e 's,^$(KBUILD_CPPFLAGS) ,,'` ; \
+	 fi ; \
+	 cflags='$(CFLAGS)' ; if test -n "$$cflags" -a -n '$(CPPFLAGS)' ; then  \
+		 cflags=`echo "$$cflags" | sed -e 's,^$(CPPFLAGS) ,,'` ; \
+	 fi ; \
+	 if test -n "$$kflags" -a -n "$$cflags" ; then \
+		 kflags=`echo "$$kflags" | sed -e "s,$$cflags ,,"` ; \
+	 fi ; \
+	 cflags="$${cflags:+$$cflags$${kflags:+ }}$$kflags" ; \
+	 echo "$$cflags"
+
+.PHONY: cppflag-check
+cppflag-check:
+	kflags='$(KBUILD_CPPFLAGS)' ; \
+	 cflags='$(CPPFLAGS)' ; \
+	 if test -n "$$kflags" -a -n "$$cflags" ; then \
+		 kflags=`echo "$$kflags" | sed -e "s,$$cflags ,,"` ; \
+	 fi ; \
+	 cppflags="$${cflags:+$$cflags$${kflags:+ }}$$kflags" ; \
+	 iflags='$(LINUXINCLUDE)' ; \
+	 if test -n "$$cppflags" -a -n "$$iflags" ; then \
+		 cppflags=`echo "$$cppflags" | sed -e "s, $$iflags,,"` ; \
+	 fi ; \
+	 cppflags="$${cppflags:+$$cppflags$${iflags:+ }}$$iflags" ; \
+	 echo "$$cppflags"
+
+.PHONY: modflag-check
+modflag-check:
+	@echo "$(MODFLAGS)$(KBUILD_CFLAGS_MODULE) $(CFLAGS_MODULE)"
+
+.PHONY: ldflag-check
+ldflag-check:
+	@echo "$(LDFLAGS) $(LDFLAGS_MODULE) $(KBUILD_LDFLAGS_MODULE)"
+
+.PHONY: bldflag-check
+bldflag-check:
+	@echo '$(basename_flags)'
+
+.PHONY: mnflag-check
+mnflag-check:
+	@echo '$(modname_flags)'
+
+.PHONY: dhflag-check
+dhflag-check:
+	@echo '$(debug_flags)'
+
+.PHONY: flag-check
+flag-check:
+	-:
+	-echo "CROSS_COMPILE='$(CROSS_COMPILE)'"
+	-echo "AS='$(AS)'"
+	-echo "LD='$(LD)'"
+	-echo "CC='$(CC)'"
+	-echo "CPP='$(CPP)'"
+	-echo "AR='$(AR)'"
+	-echo "NM='$(NM)'"
+	-echo "STRIP='$(STRIP)'"
+	-echo "OBJCOPY='$(OBJCOPY)'"
+	-echo "OBJDUMP='$(OBJDUMP)'"
+	-:
+	-echo "HOSTCC='$(HOSTCC)'"
+	-echo "HOSTCFLAGS='$(HOSTCFLAGS)'"
+	-echo "GENKSYMS='$(GENKSYMS)'"
+	-echo "DEPMOD='$(DEPMOD)'"
+	-echo "KALLSYMS='$(KALLSYMS)'"
+	-echo "MODFLAGS='$(MODFLAGS)'"
+	-echo "CFLAGS_KERNEL='$(CFLAGS_KERNEL)'"
+	-echo "PERL='$(PERL)'"
+	-echo "AWK='$(AWK)'"
+	-echo "RPM='$(RPM)'"
+	-:
+	-echo "CFLAGS='$(CFLAGS)'"
+	-echo "CPPFLAGS='$(CPPFLAGS)'"
+	-echo "AFLAGS='$(AFLAGS)'"
+	-:
+	-echo "KBUILD_CFLAGS='$(KBUILD_CFLAGS)'"
+	-echo "KBUILD_CPPFLAGS='$(KBUILD_CPPFLAGS)'"
+	-echo "KBUILD_AFLAGS='$(KBUILD_AFLAGS)'"
+
+.PHONY: env
+env:
+	@env
+
+#include $(KERNEL_CONFIG)
+include $(KERNEL_TOPDIR)/Makefile
+-include $(KERNEL_TOPDIR)/scripts/Makefile.lib
+
+ifdef CONFIG_DYNAMIC_DEBUG
+debug_flags='-DDEBUG_HASH=0 -DDEBUG_HASH2=63'
+endif
+
+
+# =============================================================================
+#
+# $Log: cflagcheck,v $
+# Revision 1.1.2.5  2011-05-31 09:46:02  brian
+# - new distros
+#
+# Revision 1.1.2.4  2011-01-12 03:44:13  brian
+# - update awk scripts and work around gawk close bug
+#
+# Revision 1.1.2.3  2010-11-28 14:01:53  brian
+# - awk script updates and corrections
+#
+# Revision 1.1.2.2  2009-06-21 12:41:53  brian
+# - updated headers
+#
+# Revision 1.1.2.1  2009-06-21 11:16:41  brian
+# - added files to new distro
+#
+# Revision 0.9.2.11  2008-09-08 05:19:00  brian
+# - ubuntu needs KERNELRELEASE too
+#
+# Revision 0.9.2.10  2008-09-03 09:04:43  brian
+# - handle new kernel makefile flags
+#
+# Revision 0.9.2.9  2008-09-03 08:23:59  brian
+# - handle newer names for kernel flags
+#
+# Revision 0.9.2.8  2008-04-28 09:23:10  brian
+# - updated script headers for release
+#
+# Revision 0.9.2.7  2007/08/12 17:47:20  brian
+# - updated script headers
+#
+# =============================================================================

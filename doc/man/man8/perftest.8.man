@@ -1,0 +1,495 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: perftest.8.man,v 1.1.2.3 2011-02-07 02:18:31 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:31 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: perftest.8.man,v $
+.\" Revision 1.1.2.3  2011-02-07 02:18:31  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH PERFTEST 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.\"
+.\"
+.SH NAME
+.B perftest, perftestn
+\- \fISTREAMS\fR benchmark performance tests on a pipe
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 12
+\fBperftest\fP [\fIoptions\fP]
+.PD 0
+.HP
+\fBperftest\fP {\fB-h\fP|\fB--help\fP}
+.HP
+\fBperftest\fP {\fB-V\fP|\fB--version\fP}
+.HP
+\fBperftest\fP {\fB-C\fP|\fB--copying\fP}
+.PD
+.HP
+\fBperftestn\fP [\fIoptions\fP]
+.PD 0
+.HP
+\fBperftestn\fP {\fB-h\fP|\fB--help\fP}
+.HP
+\fBperftestn\fP {\fB-V\fP|\fB--version\fP}
+.HP
+\fBperftestn\fP {\fB-C\fP|\fB--copying\fP}
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B perftest
+and
+.B perftestn
+perform benchmark performances tests on a
+.BR pipe (4).
+The purpose of the
+.B perftest
+performance benchmark is to perform comparison tests between
+.IR STREAMS -based
+.BR pipe (4)
+implementations.
+The purpose of the
+.B perftestn
+performance benchmark is to perform comparison tests between
+.B Linux
+native
+.BR pipe (4)s
+and
+.IR STREAMS -based
+.BR pipe (4)s.
+.I @PACKAGE_TITLE@
+also provides a
+.B benchmark
+test script that performs a number of benchmark runs and summarizes the results.  These performance
+benchmark programs can be used for development, performance tuning and optimization, and validation
+testing.
+See the
+.I @PACKAGE_TITLE@ Installation and Reference Manual
+for more information on how to invoke the
+.B autotest
+test suites.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.BR perftest " and " perftestn
+options fall into several categories as detailed in the subsections below.  If
+.BR perftest " or " perftestn
+are executed without any options, they will execute the default benchmark test and report the progress
+and results of the test.
+.SS Command Options
+.PP
+These command options determine whether a benchmark is run or whether an informative function is
+performed instead.  If none of these command options are specified, then it is assumed that the
+benchmark is to be executed.
+.TP
+\fB-h\fP, \fB--help\fP
+When this option is encountered,
+print usage information to
+.I stdout
+and exit.
+Note that all options specified following this option are ignored.
+.TP
+\fB-V\fP, \fB--version\fP
+When this option is encountered,
+print version information to
+.I stdout
+and exit.
+Note that all options specified following this option are ignored.
+.TP
+\fB-C\fP, \fB--copying\fP
+When this option is encountered,
+print copying information to
+.I stdout
+and exit.
+Note that all options specified following this option are ignored.
+.SS General Options
+.PP
+The following options are applicable to all command options.  For other than test case command
+options, these general options must appear ahead of the command option.
+.TP
+\fB-q\fR, \fB--quiet\fR
+Specifies that the caller is interested only in the return code and error diagnostics and that
+normal output should be suppressed.
+The default verbosity level if this option is not specified is
+.RB ( 1 ).
+This option is equivalent to
+.BR --verbose=0 .
+.TP
+\fB-v\fR, \fB--verbose\fR [\fILEVEL\fR]
+Increases or sets the verbosity level.  When this option is given without the
+.I LEVEL
+argument, it specifies that the verbosity level should be increased by one.  If the
+.I LEVEL
+argument is specified, the verbosity level is set to that integer value.  This option can be
+repeated.
+The default verbosity level if this option is not specified is
+.RB ( 1 ).
+For example,
+.B -vvvv
+is equivalent to
+.BR --verbose=5 .
+.SS Test Options
+.PP
+The following options are only applicable if a benchmark run is in effect.
+That is, these options are only effective if the benchmark run is executed and are used to modify
+the manner in which benchmark is executed or results reported.
+.TP
+\fB--hiwat\fP[=]\fIHIWAT\fP
+By default the read high water mark on the Stream head is
+.RI { STRHIGH }
+which is typically 5120 bytes.  This option sets the Stream head read-side
+high water mark to
+.IR HIWAT .
+.IP ""
+This option is only applicable to STREAMS-based pipes and FIFOs and is only
+supported by
+.BR "Linux Fast-STREAMS" .
+.TP
+\fB--lowat\fP[=]\fILOWAT\fP
+By default the read low water mark on the Stream head is
+.RI { STRLOW }
+which is typically 1024 bytes.  This option sets the Stream head read-side
+low water mark to
+.IR LOWAT .
+.IP ""
+This option is only applicable to STREAMS-based pipes and FIFOs and is only
+supported by
+.BR "Linux Fast-STREAMS" .
+.TP
+\fB-M\fP, \fB--mread\fP
+Normally read notification on the Stream head is disabled.  This option
+enables read notifications on the Stream head.
+This option is only applicable to STREAMS-based pipes and FIFOs and is only
+supported by
+.BR "Linux Fast-STREAMS" .
+.TP
+\fB-w\fP, \fB--readfill\fP
+Normally pipes and FIFOs have read mode set to normal (byte-mode).  This
+option sets the Stream head to read-fill mode (the reader always blocks
+awaiting a full buffer regardless of the blocking setting of the file
+descriptor).
+.IP ""
+This option is only applicable to STREAMS-based pipes and FIFOs and is only
+supported by
+.BR "Linux Fast-STREAMS" .
+.TP
+\fB-R\fP, \fB--niceread\fP
+When performing asynchronous testing, the read child will be set nice 19.
+.TP
+\fB-S\fP, \fB--nicesend\fP
+When performing asynchronous testing, the write child will be set nice 19.
+.TP
+\fB-F\fP, \fB--full\fP
+Normally the same number of bytes written per write operation will also be
+specified to the read operation.  This option causes the read operation to
+request a full
+.IR { PIPE_BUF }
+read.
+.TP
+\fB-H\fP, \fB--hold\fP
+This option is only applicable to STREAMS-based pipes and FIFOs and is only
+supported by
+.BR "Linux Fast-STREAMS" .
+.TP
+\fB-a\fP, \fB--async\fP
+By default, the benchmark testing will use a single process to write to the write-side of the
+.I pipe
+and read from the read-side of the
+.I pipe
+in a synchronous fashion.  Synchronous testing provides more predictable and repeatable results.
+When the
+.B -a
+option is specified,
+.BR perftest " and " perftestn
+will spawn two child processes, one which writes to the write-side of the
+.I pipe
+and one which reads from the read-side of the pipe.  Although higher throughputs are acheivable
+using asyncrhonous processes in this fashion, it is sometimes more a test of the
+.B Linux
+scheduler than the underlying
+.I pipe
+implementation.
+.TP
+\fB-f\fP, \fB--fifo\fP
+Use a STREAMS-based FIFO for testing instead of a STREAMS-based pipe.
+.TP
+\fB-m\fP, \fB--module\fP[=]\fIMODNAME\fP
+Specifies the name of a module to push on the write-side of the pipe.  The default is
+.RB \(lq pipemod \(rq.
+Other useful choices are
+.RB \(lq nullmod \(rq
+and
+.RB \(lq srvmod \(rq.
+.TP
+\fB-p\fP, \fB--push\fP[=][\fICOUNT\fP]
+Specifies the number of instances of
+.I MODNAME
+(as specified with the
+.B -m
+option) to push on the write-side of the
+.IR pipe .
+If
+.I COUNT
+is not given, the number of instances is incremented.
+If
+.I COUNT
+is specified, the number of instances is set to
+.IR COUNT .
+The default number of instances is zero
+.RB ( 0 ),
+i.e, do not push any modules.
+.TP
+\fB-b\fP, \fB--blocking\fP
+Normally the test is peformed with non-blocking operation on both sides of the
+.IR pipe .
+When non-blocking operation is used in syncrhonous mode, writes are performed to the write-side of
+the
+.I pipe
+until
+.RB [ EAGAIN ]
+is returned and then reads are performed from the read-side of the
+.I pipe
+until
+.RB [ EAGAIN ]
+is returned and so on.  When the
+.B -b
+option is specified, blocking operation is used, and a single blocking write is performed to the
+write-side of the
+.I pipe
+and then a single blocking read is performed from the read-side of the
+.IR pipe .
+Non-blocking synchronous operation has the effect that queues are filled with writes until flow
+control exists before being emptied with reads.  Blocking synchronous operation has the effect that
+a single message is passed from module to module to be read by the other end, and queues are left empty.
+These two effects can be used to test the message passing performance of a chain of modules or the
+queuing, enabling and back-enabling performance of a chain of modules.
+.TP
+\fB-s\fP, \fB--size\fP[=][\fIMSGSIZE\fP]
+Specifies the message size,
+.IR MSGSIZE ,
+for each read and write.  The default is
+.BR 64 bytes.
+.TP
+\fB-r\fP, \fB--readwrite\fP
+By default, the benchmark tests are performed using
+.BR getpmsg (2s)
+and
+.BR putpmsg (2s).
+When the
+.B -r
+option is specified,
+.BR read (2s)
+and
+.BR write (2s)
+will be used instead.  (Note that this is the default for
+.B Linux
+native
+.I pipe
+testing, which does not support the
+.BR getpmsg (2s)
+or
+.BR putpmsg (2s)
+system calls.)
+.TP
+\fB-t\fP, \fB--time\fP[=][\fIREPORT\fP]
+Specifies the reporting interval.  The default is
+.B 1
+second.
+.TP
+\fB-i\fP, \fB--iterations\fP[=]\fIITERATIONS\fP
+Normally the program will continue to operate, reporting each interval, until
+terminated by the controlling terminal.  This option causes the program to
+terminate after
+.IR ITERATIONS .
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+When
+.BR perftest " or " perftestn
+fails, they print a diagnostic message to
+.I stderr
+and exit with a non-zero return code.
+.\"
+.\"
+.\".SH OUTPUT FORMAT
+.\".PP
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR perftest " and " perftestn
+are normally invoked from the
+.B @PACKAGE@-@VERSION@
+benchmark script.
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
+.SH DRIVERS
+.PP
+.BR pipe (4).
+.\"
+.\"
+.SH MODULES
+.PP
+.BR pipemod (4),
+.BR nullmod (4),
+.BR srvmod (4).
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/libexec/@PACKAGE@/perftest
+contains the
+.B perftest
+command.
+.TP
+.B /usr/libexec/@PACKAGE@/perftestn
+contains the
+.B perftestn
+command.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR STREAMS (4),
+.IR "@PACKAGE_TITLE@ Installation and Reference Manual" .
+.\"
+.\"
+.SH BUGS
+.PP
+.BR perftest " and " perftestn
+have no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+None.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+None.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR perftest " and " perftestn
+are provided with the
+.I @PACKAGE_TITLE@
+package.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

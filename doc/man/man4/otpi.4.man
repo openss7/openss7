@@ -1,0 +1,534 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: otpi.4.man,v 1.1.2.2 2011-02-07 02:18:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:10 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: otpi.4.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:10  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.TH OTPI 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.SH NAME
+.B otpi
+\- ISO Transport Protocol ISO/IEC 8073 Classes 0, 1, 2, 3 and 4.
+.\"
+.\"
+.SH INTERFACE
+.PP
+STREAMS,
+TPI.
+.[
+tpi revision 2.0.0 draft 2
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/socket.h>
+.br
+.B #include <netiso/osi.h>
+.br
+.B #include <sys/xti.h>
+.br
+.B #include <sys/xti_osi.h>
+.HP
+.BI "int " tp_stream " = open(" tp_device ", " oflag );
+.PD 0
+.HP
+.BI "int " tp_xtistr " = t_open(" tp_device ", " oflag );
+.HP
+.BI "int " tp_socket " = socket(" \fRPF_ISO\fP ", " socket_type ", " \fRISOPROTO_TP\fP );
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B OTPI
+is an OSI Transport Provider Interface
+.IR STREAMS (4)
+module that appears to the user as a
+.IR STREAMS (4)
+pseudo-device driver.
+.PP
+The driver provides OSI Transport
+.[
+x214
+.]
+protocol layer services.  Users of the driver may access Transport services
+using the Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0 draft 2
+.]
+or the XTI/TLI library,
+.BR xti (3).
+.\"
+.\"
+.SH CONFIGURATION
+.PP
+The
+.B otpi
+driver is configured by the OSI Networking Daemon,
+.BR osinetd (8).
+The
+.BR osinetd (8)
+daemon is responsible for initializing and configuring the OSI link, network,
+transport and ACSE/Presentation layers.
+.PP
+Without configuration, the
+.B otpi
+driver will allow users to open Streams on the driver and attempt to bind the
+device to a Transport Address; however, as there are no networks configured,
+attempts to listen on a transport selector will be restricted to private network
+listeners only.  Once configured for a number of networks, users will be able to
+open and listen on Streams on the upper multiplex to transport selectors
+supported by the available networks.
+.\"
+.\"
+.SH USAGE
+.PP
+A daemon,
+.BR osinetd (8),
+is used to configure the transport layer at system initialization time.  The
+daemon opens and binds wildcarded network address listening Streams for each
+network type available on the system.  These Streams are bound in a listening
+mode only, and may be shared by other processes that push the
+.BR tpcots (4)
+module.  The daemon holds these Streams open and also uses them for management
+purposes.
+.PP
+When bound for listening, the tpcots module will search for a network provider
+Stream that is sharable and suitably bound.  A sharable and suitably bound
+network provider Stream is a Stream that is bound as a DEFAULT_LISTENER, for
+CONS, or bound to the wildcard NSAP as a DEFAULT_DEST for CLNS.  If an
+existing network provider stream exists and is suitably bound, the binding
+Stream will be added to the demultiplexing logic for that listening Stream.
+.PP
+When a bind is attempted on an upper multiplex Stream which includes a CONS
+NSAP, the user must provide the lower multiplex identifier of an unbound,
+temporarily linked, network Stream to use in initiator or responder roles.  In
+initiator roles, this Stream will be used for the outbound network connection.
+In responder roles, this Stream will be used to accept inbound network
+connections.
+.PP
+When a bind is attempted that includes a responder role, the driver will search
+for an appropriate permanently linked Stream.  If one is found, for the
+specified bound local transport address, the provided temporarily linked Stream
+will be bound in a non-listening mode and will only be used to accept inbound
+network connections.  The driver adds the upper multiplex Stream to internal
+demultiplexing logic.  When no appropriate permanently linked Stream is found,
+an attempt will be made to bind the provided temporarily linked Stream to the
+requested transport address in a listening mode.  This will fail if another user
+has already bound to the requested address.
+.PP
+Note that creating a suitable network Stream to be linked under the driver might
+also entail a similar process for the network driver.  See
+.BR cons (4)
+and
+.BR clns (4).
+.PP
+To avoid the necessity of temporarily linking an appropriate network provider
+Stream, the
+.B otpi
+is implemented as a generic network provider Stream that autopushes a transport
+module.  In this case, the opening and temporarily  linking of the network
+Stream becomes a matter of simply opening the autopush transport entry.
+.\"
+.\"
+.SH SERVICE INTERFACE
+.PP
+The
+.B otpi
+service interface on the upper multiplex is the Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0 draft 2
+.]
+.BR tpi (7),
+supporting the ISO Transport Service Interface
+.[
+x214
+.]
+for the ISO Transport Protocols.
+.[
+x224
+.]
+.[
+x234
+.]
+.PP
+The
+.B opti
+service interface on the lower multiplex is the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0 draft 2
+.]
+.BR npi (7),
+supporting the ISO Network Service Inteface.
+.[
+x213
+.]
+for the ISO Network Protocols,
+.[
+x223
+.]
+.[
+x224
+.]
+but can, in general, be any provider supporting the ISO Network Service Interface.
+.[
+x213
+.]
+.\"
+.\"
+.SH ADDRESSES
+.PP
+OSI Transport addresses are in an array of octets where the first octet is the
+length,
+.IR tsaplen ,
+of the TSAP, followed by
+.I tsaplen
+octets of TSAP, followed by an octet that is the length,
+.IR nsaplen ,
+of the NSAP, followed by
+.I nsaplen
+octets of NSAP.
+.PP
+The TSAP is coded according to OSI Transport conventions and is simply the
+T-Selector.  The NSAP is coded according to OSI NSAP conventions.
+.PP
+When the
+.I tsaplen
+is encoded as zero (0), a null T-Selector is used.  When the
+.I nsaplen
+is ecoded as zero (0), the underlying NS-Provider is to assign an NSAP.
+.PP
+.IR "Solaris SunLink" \(rg
+.[
+sunlink-tli
+.]
+specifies that the NSAP address passed to
+.BR t_bind (3)
+and the NSAP address passed to
+.BR t_connect (3)
+is the X.233 NSAP address (in network byte order).
+.\"
+.\"
+.SH OPTIONS
+.PP
+.IR OpenSS7 \(tm
+implements the full set of OSI XTI/TPI options described in
+.BR xti_osi (3).
+.PP
+When OSI QoS options are used, they are used to negotiate QoS requirements with
+the remote OSI Transport provider and user in the fashion of normal OSI
+Transport; when OSI management options are used, they are used to negotiate
+functional units and protocol options in the normal manner described for OSI
+Transport; both as described in
+.BR xti_osi (3).
+.\"
+.\"
+.SH PRIMITIVES
+.PP
+.B otpi
+does not implement any specialized primitives and implements the Transport
+Provider Interface (TPI) Revision 2.0.0
+.[
+tpi revision 2.0.0 draft 2
+.]
+at its upper service interfaces and the Network Provider Interface (NPI)
+Revision 2.0.0
+.[
+npi revision 2.0.0 draft 2
+.]
+at its lower service interface.  At the upper service interface, the TPI is
+implemented as required for OSI Transport as described in
+.BR tpi_osi (7).
+At the lower interface, the NPI is implemented as required for CONS and CLNS
+OSI Network as described in
+.BR npi_osi (7).
+.\"
+.\"
+.SH IOCTLS
+.PP
+The
+.B otpi
+driver does not yet support any input-output controls of its own.  The standard
+STREAMS input-output controls,
+.BR I_LINK "(7), " I_PLINK "(7), " I_UNLINK "(7), " I_PUNLINK (7)
+are used by management programs to provision and supply TCP/IP Streams to the
+lower multiplex of the driver.  This is accomplished using a control Stream, or
+any Stream on the upper multiplex provided that the user has sufficient
+privilege.
+.\"
+.\"
+.SH NOTICES
+.PP
+Note that transport protocol classes 0, 1, 2 and 3 are only available over a
+connection oriented network service provider, such as
+.BR cons (4).
+Transport protocol class 4 is available over both connection oriented and
+connectionless underlying networks,
+.BR cons (4)
+and
+.BR clns (4),
+and is used over the connectionless network protocol,
+.BR clnp (4).
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.B otpi
+provides an auxilliary
+.BR M_CTL "(9) and " M_PCCTL (9)
+interface at both the upper multiplex and the lower multiplex service
+interfaces.  The purpose of these messages is functionally the same as the
+.BR M_PROTO "(9) and " M_PCPROTO (9)
+messages, and they contain the same TPI service primitives.  The only
+difference is that, because the Stream head cannot directly generate a
+.BR M_CTL "(9) or " M_PCCTL (9)
+message, the receiver of the message is assured that the contents have been
+supplied or verified by the sending module.  This permits many checks that are
+required for user-supplied information (for security purposes) can be skipped
+for these inter-module messages.
+.\"
+.\"
+.\".SH FILES
+.\".PP
+.\"
+.\"
+.\".SH MODULES
+.\".PP
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.BR /dev/otpi
+The OSI Transport Protocol Interface device.  This device opens a network
+provider Stream and pushes the tpcots module.
+.TP
+.B /dev/otpi
+This device represents the traditional
+.IR SunLink \(rg
+.[
+sunlink-tli
+.]
+OSI Transport device driver.  This device may be directly opened using
+.BR t_open (3).
+.TP
+.B /dev/streams/otpi
+When the shadow special file system,
+.BR specfs (5),
+is mounted, this is the point within the filesystem at which the
+.B otpi
+device appears.
+.TP
+.B /dev/streams/clone/otpi
+When the shadow special file system,
+.BR specfs (5),
+is mounted, this is the clone device for opening clone device Streams.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR I_LINK (7),
+.BR I_PLINK (7),
+.BR I_PUNLINK (7),
+.BR I_UNLINK (7),
+.BR M_CTL (9),
+.BR M_PCCTL (9),
+.BR M_PROTO (9),
+.BR M_PCPROTO (9),
+.BR npi (7),
+.BR npi_osi (7),
+.BR tp (4),
+.BR sock2path (5),
+.BR socket (7),
+.BR sockets (3),
+.BR socksys (4),
+.BR specfs (5),
+.BR t_bind (3),
+.BR t_connect (3),
+.BR t_open (3),
+.BR tpi (7),
+.BR tpi_osi (7),
+.BR xnet (3),
+.BR xti (3),
+.BR xti_osi (3),
+.IR STREAMS (4).
+.\"
+.\"
+.SH BUGS
+.PP
+.B otpi
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B otpi
+is compatible with
+.IR "Solaris SunLink" \(rg
+.[
+sunlink-tli
+.]
+and implementations based on
+.IR "Solaris SunLink" \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR SunLink \(rg
+does not document options associated with the
+.B otpi
+OSI Transport provider.
+.IR OpenSS7 \(tm
+.B otpi
+supports the OSI Transport options to control both ISO Transport QoS and
+management options associated with OSI Transport described in
+.BR xti_osi (3).
+.IP \(em
+Birnary compatibility is not attempted: only source compatibility.  Any binary
+compatibility contained in the package is a bug and is scheduled to be removed
+on the next release.  If you want binary compatibility, go buy the
+\fISolaris Solstice\fP\(rn product!
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+X.214,
+.[
+x214
+.]
+X.224,
+.[
+x224
+.]
+TPI,
+.[
+tpi revision 2.0.0 draft 2
+.]
+NPI.
+.[
+npi revision 2.0.0 draft 2
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+Historically, RFC 1006 and other non-OSI transport drivers were provided
+separate from OSI transport drivers.  This was true for both the USL ONP and BSD
+ISODE approaches.  However, that separation made it difficult to provide
+initiators and responders that provided for both traditional OSI CONS and CLNS
+networks as well as RFC 1006 networks.  Therefore, both the USL ONP and BSD
+ISODE approaches integrated all networks into the same transport provider.
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.IR OpenSS7 \(tm
+OSI Stack and the
+.B otpi
+multiplexing driver.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,392 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: strthread.9.man,v 1.1.2.2 2011-02-07 02:18:46 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:46 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: strthread.9.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:46  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH STRTHREAD 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B strthread
+\- the SVR4 STREAMS scheduler thread structure and array
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+The
+.B strthread
+structure is formatted as follows:
+.nf
+\fC\s-2
+struct strthread {
+        volatile int flags;
+        queue_t *qhead;
+        queue_t **qtail;
+        queue_t *currentq;
+        syncq_t *sqhead;
+        syncq_t **sqtail;
+        struct strevent *strbcalls_head;
+        struct strevent **strbcalls_tail;
+        struct strevent *strtimout_head;
+        struct strevent **strtimout_tail;
+        struct strevent *strevents_head;
+        struct strevent **strevents_tail;
+        queue_t *scanqhead;
+        queue_t **scanqtail;
+        mblk_t *freemsg_head;
+        mblk_t **freemsg_tail;
+        mblk_t *freemblk_head;
+        mblk_t **freemblk_tail;
+        struct strevent *freeevnt_head;
+        struct strevent **freeevnt_tail;
+} __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+\s+2\fP
+.fi
+.\"
+.\"
+.SH MEMBERS
+.PP
+The
+.B strthread
+structure contains the following members:
+.TP
+.IR flags
+Flags indicating conditions of the thread.
+.TP
+.IR qhead ", " qtail
+A list of the queues that are scheduled for execution on this thread.
+.I qhead
+points to the head of the list and
+.I qtail
+points to the tail pointer of the list.
+.TP
+.IR currentq
+The queue currently being processed (if any).
+.TP
+.IR sqhead ", " sqtail
+A list of sychronization queues that are scheduled for execution on this thread.
+.I sqhead
+points to the head of the list and
+.I sqtail
+points to the tail pointer of the list.
+.TP
+.IR strbcalls_head ", " strbcalls_tail
+A list of buffer calls pending execution on this thread.
+.I strbcalls_head
+points to the head of the list and
+.I strbcalls_tail
+points to the tail pointer of the list.
+.TP
+.IR strtimout_head ", " strtimout_tail
+A list of timeouts pending execution on this thread.
+.I strtimout_head
+points to the head of the list and
+.I strtimout_tail
+points to the tail pointer of the list.
+.TP
+.IR strevents_head ", " strevents_tail
+A list of STREAMS events pending execution on this thread.
+.I strevents_head
+points to the head of the list and
+.I strevents_tail
+points to the tail pointer of the list.
+.TP
+.IR scanqhead ", " scanqtail
+A list of STREAMS queues to scan for this thread.
+.I scanqhead
+points to the head of the list and
+.I scanqtail
+points to the tail pointer of the list.
+.TP
+.IR freemsg_head ", " freemsg_tail
+A list of flushed messages to free.
+.I freemsg_head
+points to the head of the list and
+.I freemsg_tail
+points to the tail pointer of the list.
+.TP
+.IR freemblk_head ", " freemblk_tail
+A list of free message blocks still in cache.
+.I freemblk_head
+points to the head of the list and
+.I freemblk_tail
+points to the tail pointer of the list.
+.TP
+.IR freeevnt_head ", " freeevnt_tail
+A list of free STREAMS events still in cache.
+.I freeevnt_head
+points to the head of the list and
+.I freeevnt_tail
+points to the tail pointer of the list.
+.\"
+.\"
+.SS Flags
+.PP
+.TP \w'\fBQUEUEFLAG\fR\(em'u
+.B QUEUEFLAG
+This flag is set while
+.BR runqueues ()
+is running and is used to indicate to other procedures whether the thread is executing or not.
+.TP
+.B QRUNFLAG
+This flag is set when there is at least one queue to run.
+That is, there is a queue in the
+.RI < qhead , qtail >
+list.
+.TP
+.B STRBCFLAG
+This flag is set when at least one buffer callback can be run.
+.TP
+.B STRBCWAIT
+This flag is set when there is at least one buffer call waiting.
+That is, there is a
+.BR strevent (9)
+in the
+.RI < strbcalls_head , strbcalls_tail >
+list.
+.TP
+.B FLUSHWORK
+This flag is set when flushq has messages to free.
+That is, there is a buffer chain in the
+.RI < freemsg_head , freemsg_tail >
+list.
+.TP
+.B FREEBLKS
+This flag is set when fast freed blocks are available for the cache.
+That is, there is a message block in the
+.RI < freemblk_head, freemblk_tail >
+list.
+.TP
+.B STRTIMOUT
+This flag is set when at least one timeout callback can be run.
+That is, there is a timeout event in the
+.RI < strtimout_head , strtimout_tail >
+list.
+.TP
+.B STREVENTS
+This flag is set when at least one STREAMS event can be run.
+That is, there is a STREAMS event in the
+.RI < strtimout_head , strtimout_tail >
+list.
+.TP
+.B QSYNCFLAG
+This flag is ste when at least one sychronization queue can be run.
+That is, there is a synchronization queue in the
+.RI < sqhead , sqtail >
+list.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+internal,
+implementation specific.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B strthread
+structure is an structure used internal to the
+.I STREAMS
+scheduler that is used to store information about a cpu-bound kernel thread
+within the
+.I STREAMS
+executive.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.I STREAMS
+kernel threads run at process context within the kernel.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+The
+.B strthreads
+array is per-CPU and does not require protection.
+This is an internal scheduler structure and should not be manipulated directly.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B strthread
+structures are not intended to be used directly by portable
+.I STREAMS
+drivers or modules.  It is only intended to be used directly by inlined
+.I STREAMS
+utilities.
+.PP
+Manipulating
+.B strthread
+structures without using
+.I STREAMS
+utility functions intended to do so, will likely cause panics and crash the
+system.  Use proper
+.I STREAMS
+utility functions instead.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR setqsched (9),
+.BR runqueues (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B strthread
+contains information that was allocated statically within the kernel in
+accordance with the descriptions for
+.IR "SVR 4"
+.[
+svr4spg
+.]
+in the MG.
+.[
+magic
+.]
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The
+.B strthread
+structure is consistent with the description of the internal static variables
+associated with the
+.I STREAMS
+scheduler function of
+.IR "SVR 4" .
+.[
+magic
+.]
+.[
+svr4spg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B strthread
+first appears in
+.BR "@PACKAGE_TITLE@" .
+Some of the members appeared as static variables in
+.IR "SVR 4" .
+.[
+svr4spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

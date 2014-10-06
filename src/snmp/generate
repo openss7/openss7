@@ -1,0 +1,45 @@
+#!/usr/bin/awk -f
+
+BEGIN {
+	name = "";
+	root = "";
+}
+/DEFINITIONS ::= BEGIN/ {
+	name = $1;
+}
+/MODULE-IDENTITY/ {
+	if ($NF ~ /MODULE-IDENTITY/) {
+		root = $1;
+		print "# root = " root;
+	}
+}
+/^END/ {
+	if (FILENAME != "-" && name != "" && root != "") {
+		print "";
+		print "MIBPREFIXES += " root;
+		print "";
+		print root ".mib: " FILENAME;
+		print "\tsmidump -k " FILENAME ">$@ || :";
+		print "";
+		print root ".lint: " FILENAME;
+		print "\tsmilint $(SMILINTIGNORES) -ms " FILENAME ">$@ 2>&1 || :";
+		print "";
+		print root ".tree: " FILENAME;
+		print "\tsnmptranslate -Tp " name "::" root ">$@ || :";
+		print "";
+		print root "_simple.c " root "_simple.h: mib2c mib2c.conf " FILENAME;
+		print "\t./mib2c -c ./mib2c.conf -f " root "_simple " name "::" root;
+		print "\tindent -nhnl " root "_simple.[ch]";
+		print "";
+		print root "_storage.c " root "_storage.h: mib2c mib2c.conf " FILENAME;
+		print "\t./mib2c -c ./mib2c.storage.conf -f " root "_storage " name "::" root;
+		print "\tindent -nhnl " root "_storage.[ch]";
+		print "";
+		print root "_openss7.c " root "_openss7.h: mib2c mib2c.conf " FILENAME;
+		print "\t./mib2c -c ./mib2c.openss7.conf -f " root "_openss7 " name "::" root;
+		print "\tindent -nhnl " root "_openss7.[ch]";
+		print "";
+	}
+	name = "";
+	root = "";
+}

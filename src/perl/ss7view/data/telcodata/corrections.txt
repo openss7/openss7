@@ -1,0 +1,10 @@
+NPA	Bad	Good
+---	---	----
+226	CN	ON
+249	CN	ON
+343	CN	ON
+438	CN	QC
+579	CN	QC
+581	CN	QC
+587	CN	AB
+---	---	----

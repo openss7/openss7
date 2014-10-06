@@ -1,0 +1,160 @@
+#!/usr/bin/awk -f
+
+/\.ko$/ {
+    command = "strings -n 7 " $1
+    version = ""
+    release = ""
+    delete myaliases
+    while ((command | getline) > 0) {
+	if (/^alias=/) {
+	    sub(/^alias=/, "")
+	    myaliases[$0] = 1
+	    continue
+	}
+	if (/^version=/) {
+	    sub(/^version=/, "")
+	    gsub(/ /, "_")
+	    version = $0
+	    continue
+	}
+	if (/^vermagic=/) {
+	    sub(/^vermagic=/, "")
+	    sub(/ .*/, "")
+	    sub(/-.*/, "")
+	    release = $0
+	    continue
+	}
+    }
+    close(command)
+    for (alias in myaliases) {
+	aliases["modalias(kernel-" release ":" alias ")"] = 1
+	modalias = "modalias(" alias ")"
+	if (version) {
+	    aliases[modalias " = " version] = 1
+	    aliases[modalias] = 0
+	} else {
+	    if (!(modalias in aliases))
+		aliases[modalias] = 1
+	}
+    }
+}
+END {
+    j = 1
+    for (alias in aliases) {
+	if (aliases[alias]) {
+	    indices[j] = alias
+	    j++
+	}
+    }
+    n = asort(indices)
+    save = indices[1]
+    position = 0
+    variations = ""
+    for (i = 2; i <= n; i++) {
+	this = indices[i]
+	if (!/^modalias\((kernel-.+:)?.+:.+/ || (length(save) != length(this)) || (position && ((substr(save, 1, position-1) != substr(this, 1, position-1)) || (substr(save, position+1) != substr(this, position+1)) || substr(this, 1, position) == "*"))) {
+	    if (position) {
+		print substr(save, 1, position-1) "[" variations "]" substr(save, position+1)
+	    } else {
+		print save
+	    }
+	    position = 0
+	    variations = ""
+	    save = this
+	    continue
+	}
+	if (position) {
+	    variations = variations substr(this, position, 1)
+	    save = this
+	    continue
+	}
+	# we only handle one character difference at one position, and it must
+	# be to the right of all colons
+	if (match(this, "^.+:") == 0) {
+	    print save
+	    save = this
+	    continue
+	}
+	prefixlen = RLENGTH
+	for (c = 1; c <= length(this); c++) {
+	    if (substr(this, c, 1) != substr(save, c, 1)) {
+		if (c <= prefixlen || position) {
+		    position = 0
+		    break
+		}
+		position = c
+	    }
+	}
+	if (position) {
+	    variations = substr(save, position, 1) substr(this, position, 1)
+	    save = this
+	    continue
+	}
+	print save
+	save = this
+    }
+    if (position) {
+	print substr(save, 1, position-1) "[" variations "]" substr(save, position+1)
+    } else {
+	print save
+    }
+}
+
+# =============================================================================
+#
+# @(#) $RCSfile: modalias.prov,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-04 13:28:10 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2009-07-04 13:28:10 $ by $Author: brian $
+#
+# -----------------------------------------------------------------------------
+#
+# $Log: modalias.prov,v $
+# Revision 1.1.2.2  2009-07-04 13:28:10  brian
+# - conversion to pure awk
+#
+# =============================================================================
+# vim: ft=awk tw=80 sw=4 nocin nosi fo+=tcqlorn

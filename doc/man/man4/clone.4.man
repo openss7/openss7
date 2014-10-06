@@ -1,0 +1,676 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: clone.4.man,v 1.1.2.2 2011-02-07 02:18:09 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:09 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: clone.4.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:09  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH CLONE 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B clone
+\- the \fISTREAMS\fP clone driver
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/types.h>
+.br
+.B #include <sys/stat.h>
+.br
+.B #include <sys/stream.h>
+.br
+.B #include <fcntl.h>
+.HP 8
+.BI "int " fd " = open(" /dev/xxx_clone ", " oflags );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B clone
+pseudo-device driver is the traditional
+.I STREAMS
+mechanism for dynamic assignment of minor device numbers to
+.I STREAMS
+drivers.
+.SS
+Traditional Cloning
+.PP
+When a device node with the
+.B clone
+major device number is opened, the
+.B clone
+pseudo-device driver opens the
+.I STREAMS
+device associated with the device number formed by using the
+.B clone
+device minor number as the major device number, and zero (0) as the minor
+device number.
+Where
+.I dev
+is the device number associated with the
+.B clone
+device node, the
+.I STREAMS
+device opened have the device number
+.BI makedevice(getminor( dev "), " 0 ).
+.PP
+Upon locating the
+.I STREAMS
+device associated with this redirected device number, the
+.B clone
+pseudo-device driver calls the
+.BR qopen (9)
+routine of the redirected device with the
+.I sflag
+argument to the open set to
+.BR CLONEOPEN .
+This value of
+.I sflag
+tells the redirected device driver that it should assign a new, unique, minor device
+number to the stream and return it in the
+.I devp
+argument to the
+.BR qopen (9)
+call.
+Upon successful return from the
+.BR qopen (9)
+call on the redirected device, the
+.B clone
+driver takes all the necessary step to ensure that subsequent file operations
+on the resulting file descriptor act on the redirected device rather than the
+.B clone
+pseudo-device.
+.SS
+New Cloning
+.PP
+.B Linux Fast-STREAMS
+also supports the new cloning method in addition to the traditional cloning
+method.  Under the new cloning method, even when the
+.I sflag
+argument to
+.BR qopen (9)
+is set to
+.BR DRVOPEN ,
+the
+.I STREAMS
+driver is permitted to return a minor device number different from the minor
+device number passed to the driver's
+.BR qopen (9)
+procedure
+in the
+.I devp
+argument.
+For this to function properly, two conditions must occur:
+.IP 1. \w'1.\(em'u
+There must be no stream head already assigned to the minor device number
+passed in the
+.I devp
+argument to
+.BR qopen (9).
+The
+.BR qopen (9)
+procedure should check to ensure that there is no
+.I q->q_ptr
+assignment already made to the passed in read queue before attempting to
+assign a minor device number.
+.IP ""
+This condition can be relaxed if the minor device node is marked as clone
+device
+(either with the
+.B DF_CLONE
+flag on minor node registration or creation, or with the
+.B SAP_CLONE
+flag to the
+.BR "STREAMS Administrative Driver" ,
+.BR sad (4)).
+In that case,
+.I STREAMS
+will always allocate and assign a new stream head before calling
+.BR qopen (9),
+and will always set the
+.B CLONEOPEN
+flag in the
+.I sflag
+argument.
+.IP 2.
+The resulting device number returned to the
+.I devp
+argument must not yet have a stream head allocated.
+If this condition is not met, multiple stream heads will be allocated to the
+same minor device number.
+See
+.RI \(lq NOTICES \(rq,
+below.
+.PP
+Therefore, it is not necessary to use
+.B clone
+devices at all.
+Under
+.BR "Linux Fast-STREAMS" ,
+any
+.I STREAMS
+device can return a different minor device number when opened with a new
+stream, regardless of the setting of the
+.I sflag
+to
+.BR qopen (9).
+This means that a
+.I STREAMS
+driver can always treat minor device number zero (0) as a clone minor
+device and assign a new, unique, non-zero minor device number.  This removes
+the need to create special
+.B clone
+device nodes in the file system using
+.BR mknod (1)
+as described below under
+.IR \*(lqUSAGE\*(rq .
+Rather, a minor device node with minor device number zero can be used to
+represent the clone device instead.
+.SS
+Super Cloning
+.PP
+In an attempt to remove
+.B Linux Fast-STREAMS
+dependence on statically assigned major device numbers, yet permit demand
+kernel module loading, the
+.B clone
+pseudo-device driver also supports super cloning.  Super cloning is a
+.B Linux Fast-STREAMS
+facility.
+Under super cloning if the clone device is opened with a minor device number
+equal to the
+.BR "Named STREAMS Device" ,
+.BR nsdev (4),
+the creation of the the resulting device
+number is the same as under traditional cloning (i.e. the device number is
+formed with the major device number of the
+.BR nsdev (4)
+and the minor number zero (0)); however, when the open is chained to the
+.BR nsdev (4),
+with the
+.B CLONEOPEN
+.I sflag
+set, the
+.BR nsdev (4)
+will redetermine the major device number according to the name of the original
+clone device that was opened.
+.PP
+This approach permits static allocation of a single major device number for
+the
+.BR "Named STREAMS Device" ,
+.BR nsdev (4),
+and obviating the need for any further static major device number assignments.
+The
+.B Named STREAMS Device
+is a unique feature of
+.BR "Linux Fast-STREAMS" .
+.PP
+For details on this somewhat different and unique approach to
+.B clone
+devices that also accommodates the dynamic assignment of major device numbers,
+see
+.BR nsdev (4).
+.SS
+Minor Device Assignment
+.PP
+Although traditionally it was expected of drivers opened with
+.B CLONEOPEN
+that a new, unique, minor device number be assigned to the stream, this can be
+problematic, particularly where the number of minor device numbers available
+per major device number is limited.  (On
+.B Linux 2.4
+kernels, this is
+.B MAX_CHRDEV
+or 256 minor device numbers.)
+.B Linux Fast-STREAMS
+provides several solutions device number limitations including
+extended minor device numbers,
+internal minor device numbers,
+a mountable shadow special file system,
+and
+overlapping minor device ranges.
+See the
+.RI \(lq "Device Numbering" \(rq
+section of the
+.BR "Linux Fast-STREAMS Programmer's Guide" ,
+.BR SPG (9),
+or
+.BR dev_t (9)
+manual page,
+for additional information on device numbering schemes supported by
+.BR "Linux Fast-STREAMS" .
+.PP
+For maximum compatibility with other implementations,
+.B Linux Fast-STREAMS
+take the approach of allowing a device driver to assign multiple streams to
+the same minor device number when necessary.  This relaxes the requirement
+that the minor device number returned to a
+.B CLONEOPEN
+be new or unique.  In fact, an existing minor device number can be returned.
+This has two ramification on the explicit opening of minor devices:
+.IP (1) \w'(0)\(em'u
+If a minor device number is explicitly opened and the device number is
+marked with device flags
+.BR DF_CLONE ,
+or the device has been marked as a clone minor with the
+.BR SAP_CLONE
+flag to the
+.I STREAMS
+Administrative Driver
+.BR sad (4),
+then a new stream will always be created before calling
+.BR qopen (9)
+and
+.I sflag
+will always be set to
+.BR CLONEOPEN .
+.IP (2)
+If a minor device number is explicitly opened and the device number is not
+marked as a clone minor (i.e.
+.BR DF_CLONE
+is not used and
+.BR SAP_CLONE
+has not been performed on the minor device), then if one or more streams are
+already associated with the minor device number, the most recently created
+stream is accessed and the
+.BR qopen (9)
+procedure is called with an
+.I sflag
+of
+.BR DRVOPEN .
+.PP
+This is also true of minor device nodes opened using the
+.B clone
+driver.
+.\"
+.\"
+.SH USAGE
+.PP
+.B clone
+is typically used to provide dynamic minor device number assignment.  To
+accomplish this, the driver installation performs the following steps:
+.IP (1) \w'(0)\(em'u
+Write the
+.I STREAMS
+device driver to accept clone opens with
+.B CLONEOPEN
+set in
+.I sflag
+to the
+.BR qopen (9)
+procedure.
+The driver assigns a new, unique minor device number when opened in this
+fashion.
+.IP (2)
+Create a device node in the file system using
+.BR mknod (1)
+that has the major device number of the
+.B clone
+pseudo-device driver and a minor device number that corresponds to the major
+device number of the driver.
+.IP (3)
+Programs performing
+.BR open (2s)
+with the path of the
+.B clone
+device node created in this fashion will perform a
+.B CLONEOPEN
+on the device.
+In this fashion, upon each open of the
+.B clone
+device, a new
+.B CLONEOPEN
+will be performed on the real device and a new, unique minor device number
+will be associated with the resulting file descriptor.
+.PP
+This process is often useful for
+pseudo-device drivers where all minor device nodes are effectively the same.
+To obtain a new minor device node, the
+.B clone
+device is opened.  To open an existing device node, the information returned
+from
+.BR fstat (2)
+on the resulting file descriptor can be used to identify the minor node for an
+explicit open of the minor device node.
+.\"
+.\"
+.SH NOTICES
+.PP
+If there is not a
+.I STREAMS
+device associated with the resulting device number,
+attempting to open the resulting character special device will result in the
+.B Linux
+kernel attempting to load the kernel module with the name (or alias)
+.BI char-major- nnn\fR,
+where
+.I nnn
+is the ASCII representation of the major device number sought.
+This can be an undesirable side effect of the major device number is not
+associated with a
+.I STREAMS
+device.  To avoid undesirable side effects, care should be taken to not create
+.B clone
+device nodes in the file system with minor device numbers that do not correspond
+to major device numbers of
+.I STREAMS
+devices.
+.PP
+Super cloning
+(see
+.BR nsdev (4))
+and use of the
+.B spec
+filesystem (see
+.BR specfs (5))
+are other possible solutions to avoid undesirable side effects.
+.PP
+Because a minor device number is assigned to the
+Shadow Special Filesystem inode
+(see
+.BR specfs (5))
+and is assigned to the file system resident
+.B clone
+device node, the results of
+.BR stat (2)
+on the
+.B clone
+device will yield a different device number than the results of
+.BR fstat (2)
+on the file descriptor resulting from an open of the
+.B clone
+device.
+.BR stat (2)
+takes the device number from the device node in the file system, whereas,
+.BR fstat (2)
+takes the device number from the Shadow Special inode corresponding to the
+.I STREAMS
+special file.
+This is normal
+.IR UNIX \(rg
+behaviour.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.B clone
+is not implemented as a normal
+.I STREAMS
+driver: it is implemented as a shadow special device node under
+.BR "Linux Fast-STREAMS" .
+.[
+lfs
+.]
+.B Linux Fast-STREAMS
+shadow special device nodes call
+.BR clone_open ()
+from
+.BR cdev_open ()
+instead of
+.BR spec_open ()
+permitting the
+.B clone
+device to intercept and redirect the open call to the appropriate device.
+This is consistent with the descriptions of the internal
+.BR clone_open ()
+under
+.IR "SVR 4" .
+.[
+magic
+.]
+.\"
+.\"
+.SH EXAMPLES
+.PP
+If the following is performed to create the device (assuming that major device
+number 74 is the major device number of the Clone Device):
+.sp
+.nf
+\fC\s-1\
+$> mknod -m 0666 /dev/streams c 74 56
+\s+1\fP
+.fi
+.sp
+then opening
+.RB \*(lq /dev/streams \*(rq
+will result in opening minor device number
+.I 0
+of the
+.RB \*(lq streams \*(rq
+device (character major 56) with the
+.I sflag
+argument to
+.BR qopen (9)
+begin set to
+.BR CLONEOPEN .
+.\"
+.\"
+.SH DEVICES
+.PP
+.B clone
+provides for the creation of
+.B clone
+devices with the clone major device number using various names in the file
+system.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR mknod (1),
+.BR qopen (9),
+.BR open (2s),
+.BR stat (2),
+.BR fstat (2),
+.BR sad (4),
+.BR nsdev (4).
+.\"
+.\"
+.SH BUGS
+.PP
+.B clone
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B clone
+is compatible with
+.IR "SVR 4.2" ,
+and implementations based on
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+including
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg,
+.IR UnixWare \(rg,
+.IR UXP/V \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+To my knowledge,
+.IR Solaris \(rg
+does not support the concept of clone minors.
+.IP \(em
+.IR AIX \(rg
+supports the
+.B STR_NEWCLONING
+flag in the
+.B strconf_t
+structure passed to
+.BR str_install ()
+to indicate that a driver is capable of the new cloning method.  See
+.BR str_install_AIX (9)
+for more information.
+.IP \(em
+.IR UnixWare \(rg
+supports both the concept of clone minors as well as providing for clone
+channels which is more in line with the behaviour of
+.BR "Linux Fast-STREAMS" .
+This should not, however, cause incompatibility problems with
+.IR Solaris \(rg
+because correctly written drivers for these systems have the requirement that
+they assign a new and unique minor device number when drivers are opened with
+.BR CLONEOPEN .
+.IP \(em 4
+The ability for a normal minor device node to perform a clone open when
+explicitly opened with
+.I sflag
+.BR DRVOPEN
+is a characteristic of
+.BR "Linux Fast-STREAMS" .
+I do not know whether
+.IR Solaris \(rg
+or
+.IR UnixWare \(rg
+supports this feature in the same fashion.
+This should not affect user programs, because user programs open these devices
+with pathnames in the file system and should have no knowledge of the major
+device numbers assigned to
+.B clone
+and other devices.
+.PP
+The
+.B clone
+device provided with
+.B Linux Fast-STREAMS
+release must be used.  Other
+.B clone
+device drivers are incompatible with the
+.B Linux Fast-STREAMS
+executive.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2" .
+.[
+svr42
+.]
+Conformance is verified using the
+.BR test-clone (8)
+verification test suite.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B clone
+appeared in
+.IR "SVR 4" .
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,250 @@
+OpenSS7 -- kernel module package notes.  2011-04-10
+$Id: NOTES.kmp,v 1.1.2.2 2011-05-10 13:45:30 brian Exp $
+Copyright (c) 2008-2011  Monavacon Limited. <http://www.monavacon.com/>
+Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
+See the end for copying conditions (for this file).
+
+
+Kernel Module Packages
+======================
+
+These notes document the formulation of proper kernel module packages
+for recent Enterprise Linux distributions:
+
+General
+-------
+
+%{kernel_version}	the version of the kernel as would be returned
+			by $(uname -r)
+%{kernel_source}	%{kernel_version} with the flavor string
+			stripped.
+%{kernel_number}	%{kernel_version} with the first dash and
+			remainder stripped.
+%{kernel_flavor}	just the flavor portion of %{kernel_version}
+			with a leading dash whether the leading dash was
+			present in %{kernel_version} or not.
+%{kernel_string}	nil for RedHat/Fedora, but for SuSE, the
+			%{kernel_version} without the flavor (i.e.
+			%{kernel_source}), with dashes substituted with
+			underscores (and possibly .0 added to the kernel
+			version when it does not contain 4 components),
+			all prefixed with an underscore.
+%{kernel_release}	nil for SuSE, but for RedHat/Fedora, the
+			%{kernel_version} with dashes substitued with
+			periods, all prefixed with a period.
+
+%{kernel_package}	kmod-%{name}%{kernel_flavor} for RedHat/Fedora
+%{kernel_package}	%{name}-kmp%{kernel_flavor} for SuSE
+
+%{epoch}		@PACKAGE_RPMEPOCH@
+%{baseversion}		@VERSION@
+
+%{rpmrelease}		@PACKAGE_RPMRELEASE@
+%{fullrelease}		@PACKAGE_RPMRELEASE@%{extrarelease}
+%{fullrelease2}		@PACKAGE_RPMRELEASE@%{extrarelease2}
+
+%{kbaseversion}		%{baseversion}%{kernel_string}
+%{kfullrelease}		%{rpmrelease}%{kernel_release} for RedHat/Fedora
+			%{fullrelease} for SuSE
+
+Common
+------
+
+The following are for our own purposes.  That is, for describing
+dependencies between various components.
+
+Provides : %{name}-kernel = %{epoch}:%{kbaseversion}-%{kfullrelease}
+Provides : %{name}-kernel = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides : %{name}-kernel = %{epoch}:%{baseversion}-%{fullrelease}
+Provides : %{name}-kernel = %{epoch}:%{baseversion}-%{fullrelease2}
+
+Provides : %{name}-%{kernel_version} = %{epoch}:%{kbaseversion}-%{kfullrelease}
+Provides : %{name}-%{kernel_version} = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides : %{name}-%{kernel_version} = %{epoch}:%{baseversion}-%{fullrelease}
+Provides : %{name}-%{kernel_version} = %{epoch}:%{baseversion}-%{fullreleasew}
+
+RedHat/Fedora
+-------------
+
+    Name     : %{kernel_package}
+    Version  : %{kbaseversion}
+    Release  : %{kfullrelease}
+    Group    : System Environment/Kernel
+    Requires : /bin/sh /sbin/depmod
+    Requires : kernel >= %{minimum_kversion} (optional)
+
+    Provides : kernel-modules = %{kernel_version}
+    Provides : kmod-%{name}%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
+    Provides : %{name}-kmod = %{epoch}:%{kbaseversion}-%{kfullrelease}
+
+    Place modules in /lib/modules/%{kernel_version}/extra/openss7
+
+    Requires : kernel%{kernel_flavor} = %{kernel_version} (only if weak-updates not supported)
+
+    For example, $(uname -r) = 2.6.18-194.32.1.el5 becomes
+
+    Name     : kmod-openss7
+    Version  : 1.1.1
+    Release  : 1.2.6.18.194.32.1.el5
+    Group    : System Environment/Kernel
+    Requires : /bin/sh /sbin/depmod
+    Provides : kernel-modules = 2.6.18-194.32.1.el5
+    Provides : kmod-openss7 = 0:1.1.1-1.2.6.18.194.32.1.el5
+    Provides : openss7-kmod = 0:1.1.1-1.2.6.18.194.32.1.el5
+
+    Provides : openss7-kernel = 0:1.1.1-1.2.6.18.194.32.1.el5
+    Provides : openss7-kernel = 0:1.1.1-1
+    Provides : openss7-kernel = 0:1.1.1-1.centos
+    Provides : openss7-kernel = 0:1.1.1-1.el5
+
+    Provides : openss7-2.6.18-194.32.1.el5 = 0:1.1.1-1.2.6.18.194.32.1.el5
+    Provides : openss7-2.6.18-194.32.1.el5 = 0:1.1.1-1
+    Provides : openss7-2.6.18-194.32.1.el5 = 0:1.1.1-1.centos
+    Provides : openss7-2.6.18-194.32.1.el5 = 0:1.1.1-1.el5
+
+SuSE Code 11
+------------
+
+    Name     : %{kernel_package}
+    Version  : %{kbaseversion}
+    Release  : %{kfullrelease}
+    Group    : System Environment/Kernel
+    Requires : coreutils grep
+
+    Requries : kernel%{kernel_flavor}
+    Enhances : kernel%{kernel_flavor}
+
+    Provides : multiversion(kernel)
+    Provides : %{name}-kmp%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
+    Provides : %{name}-kmp = %{epoch}:%{kbasversion}-%{kfullrelease}
+
+    Place modules in /lib/modules/%{kernel_version}/extra/openss7
+		  or /lib/modules/%{kernel_version}/updates/openss7
+
+    For example, $(uname -r) = 2.6.32.24-0.2-default becomes
+
+    Name     : openss7-kmp-default
+    Version  : 1.1.1_2.6.32_0.2
+    Release  : 1.11.1
+    Group    : System Environment/Kernel
+    Requires : coreutils grep
+
+    Requires : kernel-default
+    Enhances : kernel-default
+
+    Provides : multiversion(kernel)
+    Provides : openss7-kmp-default = 0:1.1.1_2.6.32_0.2-1.11.1
+    provides : openss7-kmp = 0:1.1.1_2.6.32_0.2-1.11.1
+
+    Provides : openss7-kernel = 0:1.1.1_2.6.32_0.2-1.11.1
+    Provides : openss7-kernel = 0:1.1.1-1
+    Provides : openss7-kernel = 0:1.1.1-1.11.1
+    Provides : openss7-kernel = 0:1.1.1-1.suse
+
+    Provides : openss7-2.6.18-194.32.1.el5 = 0:1.1.1_2.6.32_0.2-1.11.1
+    Provides : openss7-2.6.18-194.32.1.el5 = 0:1.1.1-1
+    Provides : openss7-2.6.18-194.32.1.el5 = 0:1.1.1-1.11.1
+    Provides : openss7-2.6.18-194.32.1.el5 = 0:1.1.1-1.suse
+
+Debian:
+-------
+
+    Package      : openss7-@kernel_version@
+    Architecture : any
+    Section      : kernel
+    Priority     : optional
+    Provides     : openss7-kernel
+                 : openss7-@kernel_version@
+    Requires     : linux-image-2.6
+                 : linux-image-@kernel_version@ (only if tied to ABI)
+    Pre-Requires : openss7-base = @VERSION@
+
+
+When to install and when to update:
+-----------------------------------
+
+There are two 'Provides' statements, one for RedHat/Fedora and one for
+SuSE:
+
+Provides: kernel-modules = %{_kversion}
+
+and
+
+Provides: multversion(kernel)
+
+These provides statements tell yum and zypper to always install and not
+to update these packages.  However, I think that this is "after" it has
+decided what to update in the first place.  Some kmod packages do not
+provide 'kernel-modules'.
+
+There are several scenarios:
+
+Updating the openss7 package suite:
+
+ - The openss7 package suite has reved.  kmp packages must be made to
+   depend precisely on the base package version.  In this way, when the
+   base package is updated, new kmp packages will be installed, and the
+   old packages will be removed.
+
+Adding a new kmp for a more recent kernel:
+
+ - A kernel incompatability exists and a kmp for a newer kernel is
+   released.  When the base package requires a kmp package and the older
+   kernels are removed as part of the update, the old kmp package will
+   be removed and the new one installed.
+
+-----
+
+=========================================================================
+
+ Copyright (c) 2008-2011  Monavacon Limited  <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian Bidulock  <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ Permission is granted to make and distribute verbatim copies of this
+ manual provided the copyright notice and this permission notice are
+ preserved on all copies.
+
+ Permission is granted to copy and distribute modified versions of this
+ manual under the conditions for verbatim copying, provided that the
+ entire resulting derived work is distributed under the terms of a
+ permission notice identical to this one
+
+ Since the Linux kernel and libraries are constantly changing, this
+ manual page may be incorrect or out-of-date.  The author(s) assume no
+ responsibility for errors or omissions, or for damages resulting from
+ the use of the information contained herein.  The author(s) may not
+ have taken the same level of care in the production of this manual,
+ which is licensed free of charge, as they might when working
+ professionally.
+
+ Formatted or processed versions of this manual, if unaccompanied by the
+ source, must acknowledge the copyright and authors of this work.
+
+-------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+ on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department
+ of Defense ("DoD"), it is classified as "Commercial Computer Software"
+ under paragraph 252.227-7014 of the DoD Supplement to the Federal
+ Acquisition Regulations ("DFARS") (or any successor regulations) and
+ the Government is acquiring only the license rights granted herein (the
+ license rights customarily provided to non-Government users).  If the
+ Software is supplied to any unit or agency of the Government other than
+ DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19
+ of the Federal Acquisition Regulations ("FAR") (or any successor
+ regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+ NASA Supplement to the FAR (or any successor regulations).
+
+=========================================================================
+
+ Commercial licensing and support of this software is available from
+ OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+
+=========================================================================
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

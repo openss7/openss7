@@ -1,0 +1,340 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: capi.7.man,v 1.1.2.2 2011-02-07 02:18:28 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:28 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: capi.7.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:28  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.\"
+.\"
+.TH CAPI 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ CAPI 2.0 Interface (CAPI)"
+.\"
+.\"
+.SH NAME
+.B CAPI
+\- Linux CAPI 2.0 Interface
+.\"
+.\"
+.SH SYNOPSIS
+.B #include <linux/capi.h>
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B capi
+is an implementation of the Common API for ISDN interface
+.[
+capi20
+.]
+using
+.IR STREAMS (4).
+.\"
+.\"
+.SH IOCTLS
+.SS CAPI_REGISTER		\" ('C'<<8|0x01)
+This ioctl is used to announce the presence of the application to CAPI
+.[
+capi20
+.]
+and set some parameters.
+.PP
+.I arg
+is a pointer to a
+.B capi_register_params
+structure formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct capi_register_params {
+    uint32_t level3cnt;
+    uint32_t datablkcnt;
+    uint32_t datablklen;
+};
+\fR\s+1
+.fi
+.TP
+.I level3cnt
+maximum number of simultaneous user data connections.
+.TP
+.I datablkcnt
+maximum number of buffered data messages.
+.TP
+.I datablklen
+maximum size of buffered data messages.
+.\".SS CAPI_RELEASE		\" ('C'<<8|0x02) but just close()
+.\".SS CAPI_PUT_MESSAGE		\" ('C'<<8|0x03) but just putmsg()
+.\".SS CAPI_GET_MESSAGE		\" ('C'<<8|0x04) but just getmsg()
+
+.SS CAPI_GET_MANUFACTURER	\" ('C'<<8|0x06)
+This IO control obtains the CAP manufacturer identification.
+.PP
+.I arg
+is a pointer to a buffer of at least 64 bytes.  On successful return, the
+.B capi
+driver copies the manufacturer name to the buffer as a zero terminated ASCII
+character string.
+.SS CAPI_GET_VERSION		\" ('C'<<8|0x07)
+.PP
+.I arg
+is a pointer to a
+.B capi_version
+structure formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct capi_version {
+    uint32_t majorversion;
+    uint32_t minorversion;
+    uint32_t majormanuversion;
+    uint32_t minormanuversion;
+};
+\fR\s+1
+.fi
+.TP
+.I majorversion
+The CAPI
+.[
+capi20
+.]
+major version:
+.BR 0x2 .
+.TP
+.I minorversion
+The CAPI
+.[
+capi20
+.]
+minor version:
+.BR 0x0 .
+.TP
+.I majormanuversion
+The manufacturer-specific major number:
+.BR 0x0 .
+.TP
+.I minormanuversion
+The manufacturer-specific minor number:
+.BR 0x8 .
+.SS CAPI_GET_SERIAL		\" ('C'<<8|0x08)
+Retrieves the serial number of the CAPI.
+.[
+capi20
+.]
+.PP
+.I arg
+is a pointer to a buffer of at least 8 bytes to hold the zero terminated ASCII
+character string representing the serial number of up to 7 characters.
+.SS CAPI_GET_PROFILE		\" ('C'<<8|0x09)
+.PP
+.I arg
+is a pointer to a
+.B capi_profile
+structure formatted as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct capi_profile {
+    uint16_t ncontroller;       /* number of installed
+                                   controller */
+    uint16_t nbchannel;         /* number of B-Channels */
+    uint32_t goptions;          /* global options */
+    uint32_t support1;          /* B1 protocols support */
+    uint32_t support2;          /* B2 protocols support */
+    uint32_t support3;          /* B3 protocols support */
+    uint32_t reserved[6];       /* reserved */
+    uint32_t manu[5];           /* manufacturer specific
+                                   information */
+} capi_profile;
+\fR\s+1
+.fi
+.TP
+.I nocontroller
+The number of the controller.  If this field is set to zero (0) on call, the
+number of controllers will be returned and nothing else.
+.TP
+.I nbchannel
+The number of B-Channels supported by the controller.
+.TP
+.I goptions
+The global options.
+.RS
+.TP
+.B CAPI_GOPT_INT
+Internal controller supported.
+.TP
+.B CAPI_GOPT_EXT
+External equipment supported.
+.TP
+.B CAPI_GOPT_HANDSET
+Handset supported (external equipment must also be set)
+.TP
+.B CAPI_GOPT_DTMF
+DTMF supported.
+.TP
+.B CAPI_GOPT_CHANALLOC
+Channel allocationi supported (leased lines).
+.TP
+.B CAPI_GOPT_BCHANOPSUPP
+Parameter
+.I \*(lqB channel operation\*(rq
+supported.
+.TP
+.B CAPI_GOPT_LINTERC
+Line Interconnect supported.
+.RE
+.TP
+.I support1
+B1 protocols support.
+.TP
+.I support2
+B2 protocols support.
+.TP
+.I support3
+B3 protocols support.
+.TP
+.I reserved
+reserved.
+.TP
+.I manu
+Manufacturer specific information.
+
+.\".SS CAPI_SET_SIGNAL
+.\".SS CAPI_WAIT_FOR_SIGNAL
+
+.SS CAPI_MANUFACTURER_CMD	\" ('C'<<8|0x01)
+.SS CAPI_GET_ERRCODE		\" ('C'<<8|0x01)
+.SS CAPI_INSTALLED		\" ('C'<<8|0x01)
+
+.\".SS CAPI_GET_FLAGS		\" ('C'<<8|0x01)
+.\".SS CAPI_SET_FLAGS		\" ('C'<<8|0x01)
+.\".SS CAPI_CLR_FLAGS		\" ('C'<<8|0x01)
+.\".SS CAPI_NCCI_OPENCOUNT	\" ('C'<<8|0x01)
+.\".SS CAPI_NCCI_GETUNIT	\" ('C'<<8|0x01)
+
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR capi (4).
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/capi.h> .
+.\"
+.\"
+.SH VERSIONS
+The
+.B CAPI
+.[
+capi20
+.]
+driver is specific to the
+.B OpenSS7
+stack.
+This is Version 2.0 of the interface.
+.[
+$LIST$
+.]
+.TI

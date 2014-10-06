@@ -1,0 +1,92 @@
+#ISO2-3	LERG	CLLI	State as appears in NANPA web pages
+US-AK	AK	AK	AK
+US-AL	AL	AL	AL
+CA-AB	AB	AB	Alberta
+AI	AI	AI	Anguilla
+AG	AN	AN	Antigua/Barbuda
+US-AR	AR	AR	AR
+AS	AS	AM	AS
+US-AZ	AZ	AZ	AZ
+BS	BA	BA	Bahamas
+BB	BD	BD	Barbados
+BM	BM	BM	Bermuda
+CA-BC	BC	BC	British Columbia
+VG	BV	BV	British Virgin Islands
+US-CA	CA	CA	CA
+CA	ZZ		Canada
+KY	CQ	CQ	Cayman Islands
+MP	NN	NN	CNMI
+US-CO	CO	CO	CO
+US-CT	CT	CT	CT
+US-DC	DC	DC	DC
+US-DE	DE	DE	DE
+DM	DM	DM	Dominica
+DO	DO	DO	Dominican Republic
+US-FL	FL	FL	FL
+US-GA	GA	GA	GA
+GD	GN	GN	Grenada
+GU	GU	GU	GU
+US-HI	HI	HI	HI
+US-IA	IA	IA	IA
+US-ID	ID	ID	ID
+US-IL	IL	IL	IL
+US-IN	IN	IN	IN
+JM	JM	JM	Jamaica
+US-KS	KS	KS	KS
+US-KY	KY	KY	KY
+US-LA	LA	LA	LA
+US-MA	MA	MA	MA
+CA-MB	MB	MB	Manitoba
+US-MD	MD	MD	MD
+US-ME	ME	ME	ME
+US-MI	MI	MI	MI
+US-MN	MN	MN	MN
+US-MO	MO	MO	MO
+MS	RT	RT	Montserrat
+US-MS	MS	MS	MS
+US-MT	MT	MT	MT
+ZZ	ZZ		NANP Area
+ZZ	ZZ		NANP area
+US-NC	NC	NC	NC
+US-ND	ND	ND	ND
+US-NE	NE	NE	NE
+CA-NB	NB	NB	New Brunswick
+CA-NL	NF	NF	Newfoundland
+US-NH	NH	NH	NH
+US-NJ	NJ	NJ	NJ
+US-NM	NM	NM	NM
+CA-NS	NS	NS	Nova Scotia, Prince Edward Island
+CA-PE	PE	PE	Nova Scotia, Prince Edward Island
+US-NV	NV	NV	NV
+US-NY	NY	NY	NY
+US-OH	OH	OH	OH
+US-OK	OK	OK	OK
+CA-ON	ON	ON	Ontario
+US-OR	OR	OR	OR
+US-PA	PA	PA	PA
+PR	PR	PR	Puerto Rico
+CA-QC	PQ	PQ	Quebec
+US-RI	RI	RI	RI
+CA-SK	SK	SK	Saskatchewan
+US-SC	SC	SC	SC
+US-SD	SD	SD	SD
+SX	SF	SF	Sint Maarten
+KN	KA	KA	St. Kitts & Nevis
+LC	SA	SA	St. Lucia
+VC	ZF	ZF	St. Vincent & Grenadines
+US-TN	TN	TN	TN
+TT	TR	TR	Trinidad & Tobago
+TC	TC	TC	Turks & Caicos Islands
+US-TX	TX	TX	TX
+US	US		US
+VI	VI	VI	USVI
+US-UT	UT	UT	UT
+US-VA	VA	VA	VA
+US-VT	VT	VT	VT
+US-WA	WA	WA	WA
+US-WI	WI	WI	WI
+US-WV	WV	WV	WV
+US-WY	WY	WY	WY
+CA-YT	YT	YT	Yukon, NW Terr., Nunavut
+CA-NT	NT	NT	Yukon, NW Terr., Nunavut
+CA-NU	VU	VU	Yukon, NW Terr., Nunavut

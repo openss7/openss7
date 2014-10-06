@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<!DOCTYPE comps PUBLIC "-//CentOS Linux//DTD Comps info//EN" "comps.dtd">
+<comps>
+  <group>
+    <id>openss7</id>
+    <name>OpenSS7</name>
+    <description>OpenSS7 STREAMS and Protocol Suites.</description>
+    <default>true</default>
+    <uservisible>true</uservisible>
+    <packagelist>
+      <packagereq type="mandatory">openss7</packagereq>
+      <packagereq type="mandatory">openss7-base</packagereq>
+      <packagereq type="mandatory">openss7-lib</packagereq>
+      <packagereq type="mandatory">openss7-kernel</packagereq>
+      <packagereq type="optional">openss7-java</packagereq>
+      <packagereq type="optional">openss7-devel</packagereq>
+      <packagereq type="optional">openss7-devel-kernel</packagereq>
+      <packagereq type="optional">openss7-debuginfo</packagereq>
+      <packagereq type="optional">openss7-debuginfo-kernel</packagereq>
+      <packagereq type="optional">openss7-debugsource</packagereq>
+      <packagereq type="optional">openss7-debugsource-kernel</packagereq>
+      <packagereq type="optional">openss7-source-kernel</packagereq>
+      <packagereq type="optional">openss7-doc</packagereq>
+      <packagereq type="optional">openss7-javadoc</packagereq>
+    </packagelist>
+  </group>
+  <group>
+    <id>openss7-java</id>
+    <name>OpenSS7 Java</name>
+    <description>OpenSS7 STREAMS and Protocol Suite Java Components.</description>
+    <default>true</default>
+    <uservisible>true</uservisible>
+    <grouplist>
+      <groupreq>openss7</groupreq>
+    </grouplist>
+    <packagelist>
+      <packagereq type="mandatory">openss7-java</packagereq>
+      <packagereq type="optional">openss7-javadoc</packagereq>
+    </packagelist>
+  </group>
+  <group>
+    <id>openss7-devel</id>
+    <name>OpenSS7 Development</name>
+    <description>OpenSS7 STREAMS and Protocol Suite Development.</description>
+    <default>false</default>
+    <uservisible>true</uservisible>
+    <grouplist>
+      <groupreq>openss7</groupreq>
+    </grouplist>
+    <packagelist>
+      <packagereq type="mandatory">openss7-devel</packagereq>
+      <packagereq type="mandatory">openss7-devel-kernel</packagereq>
+      <packagereq type="optional">openss7-debuginfo</packagereq>
+      <packagereq type="optional">openss7-debuginfo-kernel</packagereq>
+      <packagereq type="optional">openss7-debugsource</packagereq>
+      <packagereq type="optional">openss7-debugsource-kernel</packagereq>
+      <packagereq type="optional">openss7-source-kernel</packagereq>
+      <packagereq type="optional">openss7-doc</packagereq>
+      <packagereq type="optional">openss7-javadoc</packagereq>
+    </packagelist>
+  </group>
+  <group>
+    <id>openss7-debug</id>
+    <name>OpenSS7 Debugging</name>
+    <description>OpenSS7 STREAMS and Protocol Suite Debugging.</description>
+    <default>false</default>
+    <uservisible>false</uservisible>
+    <grouplist>
+      <groupreq>openss7</groupreq>
+    </grouplist>
+    <packagelist>
+      <packagereq type="mandatory">openss7-debuginfo</packagereq>
+      <packagereq type="mandatory">openss7-debuginfo-kernel</packagereq>
+      <packagereq type="optional">openss7-debugsource</packagereq>
+      <packagereq type="optional">openss7-debugsource-kernel</packagereq>
+      <packagereq type="optional">openss7-source-kernel</packagereq>
+      <packagereq type="optional">openss7-doc</packagereq>
+      <packagereq type="optional">openss7-javadoc</packagereq>
+    </packagelist>
+  </group>
+  <group>
+    <id>openss7-source</id>
+    <name>OpenSS7 Source</name>
+    <description>OpenSS7 STREAMS and Protocol Suite Source.</description>
+    <default>false</default>
+    <uservisible>false</uservisible>
+    <grouplist>
+      <groupreq>openss7</groupreq>
+      <groupreq>openss7-debug</groupreq>
+    </grouplist>
+    <packagelist>
+      <packagereq type="mandatory">openss7-debugsource</packagereq>
+      <packagereq type="mandatory">openss7-debugsource-kernel</packagereq>
+      <packagereq type="default">openss7-source-kernel</packagereq>
+      <packagereq type="optional">openss7-doc</packagereq>
+      <packagereq type="optional">openss7-javadoc</packagereq>
+    </packagelist>
+  </group>
+  <group>
+    <id>openss7-doc</id>
+    <name>OpenSS7 Documentation</name>
+    <description>OpenSS7 STREAMS and Protocol Suite Documentation.</description>
+    <default>false</default>
+    <uservisible>true</uservisible>
+    <packagelist>
+      <packagereq type="mandatory">openss7-doc</packagereq>
+      <packagereq type="mandatory">openss7-javadoc</packagereq>
+    </packagelist>
+  </group>
+  <category>
+    <id>openss7-components</id>
+    <name>OpenSS7 Components</name>
+    <description>OpenSS7 STREAMS and Protocol Suite Components</description>
+    <display_order>999</display_order>
+    <grouplist>
+      <groupid>openss7</groupid>
+      <groupid>openss7-java</groupid>
+      <groupid>openss7-devel</groupid>
+      <groupid>openss7-debug</groupid>
+      <groupid>openss7-source</groupid>
+      <groupid>openss7-doc</groupid>
+    </grouplist>
+  </category>
+</comps>

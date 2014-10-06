@@ -1,0 +1,777 @@
+% -*- texinfo -*- vim: ft=texinfo
+% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+% =========================================================================
+%
+% @(#) $Id: SIGTRAN.texi,v 1.1.2.2 2011-02-07 02:21:49 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+%
+% All Rights Reserved.
+%
+% Permission is granted to copy, distribute and/or modify this document
+% under the terms of the GNU Free Documentation License, Version 1.3 or
+% any later version published by the Free Software Foundation; with no
+% Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+% copy of the license is included in the section entitled "GNU Free
+% Documentation License".
+%
+% Permission to use, copy and distribute this documentation without
+% modification, for any purpose and without fee or royalty is hereby
+% granted, provided that both the above copyright notice and this
+% permission notice appears in all copies and that the name of OpenSS7
+% Corporation not be used in advertising or publicity pertaining to
+% distribution of this documentation or its contents without specific,
+% written prior permission.  OpenSS7 Corporation makes no representation
+% about the suitability of this documentation for any purpose.  It is
+% provided "as is" without express or implied warranty.
+% 
+% Permission is granted to process this file through Tex and print the
+% results, provided the printed document carries copying permission
+% notice identical to this one except for the removal of this paragraph
+% (this paragraph not being relevant to the printed manual).
+% 
+% OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+% DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+% FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+% CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+% IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+% PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+% OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+% CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+% USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+% OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+% THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+% THEREOF.
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any successor
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2011-02-07 02:21:49 $ by $Author: brian $
+%
+% =========================================================================
+
+\input texinfo
+@setfilename SIGTRAN.info
+@include ../../scripts/texi/args.texi
+@set MANUAL_TITLE Signalling Transport Protocol Suite
+@set MANUAL_TYPE Users Manual
+@settitle @value{MANUAL_TITLE}
+
+@dircategory OpenSS7
+@direntry
+* SIGTRAN: (SIGTRAN).			Signalling Transport Protocol Suite
+@end direntry
+
+@include ../../scripts/texi/args.texi
+@set MANUAL_TITLE Signalling Transport Protocol Suite
+@set MANUAL_TYPE Users Manual
+
+@comment The following copyright information goes at the head of each .info file.
+@ifinfo
+This file provides the @value{MANUAL_TYPE} for @value{MANUAL_TITLE}.
+
+This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated @value{PACKAGE_DATE}, of the
+@cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
+Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
+
+Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
+
+All Rights Reserved.
+
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU
+Free Documentation License, Version 1.3 or any later version published by the Free Software
+Foundation; with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of
+the license is included in the section entitled @ref{GNU Free Documentation License}.
+
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of @cite{OpenSS7 Corporation} not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  @cite{OpenSS7 Corporation} makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@ignore
+Permission is granted to process this file through Tex and print the results, provided the printed
+document carries copying permission notice identical to this one except for the removal of this
+paragraph (this paragraph not being relevant to the printed manual).
+
+@end ignore
+OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS DOCUMENTATION INCLUDING ALL IMPLIED
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT
+THE CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN
+NO EVENT SHALL OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL
+DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+@end ifinfo
+
+@include ../../scripts/texi/args.texi
+@set MANUAL_TITLE Signalling Transport Protocol Suite
+@set MANUAL_TYPE Users Manual
+
+@set PART Signalling Transport
+@set LONG Signalling Transport
+@set SHORT SIGTRAN
+@set INTERFACE SIGTRAN
+
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@titlepage
+@titlefont{@value{MANUAL_TITLE}}
+@sp 0.5
+@title @value{MANUAL_TYPE}
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
+@subtitle Updated @value{PACKAGE_PDATE}
+@sp 0.2
+@subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
+@sp 2
+@subtitle Copyright @copyright{} 2008-2009 Monavacon Limited
+@subtitle All Rights Reserved.
+@sp 4
+@quotation
+@chapheading Abstract:
+This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
+the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
+as platform and system applicability of the @value{MANUAL_TITLE}.  It provides abstraction of the
+@value{LONG} (@value{SHORT}) interface to these components as well as providing a basis for
+@value{LONG} control for other @value{LONG} protocols.
+@end quotation
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
+
+@page
+@vskip 0pt plus 1filll
+
+@chapheading Published by:
+
+@sp 1
+
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+@noindent
+Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
+
+@noindent
+All Rights Reserved.
+
+@sp 1
+
+@noindent
+Unauthorized distribution or duplication is prohibited.
+
+@sp 1
+
+@noindent
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU
+Free Documentation License, Version 1.3 or any later version published by the Free Software
+Foundation; with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of
+the license is included in the section entitled @ref{GNU Free Documentation License}.
+
+@noindent
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of @cite{OpenSS7 Corporation} not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  @cite{OpenSS7 Corporation} makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@chapheading Notice:
+
+@noindent
+@strong{OpenSS7 Corporation disclaims all warranties with regard to this documentation including all
+implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
+that the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.}
+
+@vskip 0pt
+@end titlepage
+@iftex
+@headings off
+@everyheading @thistitle @| @thisfile @| @thischaptername
+@evenheading @thischapter @| @| @thisfile
+@oddheading @thistitle @| @| @thischaptername
+@everyfooting Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL} @| @value{PACKAGE_DATE} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
+@oddfooting @value{PACKAGE_DATE} @| @| @thispage
+@end iftex
+@page
+
+@c Define an index of primitives
+@defcodeindex pr
+@c Define an index of primitive values
+@defcodeindex pv
+@c Define an index of primitive error values
+@defcodeindex pe
+@c Define an index of protocol states
+@defcodeindex st
+@c Define an index of input-output controls
+@defcodeindex ct
+@c Define an index of manual pages.
+@defcodeindex mp
+@c Define an index of MIB objects.
+@defcodeindex mo
+
+@c frags out automake
+@c @ifnottex
+@c @c concatenate indices for text, html and info
+@syncodeindex pr cp
+@syncodeindex pv cp
+@syncodeindex pe cp
+@syncodeindex st cp
+@syncodeindex mp cp
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex ct cp
+@syncodeindex mo cp
+@c @end ifnottex
+
+@include texi/macros.texi
+@include texi/versions.texi
+@include texi/prims.texi
+
+@ifnottex
+@node Top
+@top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@heading About This Manual
+This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated @value{PACKAGE_DATE}, of
+@cite{The @value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version
+@value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL} of the
+@value{PACKAGE_TITLE} package.
+@end ifnottex
+
+@menu
+* Preface::
+* Introduction::
+* Drivers and Modules::
+* Libraries::
+* Glossary of SIGTRAN Terms and Acronyms::
+* References::
+* Licenses::
+@c @iftex
+@c * Indices::
+@c @end iftex
+@c @ifnottex
+* Index::
+@c @end ifnottex
+@end menu
+
+@iftex
+@c insert list of figures and tables for printed manuals
+@page
+@heading List of Figures
+@listoffloats Figure
+@page
+@heading List of Tables
+@listoffloats Table
+@end iftex
+
+@node Preface
+@unnumbered Preface
+
+@section Notice
+
+Software in this document and related software is released under the AGPL (@pxref{GNU Affero General
+Public License}).  Please note, however, that there are different licensing terms for some of the
+manual package and some of the documentation.  Consult permission notices contained in the
+documentation of those components for more information.
+
+This document is released under the FDL (@pxref{GNU Free Documentation License}) with no invariant
+sections, no front-cover texts and no back-cover texts.
+
+@section Abstract
+
+This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
+the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
+as platform and system applicability of the @value{MANUAL_TITLE}.
+
+@noindent
+This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 @value{LONG}
+(@value{SHORT}) protocol stacks.  It provides abstraction of the @value{PART} interface to these
+components as well as providing a basis for @value{PART} control for other @value{PART} protocols.
+
+@subsection Purpose
+@cpindex STREAMS
+
+The purpose of this document is to provide technical documentation of the @value{MANUAL_TITLE}.
+This document is intended to be included with the OpenSS7 @acronym{STREAMS} software package released
+by @cite{OpenSS7 Corporation}.  It is intended to assist software developers, maintainers and users
+of the @value{MANUAL_TITLE} with understanding the software architecture and technical interfaces
+that are made available in the software package.
+
+@subsection Intent
+
+It is the intent of this document that it act as the primary source of information concerning the
+@value{MANUAL_TITLE}.  This document is intended to provide information for writers of OpenSS7
+@value{MANUAL_TITLE} applications as well as writers of OpenSS7 @value{MANUAL_TITLE} Users.
+
+@subsection Audience
+
+The audience for this document is software developers, maintainers and users and integrators of the
+@value{MANUAL_TITLE}.  The target audience is developers and users of the OpenSS7 SS7 stack.
+
+@section Revision History
+
+Take care that you are working with a current version of this documentation: you will not be
+notified of updates.  To ensure that you are working with a current version, check the
+@uref{http://www.openss7.org/,OpenSS7 Project} website for a current version.
+
+A current version of this specification is normally distributed with the @cite{@value{PACKAGE_TITLE}}
+package, @file{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.openss7.org/repos/tarballs/@value{PACKAGE}-@value{VERSION}.tar.bz2}}
+
+@subsection Version Control
+
+@noindent
+Although the author has attempted to ensure that the information in this document is complete and
+correct, neither the Author nor OpenSS7 Corporation will take any responsibility in it.
+@cite{OpenSS7 Corporation} is making this documentation available as a reference point for the
+industry.  While @cite{OpenSS7 Corporation} believes that these interfaces are well defined in this
+release of the document, minor changes may be made prior to products conforming to the interfaces
+being made available.  @cite{OpenSS7 Corporation} reserves the right to revise this software and
+documentation for any reason, including but not limited to, conformity with standards promulgated by
+various agencies, utilization of advances in the state of the technical arts, or the reflection of
+changes in the design of any techniques, or procedures embodied, described, or referred to herein.
+@cite{OpenSS7 Corporation} is under no obligation to provide any feature listed herein.
+
+@smallexample
+@verbatim
+$Log: SIGTRAN.texi,v $
+Revision 1.1.2.2  2011-02-07 02:21:49  brian
+- updated manuals
+
+Revision 1.1.2.1  2009-06-21 10:59:42  brian
+- added files to new distro
+
+@end verbatim
+@end smallexample
+
+@section ISO 9000 Compliance
+
+Only the @TeX{}, texinfo, or roff source for this maual is controlled.  An opaque (printed,
+postscript or portable document format) version of this manual is a @strong{UNCONTROLLED VERSION}.
+
+@subsection Disclaimer
+
+@noindent
+@strong{@cite{OpenSS7 Corporation} disclaims all warranties with regard to this documentation
+including all implied warranties of merchantability, fitness for a particular purpose,
+non-infrincement, or title; that the contents of the manual are suitable for any purpose, or that
+the implementation of such contents will not infringe on any third party patents, copyrights,
+trademarks or other rights.  In no event shall @cite{OpenSS7 Corporation} be liable for any direct,
+indirect, special or consequential damages or any damages whatsoever resulting from loss of use,
+data or profits, whether in an action or contract, negligence or other tortious action, arising out
+of or in connection with any use of this documentation or the performance or implementation of the
+contents thereof.}
+
+@subsection U.S. Government Restricted Rights
+
+If you are licensing this Software on behalf of the U.S. Government ("Government"), the following
+provisions apply to you.  If the Software is supplied by the Department of Defense ("DoD"), it is
+classified as "Commercial Computer Software" under paragraph 252.227-7014 of the DoD Supplement to
+the Federal Aquisition Regulations ("DFARS") (or any successor regulations) and the Government is
+acquiring only the license rights granded herein (the license rights customarily provided to
+non-Government users).  If the Software is supplied to any unit or agency of the Government other
+than DoD, it is classified as "Restricted Computer Software" and the Government's rights in the
+Software are defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or any
+successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplerment
+to the FAR (or any successor regulations).
+
+@section Acknowledgements
+
+@url{http://www.openss7.org/,The OpenSS7 Project} was funded in part by:
+
+@itemize @bullet
+@item @url{http://www.monavacon.com/,Monavacon Limited}
+@item @url{http://www.openss7.com/,OpenSS7 Corporation}
+@end itemize
+
+Thanks to the subscribers to and sponsors of @url{http://www.openss7.org/, The OpenSS7 Project}.
+Without their support, open software like this would not be possible.
+
+As with most open source projects, this project would not have been possible without the valiant
+efforts and productive software of the @url{http://www.fsf.org/,Free Software Foundation}, the
+@url{http://www.kernel.org/,Linux Kernel Community}, and the open source software movement at large.
+
+@node Introduction
+@chapter Introduction
+
+@node Drivers and Modules
+@chapter Drivers and Modules
+
+@figuresized{sigtran01,1,SIGTRAN Drivers and Modules,5.0in}
+
+@node Libraries
+@chapter Libraries
+
+@node Glossary of SIGTRAN Terms and Acronyms
+@appendix Glossary of SIGTRAN Terms and Acronyms
+
+@multitable @columnfractions 0.15 0.85
+@item @dfn{ANSI} @tab American National Standards Institute
+@item @dfn{CCITT} @tab The International Telegraph and Telephone Consutative Committee, old name for ITU-T
+@item @dfn{CONS} @tab Connection-Oriented Network Service
+@item @dfn{CUD} @tab Call User Data
+@item @dfn{DCE} @tab Data Circuit-terminating Equipment
+@item @dfn{DDN} @tab Defence Data Network
+@item @dfn{DLPI} @tab Data Link Provider Interface
+@item @dfn{DLSAP} @tab Destination Link Service Access Point
+@item @dfn{DNIC} @tab Data Network Identification Code
+@item @dfn{DSAP} @tab Destination Service Access Point
+@item @dfn{DTE} @tab Data Terminal Equipment 
+@item @dfn{ENSDU} @tab Expedited Network Service Data Unit
+@item @dfn{ETSI} @tab European Telecommunications Standards Institute
+@item @dfn{HDLC} @tab High-Level Data Link Control
+@item @dfn{IEEE} @tab Institute of Electrical and Electronics Engineers
+@item @dfn{IP} @tab Internet Protocol
+@item @dfn{ISDNI} @tab ISDN Interface
+@item @dfn{ISDN} @tab Integrated Services Digital Network
+@item @dfn{ISO} @tab International Organization for Standardization
+@item @dfn{ISUPI} @tab ISUP Interface
+@item @dfn{ISUP} @tab ISDN User Part
+@item @dfn{ITU} @tab International Telecommunications Union
+@item @dfn{ITU-T} @tab ITU Telecom Sector
+@item @dfn{LAN} @tab Local Area Network
+@item @dfn{LAPB} @tab Link Access Procedure (Balanced), ISO/IEC 7776
+@item @dfn{LAPD} @tab Link Access Procedure D-Channel, Q.921
+@item @dfn{LAPF} @tab Link Access Procedure Frame Mode, Q.922
+@item @dfn{LAP} @tab Link Access Procedure
+@item @dfn{LCI} @tab Logical Channel Identifier
+@item @dfn{LLC1} @tab Logical Link Control Type 1
+@item @dfn{LLC2} @tab Logical Link Control Type 2
+@item @dfn{LLC3} @tab Logical Link Control Type 3
+@item @dfn{LLC} @tab Logical Link Control
+@item @dfn{LLI} @tab Logical Link Inteface
+@item @dfn{LSAP} @tab Link Service Access Point
+@item @dfn{MAC} @tab Media Access Control
+@item @dfn{MTPI} @tab Message Transfer Part Interface
+@item @dfn{MTP} @tab Message Transfer Part 
+@item @dfn{NLI} @tab Network Layer Interface
+@item @dfn{NPDU} @tab Network Protocol Data Unit
+@item @dfn{NPI} @tab Network Provider Interface
+@item @dfn{NPI} @tab Numbering Plan Indicator
+@item @dfn{NSAP} @tab Network Service Access Point
+@item @dfn{NSDU} @tab Network Service Data Unit
+@item @dfn{NSP} @tab Network Service Provider
+@item @dfn{NS} @tab Network Service
+@item @dfn{NSU} @tab Network Service User
+@item @dfn{NUI} @tab Network User Information
+@item @dfn{PAD} @tab Packet Assembler/Disassembler
+@item @dfn{PDN} @tab Public Data Network
+@item @dfn{PDU} @tab Protocol Data Unit
+@item @dfn{PLP} @tab Packet Layer Protocol
+@item @dfn{PPA} @tab Physical Point of Attachment
+@item @dfn{PSDN} @tab Public Switched Data Network
+@item @dfn{PSTN} @tab Public Switch Telephone Network
+@item @dfn{PVC} @tab Permanent Virtual Circuit
+@item @dfn{QOS} @tab Quality of Service
+@item @dfn{RPOA} @tab Recognized Private Operating Agency
+@item @dfn{SAP} @tab Service Access Point
+@item @dfn{SCCPI} @tab Signalling Connection Control Part Interface
+@item @dfn{SCCP} @tab Signalling Connection Control Part
+@item @dfn{SDLI} @tab Signalling Data Link Interface
+@item @dfn{SDL} @tab Signalling Data Link
+@item @dfn{SDTI} @tab Signalling Data Terminal Interface
+@item @dfn{SDT} @tab Signalling Data Terminal
+@item @dfn{SDU} @tab Service Data Unit
+@item @dfn{SLI} @tab Signalling Link Interface
+@item @dfn{SLSAP} @tab Source Link Service Access Point
+@item @dfn{SL} @tab Signalling Link
+@item @dfn{SNPA} @tab Subnetwork Point of Attachment
+@item @dfn{SSAP} @tab Source Service Access Point
+@item @dfn{SVC} @tab Switched Virtual Circuit
+@item @dfn{TCAP} @tab Transaction Capabilities Application Part
+@item @dfn{TCI} @tab Transaction Component Interface
+@item @dfn{TC} @tab Component Handling Sub-Layer
+@item @dfn{TLI} @tab Transport Layer Interface
+@item @dfn{TOA/NPI} @tab Type of Address/Numbering Plan Indicator
+@item @dfn{TOA} @tab Type of Address
+@item @dfn{TPI} @tab Transport Provider Interface
+@item @dfn{TRI} @tab Transaction Interface
+@item @dfn{TR} @tab Transaction Handling Sub-Layer
+@item @dfn{VC} @tab Virtual Circuit
+@item @dfn{WAN} @tab Wide Area Network
+@item @dfn{X.121} @tab ITU-T Recommendation X.121
+@item @dfn{X.25} @tab ITU-T Recommendation X.25
+@item @dfn{X.28} @tab ITU-T Recommendation X.28
+@item @dfn{X.3} @tab ITU-T Recommendation X.3
+@item @dfn{X.75} @tab ITU-T Recommendation X.75
+@item @dfn{XX25} @tab X.25 Programming Inteface using XTI
+@item @dfn{XXX} @tab X.3, X.28, X.29
+@end multitable
+
+@node References
+@unnumbered References
+
+@multitable @columnfractions 0.2 0.8
+
+@item [AIXlink/X.25] @anchor{AIXlink/X.25} @tab @cite{AIXlink/X.25 Version 2.1
+for AIX: Guide and Reference}, No: SC23-2520-07, Eighth Edition, September 2006,
+(Bolder, CO), International Business Machine Corp., IBM.
+@uref{http://publibn.bould.ibm.com/,IBM Documentation Library}.
+
+@item [ARTIC WAN] @anchor{ARTIC WAN} @tab @cite{ARTIC STREAMS Support WAN Driver
+Interface Reference}, Release 1.7, June 2004, (Hillsboro, OR), RadiSys
+Corporation, RadiSys. [Doc No: 007-01232-0003], @uref{http://www.radisys.com/,
+RadiSys Support Documentation}.
+
+@item [CDI] @anchor{CDI} @tab @cite{OpenSS7 CAE Specification: Communications
+Device Interface (CDI) Specification}, Revision @value{PACKAGE_VERSION}, Draft
+@value{PACKAGE_RELEASE}, @value{PACKAGE_PDATE}, (Edmonton, Canada), B.
+Bidulock, OpenSS7 Corporation.  Distributed with package @file{strxns-0.9.2}
+and @file{openss7-0.9.2}.  @url{http://www.openss7.org/docs/cdi.pdf, OpenSS7
+Documents}.
+
+@item [DLPI] @anchor{DLPI} @tab @cite{Open Group CAE Specification: Data Link
+Provider Interface (DLPI) Specification}, Revision 2.0.0, Draft 2, August 20,
+1992, (Reprinted @value{PACKAGE_PDATE}) (Parsippany, New Jersey), UNIX
+International, Inc., UNIX International Press.
+@uref{http://www.opengroup.org/onlinepubs/,The Open Group},
+@uref{http://www.openss7.org/docs/dlpi.pdf,The OpenSS7 Project}.
+
+@item [IRIS SX.25] @anchor{IRIS SX.25} @tab @cite{IRIS SX.25 NLI Programmer's
+Guide}, 1995, (Mountainview, CA), Silicon Graphics, Inc., SGI Technical
+Publications. [No: 007-2268-002]. @uref{http://techpubs.sgi.com/,SGI Technical
+Publications}.
+
+@item [ISO3309] @anchor{ISO3309} @tab @b{ISO/IEC 3309:1988}, @cite{Information
+Technology -- Data Communications -- High-Level Data Link Control procedures --
+Frame Structure}, 1988, ISO/IEC, International Orgianization for
+Standardization.  @uref{http://www.iso.org/,International Organization for
+Standardization}.
+
+@item [ISO7776] @anchor{ISO7776} @tab @b{ISO/IEC 7776:1995}, @cite{Information
+technology --- Telecommunications information exchange between systems ---
+High-level data link control procedures --- Description of the X.25
+LAPB-compatible DTE data link procedures}, Second Edition, July 1, 1995,
+International Organization for Standardization.
+@uref{http://www.iso.org/,International Organization for Standardization}.
+
+@item [ISO8208] @anchor{ISO8208} @tab @b{ISO/IEC 8208:2000}, @cite{Information
+Technology --- Data Communications --- X.25 Packet Layer Protocol for Data
+Terminal Equipment}, Fourth Edition, November 1, 2000, (Geneva), ISO/IEC,
+International Organization for Standardization.
+@uref{http://www.iso.org/,International Organization for Standardization}.
+
+@item [ISO8802-2] @anchor{ISO8802-2} @tab @b{ANSI/IEEE Standard 802.2-1998
+[ISO/IEC 8802-2:1998]}, @cite{IEEE Standard for Information Technology ---
+Telecommunications and Information Exchange Between Systems --- Local and
+Metropolitan Area Networks --- Specific Requirements --- Part 2: Logical Link
+Control}, May 7, 1998, (New York), ANSI/IEEE, IEEE Computer Society. [ISBN
+1-55937-959-6]. @uref{http://www.ieee.org/,Institute of Electrical and
+Electronics Engineers}.
+
+@item [ISO8881] @anchor{ISO8881} @tab @b{ISO/IEC 8881:1989}, @cite{Information
+Processing Systems --- Data Communications --- User of the X.25 Packet Level
+Protocol in Local Area Networks}, 1989, ISO/IEC, International Organization for
+Standardization. @uref{http://www.iso.org/,International Organization for
+Standardization}.
+
+@item [X.25] @tab @cite{ITU-T Recommendation X.25}.
+
+@item [X.29] @tab @cite{ITU-T Recommendation X.29}.
+
+@item [NPI] @anchor{NPI} @tab @cite{Open Group CAE Specification: Network
+Provider Interface (NPI) Specification}, Revision 2.0.0, Draft 2, August 17,
+1992, (Parisppany, New Jersey), UNIX International, Inc., UNIX International
+Press.  @uref{http://www.openss7.org/docs/npi.pdf,The OpenSS7 Project}.
+
+@item [Solstice X.25] @anchor{Solstice X.25} @tab @cite{Solstice X.25 9.2
+Administration Guide}, October 1999, (Palo Alto, CA), Sun Microsystems, Inc.,
+Sun. [Part No: 806-1234-10], @uref{http://docs-pdf.sun.com/, Solaris
+Documentation}.
+
+@item [TPI] @anchor{TPI} @tab @cite{Open Group CAE Specification: Transport
+Provider Interface (TPI) Specification}, Revision 2.0.0, Draft 2, 1999,
+(Berkshire, UK), Open Group, Open Group Publication.
+@uref{http://www.opengroup.org/onlinepubs/,The Open Group},
+@uref{http://www.openss7.org/docs/tpi.pdf,The OpenSS7 Project}.
+
+@item [V.25 bis] @anchor{V.25 bis} @tab @b{ITU-T Recommendation V.25 bis (10/96)},
+@cite{Synchronous and asynchronous automatic dialing procedures on switched
+networks}, October 1996, (Geneva), ITU, ITU-T Telecommunication Standardization
+Sector of ITU, (Previously ``CCITT Recommendation''),
+@url{http://www.itu.int/rec/T-REC-V.25bis/en/ T-REC-V.25bis}.
+
+@item [X.21] @anchor{X.21} @tab @b{ITU-T Recommendation X.21 (09/92)},
+@cite{Interface between Data Terminal Equipment (DTE) and Data
+Circuit-terminating Equiment (DCE) for synchronous operation on Public Data
+Networks}, September 1992, (Geneva), ITU, ITU-T Telecommunication
+Standardization Sector of ITU.  (Previously ``CCITT Recommendation''),
+@url{http://www.itu.int/rec/T-REC-X.21/en/, T-REC-X.21}.
+
+@item [X.21 bis] @anchor{X.21 bis} @tab @b{ITU-T Recommendation X.21 bis (03/88)},
+@cite{Use on Public Data Networks of Data Terminal Equipment (DTE) which is
+designed for interfacing to synchronous V-series modems}, March 1988, (Geneva),
+ITU, ITU-T Telecommunication Standardization Sector of ITU. (Previously ``CCITT
+Recommendation''), @url{http://www.itu.int/rec/T-REC-X.21bis/en/,
+T-REC-X.21bis}.
+
+@item [X.25] @anchor{X.25} @tab @b{ITU-T Recommendation X.25}.
+@url{http://www.itu.int/rec/T-REC-X.25/en/, T-REC-X.25}.
+
+@item [X.75] @anchor{X.75} @tab @b{ITU-T Recommendation X.75}.
+@url{http://www.itu.int/rec/T-REC-X.75/en/, T-REC-X.75}.
+
+@item [X.29] @anchor{X.29} @tab @b{ITU-T Recommendation X.29}.
+@url{http://www.itu.int/rec/T-REC-X.29/en/, T-REC-X.29}.
+
+@item [XX25] @anchor{XX25} @tab @cite{X/Open CAE Specification: X.25 Programming
+Interface using XTI (XX25)}, No. c411, November 1995, (Berkshire, UK), X/Open,
+Open Group Publication. [ISBN: 1-85912-136-5].
+@uref{http://www.opengroup.org/onlinepubs/,The Open Group}.
+
+@end multitable
+
+@node Licenses
+@unnumbered Licenses
+@cindex licenses
+
+All code presented in this manual is licensed under the @ref{GNU Affero General Public License}.
+The text of this manual is licensed under the @ref{GNU Free Documentation License}, with no
+invariant sections, no front-cover texts and no back-cover texts.  Please note, however, that it is
+just plain wrong to modify statements of, or attribute statements to, the Author or @cite{OpenSS7
+Corporation}.
+
+@menu
+* GNU Affero General Public License::
+* GNU Free Documentation License::
+@end menu
+
+@include texi/agpl3.texi
+@page
+@include texi/fdl13.texi
+
+@ifnotplaintext
+@c skip indexes for plain text (regex search works better)
+@c @iftex
+@c @node Indices
+@c @unnumbered Indices
+@c @end iftex
+
+@c @ifnottex
+@c @c concatenate indices for html and info
+@node Index
+@unnumbered Index
+@printindex cp
+@c @end ifnottex
+
+@c @iftex
+@c @menu
+@c * Concept Index::
+@c * Protocol State Index::
+@c * Primitive Index::
+@c * Primitive Structure and Type Index::
+@c * Primitive Structure Field Index::
+@c * Primitive Values Index::
+@c * Primitive Error Values Index::
+@c * Input-Output Control Index::
+@c * MIB Object Index::
+@c * Manual Page Index::
+@c @end menu
+@c 
+@c @node Concept Index
+@c @section Concept Index
+@c @printindex cp
+@c 
+@c @page
+@c @node Protocol State Index
+@c @section Protocol State Index
+@c @printindex st
+@c 
+@c @page
+@c @node Primitive Index
+@c @section Primitive Index
+@c @printindex pr
+@c 
+@c @page
+@c @node Primitive Structure and Type Index
+@c @section Primitive Structure and Type Index
+@c @printindex tp
+@c 
+@c @page
+@c @node Primitive Structure Field Index
+@c @section Primitive Structure Field Index
+@c @printindex vr
+@c 
+@c @page
+@c @node Primitive Values Index
+@c @section Primitive Values Index
+@c @printindex pv
+@c 
+@c @page
+@c @node Primitive Error Values Index
+@c @section Primitive Error Values Index
+@c @printindex pe
+@c 
+@c @page
+@c @node Input-Output Control Index
+@c @section Input-Output Control Index
+@c @printindex ct
+@c 
+@c @page
+@c @node MIB Object Index
+@c @section MIB Object Index
+@c @printindex mo
+@c 
+@c @page
+@c @node Manual Page Index
+@c @section Manual Page Index
+@c @printindex mp
+@c @end iftex
+@end ifnotplaintext
+
+@page
+@shortcontents
+@page
+@contents
+@bye

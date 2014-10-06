@@ -1,0 +1,492 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: llc2_tnioc.5.man,v 1.1.2.1 2011-02-07 02:14:40 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:14:40 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: llc2_tnioc.5.man,v $
+.\" Revision 1.1.2.1  2011-02-07 02:14:40  brian
+.\" - added manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.ad b
+.hy 1
+.\"
+.\"
+.TH LLC2_TNIOC 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.\"
+.\"
+.SH NAME
+.B llc2_tnioc
+\- LLC2 tunable parameter input-output control structure
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR "Logical Link Interface (LLI)" ,
+.[
+lli revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@
+.]
+.BR lli (7),
+.IR STREAMS (9).
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/snet/ll_proto.h>
+.br
+.B #include <sys/snet/ll_control.h>
+.PP
+.nf
+\f(CW\s-1\
+struct llc2_tnioc {
+    uint8_t lli_type;           /* LI_LLC2TUNE */
+    uint8_t lli_spare[3];
+    uint32_t lli_snid;
+    struct llc2tune llc2_tune;
+};
+
+typedef struct llc2tune {
+    uint16_t N2;                /* max numb retransmissions */
+    uint16_t T1;                /* ack timer (deciseconds) */
+    uint16_t Tpf;               /* poll timer (deciseconds) */
+    uint16_t Trej;              /* reject timer (deciseconds) */
+    uint16_t Tbusy;             /* busy timer (deciseconds) */
+    uint16_t Tidle;             /* idle timer (deciseconds) */
+    uint16_t ack_delay;         /* ack delay timer (deciseconds) */
+    uint16_t notack_max;        /* max unacked I-frames */
+    uint16_t tx_window;         /* transmit window (no XID) */
+    uint16_t tx_probe;          /* window probe position */
+    uint16_t max_I_len;         /* max I-frame size */
+    uint16_t xid_window;        /* XID window size (receive window) */
+    uint16_t xid_Ndup;          /* dup MAC XID count */
+    uint16_t xid_Tdup;          /* dup MAC XID time (deciseconds) */
+} llc2tune_t;
+\s+1\fP
+.fi
+.\"
+.\"
+.SH MEMBERS
+.PP
+The members of the
+.B ll_tnioc
+structure include:
+.TP \w'\ sabm_in_x32\(em'u
+.I lli_type
+The type of LLI structure: always \fB\)LI_LLC2TUNE\fP.
+.PD 0
+.TP
+.I lli_spare
+Spare bytes for alignment.
+.TP
+.I lli_snid
+Subnetwork (link) identifier.
+.TP
+.I llc2_tune
+LLC2 tunable parameter structure.
+.PD
+.PP
+The members of the
+.B llc2tune
+structure include:
+.TP \w'\ sabm_in_x32\(em'u
+.I N2
+Maximum number of retransmissions.
+.PD 0
+.TP
+.I T1
+Acknowledgement timer.
+.TP
+.I Tpf
+Poll timer.
+.TP
+.I Trej
+Reject timer.
+.TP
+.I Tbusy
+Busy timer.
+.TP
+.I Tidle
+Idle timer.
+.TP
+.I ack_delay
+Acknowledgement delay.
+.TP
+.I notack_max
+Maximum number of unacknowledged I-frames.
+.TP
+.I tx_window
+Transmit window.
+.TP
+.I tx_probe
+Transmit window probe position.
+.TP
+.I max_I_len
+Maximum I-frame length.
+.TP
+.I xid_window
+XID window size (receive window).
+.TP
+.I xid_Ndup
+Duplicate MAC XID count.
+.TP
+.I xid_Tdup
+Duplicate MAC XID time.
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B llc2_tnioc
+structure is used the provide LLC2 tunable parameters and related information
+for use with the
+.BR L_GETTUNE "(7) and " L_SETTUNE (7)
+input-output control commands from the
+.IR "Link Layer Interface (LLI)" ,
+.[
+lli revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@
+.]
+.BR lli (7).
+.PP
+The
+.B llc2_tnioc
+structure, and the corresponding input-output controls, are used primarily by
+the
+.BR lltune (8)
+utility, but may be used directly by user-space programs.
+.PP
+This structure is used for LLC2, and other structures are used for LAPB,
+.BR lapb_tnioc (5),
+and MLP,
+.BR mlp_tnioc (5).
+.PP
+The members of the
+.B llc2_tnioc
+structure are described as follows:
+.TP
+.I lli_type
+Specifies the type of the structure.  For the
+.B llc2_tnioc
+structure, this member is always set to
+.BR LI_LLC2TUNE .
+.TP
+.I lli_spare
+Spare bytes for alignment: set to zero by the initiator and ignore by the
+responder.
+.TP
+.I lli_snid
+Specifies the subnetwork (link) identifier of the link to tune.
+.TP
+.I llc2_tune
+Specifies the tunable LLC2 parameters.
+.PP
+The members of the
+.B llc2tune
+structure are described as follows:
+.TP
+.I N2
+The maximum number of times that a protocol data unit (PDU) is sent following
+the expiry of the acknowledgement timer, the P-bit timer, or the reject
+timer.  It also limits the number of times an RR with the P-bit set is sent
+when remote busy is true and the busy timer expires.
+.TP
+.I T1
+The time during which the LLC2 expects to receive an acknowledgement to an
+outstanding I-PDU or an expected response to a sent UI-PDU.  The value is in
+units of 0.1 seconds.
+.TP
+.I Tpf
+The time during which the LLC2 expects to receive a PDU with the F-bit set to
+1 in response to a command with the P-bit set to 1.  The value should be less
+than the acknowledgement timer.  The value is in units of 0.1 seconds.
+.TP
+.I Trej
+The time during which the LLC2 expects to receive a reply to a sent REJ PDU.
+The value is in units of 0.1 seconds.
+.TP
+.I Tbusy
+The time during which the LLC2 waits for an indication of the clearance of
+busy condition at the other LLC2.  The value is in units of 0.1 seconds.
+.TP
+.I Tidle
+The time during which the LLC2 expects to receive a PDU from the other LLC2.
+If it expires then the P/F cycle is initiated which may result in link
+disconnection.  The value is in units of 0.1 seconds.
+.TP
+.I ack_delay
+The maximum delay in 0.1 second units before transmitting a delayed RR.  This
+must be considerably less than the acknowledgement timer value.
+.TP
+.I notack_max
+The maximum number of unacknowledged receive I PDUs before the RR
+acknowledging them all must be sent.
+.TP
+.I tx_window
+The number of unacknowledged I PDUs which may be sent.
+.TP
+.I tx_probe
+The potion before the window is closed at which an I PDU is sent with the
+P-bit set to solicit an acknowledgement from the receiver.
+.TP
+.I max_I_len
+The maximum size of a LLC2 I-frame.  LLC2 requires all incoming I-frames
+above a certain size to be rejected by a FRMR.  This parameter specifies the
+maximum size.  It is constructed as (maximum X.25 data size + X.25 protocol
+length + LLC2 protocol length).
+.TP
+.I xid_window
+The XID window size (receive window), when the remote window size is unknown
+or zero.
+.TP
+.I xid_Ndup
+The duplicate MAC XID count (0 means no test).
+.TP
+.I xid_Tdup
+The duplicate MAC XID time.  The value is in units of 0.1 seconds.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B @includedir@/snet/ll_proto.h
+Defines the link classes.
+.TP
+.B @includedir@/snet/ll_control.h
+Defines the
+.B llc2_tnioc
+and
+.B llc2tune
+structures.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR lltune (8),
+.BR llc2template (5),
+.BR llc2tune (5),
+.BR llc2 (4),
+.BR L_SETTUNE (7),
+.BR L_GETTUNE (7),
+.BR lli (7).
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.B llc2_tnioc
+structure has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B llc2_tnioc
+structure is compatible with
+.IR "SpiderX25" ,
+.[
+spiderx25
+.]
+and implementations based on
+.IR "SpiderX25" ,
+such as
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+There are fine differences between the implementations in the precise fields
+and flags used in the
+.BR llc2tune (5)
+structure.
+.IP \(em
+Source compatibility is attempted.  Binary compatibility is not guaranteed.
+.PP
+For additional compatibility information see,
+.BR llc2 (4),
+and
+.BR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The
+.IR "Link Layer Interface (LLI)" ,
+.[
+lli revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@
+.]
+.BR lli (7),
+structures are not standardized; however,
+.B @PACKAGE_TITLE@
+conforms to
+.IR "SpiderX25" ,
+.[
+spiderx25
+.]
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B llc2_tnioc
+structure first appeared in
+.IR "Spider X.25" .
+.[
+spiderx25
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

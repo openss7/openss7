@@ -1,0 +1,396 @@
+@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
+@c =========================================================================
+@c
+@c @(#) $Id: kmod.texi,v 1.1.2.2 2011-08-07 11:14:27 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to copy, distribute and/or modify this document
+@c under the terms of the GNU Free Documentation License, Version 1.3 or
+@c any later version published by the Free Software Foundation; with no
+@c Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+@c copy of the license is included in the section entitled "GNU Free
+@c Documentation License".
+@c
+@c Permission to use, copy and distribute this documentation without
+@c modification, for any purpose and without fee or royalty is hereby
+@c granted, provided that both the above copyright notice and this
+@c permission notice appears in all copies and that the name of OpenSS7
+@c Corporation not be used in advertising or publicity pertaining to
+@c distribution of this documentation or its contents without specific,
+@c written prior permission.  OpenSS7 Corporation makes no representation
+@c about the suitability of this documentation for any purpose.  It is
+@c provided "as is" without express or implied warranty.
+@c 
+@c Permission is granted to process this file through Tex and print the
+@c results, provided the printed document carries copying permission notice
+@c identical to this one except for the removal of this paragraph (this
+@c paragraph not being relevant to the printed manual).
+@c 
+@c OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+@c DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+@c FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+@c CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+@c IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+@c PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+@c OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+@c CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+@c USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+@c OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+@c THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+@c THEREOF.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not have
+@c taken the same level of care in the production of this manual, which is
+@c licensed free of charge, as they might when working professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by the
+@c source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2011-08-07 11:14:27 $ by $Author: brian $
+@c
+@c =========================================================================
+
+@menu
+* Kernel Module Building::
+* Kernel Module Updates::
+* Kernel Module Packages::
+@end menu
+
+Developing Linux Fast-STREAMS kernel modules is similar to user space programs with regard to header
+files.  @file{/usr/include/openss7} should be placed as an include directory to search on the
+@command{gcc} command line.  The rules for compiling @cite{Linux} kernel modules and the rules for
+compiling @acronym{STREAMS} modules and drivers should be followed.  In particular, several
+important intricacies should be considered:
+
+@itemize @bullet
+
+@item The @command{gcc} compiler used to compile the kernel modules must be the same version of
+compiler that was used to compile the kernel and @acronym{STREAMS} base package.
+
+@item The @command{gcc} command line must have the same compile flags that were used to compile the
+kernel and @acronym{STREAMS} base package.  @command{kbuild} can be used to accomplish this.
+
+@item The @command{gcc} command line must define several important kernel defines including
+@samp{-DLINUX}, @samp{-D__KERNEL__}, as well as the base name of the module.  Again, @command{kbuild}
+can be used to accomplish this.
+
+@item The @command{gcc} command line must include several important files directly on the command
+line, such as, @samp{--include /@-lib/@-modules/@-@value{_kversion}/@-build/@-include/@-linux/@-autoconf.h} and
+@samp{--include /@-lib/@-modules/@-@value{_kversion}/@-build/@-include/@-linux/@-modversions.h}.@footnote{The
+kernel version, @samp{@value{_kversion}}, is just an example.  For the running kernel, use the
+output of @samp{uname -r}.}
+
+@end itemize
+
+@node Kernel Module Building
+@subsection Kernel Module Building
+
+Support is provided for the development of Linux Fast-STREAMS kernel modules using @cite{Kbuild}.
+
+@ref{example:kbuild} provides an example listing of a @cite{Kbuild} makefile for building the
+@file{example} driver.
+
+@cartouche
+@float Example,example:kbuild
+@caption{@emph{Example Kbuild Makefile}}
+@smallexample
+MDIR := $(PWD)
+KDIR := /lib/modules/$(shell uname -r)/build
+obj-m := streams_example.o
+streams_example-objs := example.o
+moduledir = /lib/modules/$(shell uname -r)/extra/
+
+all: modules
+modules:
+        rm -f -- Module.symvers
+        cp /usr/src/openss7/$(shell uname -r)/Module.symvers .
+        $(MAKE) -C $(KDIR) M=$(MDIR) modules MODFLAGS='-DMODULE -I/usr/include/openss7'
+
+clean-modules:
+        rm -f -- example.o .example.o.cmd
+        rm -f -- Module.markers Module.symvers
+        rm -f -- streams_example.ko .streams_example.ko.cmd
+        rm -f -- streams_example.mod.c streams_example.mod.o .streams_example.mod.o.cmd
+        rm -f -- streams_example.o .streams_example.o.cmd
+        rm -rf -- .tmp_versions
+
+install-modules:
+        mkdir -p $(moduledir)
+        cp streams_example.ko $(moduledir)/streams_example.ko
+        test -z "$RPM_BUILD_ROOT" || exit 0
+        /sbin/openss7-modules -- --kversion "$(shell uname -r)" --add-modules
+
+remove-modules:
+        rm -f -- $(moduledir)/streams_example.ko
+        test -z "$RPM_BUILD_ROOT" || exit 0
+        /sbin/openss7-modules -- --kversion "$(shell uname -r)" --remove-modules
+@end smallexample
+@end float
+@end cartouche
+
+Note that the necessary header files are contained in the @file{@value{PACKAGE}-devel} binary
+package, and the needed @file{Module.symvers} file is contained in the
+@file{@value{PACKAGE}-devel-$(uname -r)} package.
+
+@node Kernel Module Updates
+@subsection Kernel Module Updates
+@cindex kernel module updates
+
+Kernel modules can be built and installed so that they are automatically updated when kernels are
+updated (primarily for security updates), without having to be recompiled or reinstalled.  The
+@cite{OpenSS7} kernel modules packages support weak updates across a wide range of kernel versions
+from a single set of kernel modules, and also automatically performs weak update of client-supplied
+dependent kernel modules.
+
+Each distribution has a slightly different approach (detailed in the sub-sections that follow).
+@cite{RedHat}/@cite{Fedora} uses the @command{/sbin/weak-modules} script to perform weak updates of
+modules in the @file{extra} kernel modules subdirectory; @cite{SuSE} uses the
+@command{/usr/lib/module-init-tools/weak-modules} or
+@command{/usr/lib/module-init-tools/weak-modules2} scripts, to update weak modules in the
+@file{updates}, or @file{updates} or @file{extra}, kernel module subdirectories, resp.
+@cite{Debian} systems tend to use the @cite{Dell} Dynamic Kernel Module System (DKMS), which is
+triggered by the installation or removal of a kernel.
+
+All of these scripts and approaches are lacking in some number of aspects: therefore, the
+@cite{OpenSS7} package uses a supplied @command{openss7-modules} script that performs the necessary
+actions.  The additional features of the @manpage{openss7-modules(8)} script are detailed in its
+manual page, however, following are some of its features:
+
+@itemize @bullet
+@item @manpage{openss7-modules(8)} will consider for compatibility and relink any kernel modules
+that depend (or rely) upon an absolute symbol address in a given kernel.  Neither the
+@cite{RedHat}/@cite{Fedora}, @cite{SuSE Code 10}, @command{weak-modules} scripts, nor the @cite{SuSE
+Code 11} @command{weak-modules2} scripts know about absolute symbols, so both can weak-update kernel
+modules that are incompatible with a given kernel (due to unsatisfied absolute symbol dependencies).
+Only a run of the @manpage{openss7-modules(8)} script after any of these weak-modules scripts will
+correct this.
+
+@item @manpage{openss7-modules(8)} understands weak symbols (both exported and absolute), and will
+relink or allow the kernel module loader to conditionally link any weak symbols that are compatible
+with the updated module.  Both the @cite{RedHat}/@cite{Fedora} and @cite{SuSE Code 10/11}
+@command{weak-modules} scripts use @manpage{modprobe(8)} with the @option{--dump-modversions} option
+to determine which kernel modules are compatible with which kernels.  However, this does not
+consider versions for weak symbols and will fail to update a kernel module that has a weak symbol
+that is not satisfied by the kernel under consideration.  The @cite{SuSE Code 11}
+@command{weak-moduels2} script does not have this problem because it uses @manpage{depmod(8)} to
+determine module compatibility and @manpage{depmod(8)} understands and properly handles versions for
+weak symbols.
+
+@item @manpage{openss7-modules(8)} considers all install modules, regardless of whether they are
+install using a kernel module @manpage{rpm(8)} package, or whether they are install manually; and,
+regardless of which kernel module subdirectory in which they reside (other than the @file{kernel}
+subdirectory).  The @cite{RedHat}/@cite{Fedora} @command{weak-modules} script only considers weak
+updates from the @file{extra} subdirectory to the @file{weak-updates} subdirectory.  The @cite{SuSE
+Code 10} @command{weak-modules} script only considers weak updates from the @file{updates}
+subdirectory to the @file{weak-updates} subdirectory.  The @cite{SuSE Code 11}
+@command{weak-modules2} script considers weak updates from the @file{updates} and @file{extra}
+directories to the @file{weak-updates/updates} and @file{weak-updates/extras} subdirectories.  The
+@cite{RedHat}/@cite{Fedora} and @cite{SuSE Code 10} @command{weak-modules} scripts update kernel
+modules regardless of whether they belong to @manpage{rpm(8)} packages or not, the @cite{SuSE Code
+11} @command{weak-modules2} script will only update kernel modules that belong to properly formatted
+@cite{SuSE Code 11} kernel module @manpage{rpm(8)} packages.
+
+@item @manpage{openss7-modules(8)} will weak-update kernel modules from older kernels with kernel
+modules from new kernels in a given kernel allowing client-supplied kernel modules to be out of
+synchronization with the kernel versions for which @cite{STREAMS} is installed.  The
+@cite{RedHat}/@cite{Fedora} and @cite{SuSE Code 10} @command{weak-modules} scripts only consider
+symbol sets from a single other kernel version.
+
+@item @manpage{openss7-modules(8)} is run at boot time (when necessary) to ensure that kernel
+modules are appropriately updated before the @cite{STREAMS} subsystem is loaded.
+
+@item @manpage{openss7-modules(8)} does not create not update initial ramdisk nor ramfs images.
+
+@end itemize
+
+@subsubsection RedHat Systems
+
+On recent @cite{RedHat} distributions and clones (e.g., @cite{Fedora}, @cite{RHEL}, @cite{CentOS},
+@cite{PUIAS}, @cite{Scientific}, @cite{Oracle}), this can be accomplished without building an RPM,
+by simply installing the kernel modules into @file{/lib/modules/$(uname -r)/extra}, where
+@file{$(uname -r)} is the name of the kernel for which the modules were compiled.
+
+When the kernel is updated, the script @file{/sbin/weak-modules} will be run and will examine
+modules contained in the @file{extra} sub-directory for other kernel versions and determine whether
+the new kernel (and compatible modules) provides the same symbols as the old kernel (and compatible
+modules).  When the existing module is compatible with the new kernel, a symbolic link is added to
+the @file{/lib/modules/@i{newversion}/weak-updates} sub-directory that link to the module in the
+older kernel's @file{/lib/modules/@i{oldversion}/extra} sub-directory.
+
+For this mechanism to work completely the @file{/sbin/weak-modules} script must be invoked with the
+@option{--add-modules} option when installing the modules, and with the @option{--remove-modules}
+option when removing the modules.
+
+The @file{/sbin/weak-modules} script provided with even current @cite{RHEL} releases is somewhat
+flawed and is not always able to update kernel modules built against @cite{STREAMS} kernel modules.
+Therefore, the supplied @manpage{awk(1)} script @file{/sbin/openss7-modules} should be used in its
+stead.  It is invoked with the @option{--add-modules} and @option{--remove-modules} options in the
+same fashion as @file{/sbin/weak-modules}; however, it is not necessary to provide a list of modules
+on the standard input of the command.
+
+On @cite{RedHat} systems it is also possible to provide weak updates by creating kernel module
+packages.  @xref{Kernel Module Packages}.
+
+@subsubsection SuSE Systems
+
+@subsubheading SuSE Code 10 Systems
+
+On @cite{SuSE Code 10} distributions and clones (e.g., @cite{SLES}, @cite{SLED}, @cite{OpenSuSE}),
+weak updates can be accomplished without building an RPM, by simply installing the kernel modules
+into @file{/lib/modules/$(uname -r)/updates}, where @file{$(uname -r)} is the name of the kernel for
+which them modules were compiled.
+
+When the kernel is updated, the script @file{/usr/lib/module-init-tools/weak-modules} will be run an
+will examine modules contained in the @file{updates} sub-directory for the other kernel versions and
+determine whether the new kernel (and compatible modules) provides the same symbols as the old
+kernel (and compatible modules).  When the existing module is compatible with the new kernel, a
+symbolic link is added to the @file{/lib/modules/@i{newversion}/weak-updates} subdirectory that link
+to the module in the older kernel's @file{/lib/modules/@i{oldversion}/updates} sub-directory.
+
+For this mechanism to work completely, the @file{/usr/lib/module-init-tools/weak-modules} script
+must be invoked with the @option{--add-modules} option when installing the modules, and with the
+@option{--remove-modules} option when removing the modules.
+
+The @file{/sbin/weak-modules} script provided with even current @cite{SuSE} releases is somewhat
+flawed and is not always able to update kernel modules built against @cite{STREAMS} kernel modules.
+Therefore, the supplied @manpage{awk(1)} script @file{/sbin/openss7-modules} should be used in its
+stead.  It is invoked with the @option{--add-modules} and @option{--remove-modules} options in the
+same fashion as @file{/usr/lib/module-init-tools/weak-modules}; however, it is not necessary to
+provide a list of modules on the standard input of the command.
+
+@subsubheading SuSE Code 11 Systems
+
+On recent @cite{SuSE Code 11} distributiones (e.g., @cite{SLES}, @cite{SLED}, @cite{OpenSUSE}), weak
+updates cannot normally be accomplished without building a kernel module package (KMP) RPM.
+@xref{Kernel Module Packages}.
+
+Nevertheless, the @cite{OpenSS7} @file{/sbin/openss7-modules} script is equally suitable for use with
+@cite{SuSE Code 11} systems as it is for use with @cite{SuSE Code 10} systems.
+
+@subsubsection Debian Systems
+
+On recent @cite{Debian} distributions and clones (e.g., @cite{Debian}, @cite{Ubuntu}, @cite{Mint}),
+weak updates are not normally performed.  It is more typical for the system to use the @cite{Dell}
+Dynamic Kernel Module System (DKMS), especially for @cite{Ubuntu}.
+
+@node Kernel Module Packages
+@subsection Kernel Module Packages
+@cindex kernel module packages
+@cindex KMP
+
+On recent distributions, it is possible to create a kernel module package (KMP) RPM for STREAMS
+modules or drivers in a very easy and straight-forward way.
+
+@cartouche
+@float Example,example:kmp
+@caption{@emph{Example Kernel Module Package}}
+@smallexample
+@verbatim
+# norootforbuild
+
+Name: STREAMS module example
+BuildRequires: %kernel_module_package_buildreqs
+License: GPL
+Group: System/Kernel
+Summary: Sample STREAMS module Kernel Module Package
+Version: 1.0
+Release: 0
+Source0: %{name}-%{version}.tar.bz2
+BuildRoot: %{_tmppath}/%{name}-%{version}-build
+
+%kernel_module_package -x debug -x trace
+
+%description
+This package contains the streams_example.ko module.
+
+%prep
+%setup
+set -- *
+mkdir source
+mv "$@" source/
+mkdir obj
+
+%build
+for flavor in %flavors_to_build; do
+    rm -rf obj/$flavor
+    cp -r source obj/$flavor
+    make -C obj/$flavor
+done
+
+%install
+export INSTALL_MOD_PATH=$RPM_BUILD_ROOT
+export INSTALL_MOD_DIR=updates
+for flavor in %flavors_to_build; do
+    make -C obj/$flavor install-modules
+done
+
+%changelog
+*  Tue Feb 15 2011 - bidulock@openss7.org
+- Initial package.
+@end verbatim
+@end smallexample
+@end float
+@end cartouche
+
+@noindent
+The example uses several macros that are now commonly provided by both @cite{RedHat} and @cite{SUSE}
+systems (although they are implemented different ways).  Kernel module packages that are build in
+this way will have @command{weak-module} or @command{weak-module2} updates applied when installed
+and when a kernel is installed.
+
+In general, you can follow the instructions for developing kernel module packages for the
+distribution for which you are generating them.  When using the distribution approach (invoking
+@command{weak-modules} or @command{weak-modules2} from @code{%post} and @code{%preun}), there are
+several limitations of the distribution's packaging system that must be considered as follows:
+
+@itemize @bullet
+
+@item Typically, the distribution build system can build kernel modules for kernel for which there
+is no kernel actually installed.  This is also possible with kernel modules built against
+@cite{STREAMS}.  However, when the kernel modules are installed, the kernel modules provinging
+@cite{STREAMS} must also be present for the kernel in which the dependent modules are installed;
+otherwise, the @command{weak-modules} script will fail to update them.  Therefore, for
+@cite{RedHat}/@cite{Fedora} and @cite{SuSE Code 10} systems, it is necessary to require that the
+equivalent kernel modules package for @cite{OpenSS7} is installed.
+
+Unfortunately, this cannot be accomplished using the @code{%kernel_module_package} rpm spec file
+macro, and the macro must be expanded and altered.
+
+@item
+
+@end itemize
+

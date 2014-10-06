@@ -1,0 +1,1 @@
+.so man7/DL_TEST_IND.7.man

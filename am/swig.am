@@ -1,0 +1,351 @@
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
+## =============================================================================
+## 
+# @(#) $RCSfile: swig.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-03-17 07:01:28 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU Affero General Public License as published by the Free
+## Software Foundation; version 3 of the License.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+## details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+## write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+## 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2011-03-17 07:01:28 $ by $Author: brian $
+##
+## =============================================================================
+
+SWIG_INCLUDES		= -I$(top_builddir)/src/include -I$(top_srcdir)/src/include
+
+-include ./$(DEPDIR)/modules.Pi
+
+$(DEPDIR)/modules.Pi: Makefile
+	$(AM_V_at)test -d $(DEPDIR) || $(MKDIR_P) $(DEPDIR)
+	@$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "Creating $@ dependencies..." ; \
+	( \
+		wrappers='$(swig_WRAPPERS)' ; for w in $$wrappers ; do \
+			b=`echo $$w | sed -r 's,\.c(xx)?$$,,;s,/,-,g;s,[^[:alnum:]-],_,g'` ; \
+			echo "sinclude ./$(DEPDIR)/$$b.Pc" ; \
+		done \
+	) >$(DEPDIR)/modules.Tpi || { rm -f $(DEPDIR)/modules.Tpi ; exit 1 ; } ; \
+	$(am__mv) $(DEPDIR)/modules.Tpi $@
+
+DISTCLEANFILES += $(DEPDIR)/modules.Tpi $(DEPDIR)/modules.Pi
+
+distclean-modules_Pi:
+	@( \
+		echo "$(DEPDIR)/modules.Tpi" ; \
+		echo "$(DEPDIR)/modules.Pi" ; \
+		wrappers='$(swig_WRAPPERS)' ; for w in $$wrappers ; do \
+			b=`echo $$w | sed -r 's,\.c(xx)?$$,,;s,/,-,g;s,[^[:alnum:]-],_,g'` ; \
+			echo "$(DEPDIR)/$$b.Tpc" ; \
+			echo "$(DEPDIR)/$$b.Pc" ; \
+		done \
+	) | $(am__base_remove)
+
+DISTCLEAN_LOCAL += distclean-modules_Pi
+
+## -----------------------------------------------------------------------------
+##
+## This is how we build Perl modules.  The makefile including this makefile
+## fragment should define perl_c_MODULES and perl_cxx_MODULES to be the
+## corresponding .i swig files.  Libtool should be used to create the
+## corresponding .so files.
+##
+## -----------------------------------------------------------------------------
+
+perl_MODULES		= $(perl_c_MODULES) $(perl_cxx_MODULES)
+perl_c_WRAPPERS		= $(perl_c_MODULES:%.i=%_wrap.c)
+perl_cxx_WRAPPERS	= $(perl_cxx_MODULES:%.i=%_wrap.c)
+perl_WRAPPERS		= $(perl_c_WRAPPERS) $(perl_cxx_WRAPPERS)
+
+if PKG_BUILD_USER
+## PKG_BUILD_USER
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
+
+##
+# This rule is for using SWIG to generate wrapper files for C.  Note that this
+# is only for perl.  These files are distributed similar to flex and bison files
+# and a proper version of SWIG is likely not required.  Note that we need
+# version 1.3.39 or better.
+##
+$(perl_c_WRAPPERS): %_wrap.c: %.i
+	$(AM_V_at)$(MKDIR_P) $$(dirname $@)
+	$(AM_V_GEN)p=$< ; $(am__vpath_adj_setup) $(am__vpath_adj) \
+	b=`echo $@ | sed 's,\.c$$,,;s,/,-,g;s,[^[:alnum:]-],_,g'` ; \
+	if $(SWIG) -perl \
+		-MT $@ -MMD -MF $(DEPDIR)/$$b.Tpc \
+		$(SWIG_INCLUDES) -outdir `dirname $@` -o $@ $< ; \
+	then $(am__mv) $(DEPDIR)/$$b.Tpc $(DEPDIR)/$$b.Pc ; \
+	else rm -f $(DEPDIR)/$$b.Tpc ; exit 1; fi
+
+##
+# This rule is for using SWIG to generate wrapper files for C++.  Note that this
+# is only for perl.  These files are distributed similar to flex and bison files
+# and a proper version of SWIG is likely not required.  Note that we need
+# version 1.3.39 or better.
+##
+$(perl_cxx_WRAPPERS): %_wrap.cxx: %.i
+	$(AM_V_at)$(MKDIR_P) $$(dirname $@)
+	$(AM_V_GEN)p=$< ; $(am__vpath_adj_setup) $(am__vpath_adj) \
+	b=`echo $@ | sed 's,\.cxx$$,,;s,/,-,g;s,[^[:alnum:]-],_,g'` ; \
+	if $(SWIG) -c++ -perl \
+		-MT $@ -MMD -MF $(DEPDIR)/$$b.Tpc \
+		$(SWIG_INCLUDES) -outdir `dirname $@` -o $@ $< ; \
+	then $(am__mv) $(DEPDIR)/$$b.Tpc $(DEPDIR)/$$b.Pc ; \
+	else rm -f $(DEPDIR)/$$b.Tpc ; exit 1; fi
+
+
+## PKG_BUILD_ARCH
+endif
+## PKG_BUILD_USER
+endif
+
+## -----------------------------------------------------------------------------
+##
+## This is how we build Java JNI wrapper files.  The makefile including this
+## makefile fragment should define java_c_MODULES and java_cxx_MODULES to be the
+## corresponding .i swig files.  Libtool should be used to create the
+## corresponding .so files and class compiler should be used to create the
+## corresponding .class files and .jar file.
+##
+## -----------------------------------------------------------------------------
+
+java_MODULES		= $(java_c_MODULES) $(java_cxx_MODULES)
+java_c_WRAPPERS		= $(java_c_MODULES:%.i=%_wrap.c)
+java_cxx_WRAPPERS	= $(java_cxx_MODULES:%.i=%_wrap.cxx)
+java_WRAPPERS		= $(java_c_WRAPPERS) $(java_cxx_WRAPPERS)
+
+if PKG_BUILD_USER
+## PKG_BUILD_USER
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
+
+##
+# This rule is for using SWIG to generate headers and wrapper files for C.  Note
+# that this is only for Java.  These files are distributed similar to flex and
+# bison files and a proper version of SWIG is likely not required.  Note that we
+# need version 1.3.39 or better.
+##
+$(java_c_WRAPPERS): %_wrap.c: %.i
+	$(AM_V_at)$(MKDIR_P) $$(dirname $@)
+	$(AM_V_GEN)p=$< ; $(am__vpath_adj_setup) $(am__vpath_adj) \
+	b=`echo $@ | sed 's,\.c$$,,;s,/,-,g;s,[^[:alnum:]-],_,g'` ; \
+	if $(SWIG) -java -package `echo $$f | sed 's,^//*,,;s,/[^/]*$$,,;s,/,.,g'` \
+		-MT $@ -MMD -MF $(DEPDIR)/$$b.Tpc \
+		$(SWIG_INCLUDES) -o $@ $< ; \
+	then $(am__mv) $(DEPDIR)/$$b.Tpc $(DEPDIR)/$$b.Pc ; \
+	else rm -f $(DEPDIR)/$$b.Tpc ; exit 1; fi
+
+##
+# This rule is for using SWIG to generate headers and wrapper files for C++.
+# Note that this is only for Java.  These files are distributed similar to flex
+# and bison files and a proper version of SWIG is likely not required.  Note
+# that we need version 1.3.39 or better.
+##
+$(java_cxx_WRAPPERS): %_wrap.cxx : %.i
+	$(AM_V_at)$(MKDIR_P) $$(dirname $@)
+	$(AM_V_GEN)p=$< ; $(am__vpath_adj_setup) $(am__vpath_adj) \
+	b=`echo $@ | sed 's,\.cxx$$,,;s,/,-,g;s,[^[:alnum:]-],_,g'` ; \
+	if $(SWIG) -java -c++ -package `echo $$f | sed 's,^//*,,;s,/[^/]*$$,,;s,/,.,g'` \
+		-MT $@ -MMD -MF $(DEPDIR)/$$b.Tpc \
+		$(SWIG_INCLUDES) -o $@ $< ; \
+	then $(am__mv) $(DEPDIR)/$$b.Tpc $(DEPDIR)/$$b.Pc ; \
+	else rm -f $(DEPDIR)/$$b.Tpc ; exit 1; fi
+
+## PKG_BUILD_ARCH
+endif
+## PKG_BUILD_USER
+endif
+
+## -----------------------------------------------------------------------------
+##
+## This is how we build TCL wrapper files.  The makefile including this makefile
+## fragment should define tcl_c_MODULES, tcl_cxx_MODULES and tcp_pkg_INDEX to be
+## the corresponding .i swig files and master pkgIndex.tcl file respectively.
+## Libtool should be used to create the corresponding .so files.
+##
+## -----------------------------------------------------------------------------
+
+tcl_MODULES		= $(tcl_c_MODULES) $(tcl_cxx_MODULES)
+tcl_c_WRAPPERS		= $(tcl_c_MODULES:%.i=%_wrap.c)
+tcl_cxx_WRAPPERS	= $(tcl_cxx_MODULES:%.i=%_wrap.cxx)
+tcl_WRAPPERS		= $(tcl_c_WRAPPERS) $(tcl_cxx_WRAPPERS)
+
+if PKG_BUILD_USER
+## PKG_BUILD_USER
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
+
+##
+# This rule is for using SWIG to generate wrapper files for C.  Note that this
+# is only for TCL.  These files are distributed similar to flex and bison files
+# and a proper version of SWIG is likely not required.  Note that we need
+# version 1.3.39 or better.
+##
+$(tcl_c_WRAPPERS): %_wrap.c: %.i
+	$(AM_V_at)$(MKDIR_P) $$(dirname $@)
+	$(AM_V_GEN)p=$< ; $(am__vpath_adj_setup) $(am__vpath_adj) \
+	b=`echo $@ | sed 's,\.c$$,,;s,/,-,g;s,[^[:alnum:]-],_,g'` ; \
+	if $(SWIG) -tcl -namespace -pkgversion $(PACKAGE_VERSION) \
+		-MT $@ -MMD -MF $(DEPDIR)/$$b.Tpc \
+		$(SWIG_INCLUDES) -outdir `dirname $@` -o $@ $< ; \
+	then $(am__mv) $(DEPDIR)/$$b.Tpc $(DEPDIR)/$$b.Pc ; \
+	else rm -f $(DEPDIR)/$$b.Tpc ; exit 1; fi
+
+##
+# This rule is for using SWIG to generate wrapper files for C++.  Note that this
+# is only for TCL.  These files are distributed similar to flex and bison files
+# and a proper version of SWIG is likely not required.  Note that we need
+# version 1.3.39 or better.
+##
+$(tcl_cxx_WRAPPERS): %_wrap.cxx: %.i
+	$(AM_V_at)$(MKDIR_P) $$(dirname $@)
+	$(AM_V_GEN)p=$< ; $(am__vpath_adj_setup) $(am__vpath_adj) \
+	b=`echo $@ | sed 's,\.cxx$$,,;s,/,-,g;s,[^[:alnum:]-],_,g'` ; \
+	if $(SWIG) -tcl -c++ -namespace -pkgversion $(PACKAGE_VERSION) \
+		-MT $@ -MMD -MF $(DEPDIR)/$$b.Tpc \
+		$(SWIG_INCLUDES) -outdir `dirname $@` -o $@ $< ; \
+	then $(am__mv) $(DEPDIR)/$$b.Tpc $(DEPDIR)/$$b.Pc ; \
+	else rm -f $(DEPDIR)/$$b.Tpc ; exit 1; fi
+
+$(tcl_pkg_INDEXES): Makefile
+	$(AM_V_at)$(MKDIR_P) $$(dirname $@)
+	$(AM_V_GEN)d=$$(dirname $@) ; p=$$(basename $$d) ; \
+	( \
+		echo '# Tcl package index file -- autogenerated.' ; \
+		echo '' ; \
+		echo "package ifneeded $$p $(PACKAGE_VERSION) [list load [file join \$$dir $$p[info sharedlibextension]]]" ; \
+		echo '' ; \
+	) >$@
+
+$(tcl_pkg_INDEX): Makefile
+	$(AM_V_at)$(MKDIR_P) $$(dirname $@)
+	$(AM_V_GEN) ( \
+		echo '# Tcl package index file - autogenerated' ; \
+		echo '' ; \
+		echo '# All $(PACKAGE_NAME) packages need Tcl 8 (use [namespace])' ; \
+		echo 'if {![package vsatisfies [package provide Tcl] 8]} {' ; \
+		echo '    return' ; \
+		echo '}' ; \
+		echo '' ; \
+		echo '# Extend the auto_path to make $(PACKAGE_NAME) packages available' ; \
+		echo 'if {[lsearch -exact $$::auto_path $$dir] == -1} {' ; \
+		echo '    lappend ::auto_path $$dir' ; \
+		echo '}' ; \
+		echo '' ; \
+		echo '# All modules can be loaded by requiring $(PACKAGE_NAME) package' ; \
+		echo 'package ifneeded $(PACKAGE_NAME) $(PACKAGE_VERSION) {' ; \
+		list='$(tcl_MODULES)'; for m in $$list ; do \
+			p=`basename $$m .i` ; \
+			echo "    package require $$p" ; \
+		done ; \
+		echo '}' ; \
+	) >$@
+
+ALL_LOCAL		+= $(tcl_pkg_INDEX)
+
+## PKG_BUILD_ARCH
+endif
+## PKG_BUILD_USER
+endif
+
+swig_MODULES		= $(java_MODULES) $(tcl_MODULES) $(perl_MODULES)
+
+swig_WRAPPERS		= $(java_WRAPPERS) $(tcl_WRAPPERS) $(perl_WRAPPERS)
+
+clean-swig_WRAPPERS:
+	list='$(swig_WRAPPERS)' ; $(am__list_remove_build)
+
+CLEAN_LOCAL		+= clean-swig_WRAPPERS
+
+swig_INDEXES		= $(tcl_pkg_INDEX) $(tcl_pkg_INDEXES)
+
+clean-swig_INDEXES:
+	list='$(swig_INDEXES)' ; $(am__list_remove_build)
+
+CLEAN_LOCAL		+= clean-swig_WRAPPERS
+
+swig_PERLMODS		= $(perl_MODFILES)
+
+clean-swig_PERLMODS:
+	list='$(swig_PERLMODS)' ; $(am__list_remove_build)
+
+CLEAN_LOCAL		+= clean-swig_PERLMODS
+
+#MY_INTERMEDIATE	+= $(swig_WRAPPERS) $(swig_INDEXES)
+#MY_SECONDARY		+= $(swig_WRAPPERS) $(swig_INDEXES)
+
+EXTRA_DIST		+= $(swig_MODULES)
+
+##
+## Distribute everything generated by swig so that the casual builder does not
+## need to have swig installed
+##
+EXTRA_DIST		+= $(swig_INDEXES)
+EXTRA_DIST		+= $(swig_WRAPPERS)
+EXTRA_DIST		+= $(swig_PERLMODS)
+
+CLEANFILES		+= $(swig_INDEXES)
+
+DISTCLEANFILES		+= $(swig_INDEXES)
+DISTCLEANFILES		+= $(swig_WRAPPERS)
+DISTCLEANFILES		+= $(swig_PERLMODS)
+
+## =============================================================================
+##
+## $Log: swig.am,v $
+## Revision 1.1.2.4  2011-03-17 07:01:28  brian
+## - build and repo system improvements
+##
+## Revision 1.1.2.3  2009-07-21 11:06:11  brian
+## - changes from release build
+##
+## Revision 1.1.2.2  2009-07-13 07:13:26  brian
+## - changes for multiple distro build
+##
+## Revision 1.1.2.1  2009-06-21 10:26:00  brian
+## - added files to new distro
+##
+## =============================================================================
+
+

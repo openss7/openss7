@@ -1,0 +1,4271 @@
+% -*- texinfo -*- vim: ft=texinfo
+% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+% =========================================================================
+%
+% @(#) $Id: chi.texi,v 1.1.2.2 2011-02-07 02:21:38 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+%
+% All Rights Reserved.
+%
+% Permission is granted to copy, distribute and/or modify this document
+% under the terms of the GNU Free Documentation License, Version 1.3 or
+% any later version published by the Free Software Foundation; with no
+% Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+% copy of the license is included in the section entitled "GNU Free
+% Documentation License".
+%
+% Permission to use, copy and distribute this documentation without
+% modification, for any purpose and without fee or royalty is hereby
+% granted, provided that both the above copyright notice and this
+% permission notice appears in all copies and that the name of OpenSS7
+% Corporation not be used in advertising or publicity pertaining to
+% distribution of this documentation or its contents without specific,
+% written prior permission.  OpenSS7 Corporation makes no representation
+% about the suitability of this documentation for any purpose.  It is
+% provided "as is" without express or implied warranty.
+% 
+% Permission is granted to process this file through Tex and print the
+% results, provided the printed document carries copying permission
+% notice identical to this one except for the removal of this paragraph
+% (this paragraph not being relevant to the printed manual).
+% 
+% OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+% DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+% FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+% CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+% IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+% PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+% OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+% CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+% USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+% OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+% THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+% THEREOF.
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any successor
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2011-02-07 02:21:38 $ by $Author: brian $
+%
+% =========================================================================
+
+\input texinfo
+@setfilename chi.info
+@include ../../../scripts/texi/args.texi
+@set MANUAL_TITLE Channel Interface (CHI)
+@set MANUAL_TYPE Specification
+@settitle @value{MANUAL_TITLE}
+
+@dircategory OpenSS7
+@direntry
+* CHI: (chi).				Channel Interface
+@end direntry
+
+@include ../../../scripts/texi/args.texi
+@set MANUAL_TITLE Channel Interface (CHI)
+@set MANUAL_TYPE Specification
+
+@comment The following copyright information goes at the head of each .info file.
+@ifinfo
+This file provides the @value{MANUAL_TYPE} for @value{MANUAL_TITLE}.
+
+This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated @value{PACKAGE_DATE}, of the
+@cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
+Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
+
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
+
+All Rights Reserved.
+
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU
+Free Documentation License, Version 1.3 or any later version published by the Free Software
+Foundation; with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of
+the license is included in the section entitled @ref{GNU Free Documentation License}.
+
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of @cite{OpenSS7 Corporation} not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  @cite{OpenSS7 Corporation} makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@ignore
+Permission is granted to process this file through Tex and print the results, provided the printed
+document carries copying permission notice identical to this one except for the removal of this
+paragraph (this paragraph not being relevant to the printed manual).
+
+@end ignore
+OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS DOCUMENTATION INCLUDING ALL IMPLIED
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT
+THE CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN
+NO EVENT SHALL OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL
+DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+@end ifinfo
+
+@include ../../../scripts/texi/args.texi
+@set MANUAL_TITLE Channel Interface (CHI)
+@set MANUAL_TYPE Specification
+
+@set PART Channel
+@set LONG Channel
+@set SHORT CH
+@set INTERFACE CHI
+
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@titlepage
+@titlefont{@value{MANUAL_TITLE}}
+@sp 0.5
+@title @value{MANUAL_TYPE}
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
+@subtitle Updated @value{PACKAGE_PDATE}
+@sp 0.2
+@subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
+@sp 2
+@subtitle Copyright @copyright{} 2008-2011  Monavacon Limited
+@subtitle All Rights Reserved.
+@sp 4
+@quotation
+@chapheading Abstract:
+This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
+the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
+as platform and system applicability of the @value{MANUAL_TITLE}.  It provides abstraction of the
+@value{LONG} (@value{SHORT}) interface to these components as well as providing a basis for
+@value{LONG} control for other @value{LONG} protocols.
+@end quotation
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
+
+@page
+@vskip 0pt plus 1filll
+
+@chapheading Published by:
+
+@sp 1
+
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+@noindent
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
+
+@noindent
+All Rights Reserved.
+
+@sp 1
+
+@noindent
+Unauthorized distribution or duplication is prohibited.
+
+@sp 1
+
+@noindent
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU
+Free Documentation License, Version 1.3 or any later version published by the Free Software
+Foundation; with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of
+the license is included in the section entitled @ref{GNU Free Documentation License}.
+
+@noindent
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of @cite{OpenSS7 Corporation} not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  @cite{OpenSS7 Corporation} makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@chapheading Notice:
+
+@noindent
+@strong{OpenSS7 Corporation disclaims all warranties with regard to this documentation including all
+implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
+that the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.}
+
+@vskip 0pt
+@end titlepage
+@iftex
+@headings off
+@everyheading @thistitle @| @thisfile @| @thischaptername
+@evenheading @thischapter @| @| @thisfile
+@oddheading @thistitle @| @| @thischaptername
+@everyfooting Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL} @| @value{PACKAGE_DATE} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
+@oddfooting @value{PACKAGE_DATE} @| @| @thispage
+@end iftex
+@page
+
+@c Define an index of primitives
+@defcodeindex pr
+@c Define an index of primitive values
+@defcodeindex pv
+@c Define an index of primitive error values
+@defcodeindex pe
+@c Define an index of protocol states
+@defcodeindex st
+@c Define an index of input-output controls
+@defcodeindex ct
+@c Define an index of manual pages.
+@defcodeindex mp
+@c Define an index of MIB objects.
+@defcodeindex mo
+
+@c frags out automake
+@c @ifnottex
+@c @c concatenate indices for text, html and info
+@syncodeindex pr cp
+@syncodeindex pv cp
+@syncodeindex pe cp
+@syncodeindex st cp
+@syncodeindex mp cp
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex ct cp
+@syncodeindex mo cp
+@c @end ifnottex
+
+@include texi/macros.texi
+@include texi/versions.texi
+@include texi/prims.texi
+
+@ifnottex
+@node Top
+@top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@heading About This Manual
+This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated @value{PACKAGE_DATE}, of
+@cite{The @value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version
+@value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL} of the
+@value{PACKAGE_TITLE} package.
+@end ifnottex
+
+@menu
+* Preface::
+* Introduction::
+* The Channel Layer::
+* CHI Services Definition::
+* CHI Service Primitives::
+* CHI Input-Output Controls::
+* CHI Management::
+@c * Addendum for ITU-T Q.703 Conformance::
+@c * Addendum for ANSI T1.111.3 Conformance::
+@c * Addendum for ETSI Conformance::
+@c * Mapping of SDLI Primitives to ITU-T Q.703::
+@c * Mapping of SDLI Primitives to ANSI T1.111.3::
+@c * State/Event Tables::
+@c * Primitive Precedence Tables::
+* CHI Header Files::
+* CHI Drivers and Modules::
+* CHI Applications::
+* CHI Utilities::
+* CHI File Formats::
+* CHI Compatibility and Porting::
+* Glossary::
+* Acronyms::
+* References::
+* Licenses::
+@c @iftex
+@c * Indices::
+@c @end iftex
+@c @ifnottex
+* Index::
+@c @end ifnottex
+@end menu
+
+@iftex
+@c insert list of figures and tables for printed manuals
+@page
+@heading List of Figures
+@listoffloats Figure
+@page
+@heading List of Tables
+@listoffloats Table
+@end iftex
+
+@node Preface
+@unnumbered Preface
+
+@section Notice
+
+Software in this document and related software is released under the AGPL (@pxref{GNU Affero General
+Public License}).  Please note, however, that there are different licensing terms for some of the
+manual package and some of the documentation.  Consult permission notices contained in the
+documentation of those components for more information.
+
+This document is released under the FDL (@pxref{GNU Free Documentation License}) with no invariant
+sections, no front-cover texts and no back-cover texts.
+
+@section Abstract
+
+This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
+the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
+as platform and system applicability of the @value{MANUAL_TITLE}.
+
+@noindent
+This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 @value{LONG}
+(@value{SHORT}) protocol stacks.  It provides abstraction of the @value{PART} interface to these
+components as well as providing a basis for @value{PART} control for other @value{PART} protocols.
+
+@subsection Purpose
+@cpindex STREAMS
+
+The purpose of this document is to provide technical documentation of the @value{MANUAL_TITLE}.
+This document is intended to be included with the OpenSS7 @acronym{STREAMS} software package released
+by @cite{OpenSS7 Corporation}.  It is intended to assist software developers, maintainers and users
+of the @value{MANUAL_TITLE} with understanding the software architecture and technical interfaces
+that are made available in the software package.
+
+@subsection Intent
+
+It is the intent of this document that it act as the primary source of information concerning the
+@value{MANUAL_TITLE}.  This document is intended to provide information for writers of OpenSS7
+@value{MANUAL_TITLE} applications as well as writers of OpenSS7 @value{MANUAL_TITLE} Users.
+
+@subsection Audience
+
+The audience for this document is software developers, maintainers and users and integrators of the
+@value{MANUAL_TITLE}.  The target audience is developers and users of the OpenSS7 SS7 stack.
+
+@section Revision History
+
+Take care that you are working with a current version of this documentation: you will not be
+notified of updates.  To ensure that you are working with a current version, check the
+@uref{http://www.openss7.org/,OpenSS7 Project} website for a current version.
+
+A current version of this specification is normally distributed with the @cite{@value{PACKAGE_TITLE}}
+package, @file{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.openss7.org/repos/tarballs/@value{PACKAGE}-@value{VERSION}.tar.bz2}}
+
+@subsection Version Control
+
+@noindent
+Although the author has attempted to ensure that the information in this document is complete and
+correct, neither the Author nor OpenSS7 Corporation will take any responsibility in it.
+@cite{OpenSS7 Corporation} is making this documentation available as a reference point for the
+industry.  While @cite{OpenSS7 Corporation} believes that these interfaces are well defined in this
+release of the document, minor changes may be made prior to products conforming to the interfaces
+being made available.  @cite{OpenSS7 Corporation} reserves the right to revise this software and
+documentation for any reason, including but not limited to, conformity with standards promulgated by
+various agencies, utilization of advances in the state of the technical arts, or the reflection of
+changes in the design of any techniques, or procedures embodied, described, or referred to herein.
+@cite{OpenSS7 Corporation} is under no obligation to provide any feature listed herein.
+
+@smallexample
+@verbatim
+$Log: chi.texi,v $
+Revision 1.1.2.2  2011-02-07 02:21:38  brian
+- updated manuals
+
+Revision 1.1.2.1  2009-06-21 11:50:35  brian
+- added files to new distro
+
+@end verbatim
+@end smallexample
+
+@section ISO 9000 Compliance
+
+Only the @TeX{}, texinfo, or roff source for this maual is controlled.  An opaque (printed,
+postscript or portable document format) version of this manual is a @strong{UNCONTROLLED VERSION}.
+
+@subsection Disclaimer
+
+@noindent
+@strong{@cite{OpenSS7 Corporation} disclaims all warranties with regard to this documentation
+including all implied warranties of merchantability, fitness for a particular purpose,
+non-infrincement, or title; that the contents of the manual are suitable for any purpose, or that
+the implementation of such contents will not infringe on any third party patents, copyrights,
+trademarks or other rights.  In no event shall @cite{OpenSS7 Corporation} be liable for any direct,
+indirect, special or consequential damages or any damages whatsoever resulting from loss of use,
+data or profits, whether in an action or contract, negligence or other tortious action, arising out
+of or in connection with any use of this documentation or the performance or implementation of the
+contents thereof.}
+
+@subsection U.S. Government Restricted Rights
+
+If you are licensing this Software on behalf of the U.S. Government ("Government"), the following
+provisions apply to you.  If the Software is supplied by the Department of Defense ("DoD"), it is
+classified as "Commercial Computer Software" under paragraph 252.227-7014 of the DoD Supplement to
+the Federal Aquisition Regulations ("DFARS") (or any successor regulations) and the Government is
+acquiring only the license rights granded herein (the license rights customarily provided to
+non-Government users).  If the Software is supplied to any unit or agency of the Government other
+than DoD, it is classified as "Restricted Computer Software" and the Government's rights in the
+Software are defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or any
+successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplerment
+to the FAR (or any successor regulations).
+
+@section Acknowledgements
+
+@url{http://www.openss7.org/,The OpenSS7 Project} was funded in part by:
+
+@itemize @bullet
+@item @url{http://www.monavacon.com/,Monavacon Limited}
+@item @url{http://www.openss7.com/,OpenSS7 Corporation}
+@end itemize
+
+Thanks to the subscribers to and sponsors of @url{http://www.openss7.org/, The OpenSS7 Project}.
+Without their support, open software like this would not be possible.
+
+As with most open source projects, this project would not have been possible without the valiant
+efforts and productive software of the @url{http://www.fsf.org/,Free Software Foundation}, the
+@url{http://www.kernel.org/,Linux Kernel Community}, and the open source software movement at large.
+
+@node Introduction
+@chapter Introduction
+@cpindex STREAMS
+
+This document specifies a @acronym{STREAMS}-based kernel-level instantiation of the
+@value{MANUAL_TITLE} definition.  The @value{MANUAL_TITLE} enables the user of a  channel
+service to access and use any of a variety of conforming channel providers without
+specific knowledge of the provider's protocol.  The service interface is designed to support any
+network channel protocol.  This interface only
+specifies access to channel service providers, and does not address issues concerning
+channel management, protocol performance, and performance analysis tools.
+
+This specification assumes that the reader is familiar with ITU-T state machines and channel
+interface (e.g. G.703, G.704), and @acronym{STREAMS}.
+
+@section Related Documentation
+
+@itemize ---
+@item @strong{ITU-T Recommendation G.703 (White Book)}
+@item @strong{ITU-T Recommendation G.704 (White Book)}
+@item @strong{ANSI T1}
+@item @strong{System V Interface Definition, Issue 2 - Volume 3}
+@end itemize
+
+@subsection Role
+
+This document specifies an interface that supports the services provided by the @dfn{Channel} for
+ITU-T, ANSI and ETSI applications as described in ITU-T Recommendation G.703 and ITU-T
+Recommendation G.704.  These specifications are
+targeted for use by developers and testers of protocol modules that require channel
+service.
+
+@section Definitions, Acronyms, Abbreviations
+
+@table @dfn
+@item LM
+Local Management.
+@item LMS
+Local Management Service.
+@item LMS User
+A user of Local Management Services.
+@item LMS Provider
+A provider of Local Management Services.
+@item ISO
+International Organization for Standardization
+@item OSI
+Open Systems Interconnection
+@item QOS
+Quality of Service
+@item STREAMS
+A communication services development facility first available with UNIX System V Release 3.
+@end table
+
+@node The Channel Layer
+@chapter The Channel Layer
+
+@menu
+* Model of the CHI::
+* CHI Services::
+* Purpose of the CHI::
+* Channel Addressing::
+* Channel Parameters::
+@end menu
+
+The Channel Layer provides the means to manage the association of CH-Users info
+connections.  It is responsible for the routing and management of data to and from channel
+connections between CH-user entities.
+
+@node Model of the CHI
+@section Model of the CHI
+
+
+The CHI defines the services provided by the channel layer to the channel
+user at the boundary between the channel provider and the channel user
+entity.  The interface consists of a set of primitives defined as @acronym{STREAMS} messages that
+provide access to the channel layer services, and are transferred between the CHS user
+entity and the CHS provider.  These primitives are of two types; ones that originate from the CHS
+user, and others that originate from the CHS provider.  The primitives that originate from the CHS
+user make requests to the CHS provider, or respond to an indication of an event of the CHS
+provider.  The primitives that originate from the CHS provider are either confirmations of a
+request or are indications to the CHS user that an event has occurred.  @figref{1} show the model
+of the CHI.
+
+@figuresized{chi01,1,Model of the CHI,3.0in}
+
+The CHI allows the CHS provider to be configured with any channel layer user (such as
+a signalling data terminal application) that also conforms to the CHI.  A channel
+layer user can also be a user program that conforms to the CHI and accesses the CHS provider via
+@command{@b{putmsg}(2s)} and @command{@b{getmsg}(2s)} system calls.  The typical configuration,
+however, is to place a signalling data terminal module above the channel layer.
+
+@node CHI Services
+@section CHI Services
+
+The features of the CHI are defined in terms of the services provided by the CHS provider, and the
+individual primitives that may flow between the CHS user and the CHS provider.
+
+The CHI Services are broken into two groups: local management services and protocol services.
+Local management services are responsible for the local management of Streams, assignment of Streams
+to physical points of attachment, enabling and disabling of Streams, management of options
+associated with a Stream, and general acknowledgement and event reporting for the Stream.  Protocol
+services consist of connecting a Stream to a medium, exchanging bits with the medium, and
+disconnecting the Stream from the medium.
+
+@subsection Local Management
+
+Local management services are listed in @tabref{1}.
+
+@tabfig{chit01,1,Local Management Services}
+
+The local management services interface is described in @ref{Local Management Services}, and the
+primitives are detailed in @ref{Local Management Service Primitives}.  The local management services
+interface is defined by the @file{sys/chi.h} header file (@pxref{CHI Header Files}).
+
+@subsection Protocol
+
+Protocol services are listed in @tabref{2}.
+
+@tabfig{chit02,2,Protocol Services}
+
+The protocol services interface is described in @ref{Protocol Services}, and the primitives are
+detailed in @ref{Protocol Service Primitives}.  The protocol services interface is defined by the
+@file{sys/chi.h} header file (@pxref{CHI Header Files}).
+
+@node Purpose of the CHI
+@section Purpose of the CHI
+
+The CHI is typically implemented as a device driver controlling a TDM (Time Division Mutliplexing)
+device that provides access to channels.  The purpose behind exposing this low level interface is
+that almost all communications channel devices can be placed into a @emph{raw} mode, where a bit
+stream can be exchanged between the driver and the medium.  The CHI provides an interface that, once
+implemented as a driver for a new device, can provide complete and verified data link
+capabilities by pushing generic HDLC (High Level Data Link Control) and LAPB (Link Access Procedure Balanced) modules over
+an open device Stream.
+
+This allows CDI and DLPI modules to be verified independently for correct operation and then simply
+used for all manner of new device drivers that can implement the CHI interface.
+
+@node Channel Addressing
+@section Channel Addressing
+
+Each use of CHI must establish an identity to communicate with other channel users.  The CHS user
+must identify the physical medium over which it wil communicate.  This is particularly evident on
+system that are attached to multiple physical media.  @figref{17} illustrates the identification
+approach, which is explained below.
+
+@figuresized{chi17,17,Channel Addressing Components,3.5in}
+
+@subsection Physical Attachment Identification
+
+The physical point of attachment (PPA in @figref{17}) is the point at which a system interface
+attaches itself to a physical communications medium (a channel, facility or network interface).  All
+communication on that physical medium funnels through the PPA associated with that physical medium.
+On systems where a CHS provider supports more than on physical medium, the CHS user must identify
+the medium through which it will communicate.  A PPA is identified by a unique PPA identifier.
+
+For media that supports physical layer multiplexing of multiple channels over a single physical
+medium (such as the B and D channels of ISDN), the PPA identifier must identify the specific
+channel(s) over which communication will occur.  See also @ref{Multiplex Media}.
+
+Unlike the Data Link Provider Interface (DLPI), which also uses the concept of a PPA, CHI does not
+define a SAP for a CHS user.
+
+Once a Stream has been associated with a PPA, all messages received on that medium are delivered to
+the attached CHS user.  Only one major/minor device number combination (Stream head) can be
+associated with a given PPA and active for a range of channels at any point in time.
+
+@subsection CHS Provider Styles
+
+Two styles of CHS provider are defined by CHI, distinguished by the way they enable a CHS user to
+choose a particular PPA.
+
+@subsubsection Style 1 CHS Provider
+
+The @dfn{Style 1} provider assigns a PPA based on the major/minor device the CHS user opened.  One
+possible implementation of a @dfn{Style 1} driver would reserve a major device for each PPA the
+channel device driver would support.  This would allos the @acronym{STREAMS} clone open feature to be
+used for each PPA configured.  This style of provider is appropriate when few PPAs will be
+supported.
+
+For example, a CPI card that supports two V.35 ports could assign a major device number to the card
+diver and a minor device number to each of the ports on each card in the system.  To establish a
+Stream to a CHS provider for a given port, the minor device number @samp{1} or @samp{2} could be
+opened for port @samp{1} or @samp{2} on card @samp{1}, minor device number @samp{3} or @samp{4}
+could be opened for port @samp{1} or @samp{2} on card @samp{2}, and so on.  One major device number
+for the driver could easily support 127 cards in a system, which is not possible for typical PCI
+systems and, therefore, is ample.
+
+@dfn{Style 1} providers do not user the @prim{CH_ATTACH_REQ} and @prim{CH_DETACH_REQ} primitives and
+when freshly opened are in the @psta{CHS_ATTACHED} state.  That is, as illustrated in @figref{17},
+the @dfn{Style 1} CHS provider associates the Stream with the PPA during the @manref{open(2s)} system
+call.
+
+@subsubsection Style 2 CHS Provider
+
+If the number of PPAs as CHS provider will support is large, a @dfn{Style 2} provider implementation
+is more suitable.  The @dfn{Style 2} provider requires a CHS user to explicitly identify the desired
+PPA using a special attach service primitive.  For a @dfn{Style 2} driver, the @manref{open(2s)}
+system call creates a Stream between the CHS user and CHS provider, and the attach primitive then
+associated a particular PPA with that Stream.  The format of the PPA identifier is specific to the
+CHS provider, and should be described in the provider-specific addendum documentation.
+
+The CHS user uses the support primitvies(@prim{CH_ATTACH_REQ}, @prim{CH_ENABLE_REQ}) to associate a
+Stream with a given Physical Point of Appearance.  @dfn{Style 2} CHS providers, when freshly opened,
+are in the @psta{CHS_DETACHED} state.  That is, the @dfn{Style 2} CHS provider does not associate
+the Stream with the PPA during the @manref{open(2s)} call, but only later when the
+@prim{CH_ATTACH_REQ} primitive is issued by the CHS user.
+
+@subsection Multiplex Media
+@anchor{Multiplex Media}
+
+To accommodate multiplexed media and multi-media channels, there are three kinds of PPA address:
+
+@enumerate
+
+@item A discrete PPA that specifies a non-multiplexed medium.
+
+This is the normal case of a @dfn{Style 1} or @dfn{Style 2} CHS provider supporting access to a
+non-multiplexed medium.  An example is a CHS provider supporting access to a V.35 interface.
+
+@item A specific PPA that specifies a single channel to a multiplexed medium.
+
+This is again the normal case of a @dfn{Style 1} or @dfn{Style 2} CHS provider supporting access to
+a specific channel in a multiplexed medium.  An example is a CHS provider supporting access to
+channel 16 of a E1 interface.
+
+@item A general PPA that specifies a channel group for a multiplexed medium.
+
+This is th case of a @dfn{Style 1} or @dfn{Style 2} CHS provider supporting access to multiple
+channels in a multiplexed medium.  An example is a CHS provider supporting statistically multiplexed
+channel access to a full or fractional T1 facilitiy.  Another example is access to the left and
+right channels of a stereo program.
+
+@end enumerate
+
+In the case of a general PPA, as enumerated in @dfn{3} above, some additional information is
+required to identify which slots in the group of channle forming the multiplex are associatedw the
+the CHS user Stream.  This additional information is provided using the @parm{ch_slot} parameter to
+the @prim{CH_CONNECT_REQ}, @prim{CH_CONNECT_CON}, @prim{CH_DATA_REQ}, @prim{CH_DATA_IND},
+@prim{CH_EVENT_IND}, @prim{CH_DISCONNECT_REQ}, @prim{CH_DISCONNECT_CON} and @prim{CH_DISCONNECT_IND}
+primitives.@footnote{Note that it is the ability of the Channel Interface to support fractional
+E1/T1 that distinguishes it from similar interfaces such as the SDLI and CDI.}
+
+@node Channel Parameters
+@section Channel Parameters
+
+
+@node CHI Services Definition
+@chapter CHI Services Definition
+
+@menu
+* Local Management Services::
+* Protocol Services::
+@end menu
+
+@node Local Management Services
+@section Local Management Services
+
+@menu
+* Acknowledgement Service::
+* Information Reporting Service::
+* Physical Point of Attachment Service::
+* Initialization Service::
+* Options Management Service::
+* Error Reporting Service::
+* Statistics Reporting Service::
+* Event Reporting Service::
+@end menu
+
+@node Acknowledgement Service
+@subsection Acknowledgement Service
+
+The acknowledgement service provides the CHS user with the ability to receive positive and negative
+acknowledgements regarding the successful or unsuccessful completion of services.
+
+@itemize @bullet
+
+@item @b{@prim{CH_OK_ACK}}:
+The @prim{CH_OK_ACK} message is used by the CHS provider to indicate successful receipt and
+completion of a service primitive request that requires positive acknowledgement.
+
+@item @b{@prim{CH_ERROR_ACK}}:
+The @prim{CH_ERROR_ACK} message is used by the CHS provider to indicate successful receipt and
+failure to complete a service primitive request that requires negative acknowledgement.
+
+@end itemize
+
+A successful invocation of the acknowledgement service is illustrated in @figref{15}.
+
+@figuresized{chi15,15,Message Flow: Successful Acknowledgement Service,4.0in}
+
+As illustrated in @figref{15}, the
+service primitives for which a positive acknowledgement may be returned are the
+@prim{CH_ATTACH_REQ} and @prim{CH_DETACH_REQ}.
+
+An unsuccessful invocation of the acknowledgement service is illustrated in @figref{16}.
+
+@figuresized{chi16,16,Message Flow: Unsuccessful Acknowledgement Service,4.0in}
+
+As illustrated in @figref{16}, the service primitives for which a negative acknowledgement may be
+returned are the @prim{CH_INFO_REQ}, @prim{CH_ATTACH_REQ}, @prim{CH_DETACH_REQ},
+@prim{CH_ENABLE_REQ}, @prim{CH_DISABLE_REQ} and @prim{CH_OPTMGMT_REQ} messages.
+
+@node Information Reporting Service
+@subsection Information Reporting Service
+
+The information reporting service provides the CHS user with the ability to elicit information from
+the CHS provider.
+
+@itemize @bullet
+
+@item @b{@prim{CH_INFO_REQ}}:
+The @prim{CH_INFO_REQ} message is used by the CHS user to request information about the CHS
+provider.
+
+@item @b{@prim{CH_INFO_ACK}}:
+The @prim{CH_INFO_ACK} message is issued by the CHS provider to provide requested information about
+the CHS provider.
+
+@end itemize
+
+A successful invocation of the information reporting service is illustrated in @figref{2}.
+
+@figuresized{chi02,2,Message Flow: Successful Information Reporting Service,4.0in}
+
+@node Physical Point of Attachment Service
+@subsection Physical Point of Attachment Service
+
+The local management interface provides the CHS user with the ability to associate a Stream to a
+physical point of appearance (@dfn{PPA}) or to disassociate a Stream from a PPA.  The local
+management interface provides for two styles of CHS provider:@footnote{See also @ref{Channel
+Addressing}.}
+
+@subsubheading Style 1 CHS Provider
+
+A @dfn{Style 1} CHS provider is a provider that associates a Stream with a PPA at the time of the
+first @manref{open(2s)} call for the device, and disassociates a Stream from a PPA at the time of the
+last @manref{close(2s)} call for the device.
+
+Physical points of attachment (PPA) are assigned to major and minor device number combinations.
+When the major and minor device number combination is opened, the opened Stream is automatically
+associated with the PPA for the major and minor device number combination.  The last close of the
+device disassociates the PPA from the Stream.
+
+Freshly opened @dfn{Style 1} CHS provider Streams start life in the @psta{CH_DISABLED} state.
+
+This approach is suitable for CHS providers implemented as real or pseudo-device drivers and is
+applicable when the number of minor devices is small and static.
+
+@subsubheading Style 2 CHS Provider
+
+A @dfn{Style 2} CHS provider is a provider that associates a Stream with a PPA at the time that the
+CHS user issues the @prim{CH_ATTACH_REQ} message.  Freshly opened Streams are not associated with
+any PPA.  The @dfn{Style 2} CHS provider Stream is disassociated from a PPA when the Stream is
+closed or when the CHS user issues the @prim{CH_DETACH_REQ} message.
+
+Freshly opened @dfn{Style 2} CHS provider Streams start life in the @psta{CH_UNATTACHED} state.
+
+This approach is suitable for CHS providers implemented as clone real or pseudo-device drivers  and
+is applicable when the number of minor devices is large or dynamic.
+
+@menu
+* PPA Attachment Service::
+* PPA Detachment Service::
+@end menu
+
+@node PPA Attachment Service
+@subsubsection PPA Attachment Service
+
+The PPA attachment service provides the CHS user with the ability to attach a @dfn{Style 2} CHS
+provider Stream to a physical point of appearance (PPA).
+
+@itemize @bullet
+
+@item @b{@prim{CH_ATTACH_REQ}}:
+The @prim{CH_ATTACH_REQ} message is issued by the CHS user to request that a @dfn{Style 2} CHS
+provider Stream be attached to a specified physical point of appearance (PPA).
+
+@item @b{@prim{CH_OK_ACK}}:
+Upon successful receipt and processing of the @prim{CH_ATTACH_REQ} message, the CHS provider
+acknowledges the success of the service completion with a @prim{CH_OK_ACK} message.
+
+@item @b{@prim{CH_ERROR_ACK}}:
+Upon successful receipt but failure to process the @prim{CH_ATTACH_REQ} message, the CHS provider
+acknowledges the failure of the service completion with a @prim{CH_ERROR_ACK} message.
+
+@end itemize
+
+A successful invocation of the attachment service is illustrated in @figref{3}.
+
+@figuresized{chi03,3,Message Flow: Successful Attachment Service,4.0in}
+
+
+@node PPA Detachment Service
+@subsubsection PPA Detachment Service
+
+The PPA detachment service provides the CHS user with the ability to detach a @dfn{Style 2} CHS
+provider Stream from a physical point of attachment (PPA).
+
+@itemize @bullet
+
+@item @b{@prim{CH_DETACH_REQ}}:
+The @prim{CH_DETACH_REQ} message is issued by the CHS user to request that a @dfn{Style 2} CHS
+provider Stream be detached from the attached physical point of appearance (PPA).
+
+@item @b{@prim{CH_OK_ACK}}:
+Upon successful receipt and processing of the @prim{CH_DETACH_REQ} message, the CHS provider
+acknowledges the success of the service completion with a @prim{CH_OK_ACK} message.
+
+@item @b{@prim{CH_ERROR_ACK}}:
+Upon successful receipt but failure to process the @prim{CH_DETACH_REQ} message, the CHS provider
+acknowledges the failure of the service completion with a @prim{CH_ERROR_ACK} message.
+
+@end itemize
+
+A successful invocation of the detachment service is illustrated in @figref{4}.
+
+@figuresized{chi04,4,Message Flow: Successful Detachment Service,4.0in}
+
+@node Initialization Service
+@subsection Initialization Service
+
+The initialization service provides the CHS user with the abilty to enable and disable the Stream
+for the associated PPA.
+
+@menu
+* Interface Enable Service::
+* Interface Disable Service::
+@end menu
+
+@node Interface Enable Service
+@subsubsection Interface Enable Service
+
+The interface enable service provides the CHS user with the ability to enable an CHS provider
+Stream that is associated with a PPA.  Enabling the interface permits the CHS user to exchange
+protocol service interface messages with the CHS provider.
+
+@itemize @bullet
+
+@item @b{@prim{CH_ENABLE_REQ}}:
+The @prim{CH_ENABLE_REQ} message is issued by the CHS user to request that the protocol service
+interface be enabled.
+
+@item @b{@prim{CH_ENABLE_CON}}:
+Upon successful enabling of the protocol service interface, the CHS provider acknowledges successful
+completion of the service by issuing a @prim{CH_ENABLE_CON} message to the CHS user.
+
+@item @b{@prim{CH_ERRORK_ACK}}:
+Upon unsuccessful enabling of the protocol service interface, the CHS provider acknowledges the
+failure to complete the service by issuing an @prim{CH_ERROR_ACK} message to the CHS user.
+
+@end itemize
+
+A successful invocation of the enable service is illustrated in @figref{5}.
+
+@figuresized{chi05,5,Message Flow: Successful Enable Service,4.0in}
+
+@node Interface Disable Service
+@subsubsection Interface Disable Service
+
+The interface disable service provides the CHS user with the ability to disable an CHS provider
+Stream that is associated with a PPA.  Disabling the interface withdraws the CHS user's ability to
+exchange protocol service interface messages with the CHS provider.
+
+@itemize @bullet
+
+@item @b{@prim{CH_DISABLE_REQ}}:
+The @prim{CH_DISABLE_REQ} message is issued by the CHS user to request that the protocol service
+interface be disabled.
+
+@item @b{@prim{CH_DISABLE_CON}}:
+Upon successful disabling of the protocol service interface, the CHS provider acknowledges
+successful completion of the service by issuing a @prim{CH_DISABLE_CON} message to the CHS user.
+
+@item @b{@prim{CH_ERRORK_ACK}}:
+Upon unsuccessful disabling of the protocol service interface, the CHS provider acknowledges the
+failure to complete the service by issuing an @prim{CH_ERROR_ACK} message to the CHS user.
+
+@item @b{@prim{CH_DISABLE_IND}}:
+The @prim{CH_DISABLE_IND} message is used by the CHS provider to indicate to the CHS user that the
+Stream has been autonomously disabled and the cause of the autonomous disabling.
+
+@end itemize
+
+A successful invocation of the disable service is illustrated in @figref{6}.
+
+@figuresized{chi06,6,Message Flow: Successful Disable Service,4.0in}
+
+@node Options Management Service
+@subsection Options Management Service
+
+The options management service provides the CHS user with the ability to control and affect various
+generic and provider-specific options associated with the CHS provider.
+
+@itemize @bullet
+
+@item @b{@prim{CH_OPTMGMT_REQ}}:
+The CHS user issues a @prim{CH_OPTMGMT_REQ} message when it wishes to interrogate or affect the
+setting of various generic or provider-specific options associated with the CHS provider for the
+Stream upon which the message is issued.
+
+@item @b{@prim{CH_OPTMGMT_ACK}}:
+Upon successful receipt of the @prim{CH_OPTMGMT_REQ} message, and successful options processing, the
+CHS provider acknowledges the successful completion of the service with an @prim{CH_OPTMGMT_ACK}
+message.
+
+@item @b{@prim{CH_ERROR_ACK}}:
+Upon successful receipt of the @prim{CH_OPTMGMT_REQ} message, and unsuccessful options processing, the
+CHS provider acknowledges the failure to complete the service by issuing an @prim{CH_ERROR_ACK}
+message to the CHS user.
+
+@end itemize
+
+A successful invocation of the options management service is illustrated in @figref{7}.
+
+@figuresized{chi07,7,Message Flow: Successful Options Management Service,4.0in}
+
+@node Error Reporting Service
+@subsection Error Reporting Service
+
+The error reporting service provides the CHS provider with the ability to indicate asynchronous
+errors to the CHS user.
+
+@itemize @bullet
+
+@item @b{@prim{CH_ERROR_IND}}:
+The CHS provider issues the @prim{CH_ERROR_IND} message to the CHS user when it needs to indicate an
+asynchronous error (such as the unusability of the communications medium).
+
+@end itemize
+
+A successful invocation of the error reporting service is illustrated in @figref{8}.
+
+@figuresized{chi08,8,Message Flow: Successful Error Reporting Service,4.0in}
+
+@node Statistics Reporting Service
+@subsection Statistics Reporting Service
+
+@itemize @bullet
+
+@item @b{@prim{CH_STATS_IND}}:
+
+@end itemize
+
+A successful invocation of the statistics reporting service is illustrated in @figref{9}.
+
+@figuresized{chi09,9,Message Flow: Successful Statistics Reporting Service,4.0in}
+
+@node Event Reporting Service
+@subsection Event Reporting Service
+
+The event reporting service provides the CHS provider with the ability to indicate specific
+asynchronous management events to the CHS user.
+
+@itemize @bullet
+
+@item @b{@prim{CH_EVENT_IND}}:
+The CHS provider issues the @prim{CH_EVENT_IND} message to the CHS user when it wishes to indicate
+an asynchronous (management) event to the CHS user.
+
+@end itemize
+
+A successful invocation of the event reporting service is illustrated in @figref{10}.
+
+@figuresized{chi10,10,Message Flow: Successful Event Reporting Service,4.0in}
+
+@node Protocol Services
+@section Protocol Services
+
+Protocol services are specific to the Channel interface.  These services consist of
+connection services that permit the transmit and receive directions to be connected to or
+disconnected from the medium, and data transfer services that permit the exchange of bits between CHS
+users.
+
+The service primitives that implement the protocol services are described in detail in @ref{Protocol
+Service Primitives}.
+
+@menu
+* Connection Service::
+* Data Transfer Service::
+* Disconnection Service::
+@end menu
+
+@node Connection Service
+@subsection Connection Service
+
+The connection service provides the ability for the CHS user to connect to the medium for the
+purpose of transmitting bits, receiving bits, or both.  In the OSI model, this is a Layer 1 function, possibly
+the responsibility of multiplex or digital cross-connect switch.
+
+@itemize @bullet
+
+@item @b{@prim{CH_CONNECT_REQ}}:
+The @prim{CH_CONNECT_REQ} message is used by the CHS user to request that the Stream be connected to
+the medium.  Connection to the medium might require some switching or other mechanism to prepare the
+Stream for data transmission and reception.  Connections can be formed for the receive direction or
+the transmit direction independently.
+
+@item @b{@prim{CH_CONNECT_CON}}:
+The @prim{CH_CONNECT_CON} message is used by the CHS provider to confirm that the Stream has been
+connected to the medium.  Connection to the medium may have required some switching or other
+mechanism to prepare the Stream for data transmission and receptoin.  Connection can be confirmed
+for the receive or transmit directions independently.
+
+@end itemize
+
+A successful invocation of the connection service is illustrated in @figref{11}.
+
+@figuresized{chi11,11,Message Flow: Successful Connection Service,4.0in}
+
+@node Data Transfer Service
+@subsection Data Transfer Service
+
+The data transfer service provides the CHS user with the ability to request that bits be
+transmitted on the medium, and the CHS provider with the ability to indicate bits that have been
+received from the medium.
+
+@itemize @bullet
+
+@item @b{@prim{CH_DATA_REQ}}:
+The @prim{CH_DATA_REQ} message is used by the CHS user to place raw bits onto
+the medium.  The Stream must have first been successfully activated in the transmit direction using
+the @prim{CH_CONNECT_REQ} message.
+
+@item @b{@prim{CH_DATA_IND}}:
+The @prim{CH_DATA_IND} message is issued by the CHS provider when activated for the
+receive direction with the @prim{CH_CONNECT_REQ} message, to indicate bits received on the medium.
+
+@end itemize
+
+A successful invocation of the data transfer service is illustrated in @figref{12}.
+
+@figuresized{chi12,12,Message Flow: Successful Data Transfer Service,4.0in}
+
+@node Disconnection Service
+@subsection Disconnection Service
+
+The disconnection service provides the ability for the CHS user to disconnect from the medium,
+withdrawing from the purpose of transmitting bits, receiving bits, or both.  It allows the
+CHS provider to autonomously indicate that the medium has been disconnected from the Stream.  In
+OSI, this is a Layer 1 function, possibly the responsibilyt of a multiplex or digital cross-connect
+switch.
+
+@itemize @bullet
+
+@item @b{@prim{CH_DISCONNECT_REQ}}:
+The @prim{CH_DISCONNECT_REQ} message is used by the CHS user to request that the Stream be
+disconnected from the medium.  Disconnection from the medium might require some switching or other
+mechanism.  Disconnection can be performed for the receive direction or the transmit direction
+independently.
+
+@item @b{@prim{CH_DISCONNECT_CON}}:
+The @prim{CH_DISCONNECT_CON} message is used by the CHS provider to confirm that the Stream has been
+disconnected from the medium.  Disconnect from the medium might require some switching or other
+mechanism.  Disconnection can be confirmed for the receive or transmit directions independently.
+
+@item @b{@prim{CH_DISCONNECT_IND}}:
+The @prim{CH_DISCONNECT_IND} message is used by the CHS provider to indicate to the CHS user
+that the Stream has been disconnected from the medium.  Disconnection is indicated for both the
+receive and transmit directions.
+
+@end itemize
+
+A successful invocation of the disconnection service by the CHS user is illustrated in @figref{13}.
+
+@figuresized{chi13,13,Message Flow: Successful Disconnection Service by SDLS User,4.0in}
+
+A successful invocation of the disconnection service by  the CHS provider is illustrated in @figref{14}.
+
+@figuresized{chi14,14,Message Flow: Successful Disconnection Service by SDLS Provider,4.0in}
+
+@node CHI Service Primitives
+@chapter CHI Service Primitives
+
+@menu
+* Local Management Service Primitives::
+* Protocol Service Primitives::
+* Diagnostics Requirements::
+@end menu
+
+@node Local Management Service Primitives
+@section Local Management Service Primitives
+
+These service primitives implement the local management services (@pxref{Local Management
+Services}).
+
+@menu
+* Acknowledgement Service Primitives::
+* Information Reporting Service Primitives::
+* Physical Point of Attachment Service Primitives::
+* Initialization Service Primitives::
+* Options Management Service Primitives::
+* Event Reporting Service Primitives::
+@end menu
+
+@node Acknowledgement Service Primitives
+@subsection Acknowledgement Service Primitives
+
+These service primitives implement the acknowledgement service (@pxref{Acknowledgement Service}).
+
+@menu
+* CH_OK_ACK::
+* CH_ERROR_ACK::
+@end menu
+
+@node CH_OK_ACK
+@subsubsection CH_OK_ACK
+
+@subsubheading Description
+
+This primitive is used to acknowledge receipt and successful service completion for
+primitives requiring acknowledgement that have no confirmation primitive.
+
+@subsubheading Format
+@tpindex CH_ok_ack
+
+This primitive consists of one @msg{M_PCPROTO} message block, structured as follows:
+
+@display
+@verbatim
+typedef struct CH_ok_ack {
+    ch_ulong ch_primitive;
+    ch_ulong ch_correct_prim;
+    ch_ulong ch_state;
+} CH_ok_ack_t;
+@end verbatim
+@end display
+
+@subsubheading Parameters
+
+The service primitive contains the following parameters:
+
+@table @parm
+
+@item ch_primitive
+Indicates the service primitive type.  Always @prim{CH_OK_ACK}.
+
+@item ch_correct_prim
+Indicates the service primitive that was received and serviced correctly.  This field can be one of
+the following values:
+
+@multitable @columnfractions .25 .75
+@ignore
+@item @prim{CH_INFO_REQ} @tab Information request.
+@item @prim{CH_OPTMGMT_REQ} @tab Options management request.
+@end ignore
+@item @prim{CH_ATTACH_REQ} @tab Attach request.
+@item @prim{CH_ENABLE_REQ} @tab Enable request.
+@item @prim{CH_CONNECT_REQ} @tab Connect request.
+@ignore
+@item @prim{CH_DATA_REQ} @tab Data request.
+@end ignore
+@item @prim{CH_DISCONNECT_REQ} @tab Disconnect request.
+@item @prim{CH_DISABLE_REQ} @tab Disable request.
+@item @prim{CH_DETACH_REQ} @tab Detach Request.
+@ignore
+@item @prim{CH_INFO_ACK} @tab Information acknowledgement.
+@item @prim{CH_OPTMGMT_ACK} @tab Options Management acknowledgement.
+@item @prim{CH_OK_ACK} @tab Successful receipt acknolwedgement.
+@item @prim{CH_ERROR_ACK} @tab Error acknowledgement.
+@item @prim{CH_ENABLE_CON} @tab Enable confirmation.
+@item @prim{CH_CONNECT_CON} @tab Connect confirmation.
+@item @prim{CH_DATA_IND} @tab Data indication.
+@item @prim{CH_DISCONNECT_IND} @tab Disconnect indication.
+@item @prim{CH_DISCONNECT_CON} @tab Disconnect confirmation.
+@item @prim{CH_DISABLE_IND} @tab Disable indication.
+@item @prim{CH_DISABLE_CON} @tab Disable confirmation.
+@item @prim{CH_EVENT_IND} @tab Event indication.
+@end ignore
+@end multitable
+
+@item ch_state
+
+Indicates the current state of the CHS provider at the time that the primitive was issued.
+This field can be one of the following values;
+
+@multitable @columnfractions .2 .8
+@item @psta{CHS_UNINIT} @tab Unitialized.
+@item @psta{CHS_UNUSABLE} @tab Device cannot be used, Stream in hung state.
+@item @psta{CHS_DETACHED} @tab No PPA attached, awaiting @prim{CH_ATTACH_REQ}.
+@ignore
+@item @psta{CHS_WACK_AREQ} @tab Waiting for attach.
+@item @psta{CHS_WACK_UREQ} @tab Waiting for detach.
+@end ignore
+@item @psta{CHS_ATTACHED} @tab PPA attached, awaiting @prim{CH_ENABLE_REQ}.
+@ignore
+@c @item @psta{CHS_WACK_EREQ} @tab Waiting acknolwedgement of @prim{CH_ENABLE_REQ}.
+@end ignore
+@item @psta{CHS_WCON_EREQ} @tab Waiting to send @prim{CH_ENABLE_CON}.
+@ignore
+@c @item @psta{CHS_WACK_RREQ} @tab Waiting acknowledgement of @prim{CH_DISABLE_REQ}.
+@end ignore
+@item @psta{CHS_WCON_RREQ} @tab Waiting to send @prim{CH_DISABLE_CON}.
+@item @psta{CHS_ENABLED} @tab Ready for use, awaiting primitive exchange.
+@ignore
+@item @psta{CHS_WACK_CREQ} @tab Waiting acknolwedgement of @prim{CH_CONNECT_REQ}.
+@end ignore
+@item @psta{CHS_WCON_CREQ} @tab Waiting to send @prim{CH_CONNECT_CON}.
+@ignore
+@item @psta{CHS_WACK_DREQ} @tab Waiting acknolwedgement of @prim{CH_DISCONNECT_REQ}.
+@end ignore
+@item @psta{CHS_WCON_DREQ} @tab Waiting to send @prim{CH_DISCONNECT_CON}.
+@item @psta{CHS_CONNECTED} @tab Connected, active data transfer.
+@end multitable
+
+@end table
+
+@subsubheading State
+
+This primitive is issued by the CHS provider in the @psta{CHS_WACK_AREQ}, @psta{CHS_WACK_UREQ},
+@psta{CHS_WACK_CREQ} or @psta{CHS_WACK_DREQ} state.
+
+@subsubheading New State
+
+The new state is @psta{CHS_DETACHED}, @psta{CHS_ATTACHED}, @psta{CHS_ENABLED} or @psta{CHS_CONNECTED}, depending on the primitive to
+which the message is responding.
+
+@page
+@node CH_ERROR_ACK
+@subsubsection CH_ERROR_ACK
+
+@subsubheading Description
+
+The error acknowledgement primitive is used to acknowledge receipt and unsuccessful service
+completion for primitives requiring acknowledgement.
+
+@subsubheading Format
+@tpindex CH_error_ack
+
+The error acknowledgement primitive consists of one @msg{M_PCPROTO} message block, structured as follows:
+
+@display
+@verbatim
+typedef struct CH_error_ack {
+    ch_ulong ch_primtive;
+    ch_ulong ch_error_primitive;
+    ch_ulong ch_error_type;
+    ch_ulong ch_unix_error;
+    ch_ulong ch_state;
+} CH_error_ack_t;
+@end verbatim
+@end display
+
+@subsubheading Parameters
+
+The error acknowledgement primitive contains the following parameters:
+
+@table @parm
+
+@item ch_primitive
+
+Indicates the primitive type.  Always @prim{CH_ERROR_ACK}.
+
+@item ch_error_type
+
+Indicates the CH error number.
+This field can have one of the following values:
+
+@multitable @columnfractions .2 .8
+@item @perr{CHSYSERR} @tab UNIX system error.
+@item @perr{CHBADADDR} @tab Bad address format or content.
+@item @perr{CHOUTSTATE} @tab Interface out of state.
+@item @perr{CHBADOPT} @tab Bad options format or content.
+@item @perr{CHBADPARM} @tab Bad parameter format or content.
+@item @perr{CHBADPARMTYPE} @tab Bad paramater structure type.
+@item @perr{CHBADFLAG} @tab Bad flag.
+@item @perr{CHBADPRIM} @tab Bad primitive.
+@item @perr{CHNOTSUPP} @tab Primitive not supported.
+@item @perr{CHBADSLOT} @tab Bad multplex slot.
+@end multitable
+
+@item ch_unix_error
+
+Indicates the reason for failure.  This field is protocol-specific.  When the @parm{ch_error_type} field
+is @perr{CHSYSERR}, the @parm{ch_unix_error} field is the UNIX error number as described in
+@manref{errno(3)}.
+
+@item ch_error_primitive
+
+Indicates the primitive that was in error.
+This field can have one of the following values:
+
+@multitable @columnfractions .25 .75
+@item @prim{CH_INFO_REQ} @tab Information request.
+@item @prim{CH_OPTMGMT_REQ} @tab Options management request.
+@item @prim{CH_ATTACH_REQ} @tab Attach request.
+@item @prim{CH_ENABLE_REQ} @tab Enable request.
+@item @prim{CH_CONNECT_REQ} @tab Connect request.
+@item @prim{CH_DATA_REQ} @tab Data request.
+@item @prim{CH_DISCONNECT_REQ} @tab Disconnect request.
+@item @prim{CH_DISABLE_REQ} @tab Disable request.
+@item @prim{CH_DETACH_REQ} @tab Detach Request.
+@item @prim{CH_INFO_ACK} @tab Information acknowledgement.
+@item @prim{CH_OPTMGMT_ACK} @tab Options Management acknowledgement.
+@item @prim{CH_OK_ACK} @tab Successful receipt acknolwedgement.
+@item @prim{CH_ERROR_ACK} @tab Error acknowledgement.
+@item @prim{CH_ENABLE_CON} @tab Enable confirmation.
+@item @prim{CH_CONNECT_CON} @tab Connect confirmation.
+@item @prim{CH_DATA_IND} @tab Data indication.
+@item @prim{CH_DISCONNECT_IND} @tab Disconnect indication.
+@item @prim{CH_DISCONNECT_CON} @tab Disconnect confirmation.
+@item @prim{CH_DISABLE_IND} @tab Disable indication.
+@item @prim{CH_DISABLE_CON} @tab Disable confirmation.
+@item @prim{CH_EVENT_IND} @tab Event indication.
+@end multitable
+
+@item ch_state
+
+Indicates the state of the CHS provider at the time that the primitive was issued.  This field can
+have one of the following values:
+
+@multitable @columnfractions .2 .8
+@item @psta{CHS_UNINIT} @tab Unitialized.
+@item @psta{CHS_UNUSABLE} @tab Device cannot be used, Stream in hung state.
+@item @psta{CHS_DETACHED} @tab No PPA attached, awaiting @prim{CH_ATTACH_REQ}.
+@item @psta{CHS_WACK_AREQ} @tab Waiting for attach.
+@item @psta{CHS_WACK_UREQ} @tab Waiting for detach.
+@item @psta{CHS_ATTACHED} @tab PPA attached, awaiting @prim{CH_ENABLE_REQ}.
+@c @item @psta{CHS_WACK_EREQ} @tab Waiting acknolwedgement of @prim{CH_ENABLE_REQ}.
+@item @psta{CHS_WCON_EREQ} @tab Waiting to send @prim{CH_ENABLE_CON}.
+@c @item @psta{CHS_WACK_RREQ} @tab Waiting acknowledgement of @prim{CH_DISABLE_REQ}.
+@item @psta{CHS_WCON_RREQ} @tab Waiting to send @prim{CH_DISABLE_CON}.
+@item @psta{CHS_ENABLED} @tab Ready for use, awaiting primitive exchange.
+@item @psta{CHS_WACK_CREQ} @tab Waiting acknolwedgement of @prim{CH_CONNECT_REQ}.
+@item @psta{CHS_WCON_CREQ} @tab Waiting to send @prim{CH_CONNECT_CON}.
+@item @psta{CHS_WACK_DREQ} @tab Waiting acknolwedgement of @prim{CH_DISCONNECT_REQ}.
+@item @psta{CHS_WCON_DREQ} @tab Waiting to send @prim{CH_DISCONNECT_CON}.
+@item @psta{CHS_CONNECTED} @tab Connected, active data transfer.
+@end multitable
+
+@end table
+
+@subsubheading State
+
+This primitive can be issued in any state for which a local acknowledgement is not pending.  The
+CHS provider state at the time that the primitive was issued is indicated in the primitive.
+
+@subsubheading New State
+
+The new state remains unchanged.
+
+@page
+@node Information Reporting Service Primitives
+@subsection Information Reporting Service Primitives
+
+These service primitives implement the information reporting service (@pxref{Information Reporting
+Service}).
+
+@menu
+* CH_INFO_REQ::
+* CH_INFO_ACK::
+@end menu
+
+@node CH_INFO_REQ
+@subsubsection CH_INFO_REQ
+
+@subsubheading Description
+
+This CHS user originated primitive is issued by the CHS user to request that the CHS provider
+return information concerning the capabilities and state of the CHS provider.
+
+@subsubheading Format
+@tpindex CH_info_req
+
+The primitive consists of one @msg{M_PROTO} or @msg{M_PCPROTO} message block, structured as follows:
+
+@display
+@verbatim
+typedef struct CH_info_req {
+    ch_ulong ch_primitive;
+} CH_info_req_t;
+@end verbatim
+@end display
+
+@subsubheading Parameters
+
+This primitive contains the following parameters:
+
+@table @parm
+
+@item ch_primitive
+Specifies the primitive type.  Always @prim{CH_INFO_REQ}.
+
+@end table
+
+@subsubheading State
+
+This primitive may be issued in any state but only when a local acknowledgement is not pending.
+
+@subsubheading New State
+
+The new state remains unchanged.
+
+@subsubheading Response
+
+This primitive requires the CHS provider to acknowledge receipt of the primitive as follows:
+
+@itemize @minus
+
+@item @b{Successful}:
+The CHS provider is required to acknowledge receipt of the primitive and provide the requested
+information using the @prim{CH_INFO_ACK} primitive.
+
+@item @b{Unsuccessful (non-fatal errors)}:
+The CHS provider is required to negatively acknowledge the primtive using the @prim{CH_ERROR_ACK}
+primitive, and include the reason for failure in the primitive.
+
+@end itemize
+
+@subsubheading Reasons for Failure
+
+@b{Non-Fatal Errors}: applicable non-fatal errors are as follows:
+
+@multitable @columnfractions .2 .8
+@item @perr{CHSYSERR} @tab UNIX system error.
+@item @perr{CHBADADDR} @tab Bad address format or content.
+@item @perr{CHOUTSTATE} @tab Interface out of state.
+@item @perr{CHBADOPT} @tab Bad options format or content.
+@item @perr{CHBADPARM} @tab Bad parameter format or content.
+@item @perr{CHBADPARMTYPE} @tab Bad paramater structure type.
+@item @perr{CHBADFLAG} @tab Bad flag.
+@item @perr{CHBADPRIM} @tab Bad primitive.
+@item @perr{CHNOTSUPP} @tab Primitive not supported.
+@item @perr{CHBADSLOT} @tab Bad multplex slot.
+@end multitable
+
+@page
+@node CH_INFO_ACK
+@subsubsection CH_INFO_ACK
+
+@subsubheading Description
+
+This CHS provider originated primitive acknowledges receipt and successful processing of the
+@prim{CH_INFO_REQ} primitive and provides the requested information concerning the CHS provider.
+
+@subsubheading Format
+@tpindex CH_info_ack
+
+This message is formatted a one @msg{M_PROTO} or @msg{M_PCPROTO} message block, structured as follows:
+
+@display
+@verbatim
+typedef struct CH_info_ack {
+    ch_ulong ch_primitive;    /* always CH_INFO_ACK */
+    ch_ulong ch_addr_length;  /* channel address length */
+    ch_ulong ch_addr_offset;  /* channel address offset */
+    ch_ulong ch_parm_length;  /* channel paramters length */
+    ch_ulong ch_parm_offset;  /* channel paramters offset */
+    ch_ulong ch_prov_flags;   /* provider options flags */
+    ch_ulong ch_prov_class;   /* provider class */
+    ch_ulong ch_style;        /* provider style */
+    ch_ulong ch_version;      /* channel interface version */
+    ch_ulong ch_state;        /* channel state */
+} CH_info_ack_t;
+@end verbatim
+@end display
+
+@subsubheading Parameters
+
+The information acknowledgement service primitive has the following parameters:
+
+@table @parm
+
+@item ch_primitive
+Indicates the service primitive type.  Always @prim{CH_INFO_ACK}.
+
+@item ch_addr_length
+Indicates the length of the PPA address to which the provider is attached.  When in states
+@psta{CHS_DETACHED} or @psta{CHS_WACK_AREQ}, this value will be zero (@samp{0}).
+
+@item ch_addr_offset
+Indicates the offset, beginning from the start of the @msg{M_PCPROTO} message block of the
+PPA address associated with the provider.
+When the @parm{ch_addr_length} field is zero, this field is also zero (@samp{0}).
+
+@item ch_parm_length
+Indicates the length of the parameters associated with the provider.
+
+@item ch_parm_offset
+Indicates the offset, beginning from the start of the @msg{M_PCPROTO} message block, of the
+parameters associated with the provider.
+When the @parm{ch_parm_length} field is zero, this field is also zero (@samp{0}).
+
+@item ch_prov_flags
+Indicates the options flags associated with the provider.  This is a bitwise OR of zero or more of
+the following flags:
+
+@item ch_prov_class
+Indicates the provider class.  This can be one of the following values:
+
+@multitable @columnfractions .2 .6
+@item @pval{CH_CIRCUIT} @tab Circuit provider class.
+@end multitable
+
+@item ch_addr_length
+This is a variable length field.  The length of the field is determined by the length
+attribute.
+
+For a @dfn{Style 2} driver, when @parm{ch_style} is @pval{CH_STYLE2}, and when in an attached state,
+this field provides the current PPA associated with the Stream; the length is typically 4 bytes.
+
+For a @dfn{Style 1} driver, when @parm{ch_ppa_stype} is @pval{CH_STYLE1}, the length is 0 bytes.
+
+@item ch_style
+Indicates the PPA style of the CHS provider.  This value can be one of the following values;
+
+@multitable @columnfractions .15 .65
+@item @pval{CH_STYLE1} @tab PPA is implicitly attached by @manref{open(2s)}.
+@item @pval{CH_STYLE2} @tab PPA must be explicitly attached using @prim{CH_ATTACH_REQ}.
+@end multitable
+
+@item ch_version
+The version of the interface.  This version is @pval{CH_VERSION_1_1}.
+
+@multitable @columnfractions .2 .6
+@item @pval{CH_VERSION_1_0} @tab Version 1.0 of interface.
+@item @pval{CH_VERSION_1_1} @tab Version 1.1 of interface.
+@item @pval{CH_VERSION} @tab Always the current version of the header file.
+@end multitable
+
+@item ch_state
+Indicates the state of the CHS provider at the time that the information acknolwedgement service
+primitive wsa issued.  This field can be one of the following values:
+
+@multitable @columnfractions .2 .8
+@item @psta{CHS_UNINIT} @tab Unitialized.
+@item @psta{CHS_UNUSABLE} @tab Device cannot be used, Stream in hung state.
+@item @psta{CHS_DETACHED} @tab No PPA attached, awaiting @prim{CH_ATTACH_REQ}.
+@item @psta{CHS_WACK_AREQ} @tab Waiting for attach.
+@item @psta{CHS_WACK_UREQ} @tab Waiting for detach.
+@item @psta{CHS_ATTACHED} @tab PPA attached, awaiting @prim{CH_ENABLE_REQ}.
+@c @item @psta{CHS_WACK_EREQ} @tab Waiting acknolwedgement of @prim{CH_ENABLE_REQ}.
+@item @psta{CHS_WCON_EREQ} @tab Waiting to send @prim{CH_ENABLE_CON}.
+@c @item @psta{CHS_WACK_RREQ} @tab Waiting acknowledgement of @prim{CH_DISABLE_REQ}.
+@item @psta{CHS_WCON_RREQ} @tab Waiting to send @prim{CH_DISABLE_CON}.
+@item @psta{CHS_ENABLED} @tab Ready for use, awaiting primitive exchange.
+@item @psta{CHS_WACK_CREQ} @tab Waiting acknolwedgement of @prim{CH_CONNECT_REQ}.
+@item @psta{CHS_WCON_CREQ} @tab Waiting to send @prim{CH_CONNECT_CON}.
+@item @psta{CHS_WACK_DREQ} @tab Waiting acknolwedgement of @prim{CH_DISCONNECT_REQ}.
+@item @psta{CHS_WCON_DREQ} @tab Waiting to send @prim{CH_DISCONNECT_CON}.
+@item @psta{CHS_CONNECTED} @tab Connected, active data transfer.
+@end multitable
+
+@end table
+
+@subsubheading State
+
+This primitive can be issued in any state where a local acknowledgement is not pending.
+
+@subsubheading New State
+
+The new state remains unchanged.
+
+@page
+@node Physical Point of Attachment Service Primitives
+@subsection Physical Point of Attachment Service Primitives
+
+These service primitives implement the physical point of attachment service (@pxref{Physical Point
+of Attachment Service}).
+
+@menu
+* CH_ATTACH_REQ::
+* CH_DETACH_REQ::
+@end menu
+
+@node CH_ATTACH_REQ
+@subsubsection CH_ATTACH_REQ
+
+@subsubheading Description
+
+This CHS user originated primitive requests that the Stream upon which the primitive is issued be
+associated with the specified Physical Point of Attachment (PPA).  This primitive is only applicable
+to @dfn{Style 2} CHS provider Streams, that is, Streams that return @pval{CH_STYLE2} in the
+@parm{ch_style} field of the @prim{CH_INFO_ACK}.
+
+@subsubheading Format
+@tpindex CH_attach_req
+
+This primitive consists of one @msg{M_PROTO} message block, structured as follows:
+
+@display
+@verbatim
+typedef CH_attach_req {
+    ch_ulong ch_primitive;
+    ch_ulong ch_addr_length;
+    ch_ulong ch_addr_offset;
+    ch_ulong ch_flags;
+} CH_attach_req_t;
+@end verbatim
+@end display
+
+@subsubheading Parameters
+
+The attach request primitive contains the following parameters:
+
+@table @parm
+
+@item ch_primitive
+Specifies the service primitive type.  Always @prim{CH_ATTACH_REQ}.
+
+@item ch_addr_length
+Specifies the Physical Point of Attachment (PPA) to which to associate the @dfn{Style 2} Stream.
+This is a variable length identifier whose length is determined by the @parm{ch_addr_length} value.
+Specifies the length of the Physical Point of Attachment (PPA) address.  The form of the PPA address
+is provider-specific.
+
+@item ch_addr_offset
+Specifies the offset, from the beginning of the @msg{M_PROTO} message block, of the start of the
+Physical Point of Attachment (PPA) address.
+
+@item ch_flags
+Specifies the options flags for attachment.  Options flags are provider-specific.
+
+@end table
+
+@subsubheading State
+
+This primitive is only valid in state @psta{CHS_DETACHED} and when a local acknowledgement is not
+pending.
+
+@subsubheading New State
+
+Upon success, the new state is @psta{CHS_WACK_AREQ}.  Upon failure, the state remains unchanged.
+
+@subsubheading Response
+
+The attach request service primitive requires that the CHS provider respond as follows:
+
+@itemize @minus
+
+@item @b{Successful}:
+The CHS provider acknowledges receipt of the primitive and successful outcome of the attach service
+with a @prim{CH_OK_ACK} primitive.  The new state is @psta{CHS_ATTACHED}.
+
+@item @b{Unsuccessful (non-fatal errors)}:
+The CHS provider acknowledges receipt of the primitive and failure of the attach service with a
+@prim{CH_ERROR_ACK} primitive containing the reason for failure.  The new state remains unchanged.
+
+@end itemize
+
+@subsubheading Reasons for Failure
+
+@b{Non-Fatal Errors}:  applicable non-fatal errors are as follows:
+
+@multitable @columnfractions .2 .8
+@item @perr{CHSYSERR} @tab UNIX system error.
+@item @perr{CHBADADDR} @tab Bad address format or content.
+@item @perr{CHOUTSTATE} @tab Interface out of state.
+@item @perr{CHBADOPT} @tab Bad options format or content.
+@item @perr{CHBADPARM} @tab Bad parameter format or content.
+@item @perr{CHBADPARMTYPE} @tab Bad paramater structure type.
+@item @perr{CHBADFLAG} @tab Bad flag.
+@item @perr{CHBADPRIM} @tab Bad primitive.
+@item @perr{CHNOTSUPP} @tab Primitive not supported.
+@item @perr{CHBADSLOT} @tab Bad multplex slot.
+@end multitable
+
+@page
+@node CH_DETACH_REQ
+@subsubsection CH_DETACH_REQ
+
+@subsubheading Description
+
+This CHS user originated primitive requests that the Stream upon which the primitive is issued be
+disassociated from the Physical Point of Appearance (PPA) to which it is currently attached.  This
+primitive is only applicable to @dfn{Style 2} CHS provider Streams, that is, Streams that return
+@pval{CH_STYLE2} in the @parm{ch_style} field of the @prim{CH_INFO_ACK}.
+
+@subsubheading Format
+@tpindex CH_detach_req
+
+The detach request service primitive consists of one @msg{M_PROTO} message block, structured as follows:
+
+@display
+@verbatim
+typedef struct CH_detach_req {
+    ch_ulong ch_primitive;
+} CH_detach_req_t;
+@end verbatim
+@end display
+
+@subsubheading Parameters
+
+The detach request service primitive contains the following parameters:
+
+@table @parm
+
+@item ch_primitive
+Specifies the service primitive type.  Always @prim{CH_DETACH_REQ}.
+
+@end table
+
+@subsubheading State
+
+This primitive is valid in the @psta{CHS_ATTACHED} state and when no local acknowledgement is pending.
+
+@subsubheading New State
+
+Upon success, the new state is @psta{CHS_WACK_UREQ}.  Upon failure, the state remains unchanged.
+
+@subsubheading Response
+
+The detach request service primitive requires that the CHS provider respond as follows:
+
+@itemize @minus
+
+@item @b{Successful}:
+The CHS provider acknowledges receipt of the primitive and successful outcome of the detach service
+with a @prim{CH_OK_ACK} primitive.  The new state is @psta{CHS_DETACHED}.
+
+@item @b{Unsuccessful (non-fatal errors)}:
+The CHS provider acknowledges receipt of the primitive and failure of the detach service with a
+@prim{CH_ERROR_ACK} primitive containing the reason for failure.  The new state remains unchanged.
+
+@end itemize
+
+@subsubheading Reasons for Failure
+
+@b{Non-Fatal Errors}:  applicable non-fatal errors are as follows:
+
+@multitable @columnfractions .2 .8
+@item @perr{CHSYSERR} @tab UNIX system error.
+@item @perr{CHBADADDR} @tab Bad address format or content.
+@item @perr{CHOUTSTATE} @tab Interface out of state.
+@item @perr{CHBADOPT} @tab Bad options format or content.
+@item @perr{CHBADPARM} @tab Bad parameter format or content.
+@item @perr{CHBADPARMTYPE} @tab Bad paramater structure type.
+@item @perr{CHBADFLAG} @tab Bad flag.
+@item @perr{CHBADPRIM} @tab Bad primitive.
+@item @perr{CHNOTSUPP} @tab Primitive not supported.
+@item @perr{CHBADSLOT} @tab Bad multplex slot.
+@end multitable
+
+@page
+@node Initialization Service Primitives
+@subsection Initialization Service Primitives
+
+Initialization service primitives allow the CHS user to enable or disable the protocol service
+interface.  Enabling the protocol service interface may require that some action be taken to prepare
+the protocol service interface for use or to remove it from use.  For example, where the PPA
+corresponds to a channel identifier as defined in G.703, it may be necessary to perform
+switching to connect or disconnect the circuit identification code associated with the channel
+identifier.
+
+These service primitives implement the initialization service (@pxref{Initialization Service}).
+
+@menu
+* CH_ENABLE_REQ::
+* CH_ENABLE_CON::
+* CH_DISABLE_REQ::
+* CH_DISABLE_CON::
+* CH_DISABLE_IND::
+@end menu
+
+@node CH_ENABLE_REQ
+@subsubsection CH_ENABLE_REQ
+
+@subsubheading Description
+
+This CHS user originated primitive requests that the CHS provider perform the actions necessary to
+enable the protocol service interface and confirm that it is enabled.  This primitive is applicable
+to both styles of PPA.
+
+@subsubheading Format
+@tpindex CH_enable_req
+
+The enable request service primitive consists of one @msg{M_PROTO} message block, structured as follows:
+
+@display
+@verbatim
+typedef struct CH_enable_req {
+    ch_ulong ch_primitive;
+    ch_ulong ch_addr_length;
+    ch_ulong ch_addr_offset;
+    ch_ulong ch_flags;
+} CH_enable_req_t;
+@end verbatim
+@end display
+
+@subsubheading Parameters
+
+The enable request service primitive contains the following parameters:
+
+@table @parm
+
+@item ch_primitive
+Specifies the service primitive type.  Always @prim{CH_ENABLE_REQ}.
+
+@item ch_addr_length
+Specifies a remote address to which to connect the PPA.  The need for and form of this address is
+provider-specific.  The length of the field is determined by the value of this field.
+This remote address could be a circuit identification code, an IP address, or some other
+form of circuit or channel identifier.
+
+@item ch_addr_offset
+Specifies the offset, from the beginning of the @msg{M_PROTO} message block, of the start of the
+remote address.
+
+@item ch_flags
+Specifies the options flags associated with the enable request.  Options flags are
+provider-specific.
+
+@end table
+
+@subsubheading State
+
+This primitive is valid in the @psta{CHS_ATTACHED} state and when no local acknowledgement is pending.
+
+@subsubheading New State
+
+Upon success the new state is @psta{CHS_WCON_EREQ}.  Upon failure, the state remains unchanged.
+
+@subsubheading Response
+
+The enable request service primitive requires that the CHS provider acknowledge receipt of the
+primitive as follows:
+
+@itemize @minus
+
+@item @b{Successful}:
+When successful, the CHS provider acknowledges successful completion of the enable service with a
+@prim{CH_ENABLE_CON} primitive.  The new state is @psta{CHS_ENABLED}.
+
+@item @b{Unsuccessful (non-fatal errors)}:
+When unsuccessful, the CHS provider acknowledges the failure of the enable service with a
+@prim{CH_ERROR_ACK} primitive containing the error.  The new state remains unchanged.
+
+@end itemize
+
+@subsubheading Reasons for Failure
+
+@b{Non-Fatal Errors}:  applicable non-fatal errors are as follows:
+
+@multitable @columnfractions .2 .8
+@item @perr{CHSYSERR} @tab UNIX system error.
+@item @perr{CHBADADDR} @tab Bad address format or content.
+@item @perr{CHOUTSTATE} @tab Interface out of state.
+@item @perr{CHBADOPT} @tab Bad options format or content.
+@item @perr{CHBADPARM} @tab Bad parameter format or content.
+@item @perr{CHBADPARMTYPE} @tab Bad paramater structure type.
+@item @perr{CHBADFLAG} @tab Bad flag.
+@item @perr{CHBADPRIM} @tab Bad primitive.
+@item @perr{CHNOTSUPP} @tab Primitive not supported.
+@item @perr{CHBADSLOT} @tab Bad multplex slot.
+@end multitable
+
+@page
+@node CH_ENABLE_CON
+@subsubsection CH_ENABLE_CON
+
+@subsubheading Description
+
+This CHS provider originated primitive is issued by the CHS provider to confirm the successful
+completion of the enable service.
+
+@subsubheading Format
+@tpindex CH_enable_con
+
+The enable confirmation service primitive consists of one @msg{M_PROTO} message block, structured as
+follows:
+
+@display
+@verbatim
+typedef struct CH_enable_con {
+    ch_ulong ch_primitive;
+    ch_ulong ch_addr_length;
+    ch_ulong ch_addr_offset;
+    ch_ulong ch_flags;
+} CH_enable_con_t;
+@end verbatim
+@end display
+
+@subsubheading Parameters
+
+The enable confirmation service primitive contains the following parameters:
+
+@table @parm
+
+@item ch_primitive
+Indicates the service primitive type.  Always @prim{CH_ENABLE_CON}.
+
+@item ch_addr_length
+Confirms the length of the remote address to which the enable is confirmed.
+
+@item ch_addr_offset
+Confirms the offset, from the beginning of the @msg{M_PROTO} message block, of the start of the
+remote address.
+
+@item ch_flags
+Confirms the options flags associated with the enable confirmation.  Options flags are
+provider-specific.
+
+@end table
+
+@subsubheading State
+
+This primitive is issued by the CHS provider in the @psta{CHS_WCON_EREQ} state.
+
+@subsubheading New State
+
+The new state is @psta{CHS_ENABLED}.
+
+@page
+@node CH_DISABLE_REQ
+@subsubsection CH_DISABLE_REQ
+
+@subsubheading Description
+
+This CHS user originated primitive requests that the CHS provider perform the actions necessary to
+disable the protocol service interface and confirm that it is disabled.  The primitive is applicable
+to both styles of PPA.
+
+@subsubheading Format
+@tpindex CH_disable_req
+
+The disable request service primitive consists of one @msg{M_PROTO} message block, structured as follows:
+
+@display
+@verbatim
+typedef struct CH_disable_req {
+    ch_ulong ch_primitive;
+} CH_disable_req_t;
+@end verbatim
+@end display
+
+@subsubheading Parameters
+
+The disable request service primitive contains the following parameters:
+
+@table @parm
+
+@item ch_primitive
+Specifies the service primitive type.  Always @prim{CH_DISABLE_REQ}.
+
+@end table
+
+@subsubheading State
+
+The disable request service primitive is valid in the @psta{CHS_ENABLED} state and when no local
+acknowledgement is pending.
+
+@subsubheading New State
+
+Upon success, the new state is @psta{CHS_WCON_RREQ}.  Upon failure, the state remains unchanged.
+
+@subsubheading Response
+
+The disable request service primitive requires the CHS provider to acknowledge receipt of the
+primitive as follows:
+
+@itemize @minus
+
+@item @b{Successful}:
+When successful, the CHS provider acknowledges successful completion of the disable service with an
+@prim{CH_DISABLE_CON} primitive.  The new state is @psta{CHS_ATTACHED}.
+
+@item @b{Unsuccessful (non-fatal errors)}:
+When unsuccessful, the CHS provider acknowledges the failure of the disable service with a
+@prim{CH_ERROR_ACK} primitive containing the error.  The new state remains unchanged.
+
+@end itemize
+
+@subsubheading Reasons for Failure
+
+@b{Non-Fatal Errors}:  applicable non-fatal errors are as follows:
+
+@multitable @columnfractions .2 .8
+@item @perr{CHSYSERR} @tab UNIX system error.
+@item @perr{CHBADADDR} @tab Bad address format or content.
+@item @perr{CHOUTSTATE} @tab Interface out of state.
+@item @perr{CHBADOPT} @tab Bad options format or content.
+@item @perr{CHBADPARM} @tab Bad parameter format or content.
+@item @perr{CHBADPARMTYPE} @tab Bad paramater structure type.
+@item @perr{CHBADFLAG} @tab Bad flag.
+@item @perr{CHBADPRIM} @tab Bad primitive.
+@item @perr{CHNOTSUPP} @tab Primitive not supported.
+@item @perr{CHBADSLOT} @tab Bad multplex slot.
+@end multitable
+
+@page
+@node CH_DISABLE_CON
+@subsubsection CH_DISABLE_CON
+
+@subsubheading Description
+
+This CHS provider originated primitive is issued by the CHS provider to confirm the successful
+completion of the disable service.
+
+@subsubheading Format
+@tpindex CH_disable_con
+
+The disable confirmation service primitive consists of one @msg{M_PROTO} message block, structured as
+follows:
+
+@display
+@verbatim
+typedef struct CH_disable_con {
+    ch_ulong ch_primitive;
+} CH_disable_con_t;
+@end verbatim
+@end display
+
+@subsubheading Parameters
+
+The disable confirmation service primitive contains the following parameters:
+
+@table @parm
+
+@item ch_primitive
+Indicates the service primitive type.  Always @prim{CH_DISABLE_CON}.
+
+
+
+@end table
+
+@subsubheading State
+
+This primitive is issued by the CHS provider in the @psta{CHS_WCON_RREQ} state.
+
+@subsubheading New State
+
+The new state is @psta{CHS_ATTACHED}.
+
+@page
+@node CH_DISABLE_IND
+@subsubsection CH_DISABLE_IND
+
+@subsubheading Description
+
+This CHS provider originated primitive is issued by the CHS provider, if an autonomous event results
+in the disabling of the CHS use Stream without an explicity CHS user request.
+
+@subsubheading Format
+@tpindex CH_disable_ind
+
+The disable indication primitive consists of one @msg{M_PROTO} message block, structured as follows:
+
+@display
+@verbatim
+typedef struct CH_disable_ind {
+    ch_ulong ch_primitive;
+    ch_ulong ch_cause;
+} CH_disable_ind_t;
+@end verbatim
+@end display
+
+@subsubheading Parameters
+
+@table @parm
+
+@item ch_primitive
+Indicates the service primitive type.  Always @prim{CH_DISABLE_IND}.
+
+@item ch_cause
+Indicates the cause of the autonomous disabling of the CHS user Stream.
+
+@end table
+
+@subsubheading State
+
+This primitive will only be issued by the CHS provider in the @psta{CHS_ENABLED} state.
+
+@subsubheading New State
+
+The new state is @psta{CHS_ATTACHED}.
+
+@page
+@node Options Management Service Primitives
+@subsection Options Management Service Primitives
+
+The options management service primitives allow the CHS user to negotiate options with the CHS
+provider, retrieve the current and default values of options, and check that values specified for
+options are correct.
+
+The options management service primitive implement the options management service (@pxref{Options
+Management Service}).
+
+@menu
+* CH_OPTMGMT_REQ::
+* CH_OPTMGMT_ACK::
+@end menu
+
+@node CH_OPTMGMT_REQ
+@subsubsection CH_OPTMGMT_REQ
+
+@subsubheading Description
+
+This CHS user originated primitive requests that CHS provider options be managed.
+
+@subsubheading Format
+@tpindex CH_optmgmt_req
+
+The option management request service primitive consists of one @msg{M_PROTO} or @msg{M_PCPROTO} message block,
+structured as follows:
+
+@display
+@verbatim
+typedef struct CH_optmgmt_req {
+    ch_ulong ch_primitive;
+    ch_ulong ch_opt_length;
+    ch_ulong ch_opt_offset;
+    ch_ulong ch_mgmt_flags;
+} CH_optmgmt_req_t;
+@end verbatim
+@end display
+
+@subsubheading Parameters
+
+The option management request service primitive contains the following parameters:
+
+@table @parm
+
+@item ch_primitive
+Specifies the service primitive type.  Always @prim{CH_OPTMGMT_REQ}.
+
+@item ch_opt_length
+Specifies the length of the options.
+
+@item ch_opt_offset
+Specifies the offset, from the beginning of the @msg{M_PROTO} message block, of the start of the options.
+
+@item ch_mgmt_flags
+Specifies the management flags that determine what operation the CHS provider is expected to
+perform on the specified options.  This field can assume one of the following values:
+
+@table @pval
+
+@item CH_NEGOTIATE
+Negotiate the specified value of each specified option and return the negotiated value.
+
+@item CH_CHECK
+Check the validity of the specified value of each specified option and return the result.  Do not
+alter the current value assumed by the CHS provider.
+
+@item CH_DEFAULT
+Return the default value for the specified options (or all options).  Do not alter the current value
+assumed by the CHS provider.
+
+@item CH_CURRENT
+Return the current value for the specified options (or all options).  Do not alter the current value
+assumed by the CHS provider.
+
+@end table
+
+@end table
+
+@subsubheading State
+
+This primitive is valid in any state where a local acknowledgement is not pending.
+
+@subsubheading New State
+
+The new state remains unchanged.
+
+@subsubheading Response
+
+The option management request service primitive requires the CHS provider to acknowledge receipt of
+the primitive as follows:
+
+@itemize @minus
+
+@item @b{Successful}:
+Upon success, the CHS provider acknolwedges receipt of the service primitive and successful
+completion of the options management service with an @prim{CH_OPTMGMT_ACK} primitive containing the
+options management result.  The state remains unchanged.
+
+@item @b{Unsuccessful (non-fatal errors)}:
+Upon failure, the CHS provider acknowledges receipt of the service primitive and failure to
+complete the options management service with an @prim{CH_ERROR_ACK} primitive containing the error.
+The state remains unchanged.
+
+@end itemize
+
+@subsubheading Reasons for Failure
+
+@b{Non-Fatal Errors}:  applicable non-fatal errors are as follows:
+
+@multitable @columnfractions .2 .8
+@item @perr{CHSYSERR} @tab UNIX system error.
+@item @perr{CHBADADDR} @tab Bad address format or content.
+@item @perr{CHOUTSTATE} @tab Interface out of state.
+@item @perr{CHBADOPT} @tab Bad options format or content.
+@item @perr{CHBADPARM} @tab Bad parameter format or content.
+@item @perr{CHBADPARMTYPE} @tab Bad paramater structure type.
+@item @perr{CHBADFLAG} @tab Bad flag.
+@item @perr{CHBADPRIM} @tab Bad primitive.
+@item @perr{CHNOTSUPP} @tab Primitive not supported.
+@item @perr{CHBADSLOT} @tab Bad multplex slot.
+@end multitable
+
+@page
+@node CH_OPTMGMT_ACK
+@subsubsection CH_OPTMGMT_ACK
+
+@subsubheading Description
+
+This CHS provider originated primitive is issued by the CHS provider upon successful completion of
+the options management service.  It indicates the outcome of the options management operation
+requested by the CHS user in a @prim{CH_OPTMGMT_REQ} primitive.
+
+@subsubheading Format
+@tpindex CH_optmgmt_ack
+
+The option management acknowledgement service primitive consists of one @msg{M_PCPROTO} message block,
+structured as follows:
+
+@display
+@verbatim
+typedef struct CH_optmgmt_ack {
+    ch_ulong ch_primitive;
+    ch_ulong ch_opt_length;
+    ch_ulong ch_opt_offset;
+    ch_ulong ch_mgmt_flags;
+} CH_optmgmt_ack_t;
+@end verbatim
+@end display
+
+@subsubheading Parameters
+
+The option management acknowledgement service primitive contains the following parameters:
+
+@table @parm
+
+@item ch_primitive
+Indicates the service primitive type.  Always @prim{CH_OPTMGMT_ACK}.
+
+@item ch_opt_length
+Indicates the length of the returned options.
+
+@item ch_opt_offset
+Indicates the offset of the returned options from the start of the @msg{M_PCPROTO} message block.
+
+@item ch_mgmt_flags
+Indicates the returned management flags.  These flags indicate the overall success of the options
+management service.  This field can assume one of the following values:
+
+@table @pval
+
+@item CH_SUCCESS
+The CHS provider succeeded in negotiating or returning all of the options specified by the CHS
+user in the @prim{CH_OPTMGMT_REQ} primitive.
+
+@item CH_FAILURE
+The CHS provider failed to negotiate one or more of the options specified by the CHS user.
+
+@item CH_PARTSUCCESS
+The CHS provider negotiated a value of lower quality for one or more of the options specified by
+the CHS user.
+
+@item CH_READONLY
+The CHS provider failed to negotiate one or more of the options specified by the CHS user because
+the option is treated as read-only by the CHS provider.
+
+@item CH_NOTSUPPORT
+The CHS provider failed to recognize one or more of the options specified by the CHS user.
+
+@end table
+
+@end table
+
+@subsubheading State
+
+This primitive is issued by the CHS provider in direct response to a @prim{CH_OPTMGMT_REQ} primitive.
+
+@subsubheading New State
+
+The new state remains unchangted.
+
+@subsubheading Rules
+
+The CHS provider observes the following rules when processing option management service requests:
+
+@itemize ---
+
+@item
+When the @parm{ch_mgmt_flags} field in the @prim{CH_OPTMGMT_REQ} primitive is set to @pval{CH_NEGOTIATE},
+the CHS provider will attempt to negotiate a value for each of the options specified in the
+request.
+
+@item
+When the flags are @pval{CH_DEFAULT}, the CHS provider will return the default values of the specified
+options, or the default values of all options known to the CHS provider if no options were
+specified.
+
+@item
+When the flags are @pval{CH_CURRENT}, the CHS provider will return the current values of the specified
+options, or all options.
+
+@item
+When the flags are @pval{CH_CHECK}, the CHS provider will attempt to negotiate a value for each of the
+options specified in the request and return the resulg of the negotiation, but will not affect the
+current value of the option.
+
+@end itemize
+
+@page
+@node Event Reporting Service Primitives
+@subsection Event Reporting Service Primitives
+
+The event reporting service primitives allow the CHS provider to indicate asynchronous errors,
+events and statistics collection to the CHS user.
+
+These service primitives implement the event reporting service (@pxref{Event Reporting Service}).
+
+@menu
+* CH_ERROR_IND::
+* CH_STATS_IND::
+* CH_EVENT_IND::
+@end menu
+
+@node CH_ERROR_IND
+@subsubsection CH_ERROR_IND
+
+@subsubheading Description
+
+This CHS provider originated service primitive is issued by the CHS provider when it detects and
+asynchronous error event.  The service primitive is applicable to all styles of PPA.
+
+@subsubheading Format
+@tpindex CH_error_ind
+
+The error indication service primitive consists of one @msg{M_PROTO} message block, structured as follows:
+
+@display
+@verbatim
+typedef struct CH_error_ind {
+    ch_ulong ch_primitive;
+    ch_ulong ch_error_type;
+    ch_ulong ch_unix_error;
+    ch_ulong ch_state;
+} CH_error_ind_t;
+@end verbatim
+@end display
+
+@subsubheading Parameters
+
+The error indication service primitive contains the following parameters:
+
+@table @parm
+
+@item ch_primitive
+Indicates the service primitive type.  Always @prim{CH_ERROR_IND}.
+
+@item CH_error_type
+Indicates the CHI error number describing the error.  This field can have one of the following
+values:
+
+@multitable @columnfractions .2 .8
+@item @perr{CHSYSERR} @tab UNIX system error.
+@item @perr{CHBADADDR} @tab Bad address format or content.
+@item @perr{CHOUTSTATE} @tab Interface out of state.
+@item @perr{CHBADOPT} @tab Bad options format or content.
+@item @perr{CHBADPARM} @tab Bad parameter format or content.
+@item @perr{CHBADPARMTYPE} @tab Bad paramater structure type.
+@item @perr{CHBADFLAG} @tab Bad flag.
+@item @perr{CHBADPRIM} @tab Bad primitive.
+@item @perr{CHNOTSUPP} @tab Primitive not supported.
+@item @perr{CHBADSLOT} @tab Bad multplex slot.
+@end multitable
+
+@item ch_unix_error
+
+Indicates the reason for failure.  This field is protocol-specific.  When the @parm{ch_error_type} field
+is @perr{CHSYSERR}, the @parm{ch_unix_error} field is the UNIX error number as described in
+@manref{errno(3)}.
+
+@item ch_state
+
+Indicates the state of the CHS provider at the time that the primitive was issued.
+This field can have one of the following values:
+
+@multitable @columnfractions .2 .8
+@item @psta{CHS_UNINIT} @tab Unitialized.
+@item @psta{CHS_UNUSABLE} @tab Device cannot be used, Stream in hung state.
+@item @psta{CHS_DETACHED} @tab No PPA attached, awaiting @prim{CH_ATTACH_REQ}.
+@item @psta{CHS_WACK_AREQ} @tab Waiting for attach.
+@item @psta{CHS_WACK_UREQ} @tab Waiting for detach.
+@item @psta{CHS_ATTACHED} @tab PPA attached, awaiting @prim{CH_ENABLE_REQ}.
+@c @item @psta{CHS_WACK_EREQ} @tab Waiting acknolwedgement of @prim{CH_ENABLE_REQ}.
+@item @psta{CHS_WCON_EREQ} @tab Waiting to send @prim{CH_ENABLE_CON}.
+@c @item @psta{CHS_WACK_RREQ} @tab Waiting acknowledgement of @prim{CH_DISABLE_REQ}.
+@item @psta{CHS_WCON_RREQ} @tab Waiting to send @prim{CH_DISABLE_CON}.
+@item @psta{CHS_ENABLED} @tab Ready for use, awaiting primitive exchange.
+@item @psta{CHS_WACK_CREQ} @tab Waiting acknolwedgement of @prim{CH_CONNECT_REQ}.
+@item @psta{CHS_WCON_CREQ} @tab Waiting to send @prim{CH_CONNECT_CON}.
+@item @psta{CHS_WACK_DREQ} @tab Waiting acknolwedgement of @prim{CH_DISCONNECT_REQ}.
+@item @psta{CHS_WCON_DREQ} @tab Waiting to send @prim{CH_DISCONNECT_CON}.
+@item @psta{CHS_CONNECTED} @tab Connected, active data transfer.
+@end multitable
+
+@end table
+
+@subsubheading State
+
+This primitive can be issued in any state for which a local acknowledgement is not pending.  The
+CHS provider state at the time that the primitive was issued is indicated in the primitive.
+
+@subsubheading New State
+
+The new state remains unchanged.
+
+@page
+@node CH_STATS_IND
+@subsubsection CH_STATS_IND
+
+@subsubheading Description
+
+This CHS provider originated primitive is issued by the CHS provider to indicate a periodic
+statistics collection event.  The service primitive is applicable to all styles of PPA.
+
+@subsubheading Format
+@tpindex CH_stats_ind
+
+The statistics indication service primitive consists of one @msg{M_PROTO} message block, structured as
+follows:
+
+@display
+@verbatim
+typedef struct CH_stats_ind {
+    ch_ulong ch_primitive;
+    ch_ulong ch_interval;
+    ch_ulong ch_timestamp;
+} CH_stats_ind_t;
+@end verbatim
+@end display
+
+Following this structure within the @msg{M_PROTO} message block is the provider-specific statistics.
+
+@subsubheading Parameters
+
+The statistics indication service primitive contains the following parameters:
+
+@table @parm
+
+@item ch_primitive
+Indicates the service primitive type.  Always @prim{CH_STATS_IND}.
+
+@item ch_interval
+Indicates the statistics collection interval to which the statistics apply.  This interval is
+specified in milliseconds.
+
+@item ch_timestamp
+Indicates the UNIX time (from epoch) at which statistics were collected.  The timestamp is given in
+milliseconds from epoch.
+
+@end table
+
+@subsubheading State
+
+This service primitive may be issued by the CHS provider in any state in which a local
+acknowledgement is not pending.
+
+@subsubheading New State
+
+The new state remains unchanged.
+
+@page
+@node CH_EVENT_IND
+@subsubsection CH_EVENT_IND
+
+@subsubheading Description
+
+This CHS provider originated primitive is issued by the CHS provider to indicate an asynchronous
+event.  The service primitive is applicable to all styles of PPA.
+
+@subsubheading Format
+@tpindex CH_event_ind
+
+The event indication service primitive consists of one @msg{M_PROTO} message block, structured as follows:
+
+@display
+@verbatim
+typedef struct CH_event_ind {
+    ch_ulong ch_primitive;
+    ch_ulong ch_event;
+    ch_ulong ch_slot;
+} CH_event_ind_t;
+@end verbatim
+@end display
+
+Following this structure within the @msg{M_PROTO} message block is the provider-specific event
+information.
+
+@subsubheading Parameters
+
+THe event indication service primitive contains the following parameters:
+
+@table @parm
+
+@item ch_primitive
+Indicates the service primitive type.  Always @prim{CH_EVENT_IND}.
+
+@item ch_event
+Indicates the provider-specific event that has occured.
+
+@multitable @columnfractions .3 .7
+@item @pval{CHF_EVT_DCD_ASSERT} @tab Data carrier detect lead asserted.
+@item @pval{CHF_EVT_DCD_DEASSERT} @tab Data carrier detect lead deasserted.
+@item @pval{CHF_EVT_DSR_ASSERT} @tab Data set ready lead asserted.
+@item @pval{CHF_EVT_DSR_DEASSERT} @tab Data set ready lead deasserted.
+@item @pval{CHF_EVT_DTR_ASSERT} @tab Data terminal ready lead asserted.
+@item @pval{CHF_EVT_DTR_DEASSERT} @tab Data terminal ready lead deasserted.
+@item @pval{CHF_EVT_RTS_ASSERT} @tab Request to send lead asserted.
+@item @pval{CHF_EVT_RTS_DEASSERT} @tab Request to send lead deasserted.
+@item @pval{CHF_EVT_CTS_ASSERT} @tab Clear to send lead asserted.
+@item @pval{CHF_EVT_CTS_DEASSERT} @tab Clear to send lead deasserted.
+@item @pval{CHF_EVT_RI_ASSERT} @tab Ring indicator asserted.
+@item @pval{CHF_EVT_RI_DEASSERT} @tab Ring indicator deasserted.
+@item @pval{CHF_EVT_YEL_ALARM} @tab Yellow alarm condition.
+@item @pval{CHF_EVT_BLU_ALARM} @tab Blue alarm condition.
+@item @pval{CHF_EVT_RED_ALARM} @tab Red alarm condition.
+@item @pval{CHF_EVT_NO_ALARM} @tab Alarm recovery condition.
+@end multitable
+
+@ignore
+@item ch_timestamp
+Indicates the UNIX time from epoch (in milliseconds).
+
+@item ch_severity
+Indicates the provider-specific severity of the event.
+@end ignore
+
+@item ch_slot
+Where the PPA is associated with a multiplexed medium, this parameter indicates the slots within
+the mutliplexed media to which the event corresponds.  The form of the slot specification
+is provider- and media-specific.  See also @ref{Multiplex Media}.
+
+Where the PPA specifies a single channel for a medium, this parameter is set to zero (@samp{0}) by
+the CHS provider on CHS provider originated primitives and is ignored by the CHS provider on CHS
+user originated primitives.
+
+@end table
+
+@subsubheading State
+
+This service primitive can be issued by the CHS provider in any state where a local
+acknowledgement is not pending.  Normally the CHS provider must be in the @psta{CHS_ENABLED} state for
+event reporting to occur.
+
+@subsubheading New State
+
+The new state remains unchanged.
+
+@page
+@node Protocol Service Primitives
+@section Protocol Service Primitives
+
+Protocol service primitives implement the Channel Interface protocol.  Protocol service
+primitives provide the CHS user with the ability to connect transmission or reception directions of
+the bit stream, pass bits for transmission and accept received bits.
+
+These service primitives implement the protocol services (@pxref{Protocol Services}).
+
+@menu
+* Connection Service Primitives::
+* Data Transfer Service Primitives::
+* Disconnection Service Primitives::
+@end menu
+
+@node Connection Service Primitives
+@subsection Connection Service Primitives
+
+The connection service primitives permit the CHS user to establish a connection between the line
+(circuit or channel) and the CHS user in the transmit, receive, or both, directions.
+
+These service primitives implement the connection service (@pxref{Connection Service}).
+
+@menu
+* CH_CONNECT_REQ::
+* CH_CONNECT_CON::
+@end menu
+
+@node CH_CONNECT_REQ
+@subsubsection CH_CONNECT_REQ
+
+@subsubheading Description
+
+This CHS user originated service primitive allows the CHS user to connect the user Stream to the
+medium in the transmit, receive, or both, directions.
+
+@subsubheading Format
+@tpindex CH_connect_req
+
+The connect request primitive consists of one @msg{M_PROTO} message block, structured as follows:
+
+@display
+@verbatim
+typedef struct CH_connect_req {
+    ch_ulong ch_primitive;
+    ch_ulong ch_conn_flags;
+    ch_ulong ch_slot;
+} CH_connect_req_t;
+@end verbatim
+@end display
+
+@subsubheading Parameters
+
+The connect request service primitive contains the following parameters:
+
+@table @parm
+
+@item ch_primitive
+Specifies the service primitive type.  Always @prim{CH_CONNECT_REQ}.
+
+@item ch_conn_flags
+Specifies the direction in which to connect.  This field can contain a bitwise OR of one or more of
+the following flags:
+
+@multitable @columnfractions .15 .65
+@item @pval{CHF_RX_DIR} @tab Specifies that the CHS user Stream is to be connected to the medium in the receive direction.
+@item @pval{CHF_TX_DIR} @tab Specifies that the CHS user Stream is to be connected to the medium in the transmit direction.
+@item @pval{CHF_MONITOR} @tab Specifies that the CHS user Stream is to be connected to the medium in monitoring (tap) mode.
+@end multitable
+
+@item ch_slot
+Where the PPA is associated with a multiplexed medium, this parameter specifies the slots within
+the mutliplexed media to be connected to the CHS User Stream.  The form of the slot specification
+is provider- and media-specific.  See also @ref{Multiplex Media}.
+
+Where the PPA specifies a single channel for a medium, this parameter is set to zero (@samp{0}) by
+the CHS provider on CHS provider originated primitives and is ignored by the CHS provider on CHS
+user originated primitives.
+
+@end table
+
+@subsubheading State
+
+This service primitive is only valid in the @psta{CHS_ENABLED} state.
+
+@subsubheading New State
+
+The new state is the @psta{CHS_WACK_CREQ} state.
+
+@subsubheading Response
+
+The connect request service primitive requires that the CHS provider acknowledge receipt of the
+primitive as follows:
+
+@itemize @minus
+
+@item @b{Successful}:
+When successful, the CHS provider acknolwedges successful completion of the connect service wtih a
+@prim{CH_OK_ACK} primitive.  The new state is @psta{CHS_WCON_CREQ}.  When the CHS provider
+eventually completes the connection, it confirms the connection with a @prim{CH_CONNECT_CON}
+primitive and the new state is then @psta{CHS_CONNECTED}.
+
+@item @b{Unsuccessful (non-fatal errors)}:
+When unsuccessful, the CHS provider acknowledges the failure of the connect service with a
+@prim{CH_ERROR_ACK} primitive containing the error.  The new state remains unchanged.
+
+@end itemize
+
+@subsubheading Reasons for Failure
+
+@b{Non-Fatal Errors}:  applicable non-fatal errors are as follows:
+
+@multitable @columnfractions .2 .8
+@item @perr{CHSYSERR} @tab UNIX system error.
+@item @perr{CHBADADDR} @tab Bad address format or content.
+@item @perr{CHOUTSTATE} @tab Interface out of state.
+@item @perr{CHBADOPT} @tab Bad options format or content.
+@item @perr{CHBADPARM} @tab Bad parameter format or content.
+@item @perr{CHBADPARMTYPE} @tab Bad paramater structure type.
+@item @perr{CHBADFLAG} @tab Bad flag.
+@item @perr{CHBADPRIM} @tab Bad primitive.
+@item @perr{CHNOTSUPP} @tab Primitive not supported.
+@item @perr{CHBADSLOT} @tab Bad multplex slot.
+@end multitable
+
+@page
+@node CH_CONNECT_CON
+@subsubsection CH_CONNECT_CON
+
+@subsubheading Description
+
+This CHS provider originated service primitive allows the CHS provider to confirm the succesful
+completion of the connect servivce with the connection of the user Stream to the medium in the
+transmit, receive, or both, directions.
+
+@subsubheading Format
+@tpindex CH_connect_con
+
+The connect confirmation primitive consists of one @msg{M_PROTO} message block, structured as
+follows:
+
+@display
+@verbatim
+typedef struct CH_connect_con {
+    ch_ulong ch_primitive;
+    ch_ulong ch_conn_flags;
+    ch_ulong ch_slot;
+} CH_connect_con_t;
+@end verbatim
+@end display
+
+@subsubheading Parameters
+
+@table @parm
+
+@item ch_primitive
+Indicates the service primitive type.  Always @prim{CH_CONNECT_CON}.
+
+@item ch_conn_flags
+Indicates the connect flags.  This field is a bitwise OR of zero or more of the following flags:
+
+@multitable @columnfractions .15 .65
+@item @pval{CHF_RX_DIR} @tab Confirms that the CHS user Stream was connected to the medium in the receive direction.
+@item @pval{CHF_TX_DIR} @tab Confirms that the CHS user Stream was connected to the medium in the transmit direction.
+@item @pval{CHF_MONITOR} @tab Confirms that the CHS user Stream was connected to the medium in monitoring (tap) mode.
+@end multitable
+
+@item ch_slot
+Where the PPA is associated with a multiplexed medium, this parameter specifies the slots within
+the mutliplexed media that are confirmed connected to the CHS user Stream.  The form of the slot
+specification is provider- and media-specific.  See also @ref{Multiplex Media}.
+
+Where the PPA specifies a single channel for a medium, this parameter is set to zero (@samp{0}) by
+the CHS provider on CHS provider originated primitives and is ignored by the CHS provider on CHS
+user originated primitives.
+
+@end table
+
+@subsubheading State
+
+This primitive will only be issued by the CHS provider in the @psta{CHS_WCON_CREQ} state.
+
+@subsubheading New State
+
+The new state of the interface is the @psta{CHS_CONNECTED} state.
+
+@page
+@node Data Transfer Service Primitives
+@subsection Data Transfer Service Primitives
+
+The data transfer service primitives permit the CHS user to pass bits for transmission to the CHS
+provider and accept received bits from the CHS provider.
+
+These service primitives implement the data transfer service (@pxref{Data Transfer Service}).
+
+@menu
+* CH_DATA_REQ::
+* CH_DATA_IND::
+@end menu
+
+@node CH_DATA_REQ
+@subsubsection CH_DATA_REQ
+
+@subsubheading Description
+
+This CHS user originated primitive allows the CHS user to specify bits for transmission on the
+medium.
+
+@subsubheading Format
+@tpindex CH_data_req
+
+The transmission request service primitive consists of one optional @msg{M_PROTO} message block followed
+by one or more @msg{M_DATA} message blocks containing the bits for transmission.  The @msg{M_PROTO} message
+block is structured as follows:
+
+@display
+@verbatim
+typedef struct CH_data_req {
+    ch_ulong ch_primitive;
+    ch_ulong ch_slot;
+} CH_data_req_t;
+@end verbatim
+@end display
+
+@subsubheading Parameters
+
+The transmission request service primitive contains the following parameters:
+
+@table @parm
+
+@item ch_primitive
+Specifies the service primitive type.  Always @prim{CH_DATA_REQ}.
+
+@item ch_slot
+Where the PPA is associated with a multiplexed medium, this parameter specifies the slots within
+the mutliplexed media upon which the user data is to be transmitted.  The form of the slot
+specification is provider- and media-specific.  See also @ref{Multiplex Media}.
+
+Where the PPA specifies a single channel for a medium, this parameter is set to zero (@samp{0}) by
+the CHS provider on CHS provider originated primitives and is ignored by the CHS provider on CHS
+user originated primitives.
+
+@end table
+
+@subsubheading State
+
+This primitive is only valid in the @psta{CHS_CONNECTED} state.
+
+@subsubheading New State
+
+The state remains unchanged.
+
+@subsubheading Response
+@subsubheading Reasons for Failure
+
+@page
+@node CH_DATA_IND
+@subsubsection CH_DATA_IND
+
+@subsubheading Description
+
+This CHS provider originated primitive is issued by the CHS provider to indicate bits that were
+received on the medium.
+
+@subsubheading Format
+@tpindex CH_data_ind
+
+The receive indication service primitive consists of one optional @msg{M_PROTO} message block followed by
+one or more @msg{M_DATA} message blocks containing the received bits.  The @msg{M_PROTO} message block is
+structured as follows:
+
+@display
+@verbatim
+typedef struct CH_data_ind {
+    ch_ulong ch_primitive;
+    ch_ulong ch_slot;
+} CH_data_ind_t;
+@end verbatim
+@end display
+
+@subsubheading Parameters
+
+The receive indication service primitive contains the following parameters:
+
+@table @parm
+
+@item ch_primitive
+Indicates the service primitive type.  Always @prim{CH_DATA_IND}.
+
+@item ch_slot
+Where the PPA corresponds to a multiplexed media, this parameter specifies to which of the media
+streams the data indicated corresponds.  The form of the slot specification is provider- and
+media-specific.  See also @ref{Multiplex Media}.
+
+Where the PPA specifies a single channel for a medium, this parameter is set to zero (@samp{0}) by
+the CHS provider on CHS provider originated primitives and is ignored by the CHS provider on CHS
+user originated primitives.
+
+@end table
+
+@subsubheading State
+
+This primitive is only issued by the CHS provider in the @psta{CHS_CONNECTED} state.
+
+@subsubheading New State
+
+The state remains unchanged.
+
+@subsubheading Response
+@subsubheading Reasons for Failure
+
+@page
+@node Disconnection Service Primitives
+@subsection Disconnection Service Primitives
+
+The disconnection service primitives permit the CHS user to disconnect the Stream from the line
+(circuit or channel) for the transmit, receive, or both, directions.  They also allow the CHS
+provider to indicate that a disconnection has occured outside of CHS user control.
+
+These service primitives implement the disconnection service (@pxref{Disconnection Service}).
+
+@menu
+* CH_DISCONNECT_REQ::
+* CH_DISCONNECT_CON::
+* CH_DISCONNECT_IND::
+@end menu
+
+@node CH_DISCONNECT_REQ
+@subsubsection CH_DISCONNECT_REQ
+
+@subsubheading Description
+
+This CHS user originated service primitive allows the CHS user to disconnect the CHS user Stream
+from the bit-stream in the transmit, receive, or both, directions.
+
+@subsubheading Format
+@tpindex CH_disconnect_req
+
+The disconnect request primitive consists of one @msg{M_PROTO} message block, structured as follows:
+
+@display
+@verbatim
+typedef struct CH_disconnect_req {
+    ch_ulong ch_primitive;   /* always CH_DISCONNECT_REQ */
+    ch_ulong ch_conn_flags;  /* direction to disconnect */
+    ch_ulong ch_slot;        /* slot within channel */
+} CH_disconnect_req_t;
+@end verbatim
+@end display
+
+@subsubheading Parameters
+
+The disconnect request service primitive contains the following parameters:
+
+@table @parm
+
+@item ch_primitive
+Specifies the service primitive type.  Always @prim{CH_DISCONNECT_REQ}.
+
+@item ch_conn_flags
+Specifies the direction from which to disconnect.  This field can be a bitwise OR of one or more of
+the following flags:
+
+@multitable @columnfractions .15 .65
+@item @pval{CHF_RX_DIR} @tab Specifies that the CHS user Stream is to be disconnected from the medium in the receive direction.
+@item @pval{CHF_TX_DIR} @tab Specifies that the CHS user Stream is to be disconnected from the medium in the transmit direction.
+@item @pval{CHF_MONITOR} @tab Specifies that the CHS user Stream is to be discconnected from the medium in monitoring (tap) mode.
+@end multitable
+
+@item ch_slot
+Where the PPA is associated with a multiplexed medium, this parameter specifies the slots within
+the mutliplexed media that have been autonomouosly disconnected.  The form of the slot specification
+is provider- and media-specific.  See also @ref{Multiplex Media}.
+
+Where the PPA specifies a single channel for a medium, this parameter is set to zero (@samp{0}) by
+the CHS provider on CHS provider originated primitives and is ignored by the CHS provider on CHS
+user originated primitives.
+
+@end table
+
+@subsubheading State
+
+This service primitive is only valid in the @psta{CHS_CONNECTED} state.
+
+@subsubheading New State
+
+The state remains unchanged.
+
+@subsubheading Response
+
+The disconnect request service primitive requires that the CHS provider acknowledge receipt of the
+primitive as follows:
+
+@itemize @minus
+
+@item @b{Successful}:
+When successful, the CHS provider acknolwedges successful completion of the connect service wtih a
+@prim{CH_OK_ACK} primitive.  The new state is @psta{CHS_WCON_DREQ}.  When the CHS provider
+eventually completes the disconnection, it confirms the disconnect with a @prim{CH_DISCONNECT_CON}
+primitive and the new state is then @psta{CHS_ENABLED}.
+
+@item @b{Unsuccessful (non-fatal errors)}:
+When unsuccessful, the CHS provider acknowledges the failure of the connect service with a
+@prim{CH_ERROR_ACK} primitive containing the error.  The new state remains unchanged.
+
+@end itemize
+
+@subsubheading Reasons for Failure
+
+@b{Non-Fatal Errors}:  applicable non-fatal errors are as follows:
+
+@multitable @columnfractions .2 .8
+@item @perr{CHSYSERR} @tab UNIX system error.
+@item @perr{CHBADADDR} @tab Bad address format or content.
+@item @perr{CHOUTSTATE} @tab Interface out of state.
+@item @perr{CHBADOPT} @tab Bad options format or content.
+@item @perr{CHBADPARM} @tab Bad parameter format or content.
+@item @perr{CHBADPARMTYPE} @tab Bad paramater structure type.
+@item @perr{CHBADFLAG} @tab Bad flag.
+@item @perr{CHBADPRIM} @tab Bad primitive.
+@item @perr{CHNOTSUPP} @tab Primitive not supported.
+@item @perr{CHBADSLOT} @tab Bad multplex slot.
+@end multitable
+
+@page
+@node CH_DISCONNECT_CON
+@subsubsection CH_DISCONNECT_CON
+
+@subsubheading Description
+
+This CHS provider originated primitive is issued by the CHS provider to confirm the successful
+completion of the disconnect service with the disconnection of the user Stream from the medium in
+the transmit, receive, or both, directions.
+
+@subsubheading Format
+@tpindex CH_disconnect_con
+
+@display
+@verbatim
+typedef struct CH_disconnect_con {
+    ch_ulong ch_primitive;
+    ch_ulong ch_conn_flags;
+    ch_ulong ch_slot;
+} CH_disconnect_con_t;
+@end verbatim
+@end display
+
+@subsubheading Parameters
+
+@table @parm
+
+@item ch_primitive
+Indicates the service primitive type.  Always @prim{CH_DISCONNECT_CON}.
+
+@item ch_conn_flags
+Indicates the connect flags.  This field is a bitwise OR of zero or more of the following flags:
+
+@multitable @columnfractions .15 .65
+@item @pval{CHF_RX_DIR} @tab Confirms that the CHS user Stream was disconnected from the medium in the receive direction.
+@item @pval{CHF_TX_DIR} @tab Confirms that the CHS user Stream was disconnected from the medium in the transmit direction.
+@item @pval{CHF_MONITOR} @tab Confirms that the CHS user Stream was discconnected from the medium in monitoring (tap) mode.
+@end multitable
+
+@item ch_slot
+Where the PPA is associated with a multiplexed medium, this parameter indicates the slots within
+the mutliplexed media that are confirmed as disconnected.  The form of the slot specification
+is provider- and media-specific.  See also @ref{Multiplex Media}.
+
+Where the PPA specifies a single channel for a medium, this parameter is set to zero (@samp{0}) by
+the CHS provider on CHS provider originated primitives and is ignored by the CHS provider on CHS
+user originated primitives.
+
+@end table
+
+@subsubheading State
+
+This primitive will only be issued by the CHS provider in the @psta{CHS_WCON_DREQ} state.
+
+@subsubheading New State
+
+The new state of the interface is the @psta{CHS_ENABLED} state.
+
+@page
+@node CH_DISCONNECT_IND
+@subsubsection CH_DISCONNECT_IND
+
+@subsubheading Description
+
+This CHS provider originated primitive is issued by the CHS provider if an autonomous event
+results in the disconnection of the transmit and receive bit-streams from the CHS user without
+an explicit CHS user request.
+
+@subsubheading Format
+@tpindex CH_disconnect_ind
+
+The disconnect indication primitive consists of one @msg{M_PROTO} message block, structured as follows:
+
+@display
+@verbatim
+typedef struct CH_disconnect_ind {
+    ch_ulong ch_primitive;   /* always CH_DISCONNECT_IND */
+    ch_ulong ch_conn_flags;  /* direction disconnected */
+    ch_ulong ch_cause;       /* cause for disconnection */
+    ch_ulong ch_slot;        /* slot within channel */
+} CH_disconnect_ind_t;
+@end verbatim
+@end display
+
+@subsubheading Parameters
+
+@table @parm
+
+@item ch_primitive
+Indicates the service primitive type.  Always @prim{CH_DISCONNECT_IND}.
+
+@item ch_conn_flags
+Indicates the connect flags.  This field is a bitwise OR of zero or more of the following flags:
+
+@multitable @columnfractions .15 .65
+@item @pval{CHF_RX_DIR} @tab Indicates that the CHS user Stream disconnected from the medium in the receive direction.
+@item @pval{CHF_TX_DIR} @tab Indicates that the CHS user Stream disconnected from the medium in the transmit direction.
+@item @pval{CHF_MONITOR} @tab Indicates that the CHS user Stream discconnected from the medium in monitoring (tap) mode.
+@end multitable
+
+@item ch_cause
+Indicates the cause of the autonomous disconnect.
+
+@item ch_slot
+Where the PPA is associated with a multiplexed medium, this parameter indicates the slots within
+the mutliplexed media that have autonomously disconnected.  The form of the slot specification
+is provider- and media-specific.  See also @ref{Multiplex Media}.
+
+Where the PPA specifies a single channel for a medium, this parameter is set to zero (@samp{0}) by
+the CHS provider on CHS provider originated primitives and is ignored by the CHS provider on CHS
+user originated primitives.
+
+@end table
+
+@subsubheading State
+
+This primtiive will only be issued by the CHS provider in the @psta{CHS_CONNECTED} state.
+
+@subsubheading New State
+
+The new state is @psta{CHS_ENABLED}.
+
+@node Diagnostics Requirements
+@section Diagnostics Requirements
+
+Two error handling facilities should be provided to the CHS user: one to handle non-fatal errors,
+and the other to handle fatal errors.
+
+@subsection Non-Fatal Error Handling Facility
+
+These are errors that do not change the state of the CHS interface as seen by the CHS user and
+provide the user with the option of reissuing the CH primitive with the corrected options
+specification.  The non-fatal error handling is provided only to those primitives that require
+acknowledgements, and uses the @prim{CH_ERROR_ACK} to report these errors.  These errors retain the
+state of the CHS interface the same as it was before the SDL provider received the primitive that
+was in error.  Syntax errors and rule violations are reported via the non-fatal error handling
+facility.
+
+@subsection Fatal Error Handling Facility
+
+These errors are issued by the CH provider when it detects errors that are not correctable by the
+CH user, or if it is unable to report a correctible error to the CH user.  Fatal errors are
+indicated via the STREAMS message type @msg{M_ERROR} with the UNIX system error @errno{EPROTO}.  The
+@msg{M_ERROR} STREAMS message type will result in the failure of all the UNIX system calls on the
+Stream.  The CHS user can recover from a fatal error by having all the processes close the files
+associated with the Stream, and then reopening them for processing.
+
+
+
+
+@node CHI Input-Output Controls
+@chapter CHI Input-Output Controls
+
+These input-output controls can be used to interrogate, negotiate, reset, collect and manage a given
+channel or group of channels.  When issued on a CHS user Stream, they can only be used to affect the
+channel or channels associated with the CHS user Stream.  Deattached @dfn{Style 2} Streams have no
+associated channels.  When issued on a management Stream, they can be used to affect the
+configuration of any channel or channels accessible to the management Stream (i.e.  provided by the
+same driver, or temporarily linked from the control Stream).
+
+Channels can have characteristics at the channel level, as well as characteristics at the channel
+group level.  For example, the channel may not be looped back at the channel, but might be looped
+back at the channel group (span).  Where the channel represents a channel within a multiplexed
+medium (such as a PCM TDM facility), the MXI input-output controls can be used to interrogate,
+negotiate and otherwise manage the channel group characteristics providing that the CHS user has
+sufficient privilege to do so.
+
+Note that these input-output controls are not normally issued on the global management Stream by
+user processes.  Rather the Management Agent (SNMP Agent) for the driver is normally responsible for
+managing channels within the driver using these input-output controls.  Nomally these input-output
+controls would only be issued by user processes to affect the channel or channels associated with
+the attached CHS user Stream. 
+
+@menu
+* CHI Configuration::
+* CHI Options::
+* CHI State::
+* CHI Statistics::
+* CHI Events::
+* CHI Commands::
+@end menu
+
+@node CHI Configuration
+@section CHI Configuration
+
+These input-output controls can be used to interrogate or negotiate the configuration of a given
+channel or group of channels.
+
+@menu
+* CHI Get Configuration::
+* CHI Set Configuration::
+* CHI Test Configuration::
+* CHI Commit Configuration::
+@end menu
+
+@display
+@verbatim
+typedef struct ch_config {
+    ch_ulong type;         /* unused */
+    ch_ulong encoding;     /* encoding */
+    ch_ulong block_size;   /* data block size (bits) */
+    ch_ulong samples;      /* samples per block */
+    ch_ulong sample_size;  /* sample size (bits) */
+    ch_ulong rate;         /* clock rate (samples/second) */
+    ch_ulong tx_channels;  /* number of tx channels */
+    ch_ulong rx_channels;  /* number of rx channels */
+    ch_ulong opt_flags;    /* options flags */
+} ch_config_t;
+@end verbatim
+@end display
+
+The channel configuration structure, @type{ch_config_t}, contains the following members:
+
+@table @member
+@item type
+This member is only to maintain alignment with the equivalient parameter structure as defined in the
+CHI and unused in the input-output control.
+@item encoding
+Indicates or specifies the encoding associated with the channel.  When the channel is used for any
+form of data, @pval{CH_ENCODING_NONE} will be indicated and should be specified.  @member{encoding}
+can be one of the following values:
+@multitable @columnfractions .3 .5
+@item @pval{CH_ENCODING_NONE} @tab No encoding.  Used for data or other clear channel information.
+@item @pval{CH_ENCODING_CN} @tab CN.
+@item @pval{CH_ENCODING_DVI4} @tab DVI4.
+@item @pval{CH_ENCODING_FS1015} @tab FIPS FS 1015 LPC.
+@item @pval{CH_ENCODING_FS1016} @tab FIPS FS 1016 LPC.
+@item @pval{CH_ENCODING_G711_PCM_A} @tab G.711 PCM A-law.
+@item @pval{CH_ENCODING_G711_PCM_L} @tab G.711 PCM Linear.
+@item @pval{CH_ENCODING_G711_PCM_U} @tab G.711 PCM Mu-law.
+@item @pval{CH_ENCODING_G721} @tab G.721.
+@item @pval{CH_ENCODING_G722} @tab G.722.
+@item @pval{CH_ENCODING_G723} @tab G.723.
+@item @pval{CH_ENCODING_G726} @tab G.726.
+@item @pval{CH_ENCODING_G728} @tab G.728.
+@item @pval{CH_ENCODING_G729} @tab G.729.
+@item @pval{CH_ENCODING_GSM} @tab GSM.
+@item @pval{CH_ENCODING_GSM_EFR} @tab GSM Extended Full-Rate.
+@item @pval{CH_ENCODING_GSM_HR} @tab GSM Half-Rate.
+@item @pval{CH_ENCODING_LPC} @tab LPC.
+@item @pval{CH_ENCODING_MPA} @tab MPA.
+@item @pval{CH_ENCODING_QCELP} @tab QCELP.
+@item @pval{CH_ENCODING_RED} @tab RED.
+@item @pval{CH_ENCODING_S16_BE} @tab Signed 16-bit Big-Endian.
+@item @pval{CH_ENCODING_S16_LE} @tab Signed 16-bit Little-Endian.
+@item @pval{CH_ENCODING_S8} @tab Sign 8-bit.
+@item @pval{CH_ENCODING_U16_BE} @tab Unsigned 16-bit Big-Endian.
+@item @pval{CH_ENCODING_U16_LE} @tab Unsigned 16-bit Little-Endian.
+@item @pval{CH_ENCODING_U8} @tab Unsigned 8-bit.
+@item @pval{CH_ENCODING_VDVI} @tab DVI.
+@end multitable
+@item block_size
+Specifies or indicates the block size associated with the channel.  The block size is the number of
+samples that are written or read at one time.  If this value is less than the size of a STREAMS fast
+buffer, @pval{FASTBUF}, then a @pval{FASTBUF} of samples will be read or written at once.
+@item samples
+Specifies or indicates the number of samples (from the same timeslot) in a block.
+@item sample_size
+Specifies or indicates the sample size in bits.  This can normally be 3, 4, 5, 7, 8, 12, 14 or 16.
+@item rate
+Specifies or indicates the rate of the channel.  This is the rate in samples per second.
+@member{rate} can be one of the following values:
+@multitable @columnfractions .3 .5
+@item @pval{CH_RATE_VARIABLE} @tab The rate is variable.
+@item @pval{CH_RATE_8000} @tab 56kbps or 64kbps.
+@item @pval{CH_RATE_11025} @tab 11kHz Audio.
+@item @pval{CH_RATE_16000} @tab 16kHz Audio.
+@item @pval{CH_RATE_22050} @tab 22kHz Audio.
+@item @pval{CH_RATE_44100} @tab 44kHz Audio.
+@item @pval{CH_RATE_90000} @tab 90kHz Audio.
+@item @pval{CH_RATE_184000} @tab 23B.
+@item @pval{CH_RATE_192000} @tab T1 (24B).
+@item @pval{CH_RATE_240000} @tab 30B.
+@item @pval{CH_RATE_248000} @tab E1 (31B).
+@end multitable
+@item tx_channels
+Specifies or indicates the number of transmit channels available.  For the CH interface, this value
+is either 0 or 1.
+@item rx_channels
+Specifies or indicates the number of receive channels available.  For the CH interface, this value
+is either 0, 1, or 2.  (The value of 2 is used for monitoring mode where two receive channels exists
+and zero transmit channels.)
+@item opt_flags
+Specifies or indicates the options associated with the CH provider.  CH provider options are
+provider specific and no generic options have yet been defined.
+@end table
+
+@node CHI Get Configuration
+@subsection CHI Get Configuration
+@subsubheading @pioc{CH_IOCGCONFIG}
+
+Gets the channel configuration.  Upon success, the channel configuration is written to the memory
+extent indicated by the pointer argument to the @manref{ioctl(2s)} call.
+
+@node CHI Set Configuration
+@subsection CHI Set Configuration
+@subsubheading @pioc{CH_IOCSCONFIG}
+
+Set the channel configuration.  Upon success, the channel configuration is read from the memory
+extent specified by the pointer argument tot he @manref{ioctl(2s)} call.
+
+@node CHI Test Configuration
+@subsection CHI Test Configuration
+@subsubheading @pioc{CH_IOCTCONFIG}
+
+Test the channel configuration.  Upon success, the channel configuration is read from the memory
+extent specified by the pointer argument to the @manref{ioctl(2s)} call, values adjusted according to
+the rules for configuration, and the resulting configuraiton written back to the memory extent
+specified by the pointer argumnet to the @manref{ioctl(2s)} call.  Actual configuration is not
+changed.
+
+@node CHI Commit Configuration
+@subsection CHI Commit Configuration
+@subsubheading @pioc{CH_IOCCCONFIG}
+
+Confirms the channel configuration.  Upon success, the channel configuration is read from the memory
+extent specified by the pointer argument to the @manref{ioctl(2s)} call, values adjusted according to
+the rules for configuration, the configuration applied, and then the resulting configuration written
+back to the memory extent specified by the pointer argument to the @manref{ioctl(2s)} call.
+
+Normally, the argument to the @pioc{CH_IOCCCONFIG} call is the same as to an immediately preceding
+@pioc{CH_IOCTCONFIG} call.
+
+@node CHI Options
+@section CHI Options
+
+These input-output controls can used to interrogate or negotiate the options associated with a
+given channel or group of channels.
+
+@node CHI State
+@section CHI State
+
+These input-output controls can be used to interrotate or reset the state associated with a channel
+or a group of channels.
+
+State input-output controls all take an argument containing a poitner to a @type{ch_statem_t}
+structure, formatted as follows:
+
+@display
+@verbatim
+typedef struct ch_statem {
+    ch_ulong index;
+    ch_ulong type;
+    ch_ulong rate;
+    ch_ulong mode;
+    ch_ulong admin_state;
+    ch_ulong usage_state;
+    ch_ulong avail_status;
+    ch_ulong ctrl_status;
+} ch_statem_t;
+@end verbatim
+@end display
+
+The channel state structure, @type{ch_statem_t}, contains the following members:
+
+@table @member
+@item index
+Provides  time slot index for the channel.  For T1 and J1 spans, the time slots @samp{1} through
+@samp{24} index the corresponding time slot in the span.  For E1 spans, the time slot indices
+@samp{1} throught @samp{31} index the corresponding time slot in the span.  For E1 operation, TS0 is
+unusable.  For E1 CAS operation (where any channel in the span is configured for CAS), TS16 is not
+available to users for payload.  For V.35 and other discrete synchronous channels, this index is
+@samp{1}.
+@item type
+Specifies or indicates whether the channel (or channels) has channel associated signalling or common
+channel signalling.  This field can have one of the following values:
+@table @pval
+@item CH_TYPE_NONE
+For non-trunk channels, no type is necessary.
+@item CH_TYPE_CAS
+For T1 and J1 span, channel associated signalling implies 56kbps DS0A operation for data within the
+channel.
+@item CH_TYPE_CCS
+For E1, T1 or J1 spans, common channel signalling implies 64kbps DS0 oepration within the channel is
+indicated.  For E1, CCS operation for the entire span implies that channel 17 (timeslot 16) is used
+for common channel signalling or is also available for payload.  This is why it is typical on
+non-CAS E1 spans to place the signalling channel in timeslot 16 (e.g.  the D-channel of a primary
+rate interface).
+@end table
+@item rate
+Specifies or indicates the bit rate of the channel in a single-rate channel, or of each channel in a
+multi-rate channel, or of each channel in a full-rate channel.  Channels @samp{1} through @samp{24}
+for T1 and J1 can be 56kbps or 64kbps.  Channels @samp{1} through @samp{31} for E1 are 64kbps but
+can be forced into 56kbps mode.  The default is 64kbps for E1 CCS and CAS channels and T1 CCS
+channels; 56kbps for T1 CAS channels.
+@item mode
+Specifies or indicates the channel mode.  This is bitwise OR of zero or more of the following
+values:
+@table @pval
+@item CH_MODE_REMLOOP
+The receive data in the channel is looped back to replace the transmit data for the channel.  This
+may either be accomplished within the host or using the per-channel loopback capability of some chip
+sets.
+@item CH_MODE_LOCLOOP
+The transmit data for the channel is looped back to replace the receive data for the channel.  This
+may be accomplished within the host.
+@item CH_MODE_TEST
+The channel is marked for BERT testing.  When BERT testing for the span is enabled on a channel
+basis, this channel will be included in the channels upon which the BERT test pattern is
+transmitted.
+@end table
+Because tests are disruptive, no value can be added to this set unless the channel has a control
+status of ``subject to test'' or ``reserved for test''.
+@item admin_state
+Specifies or indicates the administrative state of the channel.  The administrative state can be one
+of the following values:
+@table @pval
+@item CH_ADMIN_LOCKED
+The administrative state is ``locked''.  The channel is administratively prohibited from providing
+service to users.
+@item CH_ADMIN_UNLOCKED
+The administrative state is ``unlocked''.  The channel is administratively permitted to provide
+service to users.
+@item CH_ADMIN_SHUTDOWN
+The administrative state is ``shutting down''.  The channel will continue to provide service to
+existing users but will reject new users: once there are no more users of the channel, the channel
+will move to the ``locked'' state.
+@end table
+@item usage_state
+Specifies or indicates the usage state of the channel.  The usage state can be one of the following
+values:
+@table @pval
+@item CH_USAGE_IDLE
+The channel is ``idle''.  The channel is not currently in use.
+@item CH_USAGE_ACTIVE
+The channel is ``active''.  The channel is in use and has sufficient operating capacity to provide
+for additional users simultaneously (e.g. a half-channel is used).
+@item CH_USAGE_BUSY
+The channel is ``busy''.  The channel is in use and has no spare capacity (i.e. the full channs is
+in use).
+@end table
+If partial channels are not supported, only the values ``idle'' and ``busy'' are allowed.
+@item avail_status
+Specifies or indicates the availabiltiy status of the channel.  The availablity status is a bitwise
+OR of zero or more of the following values:
+@table @pval
+@item CH_AVAIL_INTEST
+The channel is ``in test''.  The channel is undergoing a test procedure.  The administrative state
+is ``locked'' and the operational state is ``disabled''.  This condition exists while the span is in
+test in a manner disruptive to the channel, or when the channel is in loopback or test modes.
+@item CH_AVAIL_FAILED
+The channel has ``failed''.  The channel has an internal fault that prevents it from operating.  The
+operational state is ``disabled''.  This value is present when the same value is present in the span
+availability status.
+@item CH_AVAIL_POWEROFF
+The channel has ``power off''.  The channl requires power to be applied and is not powered on.  For
+example, power management may have removed power from the device.  This value is present when the
+same value is present in the span availablity status.
+@item CH_AVAIL_OFFLINE
+The channel is ``off line''.  The channel requires a outing operation to be performed to place it
+online and make it available for use.  The operation may be manul or automatic, or both.  The
+operational state is ``disabled''.  This value is present when the same value is present in the span
+availability status.
+@item CH_AVAIL_OFFDUTY
+The channel is ``off duty''.  The channel has been made inactive by an internal control process in
+accordance with a predetermined time schedule.  Under normal conditions, the control process can be
+expected to reactivate the channel at some scheduled time.
+@item CH_AVAIL_DEPEND
+The channel has a ``dependency''.  The channel cannot operate because some other resource on which
+it depends is unavailable (e.g. the span).
+@item CH_AVAIL_DEGRADED
+The channel is ``degraded''.  The channel is operating with degraded peformance.  This value is
+present when the same value is present in the span availability status.
+@item CH_AVAIL_MISSING
+The channel is ``not installed''.  The channel is not present in the system or is incomplete.
+@item CH_AVAIL_LOGFULL
+Not used.
+@end table
+@item ctrl_status
+Specifies or indicates the control status of the channel.  The control status is a bitwise OR of
+zero or more of the following values:
+@table @pval
+@item CH_CTRL_CANTEST
+The channel is ``subject to test''.  The channel is available to normal users but tests may be
+conducted on it simultaneously at unpredicatable times, which may cause it to exhibit unusual
+characteristics to users.
+@item CH_CTRL_PARTLOCK
+The channel is ``part of services locked''.  A manager has adminstratively locked some part of the
+channel.
+@item CH_CTRL_RESERVED
+The channel is ``reserved for test''.  The channel is undergoing a test procedure and is unavailable
+to users.
+@item CH_CTRL_SUSPENDED
+The channel is ``suspended''.  The channel service has been administratively suspended to users.
+@end table
+@end table
+
+@subsection CHI Get State
+@subsubheading @pioc{CH_IOCGSTATEM}
+
+Requests that the state information be obtained and written to the @type{ch_statem_t} structure
+pointed to by the argument to the input-output control.
+
+@subsection CHI Reset State
+@subsubheading @pioc{CH_IOCCMRESET}
+
+Request that the state associated with the channel be reset.  This input-output control takes no
+argument.
+
+@node CHI Statistics
+@section CHI Statistics
+
+These input-output controls can be used to collect statistics or set staticstics collection intervals
+associated with a channel or group of channels.
+
+Statistics input-output controls all take an argument containing a pointer to a @type{ch_stats_t}
+structure, formatted as follows:
+
+@display
+@verbatim
+typedef struct ch_stats {
+    ch_ulong header;
+    ch_ulong rx_octets;
+    ch_ulong tx_octets;
+    ch_ulong rx_overruns;
+    ch_ulong tx_underruns;
+    ch_ulong rx_buffer_overflows;
+    ch_ulong tx_buffer_overflows;
+    ch_ulong lead_cts_lost;
+    ch_ulong lead_dcd_lost;
+    ch_ulong carrier_lost;
+    ch_ulong errored_seconds;
+    ch_ulong severely_errored_seconds;
+    ch_ulong severely_errored_framing_seconds;
+    ch_ulong unavailable_seconds;
+    ch_ulong controlled_slip_seconds;
+    ch_ulong path_coding_violations;
+    ch_ulong line_errored_seconds;
+    ch_ulong bursty_errored_seconds;
+    ch_ulong degraded_minutes;
+    ch_ulong line_coding_violations;
+} ch_stats_t;
+@end verbatim
+@end display
+
+The channel statistics structure, @type{ch_stats_t}, contains the following members:
+
+@table @member
+@item header
+Specifies or indicates the statistics period header associated with the channel.  This header is a
+statistics collection period in milliseconds.
+@item rx_octets
+Indicates the number of octets received during the collection interval.  This does not include
+octets for which there was a receiver overrun condition.
+@item tx_octets
+Indicates the number of octets transmitted during the collection interval.  This does not include
+octets for which there was a transmitter underrun condition.
+@item rx_overruns
+Indicates the number of receive overrun conditions that occurred during the collection interval.
+When the overrun condition spans interval boundaries, the condition is counted in the interval
+during which the overrun condition began.
+@item tx_underruns
+Indicates the number of transmitter underrun conditions that occurred during the collection
+interval.  When the underrun condition spans interval boundaries, the condition is counted in the
+interval during which the underrun condition began.
+@item rx_buffer_overflows
+Indicates the number of receive buffer overflows that occured during the collection interval.
+Receive buffer overflow conditions occur when the driver is unable to allocate a message block or
+buffer for received bits, resulting in the discard of the received bits.
+@item tx_buffer_overflows
+Indicates the number of transmit buffer overflows that occured during the collection interval.
+Transmit buffer overflow conditions occur when the driver is unable to allocate a message block or
+buffer for transmit bits, resulting in the discard of the bits to be transmitted.
+@item lead_cts_lost
+Indicates the number of Clear To Send leads lost.  That is, the number of times that the Clear To
+Send lead transitioned from asserted to deasserted.
+@item lead_dcd_lost
+Indicates the number of Data Carrier Detect leads lost.  That is, the number of times that the Data
+Carrier Detect lead trasitioned from asserted to deasserted.
+@item carrier_lost
+Indicates the number of Carrier lost conditions.  That is, the number of times that an alarm or lead
+indicated that the facility carrier was lost.
+@item errored_seconds
+The number of errored seconds (ESs) in the current interval.  An errored second has one or more path
+code violations, one or more out of frame defects, one or more controlled slip events, or a detected
+alarm indication signal (AIS) defect.
+@item severely_errored_seconds
+The number of severely errored seconds (SESs) in the current interval.
+@item severely_errored_framing_seconds
+The number of severely errored framing seconds (SEFSs) in the current interval.  A severely errored
+framing second has one or more out of frame defects or a detected AIS defect.
+@item unavailable_seconds
+The number of unavailable seconds in the current interval.
+@item controlled_slip_seconds
+The number of controlled slip seconds (CSSs) in the current interval.  A controlled slip second has
+one or more controlled slip events.
+@item path_coding_violations
+The number of path coding violations (PCVs) in the current interval.  A path coding violation is a
+fram synchronization bit error in the D4  and E1 no-CRC4 formats, or a CRC or frame synchronization
+bit error in the ESF and E1 CRC4 formats.
+@item line_errored_seconds
+The number of line errored seconds (LESs) in the current interval.  A line errored second is a
+second in which one or more line code violation error events are detected.
+@item bursty_errored_seconds
+The number of bursty errroed seconds (BESs) in the current interval.  A bursty errored second has 2
+to 319 path coding violation error events, no severely errored frame defects, and no detected
+inocming AIS defects.
+@item degraded_minutes
+The number of degraded minutes (DMs) in the current interval.
+@item line_coding_violations
+The number of line coding violations (LCVs) in the current interval.  An LCV is the occurence of a
+bipolar violation (BPV) or excessive zeroes (EXZ) error event.
+@end table
+
+@node CHI Events
+@section CHI Events
+
+These input-output controls can be used to specify the events that will be reported by a channel or
+channels.
+
+Notification input-output controls all take an argument containing a pointer to a @type{ch_notify_t}
+structure, formatted as follows:
+
+@display
+@verbatim
+typedef struct ch_notify {
+    ch_ulong events;
+} ch_notify_t;
+@end verbatim
+@end display
+
+The channel events structure, @type{ch_notify_t}, contains the following members:
+
+@table @member
+@item events
+Specifies or indicates a bitwise OR of the events associated wtih the channel.  When a bit is set,
+it specifies that event reporting for the specific event is enabled for the channel; when clear,
+that the event reporting is disabled.
+@end table
+
+@subsection CHI Get Notify
+@subsubheading @pioc{CH_IOCGNOTIFY}
+
+Requests that the events associated with the channel be obtained and written to the
+@type{ch_notify_t} structure pointed to by the argument to the input-output control.
+
+@subsection CHI Set Notify
+@subsubheading @pioc{CH_IOCSNOTIFY}
+
+Requests that the events associated with the channel be read from the @type{ch_notify_t} structure
+pointed to by the argument to the input-output control and set for the channel.  Each bit set in the
+@member{events} member specifies an event for which notification is to be set.
+
+@subsection CHI Clear Notify
+@subsubheading @pioc{CH_IOCCNOTIFY}
+
+Reqeust that the events associated with the channel be read from the @type{ch_notify_t} structure
+pointed to by the argument to the input-output control and cleared for the channel.  Each bit set in
+the @member{events} member specifies an event for which notification is to be cleared.
+
+@node CHI Commands
+@section CHI Commands
+
+These input-output controls can be used to manage a channel or channels.
+
+Management input-output controls all take an argument containing a pointer to a @type{ch_mgmt_t}
+structure, formatted as follows:
+
+@display
+@verbatim
+typedef struct ch_mgmt {
+    ch_ulong cmd;
+} ch_mgmt_t;
+@end verbatim
+@end display
+
+The channel management structure, @type{ch_mgmt_t}, contains the following members:
+
+@table @member
+@item cmd
+Specifies the management command to be performed by the CHS provider.
+This member can have one of the following values:
+@table @pval
+@item CH_CMD_REMLOOP
+Place the channel in remote loopback.  The administrative state of
+the channel must be ``locked'' for this command to be successfull.  Once complete, the control
+status of the channel will contain ``reserved for test'' and the availability status of the channel
+will contain ``in test''.
+@item CH_CMD_LOCLOOP
+Place the channel in local loopback.  The administrative state of
+the channel must be ``locked'' for this command to be successfull.  Once complete, the control
+status of the channel will contain ``reserved for test'' and the availabiltiy status of the channel
+will contain ``in test''.
+@item CH_CMD_FORTEST
+Reserve the channel for BERT testing.  The administrative state of
+the channel must be ``locked'' for this command to be successful.  Once complete, the control status
+of the channel will contain ``reserved for test'' and the availability status of the channel will
+contain ``in test'' while BERT testing is actively being performed.
+@item CH_CMD_LOCK
+Place the channel in the ``locked'' administrative state.  If the
+channel is in the ``unlocked'' or ``shutting down'' states and the usage state is ``busy'', this
+will result in the removal from service of the channel while it is in use.
+@item CH_CMD_UNLOCK
+Place the channel in the ``unlocked'' administrative state.  This
+makes the channel adminstratively available for use.
+@item CH_CMD_SHUTDOWN
+Place the channel in the ``shutting down'' administrative state.
+If the channel has a usage state of ``idle'' the channel will be placed immediately into the
+``locked'' administrative state.  If the usage state is ``busy'', then the administrative state will
+be set to ``shutting down'' and the driver will wait until the channel is released before it is
+placed in the ``locked'' administrative state.
+@end table
+@end table
+
+@subsection CHI Command
+@subsubheading @pioc{CH_IOCCMGMT}
+
+Request that the management command be read from the @type{ch_mgmt_t} structure pointed to by the
+argument to the input-output control and acted upon for the channel.
+
+@node CHI Management
+@chapter CHI Management
+
+@ignore
+@node Addendum for ITU-T Q.703 Conformance
+@unnumbered Addendum for ITU-T Q.703 Conformance
+
+@node Addendum for ANSI T1.111.3 Conformance
+@unnumbered Addendum for ANSI T1.111.3 Conformance
+
+@node Addendum for ETSI Conformance
+@unnumbered Addendum for ETSI Conformance
+
+@node Mapping of SDLI Primitives to ITU-T Q.703
+@appendix Mapping of SDLI Primitives to ITU-T Q.703
+
+@node Mapping of SDLI Primitives to ANSI T1.111.3
+@appendix Mapping of SDLI Primitives to ANSI T1.111.3
+
+@node State/Event Tables
+@appendix State/Event Tables
+
+@node Primitive Precedence Tables
+@appendix Primitive Precedence Tables
+@end ignore
+
+@node CHI Header Files
+@appendix CHI Header Files
+
+@node CHI Header File Listing
+@section CHI Header File Listing
+
+@noindent
+@smallformat
+@verbatiminclude chi.h
+@end smallformat
+
+@node CHI Input-Output Controls Header File Listing
+@section CHI Input-Output Controls Header File Listing
+
+@noindent
+@smallformat
+@verbatiminclude chi_ioctl.h
+@end smallformat
+
+@node CHI Drivers and Modules
+@appendix CHI Drivers and Modules
+
+There are a number of standard drivers and modules provided by the @cite{OpenSS7 Project} the
+provide capabilities uilizing the Channel Interface.
+
+@menu
+* CHI Drivers::		CHI Modules provided by the OpenSS7 Project.
+* CHI Modules::		CHI Drivers provided by the OpenSS7 Project.
+@end menu
+
+@node CHI Drivers
+@section CHI Drivers
+
+Drivers that provide the CHI interace fall into two categories:
+
+@subsection CHI Pseudo-device Drivers
+
+Pseudo-device drivers that accept or provide the CHI interface for the purpose of providing or
+controlling access the the channels available on a system.
+
+@subsubsection Multiplexing Driver---@code{ch}
+
+The @file{ch} driver is a pseudo-device multiplexing driver that provides simple multiplexing
+services between CHI Streams at the lower service interface to CHI Streams at the upper service
+interface.
+This multiplexing driver is a simplified form of the @file{matrix} or @file{chmux} drivers.
+
+@subsubsection Multiplexing Driver---@code{chmux}
+
+The @file{chmux} driver is a pseudo-device multiplexing driver that provides simple multiplexing
+services between CHI Streams at the upper service interface and either CHI or MXI Streams at the
+lower service interface.  It performs forward and inverse multiplexing of channels to spans, but
+does not perform switching between lower service interfaces.
+This multiplexing driver is a simplified form of the @file{matrix} driver and super-sets the
+functionality of the @file{ch} driver.
+
+@subsubsection Switching Matrix Multiplexing Driver---@code{matrix}
+
+The @file{matrix} driver is a pseudo-device multiplexing driver that provides complete switching
+matrix and multiplexing services between CHI or MXI Streams at the upper service interface and CHI
+or MXI Streams at the lower service interface.  It performs forward and inverse multiplexing of
+channels to spans, and performs pseudo-digital cross-connect and dynamic switching of single-,
+multi- and full-rate channels within the switching matrix.  This driver super-sets the functionality
+of the @file{chmux} and @file{mxmux} drivers.
+
+@subsection CHI Device Drivers
+
+Real device drivers that provide the CHI interface for the purpose of accessing discrete
+non-multiplexed channels available on a hardware device (e.g. a V.35 interface card driver).
+
+@subsubsection Device Driver---@code{acb56}
+
+The @manref{acb56(4)} driver is a real device driver that provides access to a V.35 interface.  It
+is used primarily by the @cite{OpenSS7 Project} as a V.35 interface for SS7, BSC, SDLC, HDLC or
+X.21.
+
+@page
+@node CHI Modules
+@section CHI Modules
+
+@acronym{STREAMS} pushable modules are an excellent way of adapting a CHS user Stream that conforms to
+the general concept of a communications channel into a complex communications protocol.  They are
+also excellent for providing media conversion.  For example, it is possible to push the
+@manref{hdlc(4)} module onto a CHS user Stream and result with a High-Level Data Link Control (HDLC)
+Stream that provides raw HDLC framing as specified in ISO/IEC 3309 described in reference
+@ref{ISO3309}.  As another example, it is possible to push a conversion module onto a CHS user
+Stream correspondin to a mu-law compressed voice channel and convert the media stream to an A-law
+compressed voice channel.
+
+@subsection Modules that convert CHI
+
+The modules (described in the subsections that follow) convert between a CHI interface at the lower
+service boundary and a CHI interface at the upper service boundary.  Conversion is performed on the
+media stream rather than between service interfaces.
+
+@subsubsection Compression Conversion---@code{ch-conv}
+
+The @file{ch-conv} module converts one CHI interface to another CHI interface, performing conversion
+on the media stream in the process.  The module is capable of converting between 14-bit signed or
+unsigned linear, G.711 A-law compressed PCM and G.711 mu-law compressed PCM.
+
+@subsection Modules that convert from CHI
+
+The modules (described in the subsections that follow) conver between a CHI interface at the lower
+service boundary and another interface at the upper service boundary.  Conversion is performed
+between the service interfaces and might or might not include conversion of the bit stream.
+
+@subsubsection High-Level Data Link Control Module---@code{hdlc}
+
+The @file{hdlc} module converst from a CHI Stream to a Stream supporting the High-Level Data Link
+Control procedures and the Communications Device Interface (CDI) for use with SS7, ISDN, X.25,
+Frame Relay and ISO 3309.
+
+@subsubsection Signalling Data Link Module---@code{sdl}
+
+The @file{sdl} module converts from a CHI Stream to a Stream supporting the Signalling Data Link
+Interface (SDLI) for SS7.
+
+@subsection Modules that convert to CHI
+
+The modules (described in the subsections that follow) conver between another interface at the lower
+service boundary and the CHI interface at the upper service boundary.  Conversion is performed
+between the service interfaces and might or might not include conversion of the bit stream.
+
+@subsubsection Real-Time Protocol Module---@code{rtp}
+
+@node CHI Applications
+@appendix CHI Applications
+
+The channel interface is a rather important lowest layer component of a number of @cite{OpenSS7
+Project} protocol stacks.
+
+@menu
+* CHI in Switch Matrix::
+* CHI in SS7 Stack::
+* CHI in ISDN Stack::
+* CHI in X.25 Stack::
+* CHI in Media Gateway::
+@end menu
+
+@node CHI in Switch Matrix
+@section CHI in Switch Matrix
+
+As illustrated in @figref{B-5}, the CHI interface provides support for access to the @cite{OpenSS7}
+soft switching matrix.@footnote{A interesting observation is that in @figref{B-5}, any of the
+channels that are used for SS7 signalling links, X.25 or OSI links, Frame Relay links or ISDN
+D-Channel links, can themselves be ISDN B-Channels, E-Channels, H-Channels, or ISUP single-rate or
+multi-rate IMTs, or even Frame Relay PVCs.}
+
+@figuresized{chib5,B-5,Switch Matrix,5.75in}
+
+The CHI interface is responsible for providing access to communications channels (single-rate,
+multi-rate and full-rate) necessary for implementing the synchronous communications channels
+necessaary for implementing data communications links.  Use of the @cite{OpenSS7} software switch
+matrix at the lowest level, as illustrated in @figref{B-5}, provides a mechanism whereby any
+synchronous communications channel available to the host can be used as a data communications link,
+or directly as a voice (or other media) channel.
+
+The switching matrix supports syncrhonous channels using the CHI interface that are one of:
+single-rate channels, multi-rate channels (statistically multiplexed fractional spans), or full-rate
+channels (statistically multiplexed full spans).  It provides a central point for management of
+facilities and switching within an @cite{OpenSS7} host and provides for SNMP configuration,
+monitoring, operational measurements, alarms, events, maintenance access, and other OAM&P functions.
+
+Note also that the CHI interface has the capability of passing synchronous modem lead information to
+applications as well as Circuit Associated Signalling (A and B bit) and group carrier alarms (Blue,
+Yellow, Red) for those applications that require them.@footnote{Note that detection of local alarm
+conditions on carrier facilities is normally required for CAS, ISDN and SS7 ISUP applications where
+intermediate digital multiplex equipment (i.e. DCCS) can cause distrupt the transparent passing of
+carrier alarm information between endpoints.}
+
+
+@node CHI in SS7 Stack
+@section CHI in SS7 Stack
+
+@figref{B-1} illustrates the use of the CHI interface specification in the formation of the SS7
+(Signalling System No. 7) protocol stack.
+
+The CHI interface is responsible for providing access to communications channels necessary for
+implementing signalling data link, signalling terminals and signalling links in accordance with
+Q.702 and Q.703 as well as similar national standards.
+
+Use of the @cite{OpenSS7} softswitch matrix at the lowest level, as illustrated in @figref{B-1},
+provides a mechanism whereby any communications channel available to the host can be used as an SS7
+link.
+
+The major difficulties experienced with such an integrated driver were as follows:
+
+@itemize @minus
+@item Because the driver is so closely integrated, it is difficult to use the driver for anything
+other than SS7 signalling.
+@item The driver becomes too specific to SS7.
+@item It becomes difficult to use the devices under this driver approach for voice and switching.
+@item It becomes difficult to share the device with other applications.
+@item The SDLI interface does not support fractional (E1/T1) spans.
+@end itemize
+
+With the advent of the high-performance @cite{Linux Fast-STREAMS} as well as extremely powerful COTS
+processors, it is easily possible to separate the protocol levels.@footnote{As it turns out,
+@cite{Linux Fast-STREAMS} has such high performance that higher levels of performance can be
+acheived by splitting functions into narrowly defined modules that can use STREAMS flow control to
+keep code path scortching hot.}  Thus, the drivers can provide the generic Multiplex Interface (MXI)
+that provides direct access to multiplexed spans, or the generic Channel Interface (CHI) to provide
+direct access to non-multiplexed discrete channel devices, and these generic driver interfaces can
+be linked under the switching matrix multiplexing driver so that a single upper CHI user Stream can
+provide access to any channel, span, or fractional span within the entire host.
+
+@figuresized{chib1,B-1,SS7 Protocol Stack,5.75in}
+
+In previous arrangements, the MTP manager opened a Stream on the X400P-SL driver and attached it to
+a PPA corresponding to either a single-rate channel (Q.703) or a full-rate span (Q.703 Annex B) and
+linked it beneath the MTP multiplexing driver.  This management is not disrupted by the shift to the
+Software Switching Matrix.  A minor device number on the software switching matrix is defined with
+an autopush specification for the @file{sdl}, @file{sdt} and @file{sl} modules.  Opening this minor
+device number, as before, results in an unattached SL Stream.  The MTP manager attaches the Stream
+as before and links it under the MTP multiplexing driver.  This is illustrated in @figref{B-1}.
+
+@node CHI in ISDN Stack
+@section CHI in ISDN Stack
+
+@figuresized{chib2,B-2,ISDN Protocol Stack,5.75in}
+
+@figref{B-2} illustrates the use of the CHI interface specification in the formation of the ISDN
+(Integrated Services Digital Network) protocol stack.  The CHI interface provides two primary
+categories of access necessary for the ISDN protocol stack:
+@itemize @minus
+@item Access to multiplexed D channels on the physical medium (either BRI or PRI) for use with HDLC
+and LAPB protocol modules to form the ISDN signalling link.
+@item Access to multiplexed B channels on the physical medium (either BPI or PRI) for use with the
+software switchin matrix @manref{matrix(4)} of media gateway @manref{mg(4)} components.  The CHI is
+also able to provide access to the B-channel provided by CAPI devices.
+@end itemize
+
+The CHI interface is responsible for providing switched and permanent access to communications
+channels necessary for implementing D-channels (HDLC and LAPD) and B-channels (direct access).
+
+Use of the @cite{OpenSS7} softswitch matrix at the lowest level, as illustrated in @figref{B-2},
+provides a mechanism whereby any available communications channel available to the host can be used
+as a D-channel, and any communications channel available to the host can be used as a B-channel.
+
+@node CHI in X.25 Stack
+@section CHI in X.25 Stack
+
+@figuresized{chib3,B-3,X.25 Protocol Stack,5.75in}
+
+@figref{B-3} illustrates the use of the CHI interface specification in the ofrmation of the X.25
+protocol stack.  The CHI interface provides several primary categories of access necessary for the
+X.25 protocol stack:
+@itemize @minus
+@item Access to asyncrhonous modems for dial access to X.25 public or private data networks.
+@item Access to syncrhonous modems for permanent connections to X.25 public or private data networks.
+@item Access to ISDN B-channels for switched connections to X.25 public or private data networks.
+@item Access to channelized, fractional and unchannelized carrier facilities.
+@end itemize
+
+The CHI interface is responsible for providing the full and fractional carrier access necessary to
+perform HDLC and LAPB protocol functions for X.25 and OSI.
+
+Use of the @cite{OpenSS7} softswitch matrix at the lowest level, as illustrated in @figref{B-3},
+provides a mechanism whereby any available communications channel available to the host (including
+ISDN B-channels) can be used as a LAPB or ISO data link.
+
+@node CHI in Frame Relay Stack
+@section CHI in Frame Relay Stack
+
+As illustrated in @figref{B-3}, the CHI interface provides support for access to
+transmission facilities in support of the @cite{OpenSS7} Frame Relay Stack.  The CHI interface is
+responsible for providing the full and fractional carrier access necessary to provide HDLC and LAPF
+protocol functions for Frame Relay.
+
+@figuresized{chib4,B-4,Frame Relay Protocol Stack,5.75in}
+
+Use of the @cite{OpenSS7} softswitch matrix at the lowest level, as illustrated in @figref{B-4},
+provides a mechanism whereby any available communications channel available to the host (including
+ISDN B-channels) can be used as a Frame Relay data link.
+
+@node CHI in Media Gateway
+@section CHI in Media Gateway
+
+@figuresized{chib6,B-6,Media Gateway,5.75in}
+
+@node CHI Utilities
+@appendix CHI Utilities
+
+@node CHI File Formats
+@appendix CHI File Formats
+
+@node CHI Compatibility and Porting
+@appendix CHI Compatibility and Porting
+
+@node Glossary
+@unnumbered Glossary
+
+@table @emph
+
+@item Signalling Data Link Service Data Unit
+
+A grouping of SDL user data whose boundaries are preserved from one end of the signalling data link
+connection to the other.
+
+@item Data transfer
+
+The phase in connection and connectionless modes that supports the transfer of data between to
+signalling data link users.
+
+@item SDL provider
+
+The signalling data link layer protocol that provides the services of the signalling data link
+interface.
+
+@item SDL user
+
+The user-level application or user-level or kernel-level protocol that accesses the services of the
+signalling data link layer.
+
+@item Local management
+
+The phase in connection and connectionless modes in which a SDL user initializes a Stream and
+attaches a PPA address to the Stream.  Primitives in this phase generate local operations only.
+
+@item PPA
+
+The point at which a system attaches itself to a physical communications medium.
+
+@item PPA identifier
+
+An identifier of a particular physical medium over which communication transpires.
+@end table
+
+@node Acronyms
+@unnumbered Acronyms
+
+@multitable {CHS Provider}{International Telecommunication Union - Telecom Sector}
+@item AERM @tab Alignment Error Rate Monitor
+@item CC @tab Congestion Control
+@item DAEDR @tab Delimitation Alignment and Error Detection (Receive)
+@item DAEDT @tab Delimitation Alignment and Error Detection (Transmit)
+@item EIM @tab Errored Interval Monitor
+@item IAC @tab Initial Alignment Control
+@item ITU-T @tab International Telecommunications Union - Telecom Sector
+@item LMS Provider @tab A provider of Local Management Services
+@item LMS @tab Local Management Service
+@item LMS User @tab A user of Local Management Services
+@item LM @tab Local Management
+@item LSC @tab Link State Control
+@item PPA @tab Physical Point of Attachment
+@item RC @tab Reception Control
+@item SDLI @tab Signalling Data Link Interface
+@item SDL SDU @tab Signalling Data Link Service Data Unit
+@item SDLS @tab Signalling Data Link Service
+@item SDL @tab Signalling Data Link
+@item SDTI @tab Signalling Data Terminal Interface
+@item SDTS @tab Signalling Data Terminal Service
+@item SDT @tab Signalling Data Terminal
+@item SLI @tab Signalling Link Interface
+@item SLS @tab Signalling Link Service
+@item SL @tab Signalling Link
+@item SL @tab Signalling Link
+@item SS7 @tab Signalling System No. 7
+@item TXC @tab Transmission Control
+@end multitable
+
+@node References
+@unnumbered References
+
+@multitable {000}{Geoffrey Gerrien, ``CDI - Application Program Interface Guide,'' Gcom, Inc., March 1999.}
+@item [1] @anchor{Q.700} @tab @uref{http://www.itu.int/rec/T-REC-Q.700/,ITU-T Recommendation Q.700},
+@cite{Introduction to CCITT Signalling System No. 7},
+March 1993, (Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
+@item [2] @anchor{Q.701} @tab @uref{http://www.itu.int/rec/T-REC-Q.701/,ITU-T Recommendation Q.701},
+@cite{Functional Description of the Message Transfer Part (MTP) of Signalling System No. 7},
+March 1993, (Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
+@item [3] @anchor{Q.702} @tab @uref{http://www.itu.int/rec/T-REC-Q.702/,ITU-T Recommendation Q.702},
+@cite{Signalling System No. 7---Signalling Data Link},
+March 1993, (Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
+@item [4] @anchor{Q.703} @tab @uref{http://www.itu.int/rec/T-REC-Q.703/,ITU-T Recommendation Q.703},
+@cite{Signalling System No. 7---Signalling Link},
+March 1993, (Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
+@item [5] @anchor{Q.704} @tab @uref{http://www.itu.int/rec/T-REC-Q.704/,ITU-T Recommendation Q.704},
+@cite{Message Transfer Part---Signalling Network Functions and Messages},
+March 1993, (Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
+@item [6] @anchor{CDIAPI} @tab
+Geoffrey Gerrietts; Dave Grothe, Mikel Matthews, Dave Healy,
+@cite{CDI---Application Program Interface Guide},
+March 1999,
+(Savoy, IL),
+GCOM, Inc.
+@item [7] @anchor{Q.771} @tab @uref{http://www.itu.int/rec/T-REC-Q.771/,ITU-T Recommendation Q.771},
+@cite{Signalling System No. 7---Functional Description of Transaction Capabilities},
+March 1993, (Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
+@end multitable
+
+@node Licenses
+@unnumbered Licenses
+
+All code presented in this manual is licensed under the @ref{GNU Affero General Public License}.
+The text of this manual is licensed under the @ref{GNU Free Documentation License}, with no
+invariant sections, no front-cover texts and no back-cover texts.  Please note, however, that it is
+just plain wrong to modify statements of, or attribute statements to, the Author or @cite{OpenSS7
+Corporation}.
+
+@menu
+* GNU Affero General Public License::
+* GNU Free Documentation License::
+@end menu
+
+@include texi/agpl3.texi
+@page
+@include texi/fdl13.texi
+
+@ifnotplaintext
+@c skip indexes for plain text (regex search works better)
+@c @iftex
+@c @node Indices
+@c @unnumbered Indices
+@c @end iftex
+
+@c @ifnottex
+@c @c concatenate indices for html and info
+@node Index
+@unnumbered Index
+@printindex cp
+@c @end ifnottex
+
+@c @iftex
+@c @menu
+@c * Concept Index::
+@c * Protocol State Index::
+@c * Primitive Index::
+@c * Primitive Structure and Type Index::
+@c * Primitive Structure Field Index::
+@c * Primitive Values Index::
+@c * Primitive Error Values Index::
+@c * Input-Output Control Index::
+@c * MIB Object Index::
+@c * Manual Page Index::
+@c @end menu
+@c 
+@c @node Concept Index
+@c @section Concept Index
+@c @printindex cp
+@c 
+@c @page
+@c @node Protocol State Index
+@c @section Protocol State Index
+@c @printindex st
+@c 
+@c @page
+@c @node Primitive Index
+@c @section Primitive Index
+@c @printindex pr
+@c 
+@c @page
+@c @node Primitive Structure and Type Index
+@c @section Primitive Structure and Type Index
+@c @printindex tp
+@c 
+@c @page
+@c @node Primitive Structure Field Index
+@c @section Primitive Structure Field Index
+@c @printindex vr
+@c 
+@c @page
+@c @node Primitive Values Index
+@c @section Primitive Values Index
+@c @printindex pv
+@c 
+@c @page
+@c @node Primitive Error Values Index
+@c @section Primitive Error Values Index
+@c @printindex pe
+@c 
+@c @page
+@c @node Input-Output Control Index
+@c @section Input-Output Control Index
+@c @printindex ct
+@c 
+@c @page
+@c @node MIB Object Index
+@c @section MIB Object Index
+@c @printindex mo
+@c 
+@c @page
+@c @node Manual Page Index
+@c @section Manual Page Index
+@c @printindex mp
+@c @end iftex
+@end ifnotplaintext
+
+@page
+@shortcontents
+@page
+@contents
+@bye

@@ -1,0 +1,406 @@
+OpenSS7 STREAMS ISO -- notes.  2006-04-10
+Copyright (c) 2001-2007  OpenSS7 Corporation.  <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+See the end for copying conditions (for this file).
+
+Notes:
+======
+Here are some notes on all things ISO:
+
+See the OSI-FAQ at http://www.cl.cam.ac.uk/~mgk25/osi-faq.txt
+
+ISO/IEC 10589 (IS-IS) (RFC 1142) Routeing Parameters:
+------------------------------------------
+01-80-C2-00-00-14   [AllL1ISs] The multi-destination address All Level 2
+		    Intermediate Systems (ISO 10589/RFC 1142)
+01-80-C2-00-00-15   [AllL2ISs] The multi-destination address All Level 2
+		    Intermediate Systems (ISO 10589/RFC 1142)
+09-00-2B-00-00-04   [AllEndSystems] The multi-destination address All
+		    End Systems used by ISO 9542/RFC 995.
+09-00-2B-00-00-05   [AllIntermediateSystems] The multi-destination
+		    address All Intermediate Systems used by ISO
+		    9542/RFC 995.
+10000011 (0x83)	    [IDR-PD] The Network Layer Protocol Discriminator
+		    assigned by ISO/TR 9577 (X.263)
+00000000 (0x00)	    [IDR-Selector] The NSAP selector for the
+		    Intermediate System Network Entity
+FE		    [ISO-SAP] The SAP for ISO Network Layer on ISO
+		    8802-3 LANs
+
+
+Multicast MAC Addresses:
+------------------------
+
+Standard group MAC addresses:
+
+01-80-C2-00-00-14   (ISO 10589/RFC 1142) All Level 1 Intermediate Systems Addresses
+01-80-C2-00-00-15   (ISO 10589/RFC 1142) All Level 2 Intermediate Systems Addresses
+
+01-80-C2-00-00-16   (ISO 10030/RFC 1223) All CONS End System Address
+01-80-C2-00-00-17   (ISO 10030/RFC 1223) All CONS SNARES Address
+
+01-80-C2-00-00-1B   (ISO 9542/RFC 1768)  All Multicast Capable End Systems Address
+01-80-C2-00-00-1C   (ISO 9542/RFC 1768)  All Multicast Announcements Address
+01-80-C2-00-00-1D   (ISO 9542/RFC 1768)  All Multicast Capable Intermediate Systems Address
+
+Group MAC addresses used in ISO 9542 ES-IS protocol:
+
+09-00-2B-00-00-04   (ISO 9542/RFC 995) All End System Network Entities Address
+09-00-2B-00-00-05   (ISO 9542/RFC 995) All Intermediate System Network Entities Address
+
+Locally administered group MAC address used by IEEE Std. 802.5
+
+(IEEE Std. 802.5 Funcional Addresses)  [Note: Potential users of the
+addresses listed below are warened that, since these addresses are
+derived from the locally adminstered address space, there are no
+guarantees that the addresses will be used only for the listed
+purposes.]
+
+03-00-00-00-01-00   All Intermediate System Network Entities Address (ISO 9542/RFC 995)
+03-00-00-00-02-00   All End System Network Entities Address (also 802.5) (ISO 9542/RFC 995)
+
+03-00-00-00-08-00   All CONS SNARES Address (ISO 10030, RFC 1223)
+03-00-00-00-10-00   All CONS End System Address (ISO 10030, RFC 1223)
+
+Ethernet Types:
+---------------
+
+- 0x00FE shown in RFC 1701 (GRE) for OSI Network Layer, but it
+  conflicts with the 802.3 length field.  RFC 1700 shows this
+  as the LSAP for ISO CLNS IS 8473, but it is really for the whole
+  network layer using ISO/IEC TR 9577 encapsulation
+
+- 0x0800 is IPv4.
+
+- 0x0801 is X.75 Internet
+- 0x0805 is X.25 Level 3 (PLP?). (Likely ISO 8881: X.25 for use on LANs)
+- 0x0806 is ARP
+
+LLC LSAPS
+---------
+
+- 0x7E ISO/IEC 8208 (X.25 PLP over LLC2)
+- 0xFE ISO/TR 9577 NLP ID PDUs
+
+ISO/TR 9577 (X.263) NLPIDs
+--------------------------
+
+- 00000000 - 0x00 ISO/IEC 8473-1 | X.233 (inactive subset)
+
+- 00001000 - 0x08 Q.931, Q.932, Q.933, X.36, ISO/IEC 11572, ISO/IEC 11582
+- 00001001 - 0x09 Q.2931
+- 00001010 - 0x0A Q.2119
+- xx01xxxx - ---- X.25 LLC2 (ISO/IEC 8208 - Modulo 8)
+- xx10xxxx - ---- X.25 LLC2 (ISO/IEC 8208 - Modulo 128)
+- 00110010 - 0x32 X.45
+- 0011xxxx - ---- X.25 LLC2 (ISO/IEC 8208 - GFI Extension, except 0x32)
+- 01000100 - 0x44 G.764 (PVP)
+
+- 10000000 - 0x80 IEEE SNAP
+- 10000001 - 0x81 CLNL  (ISO/IEC 8473-1 | X.233) (active subset)
+- 10000010 - 0x82 ES-IS (ISO 9542)
+- 10000011 - 0x83 IS-IS (ISO/IEC 10589)
+- 10000101 - 0x85 IDRP  (ISO/IEC 10747) (Not used, 0x81 instead)
+- 10001010 - 0x8A SNARE (ISO/IEC 10030)
+- 10001011 - 0x8B X.273 (ISO/IEC 11577) (NLS)
+- 10001110 - 0x8E IPv6  (RFC 2460)
+- 11001100 - 0xCC IPv4  (RFC 0791)
+- 11001111 - 0xCF PPP   (RFC 1548)
+
+Note that CLNL packets are self identifying: that is, they identify
+whether they are CLNP, ES-IS or IS-IS packets.
+
+It looks like 8208 packets are placing the X.25 address field directly
+into the NLP-ID or some such.
+
+
+IP Multicast Addresses:
+-----------------------
+
+- 224.0.0.1  All Systems on this subnet.		(RFC1112)
+- 224.0.0.2  All Routers on this subnet.		(RFC1112)
+- 224.0.0.3  Unassigned
+
+- 224.0.0.5  OSPFIGP  OSPFIGP All Routers		(RFC2328)
+- 224.0.0.6  OSPFIGP  OSPFIGP Designated routers	(RFC2328)
+
+- 224.0.0.19 IPAllL1ISs (ISO/IEC 10589 IS-IS)		(RFC1142)
+- 224.0.0.20 IPALLL2ISs (ISO/IEC 10589 IS-IS)		(RFC1142)
+- 224.0.0.21 IPAllIntermediateSystems (IS-IS)		(RFC1142)
+
+
+IP Protocol Numbers:
+--------------------
+
+- Protocol Number 29 'ISO-TP4' is assigned by IANA for ISO Transport
+  Protocol Class 4 for RFC905 (Marshal T. Rose).  (Linux /etc/protocols
+  notes that this is ISO Transport Protocol Class 4.)  RFC905 is just a
+  copy of a draft of X.224 | ISO/IEC 8073 (COTS).  I suppose this is ISO
+  TP4 directly over IP without CLNS, but I cannot find a reference to
+  this.
+
+- Protocol Number 80 'ISO-IP' is assigned by IANA for ISO Internet
+  Protocol (Marshall T. Rose). (Linux /etc/protocols lists this with no
+  notes.)  There is no RFC reference.  I suppose this is CLNS over IP.
+  (Actually, there is a direct reference by Marshall in RFC 1070 for
+  this protocol number.)
+
+  This protocol can use 224.0.0.1 with the SNAcP defined in RFC 1070.
+
+- Protocol Number 124 'ISIS over IPv4' is assigned by IANA. (Linux
+  /etc/protocols lists this with no notes.)  There is no RFC reference.
+
+TCP/UDP/SCTP Port Numbers:
+--------------------------
+
+Well Known Port Numbers:
+
+- TCP/UDP/SCTP port number 102 'iso-tsap' is assigned by IANA for
+  ISO-TSAP Class 0 (Marshall T. Rose)  (Linux /etc/services notes that
+  this port is used for ISODE.)  (I think that this is TP0 over TCP as 
+  described by Marshall in RFC 1006 (ISOT).) (RFC 983, RFC 1006, RFC
+  2126.)
+
+- TCP/UDP/SCTP port number 146 'iso-tp0' is assigned by IANA for ISO-IP0
+  (Marshall T. Rose) (not listed in /etc/services)  (Mentioned directly
+  by Marshall in RFC 1086, "ISO-TP0 bridge between TCP and X25," for
+  TCP.)
+
+- TCP/UDP/SCTP port number 147 'iso-ip' is assigned by IANA for ISO-IP
+  (Marshall T. Rose) (not listed in /etc/services) (Mentioned directly
+  by Marshall in RFC 1070 for UDP.)
+
+  This protocol can use 224.0.0.1 with the SNAcP defined in RFC 1070.
+
+- TCP/UDP/SCTP port number 163 'cmip-man' is assigned by IANA for
+  CMIP/TCP Manager (Mashall T. Rose).  (Linux /etc/services notes that
+  this port is used for ISO Management over IP (CMOT)).  This is
+  definitely RFC 1095, which is now "Historical".
+
+- TCP/UDP/SCTP port number 164 'cmip-agent' is assigned by IANA for
+  CMIP/TCP Agent (Mashall T. Rose).  (Linux /etc/services notes that
+  this port is used for ISO Management over IP (CMOT)).  This is
+  definitely RFC 1095, which is now "Historical".
+
+- TCP/UDP/SCTP port number 399 'iso-tsap-c2' is assigned by IANA for ISO
+  Transport Class 2 Non-Control over TCP/UDP (Yannic Pouffary). (not
+  listed in /etc/services) (I think this is TP2 over TCP as described by
+  Yannic in RFC 2126 (ITOT).)
+
+- TCP/UDP/SCTP port number 499 'iso-ill' is assigned by IANA for ISO ILL
+  Protocol (Mark H. Needleman) (not listed in /etc/services)
+
+Registered Port Numbers:
+
+- TCP/UDP/SCTP port number 1106 'isoipsigport-1' is assigned by IANA for
+  ISOIPSIGPORT-1 (Peter Egli) (not listed in /etc/services)
+
+- TCP/UDP/SCTP port number 1107 'isoipsigport-2' is assigned by IANA for
+  ISOIPSIGPORT-2 (Peter Egli) (not listed in /etc/services)
+
+- TCP/UDP/SCTP port number 1998 'x25-svs-port' is assigned by IANA for
+  Cisco X.25 Service (XOT). (not listed in /etc/services) (Defined in
+  RFC 1613.)
+
+- TCP/UDP/SCTP port number 3782 'iso-tp0s' is assigned by IANA for
+  Secure ISO TP0 port (Herbert Falk) (not listed in /etc/services)
+
+- TCP/UDP/SCTP port number 17007 'isode-dua' is assigned by IANA. (not
+  listed in /etc/services)  (Probably ISODE DUA-DSA for directory
+  services.)
+
+Routing:
+--------
+
+RFC 1195 - Use of OSI IS-IS for Routing in TCP/IP and Dual Environments
+RFC 1142 - OSI IS-IS Intra-domain Routing Protocol (ISO/IEC 10589)
+RFC 1070 - Use of the Internet as a Subnetwork for Experimentation with the OSI Network Layer
+ISO/IEC  9542 (ES-IS) CLNS [RFC 0995, RFC 1768]
+ISO/IEC 10589 (IS-IS) CLNS [RFC 1142]
+ISO/IEC 10747 (IDRP)
+ISO/IEC 10030 (ES-ES) CONS [RFC 1223]
+
+Addressing
+----------
+
+- X.121
+- E.164
+
+- RFC 1069 - IP NSAPs
+  47		    AFI (ICD Binary)
+  0006		    IDI/ICD (Internet ICD)
+  02		    DFI Version
+  00		    Global Area
+  00000000000000    Padding
+  AABBCCDD	    IPv4 address
+  00		    Nsel
+
+  Or 2/6/1 format:
+  47                AFI (ICD Binary)
+  0006              IDI/ICD (Internet ICD)
+  02                DFI Version
+  00                Global Area
+  XXXX		    Routing Domain
+  000000	    Padding
+  XX		    Area Code
+  AABBCCDDPPPP      IPv4 address and port
+  00                Nsel
+
+- RFC 1277 - RFC 1006 NSAPs
+
+  54		    AFI (F.69 Decimal)
+  00		    F.69 prefix
+  728722	    Hypotetical telex number
+  03		    Prefix (RFC1006)
+  AAABBBCCCDDD	    IPv4 Address (decimal)
+  PPPPP		    Port number (decimal)
+  TTTTT		    Transport selection mask (1 TCP, 2 UDP, how about 4 SCTP)
+
+- RFC 4548 - IP NSAPs
+
+  47		    AFI (IANA ICP Binary)
+  0001		    IPv4 (IPv6 is 0000)
+  AABBCCDD          IPv4 address
+  00...             13 octets of zeros
+
+
+- RFC 1768 - Multicast NSAPs for CLNS and (ES-IS/IS-IS) extensions
+
+- Typical trick: use
+
+  49                AFI (Local Binary)
+  --                IDI (NULL)
+  XXXX              Routing Domain/Area Code (Subnetwork)
+  HH:HH:HH:HH:HH:HH MAC Address
+  00                NSel
+
+Note that ES can automatically configure their addresses by observing
+the ISO 9542 IS-Hello packets and using the NET at the NSAP all the way
+through the Area Code and appending the 48-bit IEEE MAC address and the
+N-selector to form its own address.  This does not depend on the form of
+the AFI.
+
+Design Notes:
+=============
+
+Tricks for TP4 over CLNS
+------------------------
+
+Could use an NPI CLNL driver with a wildcard bind to link underneath the
+TP4 CLNS driver.  This NPI driver would register for inet protocol 80
+'ISO-IP' and deliver packets based on Internet NSAPs.  The network
+address selector would distinguish between CLNS, ESIS and ISIS.  It
+could also register a packet handler for IP and filter UDP port 147
+ISO-grams.  It could also register for CLNL sap ethernet, 802.2 and
+SNAP packets.  If wanrouter was fixed in the Linux kernel, we would also
+receive MPOX, MPOFR and MPOA encapsulated packets in addition to MP SNAP
+packets.  Performing outgoing packet routing (interface selection) gets
+a little tricky.  Another trick would be to register for LLC and HDLC
+packets and perform our own de-encapsulation.  The trick here is that
+most protocol modules should check for PACKET_HOST before processing the
+packet.  If we want to steal a packet, just set the packet type on the
+sk_buff to -1 or something.  NITs like pcap(3) will still see the
+packet.
+
+Better Idea
+-----------
+
+TP can use Linux' device independent packet layer and some wanrouter
+magic to do what it needs, at least for CLNS.  Any special devices that
+we want to support in the scheme of things can be wrappered to pseudo
+network devices under Linux.  This could be acheived by opening a
+network stream and linking DLPI streams underneath.  NP streams would
+not be linked under the TP, the TP would access them via Linux packet
+handling.  Specific X.25 PLP CONS connections could be temporarily
+linked underneath the TP driver for use by specific TP2, TP3 or TP4 CONS
+streams.  It would require an X.25 PLP CONS packet handler and routing
+logic, as Linux doesn't have one of those.
+
+For ISO-IP, no additional packet handler is required as IP routing and
+handling can be used instead.  What underlying networking is performed
+can be handled by using the TP transport address and selectors reserved
+for IP.  Sent packets can use the entire IP subsystem.  Received packets
+can be filtered.  CONS over LAN can also be performed easily provided
+that there is an X.121 ARP facility, or that TP can hook and provide
+one.
+
+Zero copy conversion between sk_buffs and msgbs:
+------------------------------------------------
+
+Converting from an sk_buff to a chain of mblks is probably pretty easy.
+Use esballoc to allocate a message block for the sk_buff header, map
+each page in the page fragment list and esballoc a message block, hiding
+the vaddr in the internal data buffer somewhere, and then do the same
+for each sk_buff in the frag list.  Each time an mblk is esballoc'ed
+take another reference on the original sk_buff with skb_get() (except
+for the inital mblk).  When the external buffer databs are freed, each
+paged fragment has its vaddr unmapped and a reference released on the
+head sk_buff with kfree_skb(), each real memory block simply releases a
+reference on the head sk_buff with kfree_skb().  When the last reference
+to the head sk_buff is released, the head sk_buff is freed. 
+
+Coversion the other way might be difficult.  The major hurdle is that
+the sk_buff saves shared information hidden at the end of the data
+buffer.  One possibilty for msgb chains is to allocate a zero-length
+sk_buff as a header and then place the data buffer information into the
+paged frag list (up to 6 buffers in the chain) and then pull some
+portion of the header (say the first fragment).  Then these pages could
+be mapped by the user of the sk_buff as required.  An skb->destructor is
+set that uses information in the control block.  Another wrinkle is that
+the control block is overwritten between layers.  This could be
+overcome, I suppose, by placing the sk_buff pointer in the head msblk
+(b_prev) and then linking them into a hash table (b_next).  The
+destructor could then search this hash and free the corresponding mblk.
+
+
+=========================================================================
+
+Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+
+All Rights Reserved.
+
+ Permission is granted to make and distribute verbatim copies of this
+ manual provided the copyright notice and this permission notice are
+ preserved on all copies.
+
+ Permission is granted to copy and distribute modified versions of this
+ manual under the conditions for verbatim copying, provided that the
+ entire resulting derived work is distributed under the terms of a
+ permission notice identical to this one
+
+ Since the Linux kernel and libraries are constantly changing, this
+ manual page may be incorrect or out-of-date.  The author(s) assume no
+ responsibility for errors or omissions, or for damages resulting from
+ the use of the information contained herein.  The author(s) may not
+ have taken the same level of care in the production of this manual,
+ which is licensed free of charge, as they might when working
+ professionally.
+
+ Formatted or processed versions of this manual, if unaccompanied by
+ the source, must acknowledge the copyright and authors of this work.
+
+-------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+ on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department
+ of Defense ("DoD"), it is classified as "Commercial Computer Software"
+ under paragraph 252.227-7014 of the DoD Supplement to the Federal
+ Acquisition Regulations ("DFARS") (or any successor regulations) and the
+ Government is acquiring only the license rights granted herein (the
+ license rights customarily provided to non-Government users).  If the
+ Software is supplied to any unit or agency of the Government other than
+ DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19
+ of the Federal Acquisition Regulations ("FAR") (or any successor
+ regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+ NASA Supplement to the FAR (or any successor regulations).
+
+=========================================================================
+
+ Commercial licensing and support of this software is available from
+ OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+
+=========================================================================
+vim: ft=README tw=72 sw=4 nocin nosi formatoptions+=tcqlorn

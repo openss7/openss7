@@ -1,0 +1,422 @@
+201	US	NJ	New Jersey
+202	US	DC	Washington, D.C.
+203	US	CT	Connecticut
+204	CA	MB	Manitoba
+205	US	AL	Alabama
+206	US	WA	Washington
+207	US	ME	Maine
+208	US	ID	Idaho
+209	US	CA	California
+210	US	TX	Texas
+211	ZZ	ZZ	Service Access Code
+212	US	NY	New York
+213	US	CA	California
+214	US	TX	Texas
+215	US	PA	Pennsylvania
+216	US	OH	Ohio
+217	US	IL	Illinois
+218	US	MN	Minnesota
+219	US	IN	Indiana
+224	US	IL	Illinois
+225	US	LA	Louisiana
+226	CA	ON	Ontario
+227	US	MD	Maryland
+228	US	MS	Mississippi
+229	US	GA	Georgia
+231	US	MI	Michigan
+234	US	OH	Ohio
+236	CA	BC	British Columbia
+239	US	FL	Florida
+240	US	MD	Maryland
+242	BS	BS	Bahamas
+246	BB	BB	Barbados
+248	US	MI	Michigan
+249	CA	ON	Ontario
+250	CA	BC	British Columbia
+251	US	AL	Alabama
+252	US	NC	North Carolina
+253	US	WA	Washington
+254	US	TX	Texas
+256	US	AL	Alabama
+260	US	IN	Indiana
+262	US	WI	Wisconsin
+264	AI	AI	Anguilla
+267	US	PA	Pennsylvania
+268	AG	AG	Antigua and Barbuda
+269	US	MI	Michigan
+270	US	KY	Kentucky
+272	US	PA	Pennsylvania
+274	US	WI	Wisconsin
+276	US	VA	Virginia
+281	US	TX	Texas
+283	US	OH	Ohio
+284	VG	VG	British Virgin Islands
+289	CA	ON	Ontario
+301	US	MD	Maryland
+302	US	DE	Delaware
+303	US	CO	Colorado
+304	US	WV	West Virginia
+305	US	FL	Florida
+306	CA	SK	Saskatchewan
+307	US	WY	Wyoming
+308	US	NE	Nebraska
+309	US	IL	Illinois
+310	US	CA	California
+311	ZZ	ZZ	Service Access Code
+312	US	IL	Illinois
+313	US	MI	Michigan
+314	US	MO	Missouri
+315	US	NY	New York
+316	US	KS	Kansas
+317	US	IN	Indiana
+318	US	LA	Louisiana
+319	US	IA	Iowa
+320	US	MN	Minnesota
+321	US	FL	Florida
+323	US	CA	California
+325	US	TX	Texas
+327	US	AR	Arkansas
+330	US	OH	Ohio
+331	US	IL	Illinois
+334	US	AL	Alabama
+336	US	NC	North Carolina
+337	US	LA	Louisiana
+339	US	MA	Massachusetts
+340	VI	VI	U.S. Virgin Islands
+343	CA	ON	Ontario
+345	KY	KY	Cayman Islands
+347	US	NY	New York
+351	US	MA	Massachusetts
+352	US	FL	Florida
+360	US	WA	Washington
+361	US	TX	Texas
+364	US	KY	Kentucky
+365	CA	ON	Ontario
+380	US	OH	Ohio
+385	US	UT	Utah
+386	US	FL	Florida
+401	US	RI	Rhode Island
+402	US	NE	Nebraska
+403	CA	AB	Alberta
+404	US	GA	Georgia
+405	US	OK	Oklahoma
+406	US	MT	Montana
+407	US	FL	Florida
+408	US	CA	California
+409	US	TX	Texas
+410	US	MD	Maryland
+411	ZZ	ZZ	Service Access Code
+412	US	PA	Pennsylvania
+413	US	MA	Massachusetts
+414	US	WI	Wisconsin
+415	US	CA	California
+416	CA	ON	Ontario
+417	US	MO	Missouri
+418	CA	QC	Quebec
+419	US	OH	Ohio
+423	US	TN	Tennessee
+424	US	CA	California
+425	US	WA	Washington
+430	US	TX	Texas
+431	CA	MB	Manitoba
+432	US	TX	Texas
+434	US	VA	Virginia
+435	US	UT	Utah
+437	CA	ON	Ontario
+438	CA	QC	Quebec
+440	US	OH	Ohio
+441	BM	BM	Bermuda
+442	US	CA	California
+443	US	MD	Maryland
+447	US	IL	Illinois
+450	CA	QC	Quebec
+456	ZZ	ZZ	Reserved
+458	US	OR	Oregon
+464	US	IL	Illinois
+469	US	TX	Texas
+470	US	GA	Georgia
+473	GD	GD	Grenada
+475	US	CT	Connecticut
+478	US	GA	Georgia
+479	US	AR	Arkansas
+480	US	AZ	Arizona
+484	US	PA	Pennsylvania
+500	ZZ	ZZ	Personal Communications Services
+501	US	AR	Arkansas
+502	US	KY	Kentucky
+503	US	OR	Oregon
+504	US	LA	Louisiana
+505	US	NM	New Mexico
+506	CA	NB	New Brunswick
+507	US	MN	Minnesota
+508	US	MA	Massachusetts
+509	US	WA	Washington
+510	US	CA	California
+511	ZZ	ZZ	Service Access Code
+512	US	TX	Texas
+513	US	OH	Ohio
+514	CA	QC	Quebec
+515	US	IA	Iowa
+516	US	NY	New York
+517	US	MI	Michigan
+518	US	NY	New York
+519	CA	ON	Ontario
+520	US	AZ	Arizona
+521	ZZ	ZZ	Reserved
+522	ZZ	ZZ	Reserved
+523	ZZ	ZZ	Reserved
+524	ZZ	ZZ	Reserved
+525	ZZ	ZZ	Reserved
+526	ZZ	ZZ	Reserved
+527	ZZ	ZZ	Reserved
+528	ZZ	ZZ	Reserved
+529	ZZ	ZZ	Reserved
+530	US	CA	California
+531	US	NE	Nebraska
+532	ZZ	ZZ	Reserved
+533	ZZ	ZZ	Personal Communications Services
+534	US	WI	Wisconsin
+538	ZZ	ZZ	Reserved
+539	US	OK	Oklahoma
+540	US	VA	Virginia
+541	US	OR	Oregon
+542	ZZ	ZZ	Reserved
+543	ZZ	ZZ	Reserved
+544	ZZ	ZZ	Personal Communications Services
+545	ZZ	ZZ	Reserved
+547	ZZ	ZZ	Reserved
+549	ZZ	ZZ	Reserved
+551	US	NJ	New Jersey
+552	ZZ	ZZ	Reserved
+553	ZZ	ZZ	Reserved
+554	ZZ	ZZ	Reserved
+556	ZZ	ZZ	Reserved
+557	US	MO	Missouri
+559	US	CA	California
+561	US	FL	Florida
+562	US	CA	California
+563	US	IA	Iowa
+564	US	WA	Washington
+566	ZZ	ZZ	Reserved
+567	US	OH	Ohio
+569	ZZ	ZZ	Reserved
+570	US	PA	Pennsylvania
+571	US	VA	Virginia
+573	US	MO	Missouri
+574	US	IN	Indiana
+575	US	NM	New Mexico
+577	ZZ	ZZ	Reserved
+578	ZZ	ZZ	Reserved
+579	CA	QC	Quebec
+580	US	OK	Oklahoma
+581	CA	QC	Quebec
+582	US	PA	Pennsylvania
+585	US	NY	New York
+586	US	MI	Michigan
+587	CA	AB	Alberta
+588	ZZ	ZZ	Reserved
+589	ZZ	ZZ	Reserved
+600	CA	ZZ	Special telecommunications needs in Canada
+601	US	MS	Mississippi
+602	US	AZ	Arizona
+603	US	NH	New Hampshire
+604	CA	BC	British Columbia
+605	US	SD	South Dakota
+606	US	KY	Kentucky
+607	US	NY	New York
+608	US	WI	Wisconsin
+609	US	NJ	New Jersey
+610	US	PA	Pennsylvania
+611	ZZ	ZZ	Service Access Code
+612	US	MN	Minnesota
+613	CA	ON	Ontario
+614	US	OH	Ohio
+615	US	TN	Tennessee
+616	US	MI	Michigan
+617	US	MA	Massachusetts
+618	US	IL	Illinois
+619	US	CA	California
+620	US	KS	Kansas
+623	US	AZ	Arizona
+626	US	CA	California
+630	US	IL	Illinois
+631	US	NY	New York
+636	US	MO	Missouri
+639	CA	SK	Saskatchewan
+641	US	IA	Iowa
+646	US	NY	New York
+647	CA	ON	Ontario
+649	TC	TC	Turks and Caicos Islands
+650	US	CA	California
+651	US	MN	Minnesota
+657	US	CA	California
+658	JM	JM	Jamaica
+659	US	AL	Alabama
+660	US	MO	Missouri
+661	US	CA	California
+662	US	MS	Mississippi
+664	MS	MS	Montserrat
+667	US	MD	Maryland
+669	US	CA	California
+670	MP	MP	Northern Mariana Islands
+671	GU	GU	Guam
+678	US	GA	Georgia
+679	US	MI	Michigan
+681	US	WV	West Virginia
+682	US	TX	Texas
+684	AS	AS	American Samoa
+689	US	FL	Florida
+700	ZZ	ZZ	Reserved
+701	US	ND	North Dakota
+702	US	NV	Nevada
+703	US	VA	Virginia
+704	US	NC	North Carolina
+705	CA	ON	Ontario
+706	US	GA	Georgia
+707	US	CA	California
+708	US	IL	Illinois
+709	CA	NL	Newfoundland and Labrador
+710	US	ZZ	U.S. Government Special Services
+711	ZZ	ZZ	Service Access Code
+712	US	IA	Iowa
+713	US	TX	Texas
+714	US	CA	California
+715	US	WI	Wisconsin
+716	US	NY	New York
+717	US	PA	Pennsylvania
+718	US	NY	New York
+719	US	CO	Colorado
+720	US	CO	Colorado
+721	SX	SX	Sint Maarten
+724	US	PA	Pennsylvania
+727	US	FL	Florida
+730	US	IL	Illinois
+731	US	TN	Tennessee
+732	US	NJ	New Jersey
+734	US	MI	Michigan
+737	US	TX	Texas
+740	US	OH	Ohio
+747	US	CA	California
+754	US	FL	Florida
+757	US	VA	Virginia
+758	LC	LC	Saint Lucia
+760	US	CA	California
+762	US	GA	Georgia
+763	US	MN	Minnesota
+765	US	IN	Indiana
+767	DM	DM	Commonwealth of Dominica
+769	US	MS	Mississippi
+770	US	GA	Georgia
+772	US	FL	Florida
+773	US	IL	Illinois
+774	US	MA	Massachusetts
+775	US	NV	Nevada
+778	CA	BC	British Columbia
+779	US	IL	Illinois
+780	CA	AB	Alberta
+781	US	MA	Massachusetts
+784	VC	VC	Saint Vincent and the Grenadines
+785	US	KS	Kansas
+786	US	FL	Florida
+787	PR	PR	Puerto Rico
+800	ZZ	ZZ	Toll-free telephone service
+801	US	UT	Utah
+802	US	VT	Vermont
+803	US	SC	South Carolina
+804	US	VA	Virginia
+805	US	CA	California
+806	US	TX	Texas
+807	CA	ON	Ontario
+808	US	HI	Hawaii
+809	DO	DO	Dominican Republic
+810	US	MI	Michigan
+811	ZZ	ZZ	Service Access Code
+812	US	IN	Indiana
+813	US	FL	Florida
+814	US	PA	Pennsylvania
+815	US	IL	Illinois
+816	US	MO	Missouri
+817	US	TX	Texas
+818	US	CA	California
+819	CA	QC	Quebec
+828	US	NC	North Carolina
+829	DO	DO	Dominican Republic
+830	US	TX	Texas
+831	US	CA	California
+832	US	TX	Texas
+843	US	SC	South Carolina
+845	US	NY	New York
+847	US	IL	Illinois
+848	US	NJ	New Jersey
+849	DO	DO	Dominican Republic
+850	US	FL	Florida
+855	ZZ	ZZ	Toll-free telephone service
+856	US	NJ	New Jersey
+857	US	MA	Massachusetts
+858	US	CA	California
+859	US	KY	Kentucky
+860	US	CT	Connecticut
+862	US	NJ	New Jersey
+863	US	FL	Florida
+864	US	SC	South Carolina
+865	US	TN	Tennessee
+866	ZZ	ZZ	Toll-free telephone service
+867	CA	NT	Yukon, Northwest Territories, and Nunavut
+868	TT	TT	Trinidad and Tobago
+869	KN	KN	Saint Kitts and Nevis
+870	US	AR	Arkansas
+872	US	IL	Illinois
+873	CA	QC	Quebec
+876	JM	JM	Jamaica
+877	ZZ	ZZ	Toll-free telephone service
+878	US	PA	Pennsylvania
+888	ZZ	ZZ	Toll-free telephone service
+900	ZZ	ZZ	Premium-rate telephone service
+901	US	TN	Tennessee
+902	CA	NS	Nova Scotia and Prince Edward Island
+903	US	TX	Texas
+904	US	FL	Florida
+905	CA	ON	Ontario
+906	US	MI	Michigan
+907	US	AK	Alaska
+908	US	NJ	New Jersey
+909	US	CA	California
+910	US	NC	North Carolina
+911	ZZ	ZZ	Service Access Code
+912	US	GA	Georgia
+913	US	KS	Kansas
+914	US	NY	New York
+915	US	TX	Texas
+916	US	CA	California
+917	US	NY	New York
+918	US	OK	Oklahoma
+919	US	NC	North Carolina
+920	US	WI	Wisconsin
+925	US	CA	California
+928	US	AZ	Arizona
+929	US	NY	New York
+931	US	TN	Tennessee
+936	US	TX	Texas
+937	US	OH	Ohio
+938	US	AL	Alabama
+939	PR	PR	Puerto Rico
+940	US	TX	Texas
+941	US	FL	Florida
+947	US	MI	Michigan
+949	US	CA	California
+951	US	CA	California
+952	US	MN	Minnesota
+954	US	FL	Florida
+956	US	TX	Texas
+959	US	CT	Connecticut
+970	US	CO	Colorado
+971	US	OR	Oregon
+972	US	TX	Texas
+973	US	NJ	New Jersey
+975	US	MO	Missouri
+978	US	MA	Massachusetts
+979	US	TX	Texas
+980	US	NC	North Carolina
+984	US	NC	North Carolina
+985	US	LA	Louisiana
+989	US	MI	Michigan

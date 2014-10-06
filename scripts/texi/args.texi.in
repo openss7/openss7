@@ -1,0 +1,173 @@
+@c -*- texinfo -*- vim: ft=texinfo
+@c =========================================================================
+@c
+@c @(#) $Id: args.texi.in,v 1.1.2.5 2011-09-02 08:46:31 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to copy, distribute and/or modify this document
+@c under the terms of the GNU Free Documentation License, Version 1.3 or
+@c any later version published by the Free Software Foundation; with no
+@c Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+@c copy of the license is included in the section entitled "GNU Free
+@c Documentation License".
+@c
+@c Permission to use, copy and distribute this documentation without
+@c modification, for any purpose and without fee or royalty is hereby
+@c granted, provided that both the above copyright notice and this
+@c permission notice appears in all copies and that the name of OpenSS7
+@c Corporation not be used in advertising or publicity pertaining to
+@c distribution of this documentation or its contents without specific,
+@c written prior permission.  OpenSS7 Corporation makes no representation
+@c about the suitability of this documentation for any purpose.  It is
+@c provided "as is" without express or implied warranty.
+@c 
+@c Permission is granted to process this file through Tex and print the
+@c results, provided the printed document carries copying permission notice
+@c identical to this one except for the removal of this paragraph (this
+@c paragraph not being relevant to the printed manual).
+@c 
+@c OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+@c DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+@c FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+@c CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+@c IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+@c PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+@c OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+@c CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+@c USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+@c OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+@c THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+@c THEREOF.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not have
+@c taken the same level of care in the production of this manual, which is
+@c licensed free of charge, as they might when working professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by the
+@c source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2011-09-02 08:46:31 $ by $Author: brian $
+@c
+@c =========================================================================
+
+@set PACKAGE @PACKAGE@
+@set VERSION @VERSION@
+@set PACKAGE_BUGREPORT bugs@@openss7.org
+@set PACKAGE_CVSTAG @PACKAGE_CVSTAG@
+@set PACKAGE_DATE @PACKAGE_DATE@
+@set PACKAGE_DEBEPOCH @PACKAGE_DEBEPOCH@
+@set PACKAGE_DEBOPTIONS @PACKAGE_DEBOPTIONS@
+@set PACKAGE_DEBRELEASE @PACKAGE_DEBRELEASE@
+@set PACKAGE_DEBTOPDIR @PACKAGE_DEBTOPDIR@
+@set PACKAGE_EPOCH @PACKAGE_EPOCH@
+@set PACKAGE_KNUMBER @PACKAGE_KNUMBER@
+@set PACKAGE_KVERSION @PACKAGE_KVERSION@
+@set PACKAGE_LCNAME @PACKAGE_LCNAME@
+@set PACKAGE_NAME @PACKAGE_NAME@
+@set PACKAGE_PATCHLEVEL @PACKAGE_PATCHLEVEL@
+@set PACKAGE_PDATE @PACKAGE_PDATE@
+@set PACKAGE_RELEASE @PACKAGE_RELEASE@
+@set PACKAGE_RPMDIST @PACKAGE_RPMDIST@
+@set PACKAGE_RPMEPOCH @PACKAGE_RPMEPOCH@
+@set PACKAGE_RPMEXTRA @PACKAGE_RPMEXTRA@
+@set PACKAGE_RPMOPTIONS @PACKAGE_RPMOPTIONS@
+@set PACKAGE_RPMRELEASE @PACKAGE_RPMRELEASE@
+@set PACKAGE_SHORTTITLE @PACKAGE_SHORTTITLE@
+@set PACKAGE_STRING @PACKAGE_STRING@
+@set PACKAGE_TARNAME @PACKAGE_TARNAME@
+@set PACKAGE_TITLE @PACKAGE_TITLE@
+@set PACKAGE_UCNAME @PACKAGE_UCNAME@
+@set PACKAGE_VERSION @PACKAGE_VERSION@
+@set PACKAGE_ENVR @PACKAGE_ENVR@
+
+@set _bindir @prefix@/bin
+@set _datadir @prefix@/share
+@set _exec_prefix @prefix@
+@set _includedir @prefix@/include
+@set _infodir @prefix@/share/info
+@set _kmoduledir @kmoduledir@
+@set _rootdir @rootdir@
+@set _ksysmap @ksysmap@
+@set _kversion @kversion@
+@set _libdir @prefix@/lib
+@set _libexecdir @prefix@/libexec
+@set _localstatedir @localstatedir@
+@set _mandir @prefix@/share/man
+@set _oldincludedir @oldincludedir@
+@set _prefix @prefix@
+@set _sbindir @prefix@/sbin
+@set _sharedstatedir @prefix@/com
+@set _sysconfdir /etc
+@set _configdir @configdir@
+
+@set _repodir @repodir@
+@set _topdir @topdir@
+@set _sourcedir @sourcedir@
+@set _builddir @rpmbuilddir@
+@set _rpmdir @rpmdir@
+@set _srcrpmdir @srcrpmdir@
+@set _specdir @specdir@
+
+@set _build @build@
+@set _build_alias @build_alias@
+@set _build_cpu @build_cpu@
+@set _build_os @build_os@
+@set _build_vendor @build_vendor@
+@set _build_distos @build_distos@
+@set _build_distro @build_distro@
+@set _build_edition @build_edition@
+@set _build_arch @build_arch@
+
+@set _host @host@
+@set _host_alias @host_alias@
+@set _host_cpu @host_cpu@
+@set _host_os @host_os@
+@set _host_vendor @host_vendor@
+@set _host_distos @host_distos@
+@set _host_distro @host_distro@
+@set _host_edition @host_edition@
+@set _host_arch @host_arch@
+
+@set _target @target@
+@set _target_alias @target_alias@
+@set _target_cpu @target_cpu@
+@set _target_os @target_os@
+@set _target_vendor @target_vendor@
+@set _target_distos @target_distos@
+@set _target_distro @target_distro@
+@set _target_edition @target_edition@
+@set _target_arch @target_arch@

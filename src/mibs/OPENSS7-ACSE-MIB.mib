@@ -1,0 +1,2075 @@
+-- vim: ft=mib comments=\f\b\:\"ITU\-T,\f\b\:ITU\-T,\f\:\",\b\:\-\-,\:\-\-,\f\b\:\-,\f\b\:\· fo+=tcqlornw12 tw=64 ai nocin nosi sts=4 sw=4 et
+-- =============================================================================
+-- 
+-- @(#) $RCSfile: OPENSS7-ACSE-MIB.mib,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-07-18 19:42:17 $
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- Note well: notwithstanding this AGPL license, you are not permitted to make 
+-- modifications under the OpenSS7 project's enterprise object identifier arc: 
+-- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
+-- identifier arc under your control.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date: 2011-07-18 19:42:17 $ by $Author: brian $
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log: OPENSS7-ACSE-MIB.mib,v $
+-- Revision 1.1.2.3  2011-07-18 19:42:17  brian
+-- - added documentation
+--
+-- Revision 1.1.2.2  2010-06-09 12:58:31  brian
+-- - updated mibs
+--
+-- Revision 1.1.2.1  2009-06-21 11:39:29  brian
+-- - added files to new distro
+--
+-- =============================================================================
+
+OPENSS7-ACSE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    applicationProcessId, subsystemId
+        FROM OPENSS7-GMI-MIB
+    mtpMsId
+        FROM OPENSS7-MTP-MIB
+    sccpNetworkEntityId
+        FROM OPENSS7-SCCP-MIB
+    openss7Q751
+        FROM OPENSS7-SMI
+    OperationalState, SimpleNameType
+        FROM OPENSS7-SMI-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Opaque, Unsigned32
+        FROM SNMPv2-SMI
+    RowPointer, RowStatus, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+acseMIB MODULE-IDENTITY
+    LAST-UPDATED "201112101120Z"
+    ORGANIZATION 
+        "The OpenSS7 Project"
+    CONTACT-INFO 
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Crescent
+         Edmonton, Alberta T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         E-mail: bidulock@openss7.org"
+    DESCRIPTION 
+        "This is a MIB providing management information is 
+         accordance with ITU-T Rec. X.287 (2000) | ISO/IEC 
+         10165-8 : 2000.
+         
+         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+         
+         All Rights Reserved.
+         
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+         
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+         
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+         
+         Note well: notwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
+    REVISION    "201112101120Z"
+    DESCRIPTION 
+        "Corrections an smilint workup."
+    REVISION    "200810092250Z"
+    DESCRIPTION 
+        "First release of this module."
+    ::= { openss7Q751 47 }
+
+
+PresentationContext ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Providews a specification of a presentation context with the 
+         syntax of an OBJECT IDENITIFER."
+    SYNTAX      OBJECT IDENTIFIER
+
+PresentationRequirements ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Provides a set of presentation requirements."
+    REFERENCE   
+        "ITU-T Rec. X.226 | ISO/IEC 8823, 8823-PRESENTATION ASN module, 
+             Presentation-requirements."
+    SYNTAX      BITS { contextManagement(0), restoration(1) }
+
+PresentationSelectorValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x"
+    STATUS      current
+    DESCRIPTION 
+        "Provides a specification of a presentation layer selector."
+    REFERENCE   
+        "ITU-T Rec. X.226 | ISO/IEC 8823, 8823-PRESENTATION ASN module, 
+             Presentation-selector."
+    SYNTAX      OCTET STRING
+
+SessFUs ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Provides a specification of session layer functional units."
+    REFERENCE   
+        "ITU-T Rec. X.287 | ISO/IEC 10165-8, UL-AtributeModule: 
+             SessFUs."
+    SYNTAX      BITS { halfDuplex(0), duplex(1), expeditedData(2), 
+                    minorSynchronize(3), majorSynchronize(4), 
+                    resynchronize(5), activityManagement(6), 
+                    negotiatedRelease(7), capabilityData(8), 
+                    exceptions(9), typedData(10) }
+
+SessOptSupport ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Provides a specification of session layer options."
+    REFERENCE   
+        "ITU-T Rec. X.287 | ISO/IEC 10165-8, UL-AttributeModule: 
+             SessOptSupport."
+    SYNTAX      BITS { segmenting(0) }
+
+SessionSelectorValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x"
+    STATUS      current
+    DESCRIPTION 
+        "Provides a specification of a session layer selector."
+    REFERENCE   
+        "ITU-T Rec. X.287 | ISO/IEC 10165-8, UL-AttributeModule: 
+             SessionSelectorValue."
+    SYNTAX      OCTET STRING (SIZE(0..16))
+
+SessionProtVer ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Provides a specification of session layer protocol versions."
+    REFERENCE   
+        "ITU-T Rec. X.287 | ISO/IEC 10165-8, UL-AttributeModule: 
+             SessionProtVer."
+    SYNTAX      BITS { version1(0), version2(1) }
+
+AbstractSyntax ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Provides specification of a presentation layer abstract 
+         syntax."
+    REFERENCE   
+        "ITU-T Rec. X.226 | ISO/IEC 8823, 8823-PRESENTATION: 
+             Abstract-syntax."
+    SYNTAX      OBJECT IDENTIFIER
+
+TransferSyntax ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Provides specification of a presentation layer transfer 
+         syntax."
+    REFERENCE   
+        "ITU-T Rec. X.226 | ISO/IEC 8823, 8823-PRESENTATION: 
+             Tranfer-syntax."
+    SYNTAX      OBJECT IDENTIFIER
+
+ApplicationContextName ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Provides a specification of an application context name with 
+         the syntax of an OBJECT IDENTIFIER.   Fields using this"
+    SYNTAX      OBJECT IDENTIFIER
+
+AcseFUs ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Provides a specification of the ACSE functional units present 
+         in an instance of the ACSE layer."
+    REFERENCE   
+        "ITU-T Rec. X.227 (1995)/Amd.1 (1996 E), ACSE-requirements."
+    SYNTAX      BITS { authentication(0), 
+                    applicationContextNegotiation(1) }
+
+AcseEditionsSupported ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Provides a specification of the ACSE editions (versions) 
+         supported by an instance of the ACSE layer."
+    REFERENCE   
+        "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000,  AcseEditionsSupported."
+    SYNTAX      BITS { version1(0) }
+
+acseNotifications OBJECT IDENTIFIER
+    ::= { acseMIB 0 }
+
+acseSpecificExtensions OBJECT IDENTIFIER
+    ::= { acseMIB 1 }
+
+acseDefaults OBJECT IDENTIFIER
+    ::= { acseMIB 2 }
+
+acseObjectClass OBJECT IDENTIFIER
+    ::= { acseMIB 3 }
+
+aCSE OBJECT IDENTIFIER
+    ::= { acseObjectClass 1 }
+
+    -- DERIVED FROM aso
+        -- communiationsEntityId
+        -- asoTitle
+        -- asoQualifier
+        -- operationalState
+        -- aso-aso NAME BINDING
+        -- aso-asoEntity NAME BINDING
+    -- acseFUinitiator
+    -- acseEditionsSupported
+    -- acseFUresponder
+
+acseTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcseEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a table of application context service entities.
+         
+         This subclass of ASO (augmentation of the asoTable) is 
+         a specialized application service object that holds reference 
+         information about an ACSE application service element.  It 
+         specializes by adding the following attributes:
+         
+         - acseFUinitiator, the ACSE functional units supported as 
+           initiator;
+         - acseFUresponder, the ACSE functional units supported as 
+           responder;
+         - acseEditionsSupported, the ACSE editions supported.
+         
+         An application service element does not qualify as an ASO 
+         entity or as an X.723 communications entity because it does 
+         not have both the association phase and the transfer phase of 
+         communication."
+    REFERENCE   
+        "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000, aCSE MOC."
+    ::= { aCSE 1 }
+
+acseEntry OBJECT-TYPE
+    SYNTAX      AcseEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in thist able is indexed by the subsystem, application 
+         process, ASO entity and ASO identifiers.  Each row contains 
+         characteristics fo the ACSE."
+    REFERENCE   
+        "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000, aCSE MO."
+    INDEX       { subsystemId, applicationProcessId, asoEntityId, asoId }
+    ::= { acseTable 1 }
+
+AcseEntry ::= SEQUENCE {
+    acseFUinitiator         AcseFUs,
+    acseEditionsSupported   AcseEditionsSupported,
+    acseFUresponder         AcseFUs
+}
+
+acseFUinitiator OBJECT-TYPE
+    SYNTAX      AcseFUs
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the optional ACSE (X.217) functional units 
+         (protocol options) that are supported by this ACSE in the role 
+         of the initiator (client).  The ACSE kernel (required protocol 
+         features) are always supported."
+    REFERENCE   
+        "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000, acseFUinitiator 
+               ATTRIBUTE."
+    ::= { acseEntry 1 }
+
+acseEditionsSupported OBJECT-TYPE
+    SYNTAX      AcseEditionsSupported
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the ACSE (X.217) editions (versions) that are 
+         supported by this ACSE.  This attribute is set-valued and can 
+         contain zero ore more of the following:
+         
+         - version1(0), when set version 1 of the ACSE protocol as 
+           defined by ITU-T Rec. X.227 is supported.
+           
+         There is only one version of the ASCE protocol."
+    REFERENCE   
+        "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000, 
+               acseEditionsSupported ATTRIBUTE."
+    ::= { acseEntry 2 }
+
+acseFUresponder OBJECT-TYPE
+    SYNTAX      AcseFUs
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the optional ACSE (X.217) functional units (protocol 
+         options) that are supported by this ACSE in the role of 
+         a responder (server).  The ACSE kernel (required protocol 
+         features) are always supported."
+    REFERENCE   
+        "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000, acseFUresponder 
+               ATTRIBUTE."
+    ::= { acseEntry 3 }
+
+acseAssociation OBJECT IDENTIFIER
+    ::= { acseObjectClass 2 }
+
+    -- DERIVED FROM asoInvocation
+        -- connectionId
+        -- invocationOfPointer
+        -- asoInvocation-asoInvocation NAME BINDING
+        -- asoInvocation-apInvocation NAME BINDING
+    -- callingAEtitle
+    -- acseFUinUse
+    -- applContextInUse
+    -- parentASOinvoc
+    -- calledAEtitlePackage PACKAGE
+        -- calledAEtitle
+
+acseAssociationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcseAssociationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This subclass of asoInvocation holds references information for 
+         an ACSE association.  It specializes by adding the following 
+         attributes:
+         
+         - calling AE title,
+         - ACSE functional units negotiated for use,
+         - Application context in use,
+         - parent ASO invocation (relationship pointer to parent ASO 
+           invocation, which could be the AEI).
+           
+         It may also have an attribute for the called AE title, if 
+         known."
+    ::= { acseAssociation 1 }
+
+acseAssociationEntry OBJECT-TYPE
+    SYNTAX      AcseAssociationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { applicationSubsystemId, apInvocationId, 
+                  asoInvocationId }
+    ::= { acseAssociationTable 1 }
+
+AcseAssociationEntry ::= SEQUENCE {
+    acseAssociationCallingAEtitle       OCTET STRING,
+    acseAssociationFUinUse              AcseFUs,
+    acseAssociationApplContextInUse     OBJECT IDENTIFIER,
+    acseAssociationParentAsoinvoc       RowPointer,
+    acseAssociationCalledAEtitle        OCTET STRING,
+    acseAssociationRowStatus            RowStatus
+}
+
+acseAssociationCallingAEtitle OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { acseAssociationEntry 1 }
+
+acseAssociationFUinUse OBJECT-TYPE
+    SYNTAX      AcseFUs
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the (optional) ACSE functional units that were 
+         negotiated for use on the association.  The ACSE kernel is 
+         always provided.  This attribute is set-valued and can contain 
+         zero or more of the following:
+         
+         - authentication(0), authentication is provided when present;
+         - applicationContextNegotiation(1), application context can be 
+           negotiated when present.
+         
+         Note that additional ACSE function units might be added in the 
+         future (hah!)."
+    ::= { acseAssociationEntry 2 }
+
+acseAssociationApplContextInUse OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { acseAssociationEntry 3 }
+
+acseAssociationParentAsoinvoc OBJECT-TYPE
+    SYNTAX      RowPointer
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { acseAssociationEntry 4 }
+
+acseAssociationCalledAEtitle OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { acseAssociationEntry 5 }
+
+acseAssociationRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { acseAssociationEntry 6 }
+
+apInvocation OBJECT IDENTIFIER
+    ::= { acseObjectClass 3 }
+
+    -- apInvocationId
+    -- invocationOfPointer
+    -- apInvocation-applicationSubsystem NAME BINDING
+
+apInvocationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ApInvocationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This subclass of Rec. X.721 | ISO/IEC 10165-2 : 1992 : top 
+         holds reference information about an Application Process 
+         Invocation. It specializes by adding the following attributes:
+         
+         - apInvocationId;
+         
+         - invocationOfPointer.
+         
+         The apInvocationId attribute serves as the naming attribute for 
+         instances of this class. The invocationOfPointer attribute 
+         identifies the specific Application Process (using the 
+         distinguished name, DN, of an instance of the Rec. X.723 | 
+         ISO/IEC 10165-5 : 1994 : applicationProcess managed object 
+         class) of which the instance of this class is an invocation."
+    ::= { apInvocation 1 }
+
+apInvocationEntry OBJECT-TYPE
+    SYNTAX      ApInvocationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { applicationSubsystemId, apInvocationId }
+    ::= { apInvocationTable 1 }
+
+ApInvocationEntry ::= SEQUENCE {
+    apInvocationId          SimpleNameType,
+    apInvocationOfPointer   RowPointer,
+    apInvocationRowStatus   RowStatus
+}
+
+apInvocationId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { apInvocationEntry 1 }
+
+apInvocationOfPointer OBJECT-TYPE
+    SYNTAX      RowPointer
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { apInvocationEntry 2 }
+
+apInvocationRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { apInvocationEntry 3 }
+
+applicationEntity OBJECT IDENTIFIER
+    ::= { acseObjectClass 4 }
+
+    -- DERIVED FROM asoEntity
+        -- DERIVED FROM communicationsEntity
+            -- communicationsEntityId
+            -- localSapNames
+            -- operationalState
+            -- communicationsEntity-subsystem NAME BINDING
+        -- DERIVED FROM aso
+            -- communiationsEntityId
+            -- asoTitle
+            -- asoQualifier
+            -- operationalState
+            -- aso-aso NAME BINDING
+            -- aso-asoEntity NAME BINDING
+        -- applContextNameSupport
+        -- asoEntity-applicationProcess NAME BINDING
+
+applicationEntityInvocation OBJECT IDENTIFIER
+    ::= { acseObjectClass 5 }
+
+    -- DERIVED FROM singlePeerConnection
+        -- connectionId
+        -- underlyingConnectionNames
+        -- singlePeerConnectionP2 PACKAGE
+            -- supportedConnectionNames
+        -- singlePeerConnection-coProtocolMachine NAME BINDING
+    -- DERIVED FROM asoInvocation
+        -- connectionId
+        -- invocationOfPointer
+        -- asoInvocation-asoInvocation NAME BINDING
+        -- asoInvocation-apInvocation NAME BINDING
+
+applicationEntityInvocationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ApplicationEntityInvocationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This subclass of Rec. X.723 | ISO/IEC 10165-5 : 1994, 
+         singlePeerConnection, and asoInvocation represents an 
+         invocation of an application entity. It adds no additional 
+         attributes.
+         
+         The inherited Rec. X.723 | ISO/IEC 10165-5 : 1994, connectionId 
+         attribute, serves as the naming attribute for instances of this 
+         class, and represents the application entity (AE) invocation 
+         id. The inherited attribute Rec. X.723 | ISO/IEC 10165-5 : 
+         1994, underlyingConnectionNames, identifies the supporting 
+         services or connections, which for instances of this class is a 
+         presentation address (the distinguished name of an object 
+         instance representing a presentation invocation). The inherited 
+         invocationOfPointer attribute identifies the application entity 
+         of which an instance of this class is an invocation."
+    REFERENCE   
+        "ITU-T Rec. X.287 (2000) | ISO/IEC 10165-8 : 2000, 
+             applicationEntityInvocation MOC.
+         ITU-T Rec. X.723 (1994) | ISO/IEC 10165-5 : 1994, 
+             singlePeerConnection MOC."
+    ::= { applicationEntityInvocation 1 }
+
+applicationEntityInvocationEntry OBJECT-TYPE
+    SYNTAX      ApplicationEntityInvocationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.287 (2000) | ISO/IEC 10165-8 : 2000, 
+             applicationEntityInvocation MO.
+         ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993, 
+             singlePeerConnection MO."
+    INDEX       { applicationSubsystemId, apInvocationId }
+    ::= { applicationEntityInvocationTable 1 }
+
+ApplicationEntityInvocationEntry ::= SEQUENCE {
+    applicationEntityInvocationUnderlyingConnectionNames    RowPointer,
+    applicationEntityInvocationSupportedConnectionNames     RowPointer,
+    applicationEntityInvocationInvocationOfPointer          RowPointer,
+    applicationEntityInvocationRowStatus                    RowStatus
+}
+
+applicationEntityInvocationUnderlyingConnectionNames OBJECT-TYPE
+    SYNTAX      RowPointer
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { applicationEntityInvocationEntry 1 }
+
+applicationEntityInvocationSupportedConnectionNames OBJECT-TYPE
+    SYNTAX      RowPointer
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { applicationEntityInvocationEntry 2 }
+
+applicationEntityInvocationInvocationOfPointer OBJECT-TYPE
+    SYNTAX      RowPointer
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { applicationEntityInvocationEntry 3 }
+
+applicationEntityInvocationRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { applicationEntityInvocationEntry 4 }
+
+applicationSubsystem OBJECT IDENTIFIER
+    ::= { acseObjectClass 6 }
+
+    -- DERIVED FROM subsystem
+        -- subsystemId
+        -- subsystem-system NAME BINDING
+
+applicationSubsystemTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ApplicationSubsystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { applicationSubsystem 1 }
+
+applicationSubsystemEntry OBJECT-TYPE
+    SYNTAX      ApplicationSubsystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { subsystemId }
+    ::= { applicationSubsystemTable 1 }
+
+ApplicationSubsystemEntry ::= SEQUENCE {
+    applicationSubsystemId  Unsigned32
+}
+
+applicationSubsystemId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { applicationSubsystemEntry 1 }
+
+aso OBJECT IDENTIFIER
+    ::= { acseObjectClass 7 }
+
+    -- communicationsEntityId
+    -- asoTitle
+    -- asoQualifier
+    -- operationalState
+    -- aso-aso NAME BINDING (communicationsEntityId)
+    -- aso-asoEntity NAME BINDING (communicationsEntityId)
+
+asoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AsoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This subclass of Rec. X.721 | ISO/IEC 10165-2 : 1992, top, 
+         holds reference information about an ASO, which is a collection 
+         of two or more ASOs (including specialized ASOs, e.g., ASEs) 
+         together with a Control Function that moderates the 
+         interactions of the component ASEs and ASOs with the service 
+         provided and the supporting service. An ASO contains one or 
+         more ASEs/ASOs that provide for data transfer phase of 
+         communication. An ASO may also contain an ASE that provides for 
+         the establishment phase of communication. An ASO association 
+         can only be established to an ASO that provides for both the 
+         establishment and data transfer phases.
+         
+         This managed object class is non-instantiable. Subclasses of 
+         this class provide information about specific ASOs including 
+         the information about the Controlling Function. The information 
+         about the Control Function may only be specified via the 
+         behaviour definitions of subclasses of this class, but can be 
+         made visible via attributes of the subclass if needed.
+         
+         It specializes by adding the following attributes:
+         
+         - Rec. X.723 | ISO/IEC 10165-5 : 1994, communicationsEntityId;
+         - asoTitle;
+         - asoQualifier;
+         - Rec. X.721 | ISO/IEC 10165-2 : 1992, operationalState.
+         
+         The attribute Rec. X.723 | ISO/IEC 10165-5 : 1994, 
+         communicationsEntityId, serves as the naming attribute for 
+         instances of this class. The ASO Name is formed by 
+         concatenating the asoTitle and the asoQualifier. The 
+         operationalState is used to indicate whether instances of this 
+         class are enabled or disabled, the syntax and semantics of 
+         which are defined in Rec. X.721 | ISO/IEC 10165-2 and Rec.  
+         X.731 | ISO/IEC 10164-2."
+    REFERENCE   
+        "ITU-T Rec. X.287 (2000) | ISO/IEC 10165-8 : 2000, aso MOC."
+    ::= { aso 1 }
+
+asoEntry OBJECT-TYPE
+    SYNTAX      AsoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.287 (2000) | ISO/IEC 10165-8 : 2000, aso MO."
+    INDEX       { subsystemId, applicationProcessId, asoEntityId, asoId }
+    ::= { asoTable 1 }
+
+AsoEntry ::= SEQUENCE {
+    asoId                   SimpleNameType,
+    asoTitle                OBJECT IDENTIFIER,
+    asoQualifier            OBJECT IDENTIFIER,
+    asoOperationalState     OperationalState,
+    asoRowStatus            RowStatus
+}
+
+asoId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { asoEntry 1 }
+
+asoTitle OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { asoEntry 2 }
+
+asoQualifier OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { asoEntry 3 }
+
+asoOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { asoEntry 4 }
+
+asoRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { asoEntry 5 }
+
+asoEntity OBJECT IDENTIFIER
+    ::= { acseObjectClass 8 }
+
+    -- DERIVED FROM communicationsEntity
+        -- communicationsEntityId
+        -- localSapNames
+        -- operationalState
+        -- communicationsEntity-subsystem NAME BINDING
+    -- DERIVED FROM aso
+        -- communiationsEntityId
+        -- asoTitle
+        -- asoQualifier
+        -- operationalState
+        -- aso-aso NAME BINDING
+        -- aso-asoEntity NAME BINDING
+    -- applContextNameSupport
+    -- asoEntity-applicationProcess NAME BINDING
+
+asoEntityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AsoEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { asoEntity 1 }
+
+asoEntityEntry OBJECT-TYPE
+    SYNTAX      AsoEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { subsystemId, applicationProcessId, asoEntityId }
+    ::= { asoEntityTable 1 }
+
+AsoEntityEntry ::= SEQUENCE {
+    asoEntityId                             SimpleNameType,
+    asoEntityLocalSapNames                  Opaque,
+    asoEntityOperationalState               OperationalState,
+    asoEntityTitle                          OBJECT IDENTIFIER,
+    asoEntityQualifier                      OBJECT IDENTIFIER,
+    asoEntityApplicationContextNameSupport  Opaque,
+    asoEntityRowStatus                      RowStatus
+}
+
+asoEntityId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { asoEntityEntry 1 }
+
+asoEntityLocalSapNames OBJECT-TYPE
+    SYNTAX      Opaque
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { asoEntityEntry 2 }
+
+asoEntityOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { asoEntityEntry 3 }
+
+asoEntityTitle OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { asoEntityEntry 4 }
+
+asoEntityQualifier OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { asoEntityEntry 5 }
+
+asoEntityApplicationContextNameSupport OBJECT-TYPE
+    SYNTAX      Opaque
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { asoEntityEntry 6 }
+
+asoEntityRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { asoEntityEntry 7 }
+
+asoInvocation OBJECT IDENTIFIER
+    ::= { acseObjectClass 9 }
+
+    -- connectionId
+    -- invocationOfPointer
+    -- asoInvocation-asoInvocation NAME BINDING
+    -- asoInvocation-apInvocation NAME BINDING
+
+asoInvocationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AsoInvocationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This subclass of Rec. X.721 | ISO/IEC 10165-2 : 1992 top hold 
+         reference information about an ASO Invocation.  This managed 
+         object class is non-instantiable.  Subclasses of this class 
+         provide information about invocations of specific ASOs.
+         
+         An instances of a subclass of ASO Invocation serves as the 
+         supporting service for its contained object instance, which in 
+         turn are also subclasses of ASO Invocation (e.g., AE 
+         Invocation, ACSE Invocation, CMISE Invocation, SMASE 
+         Invocation.
+         
+         It specializes by adding the following attributes:
+         
+         - connectionId;
+         - invocationOfPointer.
+           
+         The connectionId attribute serves as the naming attribute for 
+         instances of this class.  The invocationOfPointer attribute 
+         identifies a specific ASO of which the instance of this class 
+         is an invocation."
+    ::= { asoInvocation 1 }
+
+asoInvocationEntry OBJECT-TYPE
+    SYNTAX      AsoInvocationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { applicationSubsystemId, apInvocationId, 
+                  asoInvocationId }
+    ::= { asoInvocationTable 1 }
+
+AsoInvocationEntry ::= SEQUENCE {
+    asoInvocationId         SimpleNameType,
+    asoInvocationOfPointer  RowPointer,
+    asoInvocationRowStatus  RowStatus
+}
+
+asoInvocationId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides an index into this table that identifies an ASO 
+         invocation."
+    ::= { asoInvocationEntry 1 }
+
+asoInvocationOfPointer OBJECT-TYPE
+    SYNTAX      RowPointer
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a pointer to the ASO that is invoked."
+    ::= { asoInvocationEntry 2 }
+
+asoInvocationRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management"
+    ::= { asoInvocationEntry 3 }
+
+monoULConnection OBJECT IDENTIFIER
+    ::= { acseObjectClass 10 }
+
+    -- DERIVED FROM applicationEntityInvocation
+        -- DERIVED FROM singlePeerConnection
+            -- connectionId
+            -- underlyingConnectionNames
+            -- singlePeerConnectionP2 PACKAGE
+                -- supportedConnectionNames
+            -- singlePeerConnection-coProtocolMachine NAME BINDING
+        -- DERIVED FROM asoInvocation
+            -- connectionId
+            -- invocationOfPointer
+            -- asoInvocation-asoInvocation NAME BINDING
+            -- asoInvocation-apInvocation NAME BINDING
+    -- DERIVED FROM presentationConnection
+        -- DERIVED FROM singlePeerConnection
+            -- connectionId
+            -- underlyingConnectionNames
+            -- singlePeerConnectionP2 PACKAGE
+                -- supportedConnectionNames
+            -- singlePeerConnection-coProtocolMachine NAME BINDING
+        -- presFUinUse
+        -- presContextInUse
+    -- DERIVED FROM sessionConnection
+        -- DERIVED FROM singlePeerConnection
+            -- connectionId
+            -- underlyingConnectionNames
+            -- singlePeerConnectionP2 PACKAGE
+                -- supportedConnectionNames
+            -- singlePeerConnection-coProtocolMachine NAME BINDING
+        -- sessProtInUse
+        -- sessFUinUse
+        -- PACKAGE maxTSDUsizePackage
+            -- maxTSDUsize
+
+monoULConnectionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MonoULConnectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { monoULConnection 1 }
+
+monoULConnectionEntry OBJECT-TYPE
+    SYNTAX      MonoULConnectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { applicationSubsystemId, apInvocationId }
+    ::= { monoULConnectionTable 1 }
+
+MonoULConnectionEntry ::= SEQUENCE {
+    monoULConnectionRowStatus   RowStatus
+}
+
+monoULConnectionRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { monoULConnectionEntry 1 }
+
+monoULEntity OBJECT IDENTIFIER
+    ::= { acseObjectClass 11 }
+
+    -- DERIVED FROM applicationEntity
+        -- DERIVED FROM asoEntity
+            -- DERIVED FROM communicationsEntity
+                -- communicationsEntityId
+                -- localSapNames
+                -- operationalState
+                -- communicationsEntity-subsystem NAME BINDING
+            -- DERIVED FROM aso
+                -- communiationsEntityId
+                -- asoTitle
+                -- asoQualifier
+                -- operationalState
+                -- aso-aso NAME BINDING
+                -- aso-asoEntity NAME BINDING
+            -- applContextNameSupport
+            -- asoEntity-applicationProcess NAME BINDING
+    -- DERIVED FROM presentationEntity
+        -- DERIVED FROM communicationsEntity
+            -- communicationsEntityId
+            -- localSapNames
+            -- operationalState
+            -- communicationsEntity-subsystem NAME BINDING
+    -- DERIVED FROM sessionEntity
+        -- DERIVED FROM communicationsEntity
+            -- communicationsEntityId
+            -- localSapNames
+            -- operationalState
+            -- communicationsEntity-subsystem NAME BINDING
+    -- DERIVED FROM presentationCopm
+        -- DERIVED FROM coProtocolMachine
+            -- coProtocolMachineId
+            -- operationalState
+            -- coProtocolMachine-entity NAME BINDING
+        -- presFUsupport
+        -- abstrSyntaxSupport
+        -- transfSynstaxSupport
+    -- DERIVED FROM sessionCopm
+        -- DERIVED FROM coProtocolMachine
+            -- coProtocolMachineId
+            -- operationalState
+            -- coProtocolMachine-entity NAME BINDING
+        -- sessProtVerSupport
+        -- sessFUsupport
+        -- sessOptSupport
+    -- presSelectorValue
+    -- sessionSelectorValue
+
+monoULEntityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MonoULEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { monoULEntity 1 }
+
+monoULEntityEntry OBJECT-TYPE
+    SYNTAX      MonoULEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { subsystemId }
+    ::= { monoULEntityTable 1 }
+
+MonoULEntityEntry ::= SEQUENCE {
+    monoUlEntityId  Unsigned32
+}
+
+monoUlEntityId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { monoULEntityEntry 1 }
+
+monolithicUpperLayerSubsystem OBJECT IDENTIFIER
+    ::= { acseObjectClass 12 }
+
+    -- DERIVED FROM sessionSubsystem
+        -- DERIVED FROM subsystem
+            -- subsystemId
+            -- subsystem-system NAME BINDING
+    -- DERIVED FROM presentationSubsystem
+        -- DERIVED FROM subsystem
+            -- subsystemId
+            -- subsystem-system NAME BINDING
+    -- DERIVED FROM applicationSubsystem
+        -- DERIVED FROM subsystem
+            -- subsystemId
+            -- subsystem-system NAME BINDING
+
+monolithicUpperLayerSubsystemTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MonolithicUpperLayerSubsystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { monolithicUpperLayerSubsystem 1 }
+
+monolithicUpperLayerSubsystemEntry OBJECT-TYPE
+    SYNTAX      MonolithicUpperLayerSubsystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { monolithicUpperLayerSubsystemId }
+    ::= { monolithicUpperLayerSubsystemTable 1 }
+
+MonolithicUpperLayerSubsystemEntry ::= SEQUENCE {
+    monolithicUpperLayerSubsystemId         SimpleNameType,
+    monolithicUpperLayerSubssytemRowStatus  RowStatus
+}
+
+monolithicUpperLayerSubsystemId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { monolithicUpperLayerSubsystemEntry 1 }
+
+monolithicUpperLayerSubssytemRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { monolithicUpperLayerSubsystemEntry 2 }
+
+pSap OBJECT IDENTIFIER
+    ::= { acseObjectClass 13 }
+
+    -- DERIVED FROM sap1
+        -- sapId
+        -- sap1Address
+        -- userEntitynames
+        -- sap1-communicationsEntity NAME BINDING
+
+pSapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PSapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { pSap 1 }
+
+pSapEntry OBJECT-TYPE
+    SYNTAX      PSapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { subsystemId }
+    ::= { pSapTable 1 }
+
+PSapEntry ::= SEQUENCE {
+    pSapId                  SimpleNameType,
+    pSapSap1Address         OCTET STRING,
+    pSapUserEntityNames     OCTET STRING,
+    pSapRowStatus           RowStatus
+}
+
+pSapId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { pSapEntry 1 }
+
+pSapSap1Address OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { pSapEntry 2 }
+
+pSapUserEntityNames OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { pSapEntry 3 }
+
+pSapRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { pSapEntry 4 }
+
+presentationConnection OBJECT IDENTIFIER
+    ::= { acseObjectClass 14 }
+
+    -- DERIVED FROM singlePeerConnection
+        -- connectionId
+        -- underlyingConnectionNames
+        -- singlePeerConnectionP2 PACKAGE
+            -- supportedConnectionNames
+        -- singlePeerConnection-coProtocolMachine NAME BINDING
+    -- presFUinUse
+    -- presContextInUse
+
+presentationConnectionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PresentationConnectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { presentationConnection 1 }
+
+presentationConnectionEntry OBJECT-TYPE
+    SYNTAX      PresentationConnectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { presentationSubsystemId, presentationEntityId, 
+                  presentationCopmId, presentationConnectionId }
+    ::= { presentationConnectionTable 1 }
+
+PresentationConnectionEntry ::= SEQUENCE {
+    presentationConnectionId                            SimpleNameType,
+    presentationConnectionUnderlyingConnectionNames     OCTET STRING,
+    presentationConnectionSupportedConnectionNames      OCTET STRING,
+    presentationConnectionPresFUinUse                   BITS,
+    presentationConnectionPresContextInUse              OBJECT IDENTIFIER,
+    presentationCOnnectionRowStatus                     RowStatus
+}
+
+presentationConnectionId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { presentationConnectionEntry 1 }
+
+presentationConnectionUnderlyingConnectionNames OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { presentationConnectionEntry 2 }
+
+presentationConnectionSupportedConnectionNames OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { presentationConnectionEntry 3 }
+
+presentationConnectionPresFUinUse OBJECT-TYPE
+    SYNTAX      BITS { unknown(0) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { presentationConnectionEntry 4 }
+
+presentationConnectionPresContextInUse OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { presentationConnectionEntry 5 }
+
+presentationCOnnectionRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { presentationConnectionEntry 6 }
+
+presentationCopm OBJECT IDENTIFIER
+    ::= { acseObjectClass 15 }
+
+    -- DERIVED FROM coProtocolMachine
+        -- coProtocolMachineId
+        -- operationalState
+        -- coProtocolMachine-entity NAME BINDING
+    -- presFUsupport
+    -- abstrSyntaxSupport
+    -- transfSynstaxSupport
+
+presentationCopmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PresentationCopmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { presentationCopm 1 }
+
+presentationCopmEntry OBJECT-TYPE
+    SYNTAX      PresentationCopmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { presentationSubsystemId, presentationEntityId, 
+                  presentationCopmId }
+    ::= { presentationCopmTable 1 }
+
+PresentationCopmEntry ::= SEQUENCE {
+    presentationCopmId                  SimpleNameType,
+    presentationCopmOperationalState    OperationalState,
+    presentationCopmPresFUsupport       BITS,
+    presentationCopmabstrSyntaxSupport  Opaque,
+    presentationCopmtransSyntaxSupport  Opaque,
+    presentationCopmRowStatus           RowStatus
+}
+
+presentationCopmId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { presentationCopmEntry 1 }
+
+presentationCopmOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { presentationCopmEntry 2 }
+
+presentationCopmPresFUsupport OBJECT-TYPE
+    SYNTAX      BITS { unknown(0) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { presentationCopmEntry 3 }
+
+presentationCopmabstrSyntaxSupport OBJECT-TYPE
+    SYNTAX      Opaque
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { presentationCopmEntry 4 }
+
+presentationCopmtransSyntaxSupport OBJECT-TYPE
+    SYNTAX      Opaque
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { presentationCopmEntry 5 }
+
+presentationCopmRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { presentationCopmEntry 6 }
+
+presentationEntity OBJECT IDENTIFIER
+    ::= { acseObjectClass 16 }
+
+    -- DERIVED FROM communicationsEntity
+        -- communicationsEntityId
+        -- localSapNames
+        -- operationalState
+        -- communicationsEntity-subsystem NAME BINDING
+
+presentationEntityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PresentationEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { presentationEntity 1 }
+
+presentationEntityEntry OBJECT-TYPE
+    SYNTAX      PresentationEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { presentationSubsystemId, presentationEntityId }
+    ::= { presentationEntityTable 1 }
+
+PresentationEntityEntry ::= SEQUENCE {
+    presentationEntityId                SimpleNameType,
+    presentationEntityLocalSapNames     OCTET STRING,
+    presentationEntityOperationalState  OperationalState,
+    presentationEntityRowStatus         RowStatus
+}
+
+presentationEntityId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { presentationEntityEntry 1 }
+
+presentationEntityLocalSapNames OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { presentationEntityEntry 2 }
+
+presentationEntityOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { presentationEntityEntry 3 }
+
+presentationEntityRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { presentationEntityEntry 4 }
+
+presentationSubsystem OBJECT IDENTIFIER
+    ::= { acseObjectClass 17 }
+
+    -- DERIVED FROM subsystem
+        -- subsystemId
+        -- subsystem-system NAME BINDING
+
+presentationSubsystemTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PresentationSubsystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { presentationSubsystem 1 }
+
+presentationSubsystemEntry OBJECT-TYPE
+    SYNTAX      PresentationSubsystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { presentationSubsystemId }
+    ::= { presentationSubsystemTable 1 }
+
+PresentationSubsystemEntry ::= SEQUENCE {
+    presentationSubsystemId         SimpleNameType,
+    presentationSubsystemRowStatus  RowStatus
+}
+
+presentationSubsystemId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { presentationSubsystemEntry 1 }
+
+presentationSubsystemRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { presentationSubsystemEntry 2 }
+
+sSap OBJECT IDENTIFIER
+    ::= { acseObjectClass 18 }
+
+    -- DERIVED FROM sap1
+        -- sapId
+        -- sap1Address
+        -- userEntitynames
+        -- sap1-communicationsEntity NAME BINDING
+
+sSapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SSapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sSap 1 }
+
+sSapEntry OBJECT-TYPE
+    SYNTAX      SSapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { subsystemId }
+    ::= { sSapTable 1 }
+
+SSapEntry ::= SEQUENCE {
+    sSapId                  SimpleNameType,
+    sSapSap1Address         OCTET STRING,
+    sSapUserEntityNames     OCTET STRING,
+    sSapRowStatus           RowStatus
+}
+
+sSapId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sSapEntry 1 }
+
+sSapSap1Address OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sSapEntry 2 }
+
+sSapUserEntityNames OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sSapEntry 3 }
+
+sSapRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sSapEntry 4 }
+
+sessionConnection OBJECT IDENTIFIER
+    ::= { acseObjectClass 19 }
+
+    -- DERIVED FROM singlePeerConnection
+        -- connectionId
+        -- underlyingConnectionNames
+        -- singlePeerConnectionP2 PACKAGE
+            -- supportedConnectionNames
+        -- singlePeerConnection-coProtocolMachine NAME BINDING
+    -- sessProtInUse
+    -- sessFUinUse
+    -- PACKAGE maxTSDUsizePackage
+        -- maxTSDUsize
+
+sessionConnectionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SessionConnectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sessionConnection 1 }
+
+sessionConnectionEntry OBJECT-TYPE
+    SYNTAX      SessionConnectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { sessionSubsystemId, sessionEntityId, sessionCopmId, 
+                  sessionConnectionId }
+    ::= { sessionConnectionTable 1 }
+
+SessionConnectionEntry ::= SEQUENCE {
+    sessionConnectionId                         SimpleNameType,
+    sessionConnectionUnderlyingConnectionNames  OCTET STRING,
+    sessionConnectionSupportedConnectionNames   OCTET STRING,
+    sessionConnectionSessProtInUse              BITS,
+    sessionConnectionSessFUinUse                BITS,
+    sessionConnectionMaxTSDUsize                Unsigned32,
+    sessionCOnnectionRowStatus                  RowStatus
+}
+
+sessionConnectionId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sessionConnectionEntry 1 }
+
+sessionConnectionUnderlyingConnectionNames OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sessionConnectionEntry 2 }
+
+sessionConnectionSupportedConnectionNames OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sessionConnectionEntry 3 }
+
+sessionConnectionSessProtInUse OBJECT-TYPE
+    SYNTAX      BITS { unknown(0) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sessionConnectionEntry 4 }
+
+sessionConnectionSessFUinUse OBJECT-TYPE
+    SYNTAX      BITS { unknown(0) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sessionConnectionEntry 5 }
+
+sessionConnectionMaxTSDUsize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sessionConnectionEntry 6 }
+
+sessionCOnnectionRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sessionConnectionEntry 7 }
+
+sessionCopm OBJECT IDENTIFIER
+    ::= { acseObjectClass 20 }
+
+    -- DERIVED FROM coProtocolMachine
+        -- coProtocolMachineId
+        -- operationalState
+        -- coProtocolMachine-entity NAME BINDING
+    -- sessProtVerSupport
+    -- sessFUsupport
+    -- sessOptSupport
+
+sessionCopmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SessionCopmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sessionCopm 1 }
+
+sessionCopmEntry OBJECT-TYPE
+    SYNTAX      SessionCopmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { sessionSubsystemId, sessionEntityId, sessionCopmId }
+    ::= { sessionCopmTable 1 }
+
+SessionCopmEntry ::= SEQUENCE {
+    sessionCopmId                   SimpleNameType,
+    sessionCopmOperationalState     OperationalState,
+    sessionCopmSessProtVerSupport   BITS,
+    sessionCopmSessFUsupport        BITS,
+    sessionCopmOptSupport           BITS,
+    sessionCopmRowStatus            RowStatus
+}
+
+sessionCopmId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sessionCopmEntry 1 }
+
+sessionCopmOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sessionCopmEntry 2 }
+
+sessionCopmSessProtVerSupport OBJECT-TYPE
+    SYNTAX      BITS { unknown(0) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sessionCopmEntry 3 }
+
+sessionCopmSessFUsupport OBJECT-TYPE
+    SYNTAX      BITS { unknown(0) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sessionCopmEntry 4 }
+
+sessionCopmOptSupport OBJECT-TYPE
+    SYNTAX      BITS { unknown(0) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sessionCopmEntry 5 }
+
+sessionCopmRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sessionCopmEntry 6 }
+
+sessionEntity OBJECT IDENTIFIER
+    ::= { acseObjectClass 21 }
+
+    -- DERIVED FROM communicationsEntity
+        -- communicationsEntityId
+        -- localSapNames
+        -- operationalState
+        -- communicationsEntity-subsystem NAME BINDING
+
+sessionEntityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SessionEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sessionEntity 1 }
+
+sessionEntityEntry OBJECT-TYPE
+    SYNTAX      SessionEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { sessionSubsystemId, sessionEntityId }
+    ::= { sessionEntityTable 1 }
+
+SessionEntityEntry ::= SEQUENCE {
+    sessionEntityId                 SimpleNameType,
+    sessionEntityLocalSapNames      OCTET STRING,
+    sessionEntityOperationalState   OperationalState,
+    sessionEntityRowStatus          RowStatus
+}
+
+sessionEntityId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sessionEntityEntry 1 }
+
+sessionEntityLocalSapNames OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sessionEntityEntry 2 }
+
+sessionEntityOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sessionEntityEntry 3 }
+
+sessionEntityRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sessionEntityEntry 4 }
+
+sessionSubsystem OBJECT IDENTIFIER
+    ::= { acseObjectClass 22 }
+
+    -- DERIVED FROM subsystem
+        -- subsystemId
+        -- subsystem-system NAME BINDING
+
+sessionSubsystemTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SessionSubsystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sessionSubsystem 1 }
+
+sessionSubsystemEntry OBJECT-TYPE
+    SYNTAX      SessionSubsystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { sessionSubsystemId }
+    ::= { sessionSubsystemTable 1 }
+
+SessionSubsystemEntry ::= SEQUENCE {
+    sessionSubsystemId          SimpleNameType,
+    sessionSubsystemRowStatus   RowStatus
+}
+
+sessionSubsystemId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sessionSubsystemEntry 1 }
+
+sessionSubsystemRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { sessionSubsystemEntry 2 }
+
+acseEntity OBJECT IDENTIFIER
+    ::= { acseObjectClass 23 }
+
+acseEntityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcseEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { acseEntity 1 }
+
+acseEntityEntry OBJECT-TYPE
+    SYNTAX      AcseEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { mtpMsId, acseEntityId }
+    ::= { acseEntityTable 1 }
+
+AcseEntityEntry ::= SEQUENCE {
+    acseEntityId            Unsigned32,
+    acseEntityRowStatus     RowStatus
+}
+
+acseEntityId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { acseEntityEntry 1 }
+
+acseEntityRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { acseEntityEntry 2 }
+
+acseAccessPoint OBJECT IDENTIFIER
+    ::= { acseObjectClass 24 }
+
+acseAccessPointTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcseAccessPointEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { acseAccessPoint 1 }
+
+acseAccessPointEntry OBJECT-TYPE
+    SYNTAX      AcseAccessPointEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { mtpMsId, acseEntityId, acseAccessPointId }
+    ::= { acseAccessPointTable 1 }
+
+AcseAccessPointEntry ::= SEQUENCE {
+    acseAccessPointId           Unsigned32,
+    acseAccessPointRowStatus    RowStatus
+}
+
+acseAccessPointId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { acseAccessPointEntry 1 }
+
+acseAccessPointRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { acseAccessPointEntry 2 }
+
+acseLinkage OBJECT IDENTIFIER
+    ::= { acseObjectClass 25 }
+
+acseLinkageTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcseLinkageEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { acseLinkage 1 }
+
+acseLinkageEntry OBJECT-TYPE
+    SYNTAX      AcseLinkageEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { mtpMsId, sccpNetworkEntityId }
+    ::= { acseLinkageTable 1 }
+
+AcseLinkageEntry ::= SEQUENCE {
+    acseLinkageRowStatus    RowStatus
+}
+
+acseLinkageRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { acseLinkageEntry 1 }
+
+acseParameters OBJECT IDENTIFIER
+    ::= { acseMIB 4 }
+
+acseScalars OBJECT IDENTIFIER
+    ::= { acseMIB 5 }
+
+acseTcUserId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { acseScalars 1 }
+
+acseApplicationEntityId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { acseScalars 2 }
+
+acsePackage OBJECT IDENTIFIER
+    ::= { acseMIB 6 }
+
+acseCompliances OBJECT IDENTIFIER
+    ::= { acseMIB 7 }
+
+acseBasicGroup OBJECT-GROUP
+    OBJECTS     { acseFUinitiator, acseEditionsSupported, 
+                  acseFUresponder, acseAssociationFUinUse, 
+                  acseAssociationApplContextInUse, 
+                  acseAssociationParentAsoinvoc, 
+                  acseAssociationCalledAEtitle, acseAssociationRowStatus, 
+                  apInvocationRowStatus, 
+                  applicationEntityInvocationRowStatus, asoRowStatus, 
+                  asoEntityRowStatus, asoInvocationRowStatus, 
+                  monoULConnectionRowStatus, 
+                  monolithicUpperLayerSubssytemRowStatus, pSapRowStatus, 
+                  presentationCOnnectionRowStatus, 
+                  presentationCopmRowStatus, presentationEntityRowStatus, 
+                  presentationSubsystemRowStatus, sSapRowStatus, 
+                  sessionCOnnectionRowStatus, sessionCopmRowStatus, 
+                  sessionEntityRowStatus, sessionSubsystemRowStatus, 
+                  acseEntityRowStatus, acseLinkageRowStatus, 
+                  acseAccessPointRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { acsePackage 1 }
+
+acseBasicCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        ""
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { acseBasicGroup }
+
+    ::= { acseCompliances 1 }
+
+END -- end of module OPENSS7-ACSE-MIB.

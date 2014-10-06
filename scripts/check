@@ -1,0 +1,1289 @@
+#!/usr/bin/awk -f
+
+function print_q(string, cntrl) {
+    if (ENVIRON["V"] == 0) {
+	cntrl = ""
+	if (string ~ /^[[:cntrl:]]/) {
+	    cntrl = substr(string, 1, 1)
+	    string = substr(string, 2)
+	}
+	printf "%s", cntrl me ": Q: " string > stderr
+	written["stderr"]++ }
+}
+function print_v(string, color) {
+    if (ENVIRON["MAINTAINER_MODE"] ~ /^(verbose|continue)$/ || ENVIRON["V"] == 1) {
+	print cr color me ":  : " string std > stdout
+	written["stdout"]++ }
+}
+function print_t(string) {
+    if (ENVIRON["MAINTAINER_MODE"] == "verbose" || ENVIRON["V"] == 1) {
+	print cr std me ": T: " string std > stdout
+	written["stdout"]++ }
+}
+function print_d(string) {
+    if (ENVIRON["MAINTAINER_MODE"] == "verbose" || ENVIRON["V"] == 1) {
+	print cr std me ": D: " string std > stderr
+	written["stderr"]++ }
+    print me ": D: " string >> logfile
+    written["logfile"]++
+}
+function get_sections(sections,    i, result) {
+    i = 1
+    result = ""
+    if (i in sections)
+	result = " in sections " sections[i]
+    for (i = 2; i in sections; i++) {
+	if ((i+1) in sections)
+	    result = result ", " sections[i]
+	else
+	    result = result " or " sections[i]
+    }
+    return result
+}
+function print_s(string) {
+    if (ENVIRON["MAINTAINER_MODE"] ~ /^(verbose|continue)$/ || ENVIRON["V"] == 1) {
+	print cr grn me ": S: " string std > stdout
+	written["stdout"]++ }
+    print me ": S: " string >> logfile
+    written["logfile"]++
+    success++
+}
+function print_s_s(string, sections) {
+    string = string get_sections(sections)
+    print_s(string)
+}
+function print_f(string) {
+    if (ENVIRON["MAINTAINER_MODE"] ~ /^(verbose|continue)$/ || ENVIRON["V"] == 1) {
+	print cr std me ": F: " string std > stdout
+	written["stdout"]++ }
+    print me ": F: " string >> logfile
+    written["logfile"]++
+}
+function print_f_s(string, sections)
+{
+    string = string get_sections(sections)
+    print_f(string)
+}
+function print_w(string) {
+    if (ENVIRON["MAINTAINER_MODE"] ~ /^(verbose|continue)$/ || ENVIRON["V"] == 1) {
+	print cr blu me ": W: --- " string std > stderr
+	written["stderr"]++ }
+    print me ": W: " string >> logfile
+    written["logfile"]++
+    warnings++
+}
+function print_w_s(string, sections) {
+    string = string get_sections(sections)
+    print_w(string)
+}
+function print_e(string) {
+    print cr red me ": E: --- " string std > stderr
+    written["stderr"]++
+    print me ": E: " string >> logfile
+    written["logfile"]++
+    errors++
+}
+function print_e_s(string, sections) {
+    string = string get_sections(sections)
+    print_e(string)
+}
+function show_starting(doing, things) {
+    print_q(doing " " things lf)
+    count = 0
+    progress = 0
+}
+function show_progress(doing, things, numb) {
+    if (progress >= numb) {
+	print_q(cr doing " " count " " things "..." lf)
+	progress = 0
+    }
+    count++
+    progress++
+}
+function show_complete(doing, things) {
+    print_q(cr doing " " count " " things "   \n")
+}
+
+function get_manpages(s,    numb, page, find) {
+    find = "find " ENVIRON["top_builddir"] "/doc/man -follow -type f -name '*.[" s "]*' 2>/dev/null | sort -u"
+    show_starting("indexing", "built manual pages")
+    while ((find | getline) == 1) {
+	if (/\.man$/) continue
+	sub(ENVIRON["top_builddir"] "/doc/man/", "")
+	page = $0
+	sub(/.*\//, "", page)
+	sub(/\.gz$/, "", page)
+	sub(/\.bz2$/, "", page)
+	sub(/\.lzma$/, "", page)
+	sub(/\.xz$/, "", page)
+	numb = page
+	sub(/\.[^\.]*$/, "", page)
+	sub(/.*\./, "", numb)
+	numb = substr(numb, 1, 1)
+	print_d("manpages: " page "." numb " " $0)
+	if ((numb,page) in manpages) {
+	    manpages[numb,page] = manpages[numb,page] " " $0
+	} else
+	    manpages[numb,page] = $0
+	show_progress("indexed", "built manual pages", 1000)
+    }
+    close(find)
+    show_complete("indexed", "built manual pages")
+}
+function get_srcpages(s,    numb, page, find) {
+    find = "find " ENVIRON["top_srcdir"] "/doc/man -follow -type f -name '*.[" s "]*' 2>/dev/null | sort -u"
+    show_starting("indexing", "source manual pages")
+    while ((find | getline) == 1) {
+	if (/\/CVS\//) continue
+	if (!sub(/\.man$/, "")) continue
+	sub(ENVIRON["top_srcdir"] "/doc/man/", "")
+	page = $0
+	sub(/.*\//, "", page)
+	sub(/\.gz$/, "", page)
+	sub(/\.bz2$/, "", page)
+	sub(/\.lzma$/, "", page)
+	sub(/\.xz$/, "", page)
+	numb = page
+	sub(/\.[^\.]*$/, "", page)
+	sub(/.*\./, "", numb)
+	numb = substr(numb, 1, 1)
+	print_d("srcpages: " page "." numb " " $0)
+	if ((numb,page) in srcpages)
+	    srcpages[numb,page] = srcpages[numb,page] " " $0
+	else
+	    srcpages[numb,page] = $0
+	show_progress("indexed", "source manual pages", 1000)
+    }
+    close(find)
+    show_complete("indexed", "source manual pages")
+}
+function search_pages(base, sections, pages,    found, s, section) {
+    found = ""
+    for (s = 1; s in sections; s++) {
+	section = sections[s]
+	#print_t("checking " base " in section " section)
+	if ((section,base) in pages) {
+	    if (found)
+		found = found " " pages[section,base]
+	    else
+		found = pages[section,base]
+	    #print_s("found " base " in section " section)
+	}
+    }
+    return found
+}
+function search_many(checks, sections,    gotone, j, found) {
+    gotone = 0
+    for (j in checks) {
+	found = search_pages(checks[j], sections, manpages)
+	if (found) {
+	    print_s("found " found)
+	    gsub(/ /, "\n", found)
+	    print found >> usedlog
+	    written["usedlog"]++
+	    gotone = 1
+	}
+    }
+    if (!gotone) {
+	for (j in checks) {
+	    found = search_pages(checks[j], sections, srcpages)
+	    if (found)
+		print_w("found manual source page " found)
+	}
+    }
+    return gotone
+}
+function search_one(name, sections,    checks) {
+    split(name, checks)
+    return search_many(checks, sections)
+}
+function search_symbol(symbol, sections, weak,    string) {
+    sub(/_R(smp_)?[[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]]$/, "", symbol)
+    if (!search_one(symbol, sections)) {
+	string = "could not find manual page for symbol " symbol
+	if (weak || symbol ~ /^_/)
+	    print_w_s(string, sections)
+	else
+	    print_e_s(string, sections)
+    }
+}
+function search_multi(myname, sections,    mcname, msname, nlname, ucname, usname, ulname, CHECKS, checks) {
+    mcname = myname; gsub(/[^-_[:alnum:]]/, "_", mcname)
+    msname = mcname; gsub(/-/, "_", msname)
+    nlname = mcname; sub(/^lib/, "", nlname)
+    ucname = toupper(mcname)
+    usname = toupper(msname)
+    ulname = toupper(nlname)
+    CHECKS = mcname ", " ucname ", " msname ", " usname ", " nlname ", " ulname
+    split(CHECKS, checks, ", ")
+    print_d("checking " CHECKS get_sections(sections))
+    if (!search_many(checks, sections))
+	print_e_s("could not find " CHECKS, sections)
+}
+function no_support(runnable, option,    line) {
+    print_e(runnable " does not support " option)
+    print_d("stdout was:")
+    while ((getline line < outfile) == 1)
+	print_d(line)
+    close(outfile)
+    print_d("stderr was:")
+    while ((getline line < errfile) == 1) 
+	print_d(line)
+    close(errfile)
+}
+function check_supports(runnable, option,    result, line) {
+    print_t("testing " runnable " " option)
+    print_d(runnable " " option)
+    ok = 1
+    if (system(runnable " " option " >" outfile " 2>" errfile) != 0)
+	ok = 0
+#    if (ok) {
+#	# cannot have error output
+#	result = getline line < errfile
+#	close(errfile)
+#	if (result == 1) ok = 0
+#    }
+    if (ok) {
+	# must have normal output
+	result = getline line < outfile
+	close(outfile)
+	if (result != 1) ok = 0
+    }
+    if (ok)
+	print_s(runnable " supports " option)
+    else no_support(runnable, option)
+}
+function check_runnable(runnable,    SHELL, result) {
+    SHELL = ""
+    if ((runnable in exempt) || ((ENVIRON["srcdir"] "/" runnable) in exempt)) {
+	print_s(runnable " is standard options exempt")
+	return
+    }
+    if (system("test -e " runnable) == 0)
+	runnable = "./" runnable
+    else if (system("test -e " ENVIRON["srcdir"] "/" runnable) == 0)
+	runnable = ENVIRON["srcdir"] "/" runnable
+    else {
+	print_e(runnable " does not exist")
+	return
+    }
+    if (system("test -x " runnable) != 0) {
+	result = getline SHELL < runnable;
+	close(runnable)
+	if (result == 1 && SHELL ~ /^#!/)  {
+	    sub(/^#![[:space:]]*/, "", SHELL)
+	    sub(/[[:space:]]*$/, " ", SHELL)
+	} else {
+	    print_w(runnable " is not executable, skipping")
+	    return
+	}
+    }
+    check_supports(SHELL runnable, "--help")
+    check_supports(SHELL runnable, "--version")
+    check_supports(SHELL runnable, "--copying")
+}
+function check_manual(command,	    found, myline)
+{
+    found = 0
+    while ((command | getline myline) == 1) {
+	#if (sub("^" mandir "/", "", myline) != 0) {
+	    found = 1
+	    #break
+	#}
+    }
+    close(command)
+    return found
+}
+function check_wrongsect(base,	    command) {
+    command = "man -aw " base " 2>/dev/null"
+    return check_manual(command)
+}
+function check_section(base, sect,  command) {
+    command = "man -aw " sect " " base " 2>/dev/null"
+    return check_manual(command)
+}
+BEGIN {
+#   LINT = "yes"
+    if ("LANG" in ENVIRON)
+	ENVIRON["LANG"] = ""
+    success = 0
+    warnings = 0
+    errors = 0
+    me = "check_all"
+    if (!("TERM" in ENVIRON))
+	ENVIRON["TERM"] = "dumb"
+    if (!("top_builddir" in ENVIRON))
+	ENVIRON["top_builddir"] = ""
+    if (!("bin_PROGRAMS" in ENVIRON))
+	ENVIRON["bin_PROGRAMS"] = ""
+    if (!("sysbin_PROGRAMS" in ENVIRON))
+	ENVIRON["sysbin_PROGRAMS"] = ""
+    if (!("sbin_PROGRAMS" in ENVIRON))
+	ENVIRON["sbin_PROGRAMS"] = ""
+    if (!("syssbin_PROGRAMS" in ENVIRON))
+	ENVIRON["syssbin_PROGRAMS"] = ""
+    if (!("pkglibexec_PROGRAMS" in ENVIRON))
+	ENVIRON["pkglibexec_PROGRAMS"] = ""
+    if (!("dist_bin_SCRIPTS" in ENVIRON))
+	ENVIRON["dist_bin_SCRIPTS"] = ""
+    if (!("dist_sbin_SCRIPTS" in ENVIRON))
+	ENVIRON["dist_sbin_SCRIPTS"] = ""
+    if (!("dist_pkglibexec_SCRIPTS" in ENVIRON))
+	ENVIRON["dist_pkglibexec_SCRIPTS"] = ""
+    if (!("PKG_HEADERS" in ENVIRON))
+	ENVIRON["PKG_HEADERS"] = ""
+    if (!("lib_LTLIBRARIES" in ENVIRON))
+	ENVIRON["lib_LTLIBRARIES"] = ""
+    if (!("syslib_LTLIBRARIES" in ENVIRON))
+	ENVIRON["syslib_LTLIBRARIES"] = ""
+    if (!("KERNEL_MODULES" in ENVIRON))
+	ENVIRON["KERNEL_MODULES"] = ""
+    if (!("KERNEL_WRAPPER" in ENVIRON))
+	ENVIRON["KERNEL_WRAPPER"] = ""
+    if (!("AM_INSTALLCHECK_STD_OPTIONS_EXEMPT" in ENVIRON))
+	ENVIRON["AM_INSTALLCHECK_STD_OPTIONS_EXEMPT"] = ""
+    if (!("cross_compiling" in ENVIRON))
+	ENVIRON["cross_compiling"] = "no"
+    if (!("MAINTAINER_MODE" in ENVIRON))
+	ENVIRON["MAINTAINER_MODE"] = "no"
+    if (!("srcdir" in ENVIRON))
+	ENVIRON["srcdir"] = ""
+    if (!("CTAGS" in ENVIRON))
+	ENVIRON["CTAGS"] = ""
+    if (!("DESTDIR" in ENVIRON))
+	ENVIRON["DESTDIR"] = ""
+    if (!("ksysmap" in ENVIRON))
+	ENVIRON["ksysmap"] = ""
+    if (!("kvmlinux" in ENVIRON))
+	ENVIRON["kvmlinux"] = ""
+    if (!("WARN_EXCESS" in ENVIRON))
+	ENVIRON["WARN_EXCESS"] = ""
+    if (!("EXPOSED_SYMBOLS" in ENVIRON))
+	ENVIRON["EXPOSED_SYMBOLS"] = ""
+    if (!("CHECK_MANS" in ENVIRON))
+	ENVIRON["CHECK_MANS"] = "no"
+    if (!("MANS_UNUSED" in ENVIRON))
+	ENVIRON["MANS_UNUSED"] = ""
+    if (!("MANS_EXEMPT" in ENVIRON))
+	ENVIRON["MANS_EXEMPT"] = ""
+    if (!("mandir" in ENVIRON))
+	ENVIRON["mandir"] = ""
+    if (!("PKG_MANPATH" in ENVIRON))
+	ENVIRON["PKG_MANPATH"] = ""
+    if (!("V" in ENVIRON))
+	ENVIRON["V"] = "0"
+
+    if (ENVIRON["TERM"] == "dumb" || system("test -t 1 -a -t 2") != 0) {
+	stdout = "/dev/stderr"; written["stdout"] = 1
+	stderr = "/dev/stderr"; written["stderr"] = 1
+	cr = ""; lf = "\n"
+	red = ""; grn = ""; lgn = ""; blu = ""; std = ""
+    } else {
+	stdout = "/dev/stdout"; written["stdout"] = 1
+	stderr = "/dev/stderr"; written["stderr"] = 1
+	cr = "\r"; lf = ""
+	red = "\033[0;31m"; grn = "\033[0;32m"; lgn = "\033[1;32m"; blu = "\033[1;34m"; std = "\033[m"
+    }
+
+    logfile = ENVIRON["top_builddir"] "/" me ".log"
+    usedlog = ENVIRON["top_builddir"] "/check_used.log"
+    symslog = ENVIRON["top_builddir"] "/check_symbols.log"
+    ctaglog = ENVIRON["top_builddir"] "/check_ctags.log"
+    libslog = ENVIRON["top_builddir"] "/check_libs.log"
+
+    outfile = ENVIRON["top_builddir"] "/" me ".out"
+    errfile = ENVIRON["top_builddir"] "/" me ".err"
+
+    written["stdout"] = 0
+    written["stderr"] = 0
+    written["logfile"] = 0
+    written["usedlog"] = 0
+    written["symslog"] = 0
+    written["ctaglog"] = 0
+    written["libslog"] = 0
+
+    retval = 0
+
+    PROGRAMS = \
+	ENVIRON["bin_PROGRAMS"] " " \
+	ENVIRON["sbin_PROGRAMS"] " " \
+	ENVIRON["sysbin_PROGRAMS"] " " \
+	ENVIRON["syssbin_PROGRAMS"] " " \
+	ENVIRON["pkglibexec_PROGRAMS"]
+    n["programs"] = split(PROGRAMS, programs)
+
+    SCRIPTS = \
+	ENVIRON["dist_bin_SCRIPTS"] " " \
+	ENVIRON["dist_sbin_SCRIPTS"] " " \
+	ENVIRON["dist_pkglibexec_SCRIPTS"]
+    n["scripts"] = split(SCRIPTS, scripts)
+
+    COMMANDS = \
+	ENVIRON["bin_PROGRAMS"] " " \
+	ENVIRON["sysbin_PROGRAMS"] " " \
+	ENVIRON["dist_bin_SCRIPTS"]
+    n["user"] = split(COMMANDS, commands)
+    if (n["user"]) {
+	need[1] = 1 }
+
+    COMMANDS = \
+	ENVIRON["bin_PROGRAMS"] " " \
+	ENVIRON["sysbin_PROGRAMS"] " " \
+	ENVIRON["dist_bin_SCRIPTS"] " " \
+	ENVIRON["sbin_PROGRAMS"] " " \
+	ENVIRON["syssbin_PROGRAMS"] " " \
+	ENVIRON["pkglibexec_PROGRAMS"] " " \
+	ENVIRON["dist_sbin_SCRIPTS"]
+    n["commands"] = split(COMMANDS, commands)
+    if (n["commands"] > n["user"]) {
+	need[8] = 1 }
+
+    HEADERS = ENVIRON["PKG_HEADERS"]
+    n["headers"] = split(HEADERS, headers)
+    if (n["headers"]) {
+	need[2] = 1; need[3] = 1; need[5] = 1; need[7] = 1; need[9] = 1 }
+
+    needctags = 0
+
+    LIBRARIES = ENVIRON["lib_LTLIBRARIES"] " " ENVIRON["syslib_LTLIBRARIES"]
+    n["libraries"] = split(LIBRARIES, libraries)
+    if (n["libraries"]) {
+	need[2] = 1; need[3] = 1; needctags = 1 }
+
+    MODULES = ENVIRON["KERNEL_MODULES"]
+    n["modules"] = split(MODULES, modules)
+    if (n["modules"]) {
+	need[4] = 1; need[5] = 1; need[7] = 1; need[9] = 1; needctags = 1 }
+
+    WRAPPER = ENVIRON["KERNEL_WRAPPER"]
+    n["wrapper"] = split(WRAPPER, wrapper)
+    for (i = 1; i <= n["wrapper"]; i++) { wrapper[wrapper[i]] = 1; delete wrapper[i] }
+
+    if (("STRCONF_MAKEDEV" in ENVIRON) && ("top_builddir" in ENVIRON)) {
+	    makedev = ENVIRON["top_builddir"] "/" ENVIRON["STRCONF_MAKEDEV"]
+	    need[4] = 1 }
+    else
+	makedev = ""
+
+    if (("STRCONF_STRLOAD" in ENVIRON) && ("top_builddir" in ENVIRON)) {
+	    strload = ENVIRON["top_builddir"] "/" ENVIRON["STRCONF_STRLOAD"]
+	    need[4] = 1; need[7] = 1 }
+    else
+	strload = ""
+
+    sects = ""; for (i = 1; i <= 9; i++) if (i in need) sects = sects i
+    if (sects) {
+	get_manpages(sects)
+	get_srcpages(sects)
+    }
+
+    if (n["commands"]) {
+	n["exempt"] = split(ENVIRON["AM_INSTALLCHECK_STD_OPTIONS_EXEMPT"], exempt)
+	for (i = 1; i <= n["exempt"]; i++) { exempt[exempt[i]] = 1; delete exempt[i] }
+
+	if (ENVIRON["MAINTAINER_MODE"] != "no") {
+	    # only check runnables in maintainer mode
+	    if (n["programs"]) {
+		if (ENVIRON["cross_compiling"] != "yes") {
+		    show_starting("checking", "programs")
+		    for (i = 1; i <= n["programs"]; i++) {
+			check_runnable(programs[i])
+			show_progress("checked", "programs", 1)
+		    }
+		    show_complete("checked", "programs")
+		} else {
+		    print_d("cannot run programs when cross-compiling")
+		    retval = 77
+		}
+	    } else
+		print_d("no programs to test")
+
+	    # only check runnables in maintainer mode
+	    if (n["scripts"]) {
+		show_starting("checking", "scripts")
+		for (i = 1; i <= n["scripts"]; i++) {
+		    check_runnable(scripts[i])
+		    show_progress("checked", "scripts", 10)
+		}
+		show_complete("checked", "scripts")
+	    } else
+		print_d("no scripts to test")
+	}
+
+	show_starting("checking", "commands")
+	split("1", sections)
+	for (i = 1; i <= n["commands"]; i++) {
+	    if (i == n["user"] + 1) sections[1] = 8
+	    command = commands[i]
+	    base = command; sub(/^.*\//, "", base)
+	    if (!search_one(base, sections)) {
+		if ((base in exempt) || (command in exempt) || ((ENVIRON["srcdir"] "/" command) in exempt))
+		    print_s(base " is standard options exempt")
+		else
+		    print_e_s("could not find " base, sections)
+	    }
+	    show_progress("checked", "commands", 1000)
+	}
+	show_complete("checked", "commands")
+    }
+
+    types["function" ] = "2 3 9"  ; onerror["function" ] = "E"
+    types["prototype"] = "2 3 9"  ; onerror["prototype"] = "E"
+    types["variable" ] = "2 3 9"  ; onerror["variable" ] = "S"
+    types["externvar"] = "2 3 9"  ; onerror["externvar"] = "E"
+    types["macro"    ] = "3 9 7"  ; onerror["macro"    ] = "S"
+    types["enumerate"] = "3 9 7"  ; onerror["enumerate"] = "S"
+    types["enum"     ] = "3 9"    ; onerror["enum"     ] = "W"
+    types["struct"   ] = "3 9 7"  ; onerror["struct"   ] = "W"
+    types["union"    ] = "3 9 7"  ; onerror["union"    ] = "W"
+    types["typedef"  ] = "3 9 7"  ; onerror["typedef"  ] = "W"
+    types["member"   ] = ""       ; onerror["member"   ] = "E"
+    types["OTHER"    ] = "2 3 9 7"; onerror["OTHER"    ] = "W"
+    types["_"        ] = "2 3 9 7"; onerror["_"        ] = "W"
+
+    if (n["headers"]) {
+	command ="xargs ctags -x --c-kinds=defgpstuvx " ENVIRON["CTAGS"] " 2>/dev/null | sed -e 's,\\$,\\ ,' > " ctaglog
+	show_starting("checking", "headers")
+	split("3 5 7", sections)
+	for (i = 1; i <= n["headers"]; i++) {
+	    header = headers[i]
+	    print header | command
+	    print ENVIRON["srcdir"] "/" header | command
+	    name = header; sub(/^.*\//, "", name)
+	    base = name; sub(/\.h.*$/, "", base)
+	    CHECKS = base " " name
+	    split(CHECKS, checks)
+	    if (!search_many(checks, sections))
+		print_w_s("could not find " CHECKS, sections)
+	    show_progress("checked", "headers", 1000)
+	}
+	close(command)
+	show_complete("checked", "headers")
+	show_starting("checking", "symbols")
+	while ((getline < ctaglog) == 1) {
+	    if ($1 ~ /^_/)
+		type = "_"
+	    else if ($2 in types)
+		type = $2
+	    else
+		type = "OTHER"
+	    if (type ~ /(function|variable)/) {
+		print $1 >> symslog
+		written["symslog"]++
+	    }
+	    if (types[type]) {
+		split(types[type], sections)
+		if (!search_one(gensub(/__*$/, "", 1, $1), sections)) {
+		    string = "could not find " $2 " " $1
+		    if (onerror[type] == "S")
+			print_f_s(string, sections)
+		    else
+		    if (onerror[type] == "W" || (type == "externvar" && $5 == "struct"))
+			print_w_s(string, sections)
+		    else
+			print_e_s(string, sections)
+		}
+	    }
+	    show_progress("checked", "symbols", 1000)
+	}
+	show_complete("checked", "symbols")
+	close(ctaglog)
+    }
+
+    if (needctags) {
+	show_starting("indexing", "ctags")
+	while ((getline < ctaglog) == 1) {
+	    if ($1 ~ /^_/) type = "_"
+	    else if ($2 in types) type = $2
+	    else type = "OTHER"
+	    ctags[type,$1] = 1
+	    show_progress("indexed", "ctags", 1000)
+	}
+	close(ctaglog)
+	show_complete("indexed", "ctags")
+    }
+
+    if (n["libraries"]) {
+	command = "xargs nm -s 2>/dev/null | egrep '\\<[BDTW]\\>' | sort -u > " libslog
+	show_starting("checking", "libraries")
+	split("3", sections)
+	for (i = 1; i <= n["libraries"]; i++) {
+	    lib = libraries[i];
+	    base = lib; sub(/^.*\//, "", base); sub(/\.(la|a|so)$/, "", base);
+	    print ".libs/" base ".so" | command
+	    print ".libs/" base ".a" | command
+	    search_multi(base, sections)
+	    show_progress("checked", "libraries", 1000)
+	}
+	close(command)
+	show_complete("checked", "libraries")
+	show_starting("indexing", "library symbols")
+	while ((getline < libslog) == 1) {
+	    if (NF == 2) { addr = ""; type = $1; symb = $2 }
+		    else { addr = $1; type = $2; symb = $3 }
+	    sub(/@.*$/, "", symb)
+	    symbols[type,symb] = addr
+	    show_progress("indexed", "library symbols", 1000)
+	}
+	close(libslog)
+	show_complete("indexed", "library symbols")
+	show_starting("checking", "library symbols")
+	split("2 3", sections)
+	for (pair in symbols) {
+	    split(pair, inds, SUBSEP)
+	    type = inds[1]; symb = inds[2]
+	    if (type == "T") {
+		if ((("function",symb) in ctags) || (("prototype",symb) in ctags) || (("_",symb) in ctags)) {
+		    print_s("symbol " type " " symb " has declaration")
+		    print symb >> symslog
+		    written["symslog"]++
+		} else {
+		    string = "symbol " type " " symb " has no declaration"
+		    if (symb ~ /^_/) print_w(string)
+		    else print_e(string)
+		}
+		search_symbol(symb, sections, 0)
+	    } else if (type ~ /^[BD]$/) {
+		if ((("externvar",symb) in ctags) || (("_",symb) in ctags)) {
+		    print_s("symbol " type " " symb " has declaration")
+		    print symb >> symslog
+		    written["symslog"]++
+		} else {
+		    string = "symbol " type " " symb " has no declaration"
+		    if (symb ~ /^_/) print_w(string)
+		    else print_e(string)
+		}
+		search_symbol(symb, sections, 0)
+	    } else if (type == "W") {
+		if ((("function",symb) in ctags) || (("prototype",symb) in ctags) || (("externvar",symb) in ctags) || (("_",symb) in ctags)) {
+		    print_s("symbol " type " " symb " has declaration")
+		    print symb >> symslog
+		    written["symslog"]++
+		} else {
+		    string = "symbol " type " " symb " has no declaration"
+		    if (symb ~ /^_/) print_w(string)
+		    else print_w(string)
+		}
+		search_symbol(symb, sections, 1)
+	    }
+	    show_progress("checked", "library symbols", 1000)
+	}
+	show_complete("checked", "library symbols")
+    }
+
+    if (n["modules"]) {
+	show_starting("checking", "modules")
+	split("4 5 7 9", sections)
+	for (i = 1; i <= n["modules"]; i++) {
+	    module = modules[i]
+	    base = module
+	    sub(/^lib[^[:space:]]*_a-/, "", base)
+	    sub(/^streams[-_]/, "", base)
+	    sub(/\.(gz|bz2|xz)$/, "", base)
+	    sub(/\.(ko|o)$/, "", base)
+	    search_multi(base, sections)
+	    show_progress("checked", "modules", 1000)
+	}
+	show_complete("checked", "modules")
+	show_starting("indexing", "module symbols")
+	modmap = "Modules.map"
+	crc_seen = 0
+	while((getline < modmap) == 1) {
+	    if (/^.*. _?__ksymtab_/) {
+		sub(/^.*. _?__ksymtab_/, "")
+		defined[$1] = 1
+		sub(/_+$/, "", $1)
+		exports[$1] = 1
+	    } else if (/^.*. _?__crc_/) {
+		sub(/^.*. _?__crc_/, "")
+		sub(/_+$/, "", $1)
+		versioned[$1] = 1
+		exports[$1] = 1
+		crc_seen = 1
+	    } else if (/\<[Uw]\>/) {
+		undefined[$2] = 1
+	    }
+	    show_progress("indexing", "module symbols", 1000)
+	}
+	close(modmap)
+	show_complete("indexing", "module symbols")
+	show_starting("checking", "module exports")
+	split("9", sections)
+	for (symb in exports) {
+	    sub(/_R(smp_)?[[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]]$/, "", symb)
+	    if ((("function",symb) in ctags) || (("prototype",symb) in ctags) || (("externvar",symb) in ctags) || (("_",symb) in ctags)) {
+		print_s("exported symbol " symb " has declaration")
+		print symb >> symslog
+		written["symslog"]++
+	    } else {
+		string = "exported symbol " symb " has no declaration"
+		if (symb ~ /^_/) print_w(string)
+		else {
+		    if (symb in wrapper)
+			print_w(string)
+		    else
+			print_e(string)
+		}
+	    }
+	    if (symb in wrapper)
+		search_symbol(symb, sections, 1)
+	    else
+		search_symbol(symb, sections, 0)
+	    if (crc_seen) {
+		if (!(symb in versioned))
+		    print_e(symb " has no version")
+	    }
+	    show_progress("checked", "module exports", 1000)
+	}
+	show_complete("checked", "module exports")
+	show_starting("indexing", "kernel exports")
+	cmd = ""
+	sysmap = ENVIRON["DESTDIR"] ENVIRON["ksysmap"]
+	if (sysmap && system("test -r " sysmap) == 0) {
+				    { cmd = "cat "   sysmap }
+	    if (sysmap~/\.gz$/    ) { cmd = "zcat "  sysmap }
+	    if (sysmap~/\.bz2$/   ) { cmd = "bzcat " sysmap }
+	    if (sysmap~/\.lzma$/  ) { cmd = "lzcat " sysmap }
+	    if (sysmap~/\.xz/     ) { cmd = "xzcat " sysmap }
+	} else {
+	vmlinux = ENVIRON["DESTDIR"] ENVIRON["kvmlinux"]
+	    if (vmlinux && system("test -r " vmlinux) == 0) {
+	    name = "/var/tmp/." me "." PROCINFO["pid"] ".vmlinux"
+					{ cmd = "( cat "   vmlinux " >" name "; nm -Bs " name "; rm -f -- " name ") 2>/dev/null" }
+		if (vmlinux~/\.gz$/   ) { cmd = "( zcat "  vmlinux " >" name "; nm -Bs " name "; rm -f -- " name ") 2>/dev/null" }
+		if (vmlinux~/\.bz2$/  ) { cmd = "( bzcat " vmlinux " >" name "; nm -Bs " name "; rm -f -- " name ") 2>/dev/null" }
+		if (vmlinux~/\.lzma$/ ) { cmd = "( lzcat " vmlinux " >" name "; nm -Bs " name "; rm -f -- " name ") 2>/dev/null" }
+		if (vmlinux~/\.xz$/   ) { cmd = "( xzcat " vmlinux " >" name "; nm -Bs " name "; rm -f -- " name ") 2>/dev/null" }
+	    }
+	}
+	if (cmd) {
+	    while ((cmd | getline) == 1) {
+		if (/^.*. _?__ksymtab_/) {
+		    sub(/^.*. _?__ksymtab_/, "")
+		    defined[$1] = 1
+		}
+		show_progress("indexed", "kernel exports", 1000)
+	    }
+	    close(cmd)
+	}
+	show_complete("indexed", "kernel exports")
+	show_starting("checking", "undefined module symbols")
+	for (symb in undefined) {
+	    if (symb in defined)
+		print_s("module symbol " symb " is resolved")
+	    else {
+		if (symb ~ /^_?__this_module$/) continue
+		sub(/_R(smp_)?[[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]]$/, "", symb)
+		if (symb in defined)
+		    print_s("module symbol " symb " is resolved")
+		else
+		    print_w("cannot resolve prelinked module symbol " symb)
+	    }
+	    show_progress("checked", "undefined module symbols", 1000)
+	}
+	show_complete("checked", "undefined module symbols")
+    }
+
+    if (strload) {
+	show_starting("checking", "modules and drivers")
+	split("4 7", dsections)
+	split("4 7", msections)
+	while ((getline < strload) == 1) {
+	    if (/^d(s)?[[:space:]]+/) {
+		sub(/^d(s)?[[:space:]]+/, "")
+		search_multi($1, dsections)
+	    } else
+	    if (/^m[[:space:]]+/) {
+		sub(/^m[[:space:]]+/, "")
+		search_multi($1, msections)
+	    }
+	    show_progress("checked", "modules and drivers", 1000)
+	}
+	close(strload)
+	show_complete("checked", "modules and drivers")
+    }
+
+    if (makedev) {
+	show_starting("checking", "devices")
+	split("4", sections)
+	while ((getline < makedev) == 1) {
+	    if (/.*%dev.*\)[[:space:]]+/) {
+		sub(/.*%dev.*\)[[:space:]]+/, "")
+		sub(/^.*\//, "")
+		sub(/^[0-9]+/, "")
+		sub(/\.[0-9].*/, "")
+		search_multi($1, sections)
+	    }
+	    show_progress("checked", "devices", 1000)
+	}
+	close(makedev)
+	show_complete("checked", "devices")
+    }
+
+    if (ENVIRON["WARN_EXCESS"]) {
+	n["exposed"] = split(ENVIRON["EXPOSED_SYMBOLS"], exposed)
+	for (i = 1; i <= n["exposed"]; i++) { exposed[exposed[i]] = 1; delete exposed[i] }
+
+	show_starting("indexing", "exported symbols")
+	if (written["symslog"]) {
+	    close(symslog)
+	    written["symslog"] = 0
+	}
+	while ((getline < symslog) == 1) {
+	    exported[$0] = 1
+	    show_progress("indexed", "exported symbols", 1000)
+	}
+	close(symslog)
+	show_complete("indexed", "exported symbols")
+	show_starting("checking", "prototypes and externvars")
+	while ((getline < ctaglog) == 1) {
+	    if ($2 ~ /^(prototype|externvar)$/) {
+		print_t("testing " $2 " " $1 " for exported symbol")
+		if ($1 in exported)
+		    print_s($2 " " $1 " has exported symbol")
+		else {
+		    string = "cannot find exported symbol for " $2 " " $1
+		    if (($1 ~ /^_/) || (ENVIRON["WARN_EXCESS"] == "yes") || ($1 in exposed))
+			 print_w(string)
+		    else print_e(string)
+		}
+	    }
+	    show_progress("checked", "prototypes and externvars", 1000)
+	}
+	close(ctaglog)
+	show_complete("checked", "prototypes and externvars")
+    }
+
+    if (ENVIRON["CHECK_MANS"] == "yes") {
+	command = "find . -name '*.[1-9]*'"
+	show_starting("indexing", "manpages")
+	while((command | getline) == 1) {
+	    sub(/^\.\//, "")
+	    if (/\.man$/) continue
+	    print_d("mans: " $1)
+	    mans[$1] = 1
+	    show_progress("indexed", "manpages", 1000)
+	}
+	close(command)
+	show_complete("indexed", "manpages")
+
+	show_starting("indexing", "cross-referenced manpages")
+	for (page in mans) {
+	    if ((getline < page) == 1) {
+		if ($1 == ".so") {
+		    xref[page] = 1
+		    if ($2 in mans) {
+			print_d("xrefed: " $2)
+			xrefed[$2] = 1
+		    } else {
+			print_e($2 " references outside page collection")
+		    }
+		    show_progress("indexed", "cross-referenced manpages", 1000)
+		}
+	    }
+	    close(page)
+	}
+	show_complete("indexed", "cross-referenced manpages")
+
+	show_starting("indexing", "used manpages")
+	if (written["usedlog"]) {
+	    close(usedlog)
+	    written["usedlog"] = 0
+	}
+	while ((getline < usedlog) == 1) {
+	    used[$1] = 1
+	    print_d("used: " $1)
+	    show_progress("indexed", "used manpages", 1000)
+	}
+	close(usedlog)
+	show_complete("indexed", "used manpages")
+
+	show_starting("indexing", "unused manpages")
+	UNUSED = ENVIRON["MANS_UNUSED"]
+	n["unused"] = split(UNUSED, unused)
+	for (i = 1; i <= n["unused"]; i++) { unused[unused[i]] = 1; print_d("unused: " unused[i] ); delete unused[i] }
+	count = n["unused"]
+	show_complete("indexed", "unused manpages")
+
+	show_starting("indexing", "missing manpages")
+	MISSING = ENVIRON["MANS_MISSING"]
+	n["missing"] = split(MISSING, missing)
+	for (i = 1; i <= n["missing"]; i++) { missing[missing[i]] = 1; print_d("missing: " missing[i] ); delete missing[i] }
+	count = n["missing"]
+	show_complete("indexed", "missing manpages")
+
+	show_starting("indexing", "exempt manpages")
+	EXEMPT = ENVIRON["MANS_EXEMPT"]
+	n["exempt"] = split(EXEMPT, exempt)
+	for (i = 1; i <= n["exempt"]; i++) { exempt[exempt[i]] = 1; print_d("exempt:" exempt[i]); delete exempt[i] }
+	count = n["exempt"]
+	show_complete("indexed", "exempt manpages")
+
+	show_starting("checking", "manual pages")
+	for (page in mans) {
+	    if (page in used) {
+		if (page in unused)
+		    print_e(page " is not necessary in MANS_UNUSED")
+		print_s(page " is used")
+	    }
+	    else if (page in xrefed) {
+		if (page in unused)
+		    print_e(page " is not necessary in MANS_UNUSED")
+		print_s(page " is cross-referenced")
+	    }
+	    else if (page in unused)
+		print_s(page " is marked unused")
+	    else {
+		if (page ~ /^man[57]/)
+		    print_w(page " is unused")
+		else
+		    print_e(page " is unused")
+	    }
+	    show_progress("checked", "manual pages", 1000)
+	}
+	show_complete("checked", "manual pages")
+
+	get_srcpages("12345789")
+	show_starting("checking", "source manual pages")
+	for (pair in srcpages) {
+	    if (!(pair in manpages))
+		print_w("source man page " srcpages[pair] " not used")
+	    show_progress("checked", "source manual pages", 1000)
+	}
+	show_complete("checked", "source manual pages")
+
+	if (ENVIRON["MAINTAINER_MODE"] != "no") {
+	    #  only check for conflicts in maintainer mode
+	    mandir = ENVIRON["DESTDIR"] ENVIRON["mandir"]
+	    if (mandir) {
+		show_starting("checking", "manual page conflicts")
+		for (page in mans) {
+		    file = mandir "/" page
+		    ok = 1
+		    if (ok == 1) {
+			if ((getline < file) == 1)
+			    ok = 0
+			close(file)
+		    }
+		    if (ok == 1) {
+			filez = file ".gz"
+			if ((getline < filez) == 1)
+			    ok = 0
+			close(filez)
+		    }
+		    if (ok == 1) {
+			filez = file ".bz2"
+			if ((getline < filez) == 1)
+			    ok = 0
+			close(filez)
+		    }
+		    if (ok == 1) {
+			filez = file ".lzma"
+			if ((getline < filez) == 1)
+			    ok = 0
+			close(filez)
+		    }
+		    if (ok == 1) {
+			filez = file ".xz"
+			if ((getline < filez) == 1)
+			    ok = 0
+			close(filez)
+		    }
+		    if (ok == 0)
+			print_e(page " conflicts with " file)
+		    show_progress("checked", "manual page conflicts", 1000)
+		}
+		show_complete("checked", "manual page conflicts")
+	    }
+
+	    # only attempt to format manual pages in maintainer mode
+	    required[1] = "NAME\nSYNOPSIS\nOPTIONS\nERRORS|DIAGNOSTICS|ERROR[[:space:]]HANDLING\nIDENTIFICATION|AUTHOR|COPYRIGHT"
+	    required[2] = "NAME\nSYNOPSIS\nDESCRIPTION\nIDENTIFICATION|AUTHOR|COPYRIGHT"
+	    required[3] = "NAME\nSYNOPSIS|OVERVIEW\nDESCRIPTION\nIDENTIFICATION|AUTHOR|COPYRIGHT"
+	    required[4] = "NAME\nDESCRIPTION\nFILES|DEVICES|MODULES|IOCTLS\nIDENTIFICATION|AUTHOR|COPYRIGHT"
+	    required[5] = "NAME\nDESCRIPTION\nFILES|DEVICES\nIDENTIFICATION|AUTHOR|COPYRIGHT"
+	    required[6] = "NAME\nDESCRIPTION\nIDENTIFICATION|AUTHOR|COPYRIGHT"
+	    required[7] = "NAME\nSYNOPSIS\nDESCRIPTION\nIDENTIFICATION|AUTHOR|COPYRIGHT"
+	    required[8] = "NAME\nSYNOPSIS\nDESCRIPTION\nOPTIONS\nERRORS|DIAGNOSTICS|ERROR[[:space:]]HANDLING\nIDENTIFICATION|AUTHOR|COPYRIGHT"
+	    required[9] = "NAME\nSYNOPSIS|OVERVIEW|FORMAT\nDESCRIPTION\nIDENTIFICATION|AUTHOR|COPYRIGHT"
+	    recommended[1] = "SEE[[:space:]]ALSO|REFERENCES\nBUGS|CAVEATS\nCOMPATIBILITY\nCONFORMANCE|CONFORMING[[:space:]]TO\nHISTORY|VERSIONS"
+	    recommended[2] = "ARGUMENTS|MEMBERS\nRETURN|RETURN[[:space:]]VALUE|MEMBERS\nERRORS|ERROR[[:space:]]HANDLING|MEMBERS\nSEE[[:space:]]ALSO|REFERENCES\nCONFORMANCE|CONFORMING[[:space:]]TO\nHISTORY|VERSIONS"
+	    recommended[3] = "ARGUMENTS|MEMBERS|OVERVIEW\nRETURN|RETURN[[:space:]]VALUE|MEMBERS|OVERVIEW\nERRORS|ERROR[[:space:]]HANDLING|MEMBERS|OVERVIEW\nSEE[[:space:]]ALSO|REFERENCES\nCOMPATIBILITY\nCONFORMANCE|CONFORMING[[:space:]]TO\nHISTORY|VERSIONS"
+	    recommended[8] = "SEE[[:space:]]ALSO|REFERENCES\nBUGS|CAVEATS\nCOMPATIBILITY\nCONFORMANCE|CONFORMING[[:space:]]TO\nHISTORY|VERSIONS"
+	    recommended[9] = "ARGUMENTS|MEMBERS|OVERVIEW|FORMAT\nRETURN|RETURN[[:space:]]VALUE|MEMBERS|OVERVIEW|FORMAT\nERRORS|ERROR[[:space:]]HANDLING|MEMBERS|OVERVIEW|FORMAT\nSEE[[:space:]]ALSO|REFERENCES\nCONTEXT|MEMBERS|FORMAT\nMP-STREAMS|MEMBERS|FORMAT\nCOMPATIBILITY\nCONFORMANCE|CONFORMING[[:space:]]TO\nHISTORY|VERSIONS"
+	    options[1] = "--help\n--version\n--copying"
+	    options[8] = "--help\n--version\n--copying"
+
+	    if (ENVIRON["PKG_MANPATH"])
+		MANPATH = ENVIRON["PKG_MANPATH"]
+	    else {
+		MANPATH = ENVIRON["top_builddir"] "/doc/man" ":" ENVIRON["top_builddir"] "/man" ":" "." "/doc/man" ":" "." "/man" ":" "."
+		if (ENVIRON["mandir"])
+		    MANPATH = MANPATH ":" ENVIRON["mandir"]
+	    }
+	    get_manpages("12345789")
+	    show_starting("checking", "manual page formats")
+	    for (page in mans) {
+		root = page; sub(/.*\//, "", root); sub(/\.[1-9][^\.]*/, "", root)
+		sect = page; sub(/.*\./, "", sect);
+		numb = sect; sub(/[[:alpha:]]*$/, "", numb)
+		fullpage = ENVIRON["srcdir"] "/" page ".man"
+		command = "man -M " MANPATH " " numb " " root " >" outfile " 2>" errfile
+		ok = 1
+		print_d(command)
+		if (system(command) != 0) ok = 0
+		if (ok) {
+		    while ((getline < errfile) == 1) {
+			if (/Reformatting.*please wait/)	    { continue }
+			if (/character above first line discarded/) { ok = 2; continue }
+			if (/multiple matches for/)		    { ok = 2; continue }
+			if (/can't break line/)			    { ok = 2; continue }
+			if (/cannot adjust line/)		    { ok = 2; continue }
+			if (/numeric expression expected/)	    { ok = 2; continue }
+			if (/can't find special character/)	    { ok = 2; continue }
+			if (/will not fit on one page/)		    { ok = 2; continue }
+			ok = 0
+			break
+		    }
+		    close(errfile)
+		}
+		if (ok) {
+		    if ((getline < outfile) != 1) ok = 0
+		    close(outfile)
+		}
+		if (ok != 1) {
+		    if (!ok) print_e("error formatting manual page " fullpage)
+		    else     print_w("warning formatting manual page " fullpage)
+		    print_d("stderr was:")
+		    while ((getline < errfile) == 1) { gsub(/.[[:cntrl:]]/, ""); print_d($0); } close(errfile)
+		    print_d("stdout was:")
+		    while ((getline < outfile) == 1) { gsub(/.[[:cntrl:]]/, ""); print_d($0); } close(outfile)
+		    if (!ok) continue
+		}
+		if (page in xref)
+		    continue
+		# check for missing autoconf substitutions
+		if (numb in required)
+		    split(required[numb], require, "\n")
+		else for (r in require) delete require[r]
+		if (numb in recommended)
+		    split(recommended[numb], recommend, "\n")
+		else for (r in recommend) delete recommend[r]
+		if (numb in options)
+		    split(options[numb], option, "\n")
+		else for (r in option) delete option[r]
+		for (h in hdrs) delete hdrs[h]
+		empty = ""
+		frag = ""
+		inbrace = 0
+		while ((getline < outfile) == 1) {
+		    gsub(/.[[:cntrl:]]/, "")
+		    if (/^$/) continue
+		    if (/@[[:alnum:]_]+@/) {
+			for (k = 1; k <= NF; k++)
+			    if ($k ~ /@[[:alnum:]_]+@/)
+				print_e(fullpage " has missing substitutions " $k)
+			continue
+		    }
+		    if (/^[[:space:]]/) {
+			for (k = 1; k <= NF; k++) {
+			    if ($k~/\{/)
+				inbrace = inbrace + 1
+			    if ($k~/\}/) {
+				inbrace = inbrace - 1
+				if (inbrace <= 0)
+				    inbrace = 0
+				continue
+			    }
+			    if (inbrace > 0)
+				continue
+			    if ($k ~ /([a-zA-Z0-9._]+[-]+)*[a-zA-Z0-9._]+\([1-9][a-z]?\)/) {
+				if (k == 1 && $k ~ /^[^a-zA-Z0-9._]/)
+				    frag = ""
+				suffix = $k
+				fragstate = 0
+				if (k != 1 || frag == "")
+				    fragstate = 3
+				while (1) {
+				    if (fragstate == 0) { cross = suffix } else
+				    if (fragstate == 1) { cross = frag suffix } else
+				    if (fragstate == 2) { cross = frag; sub(/-$/, "", cross); cross = cross suffix } else
+				    if (fragstate == 3) { cross = suffix } else break
+				    sub(/^[^a-zA-Z0-9._]*/, "", cross)
+				    sub(/\).*$/, ")", cross)
+				    base = cross
+				    sub(/\([1-9][a-z]?\)$/, "", base)
+				    sect = cross
+				    sub(/^[-a-zA-Z0-9._]+\(/, "", sect)
+				    sub(/\)$/, "", sect)
+				    numb = substr(sect, 1, 1)
+				    if ((numb,base) in manpages) {
+					print_d("xref: " cross " in " fullpage " xref " manpages[numb,base])
+					break
+				    } else if (substr(sect, 2, 1) == "s") {
+					if (fragstate < 2 && (fragstate != 1 || (fragstate == 1 && frag ~ /-$/))) {
+					    fragstate = fragstate + 1
+					    continue
+					}
+					print_e("xref: " cross " in " fullpage " xref bad STREAMS page")
+					break
+				    } else if ((numb,base) in srcpages) {
+					if (fragstate < 2 && (fragstate != 1 || (fragstate == 1 && frag ~ /-$/))) {
+					    fragstate = fragstate + 1
+					    continue
+					}
+					print_e("xref: " cross " in " fullpage " xref " srcpages[numb,base])
+					break
+				    } else {
+					if (check_section(base, sect) == 1) {
+					    file = mandir "/man" numb "/" base "." sect
+					    print_d("xref: " cross " in " fullpage " xref external page " file)
+					    break
+					} else {
+					    file = "man" numb "/" base "." sect
+					    if (file in missing) {
+						print_d("xref: " cross " in " fullpage " xref missing")
+						break
+					    } else if (fragstate < 2 && (fragstate != 1 || (fragstate == 1 && frag ~ /-$/))) {
+						fragstate = fragstate + 1
+						continue
+					    } else {
+						if (check_wrongsect(base) == 1) {
+						    print_w("xref: " cross " in " fullpage " xref wrong section")
+						} else {
+						    print_w("xref: " cross " in " fullpage " xref missing")
+						}
+						break
+					    }
+					}
+				    }
+				}
+			    }
+			}
+		    }
+		    if (/^[[:space:]].*[a-zA-Z0-9._]-$/) {
+			frag = $NF
+			gsub(/^[^-a-zA-Z0-9._]*/, "", frag)
+		    } else {
+			frag = ""
+		    }
+		    if (/^[[:space:]]+[[][1-9][0-9]*[]][[:space:]]*$/) {
+			print_e(fullpage " has empty reference " $1)
+		    }
+		    if (/^[A-Z]+([[:space:]][A-Z]+)?[A-Z]+$/) {
+			if (empty)
+			    print_e(fullpage " has empty section " empty)
+			empty = $0
+			if ($0 in hdrs)
+			    print_e(fullpage " has multiple " $0 " sections")
+			hdrs[$0] = 1
+			for (r in require) {
+			    pattern = "^(" require[r] ")$"
+			    if ($0 ~ pattern)
+				grequire[r] = 1
+			}
+			for (r in recommend) {
+			    pattern = "^(" recommend[r] ")$"
+			    if ($0 ~ pattern)
+				grecommend[r] = 1
+			}
+		    } else {
+			empty = ""
+			for (r in option) {
+			    pattern =  "(" option[r] ")"
+			    if ($0 ~ pattern)
+				goption[r] = 1
+			}
+		    }
+		}
+		close(outfile)
+		for (r in require) {
+		    if (!(r in grequire)) {
+			$0 = require[r]; gsub(/[[][[]:space:[]][]]/, " "); gsub(/\|/, ", ")
+			if (page in exempt)
+			    print_w(fullpage " has missing required section " $0)
+			else
+			    print_e(fullpage " has missing required section " $0)
+		    } else
+			delete grequire[r]
+		}
+		for (r in recommend) {
+		    if (!(r in grecommend)) {
+			$0 = recommend[r]; gsub(/[[][[]:space:[]][]]/, " "); gsub(/\|/, ", ")
+			print_w(fullpage " has missing recommended section " $0)
+		    } else
+			delete grecommend[r]
+		}
+		for (r in option) {
+		    if (!(r in goption)) {
+			$0 = option[r]; gsub(/[[][[]:space:[]][]]/, " "); gsub(/\|/, ", ")
+			if (page in exempt)
+			    print_w(fullpage " has missing required option " $0)
+			else
+			    print_e(fullpage " has missing required option " $0)
+		    } else
+			delete goption[r]
+		}
+		show_progress("checked", "manual page formats", 1)
+	    }
+	    show_complete("checked", "manual page formats")
+	}
+    }
+    if (written["usedlog"]) {
+	close(usedlog)
+	written["usedlog"] = 0
+    }
+    if (written["symslog"]) {
+	close(symslog)
+	written["symslog"] = 0
+    }
+    if (written["logfile"]) {
+	close(logfile)
+	written["logfile"] = 0
+    }
+    if (ENVIRON["MAINTAINER_MODE"] ~ /^(verbose|continue)$/ || ENVIRON["V"] == 1)
+    if (warnings) {
+	print_v("+-----------------+", blu)
+	print_v("| Warning Summary |", blu)
+	print_v("+-----------------+", blu)
+	while ((getline < logfile) == 1)
+	    if (/\<W:/) { print blu $0 std > stderr; written["stderr"]++ }
+	close(logfile)
+    }
+    if (ENVIRON["MAINTAINER_MODE"] ~ /^(verbose|continue)$/ || ENVIRON["V"] == 1)
+    if (errors) {
+	print_v("+---------------+", red)
+	print_v("| Error Summary |", red)
+	print_v("+---------------+", red)
+	while ((getline < logfile) == 1)
+	    if (/\<E:/) { print red $0 std > stderr; written["stderr"]++ }
+	close(logfile)
+    }
+    if (errors) {
+	if (ENVIRON["MAINTAINER_MODE"] == "continue")
+	    retval = 77
+	else if (ENVIRON["MAINTAINER_MODE"] != "no")
+	    retval = 1
+	else
+	    retval = 0
+    }
+    print_v("successes " success+0, grn)
+    print_v("warnings  " warnings+0, blu)
+    print_v("errors    " errors+0, red)
+    if (written["logfile"]) {
+	close(logfile)
+	written["logfile"] = 0
+    }
+    if (written["stderr"]) {
+	close(stderr)
+	written["stderr"] = 0
+	if (stdout == stderr) written["stdout"] = 0
+    }
+    if (written["stdout"]) {
+	close(stdout)
+	written["stdout"] = 0
+    }
+    exit retval
+}
+
+# vim: ft=awk sw=4 nocin fo+=tcqlorn

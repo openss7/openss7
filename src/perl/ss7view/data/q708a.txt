@@ -1,0 +1,1885 @@
+Numeric
+2-000	Liechtenstein (Principality of)
+2-001	Italy
+2-002	Netherlands (Kingdom of the)
+2-003	Italy
+2-004	Greece
+2-005	Greece
+2-006	Netherlands (Kingdom of the)
+2-007	Netherlands (Kingdom of the)
+2-008	Netherlands (Kingdom of the)
+2-009	Netherlands (Kingdom of the)
+2-010	Netherlands (Kingdom of the)
+2-011	Netherlands (Kingdom of the)
+2-012	Belgium
+2-013	Belgium
+2-014	Belgium
+2-015	Belgium
+2-016	France
+2-017	France
+2-018	France
+2-019	France
+2-020	France
+2-021	France
+2-022	France
+2-023	France
+2-024	Monaco (Principality of)
+2-025	Austria
+2-026	Austria
+2-027	Spain
+2-028	Spain
+2-029	Spain
+2-030	Spain
+2-031	Spain
+2-032	Hungary (Republic of)
+2-033	Germany (Federal Republic of)
+2-034	Germany (Federal Republic of)
+2-035	Germany (Federal Republic of)
+2-036	Germany (Federal Republic of)
+2-037	Germany (Federal Republic of)
+2-038	Germany (Federal Republic of)
+2-039	Germany (Federal Republic of)
+2-040	Serbia (Republic of)
+2-041	Italy
+2-042	Italy
+2-043	Italy
+2-044	Italy
+2-045	Italy
+2-046	Italy
+2-047	Italy
+2-048	Italy
+2-049	Italy
+2-050	Italy
+2-051	Italy
+2-052	Romania
+2-053	Switzerland (Confederation of)
+2-054	Switzerland (Confederation of)
+2-055	Switzerland (Confederation of)
+2-056	Switzerland (Confederation of)
+2-057	Switzerland (Confederation of)
+2-058	Switzerland (Confederation of)
+2-059	Switzerland (Confederation of)
+2-060	Czech Republic
+2-061	Switzerland (Confederation of)
+2-062	Switzerland (Confederation of)
+2-063	Switzerland (Confederation of)
+2-064	Austria
+2-065	Austria
+2-066	Austria
+2-067	Austria
+2-068	United Kingdom of Great Britain and Northern Ireland
+2-069	United Kingdom of Great Britain and Northern Ireland
+2-070	United Kingdom of Great Britain and Northern Ireland
+2-071	United Kingdom of Great Britain and Northern Ireland
+2-072	United Kingdom of Great Britain and Northern Ireland
+2-073	United Kingdom of Great Britain and Northern Ireland
+2-074	United Kingdom of Great Britain and Northern Ireland
+2-075	United Kingdom of Great Britain and Northern Ireland
+2-076	Denmark
+2-077	Denmark
+2-078	Denmark
+2-079	Denmark
+2-080	Sweden
+2-081	Sweden
+2-082	Sweden
+2-083	Sweden
+2-084	Norway
+2-085	Norway
+2-086	Norway
+2-087	Norway
+2-088	Finland
+2-089	Finland
+2-090	Finland
+2-091	Finland
+2-092	Estonia (Republic of)
+2-093	Italy
+2-094	Italy
+2-095	Italy
+2-096	Latvia (Republic of)
+2-097	Belgium
+2-098	Belgium
+2-099	Belgium
+2-100	Russian Federation
+2-101	Russian Federation
+2-102	Russian Federation
+2-103	Russian Federation
+2-104	Russian Federation
+2-105	Russian Federation
+2-106	Russian Federation
+2-107	Russian Federation
+2-108	Russian Federation
+2-109	Russian Federation
+2-110	Russian Federation
+2-111	Russian Federation
+2-112	Russian Federation
+2-113	Russian Federation
+2-114	Russian Federation
+2-115	Russian Federation
+2-116	Russian Federation
+2-117	Russian Federation
+2-118	Russian Federation
+2-119	Russian Federation
+2-120	Poland (Republic of)
+2-121	Germany (Federal Republic of)
+2-122	Germany (Federal Republic of)
+2-123	Germany (Federal Republic of)
+2-124	Germany (Federal Republic of)
+2-125	Germany (Federal Republic of)
+2-126	Germany (Federal Republic of)
+2-127	Germany (Federal Republic of)
+2-128	Germany (Federal Republic of)
+2-129	Germany (Federal Republic of)
+2-130	Germany (Federal Republic of)
+2-131	Germany (Federal Republic of)
+2-132	Gibraltar
+2-133	Austria
+2-134	Poland (Republic of)
+2-135	Luxembourg
+2-136	Portugal
+2-137	Portugal
+2-138	Portugal
+2-139	Portugal
+2-140	Luxembourg
+2-141	Luxembourg
+2-142	Netherlands (Kingdom of the)
+2-143	Netherlands (Kingdom of the)
+2-144	Ireland
+2-145	Ireland
+2-146	Ireland
+2-147	United Kingdom of Great Britain and Northern Ireland
+2-148	Iceland
+2-149	France
+2-150	France
+2-151	France
+2-152	Albania (Republic of)
+2-153	United Kingdom of Great Britain and Northern Ireland
+2-154	United Kingdom of Great Britain and Northern Ireland
+2-155	United Kingdom of Great Britain and Northern Ireland
+2-156	Malta
+2-157	Italy
+2-158	Italy
+2-159	Italy
+2-160	Cyprus (Republic of)
+2-161	United Kingdom of Great Britain and Northern Ireland
+2-162	United Kingdom of Great Britain and Northern Ireland
+2-163	United Kingdom of Great Britain and Northern Ireland
+2-164	United Kingdom of Great Britain and Northern Ireland
+2-165	United Kingdom of Great Britain and Northern Ireland
+2-166	United Kingdom of Great Britain and Northern Ireland
+2-167	United Kingdom of Great Britain and Northern Ireland
+2-168	Bulgaria (Republic of)
+2-169	United Kingdom of Great Britain and Northern Ireland
+2-170	United Kingdom of Great Britain and Northern Ireland
+2-171	Turkey
+2-172	Turkey
+2-173	Turkey
+2-174	United Kingdom of Great Britain and Northern Ireland
+2-175	United Kingdom of Great Britain and Northern Ireland
+2-176	United Kingdom of Great Britain and Northern Ireland
+2-177	United Kingdom of Great Britain and Northern Ireland
+2-178	United Kingdom of Great Britain and Northern Ireland
+2-179	United Kingdom of Great Britain and Northern Ireland
+2-180	Croatia (Republic of)
+2-181	Italy
+2-182	Slovenia (Republic of)
+2-183	Italy
+2-184	San Marino (Republic of)
+2-185	United Kingdom of Great Britain and Northern Ireland
+2-186	United Kingdom of Great Britain and Northern Ireland
+2-187	United Kingdom of Great Britain and Northern Ireland
+2-188	United Kingdom of Great Britain and Northern Ireland
+2-189	United Kingdom of Great Britain and Northern Ireland
+2-190	United Kingdom of Great Britain and Northern Ireland
+2-191	United Kingdom of Great Britain and Northern Ireland
+2-192	Sweden
+2-193	Sweden
+2-194	Sweden
+2-195	Sweden
+2-196	Andorra (Principality of)
+2-197	Andorra (Principality of)
+2-198	Netherlands (Kingdom of the)
+2-199	Estonia (Republic of)
+2-200	Armenia (Republic of)
+2-201	France
+2-202	France
+2-203	France
+2-204	Belarus (Republic of)
+2-205	Sweden
+2-206	Greece
+2-207	Italy
+2-208	Georgia
+2-209	United Kingdom of Great Britain and Northern Ireland
+2-210	United Kingdom of Great Britain and Northern Ireland
+2-211	United Kingdom of Great Britain and Northern Ireland
+2-212	Hungary (Republic of)
+2-213	Georgia
+2-214	Ukraine
+2-215	Italy
+2-216	Italy
+2-217	Denmark
+2-218	Bosnia and Herzegovina
+2-219	Bosnia and Herzegovina
+2-220	The Former Yugoslav Republic of Macedonia
+2-221	France
+2-222	Germany (Federal Republic of)
+2-223	Portugal
+2-224	Moldova (Republic of)
+2-225	Germany (Federal Republic of)
+2-226	Germany (Federal Republic of)
+2-227	Romania
+2-228	Czech Republic
+2-229	Czech Republic
+2-230	Czech Republic
+2-231	Czech Republic
+2-232	Slovak Republic
+2-233	Slovak Republic
+2-234	Slovak Republic
+2-235	Slovak Republic
+2-236	Lithuania (Republic of)
+2-237	Spain
+2-238	Spain
+2-239	Spain
+2-240	Spain
+2-241	Spain
+2-242	Germany (Federal Republic of)
+2-243	Germany (Federal Republic of)
+2-244	Germany (Federal Republic of)
+2-245	Germany (Federal Republic of)
+2-246	Germany (Federal Republic of)
+2-247	Germany (Federal Republic of)
+2-248	Germany (Federal Republic of)
+2-249	Germany (Federal Republic of)
+2-250	Germany (Federal Republic of)
+2-251	Germany (Federal Republic of)
+2-252	Germany (Federal Republic of)
+2-253	Netherlands (Kingdom of the)
+2-254	Finland
+2-255	Finland
+3-004	Canada
+3-005	Canada
+3-006	Canada
+3-007	Canada
+3-008	Canada
+3-009	Canada
+3-010	Canada
+3-011	Canada
+3-012	Canada
+3-013	Canada
+3-016	Saint Pierre and Miquelon (Collectivité territoriale de la République française)
+3-018	Greenland (Denmark)
+3-020	United States of America
+3-021	United States of America
+3-022	United States of America
+3-023	United States of America
+3-024	United States of America
+3-025	United States of America
+3-026	United States of America
+3-027	United States of America
+3-028	United States of America
+3-029	United States of America
+3-030	United States of America
+3-031	United States of America
+3-032	United States of America
+3-033	United States of America
+3-034	United States of America
+3-035	United States of America
+3-036	United States of America
+3-037	United States of America
+3-038	United States of America
+3-039	United States of America
+3-040	United States of America
+3-041	United States of America
+3-042	United States of America
+3-043	United States of America
+3-044	United States of America
+3-045	United States of America
+3-046	United States of America
+3-047	United States of America
+3-048	United States of America
+3-049	United States of America
+3-050	United States of America
+3-051	United States of America
+3-052	United States of America
+3-053	United States of America
+3-054	United States of America
+3-055	United States of America
+3-056	United States of America
+3-057	United States of America
+3-058	United States of America
+3-059	United States of America
+3-060	Puerto Rico
+3-064	United States Virgin Islands
+3-068	Mexico
+3-069	Mexico
+3-070	Mexico
+3-071	Mexico
+3-072	Mexico
+3-073	Mexico
+3-074	Mexico
+3-075	Mexico
+3-076	Jamaica
+3-077	Jamaica
+3-078	Jamaica
+3-079	Jamaica
+3-084	Barbados
+3-085	Barbados
+3-086	Barbados
+3-088	Antigua and Barbuda
+3-089	Antigua and Barbuda
+3-092	Cayman Islands
+3-093	Cayman Islands
+3-096	British Virgin Islands
+3-097	British Virgin Islands
+3-100	Bermuda
+3-104	Grenada
+3-108	Montserrat
+3-112	Saint Kitts and Nevis
+3-116	Saint Lucia
+3-120	Saint Vincent and the Grenadines
+3-124	Curaçao
+3-125	Curaçao
+3-126	Curaçao
+3-128	Bahamas (Commonwealth of the)
+3-132	Dominica (Commonwealth of)
+3-136	Cuba
+3-137	Cuba
+3-140	Dominican Republic
+3-141	Dominican Republic
+3-144	Haiti (Republic of)
+3-148	Trinidad and Tobago
+3-149	Trinidad and Tobago
+3-150	Trinidad and Tobago
+3-152	Turks and Caicos Islands
+3-153	Turks and Caicos Islands
+3-154	Turks and Caicos Islands
+3-156	Guadeloupe (French Department of)
+3-160	Martinique (French Department of)
+3-164	Aruba
+3-168	Anguilla
+3-169	Anguilla
+3-172	Mexico
+3-173	Mexico
+3-174	Mexico
+3-175	Mexico
+3-176	Mexico
+3-177	Mexico
+3-178	Mexico
+3-179	Faroe Islands
+3-180	United States of America
+3-181	United States of America
+3-182	United States of America
+3-183	United States of America
+3-184	United States of America
+3-185	United States of America
+3-186	United States of America
+3-187	United States of America
+3-188	United States of America
+3-189	United States of America
+3-190	United States of America
+3-191	United States of America
+3-192	United States of America
+3-193	United States of America
+3-194	United States of America
+3-195	United States of America
+3-196	United States of America
+3-197	United States of America
+3-198	United States of America
+3-199	United States of America
+3-200	United States of America
+3-201	United States of America
+3-202	United States of America
+3-203	United States of America
+3-204	United States of America
+3-210	Saint Helena, Ascension and Tristan da Cunha
+3-215	Mexico
+3-216	Mexico
+3-231	Bulgaria (Republic of)
+3-232	France
+3-233	Albania (Republic of)
+3-234	Latvia (Republic of)
+3-235	United Kingdom of Great Britain and Northern Ireland
+3-236	United Kingdom of Great Britain and Northern Ireland
+3-237	United Kingdom of Great Britain and Northern Ireland
+3-238	Romania
+3-239	Bosnia and Herzegovina
+3-240	Cambodia (Kingdom of)
+3-241	Montenegro (Republic of)
+3-242	Spain
+3-243	Germany (Federal Republic of)
+3-244	Estonia (Republic of)
+3-245	Croatia (Republic of)
+3-246	Georgia
+3-247	Turkey
+3-248	Cyprus (Republic of)
+3-249	Portugal
+3-250	Romania
+3-251	Poland (Republic of)
+3-252	Germany (Federal Republic of)
+3-253	Poland (Republic of)
+3-254	Germany (Federal Republic of)
+3-255	Germany (Federal Republic of)
+4-003	Israel (State of)
+4-004	Israel (State of)
+4-005	India (Republic of)
+4-006	India (Republic of)
+4-007	India (Republic of)
+4-008	India (Republic of)
+4-009	India (Republic of)
+4-010	India (Republic of)
+4-011	India (Republic of)
+4-012	India (Republic of)
+4-013	India (Republic of)
+4-014	India (Republic of)
+4-015	India (Republic of)
+4-016	India (Republic of)
+4-017	India (Republic of)
+4-019	Pakistan (Islamic Republic of)
+4-020	Pakistan (Islamic Republic of)
+4-021	Pakistan (Islamic Republic of)
+4-022	Pakistan (Islamic Republic of)
+4-023	Pakistan (Islamic Republic of)
+4-024	Afghanistan
+4-025	Afghanistan
+4-026	Sri Lanka (Democratic Socialist Republic of)
+4-027	Sri Lanka (Democratic Socialist Republic of)
+4-028	Myanmar (the Republic of the Union of)
+4-030	Lebanon
+4-031	Jordan (Hashemite Kingdom of)
+4-032	Jordan (Hashemite Kingdom of)
+4-033	Jordan (Hashemite Kingdom of)
+4-034	Syrian Arab Republic
+4-036	Iraq (Republic of)
+4-038	Kuwait (State of)
+4-039	Saudi Arabia (Kingdom of)
+4-040	Saudi Arabia (Kingdom of)
+4-041	Saudi Arabia (Kingdom of)
+4-042	Yemen (Republic of)
+4-043	Saudi Arabia (Kingdom of)
+4-044	Oman (Sultanate of)
+4-045	Oman (Sultanate of)
+4-046	Yemen (Republic of)
+4-048	United Arab Emirates
+4-049	United Arab Emirates
+4-050	Israel (State of)
+4-051	Israel (State of)
+4-052	Bahrain (Kingdom of)
+4-053	Bahrain (Kingdom of)
+4-054	Qatar (State of)
+4-055	Qatar (State of)
+4-056	Mongolia
+4-057	Nepal (Federal Democratic Republic of)
+4-058	Nepal (Federal Democratic Republic of)
+4-059	Nepal (Federal Democratic Republic of)
+4-060	United Arab Emirates
+4-061	United Arab Emirates
+4-062	United Arab Emirates
+4-064	Iran (Islamic Republic of)
+4-065	Iran (Islamic Republic of)
+4-070	Azerbaijani Republic
+4-071	Azerbaijani Republic
+4-072	Bhutan (Kingdom of)
+4-074	Kazakhstan (Republic of)
+4-075	Kazakhstan (Republic of)
+4-076	Kazakhstan (Republic of)
+4-077	Kazakhstan (Republic of)
+4-078	Kyrgyz Republic
+4-079	Kyrgyz Republic
+4-080	Japan
+4-081	Japan
+4-082	Japan
+4-083	Japan
+4-084	Japan
+4-085	Japan
+4-086	Japan
+4-088	Bahrain (Kingdom of)
+4-100	Korea (Republic of)
+4-101	Korea (Republic of)
+4-102	Korea (Republic of)
+4-103	Viet Nam (Socialist Republic of)
+4-104	Viet Nam (Socialist Republic of)
+4-105	Hong Kong, China
+4-106	Hong Kong, China
+4-107	Hong Kong, China
+4-108	Hong Kong, China
+4-109	Hong Kong, China
+4-110	Macao, China
+4-111	Hong Kong, China
+4-112	Cambodia (Kingdom of)
+4-113	Cambodia (Kingdom of)
+4-114	Lao People's Democratic Republic
+4-119	Macao, China
+4-120	China (People's Republic of)
+4-121	China (People's Republic of)
+4-122	China (People's Republic of)
+4-123	China (People's Republic of)
+4-124	China (People's Republic of)
+4-125	China (People's Republic of)
+4-126	China (People's Republic of)
+4-127	China (People's Republic of)
+4-128	China (People's Republic of)
+4-135	Democratic People's Republic of Korea
+4-136	Afghanistan
+4-137	Afghanistan
+4-140	Bangladesh (People's Republic of)
+4-141	Bangladesh (People's Republic of)
+4-142	Bangladesh (People's Republic of)
+4-143	Bangladesh (People's Republic of)
+4-144	Maldives (Republic of)
+4-145	Korea (Republic of)
+4-147	Korea (Republic of)
+4-148	Korea (Republic of)
+4-149	Korea (Republic of)
+4-150	Korea (Republic of)
+4-151	Korea (Republic of)
+4-152	Korea (Republic of)
+4-153	Korea (Republic of)
+4-154	Korea (Republic of)
+4-157	Tajikistan (Republic of)
+4-158	Tajikistan (Republic of)
+4-159	Tajikistan (Republic of)
+4-160	Turkmenistan
+4-164	Uzbekistan (Republic of)
+4-165	Uzbekistan (Republic of)
+4-167	Kyrgyz Republic
+4-170	Taiwan, China
+4-171	Taiwan, China
+4-172	Taiwan, China
+4-173	Taiwan, China
+4-174	Taiwan, China
+4-176	Hong Kong, China
+4-177	Hong Kong, China
+4-178	Hong Kong, China
+4-179	Hong Kong, China
+4-180	Hong Kong, China
+4-181	Hong Kong, China
+4-182	Hong Kong, China
+4-190	Sri Lanka (Democratic Socialist Republic of)
+4-191	Sri Lanka (Democratic Socialist Republic of)
+4-195	Jordan (Hashemite Kingdom of)
+4-196	Jordan (Hashemite Kingdom of)
+4-200	Kuwait (State of)
+4-205	Viet Nam (Socialist Republic of)
+4-211	Maldives (Republic of)
+4-230	Netherlands (Kingdom of the)
+4-231	Finland
+4-232	Slovenia (Republic of)
+4-233	Armenia (Republic of)
+4-234	Greece
+4-235	Spain
+4-236	Lithuania (Republic of)
+4-237	Latvia (Republic of)
+4-238	Netherlands (Kingdom of the)
+4-239	United Kingdom of Great Britain and Northern Ireland
+4-240	United Kingdom of Great Britain and Northern Ireland
+4-241	Ireland
+4-242	Ukraine
+4-243	Hungary (Republic of)
+4-244	Germany (Federal Republic of)
+4-245	Greece
+4-246	Germany (Federal Republic of)
+4-247	United Kingdom of Great Britain and Northern Ireland
+4-248	Serbia (Republic of)
+4-249	Croatia (Republic of)
+4-250	Poland (Republic of)
+4-251	Slovak Republic
+4-252	Romania
+4-253	United Kingdom of Great Britain and Northern Ireland
+4-254	United Kingdom of Great Britain and Northern Ireland
+4-255	United Kingdom of Great Britain and Northern Ireland
+5-001	Malaysia
+5-002	Malaysia
+5-003	Malaysia
+5-004	Malaysia
+5-005	Malaysia
+5-006	Malaysia
+5-007	Malaysia
+5-008	Malaysia
+5-009	Malaysia
+5-010	Australia
+5-011	Australia
+5-012	Australia
+5-013	Australia
+5-014	Australia
+5-015	Australia
+5-016	Australia
+5-017	Australia
+5-018	Australia
+5-019	Australia
+5-020	Indonesia (Republic of)
+5-021	Indonesia (Republic of)
+5-022	Indonesia (Republic of)
+5-023	Indonesia (Republic of)
+5-024	Indonesia (Republic of)
+5-025	Indonesia (Republic of)
+5-030	Philippines (Republic of the)
+5-031	Philippines (Republic of the)
+5-032	Philippines (Republic of the)
+5-033	Philippines (Republic of the)
+5-034	Philippines (Republic of the)
+5-035	Philippines (Republic of the)
+5-036	Philippines (Republic of the)
+5-037	Philippines (Republic of the)
+5-038	Philippines (Republic of the)
+5-039	Thailand
+5-040	Thailand
+5-041	Thailand
+5-042	Thailand
+5-043	Thailand
+5-044	Thailand
+5-045	Singapore (Republic of)
+5-046	Singapore (Republic of)
+5-047	Singapore (Republic of)
+5-048	Singapore (Republic of)
+5-049	Singapore (Republic of)
+5-050	Singapore (Republic of)
+5-051	Singapore (Republic of)
+5-052	Singapore (Republic of)
+5-053	Singapore (Republic of)
+5-054	Singapore (Republic of)
+5-055	Singapore (Republic of)
+5-056	Brunei Darussalam
+5-057	Brunei Darussalam
+5-060	New Zealand
+5-061	New Zealand
+5-062	New Zealand
+5-063	New Zealand
+5-065	New Zealand
+5-067	New Zealand
+5-070	Guam
+5-072	Nauru (Republic of)
+5-074	Papua New Guinea
+5-075	Papua New Guinea
+5-078	Tonga (Kingdom of)
+5-080	Solomon Islands
+5-082	Vanuatu (Republic of)
+5-084	Fiji (Republic of)
+5-085	Fiji (Republic of)
+5-086	Wallis and Futuna (Territoire français d'outre-mer)
+5-088	American Samoa
+5-090	Niue
+5-092	New Caledonia (Territoire français d'outre-mer)
+5-094	French Polynesia (Territoire français d'outre-mer)
+5-096	Cook Islands
+5-098	Samoa (Independent State of)
+5-100	Kiribati (Republic of)
+5-102	Tuvalu
+5-105	Marshall Islands (Republic of the)
+5-107	Micronesia (Federated States of)
+5-110	Palau (Republic of)
+5-113	Northern Mariana Islands (Commonwealth of the)
+5-115	Australia
+5-116	Australia
+5-117	Australia
+5-118	Australia
+5-119	Australia
+5-120	Australia
+5-121	Australia
+5-122	Australia
+5-130	Democratic Republic of Timor-Leste
+5-140	Singapore (Republic of)
+5-141	Singapore (Republic of)
+5-142	Singapore (Republic of)
+5-220	The Former Yugoslav Republic of Macedonia
+5-230	Estonia (Republic of)
+5-231	The Former Yugoslav Republic of Macedonia
+5-232	Croatia (Republic of)
+5-233	Georgia
+5-234	Armenia (Republic of)
+5-235	Malta
+5-236	Greece
+5-237	Cyprus (Republic of)
+5-238	Montenegro (Republic of)
+5-239	Netherlands (Kingdom of the)
+5-240	Germany (Federal Republic of)
+5-241	Turkey
+5-242	Romania
+5-243	United Kingdom of Great Britain and Northern Ireland
+5-244	Italy
+5-245	Germany (Federal Republic of)
+5-246	Switzerland (Confederation of)
+5-247	Slovenia (Republic of)
+5-248	United Kingdom of Great Britain and Northern Ireland
+5-249	Latvia (Republic of)
+5-250	Slovenia (Republic of)
+5-251	Germany (Federal Republic of)
+5-252	Latvia (Republic of)
+5-253	Poland (Republic of)
+5-254	Greece
+5-255	Italy
+6-003	Egypt (Arab Republic of)
+6-004	Egypt (Arab Republic of)
+6-005	Egypt (Arab Republic of)
+6-006	Algeria (People's Democratic Republic of)
+6-007	Algeria (People's Democratic Republic of)
+6-008	Morocco (Kingdom of)
+6-009	Morocco (Kingdom of)
+6-010	Tunisia
+6-012	Libya (Socialist People's Libyan Arab Jamahiriya)
+6-013	Libya (Socialist People's Libyan Arab Jamahiriya)
+6-014	Gambia (Republic of the)
+6-016	Senegal (Republic of)
+6-017	Senegal (Republic of)
+6-018	Mauritania (Islamic Republic of)
+6-019	Mauritania (Islamic Republic of)
+6-020	Mali (Republic of)
+6-021	Guinea (Republic of)
+6-022	Guinea (Republic of)
+6-023	Guinea (Republic of)
+6-024	Côte d'Ivoire (Republic of)
+6-025	Côte d'Ivoire (Republic of)
+6-026	Burkina Faso
+6-028	Niger (Republic of the)
+6-029	Niger (Republic of the)
+6-030	Togolese Republic
+6-032	Benin (Republic of)
+6-033	Mauritius (Republic of)
+6-034	Mauritius (Republic of)
+6-035	Mauritius (Republic of)
+6-036	Liberia (Republic of)
+6-038	Sierra Leone
+6-039	Sierra Leone
+6-040	Ghana
+6-041	Nigeria (Federal Republic of)
+6-042	Nigeria (Federal Republic of)
+6-043	Nigeria (Federal Republic of)
+6-044	Chad (Republic of)
+6-046	Central African Republic
+6-047	Central African Republic
+6-048	Cameroon (Republic of)
+6-049	Cameroon (Republic of)
+6-050	Cape Verde (Republic of)
+6-052	Sao Tome and Principe (Democratic Republic of)
+6-054	Equatorial Guinea (Republic of)
+6-055	Gabonese Republic
+6-056	Gabonese Republic
+6-057	Gabonese Republic
+6-058	Congo (Republic of the)
+6-059	Democratic Republic of the Congo
+6-060	Democratic Republic of the Congo
+6-061	Democratic Republic of the Congo
+6-062	Angola (Republic of)
+6-063	Angola (Republic of)
+6-064	Guinea-Bissau (Republic of)
+6-066	Seychelles (Republic of)
+6-067	Seychelles (Republic of)
+6-068	Sudan (Republic of the)
+6-069	Sudan (Republic of the)
+6-070	Rwanda (Republic of)
+6-071	Rwanda (Republic of)
+6-072	Ethiopia (Federal Democratic Republic of)
+6-074	Somali Democratic Republic
+6-076	Djibouti (Republic of)
+6-078	Kenya (Republic of)
+6-079	Kenya (Republic of)
+6-080	Tanzania (United Republic of)
+6-081	Tanzania (United Republic of)
+6-082	Uganda (Republic of)
+6-083	Uganda (Republic of)
+6-084	Burundi (Republic of)
+6-085	Burundi (Republic of)
+6-086	Mozambique (Republic of)
+6-088	Congo (Republic of the)
+6-090	Zambia (Republic of)
+6-092	Madagascar (Republic of)
+6-093	Madagascar (Republic of)
+6-094	French Departments and Territories in the Indian Ocean
+6-096	Zimbabwe (Republic of)
+6-097	Zimbabwe (Republic of)
+6-098	Namibia (Republic of)
+6-100	Malawi
+6-102	Lesotho (Kingdom of)
+6-104	Botswana (Republic of)
+6-105	Botswana (Republic of)
+6-106	Swaziland (Kingdom of)
+6-108	Comoros (Union of the)
+6-109	South Africa (Republic of)
+6-110	South Africa (Republic of)
+6-111	South Africa (Republic of)
+6-112	South Africa (Republic of)
+6-113	South Africa (Republic of)
+6-114	Eritrea
+6-116	Saint Helena, Ascension and Tristan da Cunha
+6-120	Diego Garcia
+6-123	Tanzania (United Republic of)
+6-130	Uganda (Republic of)
+6-131	Uganda (Republic of)
+6-135	Nigeria (Federal Republic of)
+6-140	Angola (Republic of)
+6-150	Morocco (Kingdom of)
+6-160	Ghana
+6-170	Sudan (Republic of the)
+6-175	Equatorial Guinea (Republic of)
+6-220	The Former Yugoslav Republic of Macedonia
+6-230	Sweden
+6-231	Cyprus (Republic of)
+6-232	Sweden
+6-233	France
+6-234	Czech Republic
+6-235	Slovenia (Republic of)
+6-236	Poland (Republic of)
+6-237	Germany (Federal Republic of)
+6-238	Sweden
+6-239	Bulgaria (Republic of)
+6-240	Monaco (Principality of)
+6-241	Ukraine
+6-242	United Kingdom of Great Britain and Northern Ireland
+6-243	Iceland
+6-244	Spain
+6-245	Italy
+6-246	Ireland
+6-247	Bulgaria (Republic of)
+6-248	Latvia (Republic of)
+6-249	Netherlands (Kingdom of the)
+6-250	Bulgaria (Republic of)
+6-251	Hungary (Republic of)
+6-252	United Kingdom of Great Britain and Northern Ireland
+6-253	Slovenia (Republic of)
+6-254	United Kingdom of Great Britain and Northern Ireland
+6-255	United Kingdom of Great Britain and Northern Ireland
+7-004	Belize
+7-008	Guatemala (Republic of)
+7-009	Guatemala (Republic of)
+7-010	Guatemala (Republic of)
+7-012	El Salvador (Republic of)
+7-013	El Salvador (Republic of)
+7-014	El Salvador (Republic of)
+7-015	El Salvador (Republic of)
+7-016	Honduras (Republic of)
+7-017	Honduras (Republic of)
+7-018	Honduras (Republic of)
+7-020	Nicaragua
+7-021	Nicaragua
+7-023	Costa Rica
+7-024	Costa Rica
+7-026	Panama (Republic of)
+7-027	Panama (Republic of)
+7-028	Panama (Republic of)
+7-029	Panama (Republic of)
+7-030	Panama (Republic of)
+7-031	Panama (Republic of)
+7-032	Peru
+7-033	Peru
+7-034	Peru
+7-035	Peru
+7-036	Peru
+7-037	Peru
+7-038	Peru
+7-039	Peru
+7-040	Argentine Republic
+7-041	Argentine Republic
+7-042	Argentine Republic
+7-043	Argentine Republic
+7-044	Argentine Republic
+7-045	Argentine Republic
+7-046	Argentine Republic
+7-047	Argentine Republic
+7-048	Brazil (Federative Republic of)
+7-049	Brazil (Federative Republic of)
+7-050	Brazil (Federative Republic of)
+7-051	Brazil (Federative Republic of)
+7-052	Brazil (Federative Republic of)
+7-053	Brazil (Federative Republic of)
+7-054	Brazil (Federative Republic of)
+7-055	Brazil (Federative Republic of)
+7-056	Brazil (Federative Republic of)
+7-059	Chile
+7-060	Chile
+7-061	Chile
+7-062	Chile
+7-063	Chile
+7-064	Colombia (Republic of)
+7-065	Colombia (Republic of)
+7-066	Colombia (Republic of)
+7-067	Colombia (Republic of)
+7-068	Venezuela (Bolivarian Republic of)
+7-069	Venezuela (Bolivarian Republic of)
+7-070	Venezuela (Bolivarian Republic of)
+7-071	Venezuela (Bolivarian Republic of)
+7-072	Bolivia (Plurinational State of)
+7-073	Bolivia (Plurinational State of)
+7-074	Bolivia (Plurinational State of)
+7-075	Bolivia (Plurinational State of)
+7-076	Guyana
+7-077	Guyana
+7-080	Ecuador
+7-081	Ecuador
+7-082	Ecuador
+7-084	French Guiana (French Department of)
+7-088	Paraguay (Republic of)
+7-089	Paraguay (Republic of)
+7-092	Suriname (Republic of)
+7-093	Suriname (Republic of)
+7-096	Uruguay (Eastern Republic of)
+7-097	Uruguay (Eastern Republic of)
+7-099	Falkland Islands (Malvinas)
+7-150	Bolivia (Plurinational State of)
+7-151	Bolivia (Plurinational State of)
+7-230	Lithuania (Republic of)
+7-231	Norway
+7-232	United Kingdom of Great Britain and Northern Ireland
+7-233	Bosnia and Herzegovina
+7-234	United Kingdom of Great Britain and Northern Ireland
+7-235	Croatia (Republic of)
+7-236	Spain
+7-237	United Kingdom of Great Britain and Northern Ireland
+7-238	France
+7-239	Slovak Republic
+7-240	Norway
+7-241	Spain
+7-242	Ukraine
+7-243	United Kingdom of Great Britain and Northern Ireland
+7-244	Poland (Republic of)
+7-245	Latvia (Republic of)
+7-246	Poland (Republic of)
+7-247	Switzerland (Confederation of)
+7-248	Romania
+7-249	Germany (Federal Republic of)
+7-250	Latvia (Republic of)
+7-251	United Kingdom of Great Britain and Northern Ireland
+7-252	Lithuania (Republic of)
+7-253	United Kingdom of Great Britain and Northern Ireland
+7-254	Spain
+7-255	Liechtenstein (Principality of)
+
+Alphabetic
+4-024	Afghanistan
+4-025	Afghanistan
+4-136	Afghanistan
+4-137	Afghanistan
+2-152	Albania (Republic of)
+3-233	Albania (Republic of)
+6-006	Algeria (People's Democratic Republic of)
+6-007	Algeria (People's Democratic Republic of)
+5-088	American Samoa
+2-196	Andorra (Principality of)
+2-197	Andorra (Principality of)
+6-062	Angola (Republic of)
+6-063	Angola (Republic of)
+6-140	Angola (Republic of)
+3-168	Anguilla
+3-169	Anguilla
+3-088	Antigua and Barbuda
+3-089	Antigua and Barbuda
+7-040	Argentine Republic
+7-041	Argentine Republic
+7-042	Argentine Republic
+7-043	Argentine Republic
+7-044	Argentine Republic
+7-045	Argentine Republic
+7-046	Argentine Republic
+7-047	Argentine Republic
+2-200	Armenia (Republic of)
+4-233	Armenia (Republic of)
+5-234	Armenia (Republic of)
+3-164	Aruba
+5-010	Australia
+5-011	Australia
+5-012	Australia
+5-013	Australia
+5-014	Australia
+5-015	Australia
+5-016	Australia
+5-017	Australia
+5-018	Australia
+5-019	Australia
+5-115	Australia
+5-116	Australia
+5-117	Australia
+5-118	Australia
+5-119	Australia
+5-120	Australia
+5-121	Australia
+5-122	Australia
+2-025	Austria
+2-026	Austria
+2-064	Austria
+2-065	Austria
+2-066	Austria
+2-067	Austria
+2-133	Austria
+4-070	Azerbaijani Republic
+4-071	Azerbaijani Republic
+3-128	Bahamas (Commonwealth of the)
+4-052	Bahrain (Kingdom of)
+4-053	Bahrain (Kingdom of)
+4-088	Bahrain (Kingdom of)
+4-140	Bangladesh (People's Republic of)
+4-141	Bangladesh (People's Republic of)
+4-142	Bangladesh (People's Republic of)
+4-143	Bangladesh (People's Republic of)
+3-084	Barbados
+3-085	Barbados
+3-086	Barbados
+2-204	Belarus (Republic of)
+2-012	Belgium
+2-013	Belgium
+2-014	Belgium
+2-015	Belgium
+2-097	Belgium
+2-098	Belgium
+2-099	Belgium
+7-004	Belize
+6-032	Benin (Republic of)
+3-100	Bermuda
+4-072	Bhutan (Kingdom of)
+7-072	Bolivia (Plurinational State of)
+7-073	Bolivia (Plurinational State of)
+7-074	Bolivia (Plurinational State of)
+7-075	Bolivia (Plurinational State of)
+7-150	Bolivia (Plurinational State of)
+7-151	Bolivia (Plurinational State of)
+2-218	Bosnia and Herzegovina
+2-219	Bosnia and Herzegovina
+3-239	Bosnia and Herzegovina
+7-233	Bosnia and Herzegovina
+6-104	Botswana (Republic of)
+6-105	Botswana (Republic of)
+7-048	Brazil (Federative Republic of)
+7-049	Brazil (Federative Republic of)
+7-050	Brazil (Federative Republic of)
+7-051	Brazil (Federative Republic of)
+7-052	Brazil (Federative Republic of)
+7-053	Brazil (Federative Republic of)
+7-054	Brazil (Federative Republic of)
+7-055	Brazil (Federative Republic of)
+7-056	Brazil (Federative Republic of)
+3-096	British Virgin Islands
+3-097	British Virgin Islands
+5-056	Brunei Darussalam
+5-057	Brunei Darussalam
+2-168	Bulgaria (Republic of)
+3-231	Bulgaria (Republic of)
+6-239	Bulgaria (Republic of)
+6-247	Bulgaria (Republic of)
+6-250	Bulgaria (Republic of)
+6-026	Burkina Faso
+6-084	Burundi (Republic of)
+6-085	Burundi (Republic of)
+3-240	Cambodia (Kingdom of)
+4-112	Cambodia (Kingdom of)
+4-113	Cambodia (Kingdom of)
+6-048	Cameroon (Republic of)
+6-049	Cameroon (Republic of)
+3-004	Canada
+3-005	Canada
+3-006	Canada
+3-007	Canada
+3-008	Canada
+3-009	Canada
+3-010	Canada
+3-011	Canada
+3-012	Canada
+3-013	Canada
+6-050	Cape Verde (Republic of)
+3-092	Cayman Islands
+3-093	Cayman Islands
+6-046	Central African Republic
+6-047	Central African Republic
+6-044	Chad (Republic of)
+7-059	Chile
+7-060	Chile
+7-061	Chile
+7-062	Chile
+7-063	Chile
+4-120	China (People's Republic of)
+4-121	China (People's Republic of)
+4-122	China (People's Republic of)
+4-123	China (People's Republic of)
+4-124	China (People's Republic of)
+4-125	China (People's Republic of)
+4-126	China (People's Republic of)
+4-127	China (People's Republic of)
+4-128	China (People's Republic of)
+7-064	Colombia (Republic of)
+7-065	Colombia (Republic of)
+7-066	Colombia (Republic of)
+7-067	Colombia (Republic of)
+6-108	Comoros (Union of the)
+6-058	Congo (Republic of the)
+6-088	Congo (Republic of the)
+5-096	Cook Islands
+7-023	Costa Rica
+7-024	Costa Rica
+6-024	Côte d'Ivoire (Republic of)
+6-025	Côte d'Ivoire (Republic of)
+2-180	Croatia (Republic of)
+3-245	Croatia (Republic of)
+4-249	Croatia (Republic of)
+5-232	Croatia (Republic of)
+7-235	Croatia (Republic of)
+3-136	Cuba
+3-137	Cuba
+3-124	Curaçao
+3-125	Curaçao
+3-126	Curaçao
+2-160	Cyprus (Republic of)
+3-248	Cyprus (Republic of)
+5-237	Cyprus (Republic of)
+6-231	Cyprus (Republic of)
+2-060	Czech Republic
+2-228	Czech Republic
+2-229	Czech Republic
+2-230	Czech Republic
+2-231	Czech Republic
+6-234	Czech Republic
+4-135	Democratic People's Republic of Korea
+6-059	Democratic Republic of the Congo
+6-060	Democratic Republic of the Congo
+6-061	Democratic Republic of the Congo
+5-130	Democratic Republic of Timor-Leste
+2-076	Denmark
+2-077	Denmark
+2-078	Denmark
+2-079	Denmark
+2-217	Denmark
+6-120	Diego Garcia
+6-076	Djibouti (Republic of)
+3-132	Dominica (Commonwealth of)
+3-140	Dominican Republic
+3-141	Dominican Republic
+7-080	Ecuador
+7-081	Ecuador
+7-082	Ecuador
+6-003	Egypt (Arab Republic of)
+6-004	Egypt (Arab Republic of)
+6-005	Egypt (Arab Republic of)
+7-012	El Salvador (Republic of)
+7-013	El Salvador (Republic of)
+7-014	El Salvador (Republic of)
+7-015	El Salvador (Republic of)
+6-054	Equatorial Guinea (Republic of)
+6-175	Equatorial Guinea (Republic of)
+6-114	Eritrea
+2-092	Estonia (Republic of)
+2-199	Estonia (Republic of)
+3-244	Estonia (Republic of)
+5-230	Estonia (Republic of)
+6-072	Ethiopia (Federal Democratic Republic of)
+7-099	Falkland Islands (Malvinas)
+3-179	Faroe Islands
+5-084	Fiji (Republic of)
+5-085	Fiji (Republic of)
+2-088	Finland
+2-089	Finland
+2-090	Finland
+2-091	Finland
+2-254	Finland
+2-255	Finland
+4-231	Finland
+2-016	France
+2-017	France
+2-018	France
+2-019	France
+2-020	France
+2-021	France
+2-022	France
+2-023	France
+2-149	France
+2-150	France
+2-151	France
+2-201	France
+2-202	France
+2-203	France
+2-221	France
+3-232	France
+6-233	France
+7-238	France
+6-094	French Departments and Territories in the Indian Ocean
+7-084	French Guiana (French Department of)
+5-094	French Polynesia (Territoire français d'outre-mer)
+6-055	Gabonese Republic
+6-056	Gabonese Republic
+6-057	Gabonese Republic
+6-014	Gambia (Republic of the)
+2-208	Georgia
+2-213	Georgia
+3-246	Georgia
+5-233	Georgia
+2-033	Germany (Federal Republic of)
+2-034	Germany (Federal Republic of)
+2-035	Germany (Federal Republic of)
+2-036	Germany (Federal Republic of)
+2-037	Germany (Federal Republic of)
+2-038	Germany (Federal Republic of)
+2-039	Germany (Federal Republic of)
+2-121	Germany (Federal Republic of)
+2-122	Germany (Federal Republic of)
+2-123	Germany (Federal Republic of)
+2-124	Germany (Federal Republic of)
+2-125	Germany (Federal Republic of)
+2-126	Germany (Federal Republic of)
+2-127	Germany (Federal Republic of)
+2-128	Germany (Federal Republic of)
+2-129	Germany (Federal Republic of)
+2-130	Germany (Federal Republic of)
+2-131	Germany (Federal Republic of)
+2-222	Germany (Federal Republic of)
+2-225	Germany (Federal Republic of)
+2-226	Germany (Federal Republic of)
+2-242	Germany (Federal Republic of)
+2-243	Germany (Federal Republic of)
+2-244	Germany (Federal Republic of)
+2-245	Germany (Federal Republic of)
+2-246	Germany (Federal Republic of)
+2-247	Germany (Federal Republic of)
+2-248	Germany (Federal Republic of)
+2-249	Germany (Federal Republic of)
+2-250	Germany (Federal Republic of)
+2-251	Germany (Federal Republic of)
+2-252	Germany (Federal Republic of)
+3-243	Germany (Federal Republic of)
+3-252	Germany (Federal Republic of)
+3-254	Germany (Federal Republic of)
+3-255	Germany (Federal Republic of)
+4-244	Germany (Federal Republic of)
+4-246	Germany (Federal Republic of)
+5-240	Germany (Federal Republic of)
+5-245	Germany (Federal Republic of)
+5-251	Germany (Federal Republic of)
+6-237	Germany (Federal Republic of)
+7-249	Germany (Federal Republic of)
+6-040	Ghana
+6-160	Ghana
+2-132	Gibraltar
+2-004	Greece
+2-005	Greece
+2-206	Greece
+4-234	Greece
+4-245	Greece
+5-236	Greece
+5-254	Greece
+3-018	Greenland (Denmark)
+3-104	Grenada
+3-156	Guadeloupe (French Department of)
+5-070	Guam
+7-008	Guatemala (Republic of)
+7-009	Guatemala (Republic of)
+7-010	Guatemala (Republic of)
+6-021	Guinea (Republic of)
+6-022	Guinea (Republic of)
+6-023	Guinea (Republic of)
+6-064	Guinea-Bissau (Republic of)
+7-076	Guyana
+7-077	Guyana
+3-144	Haiti (Republic of)
+7-016	Honduras (Republic of)
+7-017	Honduras (Republic of)
+7-018	Honduras (Republic of)
+4-105	Hong Kong, China
+4-106	Hong Kong, China
+4-107	Hong Kong, China
+4-108	Hong Kong, China
+4-109	Hong Kong, China
+4-111	Hong Kong, China
+4-176	Hong Kong, China
+4-177	Hong Kong, China
+4-178	Hong Kong, China
+4-179	Hong Kong, China
+4-180	Hong Kong, China
+4-181	Hong Kong, China
+4-182	Hong Kong, China
+2-032	Hungary (Republic of)
+2-212	Hungary (Republic of)
+4-243	Hungary (Republic of)
+6-251	Hungary (Republic of)
+2-148	Iceland
+6-243	Iceland
+4-005	India (Republic of)
+4-006	India (Republic of)
+4-007	India (Republic of)
+4-008	India (Republic of)
+4-009	India (Republic of)
+4-010	India (Republic of)
+4-011	India (Republic of)
+4-012	India (Republic of)
+4-013	India (Republic of)
+4-014	India (Republic of)
+4-015	India (Republic of)
+4-016	India (Republic of)
+4-017	India (Republic of)
+5-020	Indonesia (Republic of)
+5-021	Indonesia (Republic of)
+5-022	Indonesia (Republic of)
+5-023	Indonesia (Republic of)
+5-024	Indonesia (Republic of)
+5-025	Indonesia (Republic of)
+4-064	Iran (Islamic Republic of)
+4-065	Iran (Islamic Republic of)
+4-036	Iraq (Republic of)
+2-144	Ireland
+2-145	Ireland
+2-146	Ireland
+4-241	Ireland
+6-246	Ireland
+4-003	Israel (State of)
+4-004	Israel (State of)
+4-050	Israel (State of)
+4-051	Israel (State of)
+2-001	Italy
+2-003	Italy
+2-041	Italy
+2-042	Italy
+2-043	Italy
+2-044	Italy
+2-045	Italy
+2-046	Italy
+2-047	Italy
+2-048	Italy
+2-049	Italy
+2-050	Italy
+2-051	Italy
+2-093	Italy
+2-094	Italy
+2-095	Italy
+2-157	Italy
+2-158	Italy
+2-159	Italy
+2-181	Italy
+2-183	Italy
+2-207	Italy
+2-215	Italy
+2-216	Italy
+5-244	Italy
+5-255	Italy
+6-245	Italy
+3-076	Jamaica
+3-077	Jamaica
+3-078	Jamaica
+3-079	Jamaica
+4-080	Japan
+4-081	Japan
+4-082	Japan
+4-083	Japan
+4-084	Japan
+4-085	Japan
+4-086	Japan
+4-031	Jordan (Hashemite Kingdom of)
+4-032	Jordan (Hashemite Kingdom of)
+4-033	Jordan (Hashemite Kingdom of)
+4-195	Jordan (Hashemite Kingdom of)
+4-196	Jordan (Hashemite Kingdom of)
+4-074	Kazakhstan (Republic of)
+4-075	Kazakhstan (Republic of)
+4-076	Kazakhstan (Republic of)
+4-077	Kazakhstan (Republic of)
+6-078	Kenya (Republic of)
+6-079	Kenya (Republic of)
+5-100	Kiribati (Republic of)
+4-100	Korea (Republic of)
+4-101	Korea (Republic of)
+4-102	Korea (Republic of)
+4-145	Korea (Republic of)
+4-147	Korea (Republic of)
+4-148	Korea (Republic of)
+4-149	Korea (Republic of)
+4-150	Korea (Republic of)
+4-151	Korea (Republic of)
+4-152	Korea (Republic of)
+4-153	Korea (Republic of)
+4-154	Korea (Republic of)
+4-038	Kuwait (State of)
+4-200	Kuwait (State of)
+4-078	Kyrgyz Republic
+4-079	Kyrgyz Republic
+4-167	Kyrgyz Republic
+4-114	Lao People's Democratic Republic
+2-096	Latvia (Republic of)
+3-234	Latvia (Republic of)
+4-237	Latvia (Republic of)
+5-249	Latvia (Republic of)
+5-252	Latvia (Republic of)
+6-248	Latvia (Republic of)
+7-245	Latvia (Republic of)
+7-250	Latvia (Republic of)
+4-030	Lebanon
+6-102	Lesotho (Kingdom of)
+6-036	Liberia (Republic of)
+6-012	Libya (Socialist People's Libyan Arab Jamahiriya)
+6-013	Libya (Socialist People's Libyan Arab Jamahiriya)
+2-000	Liechtenstein (Principality of)
+7-255	Liechtenstein (Principality of)
+2-236	Lithuania (Republic of)
+4-236	Lithuania (Republic of)
+7-230	Lithuania (Republic of)
+7-252	Lithuania (Republic of)
+2-135	Luxembourg
+2-140	Luxembourg
+2-141	Luxembourg
+4-110	Macao, China
+4-119	Macao, China
+6-092	Madagascar (Republic of)
+6-093	Madagascar (Republic of)
+6-100	Malawi
+5-001	Malaysia
+5-002	Malaysia
+5-003	Malaysia
+5-004	Malaysia
+5-005	Malaysia
+5-006	Malaysia
+5-007	Malaysia
+5-008	Malaysia
+5-009	Malaysia
+4-144	Maldives (Republic of)
+4-211	Maldives (Republic of)
+6-020	Mali (Republic of)
+2-156	Malta
+5-235	Malta
+5-105	Marshall Islands (Republic of the)
+3-160	Martinique (French Department of)
+6-018	Mauritania (Islamic Republic of)
+6-019	Mauritania (Islamic Republic of)
+6-033	Mauritius (Republic of)
+6-034	Mauritius (Republic of)
+6-035	Mauritius (Republic of)
+3-068	Mexico
+3-069	Mexico
+3-070	Mexico
+3-071	Mexico
+3-072	Mexico
+3-073	Mexico
+3-074	Mexico
+3-075	Mexico
+3-172	Mexico
+3-173	Mexico
+3-174	Mexico
+3-175	Mexico
+3-176	Mexico
+3-177	Mexico
+3-178	Mexico
+3-215	Mexico
+3-216	Mexico
+5-107	Micronesia (Federated States of)
+2-224	Moldova (Republic of)
+2-024	Monaco (Principality of)
+6-240	Monaco (Principality of)
+4-056	Mongolia
+3-241	Montenegro (Republic of)
+5-238	Montenegro (Republic of)
+3-108	Montserrat
+6-008	Morocco (Kingdom of)
+6-009	Morocco (Kingdom of)
+6-150	Morocco (Kingdom of)
+6-086	Mozambique (Republic of)
+4-028	Myanmar (the Republic of the Union of)
+6-098	Namibia (Republic of)
+5-072	Nauru (Republic of)
+4-057	Nepal (Federal Democratic Republic of)
+4-058	Nepal (Federal Democratic Republic of)
+4-059	Nepal (Federal Democratic Republic of)
+2-002	Netherlands (Kingdom of the)
+2-006	Netherlands (Kingdom of the)
+2-007	Netherlands (Kingdom of the)
+2-008	Netherlands (Kingdom of the)
+2-009	Netherlands (Kingdom of the)
+2-010	Netherlands (Kingdom of the)
+2-011	Netherlands (Kingdom of the)
+2-142	Netherlands (Kingdom of the)
+2-143	Netherlands (Kingdom of the)
+2-198	Netherlands (Kingdom of the)
+2-253	Netherlands (Kingdom of the)
+4-230	Netherlands (Kingdom of the)
+4-238	Netherlands (Kingdom of the)
+5-239	Netherlands (Kingdom of the)
+6-249	Netherlands (Kingdom of the)
+5-092	New Caledonia (Territoire français d'outre-mer)
+5-060	New Zealand
+5-061	New Zealand
+5-062	New Zealand
+5-063	New Zealand
+5-065	New Zealand
+5-067	New Zealand
+7-020	Nicaragua
+7-021	Nicaragua
+6-028	Niger (Republic of the)
+6-029	Niger (Republic of the)
+6-041	Nigeria (Federal Republic of)
+6-042	Nigeria (Federal Republic of)
+6-043	Nigeria (Federal Republic of)
+6-135	Nigeria (Federal Republic of)
+5-090	Niue
+5-113	Northern Mariana Islands (Commonwealth of the)
+2-084	Norway
+2-085	Norway
+2-086	Norway
+2-087	Norway
+7-231	Norway
+7-240	Norway
+4-044	Oman (Sultanate of)
+4-045	Oman (Sultanate of)
+4-019	Pakistan (Islamic Republic of)
+4-020	Pakistan (Islamic Republic of)
+4-021	Pakistan (Islamic Republic of)
+4-022	Pakistan (Islamic Republic of)
+4-023	Pakistan (Islamic Republic of)
+5-110	Palau (Republic of)
+7-026	Panama (Republic of)
+7-027	Panama (Republic of)
+7-028	Panama (Republic of)
+7-029	Panama (Republic of)
+7-030	Panama (Republic of)
+7-031	Panama (Republic of)
+5-074	Papua New Guinea
+5-075	Papua New Guinea
+7-088	Paraguay (Republic of)
+7-089	Paraguay (Republic of)
+7-032	Peru
+7-033	Peru
+7-034	Peru
+7-035	Peru
+7-036	Peru
+7-037	Peru
+7-038	Peru
+7-039	Peru
+5-030	Philippines (Republic of the)
+5-031	Philippines (Republic of the)
+5-032	Philippines (Republic of the)
+5-033	Philippines (Republic of the)
+5-034	Philippines (Republic of the)
+5-035	Philippines (Republic of the)
+5-036	Philippines (Republic of the)
+5-037	Philippines (Republic of the)
+5-038	Philippines (Republic of the)
+2-120	Poland (Republic of)
+2-134	Poland (Republic of)
+3-251	Poland (Republic of)
+3-253	Poland (Republic of)
+4-250	Poland (Republic of)
+5-253	Poland (Republic of)
+6-236	Poland (Republic of)
+7-244	Poland (Republic of)
+7-246	Poland (Republic of)
+2-136	Portugal
+2-137	Portugal
+2-138	Portugal
+2-139	Portugal
+2-223	Portugal
+3-249	Portugal
+3-060	Puerto Rico
+4-054	Qatar (State of)
+4-055	Qatar (State of)
+2-052	Romania
+2-227	Romania
+3-238	Romania
+3-250	Romania
+4-252	Romania
+5-242	Romania
+7-248	Romania
+2-100	Russian Federation
+2-101	Russian Federation
+2-102	Russian Federation
+2-103	Russian Federation
+2-104	Russian Federation
+2-105	Russian Federation
+2-106	Russian Federation
+2-107	Russian Federation
+2-108	Russian Federation
+2-109	Russian Federation
+2-110	Russian Federation
+2-111	Russian Federation
+2-112	Russian Federation
+2-113	Russian Federation
+2-114	Russian Federation
+2-115	Russian Federation
+2-116	Russian Federation
+2-117	Russian Federation
+2-118	Russian Federation
+2-119	Russian Federation
+6-070	Rwanda (Republic of)
+6-071	Rwanda (Republic of)
+3-210	Saint Helena, Ascension and Tristan da Cunha
+6-116	Saint Helena, Ascension and Tristan da Cunha
+3-112	Saint Kitts and Nevis
+3-116	Saint Lucia
+3-016	Saint Pierre and Miquelon (Collectivité territoriale de la République française)
+3-120	Saint Vincent and the Grenadines
+5-098	Samoa (Independent State of)
+2-184	San Marino (Republic of)
+6-052	Sao Tome and Principe (Democratic Republic of)
+4-039	Saudi Arabia (Kingdom of)
+4-040	Saudi Arabia (Kingdom of)
+4-041	Saudi Arabia (Kingdom of)
+4-043	Saudi Arabia (Kingdom of)
+6-016	Senegal (Republic of)
+6-017	Senegal (Republic of)
+2-040	Serbia (Republic of)
+4-248	Serbia (Republic of)
+6-066	Seychelles (Republic of)
+6-067	Seychelles (Republic of)
+6-038	Sierra Leone
+6-039	Sierra Leone
+5-045	Singapore (Republic of)
+5-046	Singapore (Republic of)
+5-047	Singapore (Republic of)
+5-048	Singapore (Republic of)
+5-049	Singapore (Republic of)
+5-050	Singapore (Republic of)
+5-051	Singapore (Republic of)
+5-052	Singapore (Republic of)
+5-053	Singapore (Republic of)
+5-054	Singapore (Republic of)
+5-055	Singapore (Republic of)
+5-140	Singapore (Republic of)
+5-141	Singapore (Republic of)
+5-142	Singapore (Republic of)
+2-232	Slovak Republic
+2-233	Slovak Republic
+2-234	Slovak Republic
+2-235	Slovak Republic
+4-251	Slovak Republic
+7-239	Slovak Republic
+2-182	Slovenia (Republic of)
+4-232	Slovenia (Republic of)
+5-247	Slovenia (Republic of)
+5-250	Slovenia (Republic of)
+6-235	Slovenia (Republic of)
+6-253	Slovenia (Republic of)
+5-080	Solomon Islands
+6-074	Somali Democratic Republic
+6-109	South Africa (Republic of)
+6-110	South Africa (Republic of)
+6-111	South Africa (Republic of)
+6-112	South Africa (Republic of)
+6-113	South Africa (Republic of)
+2-027	Spain
+2-028	Spain
+2-029	Spain
+2-030	Spain
+2-031	Spain
+2-237	Spain
+2-238	Spain
+2-239	Spain
+2-240	Spain
+2-241	Spain
+3-242	Spain
+4-235	Spain
+6-244	Spain
+7-236	Spain
+7-241	Spain
+7-254	Spain
+4-026	Sri Lanka (Democratic Socialist Republic of)
+4-027	Sri Lanka (Democratic Socialist Republic of)
+4-190	Sri Lanka (Democratic Socialist Republic of)
+4-191	Sri Lanka (Democratic Socialist Republic of)
+6-068	Sudan (Republic of the)
+6-069	Sudan (Republic of the)
+6-170	Sudan (Republic of the)
+7-092	Suriname (Republic of)
+7-093	Suriname (Republic of)
+6-106	Swaziland (Kingdom of)
+2-080	Sweden
+2-081	Sweden
+2-082	Sweden
+2-083	Sweden
+2-192	Sweden
+2-193	Sweden
+2-194	Sweden
+2-195	Sweden
+2-205	Sweden
+6-230	Sweden
+6-232	Sweden
+6-238	Sweden
+2-053	Switzerland (Confederation of)
+2-054	Switzerland (Confederation of)
+2-055	Switzerland (Confederation of)
+2-056	Switzerland (Confederation of)
+2-057	Switzerland (Confederation of)
+2-058	Switzerland (Confederation of)
+2-059	Switzerland (Confederation of)
+2-061	Switzerland (Confederation of)
+2-062	Switzerland (Confederation of)
+2-063	Switzerland (Confederation of)
+5-246	Switzerland (Confederation of)
+7-247	Switzerland (Confederation of)
+4-034	Syrian Arab Republic
+4-170	Taiwan, China
+4-171	Taiwan, China
+4-172	Taiwan, China
+4-173	Taiwan, China
+4-174	Taiwan, China
+4-157	Tajikistan (Republic of)
+4-158	Tajikistan (Republic of)
+4-159	Tajikistan (Republic of)
+6-080	Tanzania (United Republic of)
+6-081	Tanzania (United Republic of)
+6-123	Tanzania (United Republic of)
+5-039	Thailand
+5-040	Thailand
+5-041	Thailand
+5-042	Thailand
+5-043	Thailand
+5-044	Thailand
+2-220	The Former Yugoslav Republic of Macedonia
+5-220	The Former Yugoslav Republic of Macedonia
+5-231	The Former Yugoslav Republic of Macedonia
+6-220	The Former Yugoslav Republic of Macedonia
+6-030	Togolese Republic
+5-078	Tonga (Kingdom of)
+3-148	Trinidad and Tobago
+3-149	Trinidad and Tobago
+3-150	Trinidad and Tobago
+6-010	Tunisia
+2-171	Turkey
+2-172	Turkey
+2-173	Turkey
+3-247	Turkey
+5-241	Turkey
+4-160	Turkmenistan
+3-152	Turks and Caicos Islands
+3-153	Turks and Caicos Islands
+3-154	Turks and Caicos Islands
+5-102	Tuvalu
+6-082	Uganda (Republic of)
+6-083	Uganda (Republic of)
+6-130	Uganda (Republic of)
+6-131	Uganda (Republic of)
+2-214	Ukraine
+4-242	Ukraine
+6-241	Ukraine
+7-242	Ukraine
+4-048	United Arab Emirates
+4-049	United Arab Emirates
+4-060	United Arab Emirates
+4-061	United Arab Emirates
+4-062	United Arab Emirates
+2-068	United Kingdom of Great Britain and Northern Ireland
+2-069	United Kingdom of Great Britain and Northern Ireland
+2-070	United Kingdom of Great Britain and Northern Ireland
+2-071	United Kingdom of Great Britain and Northern Ireland
+2-072	United Kingdom of Great Britain and Northern Ireland
+2-073	United Kingdom of Great Britain and Northern Ireland
+2-074	United Kingdom of Great Britain and Northern Ireland
+2-075	United Kingdom of Great Britain and Northern Ireland
+2-147	United Kingdom of Great Britain and Northern Ireland
+2-153	United Kingdom of Great Britain and Northern Ireland
+2-154	United Kingdom of Great Britain and Northern Ireland
+2-155	United Kingdom of Great Britain and Northern Ireland
+2-161	United Kingdom of Great Britain and Northern Ireland
+2-162	United Kingdom of Great Britain and Northern Ireland
+2-163	United Kingdom of Great Britain and Northern Ireland
+2-164	United Kingdom of Great Britain and Northern Ireland
+2-165	United Kingdom of Great Britain and Northern Ireland
+2-166	United Kingdom of Great Britain and Northern Ireland
+2-167	United Kingdom of Great Britain and Northern Ireland
+2-169	United Kingdom of Great Britain and Northern Ireland
+2-170	United Kingdom of Great Britain and Northern Ireland
+2-174	United Kingdom of Great Britain and Northern Ireland
+2-175	United Kingdom of Great Britain and Northern Ireland
+2-176	United Kingdom of Great Britain and Northern Ireland
+2-177	United Kingdom of Great Britain and Northern Ireland
+2-178	United Kingdom of Great Britain and Northern Ireland
+2-179	United Kingdom of Great Britain and Northern Ireland
+2-185	United Kingdom of Great Britain and Northern Ireland
+2-186	United Kingdom of Great Britain and Northern Ireland
+2-187	United Kingdom of Great Britain and Northern Ireland
+2-188	United Kingdom of Great Britain and Northern Ireland
+2-189	United Kingdom of Great Britain and Northern Ireland
+2-190	United Kingdom of Great Britain and Northern Ireland
+2-191	United Kingdom of Great Britain and Northern Ireland
+2-209	United Kingdom of Great Britain and Northern Ireland
+2-210	United Kingdom of Great Britain and Northern Ireland
+2-211	United Kingdom of Great Britain and Northern Ireland
+3-235	United Kingdom of Great Britain and Northern Ireland
+3-236	United Kingdom of Great Britain and Northern Ireland
+3-237	United Kingdom of Great Britain and Northern Ireland
+4-239	United Kingdom of Great Britain and Northern Ireland
+4-240	United Kingdom of Great Britain and Northern Ireland
+4-247	United Kingdom of Great Britain and Northern Ireland
+4-253	United Kingdom of Great Britain and Northern Ireland
+4-254	United Kingdom of Great Britain and Northern Ireland
+4-255	United Kingdom of Great Britain and Northern Ireland
+5-243	United Kingdom of Great Britain and Northern Ireland
+5-248	United Kingdom of Great Britain and Northern Ireland
+6-242	United Kingdom of Great Britain and Northern Ireland
+6-252	United Kingdom of Great Britain and Northern Ireland
+6-254	United Kingdom of Great Britain and Northern Ireland
+6-255	United Kingdom of Great Britain and Northern Ireland
+7-232	United Kingdom of Great Britain and Northern Ireland
+7-234	United Kingdom of Great Britain and Northern Ireland
+7-237	United Kingdom of Great Britain and Northern Ireland
+7-243	United Kingdom of Great Britain and Northern Ireland
+7-251	United Kingdom of Great Britain and Northern Ireland
+7-253	United Kingdom of Great Britain and Northern Ireland
+3-020	United States of America
+3-021	United States of America
+3-022	United States of America
+3-023	United States of America
+3-024	United States of America
+3-025	United States of America
+3-026	United States of America
+3-027	United States of America
+3-028	United States of America
+3-029	United States of America
+3-030	United States of America
+3-031	United States of America
+3-032	United States of America
+3-033	United States of America
+3-034	United States of America
+3-035	United States of America
+3-036	United States of America
+3-037	United States of America
+3-038	United States of America
+3-039	United States of America
+3-040	United States of America
+3-041	United States of America
+3-042	United States of America
+3-043	United States of America
+3-044	United States of America
+3-045	United States of America
+3-046	United States of America
+3-047	United States of America
+3-048	United States of America
+3-049	United States of America
+3-050	United States of America
+3-051	United States of America
+3-052	United States of America
+3-053	United States of America
+3-054	United States of America
+3-055	United States of America
+3-056	United States of America
+3-057	United States of America
+3-058	United States of America
+3-059	United States of America
+3-180	United States of America
+3-181	United States of America
+3-182	United States of America
+3-183	United States of America
+3-184	United States of America
+3-185	United States of America
+3-186	United States of America
+3-187	United States of America
+3-188	United States of America
+3-189	United States of America
+3-190	United States of America
+3-191	United States of America
+3-192	United States of America
+3-193	United States of America
+3-194	United States of America
+3-195	United States of America
+3-196	United States of America
+3-197	United States of America
+3-198	United States of America
+3-199	United States of America
+3-200	United States of America
+3-201	United States of America
+3-202	United States of America
+3-203	United States of America
+3-204	United States of America
+3-064	United States Virgin Islands
+7-096	Uruguay (Eastern Republic of)
+7-097	Uruguay (Eastern Republic of)
+4-164	Uzbekistan (Republic of)
+4-165	Uzbekistan (Republic of)
+5-082	Vanuatu (Republic of)
+7-068	Venezuela (Bolivarian Republic of)
+7-069	Venezuela (Bolivarian Republic of)
+7-070	Venezuela (Bolivarian Republic of)
+7-071	Venezuela (Bolivarian Republic of)
+4-103	Viet Nam (Socialist Republic of)
+4-104	Viet Nam (Socialist Republic of)
+4-205	Viet Nam (Socialist Republic of)
+5-086	Wallis and Futuna (Territoire français d'outre-mer)
+4-042	Yemen (Republic of)
+4-046	Yemen (Republic of)
+6-090	Zambia (Republic of)
+6-096	Zimbabwe (Republic of)
+6-097	Zimbabwe (Republic of)

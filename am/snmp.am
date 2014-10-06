@@ -1,0 +1,293 @@
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
+## =============================================================================
+## 
+# @(#) $RCSfile: snmp.am,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-05-15 12:01:19 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU Affero General Public License as published by the Free
+## Software Foundation; version 3 of the License.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+## details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+## write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+## 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2011-05-15 12:01:19 $ by $Author: brian $
+##
+## =============================================================================
+
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
+
+##
+# This was changed from PKG_BUILD_INDEP to PKG_BUILD_ARCH because it is far too
+# complex to maintainer scripts to place these files in an architecture
+# independent package away from the library binaries that they configure.
+##
+
+if PKG_BUILD_USER
+## PKG_BUILD_USER
+
+##
+# These targets are responsible for installing the default net-snmp agent
+# configuration information into the /etc/snmp/AGENT.conf configuration file and
+# the /etc/snmp/snmpd.local.conf configuration file as necessary.  This is
+# accomplished by looking for the /etc/snmp/snmp.d directory, installing this
+# package's file into that directory under the package name, and then rebuilding
+# the /etc/snmp/snmpd.local.conf file.  If the /etc/snmp/snmpd.local.conf file
+# does not exist, then the file is simply insalled in the /etc/snmp/snmp.d
+# directory (it might be an rpm or deb build).
+##
+
+
+install-snmp-conf: src/util/sysconfig/snmp
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/snmp/snmp.d
+	$(INSTALL_DATA) $< $(DESTDIR)$(sysconfdir)/snmp/snmp.d/$(SNMPORDER)@PACKAGE_LCNAME@
+
+##
+# The post-snmp-conf target checks for a fully configured install directory by
+# checking for the existence of the /etc/snmp/snmpd.conf file in the target
+# install directory $(DESTDIR).
+##
+# If it exists, then we are doing a non-rpm (autoconf) install and need to
+# configure /etc/snmp/snmpd.local.conf in the target directory.  First we check
+# if snmpd.local.conf exists.  If snmpd.local.conf exists we check if it has
+# already been configured by checking for our 'Generated' statement.  If it has,
+# we regenerate the file from the snmp.d directory components.  If it hasn't, we
+# move it to /etc/snmp/snmp.d/00local if 00local does not already exist.  If
+# 00local already exists, we abort with a warning.  When snmpd.local.conf does
+# not exist, we create an empty /etc/snmp/snmp.d/00local if one does not already
+# exist.  If 00local already exists, we abort with a warning.
+##
+# When we have not aborted as part of previous operations, we rebuild
+# /etc/snmp/snmp.local.conf from the files available in the snmp.d directory
+# (skipping any with the .rpmsave, .rpmnew or .rpmorig suffixes), placing our
+# 'Generation' lines in the file, starting with 00local, and continuing through
+# with the remaining files in snmp.d in lexical order.  If 00local is the only
+# file causing snmp.local.conf to be regenerated, 00local is moved back to
+# snmp.local.conf.  After rebuilding the file, we tell the snmp daemon to reread
+# its configuration files if it is running.
+##
+# Unfortunately, SuSE does things a little different: the snmpd.conf file is in
+# /etc instead of /etc/snmp and the persistent data file is in /var/run/net-snmp
+# instead of /var/net-snmp.  This can be detected and repaired by symbolic
+# linking /etc/snmp/snmpd.conf to /etc/snmpd.conf and linking
+# /etc/snmpd.local.conf to /etc/snmp/snmpd.local.conf.
+##
+
+post-snmp-conf:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@snmp_fil=$(DESTDIR)$(sysconfdir)/snmp/snmpd.local.conf ; \
+	snmp_dir=$(DESTDIR)$(sysconfdir)/snmp/snmp.d ; \
+	snmp_lcl=$(DESTDIR)$(sysconfdir)/snmp/snmp.d/00local ; \
+	snmp_tmp=$${TMPDIR-/var/tmp}/snmpd.local.conf.tmp.$$$$ ; \
+	files="$$snmp_dir/*" ; \
+	if test -n '$(DESTDIR)$(rootdir)' -a ! -e $$snmp_fil ; then \
+		exit 0 ; \
+	fi ; \
+	if test ! -e $(sysconfdir)/snmp/snmpd.conf -a -e $(sysconfdir)/snmpd.conf ; then \
+		$(ECHO) "  ln -L $(sysconfdir)/snmpd.conf $(sysconfdir)/snmp/snmpd.conf" ; \
+		ln -L $(sysconfdir)/snmpd.conf $(sysconfdir)/snmp/snmpd.conf ; \
+		$(ECHO) "  touch $(sysconfdir)/snmpd.local.conf" ; \
+		touch $(sysconfdir)/snmpd.local.conf ; \
+	fi ; \
+	if test ! -e $(sysconfdir)/snmp/snmpd.local.conf -a -e $(sysconfdir)/snmpd.local.conf ; then \
+		$(ECHO) "  ln -L $(sysconfdir)/snmpd.local.conf $(sysconfdir)/snmp/snmpd.local.conf" ; \
+		ln -L $(sysconfdir)/snmpd.local.conf $(sysconfdir)/snmp/snmpd.local.conf ; \
+	fi ; \
+	if test -s $$snmp_fil ; then \
+		if ! grep '^# Generated from snmp.d' $$snmp_fil >/dev/null 2>&1 ; then \
+			$(ECHO) "  cp -f -b -v --suffix=.rpmsave -- $$snmp_fil $$snmp_lcl" ; \
+			cp -f -b -v --suffix=.rpmsave -- $$snmp_fil $$snmp_lcl ; \
+		fi ; \
+	fi ; \
+	$(ECHO) "  $(ECHO) '# Generated from snmp.d by $(PACKAGE_LCNAME)' >$$snmp_tmp" ; \
+	$(ECHO) "  $(ECHO) '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!' >>$$snmp_tmp" ; \
+	$(ECHO) "  $(ECHO) '# EDIT THE FILES IN THE snmp.d DIRECTORY INSTEAD.' >>$$snmp_tmp" ; \
+	$(ECHO) '# Generated from snmp.d by $(PACKAGE_LCNAME)' >$$snmp_tmp ; \
+	$(ECHO) '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!' >>$$snmp_tmp ; \
+	$(ECHO) '# EDIT THE FILES IN THE snmp.d DIRECTORY INSTEAD.' >>$$snmp_tmp ; \
+	for f in $$files ; do \
+		if test -f $$f -a $$f = $$snmp_lcl ; then \
+			case $$f in \
+				(*.rpmsave|*.rpmnew|*.rpmorig) ;; \
+				(*)	$(ECHO) "  $(ECHO) '# Generated from snmp.d/'`basename $$f` >>$$snmp_tmp" ; \
+					$(ECHO) '# Generated from snmp.d/'`basename $$f` >>$$snmp_tmp ; \
+					$(ECHO) "  sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >>$$snmp_tmp" ; \
+					sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >>$$snmp_tmp ; \
+					;; \
+			esac ; \
+		fi ; \
+	done ; \
+	wrote_one=no ; \
+	for f in $$files ; do \
+		if test -f $$f -a $$f != $$snmp_lcl ; then \
+			case $$f in \
+				(*.rpmsave|*.rpmnew|*.rpmorig) ;; \
+				(*)	$(ECHO) "  $(ECHO) '# Generated from snmp.d/'`basename $$f` >>$$snmp_tmp" ; \
+					$(ECHO) '# Generated from snmp.d/'`basename $$f` >>$$snmp_tmp ; \
+					$(ECHO) "  sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >>$$snmp_tmp" ; \
+					sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >>$$snmp_tmp ; \
+					wrote_one=yes ;; \
+			esac ; \
+		fi ; \
+	done ; \
+	changed_local=no ; \
+	if test $$wrote_one = yes ; then \
+		if ! diff $$snmp_tmp $$snmp_fil >/dev/null 2>&1 ; then \
+			$(ECHO) "  cp -f -b --suffix=.rpmsave -- $$snmp_tmp $$snmp_fil" ; \
+			cp -f -b --suffix=.rpmsave -- $$snmp_tmp $$snmp_fil ; \
+			changed_local=yes ; \
+		fi ; \
+	elif test -f $$snmp_lcl ; then \
+		$(ECHO) "  cp -f -- $$snmp_lcl $$snmp_fil" ; \
+		cp -f -- $$snmp_lcl $$snmp_fil ; \
+		$(ECHO) "  rm -f -- $$snmp_lcl" ; \
+		rm -f -- $$snmp_lcl ; \
+		changed_local=yes ; \
+	else \
+		$(ECHO) "  cat /dev/null >$$snmp_fil" ; \
+		cat /dev/null >$$snmp_fil ; \
+		changed_local=yes ; \
+	fi ; \
+	$(ECHO) "  rmdir $$snmp_dir" ; \
+	rmdir $$snmp_dir 2>/dev/null || :; \
+	$(ECHO) "  rm -f -- $$snmp_tmp" ; \
+	rm -f -- $$snmp_tmp || :; \
+	if test -z '$(DESTDIR)$(rootdir)' ; then \
+		if test $$changed_local = yes ; then \
+			r="`runlevel | awk '{print$$2}'`" ; \
+			start=no ; \
+			for l in $(initrddir)/../rc$${r}.d/s[0-9][0-9]snmpd $(initrddir)/rc$${r}.d/S[0-9][0-9]snmpd ; do \
+				if test -L $$l ; then start=yes ; break ; fi ; \
+			done ; \
+			if test $$start = yes -o -e /var/lock/subsys/snmpd ; then \
+				test -x "`which service     2>/dev/null`" && { service      snmpd reload || :; } ; \
+				test -x "`which invoke-rc.d 2>/dev/null`" && { invoke-rc.d  snmpd reload || :; } ; \
+				test -x "$(initrddir)/snmpd"              && { $(initrddir)/snmpd reload || :; } ; \
+			fi ; \
+		else \
+			$(ECHO) "  killall -HUP snmpd" ; \
+			killall -HUP snmpd || :; \
+		fi ; \
+	fi
+
+uninstall-snmp-conf:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_UNINSTALL)
+	rm -f $(DESTDIR)$(sysconfdir)/snmp/snmp.d/$(SNMPORDER)$(PACKAGE_LCNAME)
+
+
+if INSTALL_INITSCRIPTS
+## INSTALL_INITSCRIPTS
+if WITH_SNMP
+## WITH_SNMP
+if WITH_SNMP_AGENT
+## WITH_SNMP_AGENT
+
+INSTALL_DATA_HOOK	+= install-snmp-conf
+
+POST_INSTALL_AM		+= post-snmp-conf
+
+UNINSTALL_LOCAL		+= uninstall-snmp-conf
+
+POST_UNINSTALL_MA	+= post-snmp-conf
+
+## WITH_SNMP_AGENT
+endif
+## WITH_SNMP
+endif
+## INSTALL_INITSCRIPTS
+endif
+
+## PKG_BUILD_USER
+endif
+## PKG_BUILD_ARCH
+endif
+
+EXTRA_DIST		+= src/util/sysconfig/snmp
+
+INSTALL_MIBS_AM		+= install-dist_snmpmibDATA
+
+UNINSTALL_MIBS_MA	+= uninstall-dist_snmpmibDATA
+
+SNMP_AM			+=
+
+INSTALL_SNMP_AM		+= install-dist_snmpmibDATA \
+			   install-snmpdlmodLTLIBRARIES \
+			   install-snmp-conf \
+			   post-snmp-conf
+
+UNINSTALL_SNMP_MA	+= uninstall-snmp-conf \
+			   post-snmp-conf \
+			   uninstall-snmpdlmodLTLIBRARIES \
+			   uninstall-dist_snmpmibDATA
+
+install-agents: install-snmp
+
+uninstall-agents: uninstall-snmp
+
+## =============================================================================
+##
+## $Log: snmp.am,v $
+## Revision 1.1.2.7  2011-05-15 12:01:19  brian
+## - many build system refinements
+##
+## Revision 1.1.2.6  2011-05-10 13:45:34  brian
+## - weak modules workup
+##
+## Revision 1.1.2.5  2011-03-17 07:01:27  brian
+## - build and repo system improvements
+##
+## Revision 1.1.2.4  2009-07-21 11:06:11  brian
+## - changes from release build
+##
+## Revision 1.1.2.3  2009-07-04 03:51:32  brian
+## - updates for release
+##
+## Revision 1.1.2.2  2009-06-29 07:35:35  brian
+## - improvements to build process
+##
+## Revision 1.1.2.1  2009-06-21 10:26:00  brian
+## - added files to new distro
+##
+## =============================================================================
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

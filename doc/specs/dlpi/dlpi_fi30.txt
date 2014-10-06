@@ -1,0 +1,10 @@
+                                                                                
+                              |                  |                              
+               DL_XID ----\   |                  |           DL_XID             
+              request      \->|- - - - - - - - - |------->   indication         
+                              |                  |                              
+                           /--| ~   ~   ~   ~   ~|<-------   DL_XID             
+               DL_XID <---/   |   ~   ~   ~   ~  |           response           
+              confirm         |                  |                              
+                              |                  |                              
+                                                                                

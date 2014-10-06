@@ -1,0 +1,533 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: N_DI.7.man,v 1.1.2.2 2011-02-07 02:18:21 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:21 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: N_DI.7.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:21  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH N_DI 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Network Layer Interface (NLI)"
+.SH NAME
+.B N_DI
+\- Disconnect Request and Disconnect Indication
+.SH INTERFACE
+.PP
+Network Layer Interface (NLI),
+.[
+nli revision @PACKAGE_VERSION@
+.]
+.BR nli (7).
+.SH SYNOPSIS
+.PP
+.nf
+\f(CW\s-1\
+.B #include <netx25/x25_proto.h>
+
+struct xdiscf {
+    unsigned char xl_type;
+    unsigned char xl_command;
+    unsigned char originator;
+    unsigned char reason;
+    unsigned char cause;
+    unsigned char diag;
+    int conn_id;
+    unsigned char indicated_qos;
+    struct xaddrf responder;
+    struct xaddrf deflected;
+    struct qosformat qos;
+};
+\s+1\fP
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The Disconnect Request or Indication message primitive, \fBN_DI\fP, is used
+by the NS user to reject an incoming connection or disconnect an existing
+connection, or by the NS provider to reject an outgoing connection or disconnect
+an existing connection.
+The control part of the message consists of one
+.BR M_PROTO (9)
+message block, and
+contains the \fBxdiscf\fP structure.
+The data part of the message consists of zero or one
+.BR M_DATA (9)
+message blocks
+containing the Clear User Data (CUD) when supplied.
+.PP
+The X.25 cause and diagnostic octets, \fIcause\fP and \fIdiag\fP, are
+presented, as well as the CONS \fIoriginator\fP and \fIreason\fP codes
+mapped from the X.25 cause and diagnostic.  A Disconnect Request for a non-CONS
+call can specify a non-zero \fIcause\fP code.  This has no effect for a CONS
+call.
+.\"
+.\"
+.SH FORMAT
+.PP
+The Disconnect Request and Disconnect Indication use the
+.B xdiscf
+structure.
+The control part of the message consists of one
+.BR M_PROTO (9)
+message block
+containing the
+.B xdiscf
+structure.
+The data part of the message consists of zero or one
+.BR M_DATA (9)
+message blocks
+containing the Clear User Data (if any).
+.\"
+.\"
+.SH MEMBERS
+.PP
+The \fBxdiscf\fI structure contains the following members:
+.TP
+.I xl_type
+Always \fBXL_CTL\fP.
+.TP
+.I xl_command
+Always \fBN_DI\fP, for both Disconnect Request and Disconnect Indication.
+.TP
+.I originator
+For a CONS call, contains the CONS originator (NS user, NS provider, or
+unknown), mapped from the X.25 cause and diagnostic.
+This field can have one of the following values:
+.RS
+.PP
+.TS
+tab(:);
+lnls
+lbnls.
+Constant:Value:Description
+_
+NS_UNKNOWN:0:Originator is unknown.
+NS_USER:1:Originator is the NS user.
+NS_PROVIDER:2:Originator is the NS provider.
+_
+.TE
+.RE
+.TP
+.I reason
+For a CONS call, contains the CONS reason, mapped from the X.25 cause and
+diagnostic.
+.RS
+.PP
+This field can have one of the following values when the \fIoriginator\fP is
+\fBNS_PROVIDER\fP:
+.PP
+.TS
+tab(:);
+lnls
+lbnls.
+Constant:Value:Description
+_
+NS_GENERIC:224:T{
+.ad l
+.nh
+General.
+T}
+NS_DTRANSIENT:225:T{
+.ad l
+.nh
+Disconnect, transient.
+T}
+NS_DPERMANENT:226:T{
+.ad l
+.nh
+Disconnect, permanent.
+T}
+NS_TUNSPECIFIED:227:T{
+.ad l
+.nh
+Reject, unspecified, transient.
+T}
+NS_PUNSPECIFIED:228:T{
+.ad l
+.nh
+Reject, unspecified, permanent.
+T}
+NS_QOSNATRANSIENT:229:T{
+.ad l
+.nh
+Reject, QOS unavailable, transient.
+T}
+NS_QOSNAPERMANENT:230:T{
+.ad l
+.nh
+Reject, QOS unavailable, permanent.
+T}
+NS_NSAPTUNREACHABLE:232:T{
+.ad l
+.nh
+Reject, NSAP unreachable, transient.
+T}
+NS_NSAPPUNREAHCABLE:235:T{
+.ad l
+.nh
+Reject, NSAP unreachable, permanent.
+T}
+_
+.TE
+.PP
+The field can have the following values when the \fIoriginator\fP is
+\fBNS_USER\fP:
+.PP
+.TS
+tab(:);
+lnls
+lbnls.
+Constant:Value:Description
+_
+NU_GENERIC:240:T{
+.ad l
+.nh
+General.
+T}
+NU_DNORMAL:241:T{
+.ad l
+.nh
+Disconnect, normal.
+T}
+NU_DABNORMAL:242:T{
+.ad l
+.nh
+Disconnect, abnormal.
+T}
+NU_DINCOMPUSERDATA:243:T{
+.ad l
+.nh
+Disconnect, incomprehensible user data.
+T}
+NU_TRANSIENT:244:T{
+.ad l
+.nh
+Reject, transient.
+T}
+NU_PERMANENT:245:T{
+.ad l
+.nh
+Reject, permanent.
+T}
+NU_QOSNATRANSIENT:246:T{
+.ad l
+.nh
+Reject, QOS unavailable, transient.
+T}
+NU_QOSNAPERMANENT:247:T{
+.ad l
+.nh
+Reject, QOS unavailable, permanent.
+T}
+NU_INCOMPUSERDATA:248:T{
+.ad l
+.nh
+Reject, Call User Data facility.
+T}
+NU_BADPROTID:249:T{
+.ad l
+.nh
+Reject, Bad protocol identifier.
+T}
+_
+.TE
+.RE
+.TP
+.I cause
+Conveys the X.25 cause octet associated with the disconnect.
+.TP
+.I diag
+Conveys the X.25 diagnostic octet associated with the disconnect.
+.TP
+.I conn_id
+When a Disconnect Request is used to refuse and incoming connection, this field
+contains the \fIconn_id\fP from the corresponding Connect Indication message
+primitive.
+.TP
+.I indicated_qos
+When non-zero, conveys that facilities and quality of service paraemters are
+being indicated.
+.TP
+.I responder
+Conveys the responding address.  This is the local responding address in a
+Disconnect Request used to refuse an incoming call, and a remote
+responding address in a Disconnect Indication refusing an outgoing call.
+.TP
+.I deflected
+When the \fIcall_deflect\fP field of the associated \fIqos\fP structure is
+non-zero, this field conveys the deflected address.  The deflected address is
+the address of the remote station to which the call is being deflected.  This is
+set by the NS user when deflecting a call with a Disconnect Request refusing an
+incoming connection; and by the NS provider when an outgoing call has been
+deflected.
+.TP
+.I qos
+Conveys the CONS quality of service parameters and non-OSI facilities associated
+with the disconnect.  This is used currently for the charging information when
+an existing connection is disconnected, and for the deflection facility when an
+incoming or outgoing call is being deflected.
+.\"
+.\"
+.SH STATE
+.PP
+This primitive is valid in the data transfer phase; it is also valid in the
+incoming or outgoing connecting phase.  The call moves to the disconnect phase.
+.\"
+.\"
+.SH RESPONSE
+.PP
+This primitive is valid in response to a previously sent Connect Request or
+received Connect Indication message primitive; or, to simply request or indicate
+disconnection of an existing connection.
+.PP
+When an existing connection is disconnect with a Disconnect Request by the NS
+user, the NS user expects a Disconnect Confirmation to acknowledge the
+disconnect.  All other message should be discarded from the Stream until the
+Disconnect Confirmation is received.
+.PP
+When a Disconnect Indication is issued by the NS provider, all messages sent
+downstream except Connect Request or Connect Response messages are silently
+discarded.
+.PP
+A disconnect collision can occur, where Disconnect Request and a Disconnect
+Indication messages collide.  In this case, the Disconnect Indication messages
+is taken as a confirmation and no Disconnect Confirmation message should be
+expected by the NS user.
+.\"
+.\"
+.SH USAGE
+.PP
+The Disconnect Request message primitive is equivalent to the
+.BR N_DISCON_REQ (7)
+primitive of the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0 draft 2
+.]
+.BR npi (7);
+the Disconnect Indication,
+.BR N_DISCON_IND (7).
+.\"
+.\"
+.\".SH CONTEXT
+.\".PP
+.\"
+.\"
+.\".SH MT-CONTEXT
+.\".PP
+.\"
+.\"
+.\".SH IMPLEMENTATION
+.\".PP
+.\"
+.\"
+.SH NOTICES
+.PP
+The Network Layer Interface (NLI) is a proprietary interface without a formal
+standard.  Either the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0 draft 2
+.]
+.BR npi (7),
+or the XTI-X25 interface,
+.[
+xx25
+.]
+.BR xti_x25 (3),
+should be used in its stead.
+.\"
+.\"
+.SH FILES
+.PP
+.B N_DI
+is defined in the
+.RB < netx25/x25_proto.h >
+file.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR xaddrf (5),
+.BR lsapformat (5),
+.BR qosformat (5),
+.BR extraformat (5),
+.BR NLI (7),
+.IR STREAMS (4).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B N_DI
+is compatible with NLI, and implementations based on NLI such as
+.IR "Solaris Solstice" \(rg " X.25 9.2" ,
+.[
+solx25pg
+.]
+.IR "IRIX SX.25" ,
+.[
+sx25
+.]
+.IR "HP-UX X.25/9000" ,
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+with the following considerations:
+.IP \(em \w'\(em\(em'u
+.IR "Solaris Solstice" \(rg " X.25 9.2" ,
+.[
+solx25pg
+.]
+.IR "IRIX SX.25" ,
+.[
+sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+are consistent in their documentation of
+.BR N_DI .
+.IP \(em
+NLI is an inherently low level and non-portable interface and should not be
+used by portable programs.  Portable programs should use the NPI or XX25
+interfaces in its stead.
+.IP \(em
+Binary compatibility is not attempted: only a rough source compatibility.  Any
+binary compatibility exhibited is a bug and is scheduled to be removed in the
+next release.
+.PP
+See
+.BR NLI (7),
+.IR STREAMS (4),
+for additional compatiblity considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The NLI is not a formal standard.  The
+.IR OpenSS7 \(tm
+implementation of NLI conforms to documentation for Version 3 of the NLI.
+.\"
+.\"
+.SH HISTORY
+.PP
+The NLI is an interface originally developed by Spider Systems, Ltd. (now a
+division of Emmerson Power).  The NLI interface found its way into may
+mainstream UNIX implementations and UNIX-like RTOS sporting STREAMS such as
+Windriver's VxWorks.  The NLI was never standardized and remains an inherently
+non-portable interface.
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.IR OpenSS7 \(tm
+implementation of X.25.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77

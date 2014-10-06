@@ -1,0 +1,153 @@
+#!/bin/bash
+# @configure_input@
+# =============================================================================
+# 
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date$ by $Author$
+#
+# =============================================================================
+@openss7_header@
+datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
+#
+# preinst_remove_warn_file()
+#
+preinst_remove_warn_file () {
+    echo "$script: warning: Deleting non-deb manual $1 file $2" >&2
+    rm -f -- $2 2>/dev/null || :
+}
+#
+# preinst_manpages() - Old non-deb distribution puts some man pages in the wrong
+#   place, clean them out on a fresh install.
+#
+preinst_manpages () { :
+    if [ -f /usr/man/man3/fattach.3 ] ; then
+        preinst_remove_warn_file "page" /usr/man/man3/fattach.3
+        preinst_remove_warn_file "page" /usr/man/man3/detach.3
+        preinst_remove_warn_file "page" /usr/man/man3/isastream.3
+        rmdir -p /usr/man/man3 2>/dev/null || :
+        preinst_remove_warn_file "page" /usr/man/man8/fattach.8
+        preinst_remove_warn_file "page" /usr/man/man8/fdetach.8
+        rmdir -p /usr/man/man8 2>/dev/null || :
+        preinst_remove_warn_file "page" /usr/man/man9/connld.9
+        preinst_remove_warn_file "page" /usr/man/man9/fifo.9
+        preinst_remove_warn_file "page" /usr/man/man9/pipemod.9
+        rmdir -p /usr/man/man9 2>/dev/null || :
+    fi
+}
+#
+# preinst_doc() - This is an initial installation of the base subpackage.  We
+#   need to check for non-deb installations on the host and remove any entries
+#   that might later conflict with out entries.  We treat every fresh
+#   installation like an upgrade from non-deb/rpm install.
+#
+preinst_doc () { :
+    preinst_manpages || :
+}
+
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
+#
+# postinst_manpages() - Add our manual pages to the aprospros database.  One
+#   problem with doing this is that even the oldest of debian policies and
+#   debhelper implementations will implement the debhelper code to do this.
+#   Therefore, this function is shortcircuited for now.  (We install >3000
+#   manual pages and it takes forever anyway.)  Failing to do this altogether is
+#   not critical because most machines run an evening cron job to update these.
+#
+postinst_manpages () { :; return
+    if which makewhatis >/dev/null 2>&1 ; then
+	LANGUAGE= LANG= makewhatis -u @mandir@ || true
+    fi
+    if which mandb >/dev/null 2>&1 ; then
+	LANGUAGE= LANG= mandb -p @mandir@ || :true
+    fi
+}
+#
+# postinst_infofiles() - Add our info files to the info directory.  One problem
+#   with doing this is that even the oldest of debian policies and debhelper
+#   implementations will implement the debhelper code to do this.  Therefore,
+#   this function is shorcricuited for now.  Current debian policies will use
+#   trigger directories to perform this action.
+#
+postinst_infofiles () { :; return
+    if [ -x /sbin/install-info ]; then
+#	Older policies do not compress info files.
+	for n in $manuals; do
+            if [ -f @infodir@/$n.info ] ; then
+                /sbin/install-info --info-dir=@infodir@ @infodir@/$n.info || true
+            elif [ -f @infodir@/$n.info.gz ] ; then
+                /sbin/install-info --info-dir=@infodir@ @infodir@/$n.info.gz || true
+            elif [ -f @infodir@/$n.info.bz2 ] ; then
+                /sbin/install-info --info-dir=@infodir@ @infodir@/$n.info.bz2 || true
+            fi
+        done
+    fi
+}
+#
+# postinst_doc() - Perform necessary activies for post installation of
+#   documentation files.  This is primarly handing man macros, reference
+#   database, info directories and aprospros databases.  Some of these
+#   operations are performed by debhelper code or directory trigger processing.
+#
+postinst_doc () { :
+    postinst_manpages
+    postinst_infofiles
+}
+
+preinst_doc
+postinst_doc
+
+# =============================================================================
+#
+# $Log$
+# =============================================================================
+# vim: ft=sh sw=4 noet nocin nosi formatoptions+=tcqlorn

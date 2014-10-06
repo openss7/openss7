@@ -1,0 +1,47 @@
+# =============================================================================
+# @configure_input@
+# @(#) $RCSfile: mscript_postrm.in,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-05-10 13:45:29 $
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# This software is licensed under the GNU Affero General Public License (AGPL)
+# Version 3, 19 November 2007, available at <http://www.gnu.org/licenses/>.
+# -----------------------------------------------------------------------------
+eval "echo '${package}: \"$@\"'" >&2
+case "$1" in
+    (remove) :
+	# remove-postrm remove
+	remove_postrm "$@"
+	;;
+    (purge) :
+	# remove-postrm purge
+	purge_postrm "$@"
+	;;
+    (upgrade) :
+	# old-postrm upgrade new-version
+	upgrade_postrm "$@"
+	;;
+    (failed-upgrade) :
+	# old-postrm upgrade new-version ... failed
+	# new-postrm failed-upgrade old-version
+	failed_upgrade_postrm "$@"
+	;;
+    (abort-install) :
+	# new-preinst install [old-version] ... failed
+	# new-postrm abort-install [old-version]
+	abort_install_postrm "$@"
+	;;
+    (abort-upgrade) :
+	# new-preinst upgrade old-version ... failed
+	# new-postrm abort-upgrade old-version
+	abort_upgrade_postrm "$@"
+	;;
+    (disappear) :
+	# disappear-postrm disappear overwriter overwriter-version
+	disappear_postrm "$@"
+	;;
+esac
+# -----------------------------------------------------------------------------
+# vim: ft=sh sw=4 noet
+# @configure_input@
+# =============================================================================

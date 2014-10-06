@@ -1,0 +1,346 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: unregister_clone.9.man,v 1.1.2.2 2011-02-07 02:18:46 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:46 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: unregister_clone.9.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:46  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH UNREGISTER_CLONE 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B unregister_clone
+\- unregister a clone minor
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/strsubr.h>
+.HP
+.BI "int unregister_clone(struct cdevsw *" cdev );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I cdev
+a pointer to a character device switch table,
+.BR cdevsw (9),
+structure describing the
+.I STREAMS
+driver for which to remove a clone device minor.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+internal,
+implementation specific.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR unregister_clone ()
+locates the minor device number of the
+.BR clone (4)
+driver associated with the
+.I STREAMS
+device specified by
+.I cdev
+that was registered using
+.BR register_clone (9),
+and calls
+.BR unregister_strnod (9)
+for that device node.
+.BR unregister_clone ()
+then frees the memory associated with the
+.BR devnode (9)
+structure that was allocated by the call
+to
+.BR register_clone (9).
+.\"
+.\"
+.SH USAGE
+.PP
+This is probably not the function that you want.  See
+.BR unregister_strdev (9).
+.PP
+.BR unregister_clone ()
+is called automatically by
+.BR unregister_strdev (9)
+to unregister a clone device minor
+in the
+.BR specfs (5)
+file system for every
+.I STREAMS
+device driver unregistering for an external major character device number.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR unregister_clone ()
+returns zero
+.RB ( 0 );
+upon failure, a negative error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR unregister_clone ()
+fails, it returns an appropriate negative error number as follows:
+.TP \w'[\fBEWOULDBLOCK\fR]\(en'u
+.RB [ ENXIO ]
+the minor device node
+.BR devnode (9)
+structure does not exist.
+.PP
+In addition,
+.BR unregister_clone ()
+can return any error number returned by
+.BR unregister_strnod (9).
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR unregister_clone ()
+is intended to be called from a blockable process context during just prior to the unloading of a
+.I STREAMS
+kernel module and as part of the deallocation of that kernel module.
+It may also be called at blockable process context as part of a
+.IR qi_qclose (9)
+routine.
+.\"
+.\"
+.SH MP-STREAMS
+.BR unregister_clone ()
+is MP-safe when called from the proper context.
+.PP
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR unregister_clone ()
+is a convenience function that simply locates the
+.BR devnode (9)
+structure,
+and unregisters it with
+.BR unregister_strnod (9).
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR unregister_clone ()
+is an internal
+.B @PACKAGE_TITLE@
+implementation specific
+function that is not intended to be used directly by
+.I STREAMS
+drivers and modules.  This is certainly not the utility you need: see
+.BR unregister_strdev (9)
+and
+.BR unregister_strnod (9).
+.PP
+Loadable kernel modules that call
+.BR register_clone (9)
+when loading must call
+.BR unregister_clone ()
+before unloading.
+.BR unregister_clone ()
+must be called with the same arguments with which the corresponding
+.BR register_clone (9)
+was called.
+.PP
+Drivers unregistered with
+.BR unregister_clone ()
+will no longer appear as a minor device node in the
+.B /dev/streams/clone/
+directory, visible when the
+.BR specfs (5)
+file system has been mounted on
+.BR /dev/streams.
+.PP
+If you use
+.BR unregister_clone ()
+from outside of the
+.B @PACKAGE_TITLE@
+package, your code may break on the next release.
+Do not use
+.BR unregister_clone ():
+use
+.BR unregister_strdev (9)
+or
+.BR unregister_strnod (9)
+instead.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+None.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR cdevsw (9),
+.BR clone (4),
+.BR register_clone (9),
+.BR unregister_strnod (9),
+.BR devnode (9),
+.BR unregister_strdev (9),
+.BR specfs (5),
+.IR qi_qclose (9),
+.BR unregister_strnod (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR unregister_clone ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR unregister_clone ()
+is a
+.B @PACKAGE_TITLE@
+implementation specific function with support for the mountable
+.BR specfs (5)
+file system.  Registration of
+.I STREAMS
+drivers and modules is inherently implementation specific and non-portable.
+Different implementations provide different mechanisms.
+Additional mechanisms are provided that are compatible with other
+implementations.
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Registration and de-registration of
+.I STREAMS
+drivers is implementation specific and not subject to standardization.
+.BR unregister_clone ()
+is a
+.B @PACKAGE_TITLE@
+implementation specific function.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR unregister_clone ()
+first appeared in
+.BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

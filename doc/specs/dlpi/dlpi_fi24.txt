@@ -1,0 +1,12 @@
+                                                                                
+                              |                  |                              
+             DL_RESET ----\   |                  |           DL_RESET           
+              request      \->|- - - - - - - - - |------->   indication         
+                              |                  |                              
+                           /--| ~   ~   ~   ~   ~|<-------   DL_RESET           
+             DL_RESET <---/   |   ~   ~   ~   ~  | \         response           
+              confirm         |                  |  \                           
+                              |                  |   \---->  DL_OK              
+                              |                  |           acknowledge        
+                              |                  |                              
+                                                                                

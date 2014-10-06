@@ -1,0 +1,13 @@
+A	-4	Atlantic Time
+C	-6	Central Time
+CM	-6,-7	Central/Mountain Time
+CMP	-6,-7,-8	Central/Mountain/Pacific Time
+E	-5	Eastern Time
+EC	-5,-6	Eastern/Central Time
+M	-7	Mountain Time
+MP	-7,-8	Pacific Time
+NA	-3.30,-4	Newfoundland/Atlantic Time
+P	-8	Pacific Time
+(UTC-10)	-10	Hawaii Time
+(UTC+10)	+10	
+(UTC-9)		-9	Alaska Time

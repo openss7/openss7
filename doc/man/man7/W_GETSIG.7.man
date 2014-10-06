@@ -1,0 +1,499 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: W_GETSIG.7.man,v 1.1.2.1 2011-02-07 02:14:42 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:14:42 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: W_GETSIG.7.man,v $
+.\" Revision 1.1.2.1  2011-02-07 02:14:42  brian
+.\" - added manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH W_GETSIG 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Protocols"
+.\"
+.\"
+.SH NAME
+.B W_GETSIG, W_SETSIG, W_POLLSIG
+\- get, set or poll subnetwork (link) identifier leads and signals
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR "Wide Area Network (WAN)" ,
+.[
+wan revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@
+.]
+.BR wan (7),
+.IR STREAMS (9).
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/types.h>
+.br
+.B #include <stropts.h>
+.br
+.B #include <sys/snet/wan_proto.h>
+.br
+.B #include <sys/snet/wan_control.h>
+.HP
+.BI "int " retval " = ioctl (int " fd ", W_GETSIG, ... /* " arg " */);"
+.PD 0
+.HP
+.BI "int " retval " = ioctl (int " fd ", W_SETSIG, ... /* " arg " */);"
+.HP
+.BI "int " retval " = ioctl (int " fd ", W_POLLSIG, ... /* " arg " */);"
+.PD
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I fd
+the file descriptor of a Stream providing the WAN interface.
+.TP
+.I cmd
+either
+.BR W_GETSIG ", " W_SETSIG " or " W_POLLSIG
+.TP
+.I arg
+is a pointer to an
+.BR wan_setsigf (5)
+structure containing or to contain the subnetwork identifier.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.BR W_GETSIG ", " W_SETSIG " and " W_POLLSIG
+command enables or disable the subnetwork (link) identifier associated with a
+link that provides the
+.IR "Wide Area Network (WAN)",
+.[
+wan revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@
+.]
+.BR wan (7),
+input-output control interface.
+The argument,
+.IR arg ,
+is a pointer to an
+.BR wan_setsigf (5)
+structure that contains the subnetwork (link) identifier to get or set for
+the \fB\)W_GETSIG\fP or \fB\)W_SETSIG\fP command or the structure that
+contains the subnetwork (link) identifier to poll for the \fB\)W_POLLSIG\fP
+command.
+.\"
+.\"
+.\".SH USAGE
+.\".PP
+.\"
+.\"
+.SH RETURN VALUE
+.PP
+Upon success, the
+.BR W_GETSIG ", " W_SETSIG " and " W_POLLSIG
+.BR ioctl (2s)
+command return zero.
+Upon failure, the commands return minus one
+.RB ( -1 )
+and set
+.IR errno (3)
+to an appropriate error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+When the
+.BR W_GETSIG ", " W_SETSIG " or " W_POLLSIG
+.BR ioctl (2s)
+command fails, it returns minus one
+.RB ( -1 )
+and sets
+.IR errno (3)
+to one of the following errors:
+.TP \w'[EWOULDBLOCK]\(em'u
+.RB [ EBADF ]
+.I fd
+does not specify a valid, open file descriptor.
+.TP
+.RB [ ENODEV ]
+.I fd
+refers to a file that does not support the
+.BR ioctl (2s)
+system call.
+.TP
+.RB [ ENOSTR ]
+.I fd
+is not associated with a Stream.
+.TP
+.RB [ EINVAL ]
+.I fd
+refers to a
+.IR STREAMS -based
+.BR pipe (4)
+or
+.BR fifo (4s).
+.TP
+.RB [ EINVAL ]
+.I fd
+refers to a Stream that does not support the
+.BR W_GETSIG ", " W_SETSIG " or " W_POLLSIG
+input-output control.
+.TP
+.RB [ EINVAL ]
+.I fd
+is linked under a multiplexing driver.
+.TP
+.RB [ EIO ]
+.I fd
+specifies a Stream that has closed or is closing.
+.TP
+.RB [ ENOTTY ]
+.I fd
+specifies a Stream that is a controlling terminal that has closed or is closing.
+.TP
+.RB [ ENXIO ]
+.I fd
+received a hangup
+.BR M_HANGUP (9)
+message.
+.TP
+.RB [ EIO ]
+.I fd
+specifies a controlling terminal, the calling process is not a member of the
+foreground process group and is a member of an orphaned process group, or is
+blocking
+.RI { SIGTTIN }
+signals.
+.TP
+.RB [ ERESTARTSYS ]
+.I fd
+is a controlling terminal, the calling process is a member of a background
+process group and is not blocking
+.RI { SIGTTIN }
+or
+.RI { SIGTTOU }
+signals, and a
+.RI { SIGTTIN }
+or
+.RI { SIGTTOU }
+signal was sent.
+.TP
+.RB [ ERESTARTSYS ]
+a signal was received (or generated by the call) before the operation could begin.
+.TP
+.RB [ EINTR ]
+a signal was received before the operation could complete.
+.TP
+.RB [ ETIME ]
+the operation timed out waiting for an acknowledgement from the driver.
+.TP
+.RB [ ENXIO ]
+a negative acknowledgement
+.BR M_IOCNAK (9)
+was received from the driver with no specified error.
+.TP
+.RB [ ENXIO ]
+the driver responded incorrectly (with a well formed
+.BR M_COPYIN (9)
+or
+.BR M_COPYOUT (9)
+message.)
+.\"
+.\"
+.PP
+Also, if
+.I fd
+receives an error
+.BR M_ERROR (9)
+message, containing a persistent read error,
+.BR errno (3)
+will be set to the error number in the message.
+.PP
+If
+.I fd
+receives an error
+.BR M_ERROR (9)
+message, containing only a persistent write error,
+.BR errno (3)
+will be set to the error number in the message.  If the
+.B SNDPIPE
+write option is set for the Stream, the calling process will also be sent a
+.RI { SIGPIPE }
+signal.
+.\"
+.\"
+.PP
+The operation requires that the driver send a positive
+.BR M_IOCACK (9)
+or negative
+.BR M_IOCNAK (9)
+acknowledgement.
+If a negative
+.BR M_IOCNAK (9)
+acknowledgement message is received that contains an error,
+.BR errno (3)
+will be set to the error number in the message.
+.\"
+.\"
+.SH NOTICES
+.PP
+The input-output control commands provided by the
+.IR "Wide Area Network (WAN)" ,
+.[
+wan revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@
+.]
+.BR wan (7),
+are not standardized, but are used by a wide range of X.25 implementations
+based on
+.IR "SpiderX25" .
+.[
+spiderx25
+.]
+These input-output control commands should be avoided by portable programs.
+.\"
+.\"
+.\".SH IMPLEMENTATION
+.\".PP
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR wan_setsigf (5),
+.BR ioctl (2s),
+.BR wan (7),
+.IR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.BR W_GETSIG ", " W_SETSIG " and " W_POLLSIG
+input-output control commands have no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.BR W_GETSIG ", " W_SETSIG " and " W_POLLSIG
+input-output control commands are compatible with
+.IR "SpiderX25" ,
+.[
+spiderx25
+.]
+and implementations based on
+.IR "SpiderX25" ,
+such as
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+Not all implementations support the
+.BR W_GETSIG ", " W_SETSIG " and " W_POLLSIG
+input-output control commands.
+.IP \(em
+There are some variations in the implementation of the
+.BR wan_setsigf (5)
+structure.
+.IP \(em
+Source compatibility is attempted.  Binary compatibility is not guaranteed.
+.PP
+For additional compatibility information see,
+.BR wan (4),
+.BR wan_setsigf (5),
+.BR wan (7),
+and
+.BR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The
+.IR "Wide Area Network (WAN)" ,
+.[
+wan revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@
+.]
+.BR wan (7),
+interface was never standardized.  However,
+.B @PACKAGE_TITLE@
+conforms to
+.IR SpiderX25 ,
+.[
+spiderx25
+.]
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX X.25" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+and
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ioctl (2s)
+for
+.I WAN
+first appeared in
+.IR SpiderX25 .
+.[
+spiderx25
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,222 @@
+#!/bin/bash
+# @configure_input@
+# =============================================================================
+# 
+# @(#) $RCSfile: openss7-base.postinst.in,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-05-15 12:01:18 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2011-05-15 12:01:18 $ by $Author: brian $
+#
+# =============================================================================
+subpkg=base
+@openss7_header@
+datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
+#
+# postinst_modconf() - Ensure that include line is added to the modules.conf file for old 2.4 module
+#   systems.  This must remove lines before including them because it may also be run from
+#   reconfigure.
+#
+postinst_modconf () { :
+    local conf_old conf_tmp conf_new
+    [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
+    conf_old=${sysconfdir}/modules.conf
+    conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$
+    conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
+    if [ -f $conf_old ] ; then
+        cp -f -- $conf_old $conf_new
+        ( sed -e '\|^include[[:space:]].*'${modutildir}/'@PACKAGE_LCNAME@|d' $conf_new
+          echo "include ${modutildir}/@PACKAGE_LCNAME@" ) > $conf_tmp
+        mv -f -- $conf_tmp $conf_new
+        if ! diff $conf_new $conf_old >/dev/null 2>&1; then
+            cp -f -b --suffix=.dpkg-old -- $conf_new $conf_old
+        fi
+        rm -f -- $conf_new || :
+    fi
+}
+#
+# postinst_preloads() - At the end of a fresh install or upgrade, check that our preload modules have
+#   been added to the modprobe.preload file.  Note, however, that the modprobe.preload does not
+#   normally exist for Debian.  The -kernel subpackage is responsible for adding preloads to the
+#   debian /etc/modules-@kversion@ file.
+#
+postinst_preloads () { :
+    local prel_tmp prel_new prel_old
+    prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$
+    prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$
+    for prel_old in ${sysconfdir}/modules ${sysconfdir}/modprobe.preload; do
+	if [ -f $prel_old ] ; then
+	    cp -f -- $prel_old $prel_new
+	    missing=no
+	    for m in $preloads ; do
+		if ! grep '^[[:space:]]*'"$m"'[[:space:]]*$' $prel_new >/dev/null 2>&1; then
+		    missing=yes
+		fi
+	    done
+	    if [ $missing = yes ]; then
+		for m in $preloads; do
+		    ( sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $prel_new;
+		      echo "$m" ) >$prel_tmp
+		    mv -f -- $prel_tmp $prel_new
+		done
+		cp -f -b --suffix=.dpkg-old -- $prel_new $prel_old
+	    fi
+	    rm -f -- $prel_new || :
+	fi
+    done
+}
+#
+# postinst_initscripts() - At the end of an install or upgrade, add init scripts if we can.  Note
+#   that the debhelper scriptlets are defeated because they are too disruptive in the 2.6
+#   environment.
+#
+postinst_initscripts () {
+    local list i args r
+    list="${initfiles}"
+    for i in $list; do
+	if [ -f ${initrddir}/$i ]; then
+	    [ -x /sbin/insserv              ] && { /sbin/insserv              $i       2>&1 && continue || true; }
+	    [ -x /sbin/chkconfig            ] && { /sbin/chkconfig --add      $i       2>&1 && continue || true; }
+	    [ -x /usr/lib/lsb/install_initd ] && { /usr/lib/lsb/install_initd $i       2>&1 && continue || true; }
+	    args="`grep '^#[[:space:]]*update-rc.d:' ${initrddir}/$i | sed -e 's,#[[:space:]]*update-rc.d:[[:space:]]*,,'`"
+	    [ -x /usr/sbin/update-rc.d      ] && { /usr/sbin/update-rc.d      $i $args 2>&1 && continue || true; }
+	fi
+    done
+}
+#
+# postinst_manrefs() - Some systems compress our reference database but do not provide nor invoke
+#   the zrefer command necessary to use compressed reference databases.  Therefore, we always
+#   provide a decompressed copy of the reference database.
+#
+postinst_manrefs () {
+    local m
+    for m in ${manrefs}; do
+	[ ! -f ${mandir}/$m.gz  ] || gzip  -dc ${mandir}/$m.gz  > ${mandir}/$m || :
+	[ ! -f ${mandir}/$m.bz2 ] || bzip2 -dc ${mandir}/$m.bz2 > ${mandir}/$m || :
+    done
+}
+#
+# postinst_manmacros() - Some systems compress our man macros but do not provide nor invoke the
+#   zsoelim command necessary to use compressed man macros.  Therefore, we always provide a
+#   decompressed copy of the man macros.
+#
+postinst_manmacros () {
+    local m
+    for m in ${manmacros}; do
+	[ ! -f ${mandir}/$m.gz  ] || gzip  -dc ${mandir}/$m.gz  > ${mandir}/$m || :
+	[ ! -f ${mandir}/$m.bz2 ] || bzip2 -dc ${mandir}/$m.bz2 > ${mandir}/$m || :
+    done
+}
+#
+# postinst_manpages() - Add our manual pages to the aprospros database.  One problem with doing this
+#   is that even the oldest of debian policies and debhelper implementations will implement the
+#   debhelper code to do this.  Therefore, this function is shortcircuited for now.  (We install
+#   >3000 manual pages and it takes forever anyway.)  Failing to do this altogether is not critical
+#   because most machines run an evening cron job to update these.
+#
+postinst_manpages () { :; return
+    if   [ -x "`which mandb      2>/dev/null`" ]; then
+	LANGUAGE= LANG= mandb   -q -p ${mandir} || :
+    elif [ -x "`which makewhatis 2>/dev/null`" ]; then
+	LANGUAGE= LANG= makewhatis -u ${mandir} || :
+    fi
+}
+postinst_base_configure () { :
+    [ -z '@WITH_KO_MODULES_TRUE@' ] || postinst_modconf
+    postinst_preloads
+    postinst_initscripts
+    postinst_manrefs
+    postinst_manmacros
+    postinst_manpages
+}
+postinst_base_abort () { :
+    postinst_initscripts
+}
+# -----------------------------------------------------------------------------
+# Primary functions:
+# -----------------------------------------------------------------------------
+# xxx-postinst configure
+configure_postinst () { :
+    postinst_base_configure
+}
+# xxx-postinst configure most-recently-configured-version
+reconfigure_postinst () { :
+    postinst_base_configure
+}
+# xxx-postinst triggered triggered-packages
+triggered_postinst () { :
+}
+# old-prerm upgrade new-version ...FAILED
+# new-prerm failed-upgrade new-version ...FAILED
+# old-postinst abort-upgrade new-version
+abort_upgrade_postinst () { :
+    postinst_base_abort
+}
+# con-prerm remove 'in-favour' package new-version ...FAILED
+# con-postinst abort-remove 'in-favour' package new-version
+abort_remove_postinst () { :
+    postinst_base_abort
+}
+# dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version] ...FAILED
+# dec-postinst abort-deconfigure 'in-favour' package-being-installed-but-failed version ['removing' conflicting-package version]
+abort_deconfigure_postinst ()  { :
+    postinst_base_abort
+}
+@mscript_postinst@
+@mscript_debhelper@
+# =============================================================================
+#
+# $Log: openss7-base.postinst.in,v $
+# Revision 1.1.2.2  2011-05-15 12:01:18  brian
+# - many build system refinements
+#
+# Revision 1.1.2.1  2011-05-10 13:45:28  brian
+# - weak modules workup
+#
+# =============================================================================
+# vim: ft=sh sw=4 noet nocin nosi formatoptions+=tcqlorn

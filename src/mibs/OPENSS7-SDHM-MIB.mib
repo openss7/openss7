@@ -1,0 +1,2010 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- =============================================================================
+-- 
+-- @(#) $RCSfile: OPENSS7-SDHM-MIB.mib,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-07-18 19:42:20 $
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- Note well: notwithstanding this AGPL license, you are not permitted to make 
+-- modifications under the OpenSS7 project's enterprise object identifier arc: 
+-- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
+-- identifier arc under your control.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date: 2011-07-18 19:42:20 $ by $Author: brian $
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log: OPENSS7-SDHM-MIB.mib,v $
+-- Revision 1.1.2.2  2011-07-18 19:42:20  brian
+-- - added documentation
+--
+-- Revision 1.1.2.1  2010-06-09 12:58:31  brian
+-- - updated mibs
+--
+-- =============================================================================
+
+OPENSS7-SDH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    openss7G774
+	FROM OPENSS7-SMI
+    AdministrativeState, AlarmStatus, AvailabilityStatus, ControlStatus, 
+    GnmAlarmStatus, OperationalState, ProceduralStatus, SimpleNameType, 
+    StandbyStatus, SystemTimingSource, tmnObjectInstance, 
+    tmnPerceivedSeverity, tmnProbableCause, UsageState
+	FROM OPENSS7-SMI-MIB
+    CircuitCode, CircuitIdentificationCode, CommonLanguageName, 
+    MilliSeconds
+	FROM OPENSS7-TC
+    SnmpAdminString
+	FROM SNMP-FRAMEWORK-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+	FROM SNMPv2-CONF
+    Gauge32, Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, 
+    OBJECT-IDENTITY, OBJECT-TYPE, Unsigned32, zeroDotZero
+	FROM SNMPv2-SMI
+    AutonomousType, RowPointer, RowStatus, TEXTUAL-CONVENTION, 
+    TimeInterval, TruthValue
+	FROM SNMPv2-TC;
+
+sdhMIB MODULE-IDENTITY
+    LAST-UPDATED "201004150132Z"
+    ORGANIZATION
+	"The OpenSS7 Project"
+    CONTACT-INFO 
+	"Brian Bidulock
+	 OpenSS7 Corporation
+	 1469 Jefferys Crescent
+	 Edmonton, Alberta T6L 6T1
+	 CANADA
+	 Tel: +1 780 490 1141
+	 Fax: +1 780 490 1241
+	 Mob: +1 780 953 0557
+	 E-mail: bidulock@openss7.org"
+    DESCRIPTION
+	"This is a MIB providing management information in accordance 
+	 with ITU-T Rec. G.774 : 2001.
+
+         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+
+         All Rights Reserved.
+
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+         Note well: notwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
+    REVISION "201004150132Z"
+    DESCRIPTION
+	"First release of this module."
+    ::= { openss7G774 0 }
+
+sdhNotifications	OBJECT IDENTIFIER ::= { sdhMIB		 0 }
+sdhObjects		OBJECT IDENTIFIER ::= { sdhMIB		 1 }
+sdhConformance		OBJECT IDENTIFIER ::= { sdhMIB		 2 }
+
+sdhTables		OBJECT IDENTIFIER ::= { sdhObjects	 1 }
+sdhScalars		OBJECT IDENTIFIER ::= { sdhObjects	 2 }
+sdhNotifs		OBJECT IDENTIFIER ::= { sdhObjects	 3 }
+sdhOids			OBJECT IDENTIFIER ::= { sdhObjects	 4 }
+
+sdhCompliance		OBJECT IDENTIFIER ::= { sdhConformance	 1 }
+sdhGroups		OBJECT IDENTIFIER ::= { sdhConformance	 2 }
+
+sdhDefaults		OBJECT IDENTIFIER ::= { sdhScalars	 1 }
+
+sdhProtocols		OBJECT IDENTIFIER ::= { sdhOids		 1 }
+sdhProbableCauses	OBJECT IDENTIFIER ::= { sdhOids		 2 }
+sdhSpecificProblems	OBJECT IDENTIFIER ::= { sdhOids		 3 }
+sdhSpecificExtensions	OBJECT IDENTIFIER ::= { sdhOids		 4 }
+sdhProbableCauses2	OBJECT IDENTIFIER ::= { sdhOids		 5 }
+
+sdhNe			OBJECT IDENTIFIER ::= { sdhTables	 1 }
+sdhTp			OBJECT IDENTIFIER ::= { sdhTables	 2 }
+sdhTtpSink		OBJECT IDENTIFIER ::= { sdhTables	 3 }
+sdhTtpSrce		OBJECT IDENTIFIER ::= { sdhTables	 4 }
+sdhTtpBidi		OBJECT IDENTIFIER ::= { sdhTables	 5 }
+sdhTtpConcat		OBJECT IDENTIFIER ::= { sdhTables	 6 }
+sdhTtpClients		OBJECT IDENTIFIER ::= { sdhTables	 7 }
+
+sdhElecSpiTtpBidi	OBJECT IDENTIFIER ::= { sdhTables	 8 }
+sdhElecSpiTtpSrce	OBJECT IDENTIFIER ::= { sdhTables	 9 }
+sdhElecSpiTtpSink	OBJECT IDENTIFIER ::= { sdhTables	10 }
+sdhOptiSpiTtpBidi	OBJECT IDENTIFIER ::= { sdhTables	11 }
+sdhOptiSpiTtpSrce	OBJECT IDENTIFIER ::= { sdhTables	12 }
+sdhOptiSpiTtpSink	OBJECT IDENTIFIER ::= { sdhTables	13 }
+
+sdhUnprotCtpBidi	OBJECT IDENTIFIER ::= { sdhTables	41 }
+sdhUnprotCtpSink	OBJECT IDENTIFIER ::= { sdhTables	42 }
+sdhUnprotCtpSrce	OBJECT IDENTIFIER ::= { sdhTables	43 }
+sdhProtectedTtpBidi	OBJECT IDENTIFIER ::= { sdhTables	14 }
+sdhProtectedTtpSrce	OBJECT IDENTIFIER ::= { sdhTables	15 }
+sdhProtectedTtpSink	OBJECT IDENTIFIER ::= { sdhTables	16 }
+
+sdhMsTtpBidi		OBJECT IDENTIFIER ::= { sdhTables	17 }
+sdhMsTtpSrce		OBJECT IDENTIFIER ::= { sdhTables	18 }
+sdhMsTtpSink		OBJECT IDENTIFIER ::= { sdhTables	19 }
+sdhMsCtpBidi		OBJECT IDENTIFIER ::= { sdhTables	44 }
+sdhMsCtpSink		OBJECT IDENTIFIER ::= { sdhTables	45 }
+sdhMsCtpSrce		OBJECT IDENTIFIER ::= { sdhTables	46 }
+sdhMsDatacomCtpBidi	OBJECT IDENTIFIER ::= { sdhTables	47 }
+sdhMsDatacomCtpSink	OBJECT IDENTIFIER ::= { sdhTables	48 }
+sdhMsDatacomCtpSrce	OBJECT IDENTIFIER ::= { sdhTables	49 }
+sdhMsOrderwireCtpBidi	OBJECT IDENTIFIER ::= { sdhTables	50 }
+sdhMsOrderwireCtpSink	OBJECT IDENTIFIER ::= { sdhTables	51 }
+sdhMsOrderwireCtpSrce	OBJECT IDENTIFIER ::= { sdhTables	52 }
+
+sdhRsTtpBidi		OBJECT IDENTIFIER ::= { sdhTables	20 }
+sdhRsTtpSrce		OBJECT IDENTIFIER ::= { sdhTables	21 }
+sdhRsTtpSink		OBJECT IDENTIFIER ::= { sdhTables	22 }
+sdhRsCtpBidi		OBJECT IDENTIFIER ::= { sdhTables	53 }
+sdhRsCtpSink		OBJECT IDENTIFIER ::= { sdhTables	54 }
+sdhRsCtpSrce		OBJECT IDENTIFIER ::= { sdhTables	55 }
+sdhRsDatacomCtpBidi	OBJECT IDENTIFIER ::= { sdhTables	56 }
+sdhRsDatacomCtpSink	OBJECT IDENTIFIER ::= { sdhTables	57 }
+sdhRsDatacomCtpSrce	OBJECT IDENTIFIER ::= { sdhTables	58 }
+sdhRsOrderwireCtpBidi	OBJECT IDENTIFIER ::= { sdhTables	59 }
+sdhRsOrderwireCtpSink	OBJECT IDENTIFIER ::= { sdhTables	60 }
+sdhRsOrderwireCtpSrce	OBJECT IDENTIFIER ::= { sdhTables	61 }
+sdhRsUserChanCtpBidi	OBJECT IDENTIFIER ::= { sdhTables	62 }
+sdhRsUserChanCtpSink	OBJECT IDENTIFIER ::= { sdhTables	63 }
+sdhRsUserChanCtpSrce	OBJECT IDENTIFIER ::= { sdhTables	64 }
+
+sdhVc11TtpBidi		OBJECT IDENTIFIER ::= { sdhTables	23 }
+sdhVc11TtpSrce		OBJECT IDENTIFIER ::= { sdhTables	24 }
+sdhVc11TtpSink		OBJECT IDENTIFIER ::= { sdhTables	25 }
+sdhVc12TtpBidi		OBJECT IDENTIFIER ::= { sdhTables	26 }
+sdhVc12TtpSrce		OBJECT IDENTIFIER ::= { sdhTables	27 }
+sdhVc12TtpSink		OBJECT IDENTIFIER ::= { sdhTables	28 }
+sdhVc2TtpBidi		OBJECT IDENTIFIER ::= { sdhTables	29 }
+sdhVc2TtpSrce		OBJECT IDENTIFIER ::= { sdhTables	30 }
+sdhVc2TtpSink		OBJECT IDENTIFIER ::= { sdhTables	31 }
+sdhVc3TtpBidi		OBJECT IDENTIFIER ::= { sdhTables	32 }
+sdhVc3TtpSrce		OBJECT IDENTIFIER ::= { sdhTables	33 }
+sdhVc3TtpSink		OBJECT IDENTIFIER ::= { sdhTables	34 }
+sdhVc4TtpBidi		OBJECT IDENTIFIER ::= { sdhTables	35 }
+sdhVc4TtpSrce		OBJECT IDENTIFIER ::= { sdhTables	36 }
+sdhVc4TtpSink		OBJECT IDENTIFIER ::= { sdhTables	37 }
+
+sdhAugBidi		OBJECT IDENTIFIER ::= { sdhTables	38 }
+sdhAugSink		OBJECT IDENTIFIER ::= { sdhTables	39 }
+sdhAugSrce		OBJECT IDENTIFIER ::= { sdhTables	40 }
+sdhAu3CtpBidi		OBJECT IDENTIFIER ::= { sdhTables	75 }
+sdhAu3CtpSink		OBJECT IDENTIFIER ::= { sdhTables	76 }
+sdhAu3CtpSrce		OBJECT IDENTIFIER ::= { sdhTables	77 }
+sdhAu4CtpBidi		OBJECT IDENTIFIER ::= { sdhTables	78 }
+sdhAu4CtpSink		OBJECT IDENTIFIER ::= { sdhTables	79 }
+sdhAu4CtpSrce		OBJECT IDENTIFIER ::= { sdhTables	80 }
+
+pathTermCurrentData	OBJECT IDENTIFIER ::= { sdhTables	65 }
+
+sdhTug2Bidi		OBJECT IDENTIFIER ::= { sdhTables	66 }
+sdhTug2Sink		OBJECT IDENTIFIER ::= { sdhTables	67 }
+sdhTug2Srce		OBJECT IDENTIFIER ::= { sdhTables	68 }
+sdhVcnUserChanCtpBidi	OBJECT IDENTIFIER ::= { sdhTables	69 }
+sdhVcnUserChanCtpSink	OBJECT IDENTIFIER ::= { sdhTables	70 }
+sdhVcnUserChanCtpSrce	OBJECT IDENTIFIER ::= { sdhTables	71 }
+sdhTug3Bidi		OBJECT IDENTIFIER ::= { sdhTables	72 }
+sdhTug3Sink		OBJECT IDENTIFIER ::= { sdhTables	73 }
+sdhTug3Srce		OBJECT IDENTIFIER ::= { sdhTables	74 }
+
+sdhTu11CtpBidi		OBJECT IDENTIFIER ::= { sdhTables	81 }
+sdhTu11CtpSrce		OBJECT IDENTIFIER ::= { sdhTables	82 }
+sdhTu11CtpSink		OBJECT IDENTIFIER ::= { sdhTables	83 }
+sdhTu12CtpBidi		OBJECT IDENTIFIER ::= { sdhTables	84 }
+sdhTu12CtpSrce		OBJECT IDENTIFIER ::= { sdhTables	85 }
+sdhTu12CtpSink		OBJECT IDENTIFIER ::= { sdhTables	86 }
+sdhTu2CtpBidi		OBJECT IDENTIFIER ::= { sdhTables	87 }
+sdhTu2CtpSrce		OBJECT IDENTIFIER ::= { sdhTables	88 }
+sdhTu2CtpSink		OBJECT IDENTIFIER ::= { sdhTables	89 }
+sdhTu3CtpBidi		OBJECT IDENTIFIER ::= { sdhTables	90 }
+sdhTu3CtpSrce		OBJECT IDENTIFIER ::= { sdhTables	91 }
+sdhTu3CtpSink		OBJECT IDENTIFIER ::= { sdhTables	92 }
+
+sdhModAugBidi		OBJECT IDENTIFIER ::= { sdhTables	100 }
+sdhModAugSink		OBJECT IDENTIFIER ::= { sdhTables	100 }
+sdhModAugSrce		OBJECT IDENTIFIER ::= { sdhTables	100 }
+sdhModTug3Bidi		OBJECT IDENTIFIER ::= { sdhTables	100 }
+sdhModTug3Sink		OBJECT IDENTIFIER ::= { sdhTables	100 }
+sdhModTug3Srce		OBJECT IDENTIFIER ::= { sdhTables	100 }
+sdhModTug2Bidi		OBJECT IDENTIFIER ::= { sdhTables	100 }
+sdhModTug2Sink		OBJECT IDENTIFIER ::= { sdhTables	100 }
+sdhModTug2Srce		OBJECT IDENTIFIER ::= { sdhTables	100 }
+sdhModVC4TTPBidi	OBJECT IDENTIFIER ::= { sdhTables	100 }
+sdhModVC4TTPSink	OBJECT IDENTIFIER ::= { sdhTables	100 }
+sdhModVC4TTPSrce	OBJECT IDENTIFIER ::= { sdhTables	100 }
+sdhModVC3TTPBidi	OBJECT IDENTIFIER ::= { sdhTables	100 }
+sdhModVC3TTPSink	OBJECT IDENTIFIER ::= { sdhTables	100 }
+sdhModVC3TTPSrce	OBJECT IDENTIFIER ::= { sdhTables	100 }
+sdhModVC2TTPBidi	OBJECT IDENTIFIER ::= { sdhTables	100 }
+sdhModVC2TTPSink	OBJECT IDENTIFIER ::= { sdhTables	100 }
+sdhModVC2TTPSrce	OBJECT IDENTIFIER ::= { sdhTables	100 }
+sdhModVC12TTPBidi	OBJECT IDENTIFIER ::= { sdhTables	100 }
+sdhModVC12TTPSink	OBJECT IDENTIFIER ::= { sdhTables	100 }
+sdhModVC12TTPSrce	OBJECT IDENTIFIER ::= { sdhTables	100 }
+sdhModVC11TTPBidi	OBJECT IDENTIFIER ::= { sdhTables	100 }
+sdhModVC11TTPSink	OBJECT IDENTIFIER ::= { sdhTables	100 }
+sdhModVC11TTPSrce	OBJECT IDENTIFIER ::= { sdhTables	100 }
+
+OpticalReach ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"This textual convetoin provides, in accordance with ITU-T Rec. 
+	 G.774, the optical reach of an optical module.  It indicates 
+	 the length the optical signal may travel before requiring 
+	 termination or regeneration."
+    REFERENCE
+	"ITU-T Rec. G.774 (2001) SDH.OpticalReach."
+    SYNTAX INTEGER {
+	intraOffice(0),
+	shortHaul(1),
+	longHaul(2) }
+
+OpticalWavelength ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"This textual convention provides, in accordance with ITU-T Rec. 
+	 G.774 (2001), the optical wavelength of an optical module.  It 
+	 indicates the optical wavelength used by an opticalSpiTtp 
+	 object."
+    REFERENCE
+	"ITU-T Rec. G.774 (2001) SDH.OpticalWavelength."
+    SYNTAX INTEGER {
+	wl1310(0),
+	wl1550(1) }
+
+PointerSinkType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"This textual convention provides, in accordance with ITU-T Rec. 
+	 G.774 (2001), the pointer type.  It indicates the status of the 
+	 incoming Pointer of a sink or bidirectional Connection 
+	 Termination Point (CTP).
+	 
+	 - normalPointer(0), indicate a non-concatenated container 
+	   pointer;
+	 - concatenationIndication(1), indicates a concatenated 
+	   container pointer;
+	 - invalidPointer(2), indicates that the point is unknown, such 
+	   as when a loss-of-pointer condition occurs."
+    REFERENCE
+	"ITU-T Rec. G.774 (2001) SDH.PointerSinkType and 
+	 PointerSourceType."
+    SYNTAX INTEGER {
+	normalPointer(0),
+	concatenationIndication(1),
+	invalidPointer(2) }
+
+StmLevel ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"This textual convention provides, in accordance with ITU-T Rec. 
+	 G.774 (2001), the STM level.  It indicates the `n' value in the 
+	 STM-`n' level.  It can assume values 0, 1, 4, 16, 64 and 256."
+    REFERENCE
+	"ITU-T Rec. G.774 (2001) stmLevel ATTRIBUTE."
+    SYNTAX INTEGER -- (0, 1, 4, 16, 64, 256)
+
+-- =====================================================================
+
+
+
+-- =====================================================================
+
+sdhNeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SdhNeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"An SDH network element is a system which has no internal 
+	 opensystem interfaces."
+    REFERENCE
+	"ITU-T Rec. Q.774 (2001) sdhNE MOC.
+	 ITU-T Rec. M.3100 (1995) managedElement MOC."
+    ::= { sdhNe 1 }
+
+sdhNeEntry OBJECT-TYPE
+    SYNTAX SdhNeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"The Manged Element object class is a class of managed objects 
+	 representing telecommunications equipment or TMN entities 
+	 (either groups or parts) within the telecommunications network 
+	 that performs managed element functions, i.e. provides support 
+	 and/or service to the subscriber.  Managed elements may or may 
+	 not additionally perform mediation/OS functions.  A managed 
+	 element communicates with the manager (directly or indirectly) 
+	 over one or more standard Q-interfaces for the purpose of being 
+	 monitored and/or controlled.  A managed element contains 
+	 equipment that may or may not be geographically distributed.  
+	 When the attribute value change notification package is 
+	 present, the attributeValueChange notification defined in 
+	 Rec. X.721 shall be emitted when the value of one of the 
+	 following attributes change: alarm status, user label, version, 
+	 location name and current problem list.  For the above 
+	 attributes that are in conditional packages, the behaviour for 
+	 emitting the attribute value change notification applies only 
+	 when the corresponding conditional packages are present in the 
+	 managed object.  When the state change notification package is 
+	 present, the stateChangeNotification defined in Rec. X.721 
+	 shall be emitted if the value of administrative state or 
+	 operational state or usage state changes."
+    REFERENCE
+	"ITU-T Rec. Q.774 (2001) sdhNE MOC.
+	 ITU-T Rec. M.3100 (1995) managedElement MOC."
+    INDEX {
+	sdhNeId -- index
+    }
+    ::= { sdhNeTable 1 }
+
+    -- Notifications:
+    --	    environmentalAlarm
+    --	    equipmentAlarm
+    --	    communicationsAlarm
+    --	    processingErrorAlarm
+
+SdhNeEntry ::= SEQUENCE {
+    -- inherited from M.3100 managedElement
+    sdhNeId
+	Unsigned32,
+    sdhNeSystemTitle
+	Opaque,
+    sdhNeAlarmStatus
+	AlarmStatus,
+    sdhNeAdministrativeState
+	AdministrativeState,
+    sdhNeOperationalState
+	OperationalState,
+    sdhNeUsageState
+	UsageState,
+    -- audibleVisualLocalAlarmPackage (not implemented)
+    -- resetAudibleAlarmPackage (not implemented)
+    -- userLabelPackage
+    sdhNeUserLabel
+	SnmpAdminString,
+    -- vendorNamePackage
+    sdhNeVendorName
+	SnmpAdminString,
+    -- versionPackage
+    sdhNeVersion
+	SnmpAdminString,
+    -- locationNamePackage
+    sdhNeLocationName
+	CommonLanguageName,
+    -- currentProblemListPackage (not implemented)
+    -- externalTimePackage (not implemented)
+    -- systemTimingSourcePackage
+    sdhNePrimaryTimingSource
+	SystemTimingSource,
+    sdhNePrimaryTimingObject
+	RowPointer,
+    sdhNeSecondaryTimingSource
+	SystemTimingSource,
+    sdhNeSecondaryTimingObject
+	RowPointer
+}
+
+sdhNeId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"Provides a non-zero ordinal index into the SDH managed element 
+	 table."
+    ::= { sdhNeEntry 1 }
+
+sdhNeSystemTitle OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"Provides an optional administrative name for this SDH managed 
+	 element.  It is typical to use the common language name 
+	 assigned to the element (e.g. EDTNAB01DS1)."
+    ::= { sdhNeEntry 2 }
+
+sdhNeAlarmStatus OBJECT-TYPE
+    SYNTAX AlarmStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"Provides the alarm status of the SDH managed element following 
+	 the AlarmStatus of ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 
+	 1992, and the textual convention of the OPENSS7-SMI-MIB.  The 
+	 object can assume one of the following values:
+	 
+	 - underRepair(0),
+	 - critical(1),
+	 - major(2),
+	 - minor(3),
+	 - alarmOutstanding(4).
+	"
+    REFERENCE
+	"ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000) : alarmStatus 
+	     attribute.
+	 ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+	     Attribute-ASN1Module.AlarmStatus.
+	 ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+	     Section 8.1.2.1."
+    ::= { sdhNeEntry 3 }
+
+sdhNeAdministrativeState OBJECT-TYPE
+    SYNTAX AdministrativeState
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"Provides the administrative state of the SDH managed element in 
+	 accordance with the AdministrativeState of ITU-T Rec. X.721 
+	 (1992) | ISO/IEC 10165-2 : 1992, and the textual convention of 
+	 the OPENSS7-SMI-MIB.  The object can assume one of the 
+	 following values:
+	 
+	 - unlocked(0),
+	 - locked(1),
+	 - shuttingDown(2).
+	 "
+    REFERENCE
+	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+	     Attribute-ASN1Module.AdministrativeState.
+	 ITU-T Rec. X.283 (1997) | ISO/IEC 10733 : 1998 : 
+	     administrativeState ATTRIBUTE."
+    ::= { sdhNeEntry 4 }
+
+sdhNeOperationalState OBJECT-TYPE
+    SYNTAX OperationalState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Proivdes the operational state of the SDH managed element in 
+	 accordance with the OperationalState of ITU-T Rec. X.721 | 
+	 ISO/IEC 10165-2 and the textual convention of the 
+	 OPENSS7-SMI-MIB.  The object can assume one of the following 
+	 values:
+
+	 - disabled(0),
+	 - enabled(1),
+	"
+    REFERENCE
+	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+	     Attribute-ASN1Module.OperationalState.
+	 ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+	     Section 8.1.1.1."
+    DEFVAL { disabled }
+    ::= { sdhNeEntry 5 }
+
+sdhNeUsageState OBJECT-TYPE
+    SYNTAX UsageState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Provides the usage state of the SDH managed element in 
+	 accordance with X.721 | 10165-2 and the textual convention of 
+	 the OPENSS7-SMI-MIB.  The object can assume one of the 
+	 following values:
+
+	 - idle(0),
+	 - active(1),
+	 - busy(2),
+	"
+    REFERENCE
+	"ITU-T Rec. X.721 | ISO/IEC 10165-2 usageState attribute."
+    DEFVAL { idle }
+    ::= { sdhNeEntry 6 }
+
+sdhNeUserLabel OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"The user label attribute type assigns a user friendly name to 
+	 the associated object."
+    REFERENCE
+	"ITU-T Rec. M.3100 (2005) : userLabel ATTRIBUTE."
+    ::= { sdhNeEntry 7 }
+
+sdhNeVendorName OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The vendor name attribute type identifies the vendor of the 
+	 associated managed object."
+    REFERENCE
+	"ITU-T Rec. M.3100 (2005) : vendorName ATTRIBUTE."
+    ::= { sdhNeEntry 8 }
+
+sdhNeVersion OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The version attribute type identifies the version of the 
+	 associated managed object."
+    REFERENCE
+	"ITU-T Rec. M.3100 (2005) : version ATTRIBUTE."
+    ::= { sdhNeEntry 9 }
+
+sdhNeLocationName OBJECT-TYPE
+    SYNTAX CommonLanguageName
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"The location name attribute type identifies a location."
+    REFERENCE
+	"ITU-T Rec. M.3100 (2005) : locationName ATTRIBUTE."
+    ::= { sdhNeEntry 10 }
+
+sdhNePrimaryTimingSource OBJECT-TYPE
+    SYNTAX SystemTimingSource
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"Provides the primary timing source for the SDH managed element.  
+	 This object can have value:
+	 
+	 - none(0), no primary timing source;
+	 - internal(1), the primary timing source is internal to the 
+	   managed element;
+	 - external(2), the primary timing source is external to the 
+	   managed element;
+	 - slaved(3), the primary timing source is slaved from a network 
+	   interface to the managed element.
+	 
+	Not all values are necessarily supported by all agents.
+	 
+	A typical SONET/SDH managed element will take its primary timing 
+	slaved(3) from a network interface."
+    REFERENCE
+	"ITU-T Rec. M.3100 (2005) : SystemTiming.sourceType."
+    ::= { sdhNeEntry 11 }
+
+sdhNePrimaryTimingObject OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Provides the object identifier of the managed object 
+	 responsible for providing the primary timing source.
+
+	 A typical SONET/SDH managed element will identify the network 
+	 interface from which it takes primary slaved(3) timing."
+    REFERENCE
+	"ITU-T Rec. M.3100 (2005) : SystemTiming.sourceID."
+    DEFVAL { zeroDotZero }
+    ::= { sdhNeEntry 12 }
+
+sdhNeSecondaryTimingSource OBJECT-TYPE
+    SYNTAX SystemTimingSource
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Provides a secondary timing source for the managed element.  
+	 The object can have value:
+	 
+	 - none(0), no secondary timing source;
+	 - internal(1), the secondary timing source is internal to the 
+	   managed element;
+	 - external(2), the secondary timing source is external to the 
+	   managed element;
+	 - slaved(3), the secondary timing source is slaved from a 
+	   network interface to the managed element.
+	 
+	Not all values are necessarily supported by all agents.
+	 
+	A typical SONET/SDH managed element will take its secondary 
+	timing source from an internal(1) clock."
+    REFERENCE
+	"ITU-T Rec. M.3100 (2005) : SystemTiming.sourceType."
+    ::= { sdhNeEntry 13 }
+
+sdhNeSecondaryTimingObject OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Provides the object identifier of the managed object 
+	 responsible for providing the secondary timing source.
+
+	 A typical SONET/SDH managed element will identify the internal 
+	 clock from which it takes its secondary internal(1) timing."
+    REFERENCE
+	"ITU-T Rec. M.3100 (2005) : SystemTiming.sourceID."
+    DEFVAL { zeroDotZero }
+    ::= { sdhNeEntry 14 }
+
+-- =====================================================================
+
+sdhTpTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SdhTpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"This managed object represents the termination of a transport 
+	 entity, such as a trail or a connection.  The characterisitic 
+	 information attribute is used to identify equivalence between 
+	 subclasses of termination points to determine whether cross 
+	 connection or connectivity is possible.  The operational state 
+	 reflects the perceived ability to generate and/or receive a 
+	 valid signal.  Subclasses of termination point shall specify 
+	 the attributes and states for which attribute value change and 
+	 state change notifications will be generated."
+    REFERENCE
+	"ITU-T Rec. M.3100 (2005) : terminationPoint MOC."
+    ::= { sdhTp 1 }
+
+sdhTpEntry OBJECT-TYPE
+    SYNTAX SdhTpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. M.3100 (2005) : terminationPoint MO."
+    ::= { sdhTpTable 1 }
+
+SdhTpEntry ::= SEQUENCE {
+    sdhTpId
+	Unsigned32,
+    sdhTpOperationalState
+	OperationalState,
+    -- crossConnectionPointerPackage
+    sdhTpFabric
+	RowPointer,
+    sdhTpCrossConnect
+	RowPointer,
+    sdhTpDownstreamFabric
+	RowPointer,
+    sdhTpDownstreamCrossConect
+	RowPointer,
+    sdhTpUpstreamFabric
+	RowPointer,
+    sdhTpUpstreamCrossConnect
+	RowPointer,
+    -- characteristicInformationPackage
+    sdhTpCharatersiticInfo
+	CharacteristicInfo,
+    -- networkLevelPackage
+    sdhTpNetworkLevelPointer
+	RowPointer,
+    -- tmnCommunicationsAlarmInformationPackage
+    --	currentProblemList (not implemented)
+    sdhTpAlarmStatus
+	GnmAlarmStatus,
+    -- alarmSeverityAssignmentPointerPackage
+    sdhTpAsaProfilePointer
+	RowPointer
+}
+
+sdhTpId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible -- index
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhTpEntry 1 }
+
+sdhTpOperationalState OBJECT-TYPE
+    SYNTAX OperationalState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Provides the operational state of the termination point 
+	 following the OperationalState textual convention of the 
+	 OPENSS7-SMI-MIB module and ITU-T Rec. X.721 | ISO/IEC 10165-2.
+	 
+	 - disabled(0): the termination point is inoperable;
+	 - enabled(1): the termination point is operable.
+	   
+	 When the termination point is operable, the operational state 
+	 shall have the value enabled(0); otherwise, it shall have the 
+	 value disabled(1).  Transitions of operational state shall be 
+	 reported using a state change notification.  A termination 
+	 point may be created in the enabled(0) operational state."
+    REFERENCE
+	"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+	     Attribute-ASN1Module.OperationalState."
+    DEFVAL { disabled }
+    ::= { sdhTpEntry 2 }
+
+sdhTpFabric OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Identifies the fabric to which the termination point is 
+	 attached.  When not attached to a cross-connect fabric, this 
+	 pointer will be zeroDotZero.
+
+	 This attribute points to a managed object such as a 
+	 Cross-connection, a GTP or a Fabric. When a termination point 
+	 is neither connected nor reserved for connection, its 
+	 crossConnectionObjectPointer points to the Fabric object 
+	 responsible for its connection."
+    REFERENCE
+	""
+    DEFVAL { { zeroDotZero } }
+    ::= { sdhTpEntry 3 }
+
+sdhTpCrossConnect OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Identifies the cross connection in which the termination point 
+	 is involved.  When not connected this pointer will be 
+	 zeroDotZero.
+
+	 This attribute points to a managed object such as a 
+	 Cross-connection, a GTP or a Fabric. When a termination point 
+	 is neither connected nor reserved for connection, its 
+	 crossConnectionObjectPointer points to the Fabric object 
+	 responsible for its connection."
+    REFERENCE
+	""
+    DEFVAL { { zeroDotZero } }
+    ::= { sdhTpEntry 4 }
+
+sdhTpDownstreamFabric OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Identifies the downstream fabric (if different from the 
+	 sdhTpFabric) to which the termination point is attached.  When 
+	 not attached to a downstream fabric different from the 
+	 sdhTpFabric, this pointer will be zeroDotZero.
+
+	 This attribute points to a managed object such as a 
+	 Cross-connection, a GTP or a Fabric. When a termination point 
+	 is neither connected nor reserved for connection, its 
+	 crossConnectionObjectPointer points to the Fabric object 
+	 responsible for its connection."
+    REFERENCE
+	""
+    DEFVAL { { zeroDotZero } }
+    ::= { sdhTpEntry 5 }
+
+sdhTpDownstreamCrossConect OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Identifies the downstream cross connection (different from 
+	 sdhTpCrossConnect) in which the termination point is involved.  
+	 When not connected this pointer will be zeroDotZero.
+
+	 This attribute points to a managed object such as a 
+	 Cross-connection, a GTP or a Fabric. When a termination point 
+	 is neither connected nor reserved for connection, its 
+	 crossConnectionObjectPointer points to the Fabric object 
+	 responsible for its connection."
+    REFERENCE
+	""
+    DEFVAL { { zeroDotZero } }
+    ::= { sdhTpEntry 6 }
+
+sdhTpUpstreamFabric OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Identifies the upstream fabric (if different from sdhTpFabric) 
+	 to which the termination point is attached.  When not attached 
+	 to an upstream fabric different from sdhTpFabric, this pointer 
+	 will be zeroDotZero.
+
+	 This attribute points to a managed object such as a 
+	 Cross-connection, a GTP or a Fabric. When a termination point 
+	 is neither connected nor reserved for connection, its 
+	 crossConnectionObjectPointer points to the Fabric object 
+	 responsible for its connection."
+    REFERENCE
+	""
+    DEFVAL { { zeroDotZero } }
+    ::= { sdhTpEntry 7 }
+
+sdhTpUpstreamCrossConnect OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Identifies the upstream cross-connection (different from 
+	 sdhTpCrossConnect) in which the termination point is involed.  
+	 When not connected this pointer will be zeroDotZero.
+
+	 This attribute points to a managed object such as a 
+	 Cross-connection, a GTP or a Fabric. When a termination point 
+	 is neither connected nor reserved for connection, its 
+	 crossConnectionObjectPointer points to the Fabric object 
+	 responsible for its connection."
+    REFERENCE
+	""
+    DEFVAL { { zeroDotZero } }
+    ::= { sdhTpEntry 8 }
+
+sdhTpCharatersiticInfo OBJECT-TYPE
+    SYNTAX CharacteristicInfo
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Provides the characteristic information for the terminatoin 
+	 point.  This is one of the object identifiers defined in the 
+	 OPENSS7-SMI-MIB and ITU-T Rec. M.3100 (2001).  The 
+	 characteristic information is an autonomous type identified by 
+	 an object identifier that specifies the characteristics of the 
+	 termination point.  Most of these values are used to identify 
+	 various termination points within the SDH hierarchy.
+
+	 The value of this attribute is used to verify the 
+	 connectability of instances of the termination point 
+	 subclasses."
+    REFERENCE
+	""
+    ::= { sdhTpEntry 9 }
+
+sdhTpNetworkLevelPointer OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+	"The network level pointer identifies a network level object. 
+	 The value of the network level pointer shall only be modified 
+	 by the managing system."
+    REFERENCE
+	""
+    DEFVAL { { zeroDotZero } }
+    ::= { sdhTpEntry 10 }
+
+sdhTpAlarmStatus OBJECT-TYPE
+    SYNTAX GnmAlarmStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Provides the alarm status of the termination point following 
+	 the GnmAlarmStatus textual convention of the OPENSS7-SMI-MIB 
+	 and ITU-T Rec. M.3100 (2001).
+	 
+	 - activeReportable-Critical(5), one or more active and 
+	   reportable critical alarms indicating a fault have been 
+	   detected;
+	 
+	 - activeReportable-Major(4), one or more active and reportable 
+	   major alarms indicating a fault have been detected;
+	 
+	 - activeReportable-Minor(3),
+	 
+	 - activeReportable-Indeterminate(1), one or more active and 
+	   reportable alarms of indeterminate severity have been 
+	   detected;
+	 
+	 - activeReportable-Warning(2), one or more active and 
+	   reportable warning alarms have been detected;
+	 
+	 - activePending(6), one or more active but pending alarms 
+	   (either pending severity assignment or pending reporting) 
+	   have been detected;
+	 
+	 - cleared(0), no active alarms have beend detected that have 
+	   not been cleared.
+	 
+	 The value of the alarm status condition does not suppress the 
+	 generation of future fault related notifications."
+    REFERENCE
+        "ITU-T Rec. M.3100 (2005) 
+               ASN1DefinedTypesModule.AlarmStatus.
+	 ITU-T Rec. M.3100 (2005) alarmStatus ATTRIBUTE."
+    ::= { sdhTpEntry 11 }
+
+sdhTpAsaProfilePointer OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"Provides a pointer to an alarm severity assignment profile to 
+	 be used for alarms generated by this termination point, or 
+	 zeroDotZero."
+    REFERENCE
+	""
+    DEFVAL { { zeroDotZero } }
+    ::= { sdhTpEntry 12 }
+
+-- =====================================================================
+
+sdhTtpSinkTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SdhTtpSinkEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"This managed object represents a termination point where a 
+	 trail is terminated.  It represents the access point in a layer 
+	 network which is a focus for both the trail relationship and 
+	 the client/server relationship.  The operational state reflects 
+	 the perceived ability to receive a valid signal.  If the 
+	 termination point detects that a signal received has failed or 
+	 it is unable to process the incoming signal, then the 
+	 operational state will have the value disabled.
+	 
+	 When the administrative state is locked, the termination point 
+	 is administratively removed from service. When the 
+	 administrative state is unlocked, the termination point is 
+	 administratively in service. Changes to administrative state 
+	 have no effect on the connectivity pointer.  A change in the 
+	 operational state shall cause a state change notification. If 
+	 administrative state is present in an instance of trail 
+	 termination point sink class, it shall not emit a state change 
+	 notification. However, subclasses of trail termination point 
+	 sink class may modify this behaviour to require this 
+	 notification. Subclasses of trail termination point sink shall 
+	 specify the attributes for which attribute value change 
+	 notifications should be generated.  The upstream connectivity 
+	 pointer attribute points to the termination point managed 
+	 object, within the same managed element, that sends information 
+	 (traffic) to this termination point at the same layer, or is 
+	 null. The referenced object shall be an instance of one of the 
+	 following classes or its subclasses: Connection Termination 
+	 Point Sink or Bidirectional (single or a concatenated sequence) 
+	 or Trail Termination Point Source or Bidirectional (single or a 
+	 concatenated sequence)."
+    REFERENCE
+	"ITU-T Rec. M.3100 (2005) : trailTerminationPointSink MOC."
+    ::= { sdhTtpSink 1 }
+
+sdhTtpSinkEntry OBJECT-TYPE
+    SYNTAX SdhTtpSinkEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	sdhTpId -- shared index
+    }
+    ::= { sdhTtpSinkTable 1 }
+
+SdhTtpSinkEntry ::= SEQUENCE {
+    sdhTtpSinkOperationalState
+	OperationalState,
+    sdhTtpSinkUpstreamConnectivity
+	RowPointer,
+    sdhTtpSinkAdministativeState
+	AdministrativeState,
+    sdhTtpSinkSupportableClientList
+	SupportableClientList,
+    sdhTtpSinkTtpId
+	SimpleNameType
+}
+
+sdhTtpSinkOperationalState OBJECT-TYPE
+    SYNTAX OperationalState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhTtpSinkEntry 1 }
+
+sdhTtpSinkUpstreamConnectivity OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhTtpSinkEntry 2 }
+
+sdhTtpSinkAdministrativeState OBJECT-TYPE
+    SYNTAX AdministrativeState
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhTtpSinkEntry 3 }
+
+
+sdhTtpSinkSupportableClientList OBJECT-TYPE
+    SYNTAX SupportableClientList
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+	"The value of this attribute is the list of object classes 
+	 representing the clients which the particular managed object is 
+	 capable of supporting. This may be a subset of the client 
+	 layers identified in Recommendation G.803 by the particular 
+	 server layer managed object."
+    REFERENCE
+	""
+    ::= { sdhTtpSinkEntry 4 }
+
+sdhTtpSinkTtpId OBJECT-TYPE
+    SYNTAX SimpleNameType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+	"The Trail Termination Point Id is an attribute type whose 
+	 distinguished value can be used as a RDN when naming an 
+	 instance of the Trail Termination Point object class."
+    REFERENCE
+	""
+    ::= { sdhTtpSinkEntry 5 }
+
+
+-- =====================================================================
+
+sdhTtpSrceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SdhTtpSrceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"This managed object represents a termination point where a 
+	 trail is originated.  It represents the access point in a layer 
+	 network which is a focus for both the trail relationship and 
+	 the client/server relationship.  The operational state reflects 
+	 the perceived ability to generate a valid signal.  If the 
+	 termination point detects that a valid signal cannot be 
+	 generated, then the operational state will have the value 
+	 disabled.  When the administrative state is locked, the 
+	 termination point is administratively removed from service. 
+	 When the administrative state is unlocked, the termination 
+	 point is administratively in service. Changes to administrative 
+	 state have no effect on the connectivity pointer.  A change in 
+	 the operational state shall cause a state change notification. 
+	 If administrative state is present in an instance of trail 
+	 termination point source class, it shall not emit a state 
+	 change notification. However, subclasses of trail termination 
+	 point source class may modify this behaviour to require this 
+	 notification. Subclasses of trail termination point source 
+	 shall specify the attributes for which attribute value change 
+	 notifications should be generated.  The downstream connectivity 
+	 pointer attribute points to the termination point managed 
+	 object, within the same managed element, that receives 
+	 information (traffic) from this termination point at the same 
+	 layer, or is null. The referenced object shall be an instance 
+	 of one of the following classes or its subclasses: Connection 
+	 Termination Point Source or Bidirectional (single or a 
+	 concatenated sequence or a set if connected to more than one 
+	 connection termination point source objects) or Trail 
+	 Termination Point Sink or Bidirectional (single or a set if 
+	 connected to more than one trail termination point sink 
+	 objects)."
+    REFERENCE
+	""
+    ::= { sdhTtpSrce 1 }
+
+sdhTtpSrceEntry OBJECT-TYPE
+    SYNTAX SdhTtpSrceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	sdhTpId -- shared index
+    }
+    ::= { sdhTtpSrceTable 1 }
+
+SdhTtpSrceEntry ::= SEQUENCE {
+    sdhTtpSrceOperationalState
+	OperationalState,
+    sdhTtpSrceDownstreamConnectivity
+	RowPointer,
+    sdhTtpSinkAdministrativeState
+	AdministrativeState,
+    sdhTtpSinkSupportableClientList
+	SupportableClientList,
+    sdhTtpSinkTtpId
+	SimpleNameType
+}
+
+sdhTtpSrceOperationalState OBJECT-TYPE
+    SYNTAX OperationalState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhTtpSrceEntry 1 }
+
+sdhTtpSrceDownstreamConnectivity OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhTtpSrceEntry 2 }
+
+sdhTtpSinkAdministrativeState OBJECT-TYPE
+    SYNTAX AdministrativeState
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhTtpSrceEntry 3 }
+
+sdhTtpSinkSupportableClientList OBJECT-TYPE
+    SYNTAX SupportableClientList
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+	"The value of this attribute is the list of object classes 
+	 representing the clients which the particular managed object is 
+	 capable of supporting. This may be a subset of the client 
+	 layers identified in Recommendation G.803 by the particular 
+	 server layer managed object."
+    REFERENCE
+	""
+    ::= { sdhTtpSrceEntry 4 }
+
+sdhTtpSinkTtpId OBJECT-TYPE
+    SYNTAX SimpleNameType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhTtpSrceEntry 5 }
+
+-- =====================================================================
+
+sdhTtpBidiTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SdhTtpBidiEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhTtpBidi 1 }
+
+sdhTtpBidiEntry OBJECT-TYPE
+    SYNTAX SEQUENCE OF SdhTtpBidiEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	sdhTpId -- shared index
+    }
+    ::= { sdhTtpBidiTable 1 }
+
+SdhTtpBidiEntry ::= SEQUENCE {
+    sdhTtpBidiOperationalState
+	OperationalState,
+    sdhTtpBidiAdministrativeState
+	AdministrativeState,
+    sdhTtpBidiTtpId
+	SimpleNameType
+}
+
+sdhTtpBidiOperationalState OBJECT-TYPE
+    SYNTAX OperationalState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhTtpBidiEntry 1 }
+
+sdhTtpBidiAdministrativeState OBJECT-TYPE
+    SYNTAX AdministrativeState
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhTtpBidiEntry 2 }
+
+sdhTtpBidiTtpId OBJECT-TYPE
+    SYNTAX SimpleNameType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhTtpBidiEntry 3 }
+
+-- =====================================================================
+
+sdhTtpConcatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SdhTtpConcatEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"This table provides a side-table for representing multiple 
+	 connectivity objects in the sdhTtpSinkTable and sdhTtpSrceTable 
+	 tables.  For each index that appears int he sdhTtpSinkTable or 
+	 sdhTtpSrceTable, there can appear in this table the 
+	 corresponding index and multiple occurences sdhTtpConnectivity 
+	 pointers with different values of the sdhTtpConcatIndex."
+    REFERENCE
+	""
+    ::= { sdhTtpConcat 1 }
+
+sdhTtpConcatEntry OBJECT-TYPE
+    SYNTAX SEQUENCE OF SdhTtpConcatEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	sdhTpId, -- shared index
+	sdhTtpConcatIndex
+    }
+    ::= { sdhTtpConcatTable 1 }
+
+SdhTtpConcatEntry ::= SEQUENCE {
+    sdhTtpConcatIndex
+	Unsigned32,
+    sdhTtpConnectivity
+	RowPointer,
+    sdhTtpConcatRowStatus
+	RowStatus
+}
+
+sdhTtpConcatIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible -- index
+    STATUS current
+    DESCRIPTION
+	"Provides an ordinal non-zero index of the connectivity pointers 
+	 associated with a given termination point as identified by the 
+	 sdhTpId index."
+    REFERENCE
+	""
+    ::= { sdhTtpConcatEntry 1 }
+
+sdhTtpConcatConnectivity OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"Provides a single pointer under the specified index 
+	 (sdhTtpConcatIndex) that identifies one of several connectivity 
+	 objects that are providing a source for a sdhTtpSink object, or 
+	 providing a sink for a sdhTtpSource object."
+    REFERENCE
+	""
+    ::= { sdhTtpConcatEntry 2 }
+
+sdhTtpConcatRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"Provides a mechanism whereby management stations may add or 
+	 remove members from the lists associated with sdhTtpSink or 
+	 sdhTtpSrce objects."
+    REFERENCE
+	"STD 58, SNMPv2-TC RowStatus."
+    ::= { sdhTtpConcatEntry 3 }
+
+
+-- =====================================================================
+
+sdhTtpClientsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SdhTtpClientEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhTtpClients 1 }
+
+sdhTtpClientsEntry OBJECT-TYPE
+    SYNTAX SdhTtpClientEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	sdhTpId, -- shared index
+	sdhTtpClientIndex
+    }
+    ::= { sdhTtpClientsTable 1 }
+
+SdhTtpClientEntry ::= SEQUENCE {
+    sdhTtpClientIndex
+	Unsigned32,
+    sdhTtpClientSupported
+	RowPointer,
+    sdhTtpClientRowStatus
+	RowStatus
+}
+
+sdhTtpClientIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible -- index
+    STATUS current
+    DESCRIPTION
+	"Provides a cardinal non-zero index of the supported client 
+	 pointers associated with a given termination point as 
+	 identified by the sdhTpId index."
+    REFERENCE
+	""
+    ::= { sdhTtpClientsEntry 1 }
+
+sdhTtpClientSupported OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"Provides a single pointer under the specifie dindex 
+	 (sdhTtpClientIndex) that identifies one of several client 
+	 objects that are supported by a sdhTtpSink or sdhTtpSrce 
+	 object."
+    REFERENCE
+	""
+    ::= { sdhTtpClientsEntry 2 }
+
+sdhTtpClientRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"Provides a mechanism whereby management stations may add or 
+	 remove members from the lists associatedw ith sdhTtpSink or 
+	 sdhTtpSrce objects."
+    REFERENCE
+	"STD 58, SNMPv2-TC RowStatus."
+    ::= { sdhTtpClientsEntry 3 }
+
+-- =====================================================================
+
+sdhElecSpiTtpBidiTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SdhElecSpiTtpBidiEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"This object class represents the point where the incoming 
+	 electrical interface signal is converted into an internal logic 
+	 level and the timing is recovered from the line signal. A 
+	 communicationsAlarm notification shall be issued if a loss of 
+	 signal is detected. The probableCause parameter of the 
+	 notification shall indicate LOS (Loss Of signal). The upstream 
+	 connectivity pointer is NULL for an instance of this class when 
+	 the upstream termination point is not contained within the same 
+	 network element."
+    REFERENCE
+	"ITU-T Rec. G.774 (2001) electricalSPITTPBidirectional MOC."
+    ::= { sdhElecSpiTtpBidi 1 }
+
+sdhElecSpiTtpBidiEntry OBJECT-TYPE
+    SYNTAX SdhElecSpiTtpBidiEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. G.774 (2001) electricalSPITTPBidirectional MO."
+    INDEX {
+	sdhTpId -- shared index
+    }
+    ::= { sdhElecSpiTtpBidiTable 1 }
+
+SdhElecSpiTtpBidiEntry ::= SEQUENCE {
+    sdhElecSpiTtpBidiId
+	SimpleNameType,
+    sdhElecSpiTtpBidiRowStatus
+	RowStatus
+}
+
+sdhElecSpiTtpBidiId OBJECT-TYPE
+    SYNTAX SimpleNameType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"This attribute is used as an RDN for naming instances of the 
+	 electricalSPITTP object classes. If the string choice of the 
+	 syntax is used then matching on substrings is permitted. If the 
+	 number choice for the syntax is used then matching on ordering 
+	 is permitted."
+    REFERENCE
+	""
+    ::= { sdhElecSpiTtpBidiEntry 1 }
+
+sdhElecSpiTtpBidiRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhElecSpiTtpBidiEntry 2 }
+
+-- =====================================================================
+
+sdhElecSpiTtpSinkTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SdhElecSpiTtpSinkEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"This object class represents the point where the incoming 
+	 electrical interface signal is converted into an internal logic 
+	 level and the timing is recovered from the line signal. A 
+	 communicationsAlarm notification shall be issued if a loss of 
+	 signal is detected. The probableCause parameter of the 
+	 notification shall indicate LOS (Loss Of signal). The upstream 
+	 connectivity pointer is NULL for an instance of this class when 
+	 the upstream termination point is not contained within the same 
+	 network element."
+    REFERENCE
+	"ITU-T Rec. G.774 (2001) electricalSPITTPSink MOC."
+    ::= { sdhElecSpiTtpSink 1 }
+
+sdhElecSpiTtpSinkEntry OBJECT-TYPE
+    SYNTAX SdhElecSpiTtpSinkEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. G.774 (2001) electricalSPITTPSink MO."
+    INDEX {
+	sdhTpId -- shared index
+    }
+    ::= { sdhElecSpiTtpSinkTable 1 }
+
+SdhElecSpiTtpSinkEntry ::= SEQUENCE {
+    sdhElecSpiTtpSinkId
+	SimpleNameType,
+    sdhElecSpiTtpSinkRowStatus
+	RowStatus
+}
+
+sdhElecSpiTtpSinkId OBJECT-TYPE
+    SYNTAX SimpleNameType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"This attribute is used as an RDN for naming instances of the 
+	 electricalSPITTP object classes. If the string choice of the 
+	 syntax is used then matching on substrings is permitted. If the 
+	 number choice for the syntax is used then matching on ordering 
+	 is permitted."
+    REFERENCE
+	""
+    ::= { sdhElecSpiTtpSinkEntry 1 }
+
+sdhElecSpiTtpSinkRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhElecSpiTtpSinkEntry 2 }
+
+-- =====================================================================
+
+sdhElecSpiTtpSrceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SdhElecSpiTtpSrceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"This object class represents the point where the incoming 
+	 electrical interface signal is converted into an internal logic 
+	 level and the timing is recovered from the line signal. A 
+	 communicationsAlarm notification shall be issued if a loss of 
+	 signal is detected. The probableCause parameter of the 
+	 notification shall indicate LOS (Loss Of signal). The upstream 
+	 connectivity pointer is NULL for an instance of this class when 
+	 the upstream termination point is not contained within the same 
+	 network element."
+    REFERENCE
+	"ITU-T Rec. G.774 (2001) electricalSPITTPSource MOC."
+    ::= { sdhElecSpiTtpSrce 1 }
+
+sdhElecSpiTtpSrceEntry OBJECT-TYPE
+    SYNTAX SdhElecSpiTtpSrceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. G.774 (2001) electricalSPITTPSource MO."
+    INDEX {
+	sdhTpId -- shared index
+    }
+    ::= { sdhElecSpiTtpSrceTable 1 }
+
+SdhElecSpiTtpSrceEntry ::= SEQUENCE {
+    sdhElecSpiTtpSrceId
+	SimpleNameType,
+    sdhElecSpiTtpSrceRowStatus
+	RowStatus
+}
+
+sdhElecSpiTtpSrceId OBJECT-TYPE
+    SYNTAX SimpleNameType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"This attribute is used as an RDN for naming instances of the 
+	 electricalSPITTP object classes. If the string choice of the 
+	 syntax is used then matching on substrings is permitted. If the 
+	 number choice for the syntax is used then matching on ordering 
+	 is permitted."
+    REFERENCE
+	""
+    ::= { sdhElecSpiTtpSrceEntry 1 }
+
+sdhElecSpiTtpSrceRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhElecSpiTtpSrceEntry 2 }
+
+-- =====================================================================
+
+sdhOptiSpiTtpBidiTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SdhOptiSpiTtpBidiEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"This object class represents the point where the incoming 
+	 optical interface signal is converted into an internal logic 
+	 level and the timing is recovered from the line signal. A 
+	 communicationsAlarm notification shall be issued if a loss of 
+	 signal is detected. The probableCause parameter of the 
+	 notification shall indicate LOS (Loss Of signal). The upstream 
+	 connectivity pointer is NULL for an instance of this class when 
+	 the upstream termination point is not contained within the same 
+	 network element."
+    REFERENCE
+	""
+    ::= { sdhOptiSpiTtpBidi 1 }
+
+sdhOptiSpiTtpBidiEntry OBJECT-TYPE
+    SYNTAX SdhOptiSpiTtpBidiEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	sdhTpId -- shared index
+    }
+    ::= { sdhOptiSpiTtpBidiTable 1 }
+
+SdhOptiSpiTtpBidiEntry ::= SEQUENCE {
+    sdhOptiSpiTtpBidiId
+	SimpleNameType,
+    sdhOptiSpiTtpBidiOpticalReach
+	OpticalReach,
+    sdhOptiSpiTtpBidiOpticalWavelength
+	OpticalWavelength,
+    sdhOptiSpiTtpBidiStmLevel
+	StmLevel,
+    sdhOptiSpiTtpBidiRowStatus
+	RowStatus
+}
+
+sdhOptiSpiTtpBidiId OBJECT-TYPE
+    SYNTAX SimpleNameType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhOptiSpiTtpBidiEntry 1 }
+
+sdhOptiSpiTtpBidiOpticalReach OBJECT-TYPE
+    SYNTAX OpticalReach
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhOptiSpiTtpBidiEntry 2 }
+
+sdhOptiSpiTtpBidiOpticalWavelength OBJECT-TYPE
+    SYNTAX OpticalWavelength
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhOptiSpiTtpBidiEntry 3 }
+
+sdhOptiSpiTtpBidiStmLevel OBJECT-TYPE
+    SYNTAX StmLevel
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhOptiSpiTtpBidiEntry 4 }
+
+sdhOptiSpiTtpBidiRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhOptiSpiTtpBidiEntry 5 }
+
+-- =====================================================================
+
+sdhOptiSpiTtpSinkTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SdhOptiSpiTtpSinkEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"This object class represents the point where the incoming 
+	 optical interface signal is converted into an internal logic 
+	 level and the timing is recovered from the line signal. A 
+	 communicationsAlarm notification shall be issued if a loss of 
+	 signal is detected. The probableCause parameter of the 
+	 notification shall indicate LOS (Loss Of signal). The upstream 
+	 connectivity pointer is NULL for an instance of this class when 
+	 the upstream termination point is not contained within the same 
+	 network element."
+    REFERENCE
+	""
+    ::= { sdhOptiSpiTtpSink 1 }
+
+sdhOptiSpiTtpSinkEntry OBJECT-TYPE
+    SYNTAX SdhOptiSpiTtpSinkEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	sdhTpId -- shared index
+    }
+    ::= { sdhOptiSpiTtpSinkTable 1 }
+
+SdhOptiSpiTtpSinkEntry ::= SEQUENCE {
+    sdhOptiSpiTtpSinkId
+	SimpleNameType,
+    sdhOptiSpiTtpSinkOpticalReach
+	OpticalReach,
+    sdhOptiSpiTtpSinkOpticalWavelength
+	OpticalWavelength,
+    sdhOptiSpiTtpSinkStmLevel
+	StmLevel,
+    sdhOptiSpiTtpSinkRowStatus
+	RowStatus
+}
+
+sdhOptiSpiTtpSinkId OBJECT-TYPE
+    SYNTAX SimpleNameType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhOptiSpiTtpSinkEntry 1 }
+
+sdhOptiSpiTtpSinkOpticalReach OBJECT-TYPE
+    SYNTAX OpticalReach
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhOptiSpiTtpSinkEntry 2 }
+
+sdhOptiSpiTtpSinkOpticalWavelength OBJECT-TYPE
+    SYNTAX OpticalWavelength
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhOptiSpiTtpSinkEntry 3 }
+
+sdhOptiSpiTtpSinkStmLevel OBJECT-TYPE
+    SYNTAX StmLevel
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhOptiSpiTtpSinkEntry 4 }
+
+sdhOptiSpiTtpSinkRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhOptiSpiTtpSinkEntry 5 }
+
+-- =====================================================================
+
+sdhOptiSpiTtpSrceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SdhOptiSpiTtpSrceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"This object class represents the point where the incoming 
+	 optical interface signal is converted into an internal logic 
+	 level and the timing is recovered from the line signal. A 
+	 communicationsAlarm notification shall be issued if a loss of 
+	 signal is detected. The probableCause parameter of the 
+	 notification shall indicate LOS (Loss Of signal). The upstream 
+	 connectivity pointer is NULL for an instance of this class when 
+	 the upstream termination point is not contained within the same 
+	 network element."
+    REFERENCE
+	""
+    ::= { sdhOptiSpiTtpSrce 1 }
+
+sdhOptiSpiTtpSrceEntry OBJECT-TYPE
+    SYNTAX SdhOptiSpiTtpSrceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	sdhTpId -- shared index
+    }
+    ::= { sdhOptiSpiTtpSrceTable 1 }
+
+SdhOptiSpiTtpSrceEntry ::= SEQUENCE {
+    sdhOptiSpiTtpSrceId
+	SimpleNameType,
+    sdhOptiSpiTtpSrceOpticalReach
+	OpticalReach,
+    sdhOptiSpiTtpSrceOpticalWavelength
+	OpticalWavelength,
+    sdhOptiSpiTtpSrceStmLevel
+	StmLevel,
+    sdhOptiSpiTtpSrceRowStatus
+	RowStatus
+}
+
+sdhOptiSpiTtpSrceId OBJECT-TYPE
+    SYNTAX SimpleNameType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhOptiSpiTtpSrceEntry 1 }
+
+sdhOptiSpiTtpSrceOpticalReach OBJECT-TYPE
+    SYNTAX OpticalReach
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhOptiSpiTtpSrceEntry 2 }
+
+sdhOptiSpiTtpSrceOpticalWavelength OBJECT-TYPE
+    SYNTAX OpticalWavelength
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhOptiSpiTtpSrceEntry 3 }
+
+sdhOptiSpiTtpSrceStmLevel OBJECT-TYPE
+    SYNTAX StmLevel
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhOptiSpiTtpSrceEntry 4 }
+
+sdhOptiSpiTtpSrceRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sdhOptiSpiTtpSrceEntry 5 }
+
+-- =====================================================================
+
+
+
+
+
+-- =====================================================================
+
+-- au3CTPBidirectionalR1 MANAGED OBJECT CLASS
+-- au3CTPSinkR1 MANAGED OBJECT CLASS
+-- au3CTPSource MANAGED OBJECT CLASS
+-- au4CTPBidirectionalR1 MANAGED OBJECT CLASS
+-- au4CTPSinkR1 MANAGED OBJECT CLASS
+-- au4CTPSource MANAGED OBJECT CLASS
+-- augBidirectional MANAGED OBJECT CLASS
+-- augSink MANAGED OBJECT CLASS
+-- augSource MANAGED OBJECT CLASS
+-- electricalSPITTPBidirectional MANAGED OBJECT CLASS
+-- electricalSPITTPSink MANAGED OBJECT CLASS
+-- electricalSPITTPSource MANAGED OBJECT CLASS
+-- indirectAdaptorBidirectional MANAGED OBJECT CLASS
+-- indirectAdaptorSink MANAGED OBJECT CLASS
+-- indirectAdaptorSource MANAGED OBJECT CLASS
+-- msCTPBidirectional MANAGED OBJECT CLASS
+-- msCTPSink MANAGED OBJECT CLASS
+-- msCTPSource MANAGED OBJECT CLASS
+-- msDatacomCTPBidirectional MANAGED OBJECT CLASS
+-- msDatacomCTPSink MANAGED OBJECT CLASS
+-- msDatacomCTPSource MANAGED OBJECT CLASS
+-- msOrderwireCTPBidirectional MANAGED OBJECT CLASS
+-- msOrderwireCTPSink MANAGED OBJECT CLASS
+-- msOrderwireCTPSource MANAGED OBJECT CLASS
+-- msTTPBidirectional MANAGED OBJECT CLASS
+-- msTTPSink MANAGED OBJECT CLASS
+-- msTTPSource MANAGED OBJECT CLASS
+-- opticalSPITTPBidirectional MANAGED OBJECT CLASS
+-- opticalSPITTPSink MANAGED OBJECT CLASS
+-- opticalSPITTPSource MANAGED OBJECT CLASS
+-- rsCTPBidirectional MANAGED OBJECT CLASS
+-- rsCTPSink MANAGED OBJECT CLASS
+-- rsCTPSource MANAGED OBJECT CLASS
+-- rsDatacomCTPBidirectional MANAGED OBJECT CLASS
+-- rsDatacomCTPSink MANAGED OBJECT CLASS
+-- rsDatacomCTPSource MANAGED OBJECT CLASS
+-- rsOrderwireCTPBidirectional MANAGED OBJECT CLASS
+-- rsOrderwireCTPSink MANAGED OBJECT CLASS
+-- rsOrderwireCTPSource MANAGED OBJECT CLASS
+-- rsTTPBidirectional MANAGED OBJECT CLASS
+-- rsTTPTrailTraceBidirectional MANAGED OBJECT CLASS
+-- rsTTPSink MANAGED OBJECT CLASS
+-- rsTTPTrailTraceSink MANAGED OBJECT CLASS
+-- rsTTPSource MANAGED OBJECT CLASS
+-- rsTTPTrailTraceSource MANAGED OBJECT CLASS
+-- rsUserChannelCTPBidirectional MANAGED OBJECT CLASS
+-- rsUserChannelCTPSink MANAGED OBJECT CLASS
+-- rsUserChannelCTPSource MANAGED OBJECT CLASS
+-- tu11CTPBidirectionalR1 MANAGED OBJECT CLASS
+-- tu11CTPSinkR1 MANAGED OBJECT CLASS
+-- tu11CTPSource MANAGED OBJECT CLASS
+-- tu12CTPBidirectionalR1 MANAGED OBJECT CLASS
+-- tu12CTPSinkR1 MANAGED OBJECT CLASS
+-- tu12CTPSource MANAGED OBJECT CLASS
+-- tu2CTPBidirectionalR1 MANAGED OBJECT CLASS
+-- tu2CTPSinkR1 MANAGED OBJECT CLASS
+-- tu2CTPSource MANAGED OBJECT CLASS
+-- tu3CTPBidirectionalR1 MANAGED OBJECT CLASS
+-- tu3CTPSinkR1 MANAGED OBJECT CLASS
+-- tu3CTPSource MANAGED OBJECT CLASS
+-- tug2Bidirectional MANAGED OBJECT CLASS
+-- tug2Sink MANAGED OBJECT CLASS
+-- tug2Source MANAGED OBJECT CLASS
+-- tug3Bidirectional MANAGED OBJECT CLASS
+-- tug3Sink MANAGED OBJECT CLASS
+-- tug3Source MANAGED OBJECT CLASS
+-- vc11TTPBidirectionalR1 MANAGED OBJECT CLASS
+-- vc11TTPSinkR1 MANAGED OBJECT CLASS
+-- vc11TTPSource MANAGED OBJECT CLASS
+-- vc12TTPBidirectionalR1 MANAGED OBJECT CLASS
+-- vc12TTPSinkR1 MANAGED OBJECT CLASS
+-- vc12TTPSource MANAGED OBJECT CLASS
+-- vc2TTPBidirectionalR1 MANAGED OBJECT CLASS
+-- vc2TTPSinkR1 MANAGED OBJECT CLASS
+-- vc2TTPSource MANAGED OBJECT CLASS
+-- vc3TTPBidirectionalR1 MANAGED OBJECT CLASS
+-- vc3TTPSinkR1 MANAGED OBJECT CLASS
+-- vc3TTPSourceR1 MANAGED OBJECT CLASS
+-- vc4TTPBidirectionalR1 MANAGED OBJECT CLASS
+-- vc4TTPSinkR1 MANAGED OBJECT CLASS
+-- vc4TTPSourceR1 MANAGED OBJECT CLASS
+-- vcnUserChannelCTPBidirectional MANAGED OBJECT CLASS
+-- vcnUserChannelCTPSink MANAGED OBJECT CLASS
+-- vcnUserChannelCTPSource MANAGED OBJECT CLASS
+
+END -- end of module OPENSS7-SDH-MIB

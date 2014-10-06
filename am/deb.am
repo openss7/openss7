@@ -1,0 +1,1308 @@
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
+## =============================================================================
+## 
+# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-09-02 08:46:27 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU Affero General Public License as published by the Free
+## Software Foundation; version 3 of the License.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+## details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+## write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+## 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2011-09-02 08:46:27 $ by $Author: brian $
+##
+## =============================================================================
+
+##
+## These are the rules that I use for build debian source and binary packages using automake.  As a
+## maintainer I need to package releases using dpkg.  The following rules accomplish that for all
+## most packages.
+##
+
+##
+## For better speed when building package binaries, we skip these rules to invoke package building.
+## There is not (yet) a need to build packages when building packages...  We use maintainer mode to
+## distinguish whether these rules are necessary or not.
+##
+
+if BUILD_DPKG
+## BUILD_DPKG
+
+if MAINTAINER_MODE
+## MAINTAINER_MODE
+
+##
+## Debian builds are a little different from rpm builds.  We use the same bootstrapping as we do for
+## RPM in that a distributed tarball has all of the targets necessary for building dsc and deb
+## packages built in, however, the debian control file does not have the powerful macro capabilities
+## of an RPM spec file.  Therefore, one debian source package cannot be used for building all binary
+## packages as we do with RPM.  The Debian build process here consists of unpacking the distribution
+## and configuring it.  Then the .dsc and .deb packages are built from the already configured source.
+##
+
+## Because we *are* the upstream source, we always use debian version @PACKAGE_DEBRELEASE@ and pack
+## the RPM release number onto the upstream version, but with a period instead of a dash to suppress
+## warnings from dpkg-source.
+##
+debianpkg		= $(PACKAGE_LCNAME)_$(VERSION)-$(PACKAGE_DEBRELEASE)
+debian_dir		= $(debbuilddir)/$(PACKAGE_LCNAME)-$(VERSION)
+debian_dir_stamp	= $(debbuilddir)/stamp-$(PACKAGE_LCNAME)-$(VERSION)
+debian_cache_files	= $(debbuilddir)/*config.cache \
+			  $(debbuilddir)/*config.site \
+			  $(debbuilddir)/*modpost.cache
+
+deb_base_file		= $(debianpkg)_*[ud.]deb
+deb_binary_file		= $(PACKAGE_LCNAME)*_$(VERSION)-$(PACKAGE_DEBRELEASE)_*[ud.]deb
+deb_module_file		= $(PACKAGE_LCNAME)-$(kversion)*_$(VERSION)-$(PACKAGE_DEBRELEASE)_*[ud.]deb
+deb_change_file		= $(debianpkg)_*.changes
+
+debian_tar_file		= $(debbuilddir)/$(debianpkg).tar.gz
+debian_dsc_file		= $(debbuilddir)/$(debianpkg).dsc
+debian_sig_file		= $(debbuilddir)/$(debianpkg).dsc.sig
+debian_source_files	= $(debian_tar_file) $(debian_dsc_file) $(debian_sig_file)
+debian_change_files	= $(debbuilddir)/$(deb_change_file) $(debbuilddir)/$(deb_change_file).asc
+debian_update_files	= $(debbuilddir)/$(deb_module_file)
+debian_binary_files	= $(debbuilddir)/$(deb_binary_file) \
+			  $(debian_update_files)
+debian_product_file	= $(debbuilddir)/product
+
+debtop_tar_file		= $(debdir)/source/$(debianpkg).tar.gz
+debtop_dsc_file		= $(debdir)/source/$(debianpkg).dsc
+debtop_sig_file		= $(debdir)/source/$(debianpkg).dsc.sig
+debtop_source_files	= $(debtop_tar_file) $(debtop_dsc_file) $(debtop_sig_file)
+debtop_change_files	= $(debdir)/$(deb_change_file) $(debdir)/$(deb_change_file).asc \
+			  $(debdir)/*/$(deb_change_file) $(debdir)/*/$(deb_change_file).asc
+debtop_update_files	= $(debdir)/$(deb_module_file) $(debdir)/*/$(deb_module_file)
+debtop_binary_files	= $(debdir)/$(deb_binary_file) $(debdir)/*/$(deb_binary_file) \
+			  $(debtop_update_files)
+debtop_product_file	= $(debdir)/product
+
+## aptdir = $(debdistdir)
+## aptfulldir = $(debdir)
+## aptmaindir = $(debdir)/main
+## aptdebgdir = $(debdir)/debug
+## aptdevldir = $(debdir)/devel
+## aptsrcsdir = $(debdir)/source
+
+## For the master build package it is sometime necessary to pass extra options down to configured
+## subdirectories for a master build.  These options will contain the passed down options from the
+## environment in that case.  See the recursive build targets below.
+##
+AM_DEBXOPTS	= -d
+
+ARCH		= $(target_arch)
+
+#!
+#! Debian Build Targets:
+#! ---------------------
+#!
+#! On debian systems, or systems sporting debian packaging tools, the following
+#! targets are used to generate debian release packages.  The release number can
+#! be controlled by the contents of the .debrelease file, or with the
+#! --with-debrelease=RELEASENUMBER option to 'configure'.  See 'configure
+#! --help' for more information on options.
+#!
+$(debian_dir):: $(debian_dir_stamp)
+$(debian_dir_stamp): $(tardir)/$(PACKAGE)-$(VERSION).tar.bz2
+	rm -rf $(debbuilddir)/$(PACKAGE)-$(VERSION) $(debian_dir)
+	$(MKDIR_P) $(debbuilddir)/$(PACKAGE)-$(VERSION)
+	$(BZIP2_CMD) -dc $< | tar xf - -C $(debbuilddir)
+	@if test "$(debbuilddir)/$(PACKAGE)-$(VERSION)" != "$(debian_dir)"; then \
+		$(ECHO) "$(am__mv) -- $(debbuilddir)/$(PACKAGE)-$(VERSION) $(debian_dir)"; \
+		$(am__mv) -- $(debbuilddir)/$(PACKAGE)-$(VERSION) $(debian_dir); \
+	fi
+	touch $(debian_dir_stamp)
+
+$(debian_product_file):
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(AM_V_GEN)(\
+		$(ECHO) 'distro=$(target_distro)' ; \
+		$(ECHO) 'relvel=$(target_edition)' ; \
+		$(ECHO) 'osarch=$(target_arch)' ; \
+		$(ECHO)	'repotype=debs' ; \
+		$(ECHO) 'username=' ; \
+		$(ECHO) 'password=' ; \
+	) >$@
+
+## Approach to signing dsc files taken from dpkg-buildpackage:  A signed .dsc file is merely a
+## signed cleartext armoured version of the original .dsc file with the same filename.  The tar file
+## is not signed.  As there is an md5 checksum in the signed .dsc file, the signature verifies the
+## tar file as well.  We use a little trick to allow GPGPASSWD to be exported by the user to permit
+## automated builds that including signing.  If you don't like the security issues that raises, dont
+## use it and you will be prompted for a passphrase with each signature.
+##
+$(debian_dsc_file) $(debian_tar_file):: $(debian_dir_stamp)
+	[ -d $(debian_dir) ] || $(MAKE) $(AM_MAKEFLAGS) -- $(debian_dir)
+	( cd $(debian_dir); [ -d debian/source ] || $(MKDIR_P) -- debian/source ; \
+	  $(ECHO) "3.0 (native)" >debian/source/format ; \
+	  BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' $(DPKG_BUILDPACKAGE) -S -rfakeroot -us -uc $(AM_DEBXOPTS) )
+#	(cd "$(debbuilddir)"; $(DPKG_SOURCE) -b -sn $(debian_dir))
+
+$(debtop_dsc_file) $(debtop_tar_file)::
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@f=`$(ECHO) "$@" | sed 's|^$(debdir)/source/|$(debbuilddir)/|'`; \
+	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) -- $$f"; \
+		$(MAKE) $(AM_MAKEFLAGS) -- $$f; }; \
+	test ! \( "$@" -ef "$$f" \) || exit 0; \
+	d=; test -f $$f || d='$(srcdir)/'; \
+	test ":$(FORCE)" != :force -a -f "$@" || { \
+		$(ECHO) "cp -f -- $$d$$f $@"; \
+		cp -f -- $$d$$f $@; }
+
+$(debtop_sig_file): $(debtop_dsc_file)
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(am__gpg_clear_sign)
+
+#! dsc:
+#!     This target will build the debian source change package (.dsc file).  We
+#!     use release number 0 so that the entire tarball is included in the dsc
+#!     file.  You can use release number 1 for the same purposes.  Release
+#!     numbers above 1 will not include the entire tarball.  The .dsc file will
+#!     be named: @PACKAGE_LCNAME@_@VERSION@-@PACKAGE_DEBRELEASE@.dsc
+#!
+dsc: $(debtop_dsc_file) $(debtop_tar_file)
+
+#! sigs:
+#!     This target signs the .deb files.  You will be prompted for a password,
+#!     unless to specify it to make with the GNUPGPASS variable.
+#!
+sigs: $(debtop_sig_file)
+
+AM_BINARY_TARGET = binary-arch
+
+## This is the type of thing that needs to be included in the master makefile to build debs for the
+## current target, we also build any defined AM_DEBTARGETS
+##
+each-deb:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	[ -d $(debian_dir) ] || $(MAKE) $(AM_MAKEFLAGS) -- $(debian_dir)
+	( cd $(debian_dir); BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS) $(AM_DEBCOPTS) $(AM_DEBMOPTS)' kversion='$(kversion)' debbuilddir='$(debbuilddir)' $(DPKG_BUILDPACKAGE) $(AM_DEBBOPTS) -rfakeroot -uc $(AM_DEBXOPTS) -nc )
+#	( cd $(debian_dir); eval "`$(DPKG_BUILDFLAGS) --export=sh`"; $(DPKG_ARCHITECTURE) -c fakeroot $(MAKE) $(AM_MAKEFLAGS) -f debian/rules -- BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS) $(AM_DEBCOPTS) $(AM_DEBMOPTS)' build $(AM_BINARY_TARGET) )
+
+noa-deb: AM_DEBBOPTS = -A
+noa-deb: AM_DEBXOPTS = -d
+noa-deb: AM_DEBCOPTS = --disable-arch
+noa-deb: AM_BINARY_TARGET = binary-indep
+noa-deb: each-deb
+
+one-deb: AM_DEBBOPTS = -B
+one-deb: AM_DEBXOPTS = -d
+one-deb: AM_DEBCOPTS = --disable-indep
+one-deb: AM_BINARY_TARGET = binary-arch
+one-deb: each-deb
+
+one-t-deb: AM_DEBMOPTS = --disable-modules
+one-t-deb: one-deb
+
+one-k-deb: AM_DEBMOPTS = --disable-tools
+one-k-deb: one-deb
+
+full-deb: $(debian_dir_stamp)
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	[ -d $(debian_dir) ] || $(MAKE) $(AM_MAKEFLAGS) -- $(debian_dir)
+	( cd $(debian_dir); BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS) $(AM_DEBCOPTS) $(AM_DEBMOPTS)' kversion='$(kversion)' debbuilddir='$(debbuilddir)' $(DPKG_BUILDPACKAGE) $(AM_DEBBOPTS) -rfakeroot -uc $(AM_DEBXOPTS) -nc )
+#	( cd $(debian_dir); $(DPKG_ARCHITECTURE) -c fakeroot $(MAKE) $(AM_MAKEFLAGS) -f debian/rules -- BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS) $(AM_DEBCOPTS) $(AM_DEBMOPTS)' $(AM_BINARY_TARGET) )
+
+all-deb: AM_DEBBOPTS = -b
+all-deb: AM_DEBXOPTS = -d
+all-deb: AM_DEBCOPTS =
+all-deb: AM_BINARY_TARGET = binary
+all-deb: full-deb
+
+chg-deb:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@if test "$(debdir)" != "$(debbuilddir)"; then \
+		list="$(debian_binary_files) $(debian_change_files) $(debian_product_file)"; for f in $$list; do \
+			test -f $$f || continue; \
+			s= ; \
+			case `basename $$f` in \
+				(*source*) s=source ;; \
+				(*-debug*) s=debug ;; \
+				(*-devel*) s=devel ;; \
+				(*deb)     s=main ;; \
+			esac ; \
+			t=`echo $$f | sed 's|^$(debbuilddir)/|$(debdir)'$${s:+/$$s}'/|'`; \
+			if test ! -f $$t -o \( "$(FORCE)" = force -a $$f -nt $$t \); then \
+				$(ECHO) "cp -fp -- $$f $$t"; \
+				cp -fp -- $$f $$t; \
+			fi; \
+		done; \
+	fi
+
+#! debs:
+#!     This target will build the debian binary package (.deb file) from the
+#!     .dsc created above.  (This target will also create the .dsc if it has not
+#!     been created already.)  The subpackage .deb files will be named:
+#!     @PACKAGE_LCNAME@*_@VERSION@-@PACKAGE_DEBRELEASE@_*[ud.]deb, where the stars indicate the subpackage and
+#!     the architecture.
+#!
+debs:
+	@$(ECHO) "D: $@: rebuild binary-indep"; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion='$(kversion)' ARCH="noarch" noa-deb || :
+	@$(ECHO) "D: $@: rebuild binary-$(target_arch) $(kversion)"; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion='$(kversion)' ARCH='$(target_arch)' one-k-deb || :
+	@$(ECHO) "D: $@: rebuild binary-$(target_arch)"; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion='$(kversion)' ARCH='$(target_arch)' one-t-deb || :
+	@$(ECHO) "D: $@: rebuild changes"; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion='$(kversion)' ARCH='$(target_arch)' chg-deb || :
+
+chgs:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@eval "`$(DPKG_ARCHITECTURE)`" ; \
+	debs=`(find $(debbuilddir) -maxdepth 1 -type f \( -name '$(deb_base_file)' -o -name '$(deb_binary_file)' -o -name '$(deb_module_file)' \) | LANG= sort -u) 2>/dev/null`; \
+	needrebuild=no; c="$(debbuilddir)/$(debianpkg)_$$DEB_HOST_ARCH.changes"; \
+	for f in $$debs ; do \
+		test -s $$f || continue; \
+		if test '$(FORCE)' = force -o \( ! -s $$c -o $$f -nt $$c \); then \
+			$(ECHO) "D: $@: need rebuild for $$f" ; \
+			needrebuild=yes; \
+		else \
+			$(ECHO) "D: $@: skip rebuild for $$f" ; \
+		fi; \
+	done; \
+	if test "$$needrebuild" = yes; then \
+	( \
+		cd $(debian_dir) ; \
+		eval "`$(DPKG_ARCHITECTURE)`" ; \
+		$(ECHO_V) "D: $@: generating debian/control.new"; \
+		$(ECHO_Q) "  GEN   "`basename debian/control.new`; \
+		{ \
+			cat debian/control | sed '/^$$/,$$d' ; \
+			$(ECHO) ""; \
+			for f in $(debian_binary_files) ; do \
+				test -s $$f || continue ; \
+				$(ECHO) "  $(DPKG) --info $$f | sed -n '/^ Package/,$$s,^ ,,p' | sed '/^Architecture/s,'$$DEB_HOST_ARCH',any,' | egrep -v '^(Version|Installed|Source|Origin|Bugs|Maintainer)'" >&2 ; \
+				$(DPKG) --info $$f | sed -n '/^ Package/,$$s,^ ,,p' | \
+					sed '/^Architecture/s,'$$DEB_HOST_ARCH',any,' | \
+					egrep -v '^(Version|Installed|Source|Origin|Bugs|Maintainer)' ; \
+				$(ECHO) "" ; \
+			done ; \
+		} >debian/control.new ; \
+		$(ECHO) "  mv -f -- debian/control.new debian/control" ; \
+		mv -f -- debian/control.new debian/control ; \
+		$(ECHO) "  $(DPKG_GENCHANGES) -b >../$(debianpkg)_$${DEB_HOST_ARCH}.changes" ; \
+		$(DPKG_GENCHANGES) -b >../$(debianpkg)_$${DEB_HOST_ARCH}.changes ; \
+	) ; \
+	else \
+		$(ECHO) "D: $@: skipping rebuilding changes"; \
+	fi
+
+### Another sneaky trick
+all-one-k-deb:	ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+all-one-t-deb:	ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+all-one-deb:	ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+all-noa-deb:	ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+all-all-deb:	ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+all-chg-deb:	ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+all-dsc:	ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+all-debs:	ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+all-chgs:	ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+all-sigs:	ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+all-csig:	ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+
+#! csig:
+#!     This target signs the .dsc file.  You will be prompted for a password,
+#!     unless to specify it to make with the GNUPGPASS variable.
+#!
+csig:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@list="$(debtop_change_files)"; for f in $$list; do \
+		test -f $$f || continue; \
+		$(am__gpg_clear_sign_file) ; \
+	done
+
+#! reupload:
+#!	This target searches out a list of kernel names from the
+#!	@DESTDIR@/lib/modules directory and builds debs for those kernels and
+#!	for each of a set of architectures given in the AM_DEBTARGETS variable
+#!	to make.  This is a convenience target for building a group of debs on a
+#!	given build machine.
+#!
+reupload: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+reupload:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@debs="`(find $(debdir) -name '$(deb_base_file)' -o -name '$(deb_binary_file)' | LANG= sort -u | grep '_all\..deb$$') 2>/dev/null`"; \
+	if test -z "$$debs" -o -n '$(FORCE)'; then \
+		$(ECHO) "D: $@: rebuild binary-indep"; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH=\"noarch\" noa-deb"; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH="noarch" noa-deb || :; \
+	else \
+		$(ECHO) "D: $@: skipped binary-indep"; \
+	fi; \
+	targets="$(target_arch) $(AM_DEBTARGETS)"; \
+	for t in $$targets;  do \
+		a=`$(ECHO) "$$t" | sed 's,-.*$$,,'`; \
+		test \( "$$a" != 'noarch' -a "$$a" != 'all' \) || continue; \
+		kernels="`( find $(DESTDIR)$(rootdir)/lib/modules -maxdepth 1 -type d \( -name '2.[46].[0-9]*' -o -name '3.[0-9]*' \) | $(rpmsort) ) 2>/dev/null`"; \
+		for k in $$kernels; do \
+			k=`basename $$k`; \
+			test -e $(DESTDIR)$(rootdir)/lib/modules/$$k/build || { $(ECHO) "D: $@: skipping $$k (no build directory)"; continue; }; \
+			test -e $(DESTDIR)$(rootdir)/boot/System.map-$$k || { $(ECHO) "D: $@: skipping $$k (no system map)"; continue; }; \
+			test -n '$(DESTDIR)$(rootdir)' || $(DPKG) -S `(cd /lib/modules/$$k/build; /bin/pwd)` >/dev/null 2>&1 || { $(ECHO) "D: $@: skipping $$k (no build provides)"; continue; }; \
+			ks=`echo $$k | sed 's,-,.,g;s,_,.,g'`; \
+			debs="`(find $(debdir) -name '$(PACKAGE_LCNAME)-$$k*_$(VERSION)-$(PACKAGE_DEBRELEASE)_*[ud.]deb' | LANG= sort -u | grep -v '_all\..*deb$$') 2>/dev/null`"; \
+			if test -z "$$debs" -o -n '$(FORCE)'; then \
+				$(ECHO) "D: $@: rebuild $$k"; \
+				$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion=\"$$k\" ARCH=\"$$t\" one-k-deb"; \
+				$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion="$$k" ARCH="$$t" one-k-deb || :; \
+			else \
+				$(ECHO) "D: $@: skipped $$k"; \
+			fi; \
+		done; \
+		debs="`(find $(debdir) -name '$(deb_base_file)' -o -name '$(deb_binary_file)' | LANG= sort -u | grep -v '_all\..*deb$$') 2>/dev/null`"; \
+		if test -z "$$debs" -o -n '$(FORCE)'; then \
+			$(ECHO) "D: $@: rebuild $$a"; \
+			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH=\"$$t\" one-t-deb"; \
+			$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH="$$t" one-t-deb|| :; \
+		else \
+			$(ECHO) "D: $@: skipped $$a"; \
+		fi; \
+	done; \
+	$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) chg-deb"; \
+	$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) chg-deb || :
+
+distclean-deb:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	rm -rf $(debian_dir)
+
+DISTCLEAN_LOCAL		+= distclean-deb
+DISTCLEANFILES		+= $(debian_cache_files) \
+			   $(debian_dir_stamp) \
+			   $(debian_source_files) \
+			   $(debian_change_files) \
+			   $(debian_binary_files) \
+			   $(debian_product_file)
+
+release-clean-deb: distclean-deb
+
+RELEASE_DIRECTORIES	+= $(aptdir) $(aptfulldir) $(aptmaindir) $(aptdebgdir) $(aptdevldir) $(aptsrcsdir)
+RELEASE			+= all-dsc all-debs all-chgs
+RELEASE_SIGN		+= all-sigs all-csig
+RELEASE_CLEAN_LOCAL	+= release-clean-deb
+RELEASECLEANFILES	+= $(debian_dir_stamp) \
+			   $(debian_source_files) \
+			   $(debian_change_files) \
+			   $(debian_binary_files) \
+			   $(debian_product_file) \
+			   $(debtop_source_files) \
+			   $(debtop_change_files) \
+			   $(debtop_binary_files) \
+			   $(debtop_product_file)
+
+MY_PHONY		+= dsc debs full-deb each-deb one-t-deb one-k-deb one-deb noa-deb all-deb chg-deb chgs sigs csig reupload
+ALL_RECURSIVE_TARGETS	+= all-dsc all-debs all-one-t-deb all-one-k-deb all-one-deb all-noa-deb all-all-deb all-chg-deb all-chgs all-sigs all-csig all-reupload
+
+update-clean-deb:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	rm -rf $(debian_dir)
+	@list="$(debtop_source_files) $(debtop_change_files) $(debtop_binary_files) $(debtop_product_file)"; \
+	for f in $$list; do \
+		if test -e $$f -a \( ! -f '$(USTAMP)' -o $$f -nt '$(USTAMP)' \); then \
+			echo "$$f"; \
+		fi; \
+	done | $(am__base_remove)
+
+UPDATE_DIRECTORIES	+= $(aptdir) $(aptfulldir) $(aptmaindir) $(aptdebgdir) $(aptdevldir) $(aptsrcsdir)
+UPDATE			+= all-update-dscs all-update-debs all-update-chgs
+UPDATE_SIGN		+= all-update-csig all-update-sigs
+UPDATE_CLEAN_LOCAL	+= update-clean-deb
+UPDATECLEANFILES	+= $(debian_dir_stamp) \
+			   $(debian_source_files) \
+			   $(debian_change_files) \
+			   $(debian_binary_files) \
+			   $(debian_product_file)
+
+## Provide updates to debian source packages.  If the DSC does not exist, create it.  If the DSC
+## exists, was created after the update stamp, and force is applied, remove and recreate the DSC.
+##
+update-dscs:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@list="$(debtop_dsc_file) $(debtop_tar_file)"; for f in $$list; do \
+		if test ! -e "$$f" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \) \) ; then \
+			g=`$(ECHO) "$$f" | sed 's,^$(debdir),$(debian_dir),'`; \
+			$(ECHO) "D: $@: rebuild $$f" ; \
+			$(ECHO) "rm -f -- \"$$f\" \"$$g\""; rm -f -- "$$f" "$$g"; \
+			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- \"$$f\""; \
+			$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- "$$f"; \
+		else \
+			$(ECHO) "D: $@: skipped $$f" ; \
+		fi; \
+	done
+
+## Update one architecture independent deb.  Don't create a new deb unless there the deb is missing
+## from both the distribution directory and the repository.
+##
+update-n-deb:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@rebuild=yes; \
+	repodir=`echo '$(debdir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
+	$(ECHO) "find $(debdir) $$repodir -name '$(deb_base_file)' -o -name '$(deb_binary_file)' | LANG= sort -u | grep '_all\..*deb$$'"; \
+	debs="`(find $(debdir) $$repodir -name '$(deb_base_file)' -o -name '$(deb_binary_file)' | LANG= sort -u | grep '_all\..*deb$$') 2>/dev/null`"; \
+	for f in $$debs; do \
+		if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then \
+			$(ECHO) "D: $@: leaving $$f"; \
+			rebuild=no; \
+		else \
+			$(ECHO) "D: $@: rebuild $$f"; \
+		fi; \
+	done; \
+	if test "$$rebuild" = yes; then \
+		$(ECHO) "D: $@: rebuild binary-indep"; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH=\"noarch\" noa-deb"; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH="noarch" noa-deb; \
+	else \
+		$(ECHO) "D: $@: skipping binary-indep"; \
+	fi
+
+## Update one kernel module deb.  Don't create a new deb unless the deb is missing from both the
+## distribution directory and the repository.
+##
+update-k-deb:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@a=`echo '$(target_arch)' | sed 's,-.*$$,,'`; \
+	test \( "$$a" != noarch -a "$$a" != all \) || exit 0; \
+	test -e $(DESTDIR)$(rootdir)/lib/modules/$(kversion)/build || { $(ECHO) "D: $@: skipping $(kversion) (no build directory)"; exit 0; }; \
+	test -e $(DESTDIR)$(rootdir)/boot/System.map-$(kversion) || { $(ECHO) "D: $@: skipping $(kversion) (no system map)"; exit 0; }; \
+	test -n '$(DESTDIR)$(rootdir)' || $(DPKG) -S `(cd /lib/modules/$(kversion)/build; /bin/pwd)` >/dev/null 2>&1 || { $(ECHO) "D: $@: skipping $(kversion) (no build provides)"; exit 0; }; \
+	rebuild=yes; \
+	ks=`echo '$(kversion)' | sed 's,-,.,g;s,_,.,g'`; \
+	repodir=`echo '$(debdir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
+	$(ECHO) "D: $@: find $(debdir) $$repodir -name '$(deb_module_file)' | LANG= sort -u | grep -v '_all\..*deb$$'" ; \
+	debs="`(find $(debdir) $$repodir -name '$(deb_module_file)' | LANG= sort -u | grep -v '_all\..*deb$$') 2>/dev/null`"; \
+	for f in $$debs; do \
+		if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then \
+			$(ECHO) "D: $@: leaving $$f"; \
+			rebuild=no; \
+		else \
+			$(ECHO) "D: $@: rebuild $$f"; \
+		fi; \
+	done; \
+	if test "$$rebuild" = yes; then \
+		$(ECHO) "D: $@: rebuild binary-$(kversion)"; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion='$(kversion)' ARCH='$(target_arch)' one-k-deb"; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion='$(kversion)' ARCH='$(target_arch)' one-k-deb || :; \
+	else \
+		$(ECHO) "D: $@: skipped binary-$(kversion)"; \
+	fi
+
+## Update one tools deb.  Don't create a new deb unless the deb is missing from both the
+## distribution directory and the repository.
+##
+update-t-deb:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@a=`echo '$(target_arch)' | sed 's,-.*$$,,'`; \
+	test \( "$$a" != noarch -a "$$a" != all \) || exit 0; \
+	rebuild=yes; \
+	repodir=`echo '$(debdir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
+	$(ECHO) "D: $@: find $(debdir) $$repodir -name '$(deb_base_file)' -o -name '$(deb_binary_file)' | LANG= sort -u | grep -v '_all\..*deb$$'"; \
+	debs="`(find $(debdir) $$repodir -name '$(deb_base_file)' -o -name '$(deb_binary_file)' | LANG= sort -u | grep -v '_all\..*deb$$') 2>/dev/null`"; \
+	for f in $$debs; do \
+		if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then \
+			$(ECHO) "D: $@: leaving $$f"; \
+			rebuild=no; \
+		else \
+			$(ECHO) "D: $@: rebuild $$f"; \
+		fi; \
+	done; \
+	if test "$$rebuild" = yes; then \
+		$(ECHO) "D: $@: rebuild binary-$$a"; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH='$(target_arch)' one-t-deb"; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH='$(target_arch)' one-t-deb || :; \
+	else \
+		$(ECHO) "D: $@: skipped binary-$$a"; \
+	fi
+
+update-c-deb:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@if test "$(debdir)" != "$(debbuilddir)"; then \
+		list="$(debian_binary_files) $(debian_change_files) $(debian_product_file)"; for f in $$list; do \
+			test -f $$f || continue; \
+			s= ; \
+			case `basename $$f` in \
+				(*source*) s=source ;; \
+				(*-debug*) s=debug ;; \
+				(*-devel*) s=devel ;; \
+				(*deb)     s=main ;; \
+			esac ; \
+			t=`echo $$f | sed 's|^$(debbuilddir)/|$(debdir)'$${s:+/$$s}'/|'`; \
+			if test ! -f $$t -o \( "$(FORCE)" = force -a $$f -nt $$t \); then \
+				$(ECHO) "cp -fp -- $$f $$t"; \
+				cp -fp -- $$f $$t; \
+			fi; \
+		done; \
+	fi
+
+update-all-debs: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+update-all-debs:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(ECHO) "D: $@: rebuild binary-indep"; \
+	$(ECHO) "  $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH=noarch all-update-n-deb"; \
+	$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH=noarch all-update-n-deb || :; \
+	targets="$(target_arch) $(AM_DEBTARGETS)"; \
+	for t in $$targets; do \
+		a=`$(ECHO) "$$t" | sed 's,-.*$$,,'`; \
+		test \( "$$a" != noarch -a "$$a" != all \) || continue; \
+		kernels="`( find $(DESTDIR)$(rootdir)/lib/modules -maxdepth 1 -type d \( -name '2.[46].[0-9]*' -o -name '3.[0-9]*' \) | $(rpmsort) ) 2>/dev/null`"; \
+		for k in $$kernels; do \
+			k=`basename $$k`; \
+			test -e $(DESTDIR)$(rootdir)/lib/modules/$$k/build || { $(ECHO) "D: $@: skipping $$k (no build directory)"; continue; }; \
+			test -e $(DESTDIR)$(rootdir)/boot/System.map-$$k || { $(ECHO) "D: $@: skipping $$k (no system map)"; continue; }; \
+			test -n '$(DESTDIR)$(rootdir)' || $(DPKG) -S `(cd /lib/modules/$$k/build; /bin/pwd)` >/dev/null 2>&1 || { $(ECHO) "D: $@: skippping $$k (no build provides)"; continue; }; \
+			$(ECHO) "D: $@: rebuild binary-$$k"; \
+			$(ECHO) "  $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion=\"$$k\" ARCH=\"$$t\" all-update-k-deb"; \
+			$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion="$$k" ARCH="$$t" all-update-k-deb || :; \
+		done; \
+		$(ECHO) "D: $@: rebuild binary-$$a"; \
+		$(ECHO) "  $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH=\"$$t\" all-update-t-deb"; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH="$$t" all-update-t-deb || :; \
+	done; \
+	$(ECHO) "D: $@: rebuild changes"; \
+	$(ECHO) "  $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH='$(target_arch)' all-update-c-deb"; \
+	$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH='$(target_arch)' all-update-c-deb || :
+
+MY_PHONY		+= update-n-deb update-k-deb update-t-deb update-all-debs
+ALL_RECURSIVE_TARGETS	+= all-update-n-deb all-update-k-deb all-update-t-deb
+
+## Provide updates to debian binary packages.  If the DEBs in the set do not exist, create them.  If
+## the DEBSs in the set exist, were created after the update stamp, and force is applied, recreate
+## the DEB set.
+##
+update-debs: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+update-debs:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(ECHO) "D: $@: testing binary-indep"; \
+	$(ECHO) "  $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH=noarch update-n-deb"; \
+	$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH=noarch update-n-deb || :; \
+	targets="$(target_arch) $(AM_DEBTARGETS)"; \
+	for t in $$targets; do \
+		a=`$(ECHO) "$$t" | sed 's,-.*$$,,'`; \
+		test \( "$$a" != noarch -a "$$a" != all \) || continue; \
+		kernels="`( find $(DESTDIR)$(rootdir)/lib/modules -maxdepth 1 -type d \( -name '2.[46].[0-9]*' -o -name '3.[0-9]*' \) | $(rpmsort) ) 2>/dev/null`"; \
+		for k in $$kernels; do \
+			k=`basename $$k`; \
+			$(ECHO) "D: $@: testing binary-$$a $$k"; \
+			$(ECHO) "  $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion=\"$$k\" ARCH=\"$$t\" update-k-deb"; \
+			$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion="$$k" ARCH="$$t" update-k-deb || :; \
+		done; \
+		$(ECHO) "D: $@: testing binary-$$a"; \
+		$(ECHO) "  $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH=\"$$t\" update-t-deb"; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH="$$t" update-t-deb || :; \
+	done; \
+	$(ECHO) "D: $@: testing changes"; \
+	$(ECHO) "  $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH='$(target_arch)' update-c-deb"; \
+	$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH='$(target_arch)' update-c-deb || :
+
+## Provide updates to debian binary package changes.
+##
+update-chgs:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@eval "`$(DPKG_ARCHITECTURE)`"; \
+	debs=`(find $(debbuilddir) -maxdepth 1 -type f \( -name '$(deb_base_file)' -o -name '$(deb_binary_file)' -o -name '$(deb_module_file)' \) | LANG= sort -u) 2>/dev/null`; \
+	needrebuild=no; c="$(debbuilddir)/$(debianpkg)_$$DEB_HOST_ARCH.changes"; \
+	for f in $$debs ; do \
+		test -s $$f || continue; \
+		if test '$(FORCE)' = force -o \( ! -s $$c -o $$f -nt $$c \); then \
+			$(ECHO) "D: $@: need rebuild for $$f" ; \
+			needrebuild=yes; \
+		else \
+			$(ECHO) "D: $@: skip rebuild for $$f" ; \
+		fi; \
+	done; \
+	if test "$$needrebuild" = yes; then \
+	( \
+		cd $(debian_dir); \
+		eval "`$(DPKG_ARCHITECTURE)`"; \
+		$(ECHO_V) "D: $@: generating debian/control.new"; \
+		$(ECHO_Q) "  GEN   "`basename debian/control.new`; \
+		{ \
+			cat debian/control | sed '/^$$/,$$d' ; \
+			$(ECHO) ""; \
+			for f in $$debs ; do \
+				test -s $$f || continue; \
+				$(ECHO) "  $(DPKG) --info $$f | sed -n '/^ Package/,$$s,^ ,,p' | sed '/^Architecture/s,'$$DEB_HOST_ARCH',any,' | egrep -v '^(Version|Installed|Source|Origin|Bugs|Maintainer)'" >&2 ; \
+				$(DPKG) --info $$f | sed -n '/^ Package/,$$s,^ ,,p' | \
+					sed '/^Architecture/s,'$$DEB_HOST_ARCH',any,' | \
+					egrep -v '^(Version|Installed|Source|Origin|Bugs|Maintainer)' ; \
+				$(ECHO) "" ; \
+			done ; \
+		} >debian/control.new; \
+		$(ECHO) "  mv -f -- debian/control.new debian/control" ; \
+		mv -f -- debian/control.new debian/control ; \
+		$(ECHO) "  $(DPKG_GENCHANGES) -b >../$(debianpkg)_$${DEB_HOST_ARCH}.changes" ; \
+		$(DPKG_GENCHANGES) -b >../$(debianpkg)_$${DEB_HOST_ARCH}.changes ; \
+	) ; \
+	else \
+		$(ECHO) "D: $@: skipping rebuilding changes"; \
+	fi
+
+## Provide updates to debian source package signatures.
+##
+update-sigs:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@list="$(debtop_sig_file)"; for f in $$list; do \
+		s=`echo $$f | sed -r -e 's|\.dsc(\.sig)?$$|.dsc.sig|'`; \
+		if test ! -e "$$f" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \) \); then \
+			$(ECHO) "D: $@: removed $$f"; \
+			$(ECHO) "D: $@: removed $$s"; \
+			$(ECHO) "rm -f -- \"$$f\" \"$$s\""; rm -f -- "$$f" "$$s"; \
+			$(ECHO) "D: $@: rebuild $$f"; \
+			$(ECHO) "D: $@: rebuild $$s"; \
+			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- \"$$f\" \"$$s\""; \
+			$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- "$$f" "$$s"; \
+		fi; \
+	done
+
+## Provide updates to debian binary package signatures.
+##
+update-csig:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@list="$(debtop_change_files)"; for f in $$list; do \
+		s=`echo $$f | sed -r -e 's|\.changes(\.asc)?$$|.changes.asc|'`; \
+		if test ! -e "$$f" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \) \); then \
+			$(ECHO) "D: $@: removed $$f"; \
+			$(ECHO) "D: $@: removed $$s"; \
+			$(ECHO) "rm -f -- \"$$f\" \"$$s\""; rm -f -- "$$f" "$$s"; \
+			$(ECHO) "D: $@: rebuild $$f"; \
+			$(ECHO) "D: $@: rebuild $$s"; \
+			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- \"$$f\" \"$$s\""; \
+			$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- "$$f" "$$s"; \
+		fi; \
+	done
+
+MY_PHONY		+= update-dscs update-debs update-chgs update-csig update-sigs
+ALL_RECURSIVE_TARGETS	+= all-update-dscs all-update-debs all-update-chgs all-update-csig all-update-sigs
+
+## Copy release deb files from the distribution directory to the repository (if required), but
+## ensure that the release deb files are signed before transferring them.  Existing files in the
+## repository are not overwritten unless force is specified and the new file is newer than the
+## existing file.  Rebuilding of repository metadata is performed by other targets.
+##
+release-install-debs:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+	@\
+	list='$(debtop_change_files)' ; for f in $$list ; do \
+		test -s $$f || continue ; \
+		a="$$f.asc" ; $(am__gpg_verify_sign_file) ; \
+	done ; \
+	list='$(debtop_dsc_file)' ; for f in $$list ; do \
+		test -s $$f || continue ; \
+		$(am__gpg_clear_sign_file) ; \
+	done ; \
+	for f in $(debtop_source_files) $(debtop_change_files) $(debtop_binary_files) $(debtop_product_file) ; do \
+		test -s $$f || continue ; \
+		t=`echo "$$f" | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
+		test $$f -ef $$t && continue ; \
+		if test ! -f $$t -o \( "$(FORCE)" = force -a $$f -nt $$t \) ; then \
+			$(ECHO) "  $(INSTALL_DATA) -T -D -p -- $$f $$t" ; \
+			$(INSTALL_DATA) -T -D -p -- $$f $$t ; \
+		fi ; \
+	done
+
+## Remove release deb files from the repository.  Files that have a different timestamp than that in
+## the repository are not removed unless force is specified.  When files are removed, an attempt is
+## made to remove empty directories.  Rebuilding of repository metadata is performed by other
+## targets.
+##
+release-uninstall-debs:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+	@$(ECHO) "D: $@: removing debs" ; \
+	for f in $(debtop_source_files) $(debtop_change_files) $(debtop_binary_files) $(debtop_product_file) ; do \
+		test -s $$f || continue ; \
+		t=`echo "$$f" | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
+		test -s $$t || continue ; \
+		if test -f $$t -a \( "$(FORCE)" = force -o \( ! \( $$f -nt $$t \) -a ! \( $$f -ot $$t \) \) \) ; then \
+			$(ECHO) "  rm -f -- $$t" ; \
+			rm -f -- $$t ; \
+		fi ; \
+	done ; \
+	for f in $(debtop_source_files) $(debtop_change_files) $(debtop_binary_files) $(debtop_product_file) ; do \
+		test -s $$f || continue ; \
+		t=`echo "$$f" | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
+		echo "`dirname $$t`" ; \
+	done | LANG= sort -u | while read d ; do \
+		if test -d $$d ; then \
+			$(ECHO) "  rmdir -pv -- $$d" ; \
+			rmdir -pv -- $$d || : ; \
+		fi ; \
+	done
+
+
+RELEASE_INSTALL		+= release-install-debs
+RELEASE_UNINSTALL	+= release-uninstall-debs
+
+## Copy update deb files from the distribution directory to the repository (if required), but ensure
+## that the update deb files are signed before transferring them.  Existing files in the repository
+## are not overwritten unless force is specified and the new file is newer than the existing file.
+## Rebuilding of repository metadata is performed by other targets.
+##
+update-install-debs:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+	@for f in $(debtop_update_files) ; do \
+		test -s $$f || continue ; \
+		t=`echo "$$f" | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
+		if test ! -f $$t -o \( "$(FORCE)" = force -a $$f -nt $$t \) ; then \
+			$(ECHO) "  $(INSTALL_DATA) -T -D -p -- $$f $$t" ; \
+			$(INSTALL_DATA) -T -D -p -- $$f $$t ; \
+		fi ; \
+	done
+
+## Remove update deb files from the repository.  Files that have a different timestamp than that in
+## the repository are not removed unless force is specified.  When files are removed, an attempt is
+## made to remove empty directories.  Rebuilding of repository metadata is performed by other
+## targets.
+##
+update-uninstall-debs:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+	@for f in $(debtop_update_files) ; do \
+		test -s $$f || continue ; \
+		t=`echo "$$f" | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
+		test -s $$t || continue ; \
+		if test -f $$t -a \( "$(FORCE)" = force -o \( ! $$f -nt $$t -a !  $$f -ot $$t \) \) ; then \
+			$(ECHO) "  rm -f -- $$t" ; \
+			rm -f -- $$t ; \
+		fi ; \
+	done ; \
+	for f in $(debtop_update_files) ; do \
+		test -s $$f || continue ; \
+		t=`echo "$$f" | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
+		echo "`dirname $$t`" ; \
+	done | LANG= sort -u | while read d ; do \
+		if test -d $$d ; then \
+			$(ECHO) "  rmdir -pv -- $$d" ; \
+			rmdir -pv -- $$d || : ; \
+		fi ; \
+	done
+
+UPDATE_INSTALL		+= update-install-debs
+UPDATE_UNINSTALL	+= update-uninstall-debs
+
+if BUILD_REPO_APT
+## BUILD_REPO_APT
+
+##
+## The following builds apt repositories.
+##
+
+apt_packages		= $(aptfulldir)/Packages \
+			  $(aptmaindir)/Packages \
+			  $(aptdebgdir)/Packages \
+			  $(aptdevldir)/Packages \
+			  $(aptsrcsdir)/Packages
+
+apt_package_gzips	= $(aptfulldir)/Packages.gz \
+			  $(aptmaindir)/Packages.gz \
+			  $(aptdebgdir)/Packages.gz \
+			  $(aptdevldir)/Packages.gz \
+			  $(aptsrcsdir)/Packages.gz
+
+apt_package_bzips	= $(aptfulldir)/Packages.bz2 \
+			  $(aptmaindir)/Packages.bz2 \
+			  $(aptdebgdir)/Packages.bz2 \
+			  $(aptdevldir)/Packages.bz2 \
+			  $(aptsrcsdir)/Packages.bz2
+
+apt_package_xzips	= $(aptfulldir)/Packages.xz \
+			  $(aptmaindir)/Packages.xz \
+			  $(aptdebgdir)/Packages.xz \
+			  $(aptdevldir)/Packages.xz \
+			  $(aptsrcsdir)/Packages.xz
+
+apt_sources		= $(aptfulldir)/Sources \
+			  $(aptsrcsdir)/Sources
+
+apt_source_gzips	= $(aptfulldir)/Sources.gz \
+			  $(aptsrcsdir)/Sources.gz
+
+apt_source_bzips	= $(aptfulldir)/Sources.bz2 \
+			  $(aptsrcsdir)/Sources.bz2
+
+apt_source_xzips	= $(aptfulldir)/Sources.xz \
+			  $(aptsrcsdir)/Sources.xz
+
+apt_contents		= $(aptfulldir)/Contents \
+			  $(aptmaindir)/Contents \
+			  $(aptdebgdir)/Contents \
+			  $(aptdevldir)/Contents \
+			  $(aptsrcsdir)/Contents
+
+apt_content_gzips	= $(aptfulldir)/Contents.gz \
+			  $(aptmaindir)/Contents.gz \
+			  $(aptdebgdir)/Contents.gz \
+			  $(aptdevldir)/Contents.gz \
+			  $(aptsrcsdir)/Contents.gz
+
+apt_content_bzips	= $(aptfulldir)/Contents.bz2 \
+			  $(aptmaindir)/Contents.bz2 \
+			  $(aptdebgdir)/Contents.bz2 \
+			  $(aptdevldir)/Contents.bz2 \
+			  $(aptsrcsdir)/Contents.bz2
+
+apt_content_xzips	= $(aptfulldir)/Contents.xz \
+			  $(aptmaindir)/Contents.xz \
+			  $(aptdebgdir)/Contents.xz \
+			  $(aptdevldir)/Contents.xz \
+			  $(aptsrcsdir)/Contents.xz
+
+apt_md5sums		= $(aptfulldir)/md5sums.txt \
+			  $(aptmaindir)/md5sums.txt \
+			  $(aptdebgdir)/md5sums.txt \
+			  $(aptdevldir)/md5sums.txt \
+			  $(aptsrcsdir)/md5sums.txt
+
+apt_releases		= $(aptfulldir)/Release \
+			  $(aptmaindir)/Release \
+			  $(aptdebgdir)/Release \
+			  $(aptdevldir)/Release \
+			  $(aptsrcsdir)/Release
+
+apt_release_gzips	= $(aptfulldir)/Release.gz \
+			  $(aptmaindir)/Release.gz \
+			  $(aptdebgdir)/Release.gz \
+			  $(aptdevldir)/Release.gz \
+			  $(aptsrcsdir)/Release.gz
+
+apt_release_bzips	= $(aptfulldir)/Release.bz2 \
+			  $(aptmaindir)/Release.bz2 \
+			  $(aptdebgdir)/Release.bz2 \
+			  $(aptdevldir)/Release.bz2 \
+			  $(aptsrcsdir)/Release.bz2
+
+apt_release_xzips	= $(aptfulldir)/Release.xz \
+			  $(aptmaindir)/Release.xz \
+			  $(aptdebgdir)/Release.xz \
+			  $(aptdevldir)/Release.xz \
+			  $(aptsrcsdir)/Release.xz
+
+apt_release_gpgs	= $(aptfulldir)/Release.gpg \
+			  $(aptmaindir)/Release.gpg \
+			  $(aptdebgdir)/Release.gpg \
+			  $(aptdevldir)/Release.gpg \
+			  $(aptsrcsdir)/Release.gpg
+
+apt_release_keys	= $(aptfulldir)/Release.key \
+			  $(aptmaindir)/Release.key \
+			  $(aptdebgdir)/Release.key \
+			  $(aptdevldir)/Release.key \
+			  $(aptsrcsdir)/Release.key
+
+apt_sources_lists	= $(aptfulldir)/$(PACKAGE).list \
+			  $(aptfulldir)/$(PACKAGE)-local.list \
+			  $(debdistdir)/$(PACKAGE).list \
+			  $(debdistdir)/$(PACKAGE)-local.list
+
+apt_gzips		= $(apt_package_gzips) \
+			  $(apt_source_gzips) \
+			  $(apt_content_gzips) \
+			  $(apt_release_gzips)
+
+apt_bzips		= $(apt_package_bzips) \
+			  $(apt_source_bzips) \
+			  $(apt_content_bzips) \
+			  $(apt_release_bzips)
+
+apt_xzips		= $(apt_package_xzips) \
+			  $(apt_source_xzips) \
+			  $(apt_content_xzips) \
+			  $(apt_release_xzips)
+
+apt_nonrel_files	= $(apt_packages) $(apt_package_gzips) $(apt_package_bzips) $(apt_package_xzips) \
+			  $(apt_sources)  $(apt_source_gzips)  $(apt_source_bzips)  $(apt_source_xzips)  \
+			  $(apt_contents) $(apt_content_gzips) $(apt_content_bzips) $(apt_content_xzips) \
+			  $(apt_md5sums)
+
+apt_release_files	= $(apt_releases) $(apt_release_gzips) $(apt_release_bzips) $(apt_release_xzips)
+
+apt_files		= $(apt_nonrel_files) \
+			  $(apt_release_files) \
+			  $(apt_sources_lists)
+
+apt_signs		= $(apt_release_gpgs)
+apt_keys		= $(apt_release_keys)
+
+#!
+#! APT Build Targets:
+#! ------------------
+#!
+#! On dpkg systems, or systems supporting dpkg packaging tools and apt
+#! repository metadata creation tools, the following targets are used to manage
+#! apt source repository meta data files.
+#!
+$(apt_packages):
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(APT_FTPARCHIVE) packages `dirname $@` | sed 's, $(aptfulldir)/, ,' > $@
+
+$(apt_sources):
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(APT_FTPARCHIVE) sources `dirname $@` | sed 's, $(aptfulldir)/, ,' > $@
+
+$(apt_contents):
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(APT_FTPARCHIVE) contents `dirname $@` | sed 's, $(aptfulldir)/, ,' > $@
+
+$(apt_gzips): %.gz : %
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	cat $< | $(GZIP_CMD) $(GZIP) -c >$@
+
+$(apt_bzips): %.bz2 : %
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	cat $< | $(BZIP2_CMD) $(BZIP2) -c >$@
+
+$(apt_xzips): %.xz : %
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	cat $< | $(XZ_CMD) $(XZ) -c >$@
+
+$(apt_md5sums):
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	find `dirname $@` -type f | egrep -v '(md5sums.txt|Release)' | xargs $(MD5SUM) | sed 's, $(aptfulldir)/, ,' > $@
+
+$(apt_releases): $(apt_nonrel_files)
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(ECHO) "$(APT_FTPARCHIVE) release `dirname $@` | sed 's, $(aptfulldir)/, ,' >$@.$$$$" ; \
+	$(APT_FTPARCHIVE) release `dirname $@` | sed 's, $(aptfulldir)/, ,' >$@.$$$$ ; \
+	$(ECHO) "mv -f -- $@.$$$$ $@" ; \
+	mv -f -- $@.$$$$ $@
+
+$(aptfulldir)/$(PACKAGE).list:: Makefile
+	$(AM_V_GEN)\
+	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
+	for b in "$$rb" ; do \
+		for r in main debug devel source '' ; do \
+			d="$(debdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
+			test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
+			$(ECHO) 'deb         $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+			test $${r:-full} = full -o $${r:-full} = source || continue ; \
+			test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
+			$(ECHO) 'deb-src     $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+		done ; \
+	done >$@
+
+$(aptfulldir)/$(PACKAGE)-local.list:: Makefile
+	$(AM_V_GEN)\
+	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
+	for b in "$$rb" ; do \
+		for r in main debug devel source '' ; do \
+			d="$(debdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
+			test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
+			$(ECHO) 'deb         file://$(DISTDIR)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+			test $${r:-full} = full -o $${r:-full} = source || continue ; \
+			test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
+			$(ECHO) 'deb-src     file://$(DISTDIR)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+		done ; \
+	done >$@
+
+$(debdistdir)/$(PACKAGE).list:: Makefile
+	$(AM_V_GEN)\
+	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
+	case "$$rb" in (updates|extras|testing) rb= ;; esac ; \
+	for b in '' updates extras testing $$rb ; do \
+		for r in main debug devel source '' ; do \
+			d="$(debdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
+			test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
+			$(ECHO) 'deb         $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+			test $${r:-full} = full -o $${r:-full} = source || continue ; \
+			test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
+			$(ECHO) 'deb-src     $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+		done ; \
+	done >$@
+
+$(debdistdir)/$(PACKAGE)-local.list:: Makefile
+	$(AM_V_GEN)\
+	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
+	case "$$rb" in (updates|extras|testing) rb= ;; esac ; \
+	for b in '' updates extras testing $$rb ; do \
+		for r in main debug devel source '' ; do \
+			d="$(debdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
+			test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
+			$(ECHO) 'deb         file://$(DISTDIR)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+			test $${r:-full} = full -o $${r:-full} = source || continue ; \
+			test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
+			$(ECHO) 'deb-src     file://$(DISTDIR)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+		done ; \
+	done >$@
+
+$(apt_release_gpgs): %.gpg : %
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(am__gpg_verify_sign)
+
+$(apt_release_keys):
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(am__gpg_export_key)
+
+repo-apt: $(RELEASE_DIRECTORIES) $(apt_files)
+
+repo-sign-apt: $(RELEASE_DIRECTORIES) $(apt_signs) $(apt_keys)
+
+repo-clean-apt:
+
+REPO_DIRECTORIES	+= $(aptdir) $(aptfulldir) $(aptmaindir) $(aptdebgdir) $(aptdevldir) $(aptsrcsdir)
+REPO			+= repo-apt
+REPO_SIGN		+= repo-sign-apt
+REPO_CLEAN		+= repo-clean-apt
+REPOCLEANFILES		+= $(apt_files) $(apt_signs) $(apt_keys)
+
+RELEASE			+= repo-apt
+RELEASE_SIGN		+= repo-sign-apt
+RELEASE_CLEAN_LOCAL	+= repo-clean-apt
+RELEASECLEANFILES	+= $(apt_files) $(apt_signs) $(apt_keys)
+
+UPDATE			+= repo-apt
+UPDATE_SIGN		+= repo-sign-apt
+UPDATE_CLEAN_LOCAL	+= repo-apt repo-sign-apt
+UPDATECLEANFILES	+=
+
+GENRECOMPRESSDATA = \
+	test -f $$f.gz || { \
+		$(ECHO) "    cat $$f | $(GZIP_CMD) $(GZIP) -c >$$f.gz" ; \
+		cat $$f | $(GZIP_CMD) $(GZIP) -c >$$f.gz ; \
+	} ; \
+	test -f $$f.bz2 || { \
+		$(ECHO) "    cat $$f | $(BZIP2_CMD) $(BZIP2) -c >$$f.bz2" ; \
+		cat $$f | $(BZIP2_CMD) $(BZIP2) -c >$$f.bz2 ; \
+	} ; \
+	test -f $$f.xz || { \
+		$(ECHO) "    cat $$f | $(XZ_CMD) $(XZ) -c >$$f.xz" ; \
+		cat $$f | $(XZ_CMD) $(XZ) -c >$$f.xz ; \
+	}
+
+## Release or update deb files have been added to or removed from the repository: update the apt
+## metadata for the repository.
+##
+release-update-apt:
+	@$(ECHO_V) "D: Making $@ in `pwd`" ; \
+	test '$(DISTDIR)' != '$(REPODIR)' || exit 0 ; \
+	empty_repo=yes ; \
+	repodir=`echo '$(debdistdir)' | sed -e 's,$(DISTDIR),$(REPODIR),'` ; \
+	rb=`echo '$(repobranch)' | sed -e 's,^//*,,'` ; \
+	for b in '' updates extras testing $$rb; do \
+		dir="$${repodir}$${b:+/$$b}" ; \
+		test -d $$dir || continue ; \
+		empty_subrepo=yes ; \
+		for r in main debug devel source '' ; do \
+			dir="$${repodir}$${b:+/$$b}$${r:+/$$r}" ; \
+			test -d $$dir || continue ; \
+			$(ECHO) "D: $@: processing directory $$dir" ; \
+			debs="`find $$dir -name '*.deb' 2>/dev/null`" ; \
+			dscs="`find $$dir -name '*.dsc' 2>/dev/null`" ; \
+			f="$$dir/Packages" ; \
+			$(ECHO) "rm -f -- $$f $$f.gz $$f.bz2 $$f.xz" ; \
+			rm -f -- $$f $$f.gz $$f.bz2 $$f.xz ; \
+			if test -n "$$debs" ; then \
+				$(ECHO) "  $(APT_FTPARCHIVE) packages $$dir /dev/null | sed 's, '$${repodir}'/, ,' >$$f" ; \
+				$(APT_FTPARCHIVE) packages $$dir /dev/null | sed 's, '$${repodir}'/, ,' >$$f ; \
+				$(GENRECOMPRESSDATA) ; \
+				empty_subrepo=no ; \
+			fi ; \
+			f="$$dir/Sources" ; \
+			$(ECHO) "rm -f -- $$f $$f.gz $$f.bz2 $$f.xz" ; \
+			rm -f -- $$f $$f.gz $$f.bz2 $$f.xz ; \
+			if test -n "$$dscs" ; then \
+				$(ECHO) "  $(APT_FTPARCHIVE) sources  $$dir /dev/null | sed 's, '$${repodir}'/, ,' >$$f" ; \
+				$(APT_FTPARCHIVE) sources  $$dir /dev/null | sed 's, '$${repodir}'/, ,' >$$f ; \
+				$(GENRECOMPRESSDATA) ; \
+				empty_subrepo=no ; \
+			fi ; \
+			f="$$dir/Contents" ; \
+			$(ECHO) "rm -f -- $$f $$f.gz $$f.bz2 $$f.xz" ; \
+			rm -f -- $$f $$f.gz $$f.bz2 $$f.xz ; \
+			if test -n "$$debs" ; then \
+				$(ECHO) "  $(APT_FTPARCHIVE) contents $$dir | sed 's, '$${repodir}'/, ,' >$$f" ; \
+				$(APT_FTPARCHIVE) contents $$dir | sed 's, '$${repodir}'/, ,' >$$f ; \
+				$(GENRECOMPRESSDATA) ; \
+				empty_subrepo=no ; \
+			fi ; \
+			meta="`find $$dir -name 'Packages' -o -name 'Sources' -o -name 'Contents' 2>/dev/null`" ; \
+			f="$$dir/Release" ; \
+			$(ECHO) "rm -f -- $$f $$f.gz $$f.bz2 $$f.xz" ; \
+			rm -f -- $$f $$f.gz $$f.bz2 $$f.xz ; \
+			if test -n "$$meta" ; then \
+				$(ECHO) "  $(APT_FTPARCHIVE) release  $$dir | sed 's, '$${repodir}'/, ,' >$$f" ; \
+				$(APT_FTPARCHIVE) release  $$dir | sed 's, '$${repodir}'/, ,' >$$f ; \
+				$(GENRECOMPRESSDATA) ; \
+				empty_subrepo=no ; \
+			fi ; \
+			f="$$dir/md5sums.txt" ; \
+			$(ECHO) "rm -f -- $$f" ; \
+			rm -f -- $$f ; \
+			if test -n "$$meta" ; then \
+				$(ECHO) "  find $$dir -type f | egrep -v '(md5sums.txt|Release)' | xargs -r $(MD5SUM) | sed 's, '$${repodir}'/, ,' >$$dir/md5sums.txt" ; \
+				find $$dir -type f | egrep -v '(md5sums.txt|Release)' | xargs -r $(MD5SUM) | sed 's, '$${repodir}'/, ,' >$$dir/md5sums.txt ; \
+				empty_subrepo=no ; \
+			fi ; \
+			f="$$dir/Release" ; \
+			$(ECHO) "rm -f -- $$f.gpg $$f.key" ; \
+			rm -f -- $$f.gpg $$f.key ; \
+			if test -f $$dir/Release ; then \
+				a="$$f.gpg" ; $(am__gpg_verify_sign_file) ; \
+				k="$$f.key" ; $(am__gpg_export_key_file) ; \
+				empty_subrepo=no ; \
+			fi ; \
+			if test $${empty_subrepo:-yes} = yes ; then \
+				$(ECHO) "  rmdir -pv $$dir" ; \
+				rmdir -pv -- $$dir || : ; \
+			else \
+				empty_repo=no ; \
+			fi ; \
+		done ; \
+		dir="$$repodir$${b:+/$$b}" ; \
+		f="$$dir/$(PACKAGE)" ; \
+		$(ECHO) "rm -f -- $$f.list $$f-local.list" ; \
+		rm -f -- $$f.list $$f-local.list ; \
+		if test $${empty_subrepo:-yes} = no ; then \
+			$(ECHO) "  GEN   $$(basename $$f.list)" ; \
+			for r in main debug devel source '' ; do \
+				d="$$repodir$${b:+/$$b}$${r:+/$$r}" ; \
+				test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
+				$(ECHO) 'deb      $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+				if test $${r:-full} = full -o $${r:-full} = source ; then \
+				test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
+				$(ECHO) 'deb-src  $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+				fi ; \
+			done >$$f.list ; \
+			$(ECHO) "  GEN   $$(basename $$f-local.list)" ; \
+			for r in main debug devel source '' ; do \
+				d="$$repodir$${b:+/$$b}$${r:+/$$r}" ; \
+				test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
+				$(ECHO) 'deb      file://$(REPODIR)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+				if test $${r:-full} = full -o $${r:-full} = source ; then \
+				test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
+				$(ECHO) 'deb-src  file://$(REPODIR)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+				fi ; \
+			done >$$f-local.list ; \
+		else \
+			$(ECHO) "  rmdir -pv $$dir" ; \
+			rmdir -pv -- $$dir || : ; \
+		fi ; \
+	done ; \
+	f="$$repodir/$(PACKAGE)" ; \
+	$(ECHO) "rm -f -- $$f.list $$f-local.list" ; \
+	rm -f -- $$f.list $$f-local.list ; \
+	if test $${empty_repo:-yes} = no ; then \
+		$(ECHO) "  GEN   $$(basename $$f.list)" ; \
+		for b in '' updates extras testing $$rb ; do \
+			for r in main debug devel source '' ; do \
+				d="$$repodir$${b:+/$$b}$${r:+/$$r}" ; \
+				test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
+				$(ECHO) 'deb      $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+				if test $${r:-full} = full -o $${r:-full} = source ; then \
+				test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
+				$(ECHO) 'deb-src  $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+				fi ; \
+			done ; \
+		done >$$f.list ; \
+		$(ECHO) "  GEN   $$(basename $$f-local.list)" ; \
+		for b in '' updates extras testing $$rb ; do \
+			for r in main debug devel source '' ; do \
+				d="$$repodir$${b:+/$$b}$${r:+/$$r}" ; \
+				test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
+				$(ECHO) 'deb      file://$(REPODIR)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+				if test $${r:-full} = full -o $${r:-full} = source ; then \
+				test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
+				$(ECHO) 'deb-src  file://$(REPODIR)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+				fi ; \
+			done ; \
+		done >$$f-local.list ; \
+	else \
+		$(ECHO) "  rmdir -pv $$repodir" ; \
+		rmdir -pv -- $$repodir || : ; \
+	fi
+
+RELEASE_INSTALL		+= release-update-apt
+RELEASE_UNINSTALL	+= release-update-apt
+
+UPDATE_INSTALL		+= release-update-apt
+UPDATE_UNINSTALL	+= release-update-apt
+
+## BUILD_REPO_APT
+endif
+
+## MAINTAINER_MODE
+endif
+
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
+
+dist_doc_DATA		+= debian/README.Debian \
+			   debian/TODO.Debian
+## PKG_BUILD_INDEP
+endif
+
+## BUILD_DPKG
+endif
+
+EXTRA_DIST		+= debian/changelog \
+			   debian/control \
+			   debian/rules \
+			   debian/copyright \
+			   .debrelease \
+			   .debepoch
+
+## =============================================================================
+##
+## $Log: deb.am,v $
+## Revision 1.1.2.7  2011-09-02 08:46:27  brian
+## - sync up lots of repo and build changes from git
+##
+## Revision 1.1.2.6  2011-08-07 11:14:24  brian
+## - mostly mandriva and ubuntu build updates
+##
+## Revision 1.1.2.5  2011-05-31 09:46:00  brian
+## - new distros
+##
+## Revision 1.1.2.4  2011-05-10 13:45:33  brian
+## - weak modules workup
+##
+## Revision 1.1.2.3  2011-01-18 17:09:52  brian
+## - always expand bz2 archive
+##
+## Revision 1.1.2.2  2009-06-29 07:35:35  brian
+## - improvements to build process
+##
+## Revision 1.1.2.1  2009-06-21 10:26:00  brian
+## - added files to new distro
+##
+## =============================================================================
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

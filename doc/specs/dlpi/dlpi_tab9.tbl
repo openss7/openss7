@@ -1,0 +1,42 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+box center tab(:);
+cb|cbsss
+c|lsss.
+ACTION:DESCRIPTION
+_
+1:outcnt = outcnt + 1
+2:outcnt = outcnt - 1
+3:T{
+.hy 0
+.ad l
+Pass connection to the stream indicated by the token in the DL_CONNECT_RES primitive.
+T}
+.TE
+

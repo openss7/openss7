@@ -1,0 +1,684 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: DL_INFO_ACK.7.man,v 1.1.2.2 2011-02-07 02:18:17 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:17 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: DL_INFO_ACK.7.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:17  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH DL_INFO_ACK 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Data Link Provider Interface (DLPI)"
+.SH NAME
+.B DL_INFO_ACK (dl_info_ack_t)
+\- this message is sent in response to
+.BR DL_INFO_REQ (7);
+it conveys information about the DLPI stream to the DLS user.
+.\"
+.\"
+.SH INTERFACE
+Data Link Provider Interface, DLPI.
+.[
+dlpi revision 2.0.0 draft 2
+.]
+.\"
+.\"
+.SH SYNOPSIS
+The message consists of one
+.BR M_PCPROTO (9)
+message block, which contains the following structure.
+.sp
+.nf
+\f(CW\s-1\
+#include <sys/dlpi.h>
+
+typedef struct {
+    t_uscalar_t dl_primitive;
+    t_uscalar_t dl_max_sdu;
+    t_uscalar_t dl_min_sdu;
+    t_uscalar_t dl_addr_length;
+    t_uscalar_t dl_mac_type;
+    t_uscalar_t dl_reserved;
+    t_uscalar_t dl_current_state;
+    t_scalar_t  dl_sap_length;
+    t_uscalar_t dl_service_mode;
+    t_uscalar_t dl_qos_length;
+    t_uscalar_t dl_qos_offset;
+    t_uscalar_t dl_qos_range_length;
+    t_uscalar_t dl_qos_range_offset;
+    t_uscalar_t dl_provider_style;
+    t_uscalar_t dl_addr_offset;
+    t_uscalar_t dl_version;
+    t_uscalar_t dl_brdcst_addr_length;
+    t_uscalar_t dl_brdcst_addr_offset;
+    t_uscalar_t dl_growth;
+} dl_info_ack_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+The
+.B DL_INFO_ACK
+message is sent in response to
+.BR DL_INFO_REQ (7);
+it conveys information about the DLPI stream to the DLS user.
+.\"
+.\"
+.SH PARAMETERS
+.PP
+The
+.B dl_info_ack_t
+structure contains the following members:
+.TP
+.I dl_primitive
+conveys
+.BR DL_INFO_ACK .
+.TP
+.I dl_max_sdu
+conveys the maximum number of bytes that may be transmitted in a DLSDU.  This
+value must be a positive integer that is greater than or equal to the value of
+.IR dl_min_sdu .
+.TP
+.I dl_min_sdu
+conveys the minimum number of bytes that may be transmitted in a DLSDU.  The
+value is never less than one.
+.TP
+.I dl_addr_length
+conveys the length, in bytes, of the provider's DLSAP address.  In the case
+of a hierarchical subsequent bind, the length returned is the total
+length, that is, Physical address, plus SAP, plus subsequent address length.
+When the DLP Provider Stream has not yet been bound to a DLSAP, the value of
+this field will be zero (0).
+.TP
+.I dl_mac_type
+conveys the type of medium supported by this DLPI stream.  Possible
+values include:
+.RS
+.TP \w'\fBDL_100VGTPR\fP\(em'u
+.B DL_CSMACD
+The medium is Carrier Sense Multiple Access with Collision Detection (ISO
+8802/3).
+.TP
+.B DL_TPB
+The medium is Token-Passing Bus (ISO 8802/4).
+.TP
+.B DL_TPR
+The medium is Token-Passing Ring (ISO 8802/5).
+.TP
+.B DL_METRO
+The medium is Metro Net (ISO 8802/6).
+.TP
+.B DL_ETHER
+The medium is Ethernet Bus.
+.TP
+.B DL_HDLC
+The medium is a bit synchronous communication line.
+.TP
+.B DL_CHAR
+The medium is a character synchronous communication line (for example,
+BISYNC).
+.TP
+.B DL_CTCA
+The medium is a channel-to-channel adapter.
+.TP
+.B DL_FDDI
+The medium is a Fiber Distributed Data Interface.
+.TP
+.B DL_FC
+The medium is Fiber Channel.
+.TP
+.B DL_ATM
+The medium is Asynchronous Transfer Mode.
+.TP
+.B DL_IPATM
+The medium is Internet IP over Asynchronous Transfer Mode, RFC 1577.
+.TP
+.B DL_X25
+The medium is X.25 LAPB.
+.TP
+.B DL_IPX25
+The medium is Internet IP over X.25, RFC 1356.
+.TP
+.B DL_ISDN
+The medium is ISDN.
+.TP
+.B DL_HIPPI
+The medium is High Performance Parallel Interface.
+.TP
+.B DL_100VG
+The medium is 100 Based VG Ethernet.
+.TP
+.B DL_100VGTPR
+The medium is 100 Based VG Token Ring.
+.TP
+.B DL_ETH_CSMA
+The medium is capable of both ISO 8802/3 and Ethernet.
+.TP
+.B DL_100BT
+The medium is 100 Base T Ethernet.
+.TP
+.B DL_FRAME
+The medium is Frame Relay LAPF.
+.TP
+.B DL_MPFRAME
+The medium is Multi-Protocol over Frame Relay encapsulation, RFC
+1490.
+.TP
+.B DL_ASYNC
+The medium is a bit asynchronous communication line.
+.TP
+.B DL_LOOP
+The medium is a software loopback.
+.TP
+.B DL_OTHER
+Any other medium that is not listed above.
+.I dl_mac_type
+values above 0x80000000 are available for private or experimental use and will
+not be defined by this Specification.
+.PP
+.IR Solaris \(rg
+.[
+soldoc11
+.]
+provides the following additional private MAC types:
+.TP \w'\fBDL_100VGTPR\fP\(em'u
+.B DL_IPV4
+An IP version 4 tunnel link.
+.TP
+.B DL_IPV6
+An IP version 6 tunnel link.
+.TP
+.B DL_VNI
+A virtual network interface.
+.TP
+.B DL_WIFI
+An IEEE 802.11 interface.
+.RE
+.TP
+.I dl_reserved
+is a reserved field whose value must be set to zero.
+.TP
+.I dl_current_state
+conveys the state of the DLPI interface for the stream when the DLS provider
+issued this acknowledgement.  See
+.I \*(lqAllowable Sequence of DLPI Primitives,\*(rq
+.BR dlpi (7),
+for a list of DLPI states and an explanation of each.
+.TP
+.I dl_sap_length
+indicates the current length of the SAP component of the DLSAP address.  It
+may have a negative, zero or positive value.  A positive value indicates
+the ordering of the SAP and PHYSICAL component within the DLSAP address as SAP
+component followed by PHYSICAL component.  A negative value indicates
+PHYSICAL followed by the SAP.  A zero value indicates that no SAP has yet been
+bound.  The absolute value of the
+.I dl_sap_length
+provides the length of the SAP component within the DLSAP address.
+.TP
+.I dl_service_mode
+if returned before the
+.BR DL_BIND_REQ (7)
+is processed, this conveys which service modes (connection-mode,
+connectionless-mode, acknowledged connectionless-mode, or raw data mode, or
+any combination of these modes) the DLS provider can support.  It contains a
+bit-mask specifying one or more than one of the following values:
+.RS
+.TP \w'\fBDL_HP_RAWDLS\fP\(em'u
+.B DL_CODLS
+connection-oriented data link service
+.TP
+.B DL_CLDLS
+connectionless data link service
+.TP
+.B DL_ACLDLS
+acknowledged connectionless data link service.
+.TP
+.B DL_HP_RAWDLS
+raw-mode service.
+.PP
+When the Stream is in an unattached state, the value reflects the values that
+can be supported by the DLS Provider on any PPA.  When the Stream is in an
+unbound state, the values reflects the values that can be supported by the DLS
+Provider for the attached PPA.  Once a specific service mode has been bound to
+the stream, this field returns that specific service mode.
+.RE
+.TP
+.I dl_qos_length
+conveys the length, in bytes, of the negotiated/selected values of the
+quality of service (QOS) parameters.  Section 5, Quality of Data Link
+Service , describes quality of service and its associated parameters
+completely.  For connection-mode service, the returned values are those
+agreed during negotiation.  For connectionless-mode service, the values are
+those currently selected by the DLS user.  If quality of service has not
+yet been negotiated, default values will be returned; these values correspond
+to those that will be applied by the DLS provider on a connect request in
+connection-mode service, or those that will be applied to each data
+unit transmission in connectionless-mode service.  If the DLS provider
+supports both connection-mode and connectionless-mode services but the DLS
+user has not yet bound a specific service mode, the DLS provider
+may return either connection-mode or connectionless-mode QOS
+parameter values.
+.RS
+.PP
+The QOS values are conveyed in the structures defined in
+.I \*(lqQOS Data Structures,\*(rq
+.BR dlpi (7).
+For any parameter the DLS provider does not support or cannot
+determine, the corresponding entry will be set to
+.BR DL_UNKNOWN .
+If the DLS provider does not support any QOS parameters, this length field
+will be set to zero.
+.RE
+.TP
+.I dl_qos_offset
+conveys the offset from the beginning of the
+.BR M_PCPROTO (9)
+block where the current quality of service parameters begin.
+.TP
+.I dl_qos_range_length
+conveys the length, in bytes, of the available range of QOS parameter
+values supported by the DLS provider.  Forconnection-mode
+service, this is the range available to the calling DLS user in a connect
+request.  Forconnectionless-mode, this is the range available for each data
+unit transmission.  If the DLS provider supports both
+connection-mode and connectionless-mode services but the DLS user has not
+yet bound a specific service mode, the DLS provider may return either
+connection-mode or connectionless-mode QOS parameter values.
+.RS
+.PP
+The range of available QOS values is conveyed in the structures defined in
+.I \*(lqQOS Data Structures,\*(rq
+.BR dlpi (7).
+For any parameter the DLS provider does not support or cannot determine, the
+corresponding entry will be set
+to
+.BR DL_UNKNOWN .
+If the DLS provider does not support any QOS parameters, this length field
+will be set to zero.
+.RE
+.TP
+.I dl_qos_range_offset
+conveys the offset from the beginning of the
+.BR M_PCPROTO (9)
+block where the available range of quality of service parameters begins.
+.TP
+.I dl_provider_style
+conveys the style of DLS provider associated with the DLPI stream (see
+.I \*(lqPhysical Attachment Identification,\*(rq
+.BR dlpi (7)).
+The following provider classes are defined:
+.RS
+.TP \w'\fBDL_STYLE2\fP\(em'u
+.B DL_STYLE1
+The PPA is implicitly attached to the DLPI stream by opening the
+appropriate major/minor device number.
+.TP
+.B DL_STYLE2
+The DLS user must explicitly attach a PPA to the DLPI stream using
+.BR DL_ATTACH_REQ (7).
+.PP
+DLS users implemented in a protocol-independent manner must access this
+parameter to determine whether the DLS attach service must be invoked
+explicitly.
+.RE
+.TP
+.I dl_addr_offset
+conveys the offset of the address that is bound to the associated
+stream.  If the DLS user issues a
+.BR DL_INFO_REQ (7)
+prior to binding a DLSAP, the value of
+.I dl_addr_len
+will be 0 and consequently indicate that there has been no address bound.
+.TP
+.I dl_version
+indicates the current version of the dlpi that is supported.
+.TP
+.I dl_brdcst_addr_length
+indicates the length of the physical broadcast address.  When the Stream is
+unattached, or when the PPA does not support broadcast, this field will be set
+to zero (0).
+.TP
+.I dl_brdcst_addr_offset
+indicates the offset of the physical broadcast address from the beginning of
+the
+.BR M_PCPROTO (9)
+block.
+.TP
+.I dl_growth
+conveys a growth field for future use.  The value of this field will be zero.
+.\"
+.\"
+.SH MODE
+This primitive is valid in
+any
+mode.
+.\"
+.\"
+.SH STATE
+The message is valid in any state in response to a
+.BR DL_INFO_REQ .
+.\"
+.\"
+.SH "NEW STATE"
+The resulting state is unchanged.
+.\"
+.\"
+.SH NOTES
+Readers should note that the list of data links supported by the interface
+may be augmented and is published on the World-Wide Web in U019 at
+http://www.xopen.org (under Sales and Ordering).  This Corrigendum will
+contain relevant additional information such as recognised
+implementors' agreements/guidelines for common data link providers.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B DL_INFO_ACK
+primitive is compatible with implementations based on DLPI Revision 2,
+.[
+dlpi revision 2.0.0 draft 2
+.]
+such as
+.IR AIX \(rg,
+.[
+aixdlpi
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdlpi
+.]
+.IR Solaris \(rg,
+.[
+soldoc11
+.]
+.IR Solstice \(rg,
+.[
+solx25pg
+.]
+and
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+with the following portability considerations:
+.\"
+.IP \(em \w'\(em\(em'u
+The
+.B DL_HP_RAWDLS
+value for the
+.I dl_service_mode
+field is
+.IR HP-UX \(rg-specific,
+.[
+hpuxdlpi
+.]
+and will be ignored by portable DLS Users.
+.\"
+.IP \(em
+When indicated, the
+.B DL_HP_RAWDLS
+value for the
+.I dl_service_mode
+field indicates that either the DLS Provider can support this
+.IR HP-UX \(rg-specific
+mode of operation, or that the raw mode of operation has been selected.  See
+also,
+.BR DL_HP_RAWDATA_REQ "(7) and " DL_HP_RAWDATA_IND (7).
+.\"
+.IP \(em
+The behaviour of the
+.I dl_service_mode
+field for
+.B @PACKAGE_TITLE@
+when the Stream is unattached or unbound is clarified above.  This
+behaviour may vary from implementation to implementation.
+.\"
+.IP \(em
+.B DL_HP_RAWDLS
+is provided by
+.B @PACKAGE_TITLE@
+for source compatibility with DLS Providers and Users written for use with
+.IR HP-UX \(rg,
+and for porting DLS Providers and Users from
+.IR HP-UX \(rg
+to
+.IR Linux \(rg.
+Binary compatibility is not attempted.  Any binary compatibility experienced may be
+removed from the next release.
+.\"
+.IP \(em
+For
+.IR AIX \(rg
+.[
+aixlink
+.]
+and
+.IR Solstice \(rg
+.[
+solx25pg
+.]
+LAPB, the following fields are set:
+.RS
+.TP
+.I dl_min_sdu
+Always set to one (1).
+.TP
+.I dl_addr_length
+Set to zero (0).
+.TP
+.I dl_mac_type
+Set to
+.BR DL_HDLC .
+.TP
+.I dl_reserved
+Set to zero (0).
+.TP
+.I dl_sap_length
+Set to zero (0).
+.TP
+.I dl_service_mode
+Set to
+.BR DL_CODLS .
+.TP
+.IR dl_qos_length " and " dl_qos_offset
+Set to zero (0).
+.TP
+.IR dl_qos_range_length " and " dl_qos_range_offset
+Set to zero (0).
+.TP
+.IR dl_provider_style
+Set to
+.BR DL_STYLE1
+for
+.IR AIX \(rg.
+.[
+aixlink
+.]
+.TP
+.I dl_version
+Set to
+.BR DL_VERSION_2 .
+.TP
+.IR dl_addr_offset
+Set to zero (0).
+.TP
+.IR dl_brdcst_addr_length " and " dl_brdcst_addr_offset
+Set to zero (0).
+.TP
+.I dl_growth
+Set to zero (0).
+.RE
+.\"
+.IP \(em
+.IR Solsitce \(rg
+.[
+solx25pg
+.]
+says that
+.I dl_mac_type
+is only valid for LLC and
+.I dl_mdlc_type
+is only valid for LAPB.  The problem is that there is no
+.I dl_mdlc_type
+field in the
+.BR DL_INFO_ACK .
+There is a reserved field.  For compatibility with
+.IR Solsitce \(rg
+documentation
+.B @PACKAGE_TITLE@
+sets both
+.I dl_mac_type
+and
+.I dl_reserved
+to the value of the underlying driver.  Technically this could be
+.BR DL_HDLC " or " DL_ASYNC .
+.\"
+.IP \(em
+.IR Solsitce \(rg
+.[
+solx25pg
+.]
+says that the
+.I dl_sap_length
+field is one (1) for LLC2 and that the SAP follows the MAC.  However, the DLPI specification
+.[
+dlpi revision 2.0.0 draft 2
+.]
+requires that the length be coded as minus one (-1) in this case.
+.\"
+.PP
+See
+.BR dlpi (7),
+.BR dlpi_ioctl (4),
+.BR STREAMS (9),
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This interface conforms to DLPI Revision 2.
+.[
+dlpi revision 2.0.0 draft 2
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The Data Link Provider Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.\"
+.\"
+.XX
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.T2

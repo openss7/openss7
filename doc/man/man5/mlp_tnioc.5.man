@@ -1,0 +1,415 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: mlp_tnioc.5.man,v 1.1.2.1 2011-02-07 02:14:40 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:14:40 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: mlp_tnioc.5.man,v $
+.\" Revision 1.1.2.1  2011-02-07 02:14:40  brian
+.\" - added manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.ad b
+.hy 1
+.\"
+.\"
+.TH MLP_TNIOC 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.\"
+.\"
+.SH NAME
+.B mlp_tnioc
+\- MLP tunable parameter input-output control structure
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR "Logical Link Interface (LLI)" ,
+.[
+lli revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@
+.]
+.BR lli (7),
+.IR STREAMS (9).
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/snet/mlp_proto.h>
+.br
+.B #include <sys/snet/mlp_control.h>
+.PP
+.nf
+\f(CW\s-1\
+struct mlp_tnioc {
+    uint8_t lli_type;      /* always LI_MLPTUNE */
+    uint8_t lli_spare[3];  /* for alignment only */
+    uint8_t lli_snid;      /* subnetwork (link) ID */
+    mlptune_t mlp_tune;    /* MLP tuning parameters */
+};
+
+typedef struct mlptune {
+    uint16_t mw;           /* MLP window */
+    uint16_t mx;           /* MLP window in guard region */
+    uint16_t mt1;          /* lost frame timer */
+    uint16_t mt2;          /* group busy timer */
+    uint16_t mt3;          /* MLP reset confirmation timer */
+    uint16_t mn1;          /* */
+} mlptune_t;
+\s+1\fP
+.fi
+.\"
+.\"
+.SH MEMBERS
+.PP
+The members of the
+.B mlp_tnioc
+structure include
+.TP \w'\ lli_spare\(em'u
+.I lli_type
+The type of LLI structure: always \fB\)LI_MLPTUNE\fP.
+.PD 0
+.TP
+.I lli_spare
+Spare bytes for alignment.
+.TP
+.I lli_snid
+Subnetwork (link) identifier.
+.TP
+.I mlp_tune
+MLP tunable parameter structure.
+.PD
+.PP
+The members of the
+.B mlptune
+structure include:
+.TP \w'\ lli_spare\(em'u
+.I mw
+MLP window.
+.PD 0
+.TP
+.I mx
+MLP window in guard region.
+.TP
+.I mt1
+Lost frame timer.
+.TP
+.I mt2
+Group busy timer.
+.TP
+.I mt3
+MLP reset confirmation timer.
+.TP
+.I mn1
+MLP N1 counter.
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B mlp_tnioc
+structure is used to provide MLP tunable parameters and related information
+for use with the
+.BR M_GETTUNE "(7) and " M_SETTUNE (7)
+input-output control commands from the
+.IR "Link Layer Interface (LLI)" ,
+.[
+lli revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@
+.]
+.BR lli (7).
+.PP
+The
+.B mlp_tnioc
+structure, and the corresponding input-output controls, are used primarily by
+the
+.BR mlptune (8)
+utility, but may be used directly by user-space programs.
+.PP
+This structure is used for MLP, and other structures are used for LAPB,
+.BR lapb_tnioc (5),
+and LLC2,
+.BR llc2_tnioc (5).
+.PP
+The members of the
+.B mlp_tnioc
+structure are described as follows:
+.TP
+.I lli_type
+Specifies the type of the structure.  For the
+.B mlp_tnioc
+structure, this member is always set to
+.BR LI_MLPTUNE .
+.TP
+.I lli_spare
+Spare bytes for alignment: set to zero by the initiator and ignored by the
+responder.
+.TP
+.I lli_snid
+Specifies the subnetwork (link) identifier of the link (multi-link) to tune.
+.TP
+.I mlp_tune
+Specifies the tunable MLP parameters.
+.PP
+The members of the
+.B mlptune
+structure are described as follows:
+.TP
+.I mw
+MLP window.
+.TP
+.I mx
+MLP window inside the guard region.
+.TP
+.I mt1
+MLP T1, lost frame timer.
+.TP
+.I mt2
+MLP T2, group busy timer.
+.TP
+.I mt3
+MLP T3, reset confirmation timer.
+.TP
+.I mn1
+MLP N1, number of retries.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B @includedir@/snet/mlp_proto.h
+Defines the link classes.
+.TP
+.B @includedir@/snet/mlp_control.h
+Defines the
+.B mlp_tnioc
+and
+.B mlptune
+structures.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR mlptune (8),
+.BR M_SETTUNE (7),
+.BR M_GETTUNE (7),
+.BR lli (7).
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.B mlp_tnioc
+structure has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B mlp_tnioc
+structure is compatible with
+.IR "SpiderX25" ,
+.[
+spiderx25
+.]
+and implementations based on
+.IR "SpiderX25" ,
+such as
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+There are fine differences between the implementations in the precise fields
+and flags used in the
+.BR mlptune (5)
+structure.
+.IP \(em
+Source compatibility is attempted.  Binary compatibility is not guaranteed.
+.PP
+For additional compatibility information see,
+.BR lapb (4),
+and
+.BR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The
+.IR "Link Layer Interface (LLI)" ,
+.[
+lli revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@
+.]
+.BR lli (7),
+structures are not standardized; however,
+.B @PACKAGE_TITLE@
+conforms to
+.IR "SpiderX25" ,
+.[
+spiderx25
+.]
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B mlp_tnioc
+structure first appeared in
+.IR "Spider X.25" .
+.[
+spiderx25
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

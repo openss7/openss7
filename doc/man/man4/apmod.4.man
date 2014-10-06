@@ -1,0 +1,506 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: apmod.4.man,v 1.1.2.3 2011-02-07 02:18:09 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:09 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: apmod.4.man,v $
+.\" Revision 1.1.2.3  2011-02-07 02:18:09  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH APMOD 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.SH NAME
+.B apmod
+\- OSI ASCE/Presentation Library Interface Module
+.\"
+.\"
+.SH INTERFACE
+.PP
+APLI,
+.[
+APLI UNIX International
+.]
+XAP.
+.[
+xap c303
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <sys/apmod.h>
+.HP
+.IB p " = open(" /dev/oopi ", " 0 );
+.HP
+.BI ioctl( p ", " I_PUSH ", " \*(lqapmod\*(rq );
+.HP
+.BI ioctl( p ", " I_STR ", " &ic );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B apmod
+is an APLI and XAP library cooperating module for the STREAMS ACSE/Presentation
+Interfaces,
+.BR APLI (3)
+and
+.BR XAP (3).
+It translates a set of
+.BR ioctl (2s)
+commands into APLI primitives.  These
+.BR ioctl (2s)
+commands are intended to be used with the
+.IR OpenSS7 \(tm
+APLI Library,
+.BR libapli (3),
+or the
+.IR OpenSS7 \(tm
+XAP Library,
+.BR libxap (3).
+In the sense that it provides input-output controls that accomplish most of the
+functionality required by the libraries, the
+.B apmod
+module is termed a \*(lqCooperating Module\*(rq to the libraries.  The resulting
+library consists largely of interface, and does not contain much behaviour,
+whereas, the module consists largely of behaviour with a direct and simple
+input-output control interface provided by
+.IR STREAMS .
+.PP
+One of the major purposes of this apprach and the
+.B apmod
+module is to provide thread-safe operations in support of the APLI Library.
+.BR apmod
+does not alter any messages passed with
+.BR putmsg (2s)
+or
+.BR putpmsg (2s),
+or received with
+.BR getmsg (2s)
+or
+.BR getpmsg (2s).
+.BR romod
+simply intercepts responses to its own primitives sent downstream as a result
+of an
+.BR ioctl (2s)
+command.
+.PP
+Unlike the
+.BR sockmod (4)
+module,
+.BR romod
+makes no adjustments to the Stream head for
+.BR read (2s)
+options (See
+.BR I_SRDOPT (7)
+under
+.BR streamio (7)).
+.\"
+.\"
+.SH USAGE
+.PP
+The
+.B apmod
+STREAMS module is not normally pushed directly by XAP client programs, but is
+either pushed or autopushed as necessary, either by the OSI network
+configuration daemon,
+.BR osinetd (8),
+the autopush facility,
+.BR autopush (8),
+or the XAP Library itself (when
+.BR ap_init_env (3)
+is called).
+Nevertheless, the module may be pushed in a non-portable way by clients of
+sufficient privilege to acheive specific effects, such as for testing.
+.\"
+.\"
+.SH SERVICE INTERFACE
+.PP
+As it appears that other implementations of the APLI Library are
+solely contained in user-space libraries, using IPC for communication with
+clients, there is no evident standard upper level service interface for APLI.
+Therefore,
+.IR OpenSS7 \(tm
+has specified and implements an APLI service interface modelling the primitives
+consistent with the
+.BR ap_snd (3)
+and
+.BR ap_rcv (3)
+function descriptions and the ACSE service interface.
+.[
+x217
+.]
+.PP
+Again, there is no evident standard implementation of a lower level service
+interface.  It appears that some APLI Library implementations may use the
+Transport Provider Interface (TPI) or the XTI or XTI-mOSI interfaces directly.
+Therefore, again,
+.IR OpenSS7 \(tm
+has specified and implements a Presentation Provider Interface (PPI),
+.BR PPI (7),
+service interface modelling the presentation primitives consistent with the
+.BR ap_snd (3)
+and
+.BR ap_rcv (3)
+function descriptions and the Presentation service interface.
+.[
+x216
+.]
+.\"
+.\"
+.SH ADDRESSES
+.PP
+Addresses consist of an AP-Title, AE-Qualifier, and Presentation address.  The
+Presentation Address (PSAP) consists of a P-Selector and a TSAP.  The TSAP, in
+turn, consists of a T-Selector and an NSAP.  The NSAP is an OSI network address.
+.PP
+Addresses are formatted as described in
+.BR ap_env (3).
+.\"
+.\"
+.SH OPTIONS
+.PP
+Options and option lists are internally formatted as described for XTI in
+.BR t_optmgmt (3).
+Option names and values are as described in
+.BR ap_env (3).
+.\"
+.\"
+.SH PRIMITIVES
+.PP
+Primitives supported by the upper level service interface are modelled after
+the primitives described in
+.BR apli (3)
+and are as follows:
+.BR A_ASSOC_REQ "(7),
+.BR A_ASSOC_IND "(7),
+.BR A_ASSOC_RSP "(7),
+.BR A_ASSOC_CNF "(7),
+.BR A_ABORT_REQ "(7),
+.BR A_ABORT_IND "(7),
+.BR A_PABORT_REQ "(7),
+.BR A_PABORT_IND "(7),
+.BR A_RELEASE_REQ "(7),
+.BR A_RELEASE_IND "(7),
+.BR A_RELEASE_RSP "(7),
+.BR A_RELEASE_CNF "(7).
+.\"
+.\"
+.SH IOCTLS
+.PP
+.B xapmod
+implements a non-standard (non-traditional) set of input-output controls for
+cooperating with the
+.IR OpenSS7 \(tm
+XAP Library.  These input-output controls correspond to, and implement, the
+XAP functions,
+.BR xap (3).
+Because the STREAMS service interface is an inherently asynchronous interface,
+it is necessary to use input-output controls to implement synchronous (blocking)
+functions.  This can be achieved by using a cooperating module in the manner of
+.BR timod (4).
+.\"
+.\"
+.\".SH RETURN
+.\".PP
+.\"
+.\"
+.\".SH ERRORS
+.\".PP
+.\"
+.\"
+.SH NOTICES
+.PP
+Information on this manual page is specific to the
+.IR OpenSS7 \(tm
+implementation of the corresponding libraries and cooperating modules and will
+not be used directly by portable programs.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+It appears from descriptions of the APLI Library
+.[
+sunlink-apli
+.]
+that the library has been implemented on a number of OSI implementations as a
+user-space daemon library facility that uses IPC to communicate with library
+client programs.  Under this approach, the Library daemon process would be
+responsible for opening transport or presentation Streams and performing
+multiplexing and de-multiplexing between clients.
+.PP
+The
+.IR OpenSS7 \(tm
+implementation uses this
+.B apmod
+cooperating module and a regular shared Library that links into the client's
+address space to implement the library.  Also, the
+.BR oopi (4)
+or similar presentation devices are implemented as a STREAMS multiplexing
+driver.  It is the author's contention that a Linux Fast-STREAMS multiplexing
+driver is far faster than a single-threaded, full-blown user space process, and
+that the multiplexing driver exhibits better scheduling characteristics.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /lib/modules/striso/streams-apmod.ko
+provides the
+.B apmod
+STREAMS pushable module named
+.RI \(lq apmod \(rq.
+.\"
+.\"
+.SH MODULES
+.PP
+.RB \(lq apmod \(rq
+.I STREAMS
+module.
+.\"
+.\"
+.\".SH DEVICES
+.\".PP
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR A_ABORT_IND "(7),
+.BR A_ABORT_REQ "(7),
+.BR A_ASSOC_CNF "(7),
+.BR A_ASSOC_IND "(7),
+.BR A_ASSOC_REQ "(7),
+.BR A_ASSOC_RSP "(7),
+.BR A_PABORT_IND "(7),
+.BR A_PABORT_REQ "(7),
+.BR ap_env "(3),
+.BR ap_init_env "(3),
+.BR APLI "(3),
+.BR apli "(3),
+.BR ap_rcv "(3),
+.BR ap_snd "(3),
+.BR A_RELEASE_CNF "(7),
+.BR A_RELEASE_IND "(7),
+.BR A_RELEASE_REQ "(7),
+.BR A_RELEASE_RSP "(7),
+.BR autopush "(8),
+.BR getmsg "(2s),
+.BR getpmsg "(2s),
+.BR ioctl "(2s),
+.BR I_SRDOPT "(7),
+.BR libapli "(3),
+.BR libxap "(3),
+.BR oopi "(4),
+.BR osinetd "(8),
+.BR PPI "(7),
+.BR putmsg "(2s),
+.BR putpmsg "(2s),
+.BR read "(2s),
+.BR sockmod "(4),
+.BR streamio "(7),
+.BR STREAMS "(4),
+.BR test-apli "(8),
+.BR timod "(4),
+.BR t_optmgmt "(3),
+.BR XAP "(3),
+.BR xap "(3),
+.BR xapmod "(4),
+.BR xti_mosi "(3).
+.\"
+.\"
+.SH BUGS
+.PP
+.B apmod
+will be tested with the
+.BR test-apli (8)
+test case executable and autotest conformance test suite.
+.B apmod
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+This
+.B @PACKAGE_TITLE@
+implementation of
+.B apmod
+is compatible with APLI,
+.[
+APLI UNIX International
+.]
+XAP
+.[
+xap c303
+.]
+and descriptions for
+.IR HP-UX \(rg,
+.[
+hpuxapli
+.]
+.IR Solaris \(rg,
+.[
+sunlink-apli
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Other implementations do not document any cooperating module nor input-output
+controls.  Portable applications should never use input-output controls
+directly.
+.IP \(em
+Other implementations do not document the primitive format between the library
+and any cooperating module.
+.IP \(em
+Binary compatibility is not attempted.  Binary compatibility is not possible due
+to the lack of standardized symbolic constants.  Any binary compatibility
+experienced is a bug and is scheduled to be removed on the next release.
+.PP
+See
+.BR xti_mosi "(3),
+.BR apli "(3),
+.BR xap "(3),
+.BR oopi "(4),
+.BR xapmod "(4) and
+.BR STREAMS "(4)
+for additional compatibility information.
+.PP
+Compatibility will be tested using the
+.BR test-apli (8)
+test case executable and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+None.
+.PP
+Conformance will be tested using the
+.BR test-apli (8)
+test case executable and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B apmod
+module is new for
+.IR OpenSS7 \(tm
+.BR "striso version 0.9.2.4" .
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.IR OpenSS7 \(tm
+.BR apmod (4)
+module.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

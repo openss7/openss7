@@ -1,0 +1,226 @@
+International	3-8-3
+American Samoa	8-8-8
+Anguilla	8-8-8
+Antigua and Barbuda	8-8-8
+Bahamas	8-8-8
+Bahrain
+Bangladesh
+Barbados	8-8-8
+Belarus
+Belgium
+Belize
+Benin
+Bermuda	8-8-8
+Bhutan
+Bolivia (Plurinational State of)
+Bonaire, Sint Eustatius and Saba
+Bosnia and Herzegovina
+Botswana
+Brazil
+British Virgin Islands	8-8-8
+Brunei Darussalam
+Bulgaria
+Burkina Faso
+Burundi
+Cambodia
+Cameroon
+Canada	8-8-8
+Cape Verde
+Cayman Islands	8-8-8
+Central African Rep.
+Chad
+Chile
+China	8-8-8
+Colombia
+Comoros
+Congo
+Cook Islands
+Costa Rica
+Côte d'Ivoire
+Croatia
+Cuba
+Curaçao
+Cyprus
+Czech Rep.
+Dem. People's Rep. of Korea
+Dem. Rep. of the Congo
+Denmark
+Diego Garcia
+Djibouti
+Dominica	8-8-8
+Dominican Rep.	8-8-8
+Ecuador
+Egypt
+El Salvador
+Equatorial Guinea
+Eritrea
+Estonia
+Ethiopia
+Falkland Islands (Malvinas)
+Faroe Islands
+Fiji
+Finland
+France
+French Departments and Territories in the Indian Ocean
+French Guiana
+French Polynesia
+Gabon
+Gambia
+Georgia
+Germany
+Ghana
+Gibraltar
+Greece
+Greenland
+Grenada	8-8-8
+Guadeloupe
+Guam	8-8-8
+Guatemala
+Guinea
+Guinea-Bissau
+Guyana
+Haiti
+Honduras
+Hong Kong, China
+Hungary
+Iceland
+India
+Indonesia
+Inmarsat SNAC
+International Freephone Service
+International Premium Rate Service (IPRS)
+International Shared Cost Service (ISCS)
+Iran (Islamic Republic of)
+Iraq
+Ireland
+Israel
+Italy
+Jamaica	8-8-8
+Japan	7-4-5
+Jordan
+Kazakhstan
+Kenya
+Kiribati
+Korea (Rep. of)
+Kuwait
+Kyrgyzstan
+Lao P.D.R.
+Latvia
+Lebanon
+Lesotho
+Liberia
+Libya
+Liechtenstein
+Lithuania
+Luxembourg
+Macao, China
+Madagascar
+Malawi
+Malaysia
+Maldives
+Mali
+Malta
+Marshall Islands
+Martinique
+Mauritania
+Mauritius
+Mexico
+Micronesia
+Moldova (Republic of)
+Monaco
+Mongolia
+Montenegro
+Montserrat	8-8-8
+Morocco
+Mozambique
+Myanmar
+Namibia
+Nauru
+Nepal
+Netherlands
+New Caledonia
+New Zealand
+Nicaragua
+Niger
+Nigeria
+Niue
+Northern Marianas	8-8-8
+Norway
+Oman
+Pakistan
+Palau
+Panama
+Papua New Guinea
+Paraguay
+Peru
+Philippines
+Poland
+Portugal
+Puerto Rico	8-8-8
+Qatar
+Romania
+Russian Federation
+Rwanda
+Saint Helena, Ascension and Tristan da Cunha
+Saint Helena, Ascension and Tristan da Cunha
+Saint Kitts and Nevis	8-8-8
+Saint Lucia	8-8-8
+Saint Pierre and Miquelon
+Saint Vincent and the Grenadines	8-8-8
+Samoa
+San Marino
+Sao Tome and Principe
+Saudi Arabia
+Senegal
+Serbia
+Seychelles
+Sierra Leone
+Singapore
+Sint Maarten (Dutch part)	8-8-8
+Slovakia
+Slovenia
+Solomon Islands
+Somalia
+South Africa
+South Sudan
+Spain
+Sri Lanka
+Sudan
+Suriname
+Swaziland
+Sweden
+Switzerland
+Syrian Arab Republic
+Taiwan, China
+Tajikistan
+Tanzania
+Thailand
+The Former Yugoslav Republic of Macedonia
+Timor-Leste
+Togo
+Tokelau
+Tonga
+Trinidad and Tobago	8-8-8
+Tunisia
+Turkey
+Turkmenistan
+Turks and Caicos Islands	8-8-8
+Tuvalu
+Uganda
+Ukraine
+United Arab Emirates
+United Kingdom
+United States	8-8-8
+United States Virgin Islands	8-8-8
+Uruguay
+Uzbekistan
+Vanuatu
+Vatican
+Vatican
+Venezuela (Bolivarian Republic of)
+Viet Nam
+Wallis and Futuna
+Yemen
+Zambia
+Zimbabwe
+Reserved

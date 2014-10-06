@@ -1,0 +1,151 @@
+#!/usr/bin/awk -f
+
+BEGIN {
+    RPM_BUILD_DIR = ENVIRON[RPM_BUILD_DIR]
+    RPM_PACKAGE_NAME = ENVIRON[RPM_PACKAGE_NAME]
+    RPM_PACKAGE_VERSION = ENVIRON[RPM_PACKAGE_VERSION]
+    RPM_PACKAGE_RELEASE = ENVIRON[RPM_PACKAGE_RELEASE]
+    dir = RPM_BUILD_DIR "/" RPM_PACKAGE_NAME "-" RPM_PACKAGE_VERSION
+    if (ARGC > 1 && ARGV[1]) {
+	dir = ARGV[1]
+    }
+    RPM_BUILD_ROOT = ENVIRON[RPM_BUILD_ROOT]
+    if (ARGC > 2 && ARGV[2]) {
+	RPM_BUILD_ROOT = ARGV[2]
+    }
+    sub(/\/+$/, "", RPM_BUILD_ROOT)
+    for (i=1;ARGC>i;i++) { delete ARGV[i] }
+}
+(NF == 1) {
+    if (!($1 in requiredcaps))
+	requiredcaps[$1] = 1
+    next
+}
+(NF == 3) {
+    requiredcaps[$1] = 0
+    requiredvers[$0] = 1
+    next
+}
+END {
+    for (cap in requiredcaps) {
+	whatprovides = "rpm -q --qf '%{NAME}\\n' --whatprovides '" cap "' 2>/dev/null"
+	while ((whatprovides | getline)) {
+	    if (/no package/)
+		break;
+	    providedpkgs[$1] = 1
+	    providedcaps[$1] = pkg
+	}
+	close(whatprovides)
+    }
+    for (pkg in providedpkgs) {
+	provides = "rpm -q --provides " pkg " 2>/dev/null"
+	while ((provides | getline)) {
+	    if (NF == 1) {
+		if (!($1 in providedcaps))
+		    providedcaps[$1] = pkg
+		continue
+	    }
+	    if (NF == 3) {
+		providedcaps[$1] = ""
+		providedvers[$0] = pkg
+		continue
+	    }
+	}
+	close(provides)
+    }
+    j = 1
+    k = 1
+    for (cap in requiredcaps) {
+	if (!requiredcaps[cap])
+	    continue
+	if (cap in providedcaps) {
+	    if (!providedcaps[cap])
+		continue
+	    result[j] = cap
+	    j++
+	    continue
+	}
+	unprovided[k] = cap
+	k++
+    }
+    for (ver in requiredvers) {
+	if (ver in providedvers) {
+	    result[j] = ver
+	    j++
+	    continue
+	}
+	unprovided[k] = ver
+	k++
+    }
+    n = asort(result)
+    for (i = 1; i <= n; i++)
+	print result[i]
+    n = asort(unprovided)
+    if (n) {
+	print "W: Warning: unprovided capabilities:" > "/dev/stderr"
+	for (i = 1; i <= n; i++)
+	    print "W:    " unprovided[i] > "/dev/stderr"
+    }
+}
+
+# =============================================================================
+#
+# @(#) $RCSfile: remove-unprovided,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-05-10 13:45:32 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2011-05-10 13:45:32 $ by $Author: brian $
+#
+# -----------------------------------------------------------------------------
+#
+# $Log: remove-unprovided,v $
+# Revision 1.1.2.2  2011-05-10 13:45:32  brian
+# - weak modules workup
+#
+# Revision 1.1.2.1  2009-07-21 11:06:22  brian
+# - new awk scripts for release check
+#
+# =============================================================================
+# vim: ft=awk tw=80 sw=4 fo+=tcqlorn

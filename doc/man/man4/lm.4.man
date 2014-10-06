@@ -1,0 +1,1 @@
+.so man4/lmi_ioctl.4.man

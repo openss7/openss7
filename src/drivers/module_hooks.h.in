@@ -1,0 +1,244 @@
+/*****************************************************************************
+
+ @(#) $Id: module_hooks.h.in,v 1.1.2.2 2011-04-05 16:35:12 brian Exp $
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation; version 3 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2011-04-05 16:35:12 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: module_hooks.h.in,v $
+ Revision 1.1.2.2  2011-04-05 16:35:12  brian
+ - weak module design
+
+ Revision 1.1.2.1  2011-03-26 04:28:40  brian
+ - added new hook files
+
+ *****************************************************************************/
+
+/*
+ *  This header file is responsible for determining what kinds of module address
+ *  tools are supported or not supported and providing a wrapper access to them.
+ *  It is used primarily by pseudo-device drivers wanting to hook into Linux ip
+ *  protocols.
+ */
+
+#ifndef __LOCAL_MODULE_HOOKS_H__
+#define __LOCAL_MODULE_HOOKS_H__
+
+/*
+ *  The following are hooks for module_address().  We need the module_address()
+ *  function so that we can determine whether a loadable module own a structure.
+ *  If the structure is owned by a loadable module, we will hold a reference on
+ *  the loadable module so that it cannot remove itself from the protocol hooks
+ *  until we are removed, or our hook is removed.
+ */
+
+#undef CONFIG_KERNEL_WEAK_SYMBOLS
+
+#undef HAVE_MODULE_ADDRESS_SYMBOL
+#undef HAVE_MODULE_ADDRESS_SUPPORT
+#undef HAVE_MODULE_ADDRESS_USABLE
+#undef HAVE___MODULE_ADDRESS_SYMBOL
+#undef HAVE___MODULE_ADDRESS_SUPPORT
+#undef HAVE___MODULE_ADDRESS_USABLE
+#undef HAVE___MODULE_TEXT_ADDRESS_SYMBOL
+#undef HAVE___MODULES_SUPPORT
+#undef HAVE___MODULES_USABLE
+
+#if   defined HAVE_MODULE_ADDRESS_SYMBOL
+
+#if   defined HAVE_MODULE_ADDRESS_SUPPORT
+/* module_address() is supported directly */
+extern struct module *module_address(unsigned long addr);
+
+#define module_address(_x_) module_address(_x_)
+
+#elif defined HAVE_MODULE_ADDRESS_SYMBOL && defined CONFIG_KERNEL_WEAK_SYMBOLS
+/* module_address() is supported indirectly */
+extern struct module *module_address(unsigned long addr) __attribute__ ((__weak__));
+struct module *
+module_address_(unsigned long addr)
+{
+	if (module_address != 0)
+		return module_addres(addr);
+	return NULL;
+}
+
+#define module_address(_x_) module_address_(_x_)
+
+#else
+
+#warning Need a way to find a module from one of its data addresses.
+#undef module_address
+
+#endif
+
+#elif defined HAVE___MODULE_ADDRESS_SYMBOL
+
+#if   defined HAVE___MODULE_ADDRESS_SUPPORT
+extern struct module *__module_address(unsigned long addr);
+struct module *
+module_address_(unsigned long addr)
+{
+	struct module *mod;
+
+	preempt_disable();
+	mod = __module_address(addr);
+	preempt_enable();
+	return mod;
+}
+
+#define module_address(_x_) module_address_(_x_)
+
+#elif defined HAVE___MODULE_ADDRESS_SYMBOL && defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern struct module *__module_address(unsigned long addr) __attribute__ ((__weak__));
+struct module *
+module_address_(unsigned long addr)
+{
+	struct module *mod = NULL;
+
+	if (__module_address != 0) {
+		preempt_disable();
+		mod = __module_address(addr);
+		preempt_enable();
+	}
+	return mod;
+}
+
+#define module_address(_x_) module_address_(_x_)
+
+#else
+
+#warning Need a way to find a module from one of its data addresses.
+#undef module_address
+
+#endif
+
+#elif defined HAVE___MODULE_TEXT_ADDRESS_SYMBOL && defined HAVE_MODULES_SYMBOL
+
+#if   defined HAVE___MODULES_SUPPORT
+
+extern struct list_head modules;
+struct module *
+__module_address(unsigned long addr)
+{
+	struct module *mod;
+
+	list_for_each_entry_rcu(mod, &modules, list) {
+		if (((void *) addr >= (void *) mod->module_init &&
+		     (void *) addr < (void *) mod->module_init + mod->init_size)
+		    || ((void *) addr >= (void *) mod->module_core &&
+			(void *) addr < (void *) mod->module_core + mod->core_size)) {
+			return mod;
+		}
+	}
+	return NULL;
+}
+struct module *
+module_address_(unsigned long addr)
+{
+	struct module *mod;
+
+	preempt_disable();
+	mod = __module_address(addr);
+	preempt_enable();
+	return mod;
+}
+
+#define module_address(_x_) module_address_(_x_)
+
+#elif defined HAVE___MODULES_SYMBOL && defined CONFIG_KERNEL_WEAK_SYMBOLS
+
+extern struct list_head modules __attribute__ ((__weak__));
+struct module *
+__module_address(unsigned long addr)
+{
+	if (modules != 0) {
+		struct module *mod;
+
+		list_for_each_entry_rcu(mod, &modules, list) {
+			if (((void *) addr >= (void *) mod->module_init &&
+			     (void *) addr < (void *) mod->module_init + mod->init_size)
+			    || ((void *) addr >= (void *) mod->module_core &&
+				(void *) addr < (void *) mod->module_core + mod->core_size)) {
+				return mod;
+			}
+		}
+	}
+	return NULL;
+}
+struct module *
+module_address_(unsigned long addr)
+{
+	struct module *mod = NULL;
+
+	if (modules != 0) {
+		preempt_disable();
+		mod = __module_address(addr);
+		preempt_enable();
+	}
+	return mod;
+}
+
+#define module_address(_x_) module_address_(_x_)
+
+#else
+
+#warning Need a way to find a module from one of its data addresses.
+#undef module_address
+
+#endif
+
+#else
+
+#warning Need a way to find a module from one of its data addresses.
+#undef module_address
+
+#endif
+
+#endif				/* __LOCAL_MODULE_HOOKS_H__ */

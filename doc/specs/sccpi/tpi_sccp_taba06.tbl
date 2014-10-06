@@ -1,0 +1,48 @@
+.\" N-DISCONNECT vim: ft=nroff
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS H
+box center tab(:);
+cbss
+rb|c|c
+lb|cb|cb
+lb|c|c.
+N-DISCONNECT
+_
+TPI Primitive:\s-1T_DISCON_REQ\s+1:\s-1T_DISCON_IND\s+1
+_
+Parameter:Request:Indication
+=
+.TH
+Responding address:(note):(note)
+Originator:T_USER:DISCON_reason
+Reason:(note):DISCON_reason
+Importance:(note):\*-
+User data:[M_DATA]:[M_DATA]
+Connection id.:SEQ_number:SEQ_number
+.TE

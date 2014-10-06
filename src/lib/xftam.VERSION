@@ -1,0 +1,4 @@
+XFTAM_1.0 {
+	__xftam_*;
+	_xftam_*;
+};

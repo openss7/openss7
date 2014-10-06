@@ -1,0 +1,522 @@
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\"
+.\" @(#) $Id: openss7.macros,v 1.1.2.4 2011-02-07 04:42:15 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 04:42:15 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: openss7.macros,v $
+.\" Revision 1.1.2.4  2011-02-07 04:42:15  brian
+.\" - updated manual pages
+.\"
+.\" Revision 1.1.2.3  2011-01-18 16:47:33  brian
+.\" - updated manual pages
+.\"
+.\" Revision 1.1.2.2  2010-12-02 22:22:43  brian
+.\" - regression fix and np_udp driver
+.\"
+.\" Revision 1.1.2.1  2009-06-21 10:32:53  brian
+.\" - added files to distro
+.\"
+.\" =========================================================================
+.de ]<
+.SH REFERENCES
+.PP
+..
+.de ]>
+.\".PD
+.ad b
+.hy
+.\".PP
+.\"Trademarks mentioned are the property of their owners.
+.\".TM
+..
+.de ]-
+.\".PD 0.4v
+.ad l
+.nh
+.IP "\\fR[\\fB\\*([F\\fR]\\ \\fP" \\w'[00]00'u
+.\"\\fR[\\fB\\*([F\\fR]\\fP
+.\".IP \\*([F. \\w'(00.)'u
+.\".IP [\\fB\\*([F\\fR] 5
+..
+.de ][
+.if !'\\*([T'' \{\
+.ad b
+.hy
+.if !'\\*([R'' \{\
+\fB\\*([R\fR,
+.rm [R
+.\}
+.if !'\\*([S'' \{\
+\fI\\*([S\fR: \c
+.rm [S
+.\}
+\fI\\*([T\fR\c
+.if !'\\*([J'' \{\
+, \fB\\*([J\fR\c
+.rm [J
+.if !'\\*([V'' \{\
+, Vol. \fB\\*([V\fR\c
+.rm [V
+.\}
+.if !'\\*([N'' \{\
+, No. \fB\\*([N\fR\c
+.rm [N
+.\}
+.\}
+.if !'\\*([V'' \{\
+, \fI\\*([V\fR\c
+.rm [V
+.\}
+.if !'\\*([N'' \{\
+, \fI\\*([N\fR\c
+.rm [N
+.\}
+.if !'\\*([D'' \{\
+, \\*([D\c
+.rm [D
+.\}
+.if !'\\*([C'' \{\
+, (\\*([C)\c
+.rm [C
+.\}
+.ie !'\\*([E'' \{\
+, \\*([E, ed.\c
+.rm [E
+.\}
+.el \{\
+.ie !'\\*([A'' \{\
+, \\*([A\c
+.rm [A
+.\}
+.el \{\
+.if !'\\*([Q'' \{\
+, \\*([Q\c
+.rm [Q
+.\}
+.\}
+.\}
+.if !'\\*([I'' \{\
+, \\*([I\c
+.rm [I
+.\}
+.RI .
+.if !'\\*([G'' \{\
+[\\*([G]
+.rm [G
+.\}
+.if !'\\*([O'' \{\
+\\*([O
+.rm [O
+.\}
+.if !'\\*([U'' \{\
+.\"\\*([U
+<\\fB\\*([U\\fP>
+.rm [U
+.\}
+.if !'\\*([P'' \{\
+\\*([P.
+.\}
+.\}
+.rm [F
+.rm [L
+.rm [R
+.rm [S
+.rm [T
+.rm [C
+.rm [N
+.rm [D
+.rm [E
+.rm [I
+.rm [G
+.rm [O
+.rm [U
+.rm [Q
+.rm [A
+.rm [P
+..
+.de CO
+.SH COPYRIGHT
+.PP
+\f(HR\)Copyright\ \(co\)\ 2008-2012\ Monavacon\ Limited.
+\f(HR\)All\ Rights\ Reserved.
+.br
+\f(HR\)Copyright\ \(co\)\ 2001-2008\ OpenSS7\ Corporation.
+\f(HR\)All\ Rights\ Reserved.
+.br
+\f(HR\)Copyright\ \(co\)\ 1997-2001\ Brian\ F.\ G.\ Bidulock.
+\f(HR\)All\ Rights\ Reserved.
+.ie '\\*(.T'ps' \{\
+.PP
+.ce 1
+\s-2\f(HR\)PERMISSION NOTICE\fR
+.PP
+\s-2\f(HR\)Permission is granted to copy, distribute and/or modify this
+manual under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of
+the license is included in the section entitled \*[lq]GNU Free Documentation
+License\*[rq].
+.PP
+\s-2\f(HR\)Permission to use, copy and distribute this manual without
+modification, for any purpose and without fee or royalty is hereby granted,
+provided that both the above copyright notice and this permission notice
+appears in all copies and that the name of OpenSS7 Corporation not be used in
+advertising or publicity pertaning to distribution of this documentation or
+its contents without specific, written prior permission.  OpenSS7 Corporation
+makes no representation about the suitability of this manual for any purpose.
+It is provided \*[lq]as is\*[rq] without express or implied warranty.
+.PP
+\s-2\f(HR\)Permission is granted to process this file through groff and print
+the results, provided the printed document carries a copying permission
+notice identical to this one except for the removal of this paragraph (this
+paragraph not being relevant to the printed manual).
+.PP
+\s-2\f(HB\)OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+MANUAL INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS
+OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE LIABLE FOR ANY
+DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
+RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
+CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION
+OF THE CONTENTS THEREOF.
+.PP
+\s-2\f(HR\)Since the Linux kernel and libraries are constantly changing, this
+manual page may be incorrect or out-of-date.  The author(s) assume no
+responsibility for errors or omissions, or for damages resulting from the use
+of the information contained herein.  The author(s) may not have taken the
+same level of care in the production of this manual, which is licensed free
+of charge, as they might when working professionally.  The author(s) will
+take no responsibility in it.
+.PP
+\s-2\f(HR\)Formatted or processed versions of this manual, if unaccompanied
+by the source, must acknowledge the copyright and authors of this work.
+.PP
+\s-2\f(HR\)U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this
+Software on behalf of the U.S. Government (\*[lq]Government\*[rq]), the
+following provisions apply to you.  If the Software is supplied by the
+Department of Defense (\*[lq]DoD\*[rq]), it is classified as \*[lq]Commercial
+Computer Software\*[rq] under paragraph 252.227-7014 of the DoD Supplement to
+the Federal Acquisition Regulations (\*[lq]DFARS\*[rq]) (or any successor
+regulations) and the Government is acquiring only the license rights granted
+herein (the license rights customarily provided to non-Government users).  If
+the Software is supplied to any unit or agency of the Government other than
+DoD, it is classified as \*[lq]Restricted Computer Software\*[rq] and the
+Government's rights in the Software are defined in paragraph 52.227-19 of the
+Federal Acquisition Regulations (\*[lq]FAR\*[rq]) (or any successor
+regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the NASA
+Supplement to the FAR (or any successor regulations).
+.PP
+\s-2\f(HR\)
+Commercial licensing and support of this software is available from OpenSS7
+Corporation at a fee.  See http://www.openss7.com/
+.\}
+.el \{\
+.br
+.I (See roff source for permission notice.)
+.\}
+..
+.de C2
+.SH COPYRIGHT
+.PP
+\f(HR\)Copyright\ \(co\)\ 1992\ UNIX International, Inc.
+.ie '\\*(.T'ps' \{\
+.PP
+.ce 1
+\s-2\f(HR\)PERMISSION NOTICE\fR
+.PP
+\s-2\f(HR\)Permission is granted to make and distribute verbatim copies of
+this manual provided the copyright notice and this permission notice are
+preserved on all copies.
+.PP
+\s-2\f(HR\)
+Permission to use, copy, modify, and distribute this documentation for any
+purpose and without fee is hereby granted, provided that the above copyright
+notice appears in all copies and that both that copyright notice and this
+permission notice appear in supporting documentation, and that the name UNIX
+International not be used in advertising or publicity pertaining to
+distribution of the software without specific, written prior permission.
+UNIX International makes no representations about the suitability of this
+documentation for any purpose.  It is provided \*[lq]as is\*[rq] without
+express or implied warranty.
+.PP
+\s-2\f(HB\)UNIX INTERNATIONAL DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+DOCUMENTATION, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+FITNESS, IN NO EVENT SHALL UNIX INTERNATIONAL BE LIABLE FOR ANY SPECIAL,
+INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS DOCUMENTATION.
+.PP
+.\}
+.el \{\
+.br
+\f(HR\)Copyright\ \(co\)\ 2008-2012\ Monavacon\ Limited.
+\f(HR\)All\ Rights\ Reserved.
+.br
+\f(HR\)Copyright\ \(co\)\ 2001-2008\ OpenSS7\ Corporation.
+\f(HR\)All\ Rights\ Reserved.
+.ie '\\*(.T'ps' \{\
+.PP
+.ce 1
+\s-2\f(HR\)PERMISSION NOTICE\fR
+.PP
+\s-2\f(HR\)Permission is granted to make and distribute verbatim copies of this
+manual provided that the copyright notice and this permission notice are
+preserved on all copies.
+.PP
+\s-2\f(HR\)Permission is granted to copy and distribute modified version of this
+manual under the conditions for verbatim copying, provided that the entire
+resulting derived work is distributed under the terms of a permission notice
+identical to this one.
+.PP
+\s-2\f(HR\)Since the Linux kernel and libraries are constantly changing, this manual
+may be incorrect or out-of-date.  The author(s) and copyright holder(s) assume
+no responsibility whatsoever for errors or omissions, or for damage resulting
+from the use of the information contained herein.  The author(s) and copyright
+holder(s) may not have taken the same level of care in the production of this
+manual, which is licensed free of charge, as they might when working
+professionally.
+.PP
+\s-2\f(HR\)Formated or processed versions of this manual, if unaccompanied by the
+source, must acknowledge the copyright and authors of this work.
+.\}
+.el \{\
+.br
+.I (See roff source for permission notice.)
+.\}
+..
+.de BG
+.SH BUGS
+.PP
+No known bugs.
+..
+.de AU
+.SH AUTHOR
+.PP
+Brian F. G. Bidulock <bidulock@openss7.org>
+.br
+The OpenSS7 Project http://www.openss7.org/
+..
+.de AE
+.SH EDITOR
+.PP
+Brian F. G. Bidulock <bidulock@openss7.org>
+.br
+The OpenSS7 Project http://www.openss7.org/
+..
+.de ID
+.SH IDENTIFICATION
+.ad l
+.nh
+.HP
+@PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
+.PP
+\f(HR\)Copyright\ \(co\)\ 2008-2012\ Monavacon\ Ltd.
+All\ Rights\ Reserved.
+.br
+\f(HR\)Copyright\ \(co\)\ 2001-2008\ OpenSS7\ Corp.
+All\ Rights\ Reserved.
+.br
+\f(HR\)Copyright\ \(co\)\ 1997-2001\ Brian\ Bidulock.
+All\ Rights\ Reserved.
+.br
+.I (See roff source for permission notice.)
+.PP
+Trademarks mentioned are the property of their owners.
+.hy
+.ad b
+..
+.de I2
+.SH IDENTIFICATION
+.ad l
+.nh
+.HP
+@PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
+.PP
+\f(HR\)Copyright\ \(co\)\ 2008-2012\ Monavacon\ Ltd.
+All\ Rights\ Reserved.
+.br
+\f(HR\)Copyright\ \(co\)\ 2001-2008\ OpenSS7\ Corp.
+All\ Rights\ Reserved.
+.br
+\f(HR\)Copyright\ \(co\)\ 1997-2001\ Brian\ Bidulock.
+All\ Rights\ Reserved.
+.br
+\f(HR\)Copyright\ \(co\)\ 1992\ UNIX International, Inc.
+.br
+.I (See roff source for permission notice.)
+.PP
+Trademarks mentioned are the property of their owners.
+.hy
+.ad b
+..
+.de VR
+.SH VERSIONS
+.PP
+@PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
+..
+.de TM
+.SH TRADEMARKS
+.ad l
+.nh
+.TP \w'\fBMonavacon\fR\(tm\(em'u
+.BR Monavacon \(tm
+is a trademark of Monavacon Limited.
+.PD 0
+.TP
+.BR OpenSS7 \(tm
+is a trademark of OpenSS7 Corporation.
+.TP
+.BR Linux \(rg
+is a registered trademark of Linus Torvalds.
+.TP
+.BR UNIX \(rg
+is a registered trademark of The Open Group
+in the United States and other countries.
+.TP
+.BR Solaris \(rg
+is a registered trademark of Sun Microsystems.
+.PD
+.PP
+Other trademarks are the property of their respective owners.
+.ad b
+.hy
+..
+.de TA
+.ie '\\*(.T'ps' \{\
+.if !'\nC'1' \{\
+.VR
+.AU
+.CO
+.\}
+.\}
+.el \{\
+.ID
+.\}
+..
+.de T2
+.ie '\\*(.T'ps' \{\
+.if !'\nC'1' \{\
+.I2
+.\}
+.\}
+.el \{\
+.I2
+.\}
+..
+.de T4
+.ie '\\*(.T'ps' \{\
+.if !'\nC'1' \{\
+.ID
+.\}
+.\}
+.el \{\
+.ID
+.\}
+..
+.de TI
+.T4
+..
+.de R1
+.ig R2
+..
+..
+.ie '\\*(.T'ps' \{\
+.nr ps 0.4v
+.hy
+.\}
+.el \{\
+.nr ps 1v
+.hy
+.\}
+.if !r LL .nr LL \n(.lu
+.if !r LT .nr LT \n(.lu
+.ev 1
+.lt \n(LTu
+.xl \n(LLu
+.ll \n(LLu
+.ev
+.\" vim: ft=groff

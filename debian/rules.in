@@ -1,0 +1,842 @@
+#!/usr/bin/make -f
+# @configure_input@
+# vim: ft=make comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
+# =============================================================================
+#
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-09-02 08:46:28 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2011-09-02 08:46:28 $ by $Author: brian $
+#
+# =============================================================================
+
+kversion	= $(shell uname -r)
+
+srcdir		= .
+debbuilddir	= ..
+debtmpdir	= debian/tmp
+
+PACKAGE_DEBEPOCH	= @PACKAGE_DEBEPOCH@
+PACKAGE_DEBOPTIONS	= @PACKAGE_DEBOPTIONS@
+PACKAGE_DEBRELEASE	= @PACKAGE_DEBRELEASE@
+
+rootdir		= @rootdir@
+prefix		= @prefix@
+exec_prefix	= @exec_prefix@
+datarootdir	= @datarootdir@
+datadir		= @datadir@
+localstatedir	= @localstatedir@
+
+DH_COMPAT	= @DH_COMPAT@
+DH_VERBOSE	= @DH_VERBOSE@
+
+export DH_COMPAT
+export DH_VERBOSE
+export DH_OPTIONS
+export DEB_HOST_ARCH
+export DEB_HOST_GNU_TYPE
+export BUILD_CFGOPTIONS
+
+#ebtmpdir	= ${debbuilddir}/tmp
+
+am__debian_install_format = | sed -r -e 's,^($(debtmpdir)/(.*))$$,\2 \2,;s,/[^/]*$$,,'
+am__debian_conffil_format = | sed -r -e 's,^$(debtmpdir),,'
+
+control		=
+control_n	=
+control_t	=
+control_k	=
+
+##
+## Repo package:
+##
+
+control_n	+= debian/@PACKAGE@-repo.postinst
+control_n	+= debian/@PACKAGE@-repo.postrm
+control_n	+= debian/@PACKAGE@-repo.preinst
+control_n	+= debian/@PACKAGE@-repo.prerm
+
+control_n	+= debian/@PACKAGE@-repo.conffiles
+
+debian/@PACKAGE@-repo.conffiles:
+	( [ ! -d '$(debtmpdir)$(aptsourceslistdir)' ] || find '$(debtmpdir)$(aptsourceslistdir)' -type f -name '*.list' ; \
+	) $(am__debian_conffil_format) | sort -u > $@
+
+sysconfdir	= @sysconfdir@
+aptsourceslistdir = ${sysconfdir}/apt/sources.list.d
+
+control_n	+= debian/@PACKAGE@-repo.install
+
+debian/@PACKAGE@-repo.install:
+	( [ ! -d '$(debtmpdir)$(aptsourceslistdir)' ] || find '$(debtmpdir)$(aptsourceslistdir)' -type f -name '*.list' ; \
+	) $(am__debian_install_format) | sort -u > $@
+
+##
+## Base virtual package:
+##
+
+control_n	+= debian/@PACKAGE@.docs
+
+debian/@PACKAGE@.docs:
+	( echo AUTHORS ; \
+	  [ ! -f ANNOUNCE      ] || echo ANNOUNCE      ; \
+	  [ ! -f ABOUT-NLS     ] || echo ABOUT-NLS     ; \
+	  [ ! -f BUGS          ] || echo BUGS          ; \
+	  echo COPYING ; \
+	  echo ChangeLog ; \
+	  echo INSTALL ; \
+	  echo INSTALL-@PACKAGE@ ; \
+	  [ ! -f LICENSES      ] || echo LICENSES      ; \
+	  echo LSM ; \
+	  echo MANUAL ; \
+	  echo NEWS ; \
+	  [ ! -f NOTES         ] || echo NOTES         ; \
+	  [ ! -f NOTES.cos53   ] || echo NOTES.cos53   ; \
+	  [ ! -f NOTES.kmod    ] || echo NOTES.kmod    ; \
+	  [ ! -f NOTES.kmp     ] || echo NOTES.kmp     ; \
+	  [ ! -f NOTES.ksyms   ] || echo NOTES.ksyms   ; \
+	  [ ! -f NOTES.repo    ] || echo NOTES.repo    ; \
+	  [ ! -f NOTES.rpm     ] || echo NOTES.rpm     ; \
+	  [ ! -f NOTES.sles    ] || echo NOTES.sles    ; \
+	  echo PROBLEMS ;  \
+	  echo README ; \
+	  [ ! -f README-alpha  ] || echo README-alpha  ; \
+	  echo README-cvs ; \
+	  echo README-make ; \
+	  [ ! -f RELEASE-NOTES ] || echo RELEASE-NOTES ; \
+	  echo THANKS ; \
+	  echo TODO ; \
+	  echo @PACKAGE@-@VERSION@.lsm ; \
+	  ) | sort -u > $@
+
+##
+## Base configuration and scripts package:
+##
+
+control_n	+= debian/@PACKAGE@-base.postinst
+control_n	+= debian/@PACKAGE@-base.postrm
+control_n	+= debian/@PACKAGE@-base.preinst
+control_n	+= debian/@PACKAGE@-base.prerm
+
+control_n	+= debian/@PACKAGE@-base.conffiles
+
+debian/@PACKAGE@-base.conffiles:
+	( [ ! -d '$(debtmpdir)$(sysconfdir)'				] || find '$(debtmpdir)$(sysconfdir)' -type f -name '*.conf' ; \
+	) $(am__debian_conffil_format) | sort -u > $@
+
+initrddir	= @initrddir@
+sbindir		= @sbindir@
+syssbindir	= @syssbindir@
+snmpmibdir	= @snmpmibdir@
+libexecdir	= @libexecdir@
+pkglibexecdir	= $(libexecdir)/@PACKAGE@
+
+control_n	+= debian/@PACKAGE@-base.specfs.sh.init
+control_n	+= debian/@PACKAGE@-base.streams.sh.init
+control_n	+= debian/@PACKAGE@-base.strerr.sh.init
+control_n	+= debian/@PACKAGE@-base.strace.sh.init
+control_n	+= debian/@PACKAGE@-base.openss7.sh.init
+
+debian/@PACKAGE@-base.specfs.sh.init \
+debian/@PACKAGE@-base.streams.sh.init \
+debian/@PACKAGE@-base.strerr.sh.init \
+debian/@PACKAGE@-base.strace.sh.init \
+debian/@PACKAGE@-base.@PACKAGE@.sh.init: \
+debian/@PACKAGE@-base.%.init: $(debtmpdir)$(initrddir)/%
+	cp -f -- $< $@
+
+control_n	+= debian/@PACKAGE@-base.specfs.sh.default
+control_n	+= debian/@PACKAGE@-base.streams.sh.default
+control_n	+= debian/@PACKAGE@-base.strerr.sh.default
+control_n	+= debian/@PACKAGE@-base.strace.sh.default
+control_n	+= debian/@PACKAGE@-base.@PACKAGE@.sh.default
+
+configdir	= @configdir@
+
+debian/@PACKAGE@-base.specfs.sh.default \
+debian/@PACKAGE@-base.streams.sh.default \
+debian/@PACKAGE@-base.strerr.sh.default \
+debian/@PACKAGE@-base.strace.sh.default \
+debian/@PACKAGE@-base.@PACKAGE@.sh.default: \
+debian/@PACKAGE@-base.%.sh.default: $(debtmpdir)$(configdir)/%
+	cp -f -- $< $@
+
+control_n	+= debian/@PACKAGE@-base.install
+
+debian/@PACKAGE@-base.install:
+	( [ ! -d '$(debtmpdir)$(sysconfdir)'					] || find '$(debtmpdir)$(sysconfdir)' -type f -name '*.conf' ; \
+	  [ ! -f '$(debtmpdir)$(sbindir)/$(STRCONF_DEVICES)'			] || echo '$(debtmpdir)$(sbindir)/$(STRCONF_DEVICES)' ; \
+	  [ ! -d '$(debtmpdir)$(snmpmibdir)'					] || echo '$(debtmpdir)$(snmpmibdir)/*' ; \
+	  [ ! -f '$(debtmpdir)$(pkglibexecdir)/aclocal'				] || echo '$(debtmpdir)$(pkglibexecdir)/aclocal' ; \
+	  [ ! -d '$(debtmpdir)$(pkglibexecdir)'					] || echo '$(debtmpdir)$(pkglibexecdir)/testsuite*' ; \
+	  [ ! -f '$(debtmpdir)$(pkglibexecdir)/send-pr'				] || echo '$(debtmpdir)$(pkglibexecdir)/send-pr' ; \
+	  [ ! -f '$(debtmpdir)$(pkglibexecdir)/send-pr.config'			] || echo '$(debtmpdir)$(pkglibexecdir)/send-pr.config' ; \
+	  [ ! -f '$(debtmpdir)$(sysconfdir)/kernel/postinst.d/@PACKAGE@-update'	] || echo '$(debtmpdir)$(sysconfdir)/kernel/postinst.d/@PACKAGE@-update' ; \
+	  [ ! -f '$(debtmpdir)$(sysconfdir)/kernel/postrm.d/@PACKAGE@-update'	] || echo '$(debtmpdir)$(sysconfdir)/kernel/postrm.d/@PACKAGE@-update' ; \
+	  [ ! -f '$(debtmpdir)$(sbindir)/@PACKAGE@-modules'			] || echo '$(debtmpdir)$(sbindir)/@PACKAGE@-modules' ; \
+	  [ ! -f '$(debtmpdir)$(sbindir)/@PACKAGE@-update'			] || echo '$(debtmpdir)$(sbindir)/@PACKAGE@-update' ; \
+	  [ ! -f '$(debtmpdir)$(mandir)/@PACKAGE@.refs'				] || echo '$(debtmpdir)$(mandir)/@PACKAGE@.refs' ; \
+	  [ ! -f '$(debtmpdir)$(mandir)/@PACKAGE@.macros'			] || echo '$(debtmpdir)$(mandir)/@PACKAGE@.macros' ; \
+	) $(am__debian_install_format) | sort -u > $@
+
+control_n	+= debian/@PACKAGE@-base.manpages
+
+mandir		= @mandir@
+
+debian/@PACKAGE@-base.manpages:
+	( [ ! -d '$(debtmpdir)$(mandir)' ] || find '$(debtmpdir)$(mandir)' \( -type f -or -type l \) -name '*.[1458]*' ; \
+	) | sort -u > $@
+
+##
+## Documentation package
+##
+
+control_n	+= debian/@PACKAGE@-doc.postinst
+control_n	+= debian/@PACKAGE@-doc.postrm
+control_n	+= debian/@PACKAGE@-doc.preinst
+control_n	+= debian/@PACKAGE@-doc.prerm
+
+control_n	+= debian/@PACKAGE@-doc.docs
+
+debian/@PACKAGE@-doc.docs:
+	( [ ! -d '$(debtmpdir)$(docdir)/@PACKAGE@-@VERSION@'	] || find '$(debtmpdir)$(docdir)/@PACKAGE@-@VERSION@' -type f -name '*.txt' ; \
+	  [ ! -d '$(debtmpdir)$(dvidir)/@PACKAGE@-@VERSION@'	] || find '$(debtmpdir)$(dvidir)/@PACKAGE@-@VERSION@' -type f -name '*.dvi' ; \
+	  [ ! -d '$(debtmpdir)$(psdir)/@PACKAGE@-@VERSION@'	] || find '$(debtmpdir)$(psdir)/@PACKAGE@-@VERSION@' -type f -name '*.ps' ; \
+	  [ ! -d '$(debtmpdir)$(pdfdir)/@PACKAGE@-@VERSION@'	] || find '$(debtmpdir)$(pdfdir)/@PACKAGE@-@VERSION@' -type f -name '*.pdf' ; \
+	  [ ! -d '$(debtmpdir)$(htmldir)/@PACKAGE@-@VERSION@'	] || find '$(debtmpdir)$(htmldir)/@PACKAGE@-@VERSION@' -type f -name '*.html' ; \
+	  [ ! -d '$(debtmpdir)$(htmldir)/@PACKAGE@-@VERSION@'	] || find '$(debtmpdir)$(htmldir)/@PACKAGE@-@VERSION@' -type f -name '*.png' ; \
+	  [ ! -d '$(debtmpdir)$(htmldir)/@PACKAGE@-@VERSION@'	] || find '$(debtmpdir)$(htmldir)/@PACKAGE@-@VERSION@' -type f -name '*.css' ; \
+	) | sort -u > $@
+
+control_n	+= debian/@PACKAGE@-doc.info
+
+debian/@PACKAGE@-doc.info:
+	( [ !-d '$(debtmpdir)$(infodir)' ] || find '$(debtmpdir)$(infodir)' -type f -name '*.info*' ; \
+	) | sort -u > $@
+
+control_n	+= debian/@PACKAGE@-doc.manpages
+
+debian/@PACKAGE@-doc.manpages:
+	( [ ! -d '$(debtmpdir)$(mandir)' ] || find '$(debtmpdir)$(mandir)' \( -type f -or -type l \) -name '*.[2379]*' ; \
+	) | sort -u > $@
+
+##
+## Library package:
+##
+
+control_t	+= debian/@PACKAGE@-lib.postinst
+control_t	+= debian/@PACKAGE@-lib.postrm
+control_t	+= debian/@PACKAGE@-lib.preinst
+
+control_t	+= debian/@PACKAGE@-lib.conffiles
+
+snmpconfdir	= ${sysconfdir}/snmp
+
+debian/@PACKAGE@-lib.conffiles:
+	( [ ! -d '$(debtmpdir)$(snmpconfdir)'				] || find '$(debtmpdir)$(snmpconfdir)' \( -type f -o -type l \) ; \
+	  [ ! -f '$(debtmpdir)$(sysconfdir)/nslconfig.d/@PACKAGE@'	] || echo '$(debtmpdir)$(sysconfdir)/nslconfig.d/@PACKAGE@' ; \
+	  [ ! -f '$(debtmpdir)$(sysconfdir)/sock2path'			] || echo '$(debtmpdir)$(sysconfdir)/sock2path' ; \
+	  [ ! -f '$(debtmpdir)$(sysconfdir)/sock2path.d/@PACKAGE@'	] || echo '$(debtmpdir)$(sysconfdir)/sock2path.d/@PACKAGE@' ; \
+	) $(am__debian_conffil_format) | sort -u > $@
+
+bindir		= @bindir@
+sysbindir	= @sysbindir@
+libdir		= @libdir@
+syslibdir	= @syslibdir@
+perldir		= @perldir@
+tcllibdir	= @tcllibdir@
+pkgtcllibdir	= ${tcllibdir}/$(PACKAGE_NAME)$(PACKAGE_VERSION)
+localedir	= @localedir@
+snmpdlmoddir	= @snmpdlmoddir@
+
+control_t	+= debian/@PACKAGE@-lib.install
+
+debian/@PACKAGE@-lib.install:
+	( [ ! -d '$(debtmpdir)$(snmpconfdir)'				] || find '$(debtmpdir)$(snmpconfdir)' \( -type f -o -type l \) ; \
+	  [ ! -f '$(debtmpdir)$(sysconfdir)/nslconfig.d/@PACKAGE@'	] || echo '$(debtmpdir)$(sysconfdir)/nslconfig.d/@PACKAGE@' ; \
+	  [ ! -f '$(debtmpdir)$(sysconfdir)/sock2path'			] || echo '$(debtmpdir)$(sysconfdir)/sock2path' ; \
+	  [ ! -f '$(debtmpdir)$(sysconfdir)/sock2path.d/@PACKAGE@'	] || echo '$(debtmpdir)$(sysconfdir)/sock2path.d/@PACKAGE@' ; \
+	  [ ! -d '$(debtmpdir)$(bindir)'				] || echo '$(debtmpdir)$(bindir)/*' ; \
+	  [ ! -d '$(debtmpdir)$(sbindir)'				] || echo '$(debtmpdir)$(sbindir)/*' ; \
+	  [ ! -d '$(debtmpdir)$(sysbindir)'				] || echo '$(debtmpdir)$(sysbindir)/*' ; \
+	  [ ! -d '$(debtmpdir)$(syssbindir)'				] || echo '$(debtmpdir)$(syssbindir)/*' ; \
+	  [ ! -d '$(debtmpdir)$(libdir)'				] || echo '$(debtmpdir)$(libdir)/*.so*' ; \
+	  [ ! -d '$(debtmpdir)$(libdir)'				] || echo '$(debtmpdir)$(libdir)/*.la' ; \
+	  [ ! -d '$(debtmpdir)$(syslibdir)'				] || echo '$(debtmpdir)$(syslibdir)/*.so*' ; \
+	  [ ! -d '$(debtmpdir)$(syslibdir)'				] || echo '$(debtmpdir)$(syslibdir)/*.la' ; \
+	  [ ! -d '$(debtmpdir)$(perldir)/auto/Xti'			] || echo '$(debtmpdir)$(perldir)/auto/Xti/*' ; \
+	  [ ! -f '$(debtmpdir)$(pkgtcllibdir)/pkgIndex.tcl'		] || echo '$(debtmpdir)$(pkgtcllibdir)/pkgIndex.tcl' ; \
+	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/xti'			] || echo '$(debtmpdir)$(pkgtcllibdir)/xti/*.tcl' ; \
+	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/xti'			] || echo '$(debtmpdir)$(pkgtcllibdir)/xti/*.so' ; \
+	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/xti'			] || echo '$(debtmpdir)$(pkgtcllibdir)/xti/*.la' ; \
+	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/tcap'			] || echo '$(debtmpdir)$(pkgtcllibdir)/tcap/*.tcl' ; \
+	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/tcap'			] || echo '$(debtmpdir)$(pkgtcllibdir)/tcap/*.so' ; \
+	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/tcap'			] || echo '$(debtmpdir)$(pkgtcllibdir)/tcap/*.la' ; \
+	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/streams'			] || echo '$(debtmpdir)$(pkgtcllibdir)/streams/*.tcl' ; \
+	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/streams'			] || echo '$(debtmpdir)$(pkgtcllibdir)/streams/*.so' ; \
+	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/streams'			] || echo '$(debtmpdir)$(pkgtcllibdir)/streams/*.la' ; \
+	  [ ! -d '$(debtmpdir)$(localedir)'				] || find '$(debtmpdir)$(localedir)' -type f -name '*.mo' ; \
+	  [ ! -f '$(debtmpdir)$(pkglibexecdir)/gdmo'			] || echo '$(debtmpdir)$(pkglibexecdir)/gdmo' ; \
+	  [ ! -d '$(debtmpdir)$(pkglibexecdir)'				] || echo '$(debtmpdir)$(pkglibexecdir)/*test*' ; \
+	  [ ! -d '$(debtmpdir)$(snmpdlmoddir)'				] || echo '$(debtmpdir)$(snmpdlmoddir)/*' ; \
+	) $(am__debian_install_format) | sort -u > $@
+
+##
+## 32-bit compatability libraries:
+##
+
+lib32dir	= @lib32dir@
+pkglibexec32dir	= @pkglibexec32dir@
+syslib32dir	= @syslib32dir@
+
+@WITH_32BIT_LIBS_TRUE@control_t	+= debian/@PACKAGE@-compat.postinst \
+@WITH_32BIT_LIBS_TRUE@		   debian/@PACKAGE@-compat.postrm \
+@WITH_32BIT_LIBS_TRUE@
+@WITH_32BIT_LIBS_TRUE@control_t	+= debian/@PACKAGE@-compat.install
+@WITH_32BIT_LIBS_TRUE@
+@WITH_32BIT_LIBS_TRUE@debian/@PACKAGE@-compat.install:
+@WITH_32BIT_LIBS_TRUE@	( [ ! -d '$(debtmpdir)$(lib32dir)'		] || echo '$(debtmpdir)$(lib32dir)/*.so*' ; \
+@WITH_32BIT_LIBS_TRUE@	  [ ! -d '$(debtmpdir)$(lib32dir)'		] || echo '$(debtmpdir)$(lib32dir)/*.la' ; \
+@WITH_32BIT_LIBS_TRUE@	  [ ! -d '$(debtmpdir)$(syslib32dir)'		] || echo '$(debtmpdir)$(syslib32dir)/*.so*' ; \
+@WITH_32BIT_LIBS_TRUE@	  [ ! -d '$(debtmpdir)$(syslib32dir)'		] || echo '$(debtmpdir)$(syslib32dir)/*.la' ; \
+@WITH_32BIT_LIBS_TRUE@	  [ ! -d '$(debtmpdir)$(pkglibexec32dir)'	] || echo '$(debtmpdir)$(pkglibexec32dir)/*test*' ; \
+@WITH_32BIT_LIBS_TRUE@	) $(am__debian_install_format) | sort -u > $@
+
+##
+## Development package:
+##
+
+control_t	+= debian/@PACKAGE@-devel.preinst
+
+control_t	+= debian/@PACKAGE@-devel.install
+
+includedir	= @includedir@
+pkgincludedir	= $(includedir)/@PACKAGE@
+
+@WITH_32BIT_LIBS_TRUE@debian/@PACKAGE@-devel.install:
+@WITH_32BIT_LIBS_TRUE@	( [ ! -d '$(debtmpdir)$(pkgincludedir)'	] || echo '$(debtmpdir)$(pkgincludedir)/*' ; \
+@WITH_32BIT_LIBS_TRUE@	  [ ! -d '$(debtmpdir)$(libdir)'		] || echo '$(debtmpdir)$(libdir)/*.a' ; \
+@WITH_32BIT_LIBS_TRUE@	  [ ! -d '$(debtmpdir)$(syslibdir)'		] || echo '$(debtmpdir)$(syslibdir)/*.a' ; \
+@WITH_32BIT_LIBS_TRUE@	  [ ! -d '$(debtmpdir)$(lib32dir)'		] || echo '$(debtmpdir)$(lib32dir)/*.a' ; \
+@WITH_32BIT_LIBS_TRUE@	  [ ! -d '$(debtmpdir)$(syslib32dir)'		] || echo '$(debtmpdir)$(syslib32dir)/*.a' ; \
+@WITH_32BIT_LIBS_TRUE@	) $(am__debian_install_format) | sort -u > $@
+
+@WITH_32BIT_LIBS_FALSE@debian/@PACKAGE@-devel.install:
+@WITH_32BIT_LIBS_FALSE@	( [ ! -d '$(debtmpdir)$(pkgincludedir)'	] || echo '$(debtmpdir)$(pkgincludedir)/*' ; \
+@WITH_32BIT_LIBS_FALSE@	  [ ! -d '$(debtmpdir)$(libdir)'		] || echo '$(debtmpdir)$(libdir)/*.a' ; \
+@WITH_32BIT_LIBS_FALSE@	  [ ! -d '$(debtmpdir)$(syslibdir)'		] || echo '$(debtmpdir)$(syslibdir)/*.a' ; \
+@WITH_32BIT_LIBS_FALSE@	) $(am__debian_install_format) | sort -u > $@
+
+##
+## Debugging information package:
+##
+
+control_t	+= debian/@PACKAGE@-debuginfo.install
+
+@WITH_32BIT_LIBS_TRUE@debian/@PACKAGE@-debuginfo.install:
+@WITH_32BIT_LIBS_TRUE@	( [ ! -d '$(debtmpdir)$(lib32dir)/debug' ] ||	find '$(debtmpdir)$(lib32dir)/debug' -type f \! -name '*.ko' \! -name '*.ko.debug' ; \
+@WITH_32BIT_LIBS_TRUE@	  [ ! -d '$(debtmpdir)$(lib32dir)/debug' ] || { find '$(debtmpdir)$(lib32dir)/debug' -type l | while read f ; do \
+@WITH_32BIT_LIBS_TRUE@							case `readlink $$f` in (*.ko|*.ko.debug) ;; (*) echo "$$f" ;; esac ; done ; } ; \
+@WITH_32BIT_LIBS_TRUE@	) $(am__debian_install_format) | sort -u > $@
+
+@WITH_32BIT_LIBS_FALSE@debian/@PACKAGE@-debuginfo.install:
+@WITH_32BIT_LIBS_FALSE@	( [ ! -d '$(debtmpdir)$(libdir)/debug'	 ] ||	find '$(debtmpdir)$(libdir)/debug' -type f \! -name '*.ko' \! -name '*.ko.debug' ; \
+@WITH_32BIT_LIBS_FALSE@	  [ ! -d '$(debtmpdir)$(libdir)/debug'	 ] || { find '$(debtmpdir)$(libdir)/debug' -type l | while read f ; do \
+@WITH_32BIT_LIBS_FALSE@							case `readlink $$f` in (*.ko|*.ko.debug) ;; (*) echo "$$f" ;; esac ; done ; } ; \
+@WITH_32BIT_LIBS_FALSE@	) $(am__debian_install_format) | sort -u > $@
+
+##
+## Debugging source package:
+##
+
+control_t	+= debian/@PACKAGE@-debugsource.install
+
+debian/@PACKAGE@-debugsource.install:
+	( [ ! -d '$(debtmpdir)/usr/src/debug'	] || echo '$(debtmpdir)/usr/src/debug/*' ; \
+	) $(am__debian_install_format) | sort -u > $@
+
+##
+## Kernel module package:
+##
+
+control_k	+= debian/@PACKAGE@-$(kversion).postinst
+control_k	+= debian/@PACKAGE@-$(kversion).postrm
+control_k	+= debian/@PACKAGE@-$(kversion).preinst
+control_k	+= debian/@PACKAGE@-$(kversion).prerm
+
+debian/@PACKAGE@-$(kversion).postinst \
+debian/@PACKAGE@-$(kversion).postrm \
+debian/@PACKAGE@-$(kversion).preinst \
+debian/@PACKAGE@-$(kversion).prerm: \
+debian/@PACKAGE@-$(kversion).%: debian/@PACKAGE@-kernel.%
+	cp -fv $< $@
+
+@WITH_KO_MODULES_FALSE@control_k	+= debian/@PACKAGE@-$(kversion).conffiles
+
+@WITH_KO_MODULES_FALSE@debian/@PACKAGE@-$(kversion).conffiles:
+@WITH_KO_MODULES_FALSE@	( [ ! -f $(debtmpdir)$(kmoduledir)/modules.@PACKAGE@ ] || echo '$(debtmpdir)$(kmoduledir)/modules.@PACKAGE@'; \
+@WITH_KO_MODULES_FALSE@	) $(am__debian_conffil_format) | sort -u > $@
+
+kmoduledir	= @kmoduledir@
+ksubdir		= @ksubdir@
+
+control_k	+= debian/@PACKAGE@-$(kversion).install
+
+@WITH_KO_MODULES_TRUE@debian/@PACKAGE@-$(kversion).install:
+@WITH_KO_MODULES_TRUE@	( [ ! -d $(debtmpdir)$(kmoduledir)/$(ksubdir) ] || echo '$(debtmpdir)$(kmoduledir)/$(ksubdir)/*.ko' ; \
+@WITH_KO_MODULES_TRUE@	  [ ! -d $(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/System.symvers ] || \
+@WITH_KO_MODULES_TRUE@	  echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/System.symvers' ; \
+@WITH_KO_MODULES_TRUE@	  [ ! -f $(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/Module.symvers ] || \
+@WITH_KO_MODULES_TRUE@	  echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/Module.symvers' ; \
+@WITH_KO_MODULES_TRUE@	) $(am__debian_install_format) | sort -u > $@
+
+@WITH_KO_MODULES_FALSE@debian/@PACKAGE@-$(kversion).install:
+@WITH_KO_MODULES_FALSE@	( [ ! -f $(debtmpdir)$(kmoduledir)/modules.@PACKAGE@ ] || echo '$(debtmpdir)$(kmoduledir)/modules.@PACKAGE@'; \
+@WITH_KO_MODULES_FALSE@	  [ ! -d $(debtmpdir)$(kmoduledir)/$(ksubdir) ] || echo '$(debtmpdir)$(kmoduledir)/$(ksubdir)/*.o' ; \
+@WITH_KO_MODULES_FALSE@	) $(am__debian_install_format) | sort -u > $@
+
+##
+## Kernel development package:
+##
+
+control_k	+= debian/@PACKAGE@-$(kversion)-devel.install
+
+@WITH_KO_MODULES_TRUE@debian/@PACKAGE@-$(kversion)-devel.install:
+@WITH_KO_MODULES_TRUE@	( [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/Module.mkvars' ] || \
+@WITH_KO_MODULES_TRUE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/Module.mkvars' ; \
+@WITH_KO_MODULES_TRUE@	  [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_GNU_TYPE)-$(kversion)-config.cache' ] || \
+@WITH_KO_MODULES_TRUE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_GNU_TYPE)-$(kversion)-config.cache' ; \
+@WITH_KO_MODULES_TRUE@	  [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_GNU_TYPE)-config.site' ] || \
+@WITH_KO_MODULES_TRUE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_GNU_TYPE)-config.site' ; \
+@WITH_KO_MODULES_TRUE@	  [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/abi-$(kversion)' ] || \
+@WITH_KO_MODULES_TRUE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/abi-$(kversion)' ; \
+@WITH_KO_MODULES_TRUE@	  [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/symvers-$(kversion).gz' ] || \
+@WITH_KO_MODULES_TRUE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/symvers-$(kversion).gz' ; \
+@WITH_KO_MODULES_TRUE@	  [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/symsets-$(kversion).tar.gz' ] || \
+@WITH_KO_MODULES_TRUE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/symsets-$(kversion).tar.gz' ; \
+@WITH_KO_MODULES_TRUE@	  [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/Modules.map' ] || \
+@WITH_KO_MODULES_TRUE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/Modules.map' ; \
+@WITH_KO_MODULES_TRUE@	  [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_GNU_TYPE)-$(kversion)-modpost.cache' ] || \
+@WITH_KO_MODULES_TRUE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_GNU_TYPE)-$(kversion)-modpost.cache' ; \
+@WITH_KO_MODULES_TRUE@	  [ ! -d '$(debtmpdir)/boot' ] || echo '$(debtmpdir)/boot/*' ; \
+@WITH_KO_MODULES_TRUE@	) $(am__debian_install_format) | sort -u > $@
+
+@WITH_KO_MODULES_FALSE@debian/@PACKAGE@-$(kversion)-devel.install:
+@WITH_KO_MODULES_FALSE@	( [ ! -d $(debtmpdir)$(pkgincludedir)/$(kversion) ] || echo '$(debtmpdir)$(pkgincludedir)/$(kversion)/*' ; \
+@WITH_KO_MODULES_FALSE@	  [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/Module.mkvars' ] || \
+@WITH_KO_MODULES_FALSE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/Module.mkvars' ; \
+@WITH_KO_MODULES_FALSE@	  [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_GNU_TYPE)-$(kversion)-config.cache' ] || \
+@WITH_KO_MODULES_FALSE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_GNU_TYPE)-$(kversion)-config.cache' ; \
+@WITH_KO_MODULES_FALSE@	  [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_GNU_TYPE)-config.site' ] || \
+@WITH_KO_MODULES_FALSE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_GNU_TYPE)-config.site' ; \
+@WITH_KO_MODULES_FALSE@	) $(am__debian_install_format) | sort -u > $@
+
+##
+## Kernel debugging information package:
+##
+
+control_k	+= debian/@PACKAGE@-$(kversion)-debuginfo.install
+
+@WITH_32BIT_LIBS_TRUE@debian/@PACKAGE@-$(kversion)-debuginfo.install:
+@WITH_32BIT_LIBS_TRUE@	( [ ! -d '$(debtmpdir)$(lib32dir)/debug' ] ||	find '$(debtmpdir)$(lib32dir)/debug' -type f \( -name '*.ko' -o -name '*.ko.debug' \) ; \
+@WITH_32BIT_LIBS_TRUE@	  [ ! -d '$(debtmpdir)$(lib32dir)/debug' ] || { find '$(debtmpdir)$(lib32dir)/debug' -type l | while read f ; do \
+@WITH_32BIT_LIBS_TRUE@							case `readlink $$f` in (*.ko|*.ko.debug) echo "$$f" ;; esac ; done ; } ; \
+@WITH_32BIT_LIBS_TRUE@	) $(am__debian_install_format) | sort -u > $@
+
+@WITH_32BIT_LIBS_FALSE@debian/@PACKAGE@-$(kversion)-debuginfo.install:
+@WITH_32BIT_LIBS_FALSE@	( [ ! -d '$(debtmpdir)$(libdir)/debug'	 ] ||	find '$(debtmpdir)$(libdir)/debug' -type f \( -name '*.ko' -o -name '*.ko.debug' \) ; \
+@WITH_32BIT_LIBS_FALSE@	  [ ! -d '$(debtmpdir)$(libdir)/debug'	 ] || { find '$(debtmpdir)$(libdir)/debug' -type l | while read f ; do \
+@WITH_32BIT_LIBS_FALSE@							case `readlink $$f` in (*.ko|*.ko.debug) echo "$$f" ;; esac ; done ; } ; \
+@WITH_32BIT_LIBS_FALSE@	) $(am__debian_install_format) | sort -u > $@
+
+##
+## Kernel debugging source package:
+##
+
+control_k	+= debian/@PACKAGE@-$(kversion)-debugsource.install
+
+debian/@PACKAGE@-$(kversion)-debugsource.install:
+	( [ ! -d $(debtmpdir)/usr/src/debug ] || echo '$(debtmpdir)/usr/src/debug/*' ; \
+	) $(am__debian_install_format) | sort -u > $@
+
+##
+## Kernel source package:
+##
+
+@WITH_K_PACKAGE_TRUE@control_k	+= debian/@PACKAGE@-$(kversion)-source.install
+
+@WITH_K_PACKAGE_TRUE@debian/@PACKAGE@-$(kversion)-source.install:
+@WITH_K_PACKAGE_TRUE@	( [ ! -f $(debtmpdir)/usr/src/@PACKAGE@-@VERSION@.tar.gz ] || echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@.tar.gz' ; \
+@WITH_K_PACKAGE_TRUE@	) $(am__debian_install_format) | sort -u > $@
+
+##
+## Java package:
+##
+
+control_t	+= debian/@PACKAGE@-java.postinst
+control_t	+= debian/@PACKAGE@-java.postrm
+control_t	+= debian/@PACKAGE@-java.preinst
+
+control_t	+= debian/@PACKAGE@-java.install
+
+jnidir		= @jnidir@
+pkggcjdir	= ${libdir}/gcj/@PACKAGE@
+javadir		= @javadir@
+
+debian/@PACKAGE@-java.install:
+	( [ ! -d $(debtmpdir)$(jnidir)		] || echo '$(debtmpdir)$(jnidir)/*' ; \
+	  [ ! -d $(debtmpdir)$(pkggcjdir)	] || echo '$(debtmpdir)$(pkggcjdir)/*.so' ; \
+	  [ ! -d $(debtmpdir)$(pkggcjdir)	] || echo '$(debtmpdir)$(pkggcjdir)/*.la' ; \
+	  [ ! -d $(debtmpdir)$(pkggcjdir)	] || echo '$(debtmpdir)$(pkggcjdir)/*.db' ; \
+	  [ ! -d $(debtmpdir)$(javadir)		] || echo '$(debtmpdir)$(javadir)/*' ; \
+	) $(am__debian_install_format) | sort -u > $@
+
+##
+## Java documentation package:
+##
+
+control_t	+= debian/@PACKAGE@-javadoc.docs
+
+javadocdir	= @javadocdir@
+pkgjavadocdir	= ${javadocdir}/@PACKAGE@
+
+debian/@PACKAGE@-javadoc.docs:
+	( [ ! -d $(debtmpdir)$(pkgjavadocdir) ] || find '$(debtmpdir)$(pkgjavadocdir)' -type f ; \
+	) | sort -u > $@
+
+##
+## Building the package:
+##
+
+control		= $(control_n) $(control_t) $(control_k)
+
+cache_file	= $(debbuilddir)/$(DEB_HOST_GNU_TYPE)-$(kversion)-config.cache
+csite_file	= $(debbuilddir)/$(DEB_HOST_GNU_TYPE)-config.site
+mpost_file	= $(debbuilddir)/$(DEB_HOST_GNU_TYPE)-$(kversion)-modpost.cache
+
+build:
+	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
+	dh_testdir
+	rm -fr @PACKAGE@-@VERSION@
+	[ ! -f Makefile ] || $(MAKE) clean
+	rm -f $(control)
+	case " $(BUILD_CFGOPTIONS) " in \
+		(*" --disable-arch "*) ;; \
+		(*) echo "rm -f $(cache_file) $(csite_file) $(mpost_file)" ;; \
+	esac
+	dh_auto_configure -- \
+		CONFIG_SITE='$(csite_file)' \
+		MODPOST_CACHE='$(mpost_file)' \
+		$(PACKAGE_DEBOPTIONS) \
+		--cache-file='$(cache_file)' \
+		--disable-maintainer-mode \
+		--enable-dependency-tracking \
+		--with-gnu-ld \
+		--with-k-release=$(kversion) \
+		$(BUILD_CFGOPTIONS) \
+		|| { rm -f $(cache_file) $(csite_file) $(mpost_file) ; exit 1 ; }
+	$(MAKE)
+	case " $(BUILD_CFGOPTIONS) " in \
+	(*" --disable-arch "*|*" --disable-indep "*|*" --disable-tools "*|*" --disable-modules "*) ;; \
+	(*) $(MAKE) check check-clean ;; \
+	esac
+	chmod +x debian/rules
+
+clean:
+	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
+	dh_testdir
+	dh_testroot
+	rm -fr @PACKAGE@-@VERSION@
+	[ ! -f Makefile ] || $(MAKE) clean
+	rm -f $(control)
+	rm -fr $(debtmpdir)
+
+install:
+	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
+	dh_testdir
+	dh_testroot
+	dh_prep
+	rm -fr $(debtmpdir)
+	if [ -z '@WITH_K_PACKAGE_TRUE@' ] ; then \
+		mkdir -p $(debtmpdir)/usr/src/@PACKAGE@-@VERSION@ ; \
+		tar cf - --exclude=$(debtmpdir) --exclude=@PACKAGE@-@VERSION@ . | \
+			gzip -c > $(debtmpdir)/usr/src/@PACKAGE@-@VERSION@.tar.gz ; \
+	fi
+	mkdir -p $(debtmpdir)
+	$(MAKE) DESTDIR=`pwd`/$(debtmpdir) install
+	case " $(BUILD_CFGOPTIONS) " in \
+	(*" --disable-arch "*) ;; \
+	(*)	if [ -x /usr/lib/rpm/find-debuginfo.sh ] ; then \
+			pwd=`pwd` ; \
+			RPM_BUILD_ROOT=$$pwd/$(debtmpdir) \
+			RPM_BUILD_DIR=`dirname $$pwd` \
+			/bin/bash /usr/lib/rpm/find-debuginfo.sh $$pwd ; \
+		fi ;; \
+	esac
+	case " $(BUILD_CFGOPTIONS) " in \
+	(*" --disable-arch "*) ;; \
+	(*" --disable-modules "*) ;; \
+	(*)	d=$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion) ; \
+		mkdir -p $$d ; \
+		b=$(debtmpdir)/boot ; \
+		mkdir -p $$b ; \
+		cp -p Module.mkvars $$d ; \
+		cp -p $(csite_file) $$d ; \
+		cp -p $(cache_file) $$d ; \
+		cp -p System.symvers $$d ; \
+		cp -p Module.symvers $$d ; \
+		cat System.symvers Module.symvers | gzip > $$d/symvers-$(kversion).gz ; \
+		cp -p $$d/symvers-$(kversion).gz $$b ; \
+		cat System.symvers Module.symvers | awk '{print$4"\t"$3"\t"$1"\t"$2}' > $$d/abi-$(kversion) ; \
+		cp -p $$d/abi-$(kversion) $$b ; \
+		cp -p $(mpost_file) $$d ; \
+		cp -p symsets-$(kversion).tar.gz $$d ; \
+		cp -p symsets-$(kversion).tar.gz $$b ;; \
+	esac
+	mkdir -p debian/source
+	echo "3.0 (native)" > debian/source/format
+	@case " $(BUILD_CFGOPTIONS) " in \
+		(*" --disable-indep "*) ;; \
+		(*) echo "$(MAKE) -f debian rules $(control_n)" ; \
+		    $(MAKE) -f debian/rules $(control_n) ;; \
+	esac
+	@case " $(BUILD_CFGOPTIONS) " in \
+		(*" --disable-arch "*) ;; \
+		(*" --disable-tools "*) ;; \
+		(*) echo "$(MAKE) -f debian/rules $(control_t)" ; \
+		    $(MAKE) -f debian/rules $(control_t) ;; \
+	esac
+	@case " $(BUILD_CFGOPTIONS) " in \
+		(*" --disable-arch "*) ;; \
+		(*" --disable-modules "*) ;; \
+		(*) echo "$(MAKE) -f debian/rules $(control_k)" ; \
+		    $(MAKE) -f debian/rules $(control_k) ;; \
+	esac
+
+binary-common:
+	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
+	dh_testdir
+	dh_testroot
+	dh_installdirs
+	dh_install
+	dh_installmodules -n
+	dh_installchangelogs
+	dh_installdocs debian/README.Debian debian/TODO.Debian
+	dh_installdebconf
+	dh_installinit -n --name=specfs.sh    -- start 33 S .
+	dh_installinit -n --name=streams.sh   -- start 34 S .
+	dh_installinit -n --name=strace.sh    -- start 35 S . stop 35 0 6 .
+	dh_installinit -n --name=strerr.sh    -- start 35 S . stop 35 0 6 .
+	dh_installinit -n --name=@PACKAGE@.sh -- start 35 S . stop 35 0 6 .
+	dh_installman --language=C
+	dh_installinfo
+	if [ ! -x /usr/lib/rpm/find-debuginfo.sh ] ; then \
+		dh_strip --dbg-package=@PACKAGE@-debuginfo ; \
+	fi
+	dh_link
+	dh_compress -X@PACKAGE@.macros -X@PACKAGE@.refs
+	dh_fixperms
+	dh_makeshlibs
+	dh_shlibdeps -X.ko -X.o -L @PACKAGE@-lib -l `pwd`/debian/@PACKAGE@-lib/usr/lib
+	dh_installdeb
+	dh_perl
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+	case " $(BUILD_CFGOPTIONS) " in \
+	(*" --disable-arch "*|*" --disable-indep "*|*" --disable-tools "*|*" --disable-modules "*) \
+		{ \
+			cat debian/control | sed '/^$$/,$$d' ; \
+			echo "" ; \
+			for f in ../*[ud.]deb ; do \
+				test -s $$f || continue ; \
+				echo "  dpkg --info $$f" >&2 ; \
+				dpkg --info $$f | sed -n '/^ Package/,$$s,^ ,,p' | \
+					sed '/^Architecture/s,'$$DEB_HOST_ARCH',any,' | \
+					egrep -v '^(Version|Installed|Source|Origin|Bugs|Maintainer)' ; \
+				echo "" ; \
+			done ; \
+		} >debian/control.new ; \
+		mv -f -- debian/control.new debian/control ; \
+		;; \
+	esac
+
+#
+#  dkpg-buildpackage invoke this makefile in one of two ways: with the -b flag,
+#  the 'binary' target is invoked to build both arch and indep binary packages;
+#  with the -B flag, the 'binary-arch' target is invoked to build only the arch
+#  binary packages and not the indep binary packages.
+#
+binary-indep: DH_OPTIONS = -i
+binary-indep:
+	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
+	DH_OPTIONS= ; \
+	case " $(BUILD_CFGOPTIONS) " in \
+	(*" --disable-indep "*) ;; \
+	(*) \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-repo" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-base" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-doc" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-javadoc" ; \
+		;; \
+	esac ; \
+	$(MAKE) -f debian/rules DH_OPTIONS="$${DH_OPTIONS}" install ; \
+	$(MAKE) -f debian/rules DH_OPTIONS="$${DH_OPTIONS}" binary-common
+
+binary-arch: DH_OPTIONS = -s
+binary-arch:
+	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
+	DH_OPTIONS= ; \
+	case " $(BUILD_CFGOPTIONS) " in \
+	(*" --disable-arch "*|*" --disable-tools "*) ;; \
+	(*) \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-lib" ; \
+		if test -z "@WITH_32BIT_LIBS_TRUE@"; then \
+			DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-compat" ; \
+		fi ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-devel" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-debuginfo" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-debugsource" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-java" ; \
+		;; \
+	esac ; \
+	case " $(BUILD_CFGOPTIONS) " in \
+	(*" --disable-arch "*|*" --disable-modules "*) ;; \
+	(*) \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)-devel" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)-debuginfo" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)-debugsource" ; \
+		if test -z "@WITH_K_PACKAGE_TRUE@" ; then \
+			DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)-source" ; \
+		fi ; \
+		;; \
+	esac ; \
+	$(MAKE) -f debian/rules DH_OPTIONS="$${DH_OPTIONS}" install ; \
+	$(MAKE) -f debian/rules DH_OPTIONS="$${DH_OPTIONS}" binary-common
+
+binary: DH_OPTIONS = -i -s
+binary:
+	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
+	DH_OPTIONS= ; \
+	case " $(BUILD_CFGOPTIONS) " in \
+	(*" --disable-indep "*) ;; \
+	(*) \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-repo" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-base" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-doc" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-javadoc" ; \
+		;; \
+	esac ; \
+	case " $(BUILD_CFGOPTIONS) " in \
+	(*" --disable-arch "*|*" --disable-tools "*) ;; \
+	(*) \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-lib" ; \
+		if test -z "@WITH_32BIT_LIBS_TRUE@"; then \
+			DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-compat" ; \
+		fi ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-devel" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-debuginfo" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-debugsource" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-java" ; \
+		;; \
+	esac ; \
+	case " $(BUILD_CFGOPTIONS) " in \
+	(*" --disable-arch "*|*" --disable-modules "*) ;; \
+	(*) \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)-devel" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)-debuginfo" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)-debugsource" ; \
+		if test -z "@WITH_K_PACKAGE_TRUE@" ; then \
+			DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)-source" ; \
+		fi ; \
+		;; \
+	esac ; \
+	$(MAKE) -f debian/rules DH_OPTIONS="$${DH_OPTIONS}" install ; \
+	$(MAKE) -f debian/rules DH_OPTIONS="$${DH_OPTIONS}" binary-common
+
+#
+#   Another way that we can be invoked is with a specific package name.
+#
+binary-@PACKAGE@-%: DH_OPTIONS = -p@PACKAGE@-$*
+binary-@PACKAGE@-%:
+	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
+	$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-$* install
+	$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-$* binary-common
+
+get-orig-source:
+	wget https://www.openss7.org/repo/tarballs/@PACKAGE@-@VERSION@.tar.bz2
+
+.PHONY: build clean install binary-common \
+	binary-indep binary-arch binary \
+	get-orig-source
+
+# =============================================================================
+#
+# $Log: rules.in,v $
+# Revision 1.1.2.7  2011-09-02 08:46:28  brian
+# - sync up lots of repo and build changes from git
+#
+# Revision 1.1.2.6  2011-08-07 11:14:26  brian
+# - mostly mandriva and ubuntu build updates
+#
+# Revision 1.1.2.5  2011-07-28 09:40:37  brian
+# - updates to debian debuginfo build and mandriva compressed manpages and modules
+#
+# Revision 1.1.2.4  2011-05-31 09:46:00  brian
+# - new distros
+#
+# Revision 1.1.2.3  2011-05-15 12:01:18  brian
+# - many build system refinements
+#
+# Revision 1.1.2.2  2011-05-10 13:45:29  brian
+# - weak modules workup
+#
+# =============================================================================
+# vim: ft=make comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

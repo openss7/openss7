@@ -1,0 +1,532 @@
+@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
+@c =========================================================================
+@c
+@c @(#) $Id: quick.texi,v 1.1.2.7 2011-09-02 08:46:31 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to copy, distribute and/or modify this document
+@c under the terms of the GNU Free Documentation License, Version 1.3 or
+@c any later version published by the Free Software Foundation; with no
+@c Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+@c copy of the license is included in the section entitled "GNU Free
+@c Documentation License".
+@c
+@c Permission to use, copy and distribute this documentation without
+@c modification, for any purpose and without fee or royalty is hereby
+@c granted, provided that both the above copyright notice and this
+@c permission notice appears in all copies and that the name of OpenSS7
+@c Corporation not be used in advertising or publicity pertaining to
+@c distribution of this documentation or its contents without specific,
+@c written prior permission.  OpenSS7 Corporation makes no representation
+@c about the suitability of this documentation for any purpose.  It is
+@c provided "as is" without express or implied warranty.
+@c 
+@c Permission is granted to process this file through Tex and print the
+@c results, provided the printed document carries copying permission notice
+@c identical to this one except for the removal of this paragraph (this
+@c paragraph not being relevant to the printed manual).
+@c 
+@c OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+@c DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+@c FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+@c CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+@c IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+@c PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+@c OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+@c CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+@c USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+@c OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+@c THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+@c THEREOF.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not have
+@c taken the same level of care in the production of this manual, which is
+@c licensed free of charge, as they might when working professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by the
+@c source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2011-09-02 08:46:31 $ by $Author: brian $
+@c
+@c =========================================================================
+
+@unnumberedsec @value{PACKAGE_TITLE}
+
+Package @value{PACKAGE}-@value{VERSION} was released under AGPLv3 @value{PACKAGE_DATE}.
+
+@include descrip.texi
+
+@unnumberedsubsec Release
+
+This is the @command{@value{PACKAGE}-@value{VERSION}} package, released @value{PACKAGE_DATE}.  This
+@samp{@value{VERSION}} release, and the latest version, can be obtained from the
+@uref{http://www.openss7.org/download.html, download area} of @uref{http://www.openss7.org/,, The
+OpenSS7 Project} website using a command such as:
+
+@example
+$> wget http://www.openss7.org/tarballs/@value{PACKAGE}-@value{VERSION}.tar.xz
+@end example
+
+The release is available as an @manpage{autoconf(1)} tarball, @file{src.rpm} or @file{dsc}, as a
+set of binary @file{rpm}s or @file{deb}s, or as a @manpage{yum(8)}, @manpage{zypper(8)} or
+@manpage{apt(8)} repository.  See the @uref{http://www.openss7.org/download.html, download page} for
+the @manpage{autoconf(1)} tarballs, @file{src.rpm}s, @file{dsc}s, or repository access instructions.
+See the @uref{http://www.openss7.org/@value{PACKAGE}_pkg.html, @command{@value{PACKAGE}} package
+page} for tarballs, source and binary packages.
+
+Please see the
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/NEWS,, @file{NEWS}}
+file for release notes and history of user visible changes for the current version, and the
+@uref{http://www.opesns7.org/codefiles/@value{PACKAGE}-@value{VERSION}/ChangeLog,, @file{ChangeLog}}
+file for a more detailed history of implementation changes.  The
+@uref{http://www.opesns7.org/codefiles/@value{PACKAGE}-@value{VERSION}/TODO,, @file{TODO}}
+file lists features not yet implemented and other outstanding items.
+
+Please see the
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/INSTALL,, @file{INSTALL}},
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/INSTALL-@value{PACKAGE},, @file{INSTALL-@value{PACKAGE}}}
+and
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/README-make,, @file{README-make}},
+files (or
+@pxrefman{Installation})
+for installation instructions.
+
+When working from @manpage{cvs(1)} or @manpage{git(1)}, please see the
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/README-cvs,, @file{README-cvs}},
+file (or
+@pxrefman{Downloading from CVS}).
+An abbreviated installation procedure that works for most applications appears below.
+
+This release of the package is published strictly under Version 3 of the @cite{Affero GNU Public
+License} which can be found in the file
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/COPYING,, @file{COPYING}}.
+Package specific licensing terms (if any) can be found in the file
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/LICENSES,, @file{LICENSES}}.
+Please respect these licensing arrangements.  If you are interested in different licensing terms,
+please contact the copyright holder, or
+@uref{mailto:sales@@openss7.com?subject=Licensing,, OpenSS7 Corporation <@t{sales@@openss7.com}>}.
+
+See
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/README-alpha,, @file{README-alpha}}
+(if it exists) for alpha release information.
+
+@unnumberedsubsec Repository Installation
+
+The simplest way of installing the package is to use the @cite{OpenSS7} @file{repomd} or @file{apt}
+repositories instead of attempting to build from tarball.  When you already have a the repository
+set up, the package can be udpated simply with (one of):
+
+@example
+Fedora:   $> sudo yum update openss7
+CentOS:   $> sudo yum update openss7
+RHEL:     $> sudo yum update openss7
+OpenSUSE: $> sudo zypper update openss7
+SLES:     $> sudo zypper update openss7
+Mageia:   $> sudo uprmi openss7
+Mandriva: $> sudo urpmi openss7
+MES:      $> sudo urpmi openss7
+Ubuntu:   $> sudo aptitude install openss7
+Debian:   $> sudo aptitude install openss7
+@end example
+
+@noindent
+If you have not yet set up an installation source for the @cite{OpenSS7} repositories, one of the
+following commands will establish repository access for RPM-based systems:
+
+@example
+          $> REPO=http://www.openss7.org/repo/rpms
+Fedora:   $> SUBDIR=fedora/15/$(uname -m)/RPMS/noarch
+CentOS:   $> SUBDIR=centos/5.6/$(uname -m)/RPMS/noarch
+RHEL:     $> SUBDIR=redhat/6.0/$(uname -m)/RPMS/noarch
+OpenSUSE: $> SUBDIR=opensuse/11.4/$(uname -m)/RPMS/noarch
+SUSE:     $> SUBDIR=suse/11.1/$(uname -m)/RPMS/noarch
+Mageia:   $> SUBDIR=mageia/1/$(uname -m)/RPMS/noarch
+Mandriva: $> SUBDIR=mandriva/2011.0/$(uname -m)/RPMS-noarch
+MES:      $> SUBDIR=mes/5.2/$(uname -m)/RPMS/noarch
+          $> sudo rpm -Uhv $REPO/$SUBDIR/openss7-repo.noarch.rpm
+@end example
+
+@noindent
+For DPKG-based systems, one of the following command sequences will establish repository access for
+DPKG-based systems:
+
+@example
+          $> REPO=http://www.openss7.org/repo/debs/
+Debian:   $> SUBDIR=debian/squeeze/$(dpkg-architecture -a -qDEB_HOST_ARCH)/main
+Ubuntu:   $> SUBDIR=ubuntu/10.04/$(dpkg-architecture -a -qDEB_HOST_ARCH)/main
+          $> wget $REPO/$SUBDIR/openss7-repo_all.deb
+          $> dpkg -i -D010077 openss7-repo_all.deb
+@end example
+
+@noindent
+For @manpage{zypper(8)} based systems it may be first necessary to perform:
+
+@example
+OpenSUSE: $> sudo rpm --import https://www.openss7.org/pubkey.asc
+SLES:     $> sudo rpm --import https://www.openss7.org/pubkey.asc
+@end example
+
+@noindent
+For @manpage{apt(8)} based systems it may be first necessary to perform:
+
+@example
+          $> wget https://www.openss7.org/pubkey.asc
+Debian:   $> sudo apt-key add pubkey.asc
+Ubuntu:   $> sudo apt-key add pubkey.asc
+@end example
+
+@noindent
+For @manpage{yum(8)} based systems, caches should be refreshed with:
+
+@example
+Fedora:   $> sudo yum makecache
+CentOS:   $> sudo yum makecache
+RHEL:     $> sudo yum makecache
+@end example
+
+@noindent
+For @manpage{zypper(8)} based systems, caches should be refreshed with:
+
+@example
+OpenSUSE: $> sudo zypper refresh-services
+OpenSUSE: $> sudo zypper refresh
+SLES:     $> sudo zypper refresh-services
+SLES:     $> sudo zypper refresh
+@end example
+
+@noindent
+For @manpage{urpmi(8)} based systems, caches should be refreshed with:
+
+@example
+Mageia:   $> sudo urpmi.update
+Mandriva: $> sudo urpmi.update
+MES:      $> sudo urpmi.update
+@end example
+
+@noindent
+For @manpage{apt(8)} base systems, caches should be refreshed with:@footnote{Note that the
+apt-transport-https package must be installed for the openss7 repositories to function correctly.
+Try @samp{sudo aptitude install apt-transport-https}.}
+
+@example
+Debian:   $> sudo aptitude update
+Ubuntu:   $> sudo aptitude update
+@end example
+
+@noindent
+Once the repository is set up in this fashion, it should be possible to install using (one of):
+
+@example
+Fedora:   $> sudo yum install openss7
+CentOS:   $> sudo yum install openss7
+RHEL:     $> sudo yum install openss7
+OpenSUSE: $> sudo zypper install openss7
+SLES:     $> sudo zypper install openss7
+Mageia:   $> sudo uprmi openss7
+Mandriva: $> sudo urpmi openss7
+MES:      $> sudo urpmi openss7
+Debian:   $> aptitude install openss7
+Ubuntu:   $> aptitude install openss7
+@end example
+
+@noindent
+The entire process can be undone with:
+
+@example
+Fedora:   $> sudo yum remove openss7 openss7-repo
+CentOS:   $> sudo yum remove openss7 openss7-repo
+RHEL:     $> sudo yum remove openss7 openss7-repo
+OpenSUSE: $> sudo zypper remove openss7 openss7-repo
+SLES:     $> sudo zypper remove openss7 openss7-repo
+Mageia:   $> sudo uprme openss7
+Mandriva: $> sudo urpme openss7
+MES:      $> sudo urpme openss7
+Debian:   $> sudo aptitude remove openss7 openss7-repo
+Ubuntu:   $> sudo aptitude remove openss7 openss7-repo
+@end example
+
+@unnumberedsubsec Build Prerequisites
+
+@include prerequisites.texi
+
+@ignore
+When configuring and building multiple @cite{OpenSS7 Project} release packages, place all of the
+source packages (unpacked tarballs) at the same directory level and all build directories at the
+same directory level (e.g. all source packages under @file{/usr/src}).
+@end ignore
+
+The package builds and installs kernel modules.  When configuring and building the package, it is
+necessary to have the kernel development package installed.  For the following distributions, use
+the following commands:
+
+@example
+Ubuntu:  $> apt-get install linux-headers
+Debian:  $> apt-get install kernel-headers
+Fedora:  $> yum install kernel-devel
+CentOS:  $> yum install kernel-devel
+@end example
+
+You also need the same version of @manpage{gcc(1)} compiler with which the kernel was built.  If it
+is not the default, add @samp{CC=kgcc} on the line after @samp{./configure}, for example:
+
+@example
+$> ../@value{PACKAGE}-@value{VERSION}/configure CC='gcc-3.4'
+@end example
+
+The package builds and installs SNMP agents.  When configuring and building the package, it is
+necessary to have the net-snmp development packages installed.  For the following distributions, use
+the following commands:
+
+@example
+Ubuntu:  $> apt-get install libsnmp libsnmp-perl snmp snmpd \
+                lm-sensors libsnmp-dev libsnmp9-dev libsensors-dev
+Debian:  $> apt-get install libsnmp libsnmp-perl snmp snmpd \
+                lm-sensors libsnmp-dev libsnmp9-dev libsensors-dev
+Fedora:  $> yum install net-snmp net-snmp-perl net-snmp-utils \
+                lm_sensors net-snmp-devel lm_sensors-devel
+CentOS:  $> yum install net-snmp net-snmp-perl net-snmp-utils \
+                lm_sensors net-snmp-devel lm_sensors-devel
+@end example
+
+The package builds and installs Java archives and compiled Java.  When configuring and building the
+package, it is necessary to have the GNU GCJ Java Compiler front-end and GNU Classpath archives
+installed.  For the following distributions, use the following commands:
+
+@example
+Ubuntu:  $> apt-get install gcj
+Debian:  $> apt-get install gcj
+Fedora:  $> yum install gcc-java
+CendOS:  $> yum install gcc-java
+@end example
+
+@unnumberedsubsec Installation
+
+The following commands will download, configure, build, check, install, validate, uninstall and
+remove the package:
+
+@example
+$> wget http://www.openss7.org/tarballs/@value{PACKAGE}-@value{VERSION}.tar.xz
+$> tar -xJvf @value{PACKAGE}-@value{VERSION}.tar.xz
+$> mkdir build
+$> pushd build
+$> ../@value{PACKAGE}-@value{VERSION}/configure --enable-autotest --enable-silent-rules
+$> make V=0
+$> make check
+$> sudo make install
+$> sudo make installcheck
+$> sudo make uninstall
+$> popd
+$> sudo rm -rf build
+$> rm -rf @value{PACKAGE}-@value{VERSION}
+$> rm -f @value{PACKAGE}-@value{VERSION}.tar.xz
+@end example
+
+If you have problems, try building with the logging targets instead.  If the make of a logging
+target fails, an automatic problem report will be generated that can be mailed to
+@email{bugs@@openss7.org, The OpenSS7 Project}.@footnote{Please see
+@refman{Problem Reports},
+or the file
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/PROBLEMS,, @file{PROBLEMS}}
+in the release directory for more information on filing a proper
+@dfn{Problem Report}.} Installation steps using the logging targets proceed as follows:
+
+@example
+$> wget http://www.openss7.org/tarballs/@value{PACKAGE}-@value{VERSION}.tar.xz
+$> tar -xJvf @value{PACKAGE}-@value{VERSION}.tar.xz
+$> mkdir build
+$> pushd build
+$> ../@value{PACKAGE}-@value{VERSION}/configure --enable-autotest --enable-silent-rules
+$> make V=1 compile.log
+$> make check.log
+$> sudo make install.log
+$> sudo make installcheck.log
+$> sudo make uninstall.log
+$> popd
+$> sudo rm -rf build
+$> rm -rf @value{PACKAGE}-@value{VERSION}
+$> rm -f @value{PACKAGE}-@value{VERSION}.tar.xz
+@end example
+
+See
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/README-make,, @file{README-make}}
+for additional specialized make targets.
+
+For custom applications, see the
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/INSTALL,, @file{INSTALL}}
+and
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/INSTALL-@value{PACKAGE},, @file{INSTALL-@value{PACKAGE}}}
+files or the see
+@refman{Installation},
+as listed below.  If you encounter troubles, see
+@refman{Troubleshooting},
+before issuing a bug report.
+
+@unnumberedsubsec Brief Installation Instructions
+
+The @value{PACKAGE_TITLE} package is available from the @uref{http://www.openss7.org/download.html,
+downloads area of The OpenSS7 Project website} using a command such as:
+
+@example
+$> wget http://www.openss7.org/tarballs/@value{PACKAGE}-@value{VERSION}.tar.xz
+@end example
+
+Unpack the tarball using a command such as:
+
+@example
+$> tar -xJvf @value{PACKAGE}-@value{VERSION}.tar.xz
+@end example
+
+The tarball will unpack into the relative subdirectory named after the package name:
+@value{PACKAGE}-@value{VERSION}.
+
+The package builds using the GNU @command{autoconf} utilities and the @file{configure} script.  To
+build the package, we recommend using a separate @file{build} directory as follows:
+
+@example
+$> mkdir build
+$> cd build
+$> ../@value{PACKAGE}-@value{VERSION}/configure
+@end example
+
+In general, the package configures and builds without adding any special options to the
+@file{configure} script.  For general options to the @file{configure} script, see the GNU
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/INSTALL,, @file{INSTALL}}
+file in the distribution:
+
+@example
+$> less ../@value{PACKAGE}-@value{VERSION}/INSTALL
+@end example
+
+For specific options to the @file{configure} script, see the
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/INSTALL-@value{PACKAGE},, @file{INSTALL-@value{PACKAGE}}}
+file in
+the distribution, or simply execute the configure script with the @option{--help} option like so:
+
+@example
+$> ../@value{PACKAGE}-@value{VERSION}/configure --help
+@end example
+
+After configuring the package, the package can be compiled simply by issuing the @samp{make}
+command:
+
+@example
+$> make V=0
+@end example
+
+Some specialized makefile targets exists, see the
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/README-make,, @file{README-make}}
+file in the distribution or simply invoke the @samp{help} target like so:
+
+@example
+$> make help | less
+@end example
+
+After successfully building the package, the package can be checked by invoking the @samp{check}
+make target like so:
+
+@example
+$> make check
+@end example
+
+After successfully checking the package, the package can be installed by invoking the @samp{install}
+make target (as root) like so:
+
+@example
+$> sudo make install
+@end example
+
+The @command{info} documentation is automatically installed; however, the text, html and pdf
+documentation must be installed separately like so:
+
+@example
+$> sudo make install-txt
+$> sudo make install-html
+$> sudo make install-pdf
+@end example
+
+The test suites that ship with the package can be invoked after the package has been installed by
+invoking the @samp{installcheck} target.  This target can either be invoked as root, or as a normal
+user, like so:
+
+@example
+$> make installcheck
+@end example
+
+(Note: you must add the @option{--enable-autotest} flag to @file{configure}, above for the
+test suites to be invoked with @samp{make installcheck}.)
+
+The package can be cleanly removed (including installed documentation) by invoking the
+@samp{uninstall} target (as root):
+
+@example
+$> sudo make uninstall
+@end example
+
+Then the build directory and tarball can be simply removed:
+
+@example
+$> cd ..
+$> rm -rf build
+$> rm -rf @value{PACKAGE}-@value{VERSION}
+$> rm -f @value{PACKAGE}-@value{VERSION}.tar.xz
+@end example
+
+@unnumberedsubsec Detailed Installation Instructions
+
+More detailed installation instructions can be found in the
+@refman{Installation},
+contained in the distribution in @samp{text}, @samp{info}, @samp{html} and @samp{pdf}
+formats:
+
+@example
+$> cd ../@value{PACKAGE}-@value{VERSION}
+$> less doc/manual/@value{PACKAGE}.txt
+$> lynx doc/manual/@value{PACKAGE}.html
+$> info doc/manual/@value{PACKAGE}.info
+$> xpdf doc/manual/@value{PACKAGE}.pdf
+@end example
+
+The @samp{text} version of the manual is always available in the
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/MANUAL,, @file{MANUAL}}
+file in the release.
+
+The current manual is also always available online from @cite{The OpenSS7 Project} website at:
+
+@example
+$> lynx http://www.openss7.org/@value{PACKAGE}_manual.html
+@end example
+

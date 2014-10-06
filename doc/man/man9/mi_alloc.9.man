@@ -1,0 +1,654 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: mi_alloc.9.man,v 1.1.2.2 2011-02-07 02:18:40 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:40 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: mi_alloc.9.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:40  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH MI_ALLOC 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B mi_alloc, mi_alloc_sleep, mi_zalloc, mi_zalloc_sleep, mi_free
+\- allocate and free kernel memory without later regard to size
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _MPS_SOURCE
+.br
+.B #include <sys/stream.h>
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/mpsddi.h>
+.HP
+\fBvoid *mi_alloc(size_t \fIsize\fB, uint \fIpriority\fB);\fR
+.PD 0
+.HP
+\fBvoid *mi_alloc_sleep(size_t \fIsize\fB, uint \fIpriority\fB);\fR
+.HP
+\fBcaddr_t mi_zalloc(size_t \fIsize\fB);\fR
+.HP
+\fBcaddr_t mi_zalloc_sleep(size_t \fIsize\fB);\fR
+.HP
+\fBvoid mi_free(void *\fIptr\fB);\fR
+.PD
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'priority\ \ 'u
+.I size
+the size, in bytes, of the memory to allocate.
+.PD 0
+.TP
+.I priority
+the buffer priority to assign to the allocation.
+.TP
+.I ptr
+a
+.RB non- NULL
+pointer to memory previously allocated with
+.BR mi_alloc (),
+.BR mi_alloc_sleep (),
+.BR mi_zalloc ()
+or
+.BR mi_zalloc_sleep ().
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR MPS \(rg-specific
+DDI.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR mi_alloc ()
+requests that the number of bytes of kernel memory specified by the size argument,
+.IR size ,
+be allocated with priority,
+.IR priority ,
+and returned as a
+.B void *
+to the allocated memory.  If the memory cannot be allocated immediately,
+.BR mi_alloc ()
+will fail and return
+.BR NULL .
+.I priority
+can be one of the following values:
+.TP \w'BPRI_MED\ \ 'u
+.B BPRI_LOW
+requests a low priority memory allocation.
+.PD 0
+.TP
+.B BPRI_MED
+requests a medium priority memory allocation.
+.TP
+.B BPRI_HI
+requests a high priority memory allocation.
+.PD
+.PP
+.BR mi_alloc_sleep ()
+functions the same as
+.BR mi_alloc ()
+except that the memory allocation is also permitted to sleep.
+.PP
+.BR mi_zalloc ()
+functions the same as
+.BR mi_alloc ()
+except that a priority is not accepted and the requested memory area is zeroed before returning.
+.PP
+.BR mi_zalloc_sleep ()
+functions the same as
+.BR mi_zalloc ()
+except that the memory allocation is also permitted to sleep.
+.PP
+.BR mi_free ()
+frees the memory region allocated by one of the above allocation functions when passed a pointer that
+is returned by one of those functions.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR mi_alloc (),
+.BR mi_alloc_sleep (),
+.BR mi_zalloc ()
+and
+.BR mi_zalloc_sleep ()
+allocate pinned kernel memory which is a precious kernel resource.  Allocation of large blocks of
+pinned kernel memory can impair system performance.
+.PP
+.BR mi_alloc (),
+.BR mi_alloc_sleep (),
+.BR mi_zalloc ()
+and
+.BR mi_zalloc_sleep ()
+should not be used to allocate memory that will not later be freed using
+.BR mi_free ():
+doing so can have an impact on memory allocation algorithm performance.  Static allocation should be
+used in this case whenever possible.
+.PP
+.BR mi_alloc (),
+.BR mi_alloc_sleep (),
+.BR mi_zalloc ()
+and
+.BR mi_zalloc_sleep ()
+should not be used to allocate fundamental system data structures.  Fundamental system data
+structures should always be allocated using that data structure's specific allocation function.  For
+example, a
+.BR queue (9)
+structure should always be allocated using
+.BR mi_allocq (9):
+.sp
+.RS
+.nf
+\fC\s-1
+queue_t *q;
+q = allocq();
+\s+1\fP
+.fi
+.RE
+.sp
+instead of
+.BR mi_alloc ():
+.sp
+.RS
+.nf
+\fC\s-1
+queue_t *q;
+q = mi_alloc(sizeof(*q), BPRI_HI);
+\s+1\fP
+.fi
+.RE
+.sp
+This is because sizes of fundamental system data structures may change and yet binary compatibility
+of
+.I STREAMS
+drivers and modules can be maintained.  Also, the implementation of a fundamental structure might be
+larger than the public declaration of that structure: that is, there are additional members hidden
+from the system programmer.  Portable
+.I STREAMS
+drivers and modules will not allocate fundamental system data structures using
+.BR mi_alloc (),
+.BR mi_alloc_sleep (),
+.BR mi_zalloc ()
+or
+.BR mi_zalloc_sleep (),
+but will instead use the system-provided structure-specific allocator.
+.\"
+.\"
+.SH RETURN
+.PP
+When
+.BR mi_alloc (),
+.BR mi_alloc_sleep (),
+.BR mi_zalloc ()
+and
+.BR mi_zalloc_sleep ()
+succeed, they return a pointer to the newly allocated memory;
+when they fails, they return
+.BR NULL .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR mi_alloc ()
+and
+.BR mi_zalloc ()
+fail when the requested
+.I size
+of memory at the requested
+.I priority
+could not be immediately allocated.
+.BR mi_alloc_sleep ()
+and
+.BR mi_zalloc_sleep ()
+always succeed.
+.PP
+.BR mi_free ()
+fails when the pointer is
+.B NULL
+or the pointer is not that returned by one of the above allocation functions.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR mi_alloc (),
+.BR mi_zalloc (),
+and
+.BR mi_free ()
+can be called from any context.
+.PP
+.BR mi_alloc_sleep ()
+and
+.BR mi_zalloc_sleep ()
+must not be called from a non-blocking context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR mi_alloc (),
+.BR mi_alloc_sleep (),
+.BR mi_zalloc (),
+.BR mi_zalloc_sleep ()
+and
+.BR mi_free ()
+are MP-safe.  For
+.BR mi_alloc (),
+.BR mi_alloc_sleep (),
+.BR mi_zalloc ()
+and
+.BR mi_zalloc_sleep (),
+the caller has exclusive access to the memory extent pointed to by the returned pointer.
+For
+.BR mi_free (),
+it is the callers responsibility to ensure that it has exclusive access to the memory extent
+represented by the passed in pointer.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR mi_alloc (),
+.BR mi_alloc_sleep (),
+.BR mi_zalloc (),
+.BR mi_zalloc_sleep ()
+and
+.BR mi_free ()
+are
+.IR MPS \(rg-specific
+functions:
+.BR _MPS_SOURCE ,
+.B _AIX_SOURCE
+or
+.B _MAC_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.BR "@PACKAGE_TITLE@"
+must also have been compiled with
+.BR CONFIG_STREAMS_COMPAT_MPS ,
+.BR CONFIG_STREAMS_COMPAT_MPS_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_AIX ,
+.BR CONFIG_STREAMS_COMPAT_AIX_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_MAC
+or
+.B CONFIG_STREAMS_COMPAT_MAC_MODULE
+defined.
+.PP
+Because
+.BR mi_alloc (),
+.BR mi_alloc_sleep (),
+.BR mi_zalloc (),
+.BR mi_zalloc_sleep ()
+and
+.BR mi_free ()
+utilize
+.BR kmem_alloc (9),
+.BR kmem_zalloc (9)
+and
+.BR kmem_free (9)
+almost directly, many of the caveats that apply to those functions also apply to
+.BR mi_alloc (),
+.BR mi_alloc_sleep (),
+.BR mi_zalloc (),
+.BR mi_zalloc_sleep ()
+and
+.BR mi_free ().
+An exception is the alignment of the returned pointer from
+.BR mi_alloc (),
+.BR mi_alloc_sleep (),
+.BR mi_zalloc ()
+and
+.BR mi_zalloc_sleep ():
+because these functions hide the
+.B size_t
+size of the allocated memory extent in the initial portion of the memory extent, the alignment
+of the memory extent returned by
+.BR kmem_alloc (9)
+or
+.BR kmem_zalloc (9)
+is offset by the size of a single
+.B size_t
+element.
+.PP
+If
+.BR mi_free ()
+is passed a
+.RB non- NULL
+pointer that is not a pointer returned by the
+.BR mi_alloc (),
+.BR mi_alloc_sleep (),
+.BR mi_zalloc ()
+or
+.BR mi_zalloc_sleep ()
+functions, the results will be indeterminate.  Kernel panics may very well result.
+The caller must not modify the hidden
+.B size_t
+value.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+The
+.BR mi_alloc ()
+and
+.BR mi_alloc_sleep ()
+functions are implemented with a rather direct call to
+.BR kmem_alloc (9)
+and store the size of the memory extent in the first
+.B size_t
+area of the allocated memory extent.
+The returned memory extent pointer is advanced beyond the first
+.B size_t
+area of the allocated memory extent.
+.PP
+The
+.BR mi_zalloc ()
+and
+.BR mi_zalloc_sleep ()
+functions are implemented with a rather direct call to
+.BR kmem_zalloc (9)
+and store the size of the memory extent in the first
+.B size_t
+area of the allocated memory extent.
+The returned memory extent pointer is advanced beyond the first
+.B size_t
+area of the allocated memory extent.
+.PP
+The
+.BR mi_free ()
+function is implemented with a direct call to
+.BR kmem_free (9)
+with the size argument collected from the first
+.B size_t
+area of the memory extent.
+The pointer passed to
+.BR kmem_free (9)
+is decremented to the hidden
+.B size_t
+area of the allocated memory extent.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR kmem_alloc (9),
+.BR kmem_zalloc (9),
+.BR kmem_free (9),
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR mi_alloc (),
+.BR mi_alloc_sleep (),
+.BR mi_zalloc (),
+.BR mi_zalloc_sleep ()
+and
+.BR mi_free ()
+have no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR mi_alloc (),
+.BR mi_alloc_sleep (),
+.BR mi_zalloc (),
+.BR mi_zalloc_sleep ()
+and
+.BR mi_free ()
+are
+compatible with
+.IR MPS \(rg,
+.IR AIX \(rg,
+.IR MacOT \(rg,
+and
+.IR Solaris \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR mi_alloc (),
+.BR mi_alloc_sleep (),
+.BR mi_zalloc (),
+.BR mi_zalloc_sleep ()
+and
+.BR mi_free ()
+are
+.IR MPS \(rg-specific
+functions and should not be used by portable
+.I STREAMS
+drivers and modules.
+The more common
+.BR kmem_alloc (9),
+.BR kmem_zalloc (9)
+and
+.BR kmem_free (9)
+functions should be used in their stead.
+.IP \(em
+.BR mi_alloc (),
+.BR mi_alloc_sleep (),
+.BR mi_zalloc (),
+.BR mi_zalloc_sleep ()
+and
+.BR mi_free ()
+are provided for source level compatibility with
+.IR MPS \(rg
+for the purpose of porting
+.IR MPS \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.BR "@PACKAGE_TITLE@"
+.[
+@PACKAGE@-@VERSION@
+.]
+differ from that of
+.IR MPS \(rg,
+binaries are incompatible.
+.IP \(em
+.BR mi_alloc (),
+.BR mi_alloc_sleep (),
+.BR mi_zalloc (),
+.BR mi_zalloc_sleep ()
+and
+.BR mi_free ()
+only provide functionality comparable to
+.IR MPS \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR mi_alloc (),
+.BR mi_alloc_sleep (),
+.BR mi_zalloc (),
+.BR mi_zalloc_sleep ()
+and
+.BR mi_free ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
+and
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR MPS \(rg
+DDI documentation,
+.IR MacOT \(rg
+DDI documentation,
+.[
+macotr
+.]
+.[
+macspg
+.]
+.IR AIX \(rg
+documentation.
+.[
+aixcpc
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR mi_alloc (),
+.BR mi_alloc_sleep (),
+.BR mi_zalloc (),
+.BR mi_zalloc_sleep ()
+and
+.BR mi_free ()
+first appeared in
+.IR MPS \(rg.
+.BR mi_alloc (),
+.BR mi_alloc_sleep (),
+.BR mi_zalloc (),
+.BR mi_zalloc_sleep ()
+and
+.BR mi_free ()
+are
+Mentat, Inc. functions that go all the way back to the
+.RI pre- OSF/1
+.I Mentat
+implementations.
+.BR mi_alloc (),
+.BR mi_alloc_sleep (),
+.BR mi_zalloc (),
+.BR mi_zalloc_sleep ()
+and
+.BR mi_free ()
+appear in
+.IR MacOT \(rg
+.[
+macspg
+.]
+and
+.IR AIX \(rg.
+.[
+aixcpc
+.]
+An undocumented version of
+.BR mi_alloc (),
+.BR mi_alloc_sleep (),
+.BR mi_zalloc (),
+.BR mi_zalloc_sleep ()
+and
+.BR mi_free ()
+appear in
+.IR Solaris \(rg.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

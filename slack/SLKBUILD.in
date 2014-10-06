@@ -1,0 +1,219 @@
+#!/bin/bash
+#Maintainer: Brian Bidulock <bidulock@openss7.org>
+#Former Maintainer(s): none
+# @configure_input@
+PACKAGER="${PACKAGER:-Brian Bidulock <bidulock@openss7.org>}"
+#Mandatory
+# pkgname - package name, the name of the software.
+pkgname=@PACKAGE@
+# pkgver - package version, the version of the software.
+pkgver=@VERSION@
+# pkgrel - package release, this is that number at the end of the tgz, including
+#	the initials of the packager.
+pkgrel=@PACKAGE_TXZRELEASE@bb
+# arch - the architecture of the build, usually i486 or noarch, on some occaions
+#	i686.  From slkbuild-0.8.0 onwards, this not mandatory and will default
+#	to your system's architecture.  You'll still need to use it for "noarch"
+#	packages.
+arch=@target_arch@
+# source - These are all the files that will be used in the build.  You can
+#	either put a url which will be downloaded if it isn't found in the
+#	directory.  Or you can just put the file like the commented out one
+#	below it.  If you have more than one file like a patch or an icon just
+#	add it to the array like this: source=("thing.tar.gz" "foo.patch"
+#	"bar.icon").  If you don't specify a url for a file, that file will be
+#	copied inside the package, in a /usr/src/$pkgname-$pkgver directory.
+source=("http://www.openss7.org/repo/tarballs/@PACKAGE@-@VERSION@.tar.xz"
+	"@target@-@kversion@-config.cache"
+	"@target@-config.site"
+	"@target@-@kversion@-modpost.cache")
+# sourcetemplate - url location where SLKBUILD and build-name.sh can be
+#	downloaded.  Furthermore all files from source without url must be
+#	available at this location.
+sourcetemplate="http://www.openss7.org/repo/spkg/slackware/13.37/@target_arch@/source/@PACKAGE@/"
+# docs - put any of the docs that need to be copied over, readme install
+#	changelog, etc. are common ones.  Don't worry about case or path, it
+#	does a recursive case intensive search for them and moves them over when
+#	it finds it.
+docs=\
+(
+	'AUTHORS' 'ANNOUNCE' 'ABOUT-NLS' 'BUGS' 'COPYING' 'CHANGELOG' 'INSTALL'
+	"INSTALL-@PACKAGE@" 'LICENSES' 'LSM' 'MANUAL' 'NEWS' 'NOTES'
+	'NOTES.cos53' 'NOTES.kmod' 'NOTES.kmp' 'NOTES.ksyms' 'NOTES.repo'
+	'NOTES.rpm' 'NOTES.sles' 'PROBLEMS' 'README' 'README-alpha' 'README-cvs'
+	'README-make' 'RELEASE-NOTES' 'THANKS' 'TODO' "@PACKAGE@-@VERSION@.lsm"
+)
+# options - this is an array that allows you to control certain behaviours of
+#	the build script that is generated.  The options it takes are:
+#
+#	'noextract' which prevents the script from automatically extracting
+#	    tarballs, this is useful in dealing with tarbombs and some other
+#	    instances.  If you use this, it is necessary to untar any tarballs
+#	    yourself in build().
+#
+#	'nostrip' option prevents the exection of the stripping function, can be
+#	    useful in some applications, that break if they are stripped.
+#
+#	'noautodotnew' is used to remove the automatic dotnew handling in all
+#	    files in etc.
+#
+#	'tgz', 'tbz' and 'tlz' set the compression format for the resulting
+#	    package, the default is txz.  If you set more than one 'tgz', 'tbz'
+#	    and 'tlz', only the first one will be used.  whichever is that.
+options=('nostrip')
+# url - homepage or some other information url about the software
+url="http://www.openss7.org/"
+# dotnew - These are generally configuration files.  They will be renamed with a
+#	.new extension and the appropriate addition will be made to the
+#	doinst.sh to move them over if appropriate to do so during install.
+dotnew=\
+(
+    'etc/conf.d/openss7'
+    'etc/conf.d/specfs'
+    'etc/conf.d/strace'
+    'etc/conf.d/streams'
+    'etc/conf.d/strerr'
+    'etc/nslconfig.d/openss7'
+    'etc/openss7.conf'
+    'etc/rc.d/openss7'
+    'etc/rc.d/specfs'
+    'etc/rc.d/strace'
+    'etc/rc.d/streams'
+    'etc/rc.d/strerr'
+    'etc/snmp/snmp.d/01openss7'
+    'etc/sock2path.d/openss7'
+    'etc/streams.conf'
+    'etc/strload.conf'
+    'etc/strsetup.conf'
+)
+# CXXCFLAGS/CFLAGS - You can set these to override the default flags which are
+#	"-O2 -march=$arch -mtune=i686" where $arch is the variable you set in
+#	SLKBUILD.  Note that if you override it, you need to put all the flags.
+#	Like if you just want to change -O2 to -O3, you would need to put
+#	CFLAGS="-O3 -march=$arch -mtune=i686" not just CFLAGS="-O3".
+CFLAGS="-O2"
+CXXFLAGS="-O2"
+
+# slackdesc - These are the lines for the slack-desc in the package.  Make sure
+#	each line is under 70 characters, you can ensure that by following the
+#	commented out ruler.  Use the general rules for this, the first line has
+#	the name and a short description.  The lines under it have a longer
+#	description.  Don't worry about skipping line 2, the slkbuild does that
+#	automatically.  Put quotes around each line and make sure you don't have
+#	more than ten lines.  All of these fules are checked by the script to
+#	make sure that they are compilant so don't be too worried, it will tell
+#	you.
+slackdesc=\
+(
+#	|-----handy-ruler------------------------------------------------------|
+	"openss7 (Linux Fast-STREAMS and OpenSS7 protocol suites)"
+	"This package includes kernel modules, STREAMS drivers, modules,"
+	"libraries, utilities, test programs, daemons, and development"
+	"environment for the development and execution of OpenSS7 drivers,"
+	"components and applications for the STREAMS environment.  This"
+	"distribution is currently applicable to 2.4, 2.6 and 3.x kernels and"
+	"is validated for ix86, x86_64, ppc and ppc64 architectures, but should"
+	"build and install well for other architectures."
+)
+
+# build() - This is the function that actually creates the package.  To
+#	understand this, you need to know what the build script does before it
+#	runs it.  The build script first assigns "pwd" to $startdir.  It then
+#	creates $startdir/src.  It then copies everything in the source=() array
+#	into $startdir/src and untars any tarballs.  After that it creates
+#	$startdir/pkg.  You job in build() is to do whatever you need to do in
+#	$startdir/src to get $startdir/pkg setup as a DESTDIR.  Remember that it
+#	automatically untars tarballs, so here what happens is I change into the
+#	untarred directory, compile and then install into $startdir/pkg.  Don't
+#	worrry about gzipping and strippping and all of that stuff, it is
+#	handled by the build script.  Also try to do "make || return 1" so that
+#	the build script stops if the compile fails.
+build() { :
+	cd $startdir/src/@PACKAGE@-@VERSION@
+	cache_file=../../@target@-@kversion@-config.cache
+	csite_file=../../@target@-config.site
+	mpost_file=../../@target@-@kversion@-modpost.cache
+	env
+	./configure \
+	    ${CC:+CC="${CC}"} \
+	    ${CFLAGS+CFLAGS="${CFLAGS}"} \
+	    ${WFLAGS+WFLAGS="${WFLAGS}"} \
+	    ${LD+LD="${LD}"} \
+	    ${LDFLAGS+LDFLAGS="${LDFLAGS}"} \
+	    ${CPPFLAGS+CPPFLAGS="${CPPFLAGS}"} \
+	    ${CPP+CPP="${CPP}"} \
+	    ${CXX+CXX="${CXX:-$CC}"} \
+	    ${CXXFLAGS+CXXFLAGS="${CXXFLAGS}"} \
+	    ${CXXCPP+CXXCPP="${CXXCPP:-$CPP}"} \
+	    CONFIG_SITE=${csite_file} \
+	    MODPOST_CACHE=${mpost_file} \
+	    ${PACKAGE_SLKOPTIONS} \
+	    --cache-file=${cache_file} \
+	    --prefix=/usr \
+	    --build=@build@ \
+	    --host=@host@ \
+	    --exec-prefix=/usr \
+	    --bindir=/usr/bin \
+	    --sbindir=/usr/sbin \
+	    --sysconfdir=/etc \
+	    --datadir=/usr/share \
+	    --includedir=/usr/include \
+	    --libdir=/usr/lib${LIBDIRSUFFIX} \
+	    --libexecdir=/usr/libexec \
+	    --localstatedir=/var \
+	    --sharedstatedir=/com \
+	    --mandir=/usr/man \
+	    --infodir=/usr/info \
+	    --datarootdir=/usr/share \
+	    --docdir=/usr/doc/@PACKAGE@-@VERSION@ \
+	    --htmldir=/usr/doc/@PACKAGE@-@VERSION@/html \
+	    --pdfdir=/usr/doc/@PACKAGE@-@VERSION@/pdf \
+	    --psdir=/usr/doc/@PACKAGE@-@VERSION@/ps \
+	    --localedir=/usr/share/locale \
+	    --disable-maintainer-mode \
+	    --with-k-release=@kversion@ \
+	    --with-k-modules=@kmoddir@ \
+	    --with-k-subdir=@ksubdir@ \
+	    --with-k-optimize=speed \
+	    --with-optimize=speed \
+	    --without-snmp \
+	    --without-snmp-agent \
+	    --disable-32bit-libs \
+	    --disable-papers-html \
+	    --with-gnu-ld \
+	    ${BUILD_CFGOPTIONS} \
+	    || { rm -f ${cache_file} ${csite_file} ${mpost_file} ; exit 1 ; }
+	make || return 1
+#	make pdf || return 1
+#	make check || return 1
+	make DESTDIR=$startdir/pkg install-strip
+#	make DESTDIR=$startdir/pkg install-pdf
+	d=$startdir/pkg/usr/src/@PACKAGE@-@VERSION@-@PACKAGE_TXZRELEASE@/@kversion@
+	mkdir -p $d
+	b=$startdir/pkg/boot
+	mkdir -p $b
+	cp -p Module.mkvars $d
+	cp -p ${csite_file} $d
+	cp -p ${cache_file} $d
+	cp -p System.symvers $d
+	cp -p Module.symvers $d
+	cat System.symvers Module.symvers | gzip -c >$d/symvers-@kversion@.gz
+	cp -p $d/symvers-@kversion@.gz $b
+	cat System.symvers Module.symvers | awk '{print$4"\t"$3"\t"$1"\t"$2}' > $d/abi-@kversion@
+	cp -p $d/abi-@kversion@ $b
+	cp -p ${mpost_file} $d
+	cp -p symsets-@kversion@.tar.gz $d
+	cp -p symsets-@kversion@.tar.gz $b
+}
+
+# doinst() - these are any of the commands (note dotnew stuff is taken care of
+#	so don't put that here) that you want run right after install that won't
+#	be added.
+doinst() { :
+}
+
+
+
+
+# @configure_input@
+# vim: ft=sh sw=4 tw=80

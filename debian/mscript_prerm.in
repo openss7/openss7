@@ -1,0 +1,37 @@
+# =============================================================================
+# @configure_input@
+# @(#) $RCSfile: mscript_prerm.in,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-05-10 13:45:29 $
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# This software is licensed under the GNU Affero General Public License (AGPL)
+# Version 3, 19 November 2007, available at <http://www.gnu.org/licenses/>.
+# -----------------------------------------------------------------------------
+eval "echo '${package}: \"$@\"'" >&2
+case "$1" in
+    (remove) :
+	if [ $# -gt 1 -a  ":$2" = ':in-favour' ]
+	then : # conflict-prerm remove in-favour package new-version
+	    conflict_prerm "$@"
+	else : # remove-prerm remove
+	    remove_prerm "$@"
+	fi
+	;;
+    (upgrade) :
+	# old-prerm upgrade new-version
+	upgrade_prerm "$@"
+	;;
+    (failed-upgrade) :
+	# old-prerm upgrade new-version ... failed
+	# new-prerm failed-upgrade old-version
+	failed_upgrade_prerm "$@"
+	;;
+    (deconfigure) :
+	# deconfigure-prerm deconfigure in-favour package-being-installed version removing conflicting-package version
+	deconfigure_prerm "$@"
+	;;
+esac
+# -----------------------------------------------------------------------------
+# vim: ft=sh sw=4 noet
+# @configure_input@
+# =============================================================================

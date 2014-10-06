@@ -1,0 +1,115 @@
+OpenSS7 -- notes for CentOS 5.3.  2009-05-14
+$Id: NOTES.cos53,v 1.1.2.1 2009-06-21 10:25:07 brian Exp $
+Copyright (c) 2008-2009  Monavacon Limited. <http://www.monavacon.com/>
+Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
+See the end for copying conditions (for this file).
+
+Steps for building from CVS on CentOS 5.3:
+
+1. Install CentOS 5.3 from network install disk.
+
+2. Configure /etc/fstab and /etc/hosts to get the box to work
+   on the internal network.  Add self to sudoers with visudo.
+
+3. Perform `yum update' to get recent copies of all packages and then reboot
+   on the new kernel.
+
+4. Add missing tools:
+
+   `yum groupinstall 'Development Tools''
+   `yum groupinstall 'Development Libraries''
+   `yum groupinstall 'Authoring and Publishing''
+
+   Add kernel headers, net-snmp and development:
+
+   `yum install kernel-devel'.
+   `yum install net-snmp net-snmp-perl net-snmp-utils net-snmp-devel'
+   `yum install lm_sensors lm_sensors-devel'
+
+   `yum install ghostscript tetex transfig imagemagick groff gnuplot latex2html'
+
+5. Make a tools directory and perform following:
+
+   default m4 is version 1.4.5 =>
+     wget --passive-ftp ftp://ftp.gnu.org/gnu/m4/m4-1.4.13.tar.bz2
+   default autoconf version 2.59 =>
+     wget --passive-ftp ftp://ftp.gnu.org/gnu/autoconf/autoconf-2.63.tar.bz2
+   default automake version 1.9.6 =>
+     wget --passive-ftp ftp://ftp.gnu.org/gnu/automake/automake-1.11.tar.bz2
+   default gettext version 0.14.6 =>
+     wget --passive-ftp ftp://ftp.gnu.org/gnu/gettext/gettext-0.17.tar.gz
+   default libtool version 1.5.22 =>
+     wget --passive-ftp ftp://ftp.gnu.org/gnu/libtool/libtool-2.2.6a.tar.gz
+   default texinfo version 4.8 =>
+     wget --passive-ftp ftp://ftp.gnu.org/gnu/texinfo/texinfo-4.13a.tar.gz
+   default bison version 2.3 =>
+     wget --passive-ftp ftp://ftp.gnu.org/gnu/bison/bison-2.4.1.tar.bz2
+   default flex version 2.5.4 =>
+     wget http://prdownloads.sourceforge.net/flex/flex-2.5.35.tar.bz2
+
+
+6. Get the package:
+
+   wget http://www.openss7.org/repos/tarballs/openss7-1.2.2.tar.bz2
+   tar xjf openss7-1.2.2.tar.bz2
+   directory=`pwd`
+   mkdir build
+   cd build
+   $directory/openss7-1.2.2/configure 2>&1 | tee configure.log
+   make compile.log
+
+-----
+
+=========================================================================
+
+ Copyright (c) 2008-2009  Monavacon Limited  <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian Bidulock  <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ Permission is granted to make and distribute verbatim copies of this
+ manual provided the copyright notice and this permission notice are
+ preserved on all copies.
+
+ Permission is granted to copy and distribute modified versions of this
+ manual under the conditions for verbatim copying, provided that the
+ entire resulting derived work is distributed under the terms of a
+ permission notice identical to this one
+
+ Since the Linux kernel and libraries are constantly changing, this
+ manual page may be incorrect or out-of-date.  The author(s) assume no
+ responsibility for errors or omissions, or for damages resulting from
+ the use of the information contained herein.  The author(s) may not
+ have taken the same level of care in the production of this manual,
+ which is licensed free of charge, as they might when working
+ professionally.
+
+ Formatted or processed versions of this manual, if unaccompanied by the
+ source, must acknowledge the copyright and authors of this work.
+
+-------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+ on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department
+ of Defense ("DoD"), it is classified as "Commercial Computer Software"
+ under paragraph 252.227-7014 of the DoD Supplement to the Federal
+ Acquisition Regulations ("DFARS") (or any successor regulations) and
+ the Government is acquiring only the license rights granted herein (the
+ license rights customarily provided to non-Government users).  If the
+ Software is supplied to any unit or agency of the Government other than
+ DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19
+ of the Federal Acquisition Regulations ("FAR") (or any successor
+ regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+ NASA Supplement to the FAR (or any successor regulations).
+
+=========================================================================
+
+ Commercial licensing and support of this software is available from
+ OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+
+=========================================================================
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

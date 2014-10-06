@@ -1,0 +1,175 @@
+#!/bin/bash
+# @configure_input@
+# =============================================================================
+# 
+# @(#) $RCSfile: openss7-doc.postinst.in,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-15 12:01:18 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2011-05-15 12:01:18 $ by $Author: brian $
+#
+# =============================================================================
+subpkg=doc
+@openss7_header@
+datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
+#
+# postinst_manpages() - Add our manual pages to the aprospros database.  One problem with doing this
+#   is that even the oldest of debian policies and debhelper implementations will implement the
+#   debhelper code to do this.  Therefore, this function is shortcircuited for now.  (We install
+#   >3000 manual pages and it takes forever anyway.)  Failing to do this altogether is not critical
+#   because most machines run an evening cron job to update these.
+#
+postinst_manpages () { :; return
+    if   [ -x "`which mandb      2>/dev/null`" ] ; then
+	LANGUAGE= LANG= mandb   -q -p @mandir@ || :
+    elif [ -x "`which makewhatis 2>/dev/null`" ] ; then
+	LANGUAGE= LANG= makewhatis -u @mandir@ || :
+    fi
+}
+#
+# postinst_infofiles() - Add our info files to the info directory.  One problem with doing this is
+#   that even the oldest of debian policies and debhelper implementations will implement the
+#   debhelper code to do this.  Therefore, this function is shorcricuited for now.  Current debian
+#   policies will use trigger directories to perform this action.
+#
+postinst_infofiles () { :; return
+    if [ -x /sbin/install-info ]; then
+#	Older policies do not compress info files.
+	for n in $manuals; do
+            if [ -f @infodir@/$n.info ] ; then
+                /sbin/install-info --info-dir=@infodir@ @infodir@/$n.info || true
+            elif [ -f @infodir@/$n.info.gz ] ; then
+                /sbin/install-info --info-dir=@infodir@ @infodir@/$n.info.gz || true
+            elif [ -f @infodir@/$n.info.bz2 ] ; then
+                /sbin/install-info --info-dir=@infodir@ @infodir@/$n.info.bz2 || true
+            fi
+        done
+    fi
+}
+#
+# postinst_doc() - Perform necessary activies for post installation of documentation files.  This is
+#   primarly handing man macros, reference database, info directories and aprospros databases.  Some
+#   of these operations are performed by debhelper code or directory trigger processing.
+#
+postinst_doc () { :
+    postinst_manpages
+    postinst_infofiles
+}
+# -----------------------------------------------------------------------------
+# Primary functions:
+# -----------------------------------------------------------------------------
+# xxx-postinst configure
+configure_postinst () { :
+    postinst_doc
+}
+# xxx-postinst configure most-recently-configured-version
+reconfigure_postinst () { :
+    postinst_doc
+}
+# xxx-postinst triggered triggered-packages
+triggered_postinst () { :
+}
+# old-prerm upgrade new-version ...FAILED
+# new-prerm failed-upgrade new-version ...FAILED
+# old-posinst abort-upgrade new-version
+abort_upgrade_postinst () { :
+    postinst_doc
+}
+# con-prerm remove 'in-favour' package new-version ...FAILED
+# con-postinst abort-remove 'in-favour' package new-version
+abort_remove_postinst () { :
+    postinst_doc
+}
+# dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version] ...FAILED
+# dec-postinst abort-deconfigure 'in-favour' package-being-installed-but-failed version ['removing' conflicting-package version]
+abort_deconfigure_postinst () { :
+    postinst_doc
+}
+@mscript_postinst@
+@mscript_debhelper@
+# =============================================================================
+#
+# $Log: openss7-doc.postinst.in,v $
+# Revision 1.1.2.3  2011-05-15 12:01:18  brian
+# - many build system refinements
+#
+# Revision 1.1.2.2  2011-05-10 13:45:29  brian
+# - weak modules workup
+#
+# Revision 0.9.2.7  2008-04-28 11:46:32  brian
+# - adjust headers for release
+#
+# Revision 0.9.2.6  2008-04-28 10:30:21  brian
+# - updated headers for release
+#
+# Revision 0.9.2.5  2007/12/15 20:19:30  brian
+# - updates
+#
+# Revision 0.9.2.4  2007/08/13 22:45:54  brian
+# - GPLv3 header updates
+#
+# Revision 0.9.2.3  2006/12/18 10:25:29  brian
+# - updated headers for release
+#
+# Revision 0.9.2.2  2005/05/14 08:34:11  brian
+# - copyright header correction
+#
+# Revision 0.9.2.1  2005/03/26 22:21:19  brian
+# - working up debian maint scripts
+#
+# Revision 0.9.2.2  2005/03/26 12:55:34  brian
+# - working up debian scripts
+#
+# Revision 0.9.2.1  2005/03/26 03:11:22  brian
+# - Reworking maintainance scripts
+#
+# Revision 0.9.2.1  2005/03/24 01:38:17  brian
+# - better debian build
+#
+# =============================================================================
+# vim: ft=sh sw=4 noet nocin nosi formatoptions+=tcqlorn

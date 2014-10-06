@@ -1,0 +1,181 @@
+#LERG7 EQUIP TYPE and descriptive string from telcodata.us
+12H	ALCATEL
+12H	Alcatel System 12 (Host)
+1AE	1AESS
+1AE	WECO 1AESS
+1AR	WECO 1AESS Remote (10A RSS)
+1E	WECO 1ESS 2-Wire
+1RC	Northern Telecom DMS10 RLCM
+1RC	NTDMSRLC
+1RC	NTDMSRLM
+1RE	Northern Telecom DMS10 RSLE
+1RE	NTDMSRSE
+1RL	Northern Telecom DMS10 RSLM
+210	ITT 1210
+2BE	WECO 2BESS
+2BR	WECO 2BESS Remote (10A RSS)
+3RS	Siemens Digital Switch Rem RSU-DE3
+45R	Vidar 4/5 Remote Switch
+4E	WECO 4ESS
+4RS	Siemens Digital Switch Remote RSU-DE4
+5BR	WECO 5ESS Remote (5B RSM)
+5E	5ES
+5E	5ESS
+5E	AT&T 5ESS-2000 VCDX
+5EH	WECO 5ESS Host (Digital)
+5E	Lucent 5ESS
+5ER	5ESS-ERM
+5ER	5ESS-RSM
+5ER	NTDMSRSM
+5ER	SLC-5
+5ER	WECO 5ESS Remote (5A RSM)
+5E	WECO 5ESS (Digital)
+5PH	ATT/Philps Tel 5ESS-PBX Host
+5PR	ATT/Philps Tel 5ESS-PBX Remote
+5RS	Siemens EWSD RSU-DE5
+61S	Nippon RSUNEC MEAX-61E Remote
+914E	AE-MUX
+9AW	9A Announcement - Weather
+A1S	ITT-A1
+ACD	Automatic Call Distributor
+ALR	Liech All Relay
+ANN	Announcement System
+AXR	AXERSS
+AXR	AXRSS
+AXR	Ericsson AXE-RSS (Remote)
+AXT	AXE10
+AXT	Ericsson AXE-10 - Local
+CDO	Community Dial Office
+CMC	Cellular Mobile Carrier Switching System
+CT	Concentrator
+D10	Northern Telecom Packet Switch DPN-10
+D12	DMS1/2
+D12	DMS1/200
+D12	Northern Electric DSS2 (Dig)
+D12	Northern Telecom DMS100/200 Digital Host
+D12	NTDMS1
+D12	NTDMS1/2
+D21	SCDC0
+D21	Stromberg Carlson DC021 Digital
+D21	Stromberg Carlson DCO21 Digital
+D2H	Stromberg Carlson DCO200 Dig
+D45	Vidar ITS4/5 (Digital)
+D60	Stromberg Carlson Cent DCO 6000 Digital
+D61	Nippon NEAX-61 (Digital)
+D6E	Nippon NEAX-61 Digtal Switch Loc
+DC1	Stromberg Carlson RLS-1000
+DC1	Stromberg Carlson RLS-360
+DC4	Stromberg Carlson RLS-4000
+DCL	SCRLS
+DCL	Stromberg Carlson DCO RLS
+DCN	SCRNS
+DCN	Stromberg Carlson DCO80 Digital
+DCN	Stromberg Carlson DCO Remote Network Switch
+DCO	SCDCO
+DCO	Stromberg Carlson DCO80 Digital
+DCO	Stromberg Carlson DCO Digital
+DCR	Stromberg Carlson Remote Digital
+DE3	Siemens DE3 EWSD RCU Switching System
+DE4	Siemens DE4 EWSD RCU Switching System
+DE5	EWSD
+DE5	EWSD-RCU
+DE5	Siemens DE5 EWSD RCU Sw Sys
+DIM	Vidar IMA2 (Digital)
+DLM	Liech LXP-4
+DLM	Northern Telecom DMS10 Remote Eqp Mod
+DLU	Siemens EWSD Remote Digital Line Unit
+DM2	Northern Telecom DMS200 (Digital) Host
+DM5	Northern Telecom DMS 250
+DMH	DMS100
+DMH	Northern Telecom DMS100 (Digital)
+DMH	Northern Telecom DMS100 (Digital) Host
+DMH	NTDMS1
+DMH	NTDMS100
+DMM	Motorola EMX4 Mobile Radio Switch
+DMO	Northern Telecom DMS10 Host Switching Office
+DMO	NTDMSHSO
+DMS	Northern Telecom DMS10S
+DMT	DMS10
+DMT	Northern Telecom DMS10 (Digital)
+DMT	NTDMS10
+DMT	NTDMS10M
+DMT	NTDMS10SSO
+DMT	NTDMSSSO
+DMW	DMS-MTX
+DRL	Northern Telecom DMS100 Remote Line Module
+DS1	Northern Electric DSS1 (Digital)
+	DSC Cinn. Corp. DEX-600E
+DS	CSX 2100
+DS	Digital Switching System
+DSE	Stromberg Carlson DCOSE Small Exchange
+DSF	Northern Telecom DMS10 Satellite Switching Office
+DSO	Digital Switching Office
+DSS	Northern Electric DSS Digital
+DS	Softswitch
+DST	Northern Telecom DMS-STP
+DS	UMC10
+DT5	Vidar ITS5 (Digital)
+DTM	Stromberg Carlson DTM (Digital)
+DX6	DSC Cinn. Corp. DEX-600E
+E55	EWSD-RCU
+EC1	Stromberg-Carlson ESC (1)
+ESS	Electric Switching System - Analog
+ETF	CIT-Alcatel E10 Five Sw System
+EWSD	Siemens EWSD Switching System
+EWS	EWSD
+EWS	EWSD-SR
+EWS	Siemens EMD55
+EXM	5ESS-EXM
+GT5	Auto/Elec ESU 3072 Line Capacity
+GT5	GTD5EAX
+GTR	914E
+GTR	914EX
+GTR	AE-MUX
+GTR	AE-MXU
+GTR	AE-RSU
+GTR	Auto/Elec GTD5-EAX Digital Remote
+GTR	SLC-5
+GTX	AE-DXLMF
+GX5	MITEL-GX
+GX5	Mitel GX5000
+HLE	WECO 1ESS Hi Lo
+K60	ITT-Kellogg K60
+LX4	LEICH
+M1K	Redcom Lab MDX10K
+M38	Redcom Lab MDX384
+N2A	Northern Electric NX2A
+NT5	NORTEL DMS 500
+ORM	5ESS-ORM
+ORM	5ORM
+ORM	AT&T Tech Optic Remote Switch
+RDE	Remote Digital Switching Equipment
+REX	Harris Rural Elec. Exchange
+RLC	Northern Telecom Remote Link Connect
+RLC	NTDMSOPM
+RLC	SLC-5
+RLY	ITT-KLG
+RSC	Northern Telecom Remote Switching Center
+RSC	NTDMSREM
+RSC	NTDMSRSC
+RSC	NTDMSRSCS
+RSC	RLCM
+RS	ESC
+RSL	AT&T Remote Integrated Svcs
+RSM	Ericsson Remote Swutching Mo
+RS	NTDMSRLCM
+RS	RDI
+RSS	Northern Telecom Remote Switch SONET
+RTA	Remote Trunking Arrangement
+S22	Telica Plexus 9000
+SA1	XB
+SC3	North Electric CX30
+SCC	North Electric CX200
+SCR	ITT-Kellogg CRX
+SCX	RTDISC-S
+SLC5	Subscriber Line Carrier Equipment
+SP1	Northern Telecom SP1 (2-Wire)
+SXA	Automatic Electric Step-By-Step
+SXS	WECO Step-By-Step
+SXY	Stromberg-Carlson XY
+V35	Metaswitch VP3510
+XB	SA1

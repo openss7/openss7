@@ -1,0 +1,550 @@
+#!/bin/sh
+# =============================================================================
+#
+# @(#) $RCSfile: missing3,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-09-02 08:46:30 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2011-09-02 08:46:30 $ by $Author: brian $
+#
+# =============================================================================
+
+# missing3 for more commands ala missing
+#
+# This particular missing script is used for missing repository commands.  Many
+# repository commands are scripts themselves and can be simplified here to do
+# just the things needed by our makefiles.
+
+scriptversion=2011-01-15.01
+
+if test $# -eq 0; then
+    cat 1>&2 <<-EOF
+	Try \'$0 --help' for more information
+	EOF
+    exit 1
+fi
+
+script="$0"
+scriptname=`basename $0`
+scriptdir=`dirname $0`
+scriptdir=`(cd $scriptdir; pwd)`
+srcdir=`(cd $scriptdir/../src/java; pwd)`
+run=:
+sed_output='s/.* --output[ =]\([^ ]*\) .*/\1/p'
+sed_minuso='s/.* -o \([^ ]*\) .*/\1/p'
+sed_minusd='s/.* -d \([^ ]*\) .*/\1/p'
+sed_minusf='s/.* -f \([^ ]*\) .*/\1/p'
+sed_lastop='s/.* \([^ ]*\) *$/\1/p'
+
+
+msg="missing on your system"
+
+case $1 in
+    (--run)
+	# Try to run requested program, and just exit if it succeeds.
+	run=
+	shift
+	"$@" && exit 0
+	# Exit code 63 means version mismatch.  This often happens when the
+	# user tries to use an ancient version of a tool on a file that
+	# requires a minimum version.  In this case we should proceed as
+	# though the program has been absent, or as though --run had not been
+	# passed.
+	if test $? = 63 ; then
+	    run=:
+	    msg="probably too old"
+	fi
+	;;
+
+    (-h|--h|--he|--hel|--help)
+	cat <<-EOF
+	$0 [OPTION]... PROGRAM [ARGUMENT]...
+	
+	Handle \`PROGRAM [ARGUMENT]...' for when PROGRAM is missing, or return
+	an error status if there is no known handling for PROGRAM.
+	
+	Options:
+	  -h, --help	    display this help and exit
+	  -v, --version	    output version information and exit
+	  -c, --copying	    output copying information and exit
+	  --run		    try to run PROGRAM, and emulate if it fails
+	
+	Supported PROGRAM values:
+	  Dpkg tools:
+	      dpkg			    fail
+	      dpkg-deb			    fail
+	      dpkg-architecture		    create appropriate output
+	      dpkg-buildflags		    create appropriate output
+	      dpkg-genchanges		    create appropriate output
+	      dpkg-source		    create appropriate output
+	      dpkg-buildpackage		    cteate appropriate output
+
+	  RedHat/Fedora repository commands:
+	      createrepo		    touch the output file
+	      modifyrepo		    touch the output file
+	
+	  Novell/YaST repository commands:
+	      create_directory.yast	    create directory.yast as specified
+	      create_md5sums		    create MD5SUMS and MD5SUMS.meta files
+	      create_package_desc	    create the packages file
+	      create_repo_for_patch.sh	    create patch repository
+	      create_update_source.sh	    create update repository
+	      createpatch		    create patch RPMs
+	      mk_listings		    create archive listings
+	
+	  Debian/Apt repository commands:
+	      apt-ftparchive		    create appropriate output
+	      dpkg-scanpackages		    create appropriate output
+	      dpkg-scansources		    create appropriate output
+	
+	  Apt for RPM repository commands:
+	      genbasedir		    create appropriate output
+	      genpkglist		    touch the output file
+	      gensrclist		    touch the output file
+	      countpkglist		    create appropriate output
+	
+	  Urpmi repository commands:
+	      gendistrib		    create appropriate output
+	      genhdlist			    create appropriate output
+	      genhdlist2		    create appropriate output
+	      genhdlist-old		    create appropriate output
+	
+	Send problem reports to <bugs@openss7.org>.
+	EOF
+	exit 0
+	;;
+
+    (-v|--v|--ve|--ver|--vers|--versi|--versio|--version)
+	cat <<-EOF
+	Version $scriptversion
+	EOF
+	exit 0
+	;;
+
+    (-c|--c|--co|--cop|--copy|--copyi|--copyin|--copying)
+	cat <<-EOF
+	Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+	Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+	Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+	
+	All Rights Reserved.
+	
+	This program is free software; you can redistribute it and/or modify it
+	under the terms of the GNU Affero General Public License as published by
+	the Free Software Foundation; version 3 of the License.
+	
+	This program is distributed in the hope that it will be useful, but
+	WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero
+	General Public License for more details.
+	
+	You should have received a copy of the GNU Affero General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+	write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+	02139, USA.
+	
+	U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+	on behalf of the U.S. Government ("Government"), the following
+	provisions apply to you.  If the Software is supplied by the Department
+	of Defense ("DoD"), it is classified as "Commercial Computer Software"
+	under paragraph 252.227-7014 of the DoD Supplement to the Federal
+	Acquisition Regulations ("DFARS") (or any successor regulations) and the
+	Government is acquiring only the license rights granted herein (the
+	license rights customarily provided to non-Government users).  If the
+	Software is supplied to any unit or agency of the Government other than
+	DoD, it is classified as "Restricted Computer Software" and the
+	Government's rights in the Software are defined in paragraph 52.227-19
+	of the Federal Acquisition Regulations ("FAR") (or any successor
+	regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+	NASA Supplement to the FAR (or any successor regulations).
+	
+	Commercial licensing and support of this software is available from
+	OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+	EOF
+	exit 0
+	;;
+    (-*)
+	cat 1>&2 <<-EOF
+		$0: Unknown \`$1' option
+		Try \`$0 --help' for more information
+		EOF
+	exit 1
+	;;
+
+esac
+
+program="$1" ; shift
+
+zeroarg=`which $program 2>/dev/null` ; test -n $zeroarg || zeroarg="$program"
+
+# Now exit if we have PROGRAM, but it failed.  Also exit now if we do not have
+# PROGRAM and --version, --help or --copying was passed to PROGRAM (most likely
+# to detect the program).
+
+if test -z "$run" -a -x "$zeroarg" ; then
+    # it exists and is executable, but it failed
+    exit 1
+elif test ":$2" = ":--version" -o ":$2" = ":--help" ; then
+    # Could not run --version or --help.  This is prbably someone running `$TOOL
+    # --version' to check whether $TOOL exists without knowing that $TOOL uses
+    # missing4.
+    exit 1
+fi
+
+case $program in
+    (create_directory.yast|create_md5sums|create_package_desc|create_repo_for_patch.sh|create_update_source.sh|creatpatch|mk_listings|genbasedir|genpkglist|gensrclist|countpkglist)
+	# do not handle --version or --help
+	;;
+    (createrepo|modifyrepo|apt-ftparchive|dpkg-scanpackages|dpkg-scansources|gendistrib|genhdlist|genhdlist-old|genhdlist2|*)
+	if test -z "$run" && ($program --version) >/dev/null 2>&1 ; then
+	    # it exists, but it failed.
+	    exit 1
+	elif test ":$2" = ":--version" -o ":$2" = ":--help" ; then
+	    # Could not run --version or --help.  This is probably someone
+	    # running `$TOOL --version' or `$TOOL --help' to check whether $TOOL
+	    # exists and not knowing $TOOL uses missing3.
+	    exit 1
+	fi
+	;;
+esac
+
+# If PROGRAM does not exist, or fails to run (possibly an outdated version), or
+# warning is requested, generate a warning.
+
+cat 1>&2 <<-EOF
+	*** WARNING: \`$program' is needed, and is $msg.
+	***
+	EOF
+
+case $program in
+    (apt-ftparchive)
+	if test $# -lt 2; then
+		cat 1>&1 <<-EOF
+			Error: $program: too few arguments
+			Usage: $program [options] command {path|config}
+			EOF
+		exit 1
+	fi
+	arg=$1
+	case $arg in
+	    (packages|sources)
+		;;
+	    (contents|release)
+		cat 1>&2 <<-EOF
+	*** Most arguments can be emulated, but the \`$arg' argument is not
+	*** currently supported by \`$scriptname'.
+	*** 
+	*** You might have modified some files without having the proper tools
+	*** for further handling them.  Check the \`README' file, it often tells
+	*** you about the needed prerequisites for installing this package.  You
+	*** may also peek at any GNU archive sites, in case some other package
+	*** would contain the missing \`$program' program.
+	***
+	*** Debian 5.0:	 \`apt-get install apt-utils'
+	*** Ubuntu:	 \`apt-get install apt-utils'
+	EOF
+		;;
+	    (generate|clean)
+		cat 1>&2 <<-EOF
+	*** Most arguments can be emulated, but the \`$arg' argument is not
+	*** currently supported by \`$scriptname'.
+	*** 
+	*** You might have modified some files without having the proper tools
+	*** for further handling them.  Check the \`README' file, it often tells
+	*** you about the needed prerequisites for installing this package.  You
+	*** may also peek at any GNU archive sites, in case some other package
+	*** would contain the missing \`$program' program.
+	***
+	*** Debian 5.0:	 \`apt-get install apt-utils'
+	*** Ubuntu:	 \`apt-get install apt-utils'
+	EOF
+		;;
+	    (*)
+		cat 1>&2 <<-EOF
+			Error: $program: unrecognized command \`$arg'
+			Usage: $program [options] command {path|config}
+			EOF
+		exit 1
+		;;
+	esac
+	;;
+    (dpkg-scanpackages|dpkg-scansources)
+	cat 1>&2 <<-EOF
+	*** It is straightforward to emulate \`$program'; however, emulation is
+	*** not currently supported by \`$scriptname'.
+	*** 
+	*** You might have modified some files without having the proper tools
+	*** for further handling them.  Check the \`README' file, it often tells
+	*** you about the needed prerequisites for installing this package.  You
+	*** may also peek at any GNU archive site, in case some other package
+	*** would contain this missing \`$program' program.
+	***
+	*** Debian 5.0:	 \`apt-get install dpkg-dev'
+	*** Ubuntu:	 \`apt-get install dpkg-dev'
+	EOF
+	;;
+    (dpkg|dpkg-deb)
+	cat 1>&2 <<-EOF
+	*** You might have modified some files without having the proper tools
+	*** for further handling them.  \`$program' is an essential part of a
+	*** Debian system: \`apt-get' cannot be used when \`$program' is not
+	*** present.  Chances are that \`configure' made a mistake ane thought
+	*** that a non-Debian based system was a Debian-based system.
+	*** 
+	EOF
+	;;
+    (dpkg-architecture|dpkg-buildflags|dpkg-genchanges|dpkg-source|dpkg-buildpackage)
+	cat 1>&2 <<-EOF
+	*** It is straightforward to emulate \`$program'; however, emulation is
+	*** not currently supported by \`$scriptname'.
+	*** 
+	*** You might have modified some files without having the proper tools
+	*** for further handling them.  Check the \`README' file, it often tells
+	*** you about the needed prerequisites for installing this package.  You
+	*** may also peek at any GNU archive site, in case some other package
+	*** would contain this missing \`$program' program.
+	***
+	*** Debian 5.0:	 \`apt-get install dpkg-dev'
+	*** Ubuntu:	 \`apt-get install dpkg-dev'
+	EOF
+	;;
+    (createrepo)
+	cat 1>&2 <<-EOF
+	*** You might have modified some files without having the proper tools
+	*** for further handling them.  You need an appropriate version of the
+	*** \`createrepo' program to generate repo-md metadata files.  You can
+	*** normally get \`createrepo' as part of many popular GNU/Linux
+	*** distributions.
+	***
+	*** On RPM  distributions, try 'yum install createrepo'
+	*** On DEB  distributions, try 'apt-get install createrepo'
+	*** On SuSE distributions, try 'zypper install createrepo'
+	*** On URPM distributions, try 'urpmi createrepo'
+	***
+	*** Alternately, you can specify an equivalent command with the
+	*** CREATEREPO environment variable when running \`configure'.
+	***
+	*** Debian 5.0:	 \`apt-get install createrepo'
+	*** Ubuntu:	 \`apt-get install createrepo'
+	*** CentOS 5.x:	 \`yum install createrepo'
+	*** RHEL 5,6.0:	 \`yum install createrepo'
+	*** SLES 10, 11: \`zypper install createrepo'
+	*** Mandriva:	 \`urpmi createrepo'
+	EOF
+	;;
+    (modifyrepo)
+	cat 1>&2 <<-EOF
+	*** You might have modified some files without having the proper tools
+	*** for further handling them.  You need an appropriate version of the
+	*** \`modifyrepo' program to modify repo-md metadata files.  You can
+	*** normally get \`modifyrepo' as part of many popular GNU/Linux
+	*** distributions.
+	***
+	*** On RPM  distributions, try 'yum install createrepo'
+	*** On DEB  distributions, try 'apt-get install createrepo'
+	*** on SuSE distributions, tru 'zypper install createrepo'
+	*** On URPM distributions, try 'urpmi createrepo'
+	***
+	*** Alternately, you can specify an equivalent command with the
+	*** MODIFYREPO environment variable when running \`configure'.
+	***
+	*** Debian 5.0:	 \`apt-get install createrepo'
+	*** Ubuntu:	 \`apt-get install createrepo'
+	*** CentOS 5.x:	 \`yum install createrepo'
+	*** RHEL 5,6.0:	 \`yum install createrepo'
+	*** SLES 10, 11: \`zypper install createrepo'
+	*** Mandriva:	 \`urpmi createrepo'
+	EOF
+	;;
+    (genbasedir|genpkglist|gensrclist|countpkglist)
+	environvar=`echo $program | sed 'y,abcdefghijklmnopqrstuvwxyz,abcdefghijklmnopqrstuvwxyz,'`
+	cat 1>&2 <<-EOF
+	*** You might have modified some files without having the proper tools
+	*** for further handling them.  you need an appropriate version of the
+	*** \`$program' program to create APT for RPM repository metadata files.
+	*** You can normally get \`$program' as part of many popular GNU/Linux
+	*** distributions.
+	***
+	*** On SuSE distributions, try 'zypper install apt'
+	*** On URPM distributions, try 'urpmi apt'
+	***
+	*** Alternately, you can specify an equivalent command with the
+	*** \`$environvar' environment variable when running \`configure'.
+	***
+	*** Mandriva 1:	  \`urpmi apt'
+	EOF
+	;;
+    (gendistrib|genhdlist2|genhdlist|genhdlist-old)
+	environvar=`echo $program | sed 's,genhdlist.*,genhdlist,;y,abcdefghijklmnopqrstuvwxyz,ABCDEFGHIJKLMNOPQRSTUVWXYZ,'`
+	cat 1>&2 <<-EOF
+	*** It is straightforward to emulate \`$program'; however, emulation is
+	*** not currently supported by \`$scriptname'.
+	***
+	*** You might have modified some files without having the proper tools
+	*** for further handling of them.  You need an appropriate version of
+	*** the \`$program' program to generate urpm metadata files.  You can
+	*** normally get \`$program' as part of many popular GNU/Linux
+	*** distributions.
+	***
+	*** On URPM distributsion, try 'urpmi genhdlist2'
+	***
+	*** Alternatively, you can specify an equivalent command with the
+	*** \`$environvar' environment vairable when running \`configure'.
+	***
+	*** Mandriva 1:	    \`urpmi genhdlist2'
+	EOF
+	;;
+    (*)
+	cat 1>&2 <<-EOF
+	*** You might have modified some files without having the proper tools
+	*** for further handling them.  Check the \`README' file, it often tells
+	*** you about the needed prerequisites for installing this package.  You
+	*** may also peek at any GNU archive site, in case some other package
+	*** would contain this missing \`$program' program.
+	EOF
+	;;
+esac
+
+# If PROGRAM does not exist, or fails to run (possibly an outdated version), try
+# to emulate PROGRAM.
+case $program in
+    (apt-ftparchive)
+	# first argument can be nothing (in which case packages is assumed) or
+	# can be packages, sources, contents, release, generate or clean.  The
+	# last two require parsing a configuration file that we don't do so just
+	# error out in that case.  The others can be emulated using
+	# dpkg-scanpackages, dpkg-scansources, dpkg-deb and brute force.  Note
+	# that dpkg-scanpackages and dpkg-scansources might also be missing, so
+	# invoke them using this script again.
+	arg=$1; shift
+	case $arg in
+	    (packages)
+		$script --run dpkg-scanpackages "$@"; exit $?
+		;;
+	    (sources)
+		$script --run dpkg-scansources "$@"; exit $?
+		;;
+	esac
+	exit 1
+	;;
+    (dpkg-scanpackages|dpkg-scansources)
+	exit 1
+	;;
+    (dpkg|dpkg-deb)
+	exit 1
+	;;
+    (dpkg-architecture|dpkg-buildflags|dpkg-genchanges|dpkg-source|dpkg-buildpackage)
+	exit 1
+	;;
+    (genbasedir|genpkglist|gensrclist)
+	exit 1
+	;;
+    (countpkglist)
+	args="$@"
+	test $# -ge 1 || exit 1
+	for arg in $args ; do
+	    comp=`echo "$arg" | sed 's,.*\.,,'`
+	    if test -r $arg ; then 
+		strings $arg | grep "RPMS\.$comp"
+	    else echo "Cannot read $arg." >&2 ; exit 1 ; fi
+	done | wc -l
+	;;
+    (gendistrib|genhdlist|genhdlist2|genhdlist-old)
+	exit 1
+	;;
+    (*)
+	exit 1
+	;;
+esac
+
+exit 0
+
+# =============================================================================
+#
+# $Log: missing3,v $
+# Revision 1.1.2.9  2011-09-02 08:46:30  brian
+# - sync up lots of repo and build changes from git
+#
+# Revision 1.1.2.8  2011-08-07 11:14:38  brian
+# - mostly mandriva and ubuntu build updates
+#
+# Revision 1.1.2.7  2011-02-09 17:59:27  brian
+# - repository and rpm updates for suse
+#
+# Revision 1.1.2.6  2011-01-18 17:05:40  brian
+# - update diagnostics
+#
+# Revision 1.1.2.5  2009-07-21 11:06:13  brian
+# - changes from release build
+#
+# Revision 1.1.2.4  2009-07-13 07:13:27  brian
+# - changes for multiple distro build
+#
+# Revision 1.1.2.3  2009-06-29 07:35:34  brian
+# - improvements to build process
+#
+# Revision 1.1.2.2  2009-06-21 12:41:53  brian
+# - updated headers
+#
+# Revision 1.1.2.1  2009-06-21 11:16:41  brian
+# - added files to new distro
+#
+# Revision 0.9.2.5  2008/09/22 07:52:51  brian
+# - more spsace
+#
+# Revision 0.9.2.4  2008/09/22 07:50:15  brian
+# - correction
+#
+# Revision 0.9.2.3  2008/09/22 03:24:30  brian
+# - null error output from which
+#
+# Revision 0.9.2.2  2008/09/21 08:45:58  brian
+# - additions
+#
+# Revision 0.9.2.1  2008/09/20 23:16:11  brian
+# - new missing file for repo commands
+#
+# =============================================================================
+# vim: ft=sh sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn

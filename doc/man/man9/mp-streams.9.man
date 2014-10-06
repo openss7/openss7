@@ -1,0 +1,2516 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: mp-streams.9.man,v 1.1.2.2 2011-02-07 02:18:43 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:43 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: mp-streams.9.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:43  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH MP-STREAMS 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B mp-streams
+\- multi-processor \fISTREAMS\fR executive
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
+.\"
+.\"
+.SH OVERVIEW
+.PP
+.B @PACKAGE_TITLE@
+.[
+lfs
+.]
+when run on symmetrical multi-processor systems, and when compiled with kernel
+configuration symbol
+.B CONFIG_SMP
+defined on symmetrical multi-processor (MP) or uniprocessor (UP), will execute
+in
+.B MP-STREAMS
+mode.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This manual page provides additional information with regards to synchronization
+and serialization of events within the
+.I STREAMS
+executive, for compatibility with
+.IR "SVR 4.2 MP" ,
+.[
+svr42
+.]
+and systems based on
+.IR "SVR 4 MP" .
+.[
+svr4
+.]
+.B @PACKAGE_TITLE@
+also provide a synchronization framework based on perimeters for compatibility
+with the
+.IR Solaris \(rg
+.[
+solspg
+.]
+implementation of
+.IR STREAMS .
+.B @PACKAGE_TITLE@
+also provides a synchronization frameworks based on syncrhonization level for
+compatibility with the
+.IR OSF/1 \(rg,
+.[
+osfspg
+.]
+.IR AIX \(rg,
+.[
+aixspg
+.]
+.IR HPUX \(rg,
+.[
+hpuxspg
+.]
+.IR VxWorks \(rg,
+.[
+vxwspg
+.]
+implementations of
+.IR STREAMS ,
+and other implementations based on the
+.I Mentat Portable Streams
+model.
+.PP
+There are three prevalent models for synchronization in
+.IR STREAMS :
+.IP (1) \w'(0)\(em'u
+The
+.I SVR 4.2 MP STREAMS
+model.
+This is the model followed by
+.IR UnixWare \(rg,
+.[
+uw7spg
+.]
+.IR SUPER/UX \(rg,
+.[
+suxspg
+.]
+.IR UXP/V \(rg,
+.[
+uxpspg
+.]
+.IR IRIX \(rg,
+.[
+irixspg
+.]
+and other implementations based on the classical
+.I SVR 4.2 MP
+implementation.
+.IP ""
+Under this model, each module or driver exports a
+.IB pfx devflag
+flags variable that either contains the
+.B D_MP
+flag, or does not contain the
+.B D_MP
+flag.
+On a symmetrical multiprocessor system,
+.I STREAMS
+drivers and modules that do not advertise the
+.B D_MP
+flag in their
+.IB pfx devflags
+variable, that load on a UP system, simply refuse to load on an MP system.
+.IP (2)
+The
+.I OSF/1 STREAMS
+model.
+This is the model followed by
+.IR AIX \(rg,
+.[
+aixspg
+.]
+.IR HPUX \(rg,
+.[
+hpuxspg
+.]
+.IR MacOT \(rg,
+.[
+macspg
+.]
+.IR OSF/1 \(rg,
+.[
+osfspg
+.]
+and
+.IR VxWorks \(rg.
+.[
+vxwspg
+.]
+and other implementations based on the neo-classical
+.I Mentat Portable Streams
+implementation.
+.IP ""
+Under this model, each module or driver registers with the
+.I STREAMS
+executive and advertises a
+.B STR_MPSAFE
+flag when they are fully MP-SAFE, and do not advertise the flag when they are
+not.  Drivers and modules may also select one of a number of syncrhonization levels.
+Drivers and modules that are not MP-SAFE (do not advertise the
+.B STR_MPSAFE
+flag) and do not specify a sychronization level will by default be run at
+per-module synchronization.  (Per-module syncrhonization provides the most
+appropriate protection for drivers or modules written to UP specifications,
+yet following SVR 4.2 STREAMS programming guidelines.)
+.IP (3)
+The
+.I Solaris STREAMS
+model.
+This is the model followed by
+.IR Solaris \(rg.
+.[
+solspg
+.]
+.IP ""
+Under this model, each module or driver registers with the
+.I STREAMS
+executive and advertises a
+.B D_MP
+flag when they are fully MP-SAFE, and do not advertise the flag when they are
+not.  Drivers and modules may also select from a number of syncrhonization
+perimeter features using additional flags.  Drivers and modules that are not
+MP-SAFE (do not advertise the
+.B D_MP
+flag) and do not specify perimeter flags, will by default be run at per-module
+syncrhonization.
+Flags provide additional control over the behaviour of put procedures and
+open and close routines.
+.PP
+.B @PACKAGE_TITLE@
+provides a syncrhonization framework that supports all three models
+simultaneously in a single
+.I STREAMS
+executive.  This is accomplished by using syncrhonization queues that provides
+syncrhonization at barriers that threads of execution attempt to enter.
+.B @PACKAGE_TITLE@
+can have at most two barriers per module.  These barriers roughly correspond to
+.IR Solaris \(rg
+perimeters.  Each driver or module can have an outer barrier and an inner
+barrier.
+.PP
+Threads of execution predicated on a queue (put and service procedures, and
+functions behaving like a put or service procedure) must enter both barriers.
+Normally these procedures enter the outer barrier shared and the inner barrier
+exclusive; however, some
+.IR Solaris \(rg
+compatible controls can affect whether the inner barrier is entered shared or
+exclusive.  The
+.B D_MTPUTSHARED
+flag can cause put procedures (or functions behaving as a put procedure) to
+enter the inner barrier shared instead of exclusive.
+.PP
+Threads of execution not predicated on a queue (open and close routines)
+enter only the outer barrier.  Normally these procedures enter the outer
+barrier shared; however, some
+.IR Solaris \(rg
+compatible controls and
+.IR OSF/1 \(rg
+implementations specifics cause the outer barrier to be entered exclusive by
+these routines.
+.PP
+Registration functions specific to the emulated implementation provided by the
+.I STREAMS Compatibility Modules
+package
+.RB ( strcompat )
+.[
+strcompat
+.]
+handle the setting of barrier specifics for the flavor of the implementation
+automatically and the user is not required to understand the internals of the
+.B @PACKAGE_TITLE@
+implementation.
+.\"
+.SS Configuration
+.PP
+Synchronization is specified by the module writer during configuration of a
+.I STREAMS
+module.
+This is accomplished using flags and synchronization level definitions to the
+module installation or registration function.  For compatibility with other
+.I STREAMS
+registration mechanisms,
+.B @PACKAGE_TITLE@
+provides both
+.I Solaris \(rg
+style syncrhonization flags and
+.I OSF/1 \(rg
+style configuration flags and synchronization levels.
+.\"
+.\"
+.PP
+.B Synchronization Flags
+.PP
+.B @PACKAGE_TITLE@
+provides the following
+.IR Solaris \(rg
+compatible syncrhonization flags:
+.TP
+.B D_MP
+Specifies that the module is MP-SAFE and does not require a synchronization model.
+Additional synchronization flags are ignored.
+The queue
+.IR qi_qopen (9),
+.IR qi_qclose (9),
+.IR qi_putp (9)
+and
+.IR qi_srvp (9)
+procedures, as well as asynchronous callbacks and call-outs of all kinds
+can run concurrent, particularly in a multiprocessor environment.
+Modules that set this flag must normally perform their own mutual exclusion or
+critical section protections, and all procedures must be fully MP-SAFE (and
+reentrant).
+.IP ""
+Modules that do not specify
+.B D_MP
+are not MP-SAFE and will be run by default with synchronization at the module
+level (single threaded).
+(For most systems supporting syncrhonization, the default level is at the
+level of the module,
+.BR SQLVL_MODULE ;
+however, note that
+.IR HPUX \(rg
+.[
+hpuxspg
+.]
+specifies that the default syncrhonization level is at the level of the queue
+pair,
+.BR SQLVL_QUEUEPAIR .)
+.TP
+.B D_MTPERQ
+Specifies that the module has an inner perimeter and that synchronization at the
+inner perimeter is per queue.  This is the same as the synchronization level
+.BR SQLVL_QUEUE ,
+below.
+Only one
+.I STREAMS
+executive thread per queue will be permitted.  Other threads will wait until
+a thread currently within the perimeter exits.
+.IP ""
+Normally in
+.BR "@PACKAGE_TITLE@" ,
+only one thread will execute a queue's
+.IR qi_srvp (9)
+procedure at a given time.  However, normally queue
+.IR qi_putp (9)
+procedures, as well as all asynchronous callbacks, can run concurrent with the
+.IR qi_srvp (9)
+procedure.
+This inner perimeter causes
+.IR qi_srvp (9)
+procedures to be run exclusive with
+.IR qi_putp (9)
+(unless
+.B D_MTPUTSHARED
+is also set), as well as exclusive with all synchronous callbacks.
+.TP
+.B D_MTQPAIR
+Specifies that the module has an inner perimeter and that synchronization at
+the inner perimeter is per queue pair.  This is the same as the
+synchronization level
+.BR SQLVL_QUEUEPAIR ,
+below.
+Only one
+.I STREAMS
+executive thread per queue pair will be permitted.  Other threads will wait
+until a thread currently within the perimeter exits.
+.TP
+.B D_MTPERMOD
+Specifies that the module has an inner perimeter and that synchronization at
+the inner perimeter is per module.  This is the same as the synchronization
+level
+.BR SQLVL_MODULE ,
+below.
+Only one
+.I STREAMS
+executive thread per module will be permitted.  Other threads will wait until
+a thread currently within the perimeter exits.
+.TP
+.B D_MTPUTSHARED
+Specifies that the
+.IR qi_putp (9)
+procedure will be permitted to enter the inner perimeter shared.  This means
+that module
+.IR qi_putp (9)
+procedures must run fully re-entrant and multi-threaded.  Also, that
+calling sequence of
+.IR qi_putp (9)
+procedures is not guaranteed by the
+.I STREAMS
+executive.
+.TP
+.B D_MTOUTPERIM
+Specifies that an outer perimeter exists enclosing the module.  Threads at the
+outer perimeter will be allowed to enter the module shared.
+.TP
+.B D_MTOCEXCL
+Specifies that the
+.IR qi_qopen (9)
+and
+.IR qi_qclose (9)
+procedures will be run exclusive at the outer perimeter.  That is,
+.IR qi_qopen (9)
+and
+.IR qi_qclose (9)
+procedures will run single-threaded.
+This flag is useful where the
+.IR qi_qopen (9)
+or
+.IR qi_qclose (9)
+procedures of a module use data structures that are global to the module.
+This is a
+.IR Solaris \(rg
+specific concept.
+.[
+solspg
+.]
+Other multi-processor
+.I STREAMS
+executives provide some utility functions that ensure that common data
+structures are protected.  For example:
+.BR mi_open_comm (9),
+.BR mi_close_comm (9),
+.BR streams_open_comm (9),
+.BR streams_close_comm (9),
+or even
+.IR Solaris \(rg's
+own
+.BR ddi_get_soft_state (9)
+mechanism.
+.\"
+.\"
+.PP
+.B Configuration Flags
+.PP
+.B @PACKAGE_TITLE@
+provides the following
+.IR OSF/1 \(rg
+(and derivative) compatible configuration flags:
+.TP
+.B STR_MPSAFE
+Same as the
+.B D_MP
+flag, above.
+When specified the module or driver is fully MP-SAFE and reentrant and
+additional synchronization is ignored.
+.TP
+.B STR_QSAFETY
+Specifies that interrupt-safe callbacks are required.
+.TP
+.B STR_PERSTREAM
+Specifies that the module agrees to per-Stream synchronization for non MP-SAFE
+modules.
+.IP ""
+Normally when modules are not MP-SAFE, the default is to use per-module synchronization for the
+module (see
+.B SQLVL_DEFAULT
+below).  This means that only one thread is permitted into the entire module.  That is rather
+restrictive and can cause difficulties when MP-SAFE modules are in the Stream.  (MP-SAFE modules
+will run more aggressive and are likely to out-pace per-module synchronized modules, impairing the
+performance of all Streams in which the module is included.)
+.IP ""
+Another solution is to run each of the non-MP-SAFE module's Streams at per-Stream synchronization,
+where only a single thread is permitted per Stream, but multiple threads are permitted per module.
+Unfortunately, other MP-SAFE modules in the Stream must be prepared to accept this situation, as
+they may be relying on a different synchronization model within their modules.  Setting the
+.B STR_PERSTREAM
+flag for a driver or module indicates that, regardless of whether the driver or module is MP-SAFE or
+not, that it accepts being run in per-Stream synchronization when a non-MP-SAFE driver or module is
+in the same Stream.  As a Stream is built up and includes a non-MP-SAFE module, if all of the
+modules and driver on the Stream have the
+.B STR_PERSTREAM
+flag set, then the Stream will be run with per-Stream synchronization.  If any driver or module on
+the Stream does not have the
+.B STR_PERSTREAM
+flag set, then all non-MP-SAFE modules on the Stream (and any of their instances in other Streams)
+will be forced to run in per-module synchronization.
+.TP
+.B STR_Q_NOTTOSPEC
+Specifies that the module is not to specification and runs under a process
+context.  The module might sleep in its procedures.
+.\"
+.\"
+.PP
+.B Synchronization Levels
+.TP
+.BR SQLVL_NOP ", " SQLVL_NOSYNC
+Specifies that the module is run without synchronization.  All synchronous
+module entry points, call-outs and callbacks become asynchronous.  It is the
+module's responsibility to provide synchronization or serialization as
+required.
+(Note that
+.IR HPUX \(rg
+.[
+hpuxspg
+.]
+calls this option
+.B SQLVL_NOSYNC
+instead of
+.BR SQLVL_NOP .)
+.TP
+.B SQLVL_QUEUE
+Specifies that the module is run with synchronization at the queue.  Only one
+thread will be permitted to enter a given queue's procedures, however, another
+thread will be permitted to enter the procedures of the other queue in the
+queue pair.
+This is useful when the read and write side of a module are largely
+independent and do not require synchronization between sides of the queue
+pair.
+This level is equivalent to the
+.B D_MTPERQ
+flag, above.
+.TP
+.B SQLVL_QUEUEPAIR
+Specifies that the module is run with synchronization at the queue pair.
+Only one thread will be permitted to enter a given queue's procedures within a
+given queue pair.  Where the read and write side of the queue pair shared the
+same private structure (q->q_ptr), this provides MP protection of the common
+data structure to all synchronous entry points.
+This level is equivalent to the
+.B D_MTQPAIR
+flag, above.
+.TP
+.B SQLVL_DEFAULT
+Specifies that the module uses the default synchronization scheme.  This is
+the same a specifying
+.BR SQLVL_MODULE .
+.TP
+.B SQLVL_MODULE
+Specifies that the module is run with synchronization at the module.  Only one
+thread of execution will be permitted within the module.  Where the module
+does not share data structures between modules, this has a similar effect to
+running on a UP system.
+This is the default and works best for non-MP-SAFE modules written in
+accordances with
+.I STREAMS
+guidelines.
+This level is equivalent to the
+.B D_MTPERMOD
+flag, above. (Except for
+.IR HPUX \(rg,
+.[
+hpuxspg
+.]
+where the default is equivalent to
+.BR SQLVL_QUEUEPAIR .)
+.TP
+.B SQLVL_SPLITMODULE
+Specifies that at most two threads are permitted inside the module: at most
+one thread executing a read-side queue procedure and at modst one thread
+executing a write-size queue procedure.  This syncrhonization level is
+specific to
+.IR MacOT \(rg,
+.[
+macspg
+.]
+and was invented to handle a specific problem with the implementation of
+.BR mps_become_writer (9)
+in that implementation.  No other operating system provides this
+syncrhonization level.
+.TP
+.B SQLVL_ELSEWHERE
+Specifies that the module is run with synchronization within a group of
+modules.  Only one thread of execution will be within the group of modules at
+a time.  The group is separately specified as a character string name.  This
+permits a group of modules to run single threaded as though they are running
+on a single processor, without interfering with the concurrency of other
+module outside the group.  This can be important for testing and for modules
+that implicitly share unprotected data structures.
+.TP
+.B SQLVL_GLOBAL
+Specifies that the module is run with global synchronization.  This means that
+only one
+.I STREAMS
+executive thread will be permitted to enter any synchronous module.  This makes
+the entire
+.I STREAMS
+executive single threaded and is useful primarily for debugging.  This is the
+same as
+.I "\*(lqUniprocessor Emulation\*(rq"
+on some systems, and reduces the
+.I STREAMS
+executive to running on a single processor at a time.  On multiprocessor
+systems, the
+.I STREAMS
+executive will still run on multiple processors, it is just that it will be
+running on only one of those processors at a given point in time.
+.\"
+.SS "Asynchronous Callbacks"
+.PP
+The following D3DK utilities use asynchronous callback functions:
+.PP
+.TS
+tab(:);
+lbw(14n)0c0lssss.
+timeout\fR(9):\ \(en\ :T{
+the caller-supplied timeout callback function.
+T}
+dtimeout\fR(9):\ \(en\ :T{
+the caller-supplied timeout callback function.
+T}
+itimeout\fR(9):\ \(en\ :T{
+the caller-supplied timeout callback function.
+T}
+bufcall\fR(9):\ \(en\ :T{
+the caller-supplied buffer callback function.
+T}
+esbbcall\fR(9):\ \(en\ :T{
+the caller-supplied buffer callback function.
+T}
+esballoc\fR(9):\ \(en\ :T{
+the caller-supplied free function.
+T}
+.TE
+.PP
+Asynchronous callback functions are not normally synchronized.
+.PP
+.B @PACKAGE_TITLE@
+provides the following assurances with regard to asynchronous callbacks:
+.IP \(bu \w'\(bu\(em'u
+The callback function will be invoked on the processor that initiated the
+callback.  This ensures that the callback function will not execute until
+after the function that invoked the callback returns or encounters a
+preemption point.
+.IP \(bu
+If the
+.B STR_QSAFETY
+flag is set during configuration, asynchronous callback function invoked from
+within the
+.I STREAMS
+executive (within a
+.I STREAMS
+queue procedure, call-out or callback function),
+will be synchronized with the queue for which the callback is associated.  In
+addition, local interrupts will be suppressed on the servicing processor.
+.IP \(bu
+Asynchronous callbacks invoked from outside the
+.I STREAMS
+executive (at user context outside the
+.IR qi_qopen (9)
+and
+.IR qi_qclose (9)
+procedures, at soft interrupt other than STREAMS_SOFTIRQ and from within
+interrupt service routines)
+will not be synchronized with the
+.I STREAMS
+framework until they call a syncrhonous function.
+.PP
+.\"
+.SS "Asynchronous Callback Cancellation"
+.PP
+.TS
+tab(:);
+lbw(14n)0c0lssss.
+untimeout\fR(9):\ \(en\ :T{
+cancels a timeout callback function.
+T}
+unbufcall\fR(9):\ \(en\ :T{
+cancels a buffer callback function.
+T}
+freemsg\fR(9):\ \(en\ :T{
+calls a free routine callback function.
+T}
+.TE
+.PP
+Normally, the caller-supplied timeout callback function can execute at any time; however,
+.BR timeout (9),
+.BR itimeout (9),
+.BR dtimeout (9)
+uses CPU binding to ensure that the timeout callback will be executed on the
+same processor that raised the timeout.  The callback function will not
+execute until after
+.BR timeout (9)
+.BR itimeout (9),
+.BR dtimeout (9),
+returns and the calling thread encounters a preemption point.  Private locks
+do not need to be held across the call to
+.PP
+The callback functions passed to
+.BR timeout (9),
+.BR dtimeout (9),
+.BR itimeout (9),
+.BR bufcall (9),
+.BR esbbcall (9),
+and
+.BR esballoc (9)
+are asynchronous callbacks.
+The callback function can execute at any time, asynchronous with other
+.I STREAMS
+procedures.
+When the callback function is executed, no synchronization is performed on any
+module, Stream, queue pair or queue before calling the function.
+.\"
+.\"
+.SS "Synchronous Entry Points"
+.PP
+.TS
+tab(:);
+lbw(14n)0c0ls.
+qi_qopen\fR(9):\ \(en\ :the driver or module open routine
+qi_qclose\fR(9):\ \(en\ :the driver or module close routine
+qi_putp\fR(9):\ \(en\ :the driver or module put procedure
+qi_srvp\fR(9):\ \(en\ :the driver or module service procedure
+.TE
+.PP
+.B @PACKAGE_TITLE@
+provides the following assurances with regard to synchronous entry points:
+.IP \(bu \w'\(bu\(em'u
+Per normal
+.I STREAMS
+semantics, only one
+.IR qi_qopen (9)
+or
+.IR qi_qclose (9)
+call will be permitted to execute at a time, per Stream.  However, for Streams that are
+already open,
+.IR qi_qopen (9)
+and
+.IR qi_qclose (9)
+can run concurrent with
+other synchronous entry points for the same Stream (once
+.BR qprocson (9)
+is called and before
+.BR qprocsoff (9)
+is called) and both synchronous and asynchronous callbacks.
+.IP \(bu
+Without syncrhonization,
+.IR qi_qopen (9)
+and
+.IR qi_qclose (9),
+can run concurrent with any synchronous entry point
+.RI ( qi_qopen (9),
+.IR qi_qclose (9)
+.IR qi_putp (9),
+.IR qi_srvp (9)),
+synchronous or asynchronous callback function, belonging to a separate Stream.
+.IP \(bu
+With syncrhonization, when the syncrhonization level is at the level of the
+module or greater, only one thread will be permitted in
+.IR qi_qopen (9)
+or
+.IR qi_qclose (9)
+routines in the same manner as
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedures.  However, when the syncrhonization level is at the level of a
+queue pair or individual queue, syncrhonization of
+.IR qi_qopen (9)
+or
+.IR qi_qclose (9)
+will only be performed if an outer barrier exists and that barrier is set for
+exclusive access.  (An exception is
+.IR MacOT \(rg
+which places an outer barrier at the queue pair when synchronization is at the
+level of the individual queue.)
+.\"
+.\"
+.SS "Synchronous Callbacks"
+.PP
+.TS
+tab(:);
+lbw(14n)0c0ls.
+qtimeout\fR(9):\ \-\ :the timeout function
+qbufcall\fR(9):\ \-\ :the buffer callback function
+qwriter\fR(9):\ \-\ :the exclusive callback function
+mps_become_writer\fR(9):\ \-\ :the exclusive callback function
+weldq\fR(9):\ \-\ :the weld complete callback function
+unweldq\fR(9):\ \-\ :the unweld complete callback function
+streams_put\fR(9):\ \-\ :the put function
+.TE
+.\"
+.\"
+.SS "Asynchronous Callback Cancellation"
+.PP
+.TS
+tab(:);
+lbw(14n)0c0ls.
+untimeout\fR(9):\ \-\ :the \fBtoid_t\fP
+unbufcall\fR(9):\ \-\ :the \fBbcid_t\fP
+freeb\fR(9):\ \-\ :the message block
+.TE
+.PP
+.B @PACKAGE_TITLE@
+provides the following assurances with regard to asyncrhonous callback
+cancellation:
+.IP \(bu \w'\(bu\(em'u
+When
+.BR untimeout (9)
+is called, control will not return to the caller until either the timeout has
+been cancelled or the timeout callback has completed execution.  That is, if
+the timeout function was not yet called at the time that
+.BR untimeout (9)
+was called, but the timeout function gets executed before cancellation can be
+effected,
+.BR untimeout (9)
+will spin until the timeout function returns.
+.IP \(bu
+When
+.BR unbufcall (9)
+is called, control will not return to the caller until either the bufcall has
+been cancelled or the buffer callback has completed execution.  That is, if
+the buffer callback function was not yet called at the time that
+.BR unbufcall (9)
+was called, but the buffer callback function gets executed before cancellation
+can be effected,
+.BR unbufcall (9)
+will spin until the buffer callback function returns.
+.IP \(bu
+When
+.BR freeb (9)
+is called, control will not return to the caller until the free routine has
+completed execution.
+.\"
+.\"
+.SS "Synchronous Callback Cancellation"
+.PP
+.TS
+tab(:);
+lbw(14n)0c0ls.
+quntimeout\fR(9):\ \-\ :the \fBtimeout_id_t\fR
+qunbufcall\fR(9):\ \-\ :the \fBbufcall_id_t\fR
+.TE
+.PP
+.B @PACKAGE_TITLE@
+provides the same assurances for
+.BR quntimeout (9)
+and
+.BR qunbufcall (9)
+as are provided for
+.BR untimeout (9)
+and
+.BR unbufcall (9).
+.\"
+.\"
+.SH CONTEXT
+.PP
+The following contexts are of interest:
+.\"
+.SS STREAMS Synchronous
+Running under
+.I STREAMS
+and synchronized against the target queue.  A Stream head plumbing lock is held in the Stream to
+which the queue belongs, or the
+.B STRWOPEN
+bit is held.
+.PP
+This is the case when the Stream is frozen, or when executing a queue put or service procedure, open
+or close call-out, or a synchronous callback for the target queue.
+.I q_next
+pointers can be dereferenced for any queue in the Stream without being invalidated.
+.\"
+.SS STREAMS Asynchronous
+Running under
+.I STREAMS
+but not synchronized against the target queue.
+.PP
+This is the case when executing a synchronous procedure, call-out or callback, for a queue in one
+Stream and referencing a queue in another Stream.  It is also the case when an asynchronous callback
+(one not referenced on a queue) is being executed.
+.PP
+Under the special case when running under
+.I STREAMS
+where the target queue belongs to a Stream linked to a lower multiplex, the context can be
+considered as synchronous if the caller can suppress concurrent unlinking of the Stream.  This can
+normally be performed with private locks taken within a put or service procedure of a multiplexing
+driver.  But this is complex and best avoided by treating all such queues as asynchronous.
+.\"
+.SS Non-STREAMS Asynchronous
+Not running under
+.I STREAMS
+and not synchronized against the target queue.
+.PP
+This is the case when calling any utility from outside of
+.IR STREAMS .
+This can be from process context, software interrupt, bottom-halves, tasklets,
+.B Linux
+timeouts, interrupt service routines, etc.
+.PP
+.RI Non- STREAMS
+asynchronous contexts can be synchronized against a queue with
+.BR freezestr (9),
+.BR qwriter (9),
+.BR streams_put (9),
+.BR mps_become_writer (9).
+.\"
+.SS Validity and Exclusion
+.PP
+In a synchronous context, all
+.I q_next
+pointer dereferences for any queue in the Stream to which the synchronization queue belongs is
+valid for the duration of the context.
+In an asynchronous context, no assurances of the validity of
+.I q_next
+dereferences can be made.   This is of primary concern to
+.I STREAMS
+utilities that dereference a
+.I q_next
+pointer.
+As discussed briefly above, lower multiplex Streams are of less concern that upper multiplex Streams
+(that could be closed or have modules pushed or popped at any time).
+.PP
+When in a synchronous context with respect to a queue, a plumbing read lock is held for the Stream
+head of the Stream to which the queue belongs.  Utilities that deference
+.I q_next
+without first taking a Stream head plumbing read lock can only be called in a synchronous context.
+Utilities that acquire a Stream head plumbing read lock before dereferencing
+.I q_next
+can be called from any context, but would be wasteful and scale poorly if normally called from
+synchronous context.
+Utilities that do not dereference
+.I q_next
+and only affect the queue itself, take a queue write lock and can be called from any
+context.
+.PP
+.B Validity/Exclusion for q
+.PP
+All
+.I STREAMS
+utilities that accept a queue pointer require validity of the queue pointer across the call, but not
+exclusion: exclusion is accomplished within the utility with locks.
+.PP
+When in the synchronous context, any queue in the Stream can be passed to a utility function and it
+is guaranteed valid.  However, in the asynchronous context, the caller is responsible for ensuring
+the validity of the passed in queue pointer.  A pointer to a queue remains valid from the point that
+the
+.IR qi_qopen (9)
+routine for a queue pair is entered, until just before the
+.IR qi_qopen (9)
+routine for the queue pair is exited.
+Therefore, references to a queue that are acquired in the
+.IR qi_qopen (9)
+routine and released in the
+.IR qi_qclose (9)
+routine are guaranteed valid.
+.PP
+For example, an interrupt service routine that is established and passed a read queue pointer on
+.IR qi_qopen (9)
+for the queue pair, and if the ISR is disabled in the
+.IR qi_qclose (9)
+for the queue pair, releasing the read queue pointer,
+then the read queue pointer is valid to be used in any
+.I STREAMS
+utility called during the ISR.
+.PP
+Pointers to queues in a Stream that is linked to a lower multiplex are guaranteed valid while the
+Stream remains linked (the
+.IR qi_qclose (9)
+routine cannot be called until it is unlinked).  This is also true for
+.I q_next
+pointers, in that modules cannot be pushed or popped from a Stream linked to a lower multiplex until
+it is unlinked.
+Therefore, if a multiplexing driver can guarantee, by acquiring a private lock, that no Stream will
+be unlinked until the lock is released, a pointer to any queue in any lower multiplex Stream will be
+guaranteed valid, and the context can be considered synchronous for any Stream on the lower
+multiplex.
+Pointers to queues in an upper multiplex cannot be guaranteed in this way (because modules can be
+pushed or popped from an asynchronous Stream at any time).
+.PP
+.I STREAMS
+utilities that require exclusive access to the referenced queue, take their own write locks on the
+queue.  Therefore, the caller does not have to ensure exclusion on the
+.BR queue (9)
+structure or any attached [e.g.,
+.BR qband (9)]
+structures.
+.PP
+.B Validity/Exclusion for mp
+.PP
+All
+.I STREAMS
+utilities that accept a message pointer require both validity of the message pointer across the
+call, exclusion on the message block across the call, and exclusion on the data block or buffer of
+the message altered by the utility across the call.
+.PP
+When in a synchronous context and the message has been passed to the queue's put procedure, removed
+from the the queue by its service procedure, or freshly allocated (regardless of context), the
+message pointer is guaranteed valid until passed to another put procedure.
+.PP
+Whenever a dereference of a message pointer is valid, the holder of the dereference has exclusive
+access to the
+.BR msgb (9)
+message block structure.
+If the
+.BR datab (9)
+data block structure has a reference count
+.I db_ref
+of one, the holder also has exclusive access to the data block.  If the holder has exclusive access
+to the data block and there is no extended buffer attached to the data block (i.e., it was allocated
+with
+.BR allocb (9)
+and not
+.BR esballoc (9),
+the holder also has exclusive access to the data buffer.
+When
+.I db_ref
+is greater than 1, the easiest way to obtain exclusion from the data block and data buffer is to
+copy the data block using utilities such as
+.BR copyb (9)
+or
+.BR copymsg (9). 
+.\"
+.SS "Stream Ends and Multiplexing"
+.PP
+Passing of messages along a Stream using
+.I q_next
+pointers and the
+.RI \(lq next \(rq
+versions of the
+.I STREAMS
+utilities
+.RB ( putnext (9),
+.BR canputnext (9),
+.BR bcanputnext (9),
+.BR qreply (9))
+is simple and straightforward.  These functions are always invoked from within one of queue pair's
+procedures, and Stream synchronization is performed before entering the procedure within which they
+are called.  These are
+.I STREAMS
+synchronous contexts.
+.PP
+.IR "Stream ends" ,
+(Stream head, Driver, Upper Multiplexer, Lower Multiplexer), on the other hand are more problematic
+because they interface with contexts within which Stream synchronization has not been performed.
+These are asynchronous contexts and are more problematic.
+.PP
+A Stream end exists at the queue pair forming the Stream head, Driver, or Upper or Lower Multiplexer;
+each is separately discussed:
+.PP
+Interaction between user process context and the Stream head is performed by the
+specialized functions of the Stream head.  Modules and drivers do not normally need to provide any
+of these procedures.
+.\"
+.SS Driver Read Queue
+.PP
+For the driver read queue there are two approaches as well.  Again, the first is not problematic,
+the second is.
+.PP
+.B Approach #1.
+.PP
+Under the first approach, the driver read queue has both a put and a service procedure.
+For driver read queues with service procedures, the non-MP approach used to be not even define a put
+procedure, but to place messages directly on the read queue, using
+.BR putq (9).
+All actions would then be taken out of the driver read queue's service procedure.
+Some variations, however, would use
+.BR canputnext (9)
+or
+.BR bcanputnext (9)
+when determining whether to use
+.BR putq (9)
+or
+.BR putnext (9).
+.PP
+The pure
+.BR putq (9)
+variation is still a viable approach for
+.BR "@PACKAGE_TITLE@" .
+.BR putq (9)
+does not dereference any
+.I q_next
+pointer, and takes the queue write locks necessary to protect the queue structure both inside and
+outside of
+.IR STREAMS .
+A more portable MP approach is to provide a put procedure that simply does a
+.BR putq (9)
+and use the
+.BR put (9s)
+call to invoke it.
+.PP
+Calling
+.BR canputnext (9)
+or
+.BR bcanputnext (9)
+however, does dereference a
+.I q_next
+pointer and are not MP-SAFE from an asynchronous context.
+Drivers using these variations must define a put procedure and invoke it with
+.BR put (9s)
+to enter a
+.I STREAMS
+synchronous context (the put procedure), before calling any of the
+.RI \(lq next \(rq
+versions of functions such as
+.BR putnext (9),
+.BR canputnext (9),
+or
+.BR bcanputnext (9).
+.PP
+If an ISR feeding a driver read queue with a service procedure needs to determine whether the queue
+is full for a given band,
+before calling
+.BR put (9s),
+the ISR or bottom half can call
+.BR canput (9)
+or
+.BR bcanput (9)
+from outside of
+.I STREAMS
+synchronization. Under all implementation this seems acceptable as long as the driver read queue has
+a service procedure (otherwise, these functions might try to scan upstream for a queue with a
+service procedure, dereferencing
+.I q_next
+pointers along the way).
+.PP
+.B Approach #2.
+.PP
+The second approach defines a put procedure but no service procedure for the driver read queue.  The 
+classical non-MP approach was to either call the put procedure directly using the
+.I qi_putp
+function pointer, or to not define a put procedure and make calls to
+.BR putnext (9)
+directly from the ISR or bottom half.
+This approach cannot work on MP.
+.BR putnext (9)
+cannot be called from outside
+.I STREAMS
+synchronous context.
+.PP
+For MP, the proper technique is to define a put procedure and use
+.BR put (9s)
+to invoke it.  Once within the put procedure,
+.BR putnext (9)
+can be called safely.
+.PP
+.B Summary.
+.PP
+All implementations of
+.I STREAMS
+use
+.BR put (9s)
+to enter a
+.I STREAMS
+synchronous context and invoke the put procedure for the specified queue.  All driver read qeues
+must define a put procedure, and
+.BR put (9s)
+is the only way that messages should be passed to the queue from outside of
+.IR STREAMS .
+Driver must be aware, however, that the put procedure of the driver read queue might not be directly
+invoked as a function call, but might be deferred for later execution in a different context.
+On the other hand, when invoke directly from an ISR, the put procedure might run in ISR context.
+Whether the driver read queue has a service procedure or not is according to its own design,
+however, it is more portable to provide one and never call
+.BR putnext (9)
+from the driver read queue put procedure, only the service procedure.  This is because calling
+.BR putnext (9)
+will invoke the upstream module's put procedure in ISR context and on the ISR stack.  The upstream
+module might not be prepared for this.
+.\"
+.SS Driver Write Queue.
+.PP
+The driver write queue can be implemented in one of two ways.  The first is not problematic.  The
+second is.
+.PP
+.B Method #1.
+.PP
+In the first method, the driver write queue has both a put and a service procedure.  The put
+procedure responds to critical or immediate messages and places all data messages onto the message
+queue.  The service procedure removes messages from the message queue and outputs them to the hardware.
+If there is too much data for the hardware to accept, the service procedure places the message back
+on the queue and returns.  When a hardware interrupt makes it possible for the service procedure to
+again write data, the transmit ISR enables the write queue by calling
+.BR enableq (9)
+or
+.BR qenable (9).
+.PP
+A similar approach can be taken if the driver is a pseudo-device (software) driver rather than a
+hardware device driver.  Instead of outputing to the hardware, the service procedure takes the data
+from messages and passes in some manner to the external subsystem.
+.PP
+This first method is quite portable.
+.PP
+.B Method #2.
+.PP
+In the second method, the driver write queue has only a put procedure.  The put procedure responds
+to critical or immediate messages and places all data messages onto the message queue.  The transmit
+ISR (or a bottom half of the transmit ISR) directly performs the functions performed by the service
+procedure in the first method above.
+.PP
+The routine uses
+.BR rmvq (9),
+.BR getq (9),
+.BR flushq (9),
+.BR flushband (9),
+and
+.BR appq (9),
+.BR insq (9),
+.BR putq (9),
+.BR putbq (9),
+in the same fashion as a service procedure would.  Under
+.BR "@PACKAGE_TITLE@" ,
+.BR rmvq (9),
+.BR getq (9),
+.BR flushq (9),
+.BR flushband (9),
+are safe to be called asynchronously on a Stream end.  The difference with this approach, however,
+is that the method is only applicable to MP-SAFE drivers, because synchronization with the framework
+is not peformed for an interrupt service routine.
+.PP
+This method relies on
+.BR canputnext (9)
+and
+.BR bcanputnext (9)
+setting the
+.BR QWANTW
+and
+.BR QB_WANTW
+bits on the driver write queue even though it does not have a service procedure.  This is provided
+for under
+.IR "SVR 4 STREAMS" .
+.[
+svr4spg
+.]
+.BR canputnext (9)
+and
+.BR bcanputnext (9)
+will operate on a queue that has no next queue regardless of whether it has a service procedure or
+not.
+.PP
+This second method is not as portable
+.IR "to other implementations" .
+.PP
+.B Summary.
+.PP
+Because the first method, for all intents and purposes, should perform just as well as the second
+method, it is recommended that portable
+.I STREAMS
+drivers and modules only use the first method for driver write queues.  Under the first method, only
+.BR enableq (9)
+or
+.BR qenable (9)
+are called from outside of the
+.I STREAMS
+synchronous context, and the interface between Stream and ISR is simple.
+.\"
+.SS Upper Multiplexer Read Queue
+.PP
+Passing messages between upper multiplexer Streams, or from a lower multiplexer Stream to an upper
+on is problematic, because the procedure passing the message is not in a synchronous context with
+respect to the Stream to which messages are being passed.  Each upper multiplexer Stream, when used
+in this fashion, should be treated like the driver read queue described above.  That is, each upper
+multiplexer Stream must have a read queue put procedure, and that procedure must be invoked using
+.BR put (9s).
+.BR canput (9)
+and
+.BR bcanput (9)
+can be used on any upper multiplexer Stream read queue provided that the caller can ensure that the
+passed in queue pointer will remain valid across the call (e.g, the Stream will not close).
+.\"
+.SS Upper Multiplexer Write Queue
+.PP
+The upper multiplexer write queue should follow the procedures and recommendations decribed for the
+driver write queue.  The upper multiplexer write queue can be implemented with or without a service
+procedure.
+.\"
+.SS Lower Multiplexer Write Queue
+.PP
+.\"
+.SS Lower Multiplexer Read Queue
+.PP
+The lower multiplexer read queue should follow the procedures and recommendations decribed for the
+driver write queue, except in an upside-down sense.  The lower multiplexer read queue can be
+implemented with or without a service procedure.
+.PP
+.\"
+.SS "Queue Handling Functions"
+.PP
+Whether a
+.I STREAMS
+utility needs to be called in on a frozen or thawed Stream, and whether it needs to be called from a
+.I STREAMS
+synchronous context, or can be called from an asynchronous context, is tabulated below.
+.PP
+.TS
+tab(:);
+ltbctbctbltbsss
+ltbctctltsss.
+_
+Macros:Context:State:Notes
+_
+RD\fR(9):either:either:T{
+These macros can be called from any context.  It does not matter whether the
+Stream
+is frozen by the caller or not.  The caller is responsible for the validity of the passed in
+queue pointer
+.I q
+across the call.
+T}
+WR\fR(9):either:either:\^
+OTHERQ\fR(9):either:either:\^
+SAMESTR\fR(9):sync:either:
+_
+.T&
+ltbctbctbltbsss
+ltbctctltsss.
+UP Functions:Context:State:Notes
+_
+appq\fR(9):either:frozen:T{
+Can be called from any context.  The Stream should be frozen by the caller.
+Takes ownership of the passed in message on success, not on failure.
+T}
+insq\fR(9):either:frozen:\^
+putq\fR(9):either:thawed:\^
+putbq\fR(9):either:thawed:\^
+
+rmvq\fR(9):either:frozen:T{
+These utilities dereference a
+.I q_next
+pointer in the Stream, and must be called from a synchronous context for in intermediate module, but
+may be called in asynchronous context for a Stream end.  The Stream can also, however, be
+frozen by the caller.
+.BR rmvq (9)
+must be called with the Stream frozen by the caller.
+T}
+getq\fR(9):either:thawed:\^
+flushq\fR(9):either:thawed:\^
+flushband\fR(9):either:thawed:\^
+
+.T&
+ltbctctltsss.
+bcanput\fR(9):either:thawed:T{
+These two can only be called from an
+asynchronous context
+when the queue that is the argument of the call has a
+.IR qi_srvp (9)
+service procedure.  Otherwise, they must be called from a
+context synchronized on the queue.
+T}
+canput\fR(9):either:thawed:\^
+
+canenable\fR(9):either:thawed:T{
+Can be called from any context.  The Stream may be frozen by the caller.
+T}
+enableok\fR(9):either:thawed:\^
+enableq\fR(9):either:thawed:\^
+noenable\fR(9):either:thawed:\^
+putctl\fR(9):either:thawed:\^
+putctl1\fR(9):either:thawed:\^
+putctl2\fR(9):either:thawed:\^
+qenable\fR(9):either:thawed:\^
+qsize\fR(9):either:either:\^
+
+backq\fR(9):sync:thawed:T{
+These utilities dereference a
+.I q_next
+pointer in the Stream, and must be called from a synchronous context.
+The Stream can, however, be frozen by the caller.
+.BR backq (9)
+is the worst: if not called from a synchronous context, the return value cannot be considered
+valid.
+T}
+qcountstrm\fR(9):sync:thawed:\^
+qreply\fR(9):either:thawed:\^
+_
+.T&
+ltbctbctbltbsss
+ltbctctltsss.
+MP Functions:Context:State:Notes
+_
+freezestr\fR(9):either:thawed:T{
+These must be called from a thawed state and may be called from any context.
+Both of these functions enter a synchronous context on
+.IR q .
+.BR put (9s)
+exits the synchronous context before returning;
+.BR freezestr (9)
+does not (it takes
+.BR unfreezestr (9)
+to exit the synchronous context).
+T}
+put\fR(9s):either:thawed:T{
+Can be called from any context.  The Stream may be frozen by the caller.
+T}
+
+qprocsoff\fR(9):close:thawed:T{
+These must be called from a thawed state and must only be called from a
+.IR qi_qopen (9)
+or
+.IR qi_qclose (9)
+routine belonging to
+.IR q .
+T}
+qprocson\fR(9):open:thawed:\^
+
+bcanputnext\fR(9):either:thawed:T{
+These utilities dereference a
+.I q_next
+pointer in the Stream,
+and must be called from a
+synchronous context.  The Stream can, however, be frozen by the caller.
+T}
+canputnext\fR(9):either:thawed:\^
+putnext\fR(9):either:thawed:\^
+putnextctl\fR(9):either:thawed:\^
+putnextctl1\fR(9):either:thawed:\^
+putnextctl2\fR(9):either:thawed:\^
+
+strqset\fR(9):either:frozen:T{
+Can be called from any context.  They take or return a queue state variable and, therefore, the
+Stream must be frozen by the caller.
+T}
+strqget\fR(9):either:frozen:\^
+
+unfreezestr\fR(9):\(en:frozen:T{
+Must be called with the Stream frozen by the caller.
+T}
+.TE
+.PP
+Following are general rules for the use of these functions:
+.IP \(bu \w'\(bu\(em'u
+Bracketing a code sequence with
+.BR freezestr (9)
+and
+.BR unfreezestr (9),
+permits an otherwize asynchronous code sequence to run within an exclusive, synchronous context on
+.IR q .
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will only call
+.BR appq (9),
+.BR insq (9),
+.BR rmvq (9),
+.BR strqget (9),
+.BR strqset (9),
+for a Stream frozen by the caller.
+.IP \(bu
+In general,
+.BR appq (9),
+.BR insq (9),
+.BR rmvq (9),
+.BR strqset (9),
+.BR strqget (9),
+must be called with the Stream, containing
+.IR q ,
+frozen by the caller.
+.B "@PACKAGE_TITLE@"
+permits all utilities
+(except
+.BR freezestr (9),
+.BR qprocson (9),
+.BR qprocsoff (9))
+to be called on a Stream frozen by the caller, because it uses caller
+recursive freeze locks, however, some implementations will lock the kernel.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will not call any other queue utilities with the Stream frozen
+by the caller.
+.IP \(bu
+Some implementations place restrictions on
+.BR putq (9),
+.BR putbq (9),
+and utilities that place messages on the queue.
+.B "@PACKAGE_TITLE@"
+permits all utilities that place mesages on or remove message from a queue to be called from outside
+a procedure of
+.IR q ,
+providing that the caller ensures the validity of
+.I q
+across the call.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will call utilities the places messages on the queue (other than
+.BR putq (9))
+only from within a procedure belonging to
+.IR q .
+.IP \(bu
+Some implementations place restrictions on
+.BR getq (9),
+.BR flushq (9),
+.BR flushband (9),
+and queue utilities that remove messages from the queue.
+.B "@PACKAGE_TITLE@"
+permits all utilities that place mesages on or remove message from a queue to be called from outside
+a procedure of
+.IR q ,
+providing that the caller ensures the validity of
+.I q
+across the call.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will call utilities the remove messages from the queue
+only from within a procedure belonging to
+.IR q .
+.IP \(bu
+For testing flow control and passing messages to a put procedure,
+.BR canput (9),
+.BR bcanput (9),
+.BR put (9s),
+.BR putctl (9),
+.BR putctl1 (9),
+.BR putctl2 (9),
+can be called from an asynchronous context and passed a queue from a Stream end queue pair.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will only call these functions
+with a Stream end queue pointer,
+.IR q .
+Portable
+.I STREAMS
+drivers and modules will also only call
+.BR canput (9)
+and
+.BR bcanput (9)
+and if
+.I q
+has a
+.IR qi_srvp (9)
+service procedure.
+.IP \(bu
+.BR canputnext (9),
+.BR bcanputnext (9),
+.BR putnext (9),
+.BR putnextctl (9),
+.BR putnextctl1 (9),
+.BR putnextctl2 (9),
+must be called from a
+.I STREAMS
+synchronous context on
+.IR q ;
+that is, from
+.IR q 's
+put or service procedure.
+.B "@PACKAGE_TITLE@"
+allows these to be called from an asynchronous context, and on a Stream frozen by the caller, as
+well.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules can call these functions from an asynchronous context, but must ensure the
+validity of the
+.I q
+pointer passed to them across the call.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.\"
+.\"
+.SS Plumbing
+.PP
+Most plumbing operations performed on a Stream are performed from user process context (i.e., in
+response to a system call).
+One exception is
+.BR weldq (9)
+and
+.BR unweldq (9)
+if they were to be called from a
+.IR qi_putp (9)
+procedure instead of a
+.IR qi_qopen (9)
+or
+.IR qi_qclose (9)
+routine.
+.PP
+Plumbing operations include
+.BR open (2s),
+.BR close (2s),
+.BR I_POP (7),
+.BR I_PUSH (7),
+.BR weldq (9),
+.BR unweldq (9).
+So, generally, any operation that invokes
+.IR qi_qopen (9)
+or
+.IR qi_qclose (9)
+to create or destroy the queue pair instance of a driver or module in a Stream, plus any welding of
+Streams.
+.BR I_LINK (7),
+.BR I_UNLINK (7),
+.BR I_PLINK (7),
+.BR I_PUNLINK (7),
+are not plumbing operations in the sense that they do not alter
+.I q_next
+pointers.
+.PP
+.B "@PACKAGE_TITLE@"
+.[
+@PACKAGE@-@VERSION@
+.]
+provides a specialized plumbing reader-writer lock in the Stream head to protect the
+.I q_next
+pointers (i.e., the plumbing) in a Stream.  When the plumbing reader-writer lock is acquired for
+read, any
+.I q_next
+pointer in the entire Stream can be dereferenced and the dereference will remain valid until the
+lock is released.
+The reader-writer lock is acquired for write by any plumbing operation, as was described above.
+.PP
+All queue procedures, call-outs, and synchronous callbacks associated are synchronized against a
+queue that belongs to a Stream which has a Stream head.  Before the synchronous procedure, call-out
+or callback is invoked, the
+.I STREAMS
+scheduler thread acquires the Stream head (associated with the synchronizing queue) plumbing
+reader-writer lock for read.  This means that any queue procedure, call-out, and callback,
+synchronized on a queue, can dereference any
+.I q_next
+pointer within the Stream to which the synchronizing queue belongs, without any special treatment.
+.PP
+Some other implementations (e.g.,
+.IR HP-UX \(rg,
+.[
+hpuxspg
+.]
+place restrictions upon which queue pointers can be passed to which utility functions and which
+utility functions can be called from within the
+.I STREAMS
+framework and which can be called from outside the
+.I STREAMS
+framework.
+.PP
+.B "@PACKAGE_TITLE@"
+does not place such restrictions on most
+.I STREAMS
+utilities.  The only
+.I STREAMS
+utilities that are restricted are
+.BR qprocson (9),
+and
+.BR qprocsoff (9),
+which must be called from a
+.IR qi_qopen (9)
+open, or
+.IR qi_qclose (9)
+close routine for a driver or module.
+The remaining utilities can be called from outside of
+.I STREAMS
+provided that the caller can ensure the validity of any passed in queue pointer,
+.IR q ,
+and exclusive access to any passed in message,
+.IR mp .
+.PP
+The validity of a passed in queue pointer, or its
+.I q_next
+pointer is guaranteed by
+.B "@PACKAGE_TITLE@"
+whenever it (or its pair) was passed to a module procedure, callout, or synchronous callback.
+Asynchronous callbacks passed
+.I q
+(or its pair) as an argument from a module procedure, callout, or synchronous callback, may
+also use
+.I q
+or
+.IR q->q_next .
+.PP
+From outside of a module procedure, callout, or callback that meets the above criteria, the caller
+must ensure the validity of the passed in
+.I q
+pointer.  From an asynchronous callback associated with
+.IR q ,
+provided that the driver or module follows rules for cancelling asyncrhonous callbacks in the driver
+or modules
+.IR qi_qclose (9)
+close routine,
+.I q
+is valid within the asyncrhonous callback.
+.PP
+Within a device, pseudo-device or multiplexing driver, either the driver's upper multiplex read
+queue or the driver's lower multiplex write queue can be passed to most functions, provided that the
+driver will not offer any reference to
+.I q
+to asynchronous  procedures before
+.BR qprocson (9)
+has returned, and will
+cancel any reference to
+.I q
+available to these asychronous procedures (e.g., interrupt service routines) before the call to
+.BR qprocsoff (9).
+Also, the multiplexing driver can pass the
+.I q
+pointer of a lower mutliplexer write queue, provided that the driver can make the same assurances
+with regard to the
+.BR I_LINK (7),
+.BR I_PLINK (7),
+.BR I_UNLINK (7),
+.BR I_PUNLINK (7)
+operations.
+.PP
+Under
+.B "@PACKAGE_TITLE@"
+it is always safe to use the form,
+.BI canput( q->q_next )
+as well as
+.BI canputnext( q ),
+even
+.BI put( q->q_next )
+instead of
+.BI putnext( q ),
+from within a module procedure, callout, synchronous callback, or asynchronous callback invoked from
+within a context synchronous on
+.IR q .
+From a purely asynchronous module procedure, callback, or subsystem outside of
+.IR STREAMS ,
+the
+.I q->q_next
+form is forbidden.  From these asynchronous contexts, use the
+.RB \(lq next \(rq
+versions of the functions when referring to the next queue instead.
+.PP
+.B "@PACKAGE_TITLE@"
+provides maximum portability and compatibility in this regard.
+.\"
+.\"
+.SS Freezing
+.PP
+In the Uni-Processor (UP) environment, it was sufficient to raise the system priority level
+to ensure that no other queue procedures or thread were accessing the
+Stream.
+This was performed with
+.BR splstr (9)
+and
+.BR splx (9).
+.PP
+In the Symmetric Multi-Processor (SMP) environment, it is also necessary to hold a lock to block
+other processors from entering the critical section.
+This is achieved by freezing the
+Stream
+with
+.BR freezestr (9)
+and thawing it with
+.BR unfreezestr (9).
+.RS
+.ll -7n
+.PP
+.B Note:
+when
+.BR freezestr (9)
+is called in a Uni-Processor (UP) environment, it is equivalent to
+.BR splstr (9);
+.BR unfreezestr (9),
+.BR splx (9).
+.ll +7n
+.RE
+.PP
+Freezing a Stream results in local interrupts being suppressed and the Stream head reader-writer
+freeze lock being held for write.  The Stream head reader-writer plumbing lock is also acquired for
+read.  Thawing a Stream releases the read and write locks and restores local interrupts.
+.PP
+The Stream head plumbing reader-writer lock is acquired for write by any plumbing operation on the
+Stream that would change
+.I q_next
+pointers on either queue pair.
+Holding the Stream head plumbing read lock blocks any plumbing changes to the Stream.
+.PP
+The Stream head freeze reader-writer lock is acquired for read by any thread other than
+the freezing thread entering a queue procedure
+.RI [ qi_putp "(9) or " qi_srvp (9)].
+After being acquired, the read lock is immediately released.  This stops any queue procedure from
+being entered after the Stream is frozen by any thread other than the thread that froze the Stream,
+but allows threads already executing in a queue procedure to proceed.  This is in accordance with
+the descriptions for
+.BR freezestr (9).
+.PP
+Many other implementations require that a Stream (and queue) be frozen by the caller with
+.BR freezestr (9),
+across a call to
+.BR appq (9),
+.BR insq (9),
+.BR rmvq (9),
+.BR strqget (9),
+.BR strqset (9),
+and require that a Stream (and queue)
+.B not
+be frozen by the caller with
+.BR freezestr (9),
+across a call to
+.BR putq (9),
+.BR putbq (9),
+.BR getq (9),
+.BR put (9s),
+.BR putnext (9),
+.BR canput (9),
+.BR canputnext (9),
+.BR bcanput (9),
+.BR bcanputnext (9),
+and a host of others.
+The precise functions vary from implementation to implementation.  See
+.BR freezestr (9)
+for more information.
+.PP
+.B "@PACKAGE_TITLE@"
+permits all queue functions other than
+.BR qprocson (9),
+.BR qprocsoff (9),
+.BR freezestr (9),
+to be called on a Stream frozen by the caller.
+.B "@PACKAGE_TITLE@"
+also permits
+.BR appq (9),
+.BR insq (9),
+.BR rmvq (9),
+.BR strqget (9),
+.BR strqset (9),
+to be called on a thawed Stream provided that the caller provides some other mutual exclusion to
+guarantee the validity of any arguments that reference a message on the queue.
+For example, a driver's read queue can only have messages placed on the queue and taken off of the
+the queue by a driver procedure.  With driver-private locks, it is possible to ensure that at a
+given point in time the queue state is frozen even though the Stream is thawed.
+.PP
+.B "@PACKAGE_TITLE@"
+provides maximum portability and compatibility in this regard.
+.\"
+.\"
+.SS Queue Pointers
+.PP
+In the Uni-Processor (UP) environment, calling
+.BR splstr (9)
+is sufficient to ensure that a valid queue pointer
+.I q
+will not invalidate across a call to any function until
+.BR splx (9)
+was called.  This is not the case in the Symmetric Multi-Processor (SMP) environment.
+.PP
+In the SMP environment, another processor may be executing
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedures, or synchronous callbacks, concurrent with
+.IR qi_qopen (9)
+or
+.IR qi_qclose (9)
+procedures.
+Utilities called from the
+.RI non- STREAMS
+context (process context, asynchronous callbacks, soft interrupts, and interrupt service routines)
+can execute concurrent with any procedures within the
+.I STREAMS
+environment
+.RI ( qi_qopen (9),
+.IR qi_qclose (9),
+.IR qi_putp (9),
+.IR qi_srvp (9),
+synchronous callbacks, buffer free routines).
+.IR qi_qopen (9)
+and
+.IR qi_qclose (9)
+procedures, in particular, can cause
+.I q_next
+pointers to change, and
+.IR qi_qclose (9)
+procedures can also result in the deallocation of queues.
+The only
+.I STREAMS
+utilities that are provided that permit blocking of plumbing changes to the
+Stream
+are
+.BR freezestr "(9), " unfreezestr (9)
+and
+.BR MPSTR_STPLOCK "(9), " MPSTR_STPRELE (9)
+(from the
+.BR uw7compat (9)
+module.)
+.\"
+.\"
+.SS Message Pointers
+.PP
+In both the UP and SMP environments, it is the responsibility of the caller to ensure exclusive
+access to any message pointer
+.I mp
+passed to any message handling or queue handing function.  Exclusive access does not have to be
+ensured to the data blocks associated with the messages, and in particular the
+.I db_ref
+member.
+.\"
+.\"
+.SS Locking
+.PP
+Following is a discussion of the locking used in
+.BR "@PACKAGE_TITLE@" :
+.PP
+.B @PACKAGE_TITLE@
+performs reference counting on all
+.I STREAMS
+objects.  Reference counting ensures that objects are not destroyed until the last reference to them
+is released.  This means that no reference will be invalidated while it is still being used.  There
+are several primary
+.I STREAMS
+object upon which most other references depend:
+the driver,
+.BR cdevsw (9)
+structure;
+the module
+.BR fmodsw (9)
+structure;
+the Stream head,
+.BR stdata (9)
+structure; the queue,
+.BR queue (9)
+structure;
+the synchronization queue,
+.BR syncq (9)
+structure.
+.PP
+Of these, the most delicate and complicated references are the reference to the Stream head,
+.BR stdata (9)
+structure from the
+.B inode
+and
+.B file
+pointer.
+.PP
+To protect the reference to a Stream head,
+.BR stdata (9)
+structure, from the
+.BR inode ,
+the
+.B inode
+.I i_sem
+semaphore
+is acquired before referencing from, or invalidating the reference to, the Stream head.
+This is also true for the
+.B file
+pointer
+.IR private_data :
+we hold the
+.B inode
+.I i_sem
+semaphore
+while acquiring a reference to the Stream head via the
+.B file
+pointer, and also hold the
+semaphore
+while clearing the
+.I private_data
+pointer.
+(This means a fair amount of
+semaphore
+taking and releasing when performing system calls.
+In newer kernels the
+.B inode
+.I i_lock
+spinlock can use used instead of the semaphore to reduce the locking overheads.)
+.PP
+The Stream head has associated with it a queue pair.  While the Stream head reference is valid,
+there always exists a Stream head queue pair.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B MP-STREAMS
+synchronization is a complex and difficult part of any
+.I STREAMS
+implementation.  Performance and implementation specifics can cause the behaviour of modules or
+drivers invoking synchronization to differ from implementation to implementation.  Portable
+.I STREAMS
+drivers and modules will, and all new projects should, be written to be fully MP-SAFE and will set
+the
+.B D_MP
+flag.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR qi_qopen (9),
+.BR qi_qclose (9),
+.BR qi_putp (9),
+.BR qi_srvp (9),
+.BR mi_open_comm (9),
+.BR mi_close_comm (9),
+.BR streams_open_comm (9),
+.BR streams_close_comm (9),
+.BR ddi_get_soft_state (9),
+.BR timeout (9),
+.BR itimeout (9),
+.BR dtimeout (9),
+.BR bufcall (9),
+.BR esbbcall (9),
+.BR esballoc (9),
+.BR untimeout (9),
+.BR unbufcall (9),
+.BR freemsg (9),
+.BR qtimeout (9),
+.BR qbufcall (9),
+.BR qwriter (9),
+.BR weldq (9),
+.BR unweldq (9),
+.BR streams_put (9),
+.BR quntimeout (9),
+.BR qunbufcall (9),
+.BR freezestr (9),
+.BR qwriter (9),
+.BR streams_put (9),
+.BR mps_become_writer (9),
+.BR queue (9),
+.BR qband (9),
+.BR msgb (9),
+.BR datab (9),
+.BR allocb (9),
+.BR esballoc (9),
+.BR copyb (9),
+.BR copymsg (9),
+.BR qreply (9),
+.BR putq (9),
+.BR canputnext (9),
+.BR bcanputnext (9),
+.BR putnext (9),
+.BR put (9s),
+.BR enableq (9),
+.BR qenable (9),
+.BR rmvq (9),
+.BR getq (9),
+.BR flushq (9),
+.BR flushband (9),
+.BR appq (9),
+.BR insq (9),
+.BR putq (9),
+.BR putbq (9),
+.BR RD (9),
+.BR WR (9),
+.BR OTHERQ (9),
+.BR SAMESTR (9),
+.BR bcanput (9),
+.BR canput (9),
+.BR canenable (9),
+.BR enableok (9),
+.BR enableq (9),
+.BR noenable (9),
+.BR putctl (9),
+.BR putctl1 (9),
+.BR putctl2 (9),
+.BR qenable (9),
+.BR qsize (9),
+.BR backq (9),
+.BR qcountstrm (9),
+.BR unfreezestr (9),
+.BR strqset (9),
+.BR strqget (9),
+.BR qprocson (9),
+.BR qprocsoff (9),
+.BR weldq (9),
+.BR unweldq (9),
+.BR open (2s),
+.BR close (2s),
+.BR I_POP (7),
+.BR I_PUSH (7),
+.BR I_LINK (7),
+.BR I_UNLINK (7),
+.BR I_PLINK (7),
+.BR I_PUNLINK (7),
+.BR splstr (9),
+.BR splx (9),
+.BR MPSTR_STPLOCK (9),
+.BR MPSTR_STPRELE (9),
+.BR cdevsw (9),
+.BR fmodsw (9),
+.BR stdata (9),
+.BR queue (9),
+.BR syncq (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.B MP-STREAMS
+mechanism has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B MP-STREAMS
+mechanism is compatible with
+.I "SVR 4.2 MP"
+.[
+usldk
+.]
+and implementations based on
+.I "SVR 4.1 MP"
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+See the text for discussion of issues.
+.IP \(em
+Some implementations do not support syncrhonization: under these
+implementations (e.g.
+.IR UnixWare \(rg,
+.[
+uw7spg
+.]
+.IR IRIX \(rg,
+.[
+irixspg
+.]
+.IR SUX \(rg,
+.[
+suxspg
+.]
+.IR UXP/V \(rg)
+.[
+uxpspg
+.]
+all
+.I STREAMS
+modules and drivers that run on an MP system must be fully MP-SAFE.
+.IP ""
+.B @PACKAGE_TITLE@
+allows the use of synchronization; however, the package might have to have
+been compiled with compile option
+.B CONFIG_STREAMS_SYNCQS
+defined.
+However, portable
+.I STREAMS
+modules and drivers will be written (or converted) to be fully MP-SAFE an will
+not use syncrhonization.
+.IP \(em
+Some implementations do not permit some
+.I STREAMS
+utility functions to be called for a Stream end,
+some do.
+.IP ""
+.B @PACKAGE_TITLE@
+allows all
+.I STREAMS
+utility functions to be called for a Stream end.
+.IP \(em
+Some implementations do not permit some
+.I STREAMS
+utility functions to be called on a Stream frozen by the caller with
+.BR freezestr (9),
+some do.
+.IP ""
+.B @PACKAGE_TITLE@
+allows all
+.I STREAMS
+utility functions to be called on a Stream frozen by the caller with
+.BR freezestr (9).
+.IP \(em
+Some implementations (e.g.
+.IR HPUX \(rg,
+.[
+hpuxspg
+.]
+.IR OSF/1 \(rg,
+.[
+osfspg
+.]
+and
+.IR IRIX \(rg)
+.[
+irixspg
+.]
+do not permit some (or all)
+.I STREAMS
+utility functions to be called from interrupt.
+.IP ""
+.B @PACKAGE_TITLE@
+allows all
+.I STREAMS
+utility functions to be called form interrupt.
+.IP \(em
+For the most part,
+.B @PACKAGE_TITLE@
+permits some functions to be called where other implementations do not.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not rely on the fact that a function is prohbited in
+a specific context; however,
+protable
+.I STREAMS
+modules and drivers will not assume that all utility functions are permitted
+in all contexts.
+.IP \(em
+.I STREAMS
+syncrhonization is poorly documented for most systems and is treated uniquely
+on most.  Some implementations do not support
+.I STREAMS
+syncrhonization at all.  (For example,
+.IR IRIX \(rg
+.[
+irixspg
+.]
+does not support
+.I STREAMS
+synchronization at all: all modules are required to be MT-SAFE and must set
+.B D_MP
+in
+.IB pfx devflag \fR.)
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not require syncrhonization and will be written to be
+MT- and MP-SAFE.
+.IP \(em
+.IR AIX \(rg
+.[
+aixspg
+.]
+states that syncrhonization level
+.B SQLVL_GLOBAL
+reduces STREAMS to be single threaded (regardless of the setting of other
+modules).
+.IR MacOT \(rg,
+.[
+macspg
+.]
+.IR OSF/1 \(rg
+.[
+osfspg
+.]
+and
+.IR HPUX \(rg
+.[
+hpuxspg
+.]
+state that
+syncrhonization level
+.B SQLVL_GLOBAL
+only single threads the modules that are syncrhonized under that level (making
+it, however, little different than
+.B SQLVL_ELSEWHERE
+with a common name).
+Therefore,
+.B @PACKAGE_TITLE@
+implements
+.B SQLVL_GLOBAL
+specified to the corresponding registration functions as
+.B SQLVL_ELSEWHERE
+with the common name
+.RB \(lq global \(rq,
+whereas when the
+.IR AIX \(rg
+.[
+aixspg
+.]
+registration function specifies
+.BR SQLVL_GLOBAL ,
+it is treated as
+.BR SQLVL_GLOBAL .
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not specify
+.B SQLVL_GLOBAL
+for synchronization.
+.IP \(em
+.IR HPUX \(rg
+.[
+hpuxspg
+.]
+states that open and close routines associated with a Stream a synchronized
+(with put and service procedures) at minimum an queue pair synchronization.
+Also, it states that only one open or close routine runs at a time (there is
+not concurrency between open and close for any Stream).  Because of this, if a
+thread sleeps in an open or close routine, it must use a special sleep
+function to release the sycnhronization before sleeping.
+.IP ""
+For compatibility with
+.IR HPUX \(rg,
+.B @PACKAGE_TITLE@
+implements a global outer barrier that is entered exclusive by open and close
+routines for drivers and modules registered using
+.IR HPUX \(rg
+.[
+hpuxspg
+.]
+compatible registration functions.
+.IP \(em
+.IR MacOT \(rg
+.[
+macspg
+.]
+states that when the syncrhonization level is
+.B SQLVL_QUEUE
+that an outer exclusive barrier exists at the queue pair level for open and
+close routines.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not rely upon exclusive syncrhonization at an outer
+barrier.
+.IP \(em
+.IR VxWorks \(rg
+.[
+vxwspg
+.]
+states that only one open and close routine associated with a module executes
+at any given point in time (regardless of whether
+.BR SQLVL_QUEUEPAIR " or " SQLVL_QUEUE
+is set) and that special sleep functions must be called if a thread sleeps in
+an open or close routine.  This is similar to
+.IR Solaris \(rg
+.[
+solspg
+.]
+with flag
+.BR D_MTOUTPERIM " and " D_MTOCEXCL
+set in addition to
+.BR D_MTPERQ " or " D_MTQPAIR .
+.IP \(em
+.IR MacOT \(rg
+.[
+macspg
+.]
+does not support
+.B SQLVL_ELSEWHERE
+but supports a buddy mechanism for
+.B SQLVL_MODULE
+modules that is similar.
+.IR MacOT \(rg
+.[
+macspg
+.]
+also supports specialized level
+.BR SQLVL_SPLITMODULE ,
+which is similar to
+.BR SQLVL_MODULE ,
+but which allows on thread on the read side and one thread on the write side
+of the module.
+.B @PACKAGE_TITLE@
+does not support the syncrhonization level
+.BR SQLVL_SPLITMODULE .
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not use the
+.B SQLVL_SPLITMODULE
+synchronization level.
+.IP \(em
+Nowhere is it documented what syncrhonization is applied to lower multiplex
+queue pairs and Streams.
+.B @PACKAGE_TITLE@
+applies the synchronization required of the upper multiplex Stream to the
+lower multiplex Stream when it is linked.  That is, the linked lower multiplex
+queue pair is treated the same as any upper multiplex queue pair in the
+module.
+.IP \(em
+The flag
+.B STR_Q_NOTTOSPEC
+is an
+.IR AIX \(rg
+.[
+aixspg
+.]
+concept.
+.B @PACKAGE_TITLE@
+can normally execute procedures, callouts and callbacks in any context
+(including hard interrupt context on the ICS), setting this flag causes all
+entry points to the module or driver to be run at process context only.
+Procedures or routines attempted at non-blocking context will be deferred.
+.IP ""
+Note that some
+.IR OSF/1 \(rg
+based implementations, such as
+.IR HPUX \(rg,
+and even some
+.I SVR 4.2
+based implementations, such as
+.IR IRIX \(rg,
+never permit
+.I STREAMS
+to run a put procedure at hard interrupt context.
+.B @PACKAGE_TITLE@
+also does not run a sychronized queue pair put procedure at hard interrupt;
+the
+.B STR_Q_NOTTOSPEC
+flag also prohibits running the synchronized queue pair put procedure at soft
+interrupt.
+.IP ""
+However, sleeping in put or service procedure, or sleeping in a function
+run as a put procedure, has a serious negative impact on the performance of all
+.I STREAMS
+modules and drivers and should be avoided.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not set the
+.BR STR_Q_NOTTOSPEC
+flag and will not sleep in put or service procedures, nor functions executed
+as put or service procedures.
+.IP \(em
+The flag
+.B STR_PERSTREAM
+is another
+.IR AIX \(rg
+.[
+aixspg
+.]
+concept.
+Although the mechanism is described above,
+.B @PACKAGE_TITLE@
+does not support per-Stream synchronization and such modules will always be
+run with module syncrhonization.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not specify nor expect to run under per-Stream
+syncrhonization.
+.IP \(em
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP" .
+.[
+svr42spg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+Synchronization mechanisms for
+.I STREAMS
+first appeared in
+.IR "SVR 4.1 MP" .
+.PP
+Historically, the first sychcronization framework to appear in UNIX was the
+perimeters provided by
+.IR Solaris \(rg.
+.[
+solspg
+.]
+It appears that UNIX International and Mentat came up with their own mechanism
+that is widespread across
+.IR "Mentat Portable STREAMS (MPS)" \(rg
+implementations such as those that appear in
+.IR AIX \(rg,
+.[
+aixspg
+.]
+.IR HPUX \(rg,
+.[
+hpuxspg
+.]
+.IR OSF/1 \(rg,
+.[
+osfspg
+.]
+.IR MacOT \(rg
+.[
+macspg
+.]
+and
+.IR VxWorks \(rg,
+.[
+vxwspg
+.]
+for example.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

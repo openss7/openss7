@@ -1,0 +1,892 @@
+Aberdeen City
+Aberdeenshire
+Aberdeen	XXX
+Aberfeldy	XXX
+Abergavenny	XXX
+Aberystwyth	XXX
+Abingdon	XXX
+Abington	XXX
+Aboyne	XXX
+Aldershot	XXX
+Alford (Aberdeen)	XXX
+Alford (Lincs)	XXX
+Alloa	XXX
+Alnwick	XXX
+Alton	XXX
+Amesbury	XXX
+Ammanford	XXX
+Andover	XXX
+Angus
+Antrim
+Antrim	XXX
+Appleby	XXX
+Arbroath	XXX
+Ardgay	XXX
+Ardrossan	XXX
+Ards
+Argyll and Bute
+Armagh
+Armagh	XXX
+Arrochar	XXX
+Ashbourne	XXX
+Ashburton	XXX
+Ashford (Kent)	XXX
+Axminster	XXX
+Aylesbury	XXX
+Ayr	XXX
+Ayton	XXX
+Bala	XXX
+Ballachulish	XXX
+Ballater	XXX
+Ballindalloch	XXX
+Ballycastle	XXX
+Ballyclare	XXX
+Ballygawley	XXX
+Ballymena
+Ballymena	XXX
+Ballymoney
+Ballymoney	XXX
+Bamburgh	XXX
+Banbridge
+Banbridge	XXX
+Banbury	XXX
+Banchory	XXX
+Banff	XXX
+Bangor (Co. Down)	XXX
+Bangor (Gwynedd)	XXX
+Barking and Dagenham
+Barmouth	XXX
+Barnard Castle	XXX
+Barnet
+Barnsley
+Barnsley	XXX
+Barnstaple	XXX
+Barrow-in-Furness	XXX
+Barry	XXX
+Basildon	XXX
+Basingstoke	XXX
+Bath and North East Somerset
+Bathgate	XXX
+Bath	XXX
+Bedale	XXX
+Bedford
+Bedford	XXX
+Belfast City
+Belfast	XXX
+Bellingham	XXX
+Berwick-upon-Tweed	XXX
+Betws-y-Coed	XXX
+Bewdley	XXX
+Bexley
+Bicester	XXX
+Bideford	XXX
+Biggar	XXX
+Birmingham
+Birmingham	XXX
+Bishop Auckland	XXX
+Bishops Castle	XXX
+Bishops Stortford	XXX
+Bishops Waltham	XXX
+Blackburn with Darwen
+Blackburn	XXX
+Blackpool
+Blackpool	XXX
+Blaenau Gwent
+Blairgowrie	XXX
+Blandford	XXX
+Bodmin	XXX
+Bolton
+Bolton	XXX
+Boroughbridge	XXX
+Boston	XXX
+Bournemouth
+Bournemouth	XXX
+Bourne	XXX
+Bracknell Forest
+Bracknell	XXX
+Bradford
+Bradford	XXX
+Braintree	XXX
+Brampton	XXX
+Brechin	XXX
+Brecon	XXX
+Brent
+Brentwood	XXX
+Bridgend
+Bridgend	XXX
+Bridgnorth	XXX
+Bridgwater	XXX
+Bridlington	XXX
+Bridport	XXX
+Brigg	XXX
+Brighton	XXX
+Bristol	XXX
+Bromley
+Bromyard	XXX
+Brooke	XXX
+Buckinghamshire
+Buckingham	XXX
+Bude	XXX
+Budleigh Salterton	XXX
+Builth Wells	XXX
+Bungay	XXX
+Burnley	XXX
+Burton-on-Trent	XXX
+Bury
+Bury St Edmunds	XXX
+Buxton	XXX
+Caernarfon	XXX
+Caerphilly
+Calderdale
+Callander	XXX
+Camberley	XXX
+Cambridgeshire
+Cambridge	XXX
+Camden
+Camelford	XXX
+Campbeltown	XXX
+Cannock	XXX
+Canterbury	XXX
+Cardiff
+Cardiff	XXX
+Cardigan	XXX
+Carlisle	XXX
+Carmarthenshire
+Carmarthen	XXX
+Carradale	XXX
+Carrickfergus
+Carrickmore	XXX
+Castlebay	XXX
+Castle Douglas	XXX
+Castlereagh
+Caterham	XXX
+Cemmaes Road	XXX
+Central Bedfordshire
+Ceredigion
+Cerne Abbas	XXX
+Chard	XXX
+Chatteris	XXX
+Chelmsford	XXX
+Cheltenham	XXX
+Chepstow	XXX
+Cheshire East
+Cheshire West and Chester
+Chesterfield	XXX
+Chester	XXX
+Chichester	XXX
+Chippenham	XXX
+Chipping Norton	XXX
+Chipping Sodbury	XXX
+Church Stretton	XXX
+Cirencester	XXX
+City of Bristol
+City of Derby
+City of Edinburgh
+City of Leicester
+City of London
+City of Manchester
+City of Nottingham
+City of Peterborough
+City of Plymouth
+City of Portsmouth
+City of Salford
+City of Southampton
+City of Stoke-on-Trent
+City of Westminster
+City of Wolverhampton
+Clackmannanshire
+Clacton-on-Sea	XXX
+Clevedon	XXX
+Clitheroe	XXX
+Clopton	XXX
+Clynderwen	XXX
+Coalville	XXX
+Coatbridge	XXX
+Colchester	XXX
+Coldstream	XXX
+Coleraine
+Coleraine	XXX
+Coleshill	XXX
+Colonsay	XXX
+Colwyn Bay	XXX
+Congleton	XXX
+Consett	XXX
+Conwy
+Cookstown
+Cookstown	XXX
+Coppull	XXX
+Cornwall
+Corwen	XXX
+Coupar Angus	XXX
+Coventry
+Coventry	XXX
+Craigavon
+Craigellachie	XXX
+Cranbrook	XXX
+Crawley	XXX
+Crediton	XXX
+Crewe	XXX
+Crieff	XXX
+Cromer	XXX
+Croydon
+Cumbria
+Cumnock	XXX
+Dalmally	XXX
+Darlington
+Darlington	XXX
+Dartford	XXX
+Daventry	XXX
+Denbighshire
+Derbyshire
+Derby	XXX
+Dereham	XXX
+Derry City
+Devizes	XXX
+Devon
+Dingwall	XXX
+Diss	XXX
+Doncaster
+Doncaster	XXX
+Dorchester	XXX
+Dorking	XXX
+Dorset
+Dover	XXX
+Down
+Downham Market	XXX
+Downpatrick	XXX
+Driffield	XXX
+Dudley
+Dudley	XXX
+Dulverton	XXX
+Dumbarton	XXX
+Dumfries and Galloway
+Dumfries	XXX
+Dunbar	XXX
+Dundee City
+Dundee	XXX
+Dunfermline	XXX
+Dungannon and South Tyrone
+Dungannon	XXX
+Dunkeld	XXX
+Dunoon	XXX
+Duns	XXX
+Durham
+Durham	XXX
+Dursley	XXX
+Ealing
+Easingwold	XXX
+East Ayrshire
+Eastbourne	XXX
+East Dunbartonshire
+East Grinstead	XXX
+East Kilbride	XXX
+East Lothian
+East Renfrewshire
+East Riding of Yorkshire
+East Sussex
+Ebbsfleet	XXX
+Edinburgh	XXX
+Elgin	XXX
+Ellon	XXX
+Ely	XXX
+Enfield
+Enniskillen	XXX
+Esher	XXX
+Essex
+Evesham	XXX
+Exeter	XXX
+Fair Isle	XXX
+Fakenham	XXX
+Falkirk
+Falkirk	XXX
+Falmouth	XXX
+Fareham	XXX
+Faringdon	XXX
+Felixstowe	XXX
+Fermanagh
+Fife
+Fishguard	XXX
+Fivemiletown	XXX
+Flintshire
+Folkestone	XXX
+Forfar	XXX
+Forres	XXX
+Fort Augustus	XXX
+Fortrose	XXX
+Fort William	XXX
+Fraserburgh	XXX
+Frome	XXX
+Gainsborough	XXX
+Gairloch	XXX
+Galashiels	XXX
+Garstang	XXX
+Gateshead
+Girvan	XXX
+Glasgow City
+Glasgow	XXX
+Glastonbury	XXX
+Glenborrodale	XXX
+Glenurquhart	XXX
+Glossop	XXX
+Gloucestershire
+Gloucester	XXX
+Golspie	XXX
+Goole	XXX
+Gosforth	XXX
+Grange-over-Sands	XXX
+Grantham	XXX
+Grantown-on-Spey	XXX
+Gravesend	XXX
+Grays Thurrock	XXX
+Great Bernera	XXX
+Great Dunmow	XXX
+Great Yarmouth	XXX
+Greenock	XXX
+Greenwich
+Gretna	XXX
+Grimsby	XXX
+Guernsey	XXX
+Guildford	XXX
+Guisborough	XXX
+Guiseley	XXX
+Gwynedd
+Hackney
+Halifax	XXX
+Halton
+Haltwhistle	XXX
+Hammersmith and Fulham
+Hampshire
+Haringey
+Harris	XXX
+Harrogate	XXX
+Harrow
+Harthill	XXX
+Hartlepool
+Hartlepool	XXX
+Haslemere	XXX
+Hastings	XXX
+Hathersage	XXX
+Haverfordwest	XXX
+Haverhill	XXX
+Havering
+Hawick	XXX
+Hawkshead	XXX
+Hay-on-Wye	XXX
+Haywards Heath	XXX
+Heathfield	XXX
+Helensburgh	XXX
+Helmsdale	XXX
+Helmsley	XXX
+Hemel Hempstead	XXX
+Henley-on-Thames	XXX
+Herefordshire
+Hereford	XXX
+Hertfordshire
+Hexham	XXX
+Highland
+High Wycombe	XXX
+Hillingdon
+Hinckley	XXX
+Hitchin	XXX
+Holbeach	XXX
+Holmes Chapel	XXX
+Holsworthy	XXX
+Holyhead	XXX
+Honington	XXX
+Honiton	XXX
+Hornby	XXX
+Hornsea	XXX
+Horsham	XXX
+Hounslow
+Huddersfield	XXX
+Hull	XXX
+Hungerford	XXX
+Hunstanton	XXX
+Huntingdon	XXX
+Huntly	XXX
+Insch	XXX
+Inveraray	XXX
+Inverclyde
+Inverness	XXX
+Inverurie	XXX
+Ipstones	XXX
+Ipswich	XXX
+Isle of Anglesey
+Isle of Arran	XXX
+Isle of Benbecula	XXX
+Isle of Man	XXX
+Isle of Mull - Craignure	XXX
+Isle of Mull - Fionnphort	XXX
+Isle of Mull - Tobermory	XXX
+Isle of Skye - Broadford	XXX
+Isle of Skye - Edinbane	XXX
+Isle of Skye - Portree	XXX
+Isle of Wight
+Isle of Wight	XXX
+Isles of Scilly	XXX
+Islington
+Jersey	XXX
+Johnstone	XXX
+Keighley	XXX
+Keith	XXX
+Kelso	XXX
+Kendal	XXX
+Kensington and Chelsea
+Kent
+Kesh	XXX
+Keswick	XXX
+Kettering	XXX
+Kidderminster	XXX
+Kilchrenan	XXX
+Killearn	XXX
+Killingholme	XXX
+Killin	XXX
+Kilmarnock	XXX
+Kilmelford	XXX
+Kilrea	XXX
+Kingsbridge	XXX
+Kings Lynn	XXX
+Kingston upon Hull
+Kingston upon Thames
+Kington	XXX
+Kingussie	XXX
+Kinloch Rannoch	XXX
+Kinrossie	XXX
+Kinross	XXX
+Kircubbin	XXX
+Kirkcaldy	XXX
+Kirkcudbright	XXX
+Kirklees
+Kirkwhelpington	XXX
+Kirriemuir	XXX
+Knighton	XXX
+Knowsley
+Knutsford	XXX
+Kyle	XXX
+Ladybank	XXX
+Laggan	XXX
+Lairg	XXX
+Lambeth
+Lampeter	XXX
+Lanark	XXX
+Lancashire
+Lancaster	XXX
+Langholm	XXX
+Lapworth	XXX
+Larne
+Larne	XXX
+Lauder	XXX
+Launceston	XXX
+Laurencekirk	XXX
+Lea Valley	XXX
+Ledbury	XXX
+Leeds
+Leeds	XXX
+Leicestershire
+Leicester	XXX
+Leighton Buzzard	XXX
+Leominster	XXX
+Lerwick Foula	XXX
+Lewisham
+Leyburn	XXX
+Limavady
+Limavady	XXX
+Lincolnshire
+Lincoln	XXX
+Lisburn
+Lisburn	XXX
+Liskeard	XXX
+Lisnaskea	XXX
+Liverpool
+Liverpool	XXX
+Llanarth	XXX
+Llandeilo	XXX
+Llandovery	XXX
+Llandrindod Wells	XXX
+Llandysul	XXX
+Llanelli	XXX
+Llanidloes	XXX
+Llanon	XXX
+Llanwrtyd Wells	XXX
+Lochboisdale	XXX
+Lochcarron	XXX
+Lochgilphead	XXX
+Lochinver	XXX
+Lochmaddy	XXX
+Lockerbie	XXX
+Londonderry	XXX
+London	XXX
+Looe	XXX
+Loughborough	XXX
+Louth	XXX
+Lowestoft	XXX
+Ludlow	XXX
+Luton
+Luton	XXX
+Lybster	XXX
+Lydney	XXX
+Lymington	XXX
+Lynton	XXX
+Macclesfield	XXX
+Machynlleth	XXX
+Madingley	XXX
+Magherafelt
+Magherafelt	XXX
+Maidenhead	XXX
+Maidstone	XXX
+Maldon	XXX
+Mallaig	XXX
+Malmesbury	XXX
+Malton	XXX
+Malvern	XXX
+Manchester	XXX
+Mansfield	XXX
+Market Drayton	XXX
+Market Harborough	XXX
+Market Rasen	XXX
+Market Weighton	XXX
+Marlborough	XXX
+Martinstown	XXX
+Martin	XXX
+Matlock	XXX
+Maud	XXX
+Maybole	XXX
+Medway
+Medway	XXX
+Melton Mowbray	XXX
+Meriden	XXX
+Merthyr Tydfil
+Merthyr Tydfil	XXX
+Merton
+Middlesbrough
+Middlesbrough	XXX
+Midlothian
+Mid Yell	XXX
+Milford Haven	XXX
+Millom	XXX
+Milton Keynes
+Milton Keynes	XXX
+Minehead	XXX
+Moffat	XXX
+Mold	XXX
+Monmouthshire
+Monmouth	XXX
+Montrose	XXX
+Moray
+Moretonhampstead	XXX
+Morpeth	XXX
+Moscow	XXX
+Motherwell	XXX
+Moyle
+Nairn	XXX
+Narberth	XXX
+Neath Port Talbot
+Neath	XXX
+Newark	XXX
+Newbury	XXX
+Newcastle (Co. Down)	XXX
+Newcastle upon Tyne
+New Galloway	XXX
+Newham
+New Luce	XXX
+Newmarket	XXX
+New Mills	XXX
+Newport
+Newport	XXX
+Newquay	XXX
+Newry and Mourne
+Newry	XXX
+Newton Abbot	XXX
+Newton Stewart	XXX
+Newtownabbey
+Newtownstewart	XXX
+Newtown	XXX
+Norfolk
+Northallerton	XXX
+Northamptonshire
+Northampton	XXX
+North Ayrshire
+North Berwick	XXX
+North Cave	XXX
+North Down
+North East Lincolnshire
+North Lanarkshire
+North Lincolnshire
+North Somerset
+North Tyneside
+Northumberland
+North Walsham	XXX
+Northwich	XXX
+North Yorkshire
+Norwich	XXX
+Nottinghamshire
+Nottingham	XXX
+Oakham	XXX
+Oban	XXX
+Okehampton	XXX
+Oldham
+Oldmeldrum	XXX
+Omagh
+Omagh	XXX
+Orkney Islands
+Orkney	XXX
+Orpington	XXX
+Oswestry	XXX
+Outer Hebrides
+Oxfordshire
+Oxford	XXX
+Pakenham	XXX
+Patrington	XXX
+Peat Inn	XXX
+Peebles	XXX
+Pembrokeshire
+Pencombe	XXX
+Penicuik	XXX
+Penrith	XXX
+Penzance	XXX
+Perth and Kinross
+Perth	XXX
+Peterborough	XXX
+Peterhead	XXX
+Petersfield	XXX
+Pickering	XXX
+Pitlochry	XXX
+Plymouth	XXX
+Pocklington	XXX
+Pontefract	XXX
+Pontypool	XXX
+Pontypridd	XXX
+Poole
+Pooley Bridge	XXX
+Portadown	XXX
+Port Ellen	XXX
+Porthmadog	XXX
+Portsmouth	XXX
+Powys
+Preston	XXX
+Prudhoe	XXX
+Pulborough	XXX
+Pwllheli	XXX
+Raughton Head	XXX
+Reading
+Reading	XXX
+Redbridge
+Redcar and Cleveland
+Redditch	XXX
+Redhill	XXX
+Redruth	XXX
+Renfrewshire
+Retford	XXX
+Rhondda Cynon Taf
+Rhyl	XXX
+Richmond upon Thames
+Richmond	XXX
+Ringwood	XXX
+Ripley	XXX
+Ripon	XXX
+Rochdale
+Rochdale	XXX
+Rockbourne	XXX
+Romford	XXX
+Romsey	XXX
+Ross-on-Wye	XXX
+Rostrevor	XXX
+Rothbury	XXX
+Rotherham
+Rotherham	XXX
+Rothesay	XXX
+Royston	XXX
+Rugby	XXX
+Rugeley	XXX
+Runcorn	XXX
+Ruthin	XXX
+Rutland
+Rye	XXX
+Saffron Walden	XXX
+Saintfield	XXX
+Salisbury	XXX
+Sanday	XXX
+Sandwell
+Sandwick	XXX
+Sandy	XXX
+Sanquhar	XXX
+Saxmundham	XXX
+Scarborough	XXX
+Scarinish	XXX
+Scottish Borders
+Scourie	XXX
+Scunthorpe	XXX
+Sedbergh	XXX
+Sedgefield	XXX
+Sefton
+Selby	XXX
+Selkirk	XXX
+Settle	XXX
+Sevenoaks	XXX
+Shaftesbury	XXX
+Shap	XXX
+Sheffield
+Sheffield	XXX
+Shepton Mallet	XXX
+Shetland Islands
+Shetland	XXX
+Shrewsbury	XXX
+Shropshire
+Sittingbourne	XXX
+Skegness	XXX
+Skelmersdale	XXX
+Skipton	XXX
+Sleaford	XXX
+Slough
+Slough	XXX
+Solihull
+Somerset
+Southampton	XXX
+South Ayrshire
+Southend-on-Sea
+Southend-on-Sea	XXX
+South Gloucestershire
+South Lanarkshire
+South Molton	XXX
+Southport	XXX
+South Tyneside
+Southwark
+Spalding	XXX
+Spilsby	XXX
+Staffordshire
+Stafford	XXX
+Staines	XXX
+St Albans	XXX
+Stamford	XXX
+St Andrews	XXX
+Stanhope	XXX
+St Austell	XXX
+St Boswells	XXX
+St Clears	XXX
+Stevenage	XXX
+St. Helens
+St Helens	XXX
+Stirling
+Stirling	XXX
+Stockport
+Stockton-on-Tees
+Stoke-on-Trent	XXX
+Stonehaven	XXX
+Stornoway	XXX
+Stowmarket	XXX
+Stow-on-the-Wold	XXX
+Strabane
+Stranraer	XXX
+Stratford-upon-Avon	XXX
+Strathaven	XXX
+Strathdon	XXX
+Strathpeffer	XXX
+Strathy	XXX
+Strontian	XXX
+Sudbury	XXX
+Suffolk
+Sunderland
+Sunderland	XXX
+Surrey
+Sutton
+Swaffham	XXX
+Swansea
+Swansea	XXX
+Swindon
+Swindon	XXX
+Tain	XXX
+Tameside
+Tamworth	XXX
+Tarbert	XXX
+Tarporley	XXX
+Taunton	XXX
+Tavistock	XXX
+Telford and Wrekin
+Telford	XXX
+Temple Cloud	XXX
+Thame	XXX
+Thanet	XXX
+The City of Brighton and Hove
+Thetford	XXX
+Thirsk	XXX
+Thornhill	XXX
+Thurrock
+Thurso	XXX
+Tiverton	XXX
+Tomatin	XXX
+Tomdoun	XXX
+Tongue	XXX
+Torbay
+Torfaen
+Torquay	XXX
+Torrington	XXX
+Tower Hamlets
+Trafford
+Tranent	XXX
+Truro	XXX
+Tunbridge Wells	XXX
+Turriff	XXX
+Tyneside	XXX
+Uckfield	XXX
+Ullapool	XXX
+Uxbridge	XXX
+Vale of Glamorgan
+Wakefield
+Wakefield	XXX
+Walsall
+Walsall	XXX
+Waltham Forest
+Wandsworth
+Warboys	XXX
+Wareham	XXX
+Ware	XXX
+Warminster	XXX
+Warrington
+Warrington	XXX
+Warwickshire
+Warwick	XXX
+Watchet	XXX
+Watford	XXX
+Wellingborough	XXX
+Welshpool	XXX
+Welwyn Garden City	XXX
+Wem	XXX
+West Berkshire
+West Dunbartonshire
+Westerham	XXX
+West Heslerton	XXX
+West Lothian
+Weston-super-Mare	XXX
+West Sussex
+Wetherby	XXX
+Weybridge	XXX
+Whatton	XXX
+Whitby	XXX
+Whitchurch	XXX
+Whitehaven	XXX
+Wick	XXX
+Wigan
+Wigan	XXX
+Wigton	XXX
+Wigtown	XXX
+Wiltshire
+Wincanton	XXX
+Winchester	XXX
+Windsor and Maidenhead
+Wirral
+Wisbech	XXX
+Witney	XXX
+Wokingham
+Wolverhampton	XXX
+Worcestershire
+Worcester	XXX
+Workington	XXX
+Worksop	XXX
+Wormbridge	XXX
+Worthing	XXX
+Wrexham
+Wrexham	XXX
+Wymondham	XXX
+Yeovil	XXX
+York
+York	XXX

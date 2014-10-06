@@ -1,0 +1,288 @@
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
+## =============================================================================
+## 
+# @(#) $RCSfile: lsm.am,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:27 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU Affero General Public License as published by the Free
+## Software Foundation; version 3 of the License.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+## details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+## write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+## 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2011-09-02 08:46:27 $ by $Author: brian $
+##
+## =============================================================================
+
+LSM $(PACKAGE)-$(VERSION).lsm: $(PACKAGE_TARNAME).lsm
+	$(AM_V_GEN)cat $< > $@
+
+if MAINTAINER_MODE
+## MAINTAINER_MODE
+
+$(tardir)/$(PACKAGE)-$(VERSION).lsm:
+	@f=`$(ECHO) "$@" | sed 's|^.*/||'` ; \
+	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
+		$(ECHO_Q) "  GEN   " $$f ; \
+		$(ECHO_V) "$(MAKE) $(AM_MAKEFLAGES) -- $$f" ; \
+		$(MAKE) $(AM_MAKEFLAGES) -- $$f ; } ; \
+	d=; test -f $$f || d='$(srcdir)/'; \
+	test ! \( "$@" -ef "$$d$$f" \) || exit 0 ; \
+	test ":$(FORCE)" != :force -a -f "$@" || { \
+		$(ECHO_Q) "  GEN   " `basename $@` ; \
+		$(ECHO_V) "cp -f -- $$d$$f $@" ; \
+		cp -f -- $$d$$f $@ ; }
+
+ALL_LOCAL		+= LSM $(PACKAGE)-$(VERSION).lsm
+CLEANFILES		+= LSM $(PACKAGE)-$(VERSION).lsm
+DISTCLEANFILES		+= $(PACKAGE_TARNAME).lsm
+MAINTAINERCLEANFILES	+= $(srcdir)/$(PACKAGE)-$(VERSION).lsm \
+			   $(srcdir)/$(PACKAGE_TARNAME).lsm \
+			   $(srcdir)/LSM
+
+release-lsm: $(tardir)/$(PACKAGE)-$(VERSION).lsm
+
+release-clean-lsm:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test -d '$(tardir)' || { $(ECHO_V) "D: $@ missing $(tardir)" ; exit 0 ; } ; \
+	case "`(cd '$(tardir)'; pwd)`" in ("`pwd`"*) ;; (*) test '$(FORCE)' = force || { $(ECHO_V) "D: $@ skipping $(tardir) (force is '$(FORCE)')" ; exit 0 ; } ;; esac ; \
+	reverse='$(tardir)/$(PACKAGE)-$(VERSION).lsm' ; \
+	list=; for f in $$reverse; do \
+		list="$$f$${list:+ $$list}" ; \
+	done ; $(am__list_remove)
+
+RELEASE			+= all-release-lsm
+RELEASE_CLEAN_LOCAL	+= release-clean-lsm
+RELEASECLEANFILES	+= LSM \
+			   $(PACKAGE_TARNAME).lsm \
+			   $(PACKAGE)-$(VERSION).lsm
+
+ALL_RECURSIVE_TARGETS	+= all-release-lsm
+
+##
+## Provides updates to lsm files.
+##
+## If the lsm does not exist, create it.  If the lsm exists, wat created after
+## the update stamp, and force was applied, remove and recereate the lsm.
+##
+update-lsm:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@f='$(tardir)/$(PACKAGE)-$(VERSION).lsm'; \
+	if test ! -e "$$f" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \) \); then \
+		$(ECHO_V) "D: $@: rebuild $$f"; \
+		$(ECHO_Q) "  GEN   " $$f ; \
+		$(ECHO_V) "rm -f -- \"$$f\""; \
+		rm -f -- "$$f"; \
+		$(ECHO_V) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- \"$$f\""; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- "$$f"; \
+	else \
+		test ! -e "$$f" || $(ECHO_V) "D: $@: skipped $$f"; \
+	fi
+
+##
+## Clean updates to lsm files.
+##
+## If the lsm exists and was created after the update stamp, remove it.
+##
+update-clean-lsm:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@f='$(tardir)/$(PACKAGE)-$(VERSION).lsm'; \
+	if test -e "$$f" -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \); then \
+		$(ECHO_V) "D: $@: removed $$f"; \
+		$(ECHO) "rm -f -- \"$$f\""; rm -f -- "$$f"; \
+	else \
+		test ! -e "$$f" || $(ECHO_V) "D: $@: leaving $$f"; \
+	fi
+
+MY_PHONY		+= update-lsm
+ALL_RECURSIVE_TARGETS	+= all-update-lsm
+
+UPDATE			+= all-update-lsm
+UPDATE_CLEAN_LOCAL	+= update-clean-lsm
+UPDATECLEANFILES	+= LSM \
+			   $(PACKAGE_TARNAME).lsm \
+			   $(PACKAGE)-$(VERSION).lsm
+
+repo_html_files		= src/mason/.htaccess \
+			  src/mason/auth.pl \
+			  src/mason/autohandler
+
+repo_need_files		= mirrorlist \
+			  $(PACKAGE_UCNAME)credentials \
+			  $(PACKAGE).list \
+			  $(PACKAGE).vendor.list \
+			  $(PACKAGE).repo \
+			  $(PACKAGE_UCNAME).service \
+			  repoindex.xml \
+			  credentials \
+			  media.cfg \
+			  urpmi.cfg \
+			  $(PACKAGE).defs \
+			  $(PACKAGE)-mirrors
+
+EXTRA_DIST		+= $(repo_html_files)
+
+release-install-repo:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+	@for f in $(repo_html_files); do \
+		t="$(REPODIR)/`basename $$f`"; \
+		d=; test -f $$f || d='$(srcdir)/'; \
+		if test ! -e "$$t" -o '$(FORCE)' = force -o "$$t" -ot "$$d$$f" ; then \
+			$(ECHO) "  $(INSTALL_DATA) -T -D -p -- $$d$$f $$t"; \
+			$(INSTALL_DATA) -T -D -p -- $$d$$f $$t; \
+		else \
+			$(ECHO) "  not installing older $$d$$f"; \
+		fi ; \
+	done
+	@for f in $(repo_need_files); do \
+		t="$(REPODIR)/$$f"; \
+		if test ! -e "$$t" -o '$(FORCE)' = force ; then \
+			$(ECHO) "  touch $$t"; \
+			touch $$t; \
+		fi ; \
+	done
+
+release-uninstall-repo:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+
+RELEASE_INSTALL		+= release-install-repo
+RELEASE_UNINSTALL	+= update-uninstall-repo
+
+update-install-repo:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+	@for f in $(repo_html_files); do \
+		t="$(REPODIR)/`basename $$f`"; \
+		if test ! -e "$$t" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$t" -ot '$(USTAMP)' \) \); then \
+			$(ECHO) "  $(INSTALL_DATA) -T -D -p -- $$d$$f $$t"; \
+			$(INSTALL_DATA) -T -D -p -- $$d$$f $$t; \
+		else \
+			$(ECHO) "  not installing older $$d$$f"; \
+		fi ; \
+	done
+	@for f in $(repo_need_files); do \
+		t="$(REPODIR)/$$f"; \
+		if test ! -e "$$t" -o '$(FORCE)' = force ; then \
+			$(ECHO) "  touch $$t"; \
+			touch $$t; \
+		fi ; \
+	done
+
+update-uninstall-repo:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+
+UPDATE_INSTALL		+= update-install-repo
+UPDATE_UNINSTALL	+= update-uninstall-repo
+
+release-install-lsm:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+	@files='$(tardir)/$(PACKAGE)-$(VERSION).lsm' ; \
+	for f in $$files ; do \
+		test -s $$f || continue ; \
+		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+		if test ! -f $$t -o \( '$(FORCE)' = force -a $$f -nt $$t \) ; then \
+			$(ECHO) "  $(INSTALL_DATA) -T -D -p -- $$f $$t" ; \
+			$(INSTALL_DATA) -T -D -p -- $$f $$t ; \
+		fi ; \
+	done
+
+release-uninstall-lsm:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+	@files='$(tardir)/$(PACKAGE)-$(VERSION).lsm' ; \
+	for f in $$files ; do \
+		test -s $$f || continue ; \
+		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+		test -s $$t || continue ; \
+		if test -f $$t -a \( "$(FORCE)" = force -o \( ! $$f -nt $$t -a !  $$f -ot $$t \) \) ; then \
+			$(ECHO) "  rm -f -- $$t" ; \
+			rm -f -- $$t ; \
+		fi ; \
+	done ; \
+	for f in $$files ; do \
+		test -s $$f || continue ; \
+		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+		echo "`dirname $$t`" ; \
+	done | LANG= sort -u | while read d ; do \
+		if test -d $$d ; then \
+			$(ECHO) "  rmdir -p -- $$d" ; \
+			rmdir -p -- $$d 2>/dev/null || : ; \
+		fi ; \
+	done
+
+RELEASE_INSTALL		+= release-install-lsm
+RELEASE_UNINSTALL	+= release-uninstall-lsm
+
+## MAINTAINER_MODE
+endif
+
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
+
+dist_doc_DATA		+= LSM $(PACKAGE)-$(VERSION).lsm
+
+## PKG_BUILD_INDEP
+endif
+
+## =============================================================================
+##
+## $Log: lsm.am,v $
+## Revision 1.1.2.5  2011-09-02 08:46:27  brian
+## - sync up lots of repo and build changes from git
+##
+## Revision 1.1.2.4  2011-08-07 11:14:24  brian
+## - mostly mandriva and ubuntu build updates
+##
+## Revision 1.1.2.3  2011-05-10 13:45:33  brian
+## - weak modules workup
+##
+## Revision 1.1.2.2  2009-06-29 07:35:35  brian
+## - improvements to build process
+##
+## Revision 1.1.2.1  2009-06-21 10:26:00  brian
+## - added files to new distro
+##
+## =============================================================================
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

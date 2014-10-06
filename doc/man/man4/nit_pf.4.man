@@ -1,0 +1,437 @@
+'\" rtp
+.\" =========================================================================
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH NIT_PF 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Modules"
+.\"
+.\"
+.SH NAME
+.B nit_pf, pf
+\- \fISTREAMS\fP NIT packet filtering module
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/ioctl.h>
+.br
+.B #include <net/nit_pf.h>
+.HP 8
+.BI "int " fd ;
+.PD 0
+.HP
+.BI "int open(" \*(lq\fR/dev/nit\fP\*(rq ", " \fR0\fP );
+.HP
+.BI "int ioctl(" fd ", " I_PUSH ", " \*(lqpf\*(rq );
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B nit_pf
+is a
+.I STREAMS
+module that subjects messages arriving on its read queue to a packet filter
+and passes only those messages that the filter accepts on to its upstream
+neighbor.  Such filtering can be very useful for user-level protocol
+implementations and for networking monitoring programs that wish to view only
+specific types of events.
+.\"
+.SS Read-side Behaviour
+.PP
+.B nit_pf
+applies the current packet filter to all
+.BR M_DATA "(9) and " M_PROTO (9)
+messages arriving on its read queue.  The module prepares these messages for
+examination by first skipping over all leading
+.BR M_PROTO (9)
+message blocks to arrive at the beginning of the message's data portion.  If
+there is no data portion,
+.B nit_pf
+accepts the message and passes it along to its upstream neighbour.  Otherwise,
+the module ensures that the part of the message's data that the packet filter
+might examine lies in contiguous memory, calling the
+.BR pullupmsg (9)
+utility routine if necessary to force contiguity.  (Note: this action destroys
+any sharing relationships that the subject message might have had with other
+messages.)  Finally, it applies the packet filter to the message's data,
+passing the entire message upstream to the next module if the filter accepts,
+and discarding the message otherwise.  See
+.IR \*(lq "PACKET FILTERS" \*(rq
+below for details on how the filter works.
+.PP
+If there is no packet filter yet in effect, the module acts as if the filter
+exists but does nothing, implying that all incoming messages are accepted.
+.IR \*(lq IOCTLS \*(rq,
+below describes how to associate a packet filter with an instance of
+.BR nit_pf .
+.B nit_pf
+handles other message types as follows.  Upon receiving an
+.BR M_FLUSH (9)
+message specifying that the read queue be flushed, the module does so, and
+passes the message on to its upstream neighbour.  It passes all other messages
+through unaltered to its upper neighbour.
+.\"
+.SS Write-side Behaviour
+.PP
+.B nit_pf
+intercepts
+.BR M_IOCTL (9)
+messages for the ioctl described below.  Upon receiving an
+.BR M_FLUSH (9)
+message specifying that the write queue be flushed, the module does so and
+passes the message on to the module or driver below.  The module passes all
+other messages through unaltered to its lower neighbour.
+.\"
+.\"
+.SH IOCTLS
+.PP
+.B nit_pf
+responds to the following ioctl.
+.TP
+.I NIOCSETF
+This ioctl directs the module to replace its current packet filter, if any,
+with the filter specified by the
+.B struct packetfilt
+pointer named by its final argument.  This structure is defined in
+.I <net/packetfilt.h>
+as
+.sp
+.RS
+.nf
+\fC\s+1\
+struct packetfilt {
+    u_char   Pf_Priority;   /* priority of filter */
+    u_char   Pf_FilterLen;  /* # of cmds in list */
+    u_short  Pf_Filter[ENMAXFILTERS];
+                            /* filter command list */
+};
+\s-1\fP
+.fi
+.PP
+The
+.I Pf_Priority
+field is included only for compatibility with other packet filter
+implementations and is otherwise ignored.  The packet filter itself is
+specified in the
+.I Pf_Filter
+array as a sequence of two-byte commands, with the
+.I Pf_FilterLen
+field giving the number of commands in the sequence.  This implementation
+restricts the maximum number of commands in a filter
+.RB ( ENMAXFILTERS )
+to 40.  The next section describes the available commands and their
+semantics.
+.RE
+.\"
+.\"
+.SH "PACKET FILTERS"
+.PP
+A packet filter consists of the filter command list length (in units of
+.BR u_shorts ),
+and the filter command list itself.  (The priority field mentioned above is
+ignored in this implementation.)  Each filter command list specifies a
+sequence of actions that operate on an internal stack of
+.B u_shorts
+("short-words").  Each short-word of the command list specifies one of the
+actions
+.IR ENF_PUSHLIT ,
+.IR ENF_PUSHZERO ,
+or
+.IR "ENF_PUSHWORD +n" ,
+which respectively push the next short-word of the command list, zero, or
+short-word
+.B n
+of the subject message on the stack, and a binary operator from the set
+.IR "{\ ENF_EQ" ", " ENF_NEQ ", " ENF_LT ", " ENF_LE ", " ENF_GT ", " ENF_GE ", " ENF_AND ", " ENF_OR ", " "ENF_XOR\ }"
+which then operates on the top two elements of the stack and replaces them
+with its result.  When both an action and operator are specified in the same
+short-word, the action is performed followed by the operation.
+.PP
+The binary operator can also be from the set
+.IR "{\ ENF_COR" ", " ENF_CAND ", " ENF_CNOR ", " "ENF_CNAND\ }" .
+These are "short-circuit" operators, in that they terminate the
+execution of the filter immediately if the condition they are checking for is
+found, and continue otherwise.  All pop two elements from the stack and
+compare them for equality;
+.I ENF_CAND
+returns false if the result is false;
+.I ENF_COR
+returns true if the result is true;
+.I ENF_CNAND
+returns true if the result is false;
+.I ENF_CNOR
+returns false if the result is true.  Unlike the other binary operators, these
+four do not leave a result on the stack, even if they continue.
+.PP
+The short-circuit operators should be used when possible, to reduce the
+amount of time spent evaluating filters.  When they are used, you should also
+arrange the order of the tests so that the filter will succeed or fail as
+soon as possible; for example, checking the IP destination field of a UDP
+packet is more likely to indicate failure than the packet type field.
+.PP
+The special action
+.I ENF_NOPUSH
+and the special operator
+.I ENF_NOP
+can be used to only perform the binary operation or to only push a value on
+the stack.  Since both are (conveniently) defined to be zero, indicating only
+an action actually specifies the action followed by
+.IR ENF_NOP ,
+and indicating only an operation actually specifies
+.I ENF_NOPUSH
+followed by the operation.
+.PP
+After executing the filter command list, a non-zero value (true) left on top
+of the stack (or an empty stack) causes the incoming packet to be accepted
+and a zero value (false) causes the packet to be rejected.  (If the filter
+exits as the result of a short- circuit operator, the top-of-stack value is
+ignored.)  Specifying an undefined operation or action in the command list or
+performing an illegal operation or action (such as pushing a short-word
+offset past the end of the packet or executing a binary operator with fewer
+than two short-words on the stack) causes a filter to reject the packet.
+.PP
+.\"
+.\"
+.SH EXAMPLES
+.PP
+The reverse ARP daemon program,
+.BR rarpd (8),
+uses code similar to the following fragment to construct a filter that
+rejects all but RARP packets.  That is, is accepts only packets whose
+Ethernet type field has the value
+.BR ETHERTYPE_REVARP .
+.sp
+.RS
+.nf
+\fC\s+1\
+struct ether_header eh;       /* used only for offset values */
+struct packetfilt pf;
+register u_short *fwp = pf.Pf_Filter;
+u_short offset;
+\s-1\fP
+.fi
+.RE
+.sp
+.RS
+.nf
+\fC\s+1\
+/*
+ * Set up filter.  Offset is the displacement of the Ethernet
+ * type field from the beginning of the packet in units of
+ * u_shorts.
+ */
+
+offset = ((u_int) &eh.ether_type - (u_int) &eh.ether_dhost) / sizeof (u_short);
+*fwp++ = ENF_PUSHWORD + offset;
+*fwp++ = ENF_PUSHLIT;
+*fwp++ = htons(ETHERTYPE_REVARP);
+*fwp++ = ENF_EQ;
+pf.Pf_FilterLen = fwp - &pf.Pf_Filter[0];
+\s-1\fP
+.fi
+.RE
+.PP
+This filter can be abbreviated by taking advantage of the ability to combine
+actions and operations:
+.RS
+.nf
+\fC\s+1\
+...
+*fwp++ = ENF_PUSHWORD + offset;
+*fwp++ = ENF_PUSHLIT | ENF_EQ;
+*fwp++ = htons(ETHERTYPE_REVARP);
+...
+\s-1\fP
+.fi
+.RE
+.\"
+.\"
+.SH WARNING
+.PP
+The module name `pf' used in the system configuration file and as argument to
+the
+.IR I_PUSH (7)
+ioctl is provisional and subject to change.
+.PP
+The
+.I Pf_Priority
+field of the
+.B packetfilt
+structure is likely to be removed.
+.PP
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+Note that
+.B nit_pf
+is implemented using the same module as is provided for
+.BR pfmod (4);
+it just reponds in the same manner as would the
+.B nit_pf
+module when pushed as
+.RB \*(lq pf \*(rq.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR inet (4),
+.BR nit (4),
+.BR nit_buf (4),
+.BR nit_if (4).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B nit_pf
+is compatible with
+.BR "SVR 4.1" ,
+.[
+svr42spg
+.]
+and descriptions for
+.BR SunOS\(rg 4.x,
+with the following portability considerations:
+.IP \(em \w'\(em\ \ 'u
+.B nit_pf
+is compatible with the module of the same name documented in old SunOS 4.1
+manual pages.
+.IP \(em
+This module was replaced in SunOS 5.x with the
+.BR pfmod (4)
+module.  The two are so similar that the
+.BR pfmod (4)
+module can be made to emulate the
+.BR nit_pf
+module when pushed under the name
+.RB \*(lq pf \*(rq.
+.PP
+Compatibility is tested using the
+.BR test-snit (8)
+test case executable and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Network interface taps and raw sockets and DLPI drivers have never been an
+interesting subject for standards organizations such as IEEE and the
+OpenGroup, and these modules have never been subjected to formal
+standardization.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B nbuf
+first appeared in
+.IR "SunOS\fR\(rg\fP 4.x" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

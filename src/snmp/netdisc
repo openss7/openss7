@@ -1,0 +1,189 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use threads;
+use threads::shared;
+use Thread qw/:DEFAULT async yield/;
+use Thread::Queue;
+use Carp;
+use constant {
+	MY_USE_GTK=>1,
+};
+if (MY_USE_GTK) {
+	use Gtk2 qw/-init -threads-init/;
+	use Gtk2::SimpleList;
+	use Glib;
+	use Goo::Canvas;
+	use Gtk2::Helper;
+} else {
+	use Tk;
+	use Tk::Xrm;
+	use Tk::Event;
+	use Tk::Trace;
+	require Tk::Toplevel;
+	require Tk::Adjuster;
+	require Tk::Dialog;
+	require Tk::HList;
+	require Tk::ItemStyle;
+	require Tk::ROText;
+	require Tk::NoteBook;
+	require Tk::Pane;
+	require Tk::Balloon;
+	require Tk::DragDrop;
+	require Tk::DropSite;
+	require Tk::TableMatrix;
+	require Tk::TableMatrix::Spreadsheet;
+	require Tk::Frame;
+	require Tk::TFrame;
+}
+use SNMP;
+use Net::IP;
+use Net::SNMP;
+use Data::Dumper;
+use Net::Libdnet::Arp;
+use Net::Libdnet::Intf;
+use Net::Libdnet::Route;
+use Net::hostent;
+use Socket;
+use SNMP::Info;
+use SNMP::Info::LLDP;
+use Data::Dumper;
+use FileHandle;
+use DBI;
+use Time::HiRes qw(gettimeofday tv_interval);
+use FindBin qw($Bin);
+use lib "$Bin";
+print STDERR "Loading Universal.pm...\n";
+require "Universal.pm";
+print STDERR "Loading Network.pm...\n";
+require "Network.pm";
+print STDERR "Loading Viewer.pm...\n";
+require "Viewer.pm";
+if (MY_USE_GTK) {
+	print STDERR "Loading GtkViewer.pm...\n";
+	require "GtkViewer.pm";
+} else {
+	print STDERR "Loading TkViewer.pm...\n";
+	require "TkViewer.pm";
+}
+use strict;
+
+$ENV{MIBDIRS} = '+'.join(':',qw{
+	/usr/share/netdisco/mibs
+	/usr/share/netdisco/mibs/allied
+	/usr/share/netdisco/mibs/arista
+	/usr/share/netdisco/mibs/aruba
+	/usr/share/netdisco/mibs/asante
+	/usr/share/netdisco/mibs/cabletron
+	/usr/share/netdisco/mibs/cisco
+	/usr/share/netdisco/mibs/cyclades
+	/usr/share/netdisco/mibs/dell
+	/usr/share/netdisco/mibs/enterasys
+	/usr/share/netdisco/mibs/extreme
+	/usr/share/netdisco/mibs/foundry
+	/usr/share/netdisco/mibs/hp
+	/usr/share/netdisco/mibs/juniper
+	/usr/share/netdisco/mibs/netscreen
+	/usr/share/netdisco/mibs/net-snmp
+	/usr/share/netdisco/mibs/nortel
+	/usr/share/netdisco/mibs/rfc
+});
+$SNMP::debugging = 0;
+$SNMP::verbose = 0;
+$SNMP::use_long_names = 0;
+$SNMP::use_sprint_value = 0;
+$SNMP::use_enums = 1;
+$SNMP::use_numeric = 0;
+$SNMP::best_guess = 2;
+$SNMP::save_descriptions = 1;
+SNMP::initMib();
+SNMP::addMibDirs(qw{
+	/usr/share/netdisco/mibs
+	/usr/share/netdisco/mibs/allied
+	/usr/share/netdisco/mibs/arista
+	/usr/share/netdisco/mibs/aruba
+	/usr/share/netdisco/mibs/asante
+	/usr/share/netdisco/mibs/cabletron
+	/usr/share/netdisco/mibs/cisco
+	/usr/share/netdisco/mibs/cyclades
+	/usr/share/netdisco/mibs/dell
+	/usr/share/netdisco/mibs/enterasys
+	/usr/share/netdisco/mibs/extreme
+	/usr/share/netdisco/mibs/foundry
+	/usr/share/netdisco/mibs/hp
+	/usr/share/netdisco/mibs/juniper
+	/usr/share/netdisco/mibs/netscreen
+	/usr/share/netdisco/mibs/net-snmp
+	/usr/share/netdisco/mibs/nortel
+	/usr/share/netdisco/mibs/rfc
+});
+SNMP::loadModules(qw{
+	SNMPv2-SMI
+	SNMPv2-TC
+	SNMPv2-MIB
+	RFC1213-MIB
+	IF-MIB
+	Q-BRIDGE-MIB
+	INET-ADDRESS-MIB
+	IP-MIB
+	LLDP-MIB
+	LLDP-EXT-DOT1-MIB
+	LLDP-EXT-DOT3-MIB
+	LLDP-EXT-MED-MIB
+});
+
+package main;
+use strict;
+use warnings;
+
+my $db = new Database('./.netdisc');
+my $model = new Model::Internet($db);
+my $gui;
+if (MY_USE_GTK) {
+	$gui = new Gui::Gtk($db,$model);
+} else {
+	$gui = new Gui::Tk($db,$model);
+}
+my @windows = values %{$gui->{gobjs}{Window}};
+unless (@windows) {
+	print STDERR "Creating window...\n";
+	my $window;
+	if (MY_USE_GTK) {
+		$window = new Window::Gtk($gui);
+	} else {
+		$window = new Window::Tk($gui);
+	}
+	print STDERR "Window is $window\n";
+	my $net = $model->{net}{PUBLIC};
+	print STDERR "Creating viewer...\n";
+	my $viewer = $window->new_viewer($net);
+}
+my $hkey = Item::makekey('127.0.0.1');
+my $loc = $model->{net}{LOOPBACK};
+$loc->getchild('Host::Ip::Here',$hkey,undef,[['Local::Here',$loc,$hkey]]);
+
+print STDERR "Entering main loop...\n";
+$gui->mainloop;
+
+exit;
+
+1;
+
+__END__
+
+	atTable
+	ifTable
+	ipAddrTable
+	ipRouteTable
+	ipAddressTable
+	ipNetToPhysicalTable
+	ipDefaultRouterTable
+	lldpLocPortTable
+	lldpLocManAddrTable
+	lldpRemTable
+	lldpRemManAddrTable
+	lldpRemOrgDefInfoTable
+
+
+

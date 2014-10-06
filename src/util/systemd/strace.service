@@ -1,0 +1,20 @@
+[Unit]
+Description=STREAMS trace logger
+Documentation=man:strace(8)
+ConditionPathIsMountPoint=/dev/streams
+Conflicts=streams-shutdown.target
+Before=streams-shutdown.target
+After=streams.service
+
+[Service]
+Type=forking
+EnvironmentFile=-/etc/sysconfig/strace
+EnvironmentFile=-/etc/default/strace
+EnvironmentFile=-/etc/conf.d/strace
+PIDFile=/var/run/strace.pid
+ExecStartPre=/bin/mkdir -p -- /var/log/streams
+ExecStart=/usr/sbin/strace -n $STRACE_OPTIONS
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=streams.target

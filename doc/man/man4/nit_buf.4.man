@@ -1,0 +1,351 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH NIT_BUF 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Modules"
+.\"
+.\"
+.SH NAME
+.B nit_buf, nbuf
+\- \fISTREAMS\fR NIT buffer module
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 8
+.BI "int " fd ;
+.PD 0
+.HP
+.BI "int open(" \*(lq\fR/dev/nit\fP\*(rq ", " \fR0\fP );
+.HP
+.BI "int ioctl(" fd ", " I_PUSH ", " \*(lqnbuf\*(rq );
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B nit_buf
+is a
+.I STREAMS
+module that buffers incoming messages, thereby reducing the number of system
+calls and associated overhead required to read and process them.  Although
+designed to be used in conjunction with the other components of NIT,
+.BR nit (4),
+.B nit_buf
+is a general purpose module and can be used anywhere
+.I STREAMS
+input buffering is required.
+.\"
+.SS Read-side Behavior
+.PP
+.B nit_buf
+collects incoming
+.BR M_DATA (9)
+and
+.BR M_PROTO (9)
+messages into chunks, passing each chunk upward when either the chunk becomes
+full or the current read timeout expires.  When a message arrives, it is
+processed for inclusion in a chunk, and then it is added to the current
+chunk.  The following paragraphs discuss each step in turn.
+.PP
+Upon receiving a message from below,
+.B nit_buf
+immediately converts all leading
+.BR M_PROTO (9)
+message blcoks in the message to
+.BR M_DATA (9)
+message blocks, altering only the message type field and leaving the contents
+alone.  It then prepends a header to the converted message.  This header is
+defined as follows.
+.sp
+.RS
+.nf
+\fC\s+1\
+struct nit_bufhdr {
+    u_int   nhb_msglen;
+    u_int   nhb_totlen;
+}
+\s-1\fP
+.fi
+.RE
+.sp
+.PP
+The first field of the header gives the length in bytes of the converted
+message.  The second field gives the distance in bytes from the start of the
+message in the current chunk (described below) to the start of the next
+message in the chunk; the value reflects any padding necessary to ensure
+correct data alignment for the host machine and includes the length of the
+header itself.
+.PP
+After preparing a message,
+.B nit_buf
+attempts to add it to the end of the current chunk, using the chunk size and
+timeout values to govern the addition.  (The chunk size and timeout values
+are set and inspected using the input-output control calls described below.)
+If adding the new message would make the current chunk grow larger than the
+chunk size,
+.B nit_buf
+closes off the current chunk, passing it up to the next module in line, and
+starts a new chunk, seeding it with a zero-length message.  If adding the
+message would still make the current chunk overflow, the module passes it
+upward in an over-size chunk of its own.  Otherwise, the module concatenates
+the message to the end of the current chunk.
+.PP
+To ensure that messages do not languish forever in an accumulating chunk,
+.B nit_buf
+maintains a read timeout.  Whenever this timeout expires, the module closes
+off the current chunk, regardless of its length, and passes it upward; if no
+incoming messages have arrived, the chunk passed upward will have zero
+length.  Whenever the module passes a chunk upward, it restarts the timeout
+period.  These two rules ensure that
+.B nit_buf
+minimizes the number of chunks it produces during periods of intense message
+activity and that it periodically disposes of all messages during slack
+intervals.
+.PP
+.B nit_buf
+handles other message types as follows.  Upon receiving a
+.BR M_FLUSH (9)
+message specifying that the read queue be flushed, the modules does so,
+clearing the currently accumulating chunk as well, and passes the message on
+to the module or driver above.  It passes all other messages through
+unaltered to its upper neighbour. 
+.\"
+.SS Write-side Behaviour
+.PP
+.B nit_buf
+intercepts
+.BR M_IOCTL (9)
+messages for the input-output control calls described below.  Upon receiving
+an
+.BR M_FLUSH (9)
+message specifying that the write queue be flushed, the modules does so and
+passes the message on to the module or driver below.  The module passes all
+other messages through unaltered to its lower neighbour.
+.\"
+.\"
+.SH IOCTLS
+.PP
+.B nit_buf
+responds to the following input-output controls.
+.TP \w'\fBNIOCGCHUNK\(em'u
+.B NIOCSTIME
+Set the read timeout value to the value referred to by the
+.B struct timeval
+pointer given as argument.  Setting the timeout value to zero has the
+side-effect of forcing the chunk size to zero as well, so that the module
+will pass all incoming messages upward immediately upon arrival.
+.TP
+.B NIOCGTIME
+Return the read timeout in the
+.B struct timeval
+pointed to by the argument.  If the timeout has been cleared with the
+.B NIOCCTIME
+input-output control, return with an
+.RB [ ERANGE ]
+error.
+.TP
+.B NIOCCTIME
+Clear the read timeout, effectively setting its value to infinity.
+.TP
+.B NIOCSCHUNK
+Set the chunk size to the value referred to by the
+.B u_int
+pointer given as argument.
+.TP
+.B NIOCGCHUNK
+Return the chunk size in the
+.B u_int
+pointed to by the argument.
+.\"
+.\"
+.SH WARNING
+.PP
+The module name
+.RB \*(rq nbuf \*(lq
+used in the system configuration file and as argument to the
+.IR I_PUSH (7)
+input-output control is provisional and subject to change.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+Note that
+.B nit_buf
+is implemented using the same module as is provided for
+.BR bufmod (4);
+it just responds in the same manner as would the
+.B nit_buf
+module when pushed as
+.RB \*(lq nbuf \*(rq.
+.\"
+.\"
+.SH CAVEATS
+.PP
+Note that the setting of the read options at the Stream head can
+significantly affect the operation when using
+.BR read "(2s) or " readv (2s)
+to read chunks from the Stream head.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR nit (4),
+.BR nit_if (4),
+.BR nit_pf (4).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B nit_buf
+is compatible with
+.BR "SVR 4.1" ,
+.[
+svr42spg
+.]
+and descriptions for
+.BR SunOS\(rg 4.x,
+with the following portability considerations:
+.IP \(em \w'\(em\ \ 'u
+.B nit_buf
+is compatible with the module of the same name documented in old SunOS 4.1
+manual pages.
+.IP \(em
+This module was replaced in SunOS 5.x with the
+.BR bufmod (4)
+module.  The two are so similar that the
+.BR bufmod (4)
+module can be made to emulate the
+.BR nit_buf
+module when pushed under the name
+.RB \*(lq nbuf \*(rq.
+.PP
+Compatibility is tested using the
+.BR test-nbuf (8)
+test case executable and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Network interface taps and raw sockets and DLPI drivers have never been an
+interesting subject for standards organizations such as IEEE and the
+OpenGroup, and these modules have never been subjected to formal
+standardization.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B nbuf
+first appeared in
+.IR "SunOS\fR\(rg\fP 4.x" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

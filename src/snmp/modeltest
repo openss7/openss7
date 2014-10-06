@@ -1,0 +1,297 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Carp;
+use Gtk2 '-init';
+use Gtk2::SimpleList;
+use Glib;
+use Goo::Canvas;
+use Gtk2::Helper;
+use SNMP;
+use Net::IP;
+use Net::SNMP;
+use Data::Dumper;
+use Net::Libdnet::Arp;
+use Net::Libdnet::Intf;
+use Net::Libdnet::Route;
+use Net::hostent;
+use Socket;
+use SNMP::Info;
+use SNMP::Info::LLDP;
+use Data::Dumper;
+use FileHandle;
+use DBI;
+use Time::HiRes qw(gettimeofday tv_interval);
+use FindBin qw($Bin);
+use lib "$Bin";
+#require "Network.pm";
+#require "GtkNetwork.pm";
+use strict;
+
+# ------------------------------------------
+package Canvas; our @ISA = qw(Gtk2::ScrolledWindow);
+use strict; use warnings; use Carp;
+use Gtk2; use Glib; use Goo::Canvas;
+# ------------------------------------------
+#package Canvas;
+our %model;
+#package Canvas;
+sub model_init {
+	my $root = $model{root} = new Goo::Canvas::GroupModel();
+	my $group;
+	$group = $model{groups}{blue} = new Goo::Canvas::GroupModel($root);
+	$group->raise;
+	$model{models}{bluebox} = new Goo::Canvas::RectModel($group,0,0,10,10,
+		'line-width'=>0.4,
+		'stroke-color'=>'blue',
+		'fill-color'=>'white',
+	);
+	$group = $model{groups}{black} = new Goo::Canvas::GroupModel($root);
+	$group->raise($model{groups}{blue});
+	$model{models}{blackbox} = new Goo::Canvas::RectModel($group,50,50,10,10,
+		'line-width'=>0.4,
+		'stroke-color'=>'black',
+		'fill-color'=>'white',
+	);
+	$group = $model{groups}{red} = new Goo::Canvas::GroupModel($root);
+	$group->raise($model{groups}{black});
+	$model{models}{redbox} = new Goo::Canvas::RectModel($group,100,100,10,10,
+		'line-width'=>0.4,
+		'stroke-color'=>'red',
+		'fill-color'=>'white',
+	);
+}
+#package Canvas;
+sub new {
+	my ($type,$windid,$pageid) = @_;
+	my $self = new Gtk2::ScrolledWindow();
+	bless $self,$type;
+	$self->{windid} = $windid;
+	$self->{pageid} = $pageid;
+	$self->set_policy('automatic','automatic');
+	my $canv = $self->{canv} = new Goo::Canvas();
+	$canv->set(
+		'background-color'=>'white',
+		'automatic-bounds'=>Glib::TRUE,
+		'units'=>'mm',
+	);
+	$self->add($canv);
+	$self->signal_connect('scroll-event'=>\&Canvas::scrollWindow,$canv);
+	$canv->signal_connect('scroll-event'=>\&Canvas::scrollCanvas,$self);
+	model_init() unless exists $model{root};
+	my $root = $self->{root} = $model{root};
+	$canv->set_root_item_model($root);
+	my $item = $self->{item} = $canv->get_root_item();
+	my ($group,$box);
+
+	$group = $canv->get_item($model{groups}{blue});
+	$box = new Goo::Canvas::Rect($group,0,0,10,10);
+	$box->set_model($model{models}{bluebox});
+	$box->set(x=>0,y=>0);
+	$box = new Goo::Canvas::Rect($group,5,5,10,10);
+	$box->set_model($model{models}{bluebox});
+	$box->set(x=>5,y=>5);
+
+	$group = $canv->get_item($model{groups}{black});
+	$box = new Goo::Canvas::Rect($group,10,10,10,10);
+	$box->set_model($model{models}{blackbox});
+	$box->set(x=>10,y=>10);
+	$box = new Goo::Canvas::Rect($group,15,15,10,10);
+	$box->set_model($model{models}{blackbox});
+	$box->set(x=>15,y=>15);
+
+	$group = $canv->get_item($model{groups}{red});
+	$box = new Goo::Canvas::Rect($group,20,20,10,10);
+	$box->set_model($model{models}{redbox});
+	$box->set(x=>20,y=>20);
+	$box = new Goo::Canvas::Rect($group,25,25,10,10);
+	$box->set_model($model{models}{redbox});
+	$box->set(x=>25,y=>25);
+
+	if (0) {
+		$group = $canv->get_item($model{groups}{blue});
+		$box = new Goo::Canvas::RectModel($group,0,0,10,10,
+			'line-width'=>0.4,
+			'stroke-color'=>'blue',
+			'fill-color'=>'white',
+		);
+		$box = new Goo::Canvas::RectModel($group,5,5,10,10,
+			'line-width'=>0.4,
+			'stroke-color'=>'blue',
+			'fill-color'=>'white',
+		);
+		$group = $canv->get_item($model{groups}{black});
+		$box = new Goo::Canvas::RectModel($group,10,10,10,10,
+			'line-width'=>0.4,
+			'stroke-color'=>'black',
+			'fill-color'=>'white',
+		);
+		$box = new Goo::Canvas::RectModel($group,15,15,10,10,
+			'line-width'=>0.4,
+			'stroke-color'=>'black',
+			'fill-color'=>'white',
+		);
+		$group = $canv->get_item($model{groups}{red});
+		$box = new Goo::Canvas::RectModel($group,20,20,10,10,
+			'line-width'=>0.4,
+			'stroke-color'=>'red',
+			'fill-color'=>'white',
+		);
+		$box = new Goo::Canvas::RectModel($group,25,25,10,10,
+			'line-width'=>0.4,
+			'stroke-color'=>'red',
+			'fill-color'=>'white',
+		);
+	}
+	return $self;
+}
+
+# ------------------------------------------
+package Window; our @ISA = qw(Gtk2::Window);
+use strict; use warnings; use Carp;
+use Gtk2; use Glib; use Goo::Canvas;
+# ------------------------------------------
+#package Window;
+our $windidn = 0;
+our @windows = ();
+our $quitting = 0;
+#package Window;
+sub new {
+	my ($type,$windid) = @_;
+	my $self = new Gtk2::Window('toplevel');
+	bless $self,$type;
+	if (defined $windid) {
+		if ($windidn <= $windid) {
+			$windidn = $windid+1;
+		}
+	} else {
+		$windid = $windidn;
+		$windidn++;
+	}
+	$self->{windid} = $windid;
+	#$self->Store::_init('winds',$windid);
+	my $mb = new Gtk2::MenuBar();
+	my $me = new Gtk2::Menu();
+	my $mi;
+	$mi = new_from_stock Gtk2::ImageMenuItem('gtk-new',undef);
+	$mi->signal_connect('activate'=>\&Window::menuSnmpNew,$self);
+	$me->append($mi);
+	$mi = new_from_stock Gtk2::ImageMenuItem('gkt-open',undef);
+	$mi->signal_connect('activate'=>\&Window::menuSnmpOpen,$self);
+	$me->append($mi);
+	$mi = new_from_stock Gtk2::ImageMenuItem('gkt-close',undef);
+	$mi->signal_connect('activate'=>\&Window::menuSnmpClose,$self);
+	$me->append($mi);
+	$mi = new_from_stock Gtk2::ImageMenuItem('gkt-quit',undef);
+	$mi->signal_connect('activate'=>\&Window::menuSnmpQuit,$self);
+	$me->append($mi);
+	my $mc = new Gtk2::MenuItem('_SNMP');
+	$mc->set_submenu($me);
+	$mb->append($mc);
+	my $nb = new Gtk2::Notebook();
+	$nb->popup_disable;
+	my $vb = new Gtk2::VBox();
+	$vb->set_spacing(0);
+	$vb->pack_start($mb,Glib::FALSE,Glib::FALSE,0);
+	$vb->pack_start($nb,Glib::TRUE,Glib::TRUE,0);
+	$self->set_type_hint('normal');
+	$self->set_default_size(800,640);
+	if (0) {
+		my $read = $self->read;
+		if ($read) {
+			$self->move($self->{xpos},$self->{ypos}) if defined $self->{xpos};
+			$self->resize($self->{width},$self->{height}) if defined $self->{width};
+			# If the window is in the database, then we need to read whatever notebook
+			# pages there are are.
+		}
+	}
+	$self->set_opacity(0.5);
+	$self->set_position('mouse');
+	$self->signal_connect('delete-event'=>sub{
+			my ($self,$ev) = @_;
+			my %windows = map {$_=>$_} @windows;
+			delete $windows{$self};
+			@windows = (values %windows);
+			if ($quitting or scalar @windows == 0) {
+				#$self->save_all;
+			} else {
+				#$self->remove;
+			}
+			if (scalar @windows == 0) {
+				$quitting = 1;
+				Gtk2->main_quit;
+			}
+			return Gtk2::EVENT_PROPAGATE;
+		});
+	$self->add($vb);
+	$self->show_all;
+	$self->{nb} = $nb;
+	push @windows, $self;
+	return $self;
+}
+#package Window;
+sub menuSnmpNew {
+	my ($mi,$self) = @_;
+	Carp::cluck join(', ',@_).": menu item invoked";
+}
+#package Window;
+sub menuSnmpOpen {
+	my ($mi,$self) = @_;
+	Carp::cluck join(', ',@_).": menu item invoked";
+}
+#package Window;
+sub menuSnmpClose {
+	my ($mi,$self) = @_;
+	Carp::cluck join(', ',@_).": menu item invoked";
+	my %windows = map {$_=>$_} @windows;
+	delete $windows{$self};
+	@windows = (values %windows);
+	#$self->remove;
+	$self->destroy;
+}
+#package Window;
+sub menuSnmpQuit {
+	my ($mi,$self) = @_;
+	Carp::cluck join(', ',@_).": menu item invoked";
+	$quitting = 1;
+	foreach (@windows) {
+		#$_->save_all
+	}
+	Gtk2->main_quit;
+}
+#package Window;
+sub add_canvas {
+	my ($self,$canvas) = @_;
+	my $nb = $self->{nb};
+	$nb->append_page($canvas,'Canvas '.$canvas->{pageid});
+	$nb->set_tab_detachable($canvas,Glib::TRUE);
+	$nb->set_tab_reorderable($canvas,Glib::TRUE);
+	$self->show_all;
+}
+#package Window;
+sub new_canvas {
+	my $self = shift;
+	my $windid = $self->{windid};
+	my $nb = $self->{nb};
+	my $pageid = $nb->get_n_pages;
+	my $canvas = new Canvas($windid,$pageid);
+	$self->add_canvas($canvas);
+}
+
+# ------------------------------------------
+package main;
+use strict; use warnings; use Carp;
+use Gtk2; use Glib; use Goo::Canvas;
+# ------------------------------------------
+
+my $window = new Window();
+$window->new_canvas();
+Gtk2->main();
+
+exit;
+
+1;
+
+__END__
+

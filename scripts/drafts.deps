@@ -1,0 +1,46 @@
+#!/usr/bin/awk -f
+
+BEGIN {
+    if ("srcdir" in ENVIRON)
+	srcdir = EINVRON["srcdir"]
+    if ("top_srcdir" in ENVIRON)
+	top_srcdir = EINVRON["top_srcdir"]
+    suffixes["ps"  ] = ".eps"; depends["ps"  ] = ".dvi"
+    suffixes["dvi" ] = ".eps"; depends["dvi" ] = ".texi"
+    suffixes["pdf" ] = ".pdf"; depends["pdf" ] = ".texi"
+    suffixes["html"] = ".png"; depends["html"] = ".texi"
+}
+{
+    f = $0
+    if (system("test -f " f) != 0) {
+	fd = srcdir "/" f
+    } else {
+	fd = f
+    }
+    while ((getline < fd) == 1) {
+	if (/^\.so[[:space:]]+/) {
+	    sub(/^\.so[[:space:]]+/, "")
+	    soelim[$0] = 1
+	    if (/\.pic$/) {
+		sub(/\.pic$/, "")
+		figures[$0] = 1
+	    }
+	}
+    }
+    close(fd)
+    t = f; sub(/\.me/, "", t); sub(/.*\//, "", t)
+    line = t ".txt " t ".dvi " t ".ps " t ".html:"
+    for (s in soelim) {
+	line = line " \\\n\t" s
+    }
+    line = line " \\\n\tidrefs"
+    print line
+    print t ".pdf: " t ".ps"
+    for (f in figures) {
+	print f ".pic: " f ".fig"
+	print f ".gif: " f ".fig"
+	print f ".eps: " f ".fig"
+    }
+}
+
+# vim: ft=awk sw=4 nocin fo+=tcqlorn

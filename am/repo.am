@@ -1,0 +1,1721 @@
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
+## =============================================================================
+## 
+# @(#) $RCSfile: repo.am,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-09-02 08:46:27 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU Affero General Public License as published by the Free
+## Software Foundation; version 3 of the License.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+## details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+## write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+## 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2011-09-02 08:46:27 $ by $Author: brian $
+##
+## =============================================================================
+
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
+
+repo-install-credentials:
+	@$(ECHO_V) "D: Making $@ in `pwd`."
+	@if test ! -d '$(DESTDIR)$(pkgcachedir)' ; then \
+		$(ECHO) "$(MKDIR_P) $(DESTDIR)$(pkgcachedir)" ; \
+		$(MKDIR_P) $(DESTDIR)$(pkgcachedir) ; \
+	fi
+	@( \
+		umask 0077 ; \
+		cd '$(DESTDIR)$(pkgcachedir)' ; \
+		un=; pw=; o=; f='credentials' ; \
+		if test \( -z "$$un" -o -z "$$pw" \) -a -n '$(pkgcachedir)' -a -d '$(DESTDIR)$(pkgcachedir)' ; then \
+		for s in '' .rpmsave .rpmnew ; do \
+		for p in '' '$(DISTDIR)/' ; do \
+			o=$$p$$f$$s ; \
+			test -e $$o || continue ; \
+			un=`awk 'BEGIN{FS="="}{if($$1~/^username$$/){print$$2;exit}}' $$o` ; \
+			pw=`awk 'BEGIN{FS="="}{if($$1~/^password$$/){print$$2;exit}}' $$o` ; \
+			test -n "$$un" -a -n "$$pw" || continue ; \
+			break 2 ; \
+		done ; \
+		done ; \
+		fi ; \
+		if test \( -z "$$un" -o -z "$$pw" \) -a -n '$(zyppcreddir)' -a -d '$(DESTDIR)$(zyppcreddir)' ; then \
+		for s in '' .rpmsave .rpmnew ; do \
+		for p in $(PACKAGE_UCNAME) NCC ; do \
+			o="$(DESTDIR)$(zyppcreddir)/$${p}credentials$$s" ; \
+			test -e $$o || continue ; \
+			un=`awk 'BEGIN{FS="="}{if($$1~/^username$$/){print$$2;exit}}' $$o` ; \
+			pw=`awk 'BEGIN{FS="="}{if($$1~/^password$$/){print$$2;exit}}' $$o` ; \
+			test -n "$$un" -a -n "$$pw" || continue ; \
+			break 2 ; \
+		done ; \
+		done ; \
+		fi ; \
+		if test \( -z "$$un" -o -z "$$pw" \) -a -n '$(yumrepodir)' -a -d '$(DESTDIR)$(yumrepodir)' ; then \
+		for s in '' .rpmsave .rpmnew ; do \
+			o="$(DESTDIR)$(yumrepodir)/$(PACKAGE).repo$$s" ; \
+			test -e $$o || continue ; \
+			un=`sed -n -r 's,^.*baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\1,p;t end;b;: end q' $$o` ; \
+			pw=`sed -n -r 's,^.*baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\3,p;t end;b;: end q' $$o` ; \
+			test -n "$$un" -a -n "$$pw" || continue ; \
+			break 1 ; \
+		done ; \
+		fi ; \
+		if test \( -z "$$un" -o -z "$$pw" \) -a -n '$(urpmiconfdir)' -a -d '$(DESTDIR)$(urpmiconfdir)' ; then \
+		for s in '' .rpmsave .rpmnew ; do \
+		for p in '' .$(PACKAGE) ; do \
+			o="$(DESTDIR)$(urpmiconfdir)/netrc$$p$$s" ; \
+			test -e $$o || continue ; \
+			un=`sed -n -r 's,^machine[[:space:]]*www.openss7.org[[:space:]]*login[[:space:]]*([^[:space:]]*)[[:space:]]*password[[:space:]]*([^[:space:]]*)[[:space:]]*.*$$,\1,p;t end;b;: end q' $$o` ; \
+			pw=`sed -n -r 's,^machine[[:space:]]*www.openss7.org[[:space:]]*login[[:space:]]*([^[:space:]]*)[[:space:]]*password[[:space:]]*([^[:space:]]*)[[:space:]]*.*$$,\2,p;t end;b;: end q' $$o` ; \
+			test -n "$$un" -a -n "$$pw" || continue ; \
+			break 2 ; \
+		done ; \
+		done ; \
+		fi ; \
+		if test \( -z "$$un" -o -z "$$pw" \) -a -n '$(aptrepodir)' -a -d '$(DESTDIR)$(aptrepodir)' ; then \
+		for s in '' .rpmsave .dpkg-old .rpmnew .dpkg-new ; do \
+		for p in $(PACKAGE) sources ; do \
+		for d in '$(aptrepodir)' '$(aptconfdir)' ; do \
+			o="$(DESTDIR)$$d$$p.list$$s" ; \
+			test -e $$o || continue ; \
+			un=`sed -n -r 's,^[#]?deb(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\2,p;t end;b;: end q' $$o` ; \
+			pw=`sed -n -r 's,^[#]?deb(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\4,p;t end;b;: end q' $$o` ; \
+			test -n "$$un" -a -n "$$pw" || continue ; \
+			break 3 ; \
+		done ; \
+		done ; \
+		done ; \
+		fi ; \
+		if test "$$o" != "$$f" -a -e "$$f" ; then \
+			$(ECHO) "mv -f -- $$f $$f.rpmsave" ; \
+			mv -f -- $$f $$f.rpmsave ; \
+		fi ; \
+		ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`$${un:+&un=$$un}$${pw:+&pw=$$pw}" ; \
+		ext="$$ext"`echo '/$(reposubdir)' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'` ; \
+		url='$(reposerv)://'"$${un:+$$un$${pw:+:$$pw}@}"'$(repobase)/$(reporoot)/'"$$f$$ext" ;  \
+		$(ECHO) "rm -f -- $$f" ; \
+		rm -f -- $$f ; \
+		if ! echo "$$url" | wget -i - -O $$f 2>/dev/null ; then \
+			if echo "$$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then \
+				u='anonymous'; p= ; \
+				m='Authorization required for repository access.' ; \
+				if test -n "$$DISPLAY" -a -x "`which zenity`" ; then \
+					zenity --info --text="$$m" --no-wrap || exit 1 ; \
+					while true ; do \
+						d="$$u" ; \
+						u=`zenity --entry --text="Username: " --entry-text="$$u" || exit 1` || exit 1 ; \
+						u=$${u:-$$d} ; \
+						test "$$u" != anonymous || break ; \
+						p=`zenity --entry --text="Passsword for '$$u': " --hide-text || exit 1` || continue ; \
+						test -z "$$p" || break ; \
+					done ; \
+				elif test -x "`which dialog`" ; then \
+					dialog --msgbox "$m" 5 50 >/dev/tty </dev/tty || exit 1 ; \
+					while true ; do \
+						d="$$u" ; \
+						u=`dialog --inputbox "Username: " 0 0 "$$u" 2>&1 >/dev/tty </dev/tty || exit 1` || exit 1 ; \
+						u=$${u:-$$d} ; \
+						test "$$u" != anonymous || break ; \
+						p=`dialog --passwordbox "Password for '$$u': " 0 0 2>&1 >/dev/tty </dev/tty || exit 1` || continue ; \
+						test -z "$$p" || break ; \
+					done ; \
+				else \
+					echo "$m" >/dev/tty ; \
+					while true ; do \
+						d="$$u" ; \
+						read -e  -p "Username ($$u): " u </dev/tty >/dev/tty || { echo '' >/dev/tty ; exit 1 ; } ; \
+						u=$${u:-$$d} ; \
+						test "$$u" != anonymous || break ; \
+						read -es -p "Password ($$u): " p </dev/tty >/dev/tty || { echo '' >/dev/tty ; continue ; } ; \
+						echo '' >/dev/tty ; \
+						test -z "$$p" || break ; \
+					done ; \
+				fi ; \
+				url='$(reposerv)://'"$${u:+$$u:$$p@}"'$(repobase)/$(reporoot)/'"$$f$$ext" ; \
+				$(ECHO) "rm -f -- $$f" ; \
+				rm -f -- $$f ; \
+				if ! echo "$$url" | wget -i - -O $$f 2>/dev/null ; then \
+					if test "$$o" != "$$f" ; then \
+						$(ECHO) "mv -f -- $$f.rpmsave $$f" ; \
+						mv -f -- $$f.rpmsave $$f ; \
+					fi ; \
+					m='Authorization failed.' ; \
+					if test -n "$$DISPLAY" -a -x "`which zenity`" ; then \
+						zenity --error --text="$m" --no-wrap ; \
+					elif test -x "`which dialog`" ; then \
+						dialog --msgbox "$m" 5 50 >/dev/tty </dev/tty ; \
+					else \
+						echo "$$m" >/dev/tty ; \
+					fi ; \
+					exit 1 ; \
+				fi ; \
+			fi ; \
+		fi ; \
+		if test ! -e $$f ; then \
+			if test "$$o" != "$$f" -a -e $$f.rpmsave ; then \
+				$(ECHO) "mv -f -- $$f.rpmsave $$f" ; \
+				mv -f -- $$f.rpmsave $$f ; \
+			fi ; \
+			exit 1 ; \
+		fi ; \
+	) || exit 1
+
+repo-uninstall-credentials:
+	@$(ECHO_V) "D: Making $@ in `pwd`."
+
+REPO_INSTALL			+= repo-install-credentials
+REPO_UNINSTALL			+= repo-uninstall-credentials
+
+repo-install-certs:
+	@$(ECHO_V) "D: Making $@ in `pwd`."
+	@$(NORMAL_INSTALL)
+	@c='OPENSS7-CA-CERT' ; \
+	if test ! -d '$(DESTDIR)$(sslcertdir)' ; then \
+		$(ECHO) " $(MKDIR_P) $(DESTDIR)$(sslcertdir)" ; \
+		$(MKDIR_P) $(DESTDIR)$(sslcertdir) ; \
+	fi ; \
+	$(ECHO) " $(INSTALL_DATA) $(srcdir)/scripts/$$c '$(DESTDIR)$(sslcertdir)/$$c.pem'" ; \
+	$(INSTALL_DATA) $(srcdir)/scripts/$$c '$(DESTDIR)$(sslcertdir)/$$c.pem' ; \
+	if test -z "$(DESTDIR)$(rootdir)" ; then \
+		$(ECHO) " $(C_REHASH)" ; \
+		$(C_REHASH) ; \
+	else \
+		s=`$(OPENSSL) x509 -hash -noout -in $(srcdir)/scripts/$$c` ; \
+		$(ECHO) " $(LN_S) -f -- $$c.pem $(DESTDIR)$(sslcertdir)/$$s.0" ; \
+		$(LN_S) -f -- $$c.pem $(DESTDIR)$(sslcertdir)/$$s.0 ; \
+	fi
+
+repo-uninstall-certs:
+	@$(ECHO_V) "D: Making $@ in `pwd`."
+	@$(NORMAL_UNINSTALL)
+	@c='OPENSS7-CA-CERT' ; \
+	s=`$(OPENSSL) x509 -hash -noout -in $(srcdir)/scripts/$$c` ; \
+	$(ECHO) " rm -f -- $(DESTDIR)$(sslcertdir)/$$c.pem $(DESTDIR)$(sslcertdir)/$$s.0" ; \
+	rm -f -- $(DESTDIR)$(sslcertdir)/$$c.pem $(DESTDIR)$(sslcertdir)/$$s.0
+
+REPO_INSTALL			+= repo-install-certs
+REPO_UNINSTALL			+= repo-uninstall-certs
+
+if WITH_INSTALL_SOURCE_YUM
+## WITH_INSTALL_SOURCE_YUM
+
+$(PACKAGE).yum.repo: Makefile
+	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	if test "$$rb" = 'Base' ; then rlist='Base Updates Extras Testing' ; else rlist="$$rb" ; fi ; \
+	for branch in $$rlist ; do \
+		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
+		for repo in '' 'Main' 'Debug' 'Devel' 'Source' ; do \
+			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			$(ECHO) '[$(PACKAGE)'$${b:+-$$b}$${r:+-$$r}']' ; \
+			if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) ; then \
+				$(ECHO) 'enabled = 1'; else $(ECHO) 'enabled = 0'; fi ; \
+			$(ECHO) 'name = $(PACKAGE_TITLE)'$${branch:+ $$branch}$${repo:+ $$repo}' ($(target_distos))'; \
+			$(ECHO) 'baseurl = $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}; \
+			$(ECHO) 'gpgkey = $(reposerv)://$(repobase)/$(reporoot)/tarballs/OPENSS7-GPG-KEY'; \
+			$(ECHO) 'gpgcheck = 1'; \
+			$(ECHO) ''; \
+		done ; \
+	done >$@
+
+INSTALL_YUM_REPOS = $(PACKAGE).yum.repo
+
+if MAINTAINER_MODE
+## MAINTAINER_MODE
+
+$(PACKAGE)-local.yum.repo: Makefile
+	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	repodir='$(rpmdistdir)'; test '$(REPODIR)' = '$(DISTDIR)' || repodir=`echo '$(rpmdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+	tardir='$(tardir)'; test '$(REPODIR)' = '$(DISTDIR)' || tardir=`echo '$(tardir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+	for branch in $$rb ; do \
+		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
+		if test -n '$(repobranch)' -a '$(rpmdistdir)' = '$(topdir)' ; then \
+			test "$$b" = '$(repobranch)' -o "/$$b" = '$(repobranch)' || continue ; s= ; else s="$$b" ; fi ; \
+		for repo in '' 'Main' 'Debug' 'Devel' 'Source' ; do \
+			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			$(ECHO) '[$(PACKAGE)-local'$${b:+-$$b}$${r:+-$$r}']' ; \
+			if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' -o -n '$(repobranch)' \) ; then \
+				$(ECHO) 'enabled = 1'; else $(ECHO) 'enabled = 0'; fi ; \
+			$(ECHO) 'name = $(PACKAGE_TITLE) Local'$${branch:+ $$branch}$${repo:+ $$repo}' ($(target_distos))'; \
+			$(ECHO) 'baseurl = file://'$${repodir}$${b:+/$$b}$${d:+/$$d}; \
+			$(ECHO) 'gpgkey = file://'$${tardir}'/OPENSS7-GPG-KEY'; \
+			$(ECHO) 'gpgcheck = 1'; \
+			$(ECHO) ''; \
+		done ; \
+	done >$@
+
+INSTALL_YUM_REPOS += $(PACKAGE)-local.yum.repo
+
+## MAINTAINER_MODE
+endif
+
+install-yum: $(INSTALL_YUM_REPOS)
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_INSTALL)
+	@if test -n "$(yumrepodir)" ; then \
+		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(yumrepodir)'" ; \
+		$(MKDIR_P) "$(DESTDIR)$(yumrepodir)" ; \
+		$(ECHO) " $(INSTALL_DATA) $(PACKAGE).yum.repo '$(DESTDIR)$(yumrepodir)/$(PACKAGE).repo'" ; \
+		$(INSTALL_DATA) $(PACKAGE).yum.repo "$(DESTDIR)$(yumrepodir)/$(PACKAGE).repo" ; \
+	fi
+	@if test -n "$(rpmgpgdir)" ; then \
+		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(rpmgpgdir)'" ; \
+		$(MKDIR_P) "$(DESTDIR)$(rpmgpgdir)" ; \
+		$(ECHO) " $(INSTALL_DATA) $(srcdir)/scripts/OPENSS7-GPG-KEY '$(DESTDIR)$(rpmgpgdir)/RPM-GPG-KEY-$(PACKAGE)'" ; \
+		$(INSTALL_DATA) $(srcdir)/scripts/OPENSS7-GPG-KEY "$(DESTDIR)$(rpmgpgdir)/RPM-GPG-KEY-$(PACKAGE)" ; \
+	fi
+if MAINTAINER_MODE
+	@if test -n "$(yumrepodir)" ; then \
+		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(yumrepodir)'" ; \
+		$(MKDIR_P) "$(DESTDIR)$(yumrepodir)" ; \
+		$(ECHO) " $(INSTALL_DATA) $(PACKAGE)-local.yum.repo '$(DESTDIR)$(yumrepodir)/$(PACKAGE)-local.repo'" ; \
+		$(INSTALL_DATA) $(PACKAGE)-local.yum.repo "$(DESTDIR)$(yumrepodir)/$(PACKAGE)-local.repo" ; \
+	fi
+endif
+
+uninstall-yum:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_UNINSTALL)
+	rm -f -- $(DESTDIR)$(yumrepodir)/$(PACKAGE).repo
+	rm -f -- $(DESTDIR)$(rpmgpgpdir)/RPM-GPG-KEY-$(PACKAGE)
+if MAINTAINER_MODE
+	rm -f -- $(DESTDIR)$(yumrepodir)/$(PACKAGE)-local.repo
+endif
+
+## When the stuff is installed go looking for the configuration file for the yum-kmod or
+## yum-fedorakmod plugin and change the 'pinkernels' and 'installforallkernels' options.
+##
+post-yum:
+	if test -n "$(yumkmodconf)" -a -f "$(DESTDIR)$(yumkmodconf)" ; then \
+		sed -r -e 's/^[[:space:]]*pinkernels.*$$/pinkernels = 1/;s/^[[:space:]]*installforallkernels.*$$/installforallkernels = 1/' \
+			"$(DESTDIR)$(yumkmodconf)" ; \
+		yum makecache ; \
+	fi
+
+#ALL_LOCAL			+= $(PACKAGE).yum.repo
+#INSTALL_DATA_LOCAL		+= install-yum
+#UNINSTALL_LOCAL		+= uninstall-yum
+#CLEANFILES			+= $(PACKAGE).yum.repo
+#POST_INSTALL_AM		+= post-yum
+
+if MAINTAINER_MODE
+#ALL_LOCAL			+= $(PACKAGE)-local.yum.repo
+#CLEANFILES			+= $(PACKAGE)-local.yum.repo
+endif
+
+MY_PHONY			+= install-yum uninstall-yum post-zypp
+
+## Install a yum installation source for both remote and local repositories.  This involves
+## downloading the @PACKAGE@.repo file, installing the @PACKAGE@-local.repo file, and performing yum
+## makecache.
+##
+repo-install-yum:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@if test ! -d '$(DESTDIR)$(yumrepodir)' ; then \
+		$(ECHO) "$(MKDIR_P) $(DESTDIR)$(yumrepodir)" ; \
+		$(MKDIR_P) $(DESTDIR)$(yumrepodir) ; \
+	fi
+	@if test ! -d '$(DESTDIR)$(pkgcachedir)' ; then \
+		$(ECHO) "$(MKDIR_P) $(DESTDIR)$(pkgcachedir)" ; \
+		$(MKDIR_P) $(DESTDIR)$(pkgcachedir) ; \
+	fi
+	@( \
+		umask 0077 ; \
+		un=; pw=; \
+		cd '$(DESTDIR)$(pkgcachedir)' ; \
+		o=; f='credentials' ; \
+		for s in '' .rpmsave .rpmnew ; do \
+			for p in $(DISTDIR)/ $(DESTDIR)$(zyppcreddir)/$(PACKAGE_UCNAME) $(DESTDIR)$(zyppcreddir)/NCC ; do \
+				o=$$p$$f$$s ; \
+				test -e $$o || continue ; \
+				un=`awk 'BEGIN{FS="="}{if($$1~/^username$$/){print$$2;exit}}' $$o` ; \
+				pw=`awk 'BEGIN{FS="="}{if($$1~/^password$$/){print$$2;exit}}' $$o` ; \
+				test -n "$$un" -a -n "$$pw" || continue ; \
+				break 2 ; \
+			done ; \
+		done ; \
+		cd '$(DESTDIR)$(yumrepodir)' ; \
+		o=; f='$(PACKAGE).repo' ; \
+		if test -z "$$un" -o -z "$$pw" ; then \
+			for s in '' .rpmsave .rpmnew ; do  \
+				o="$$f$$s" ; \
+				test -e $$o || continue ; \
+				un=`sed -n -r 's,^.*baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\1,p;t end;b;: end q' $$o` ; \
+				pw=`sed -n -r 's,^.*baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\3,p;t end;b;: end q' $$o` ; \
+				test -n "$$un" -a -n "$$pw" || continue ; \
+				break ; \
+			done ; \
+		fi ; \
+		if test $$o != $$f -a -e $$f ; then \
+			$(ECHO) "mv -f -- $$f $$f.rpmsave" ; \
+			mv -f -- $$f $$f.rpmsave || : ; \
+		fi ; \
+		ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`$${un:+&un=}$${un}$${pw:+&pw=}$${pw}" ; \
+		ext="$$ext"`echo '/$(reposubdir)' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'` ; \
+		key=; test -z "$$un" || key="$${un}$${pw:+:}$${pw}@" ; \
+		url='$(reposerv)://'"$${key}"'$(repobase)/$(reporoot)/rpms/repodata/'"$$f$$ext" ; \
+		$(ECHO) "rm -f -- $$f" ; \
+		rm -f -- $$f ; \
+		if ! echo "$$url" | wget -i - -O $$f 2>/dev/null ; then \
+			if echo "$$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then \
+				echo 'Authorization required for repository access.' >/dev/tty ; \
+				u='anonymous'; p= ; \
+				read -e  -p 'Username: ' u </dev/tty >/dev/tty; u=$${u:-anonymous} ; \
+				if test "$$u" != 'anonymous' ; then \
+				read -es -p 'Password: ' p </dev/tty >/dev/tty ; \
+				echo '' >/dev/tty ; \
+				fi ; \
+				key=; test -z "$$u" || key="$${u}:$${p}@" ; \
+				url='$(reposerv)://'"$${key}"'$(repobase)/$(reporoot)/rpms/repodata/'"$$f$$ext" ; \
+				$(ECHO) "rm -f -- $$f" ; \
+				rm -f -- $$f ; \
+				if ! echo "$$url" | wget -i - -O $$f 2>/dev/null ; then \
+					test ":$$o" != ":$$f" || mv -f -- $$f.rpmsave $$f ; \
+					echo 'Authorization failed.' >/dev/tty ; \
+					exit 1 ; \
+				fi ; \
+			fi ; \
+		fi ; \
+		if test ! -e $$f ; then \
+			if test ":$$o" != ":$$f" ; then \
+				$(ECHO) "mv -f -- $$f.rpmsave $$f" ; \
+				mv -f -- $$f.rpmsave $$f ; \
+			fi ; \
+			exit 1 ; \
+		fi ; \
+		rpmdistdir='$(rpmdistdir)' ; test '$(DISTDIR)' = '$(REPODIR)' || rpmdistdir=`echo '$(rpmdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+		tardir='$(tardir)' ; test '$(DISTDIR)' = '$(REPODIR)' || tardir=`echo '$(tardir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+		( \
+			$(ECHO) '[$(PACKAGE)]-local]' ; \
+			$(ECHO) 'enabled = 1' ; \
+			$(ECHO) 'name = $(PACKAGE_TITLE) Local Repository' ; \
+			$(ECHO) 'baseurl = file://'$${rpmdistdir} ; \
+			$(ECHO) 'gpgkey = file://'$${tardir}'/OPENSS7-GPG-KEY' ; \
+			$(ECHO) 'gpgcheck = 1' ; \
+			$(ECHO) 'repo_gpgcheck = 0' \
+		) >$(PACKAGE)-local.repo \
+	) || exit 1
+	@f='$(DESTDIR)$(yumkmodconf)' ; \
+	if test -f $$f ; then \
+		$(ECHO) "mv -f -- $$f $$f.rpmsave" ; \
+		mv -f -- $$f $$f.rpmsave ; \
+		$(ECHO) "sed -r 's,^pinkernels.*$$,pinkernels = 1,;s,^installforallkernels.*$$,installforallkernels = 1,' $$f.rpmsave >$$f" ; \
+		sed -r 's,^pinkernels.*$$,pinkernels = 1,;s,^installforallkernels.*$$,installforallkernels = 1,' $$f.rpmsave >$$f ; \
+		if diff $$f.rpmsave $$f >/dev/null 2>&1 ; then \
+			$(ECHO) "mv -f -- $$f.rpmsave $$f" ; \
+			mv -f -- $$f.rpmsave $$f ; \
+		fi ; \
+	fi
+	@if test -z '$(DESTDIR)$(rootdir)' ; then \
+		$(ECHO) "yum makecache" ; \
+		yum makecache || : ; \
+	fi
+
+## Install a yum installation source for the local repository.  This involves generating the
+## @PACKAGE@-local.repo file, installing it, and performing a `yum makecache'.  This target must be
+## executed as root when operating on the base directory.
+##
+repo-install-local-yum:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@d='$(DESTDIR)$(yumrepodir)' ; \
+	test -d $$d || { $(ECHO) "$(MKDIR_P) -- $$d" ; $(MKDIR_P) -- $$d ; } ; \
+	tardir=`echo '$(tardir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
+	rpmrepodir=`echo '$(rpmdistdir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
+	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
+	for b in '' updates extras testing $$rb ; do \
+		bran=`echo "$${b:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
+		for r in main debug devel source '' ; do \
+			repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
+			if test -d $$rpmrepodir/$${b:+/$$b}/RPMS ; then enabled=1 ; else enabled=0 ; fi ; \
+			$(ECHO) "[$(PACKAGE)-local$${b:+-$$b}$${r:+-$$r}]" ; \
+			$(ECHO) "name = $(PACKAGE_TITLE) $${bran} $${repo} ($(target_distos))" ; \
+			$(ECHO) "baseurl = file://$$rpmrepodir$${b:+/$$b}$${r:+/$$r}" ; \
+			$(ECHO) "gpgkey = file://$$tardir/OPENSS7-GPG-KEY" ; \
+			$(ECHO) "gpgcheck = 1" ; \
+			$(ECHO) "repo_gpgcheck = 0" ; \
+			$(ECHO) "enabled = $$enabled" ; \
+			$(ECHO) ""; \
+		done ; \
+	done >$$d/$(PACKAGE)-local.repo
+	@f='$(DESTDIR)$(yumkmodconf)' ; \
+	if test -f $$f ; then \
+		$(ECHO) "mv -f -- $$f $$f.rpmsave" ; \
+		mv -f -- $$f $$f.rpmsave ; \
+		$(ECHO) "sed -r 's,^pinkernels.*$$,pinkernels = 1,;s,^installforallkernels.*$$,installforallkernels = 1,' $$f.rpmsave >$$f" ; \
+		sed -r 's,^pinkernels.*$$,pinkernels = 1,;s,^installforallkernels.*$$,installforallkernels = 1,' $$f.rpmsave >$$f ; \
+		if diff $$f.rpmsave $$f >/dev/null 2>&1 ; then \
+			$(ECHO) "mv -f -- $$f.rpmsave $$f" ; \
+			mv -f -- $$f.rpmsave $$f ; \
+		fi ; \
+	fi
+	@if test -z '$(DESTDIR)$(rootdir)' ; then \
+		$(ECHO) "yum makecache" ; \
+		yum makecache || : ; \
+	fi
+
+## To remove a yum install source, first remove any changes that were made to the (fedora)kmod.conf
+## file.  The original (fedora)kmod.conf file is saved before changes in (fedora)kmod.conf.rpmsave
+## (when changes were actually made).  Restore (fedora)kmod.conf.rpmsave to (fedora)kmod.conf.
+## Disable and copy the @PACKAGE@.repo file to @PACKAGE@.repo.rpmsave so that the credentials will
+## be maintained even when the repository has been removed.  Next remove the @PACKAGE@.repo and
+## @PACKAGE@-local.repo repositories and rebuild the yum cache.
+##
+repo-uninstall-yum:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@f='$(DESTDIR)$(yumkmodconf)' ; \
+	if test -f $$f.rpmsave ; then \
+		if test -f $$f ; then \
+			if ! diff $$f $$f.rpmsave >/dev/null 2.&1 ; then \
+				$(ECHO) "mv -f -- $$f.rpmsave $$f" ; \
+				mv -f -- $$f.rpmsave $$f ; \
+			fi ; \
+		fi ; \
+		$(ECHO) "rm -f -- $$f.rpmsave" ; \
+		rm -f -- $$f.rpmsave ; \
+	fi
+	@f='$(DESTDIR)$(yumrepodir)/$(PACKAGE).repo' ; \
+	if test -f $$f ; then \
+		$(ECHO) "sed 's,^enabled[[:space:]]*=[[:space:]]*1[[:space:]]*$$,enabled = 0,' $$f >$$f.rpmsave" ; \
+		sed 's,^enabled[[:space:]]*=[[:space:]]*1[[:space:]]*$$,enabled = 0,' $$f >$$f.rpmsave ; \
+	fi
+	@for s in '' '-local' ; do \
+		f='$(DESTDIR)$(yumrepodir)/$(PACKAGE)'$$s'.repo' ; \
+		if test -f $$f ; then \
+			$(ECHO) "rm -f -- $$f" ; \
+			rm -f -- $$f ; \
+		fi ; \
+	done
+	@$(ECHO) "yum makecache" ; \
+	yum makecache || :
+
+REPO_INSTALL			+= repo-install-yum
+REPO_INSTALL_LOCAL		+= repo-install-local-yum
+REPO_UNINSTALL			+= repo-uninstall-yum
+
+## WITH_INSTALL_SOURCE_YUM
+endif
+
+if WITH_INSTALL_SOURCE_ZYPP
+## WITH_INSTALL_SOURCE_ZYPP
+
+$(PACKAGE_UCNAME).zypp.credentials: Makefile
+	( \
+	: ) >$@
+
+$(PACKAGE).zypp.service: Makefile
+	( \
+		$(ECHO) '[$(PACKAGE)]' ; \
+		$(ECHO) 'name=$(PACKAGE)' ; \
+		$(ECHO) 'enabled=1' ; \
+		$(ECHO) 'autorefresh=1' ; \
+		$(ECHO) 'url = $(reposerv)://$(repobase)/?credentials=$(PACKAGE_UCNAME)credentials' ; \
+		$(ECHO) 'type = ris' ; \
+	) >$@
+
+$(PACKAGE).zypp.repo: Makefile
+	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	if test "$$rb" = 'Base' ; then rlist='Base Updates Extras Testing' ; else rlist="$$rb" ; fi ; \
+	for branch in $$rlist ; do \
+		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
+		for repo in '' 'Main' 'Debug' 'Devel' 'Source' ; do \
+			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			$(ECHO) '[$(PACKAGE)'$${b:+-$$b}$${r:+-$$r}']' ; \
+			$(ECHO) 'name=$(PACKAGE_TITLE)'$${branch:+ $$branch}$${repo:+ $$repo}' ($(target_distos))'; \
+			if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) ; then \
+				$(ECHO) 'enabled=1'; else $(ECHO) 'enabled=0'; fi ; \
+			$(ECHO) 'autorefresh=1'; \
+			$(ECHO) 'baseurl=$(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}; \
+			$(ECHO) 'type=rpm-md'; \
+			$(ECHO) 'gpgcheck=1'; \
+			$(ECHO) 'gpgkey=$(reposerv)://$(repobase)/pubkey.asc'; \
+			$(ECHO) 'keeppackages=0'; \
+			$(ECHO) ''; \
+		done ; \
+	done >$@
+
+INSTALL_ZYPP_REPOS = $(PACKAGE).zypp.repo
+
+if MAINTAINER_MODE
+## MAINTAINER_MODE
+
+## The only purpose for making this file in the build directory before installing it is for
+## debugging.  This data really needs to be split into 3 files for them to be installed directly
+## into /etc/zypp/repos.d/.  Otherwise, they really need to be formatted identical to a yum .repo
+## file so that zypper can be used to import them.
+##
+$(PACKAGE)-local.zypp.repo: Makefile
+	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	repodir='$(rpmdistdir)'; test '$(REPODIR)' = '$(DISTDIR)' || repodir=`echo '$(rpmdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+	tardir='$(tardir)'; test '$(REPODIR)' = '$(DISTDIR)' || tardir=`echo '$(tardir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+	for branch in $$rb ; do \
+		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
+		if test -n '$(repobranch)' -a '$(rpmdistdir)' = '$(topdir)' ; then \
+			test "$$b" = '$(repobranch)' -o "/$$b" = '$(repobranch)' || continue ; s= ; else s="$$b" ; fi ; \
+		test -d '$(rpmdistdir}'"$${s:+/$$s}" || continue ; \
+		for repo in '' 'Main' 'Debug' 'Devel' 'Source' ; do \
+			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,' ; \
+			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,SRPMS,' ; \
+			$(ECHO) '[$(PACKAGE)-local'$${b:+-$$b}$${r:+-$$r}']' ; \
+			$(ECHO) 'name=$(PACKAGE_TITLE) Local'$${branch:+ $$branch}$${repo:+ $$repo}' ($(target_distos))'; \
+			if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' -o -n '$(repobranch)' \) ; then \
+				$(ECHO) 'enabled=1'; else $(ECHO) 'enabled=0'; fi ; \
+			$(ECHO) 'autorefresh=0'; \
+			$(ECHO) 'baseurl = file://'$${repodir}$${b:+/$$b}$${d:+/$$d}; \
+			$(ECHO) 'gpgcheck=1'; \
+			$(ECHO) 'gpgkey = file://'$${tardir}'/OPENSS7-GPG-KEY'; \
+			$(ECHO) 'keeppackages=0'; \
+			$(ECHO) ''; \
+		done ; \
+	done >$@
+
+INSTALL_ZYPP_REPOS += $(PACKAGE)-local.zypp.repo
+
+## MAINTAINER_MODE
+endif
+
+install-zypp: $(INSTALL_ZYPP_REPOS)
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_INSTALL)
+	@if test -n "$(zypprepodir)" ; then \
+		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(zypprepodir)'" ; \
+		$(MKDIR_P) "$(DESTDIR)$(zypprepodir)" ; \
+		$(ECHO) " $(INSTALL_DATA) $(PACKAGE).zypp.repo '$(DESTDIR)$(zypprepodir)/$(PACKAGE).repo'" ; \
+		$(INSTALL_DATA) $(PACKAGE).zypp.repo "$(DESTDIR)$(zypprepodir)/$(PACKAGE).repo" ; \
+	fi
+if MAINTAINER_MODE
+	@if test -n "$(zypprepodir)" ; then \
+		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(zypprepodir)'" ; \
+		$(MKDIR_P) "$(DESTDIR)$(zypprepodir)" ; \
+		$(ECHO) " $(INSTALL_DATA) $(PACKAGE)-local.zypp.repo '$(DESTDIR)$(zypprepodir)/$(PACKAGE)-local.repo'" ; \
+		$(INSTALL_DATA) $(PACKAGE)-local.zypp.repo "$(DESTDIR)$(zypprepodir)/$(PACKAGE)-local.repo" ; \
+	fi
+endif
+
+uninstall-zypp:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_UNINSTALL)
+	rm -f -- $(DESTDIR)$(zypprepodir)/$(PACKAGE).repo
+if MAINTAINER_MODE
+	rm -f -- $(DESTDIR)$(zypprepodir)/$(PACKAGE)-local.repo
+endif
+
+## When multiversion is set in the zypp.conf file, we need to make sure that it is set to
+## multiversion = provides:multiversion(kernel).
+##
+post-zypp:
+	if test -n "$(zyppconfig)" - a -f "$(DESTDIR)$(zyppconfig)" ; then \
+		sed -r -e 's/^[[:space:]]*multiversion.*$$/mulversion = provides:multiversion(kernel)/' \
+			"$(DESTDIR)$(zyppconfig)" ; \
+		zypper refresh ; \
+	fi
+
+
+#ALL_LOCAL			+= $(PACKAGE).zypp.repo
+#INSTALL_DATA_LOCAL		+= install-zypp
+#UNINSTALL_LOCAL		+= uninstall-zypp
+#CLEANFILES			+= $(PACKAGE).zypp.repo
+#POST_INSTALL_AM		+= post-zypp
+
+MY_PHONY			+= install-zypp uninstall-zypp post-zypp
+
+## Install a zypp installation source for the remote repository.  This involves downloading
+## @PACKAGE_UCNAME@credentials file and then adding and activating the @PACKAGE_UCNAME@-service.
+## The purpose of this target is to test the repository, not the mechanism for establishing access
+## to the repository.  Unfortunately, the @PACKAGE@-repo rpm cannot recursively invoke zypper
+## commands from rpm scriplets.  Here, however, aside from the credentials file, this can be
+## accomplished with zypper commands alone.
+##
+## Note that we also search the distribution directory for a machine credentials file so that our
+## laboratory machines are not always pulling down a difference set of credentials for each
+## distribution loaded on that machine.
+##
+repo-install-zypp:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@if test ! -d '$(DESTDIR)$(zyppcreddir)' ; then \
+		$(ECHO) "$(MKDIR_P) $(DESTDIR)$(zyppcreddir)" ; \
+		$(MKDIR_P) $(DESTDIR)$(zyppcreddir) ; \
+	fi
+	@(
+		umask 0077 ; \
+		cd '$(DESTDIR)$(zyppcreddir)' ; \
+		un=; pw=; o=; f='$(PACKAGE_UCNAME)credentials' ; \
+		for s in '' '.rpmsave' '.rpmnew' ; do \
+			for p in '$(DISTDIR)/' '$(PACKAGE_UCNAME)' 'NCC' ; do ; \
+				o=$${p}credentials$$s ; \
+				if test -e $$o ; then \
+					un=`awk 'BEGIN{FS="="}{if($$1~/^username$$/){print$$2;exit}}' $$o` ; \
+					pw=`awk 'BEGIN{FS="="}{if($$1~/^password$$/){print$$2;exit}}' $$o` ; \
+					test -n "$$un" -a -n "$$pw" || continue ; \
+					break 2 ; \
+				fi ; \
+			done ; \
+		done ; \
+		if test "$$o" != "$$f" -a -e "$$f" ; then \
+			$(ECHO) "mv -f -- $$f $$f.rpmsave" ; \
+			mv -f -- $$f $$f.rpmsave ; \
+		fi ; \
+		ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`$${un:+&un=$$un}$${pw:+&pw=$$pw}" ; \
+		ext="$$ext"`echo '/$(reposubdir)' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'` ; \
+		url='$(reposerv)://'"$${un:+$$un$${pw:+:$$pw}@}"'$(repobase)/$(reporoot)/'"$$f$$ext" ;  \
+		$(ECHO) "rm -f -- $$f" ; \
+		rm -f -- $$f ; \
+		if ! echo "$$url" | wget -i - -O $$f 2>/dev/null ; then \
+			if echo "$$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then \
+				echo 'Authorization required for repository access.' >/dev/tty ; \
+				u='anonymous'; p= ; \
+				read -e  -p 'Username: ' u </dev/tty >/dev/tty; u=$${u:-anonymous} ; \
+				if test "$$u" != 'anonymous' ; then \
+				read -es -p 'Password: ' p </dev/tty >/dev/tty ; \
+				echo '' >/dev/tty ; \
+				fi ; \
+				url='$(reposerv)://'"$${u:+$$u:$$p@}"'$(repobase)/$(reporoot)/'"$$f$$ext" ; \
+				$(ECHO) "rm -f -- $$f" ; \
+				rm -f -- $$f ; \
+				if ! echo "$$url" | wget -i - -O $$f 2>/dev/null ; then \
+					if test "$$o" != "$$f" ; then \
+						$(ECHO) "mv -f -- $$f.rpmsave $$f" ; \
+						mv -f -- $$f.rpmsave $$f ; \
+					fi ; \
+					echo 'Authorization failed.' >/dev/tty ; \
+					exit 1 ; \
+				fi ; \
+			fi ; \
+		fi ; \
+		if test -e $$f ; then \
+			$(ECHO) "chmod go-rw $$f" ; \
+			chmod go-rw $$f ; \
+			un=`awk 'BEGIN{FS="="}{if($$1~/^username$$/){print$$2;exit}}' $$f` ; \
+			pw=`awk 'BEGIN{FS="="}{if($$1~/^password$$/){print$$2;exit}}' $$f` ; \
+			test -d '$(DISTDIR)' || { $(ECHO) "$(MKDIR_P) '$(DISTDIR)'" ; $(MKDIR_P) '$(DISTDIR)' ; } ; \
+			$(ECHO) "echo -e \"username=$$un\\npassword=$$pw\" >$(DISTDIR)/credentials" ; \
+			echo -e "username=$$un\npassword=$$pw" >$(DISTDIR)/credentials ; \
+		else \
+			if test "$$o" != "$$f" ; then \
+				$(ECHO) "mv -f -- $$f.rpmsave $$f" ; \
+				mv -f -- $$f.rpmsave $$f ; \
+			fi ; \
+			exit 1 ; \
+		fi ; \
+	) || exit 1
+	@f='$(DESTDIR)$(zyppconfig)' ; \
+	if test -f $$f ; then \
+		$(ECHO) "mv -f -- $$f $$f.rpmsave" ; \
+		mv -f -- $$f $$f.rpmsave ; \
+		$(ECHO) "sed -r 's,^multiversion.*$$,multiversion = provides:multiversion(kernel),' $$f.rpmsave >$$f" ; \
+		sed -r 's,^multiversion.*$$,multiversion = provides:multiversion(kernel),' $$f.rpmsave >$$f ; \
+		if ! diff $$f.rpmsave $$f >/dev/null 2>&1 ; then \
+			$(ECHO) "mv -f -- $$f.rpmsave $$f" ; \
+			mv -f -- $$f.rpmsave $$f ; \
+		fi ; \
+	fi
+	@if test -z '$(DESTDIR)$(rootdir)' ; then \
+		$(ECHO) "zypper addservice -t ris -n '$(PACKAGE_UCNAME)-service' \
+			'$(reposerv)://$(repobase)/?credentials=$(PACKAGE_UCNAME)credentials' \
+			'$(PACKAGE_UCNAME)-service'" ; \
+		zypper addservice -t ris -n '$(PACKAGE_UCNAME)-service' \
+			'$(reposerv)://$(repobase)/?credentials=$(PACKAGE_UCNAME)credentials' \
+			'$(PACKAGE_UCNAME)-service' ; \
+		$(ECHO) "zypper modifyservice -r -i -e '$(PACKAGE_UCNAME)-service'" ; \
+		zypper modifyservice -r -i -e '$(PACKAGE_UCNAME)-service' ; \
+		if test :$$(basename '$(REPODIR)') = ':repo' ; then \
+			$(ECHO) "zypper addservice -t ris -n '$(PACKAGE_UCNAME)-local-service' \
+				\"file://`dirname '$(REPODIR)'`\" \
+				'$(PACKAGE_UCNAME)-local-service'" ; \
+			zypper addservice -t ris -n '$(PACKAGE_UCNAME)-local-service' \
+				"file://`dirname '$(REPODIR)'`" \
+				'$(PACKAGE_UCNAME)-local-service' ; \
+			$(ECHO) "zypper modifyservice -r -i -e '$(PACKAGE_UCNAME)-local-service'" ; \
+			zypper modifyservice -r -i -e '$(PACKAGE_UCNAME)-local-service' ; \
+		fi ; \
+		$(ECHO) "zypper refresh" ; \
+		zypper refresh || : ; \
+	fi
+
+## Install a zypp installation source for the local repository.  This involves generating the
+## repository repoindex.xml file and then adding and activating the repository service.  Note that
+## the repoindex.xml and its associated repoindex.xml.asc signature file are generated by the
+## release-install and update-install targets in the repository.  All that is left to do here is to
+## install and activate the service.
+##
+repo-install-local-zypp:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@f='$(DESTDIR)$(zyppconfig)' ; \
+	if test -f $$f ; then \
+		$(ECHO) "D: $@: editting $$f" ; \
+		$(ECHO) "   mv -f -- $$f $$f.rpmsave" ; \
+		mv -f -- $$f $$f.rpmsave ; \
+		$(ECHO) "   sed -r 's,^multiversion.*$$,multiversion = provides:multiversion(kernel),' $$f.rpmsave >$$f" ; \
+		sed -r 's,^multiversion.*$$,multiversion = provides:multiversion(kernel),' $$f.rpmsave >$$f ; \
+		if ! diff $$f.rpmsave $$f >/dev/null 2>&1 ; then \
+			$(ECHO) "   mv -f -- $$f.rpmsave $$f" ; \
+			mv -f -- $$f.rpmsave $$f ; \
+		fi ; \
+	fi
+	@name='$(PACKAGE_UCNAME)-local-service' ; path=`dirname $(REPODIR)` ; \
+	if test -z '$(DESTDIR)$(rootdir)' ; then \
+		$(ECHO) "D: $@: adding $$name" ; \
+		$(ECHO) "   zypper addservice -t ris -n $$name file://$$path/ $$name" ; \
+		zypper addservice -t ris -n $$name file://$$path/ $$name ; \
+		$(ECHO) "   zypper modifyservice -r -i -e $$name" ; \
+		zypper modifyservice -r -i -e $$name ; \
+		$(ECHO) "   zypper refresh" ; \
+		zypper refresh || :; \
+	fi
+
+## To remove a zypper install source, first remove any changes that we made to the zypp.conf file.
+## The original zypp.conf file is saved before making changes in zypp.conf.rpmsave (when changes
+## were actually made).  Restore zypp.conf.rpmsave to zypp.conf.  Copy the
+## @PACKAGE_UCNAME@credentials file to @PACKAGE_UCNAME@credentials.rpmsave so that the credentials
+## will be maintained even when the services have been removed.  Next remove the
+## @PACKAGE_UCNAME@-service and @PACKAGE_UCNAME@-local-service services and refresh zypper.
+##
+repo-uninstall-zypp:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@f='$(DESTDIR)$(zyppconfig)' ; \
+	if test -f $$f.rpmsave ; then \
+		if test -f $$f ; then \
+			if ! diff $$f $$f.rpmsave >/dev/null 2>&1 ; then \
+				$(ECHO) "mv -f -- $$f.rpmsave $$f" ; \
+				mv -f -- $$f.rpmsave $$f ; \
+			fi ; \
+		fi ; \
+		$(ECHO) "rm -f -- $$f.rpmsave" ; \
+		rm -f -- $$f.rpmsave ; \
+	fi
+	zypper removeservice --loose-auth --loose-query '$(PACKAGE_UCNAME)-service'
+	zypper removeservice --loose-auth --loose-query '$(PACKAGE_UCNAME)-local-service'
+	@$(ECHO) "zypper refresh" ; \
+	zypper refresh || :
+
+REPO_INSTALL			+= repo-install-zypp
+REPO_INSTALL_LOCAL		+= repo-install-local-zypp
+REPO_UNINSTALL			+= repo-uninstall-zypp
+
+## WITH_INSTALL_SOURCE_ZYPP
+endif
+
+if WITH_INSTALL_SOURCE_URPMI
+## WITH_INSTALL_SOURCE_URPMI
+
+$(PACKAGE).media.cfg: Makefile
+	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	if test "$$rb" = 'Base' ; then rlist='Base Updates Extras Testing' ; else rlist="$$rb" ; fi ; \
+	( \
+		$(ECHO) "[media_info]" ; \
+		$(ECHO) "version=$(target_edition)" ; \
+		$(ECHO) "mediacfg_version=2" ; \
+		$(ECHO) "branch=OpenSS7" ; \
+		$(ECHO) "arch=$(target_cpu)" ; \
+		$(ECHO) "xml-info=1" ; \
+		$(ECHO) "" ; \
+		for branch in $$rlist ; do \
+			b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
+			for repo in '' 'Main' 'Debug' 'Devel' 'Source' ; do \
+				r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+				d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+				if test -z "$$b" ; then s="$$r" ; else s="$$b$${r:+/$$r}" ; fi ; \
+				stem=`echo "$$s" | sed 's,[^a-zA-Z0-9_],_,g'` ; \
+				bran=`echo "$$r" | sed 's,main,Main,;t;s,debug,Debug,;t;s,devel,Devel,;t;s,source,Source,;t;s,^$$,Full,'` ; \
+				$(ECHO) "[$$s]" ; \
+				$(ECHO) "hdlist=hdlist_$$stem.cz" >/dev/null ; \
+				$(ECHO) "synthesis=synthesis.hdlist_$$stem.cz" > /dev/null ; \
+				$(ECHO) "info=info_$$stem.xml.lzma" >/dev/null ; \
+				$(ECHO) "changelog=changelog_$$stem.xml.lzma" >/dev/null ; \
+				$(ECHO) "files=files_$$stem.xml.lzma" >/dev/null ; \
+				$(ECHO) "name=$${branch} $${bran}" ; \
+				case "$$r" in \
+				(source) $(ECHO) "rpms=$${b:+$$b/}main" ;; \
+				(*)      $(ECHO) "srpms=$${b+$$b/}source" ;; \
+				esac ; \
+				$(ECHO) "media_type=release:$${b:-base}:$${r:-full}" ; \
+				case "$$b:$$r" in \
+				(*:debug|*:devel|*:source|testing:*) $(ECHO) "noauto=1" ;; \
+				esac ; \
+				$(ECHO) "" ; \
+			done ; \
+		done ; \
+	) >$@
+
+INSTALL_URPMI_REPOS = $(PACKAGE).media.cfg
+		
+$(PACKAGE).url: Makefile
+	$(ECHO) "$(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)" >$@
+
+INSTALL_URPMI_REPOS += $(PACKAGE).url
+
+$(PACKAGE).mirrorlist: Makefile
+	$(ECHO) "" >$@
+
+INSTALL_URPMI_REPOS += $(PACKAGE).mirrorlist
+
+if MAINTAINER_MODE
+## MAINTAINER_MODE
+
+$(PACKAGE)-local.media.cfg: Makefile
+	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	repodir='$(rpmdistdir)'; test '$(REPODIR)' = '$(DISTDIR)' || repodir=`echo '$(rpmdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+	tardir='$(tardir)'; test '$(REPODIR)' = '$(DISTDIR)' || tardir=`echo '$(tardir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+	( \
+		$(ECHO) "[media_info]" ; \
+		$(ECHO) "version=$(target_edition)" ; \
+		$(ECHO) "mediacfg_version=2" ; \
+		$(ECHO) "branch=OpenSS7-local" ; \
+		$(ECHO) "arch=$(target_cpu)" ; \
+		$(ECHO) "xml-info=1" ; \
+		$(ECHO) "" ; \
+		for branch in $$rb ; do \
+			b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
+			if test -n '$(repobranch)' -a '$(rpmdistdir)' = '$(topdir)' ; then \
+				test "$$b" = '$(repobranch)' -o "/$$b" = '$(repobranch)' || continue ; s= ; else s="$$b" ; fi ; \
+			for repo in '' 'Main' 'Debug' 'Devel' 'Source' ; do \
+				r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+				d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+				if test -z "$$s" ; then l="$$r" ; else l="$$s$${r:+/$$r}" ; fi ; \
+				stem=`echo "$$l" | sed 's,[^a-zA-Z0-9_],_,g'` ; \
+				bran=`echo "$$r" | sed 's,main,Main,;t;s,debug,Debug,;t;s,devel,Devel,;t;s,source,Source,;t;s,^$$,Full,'` ; \
+				$(ECHO) "[$$l]" ; \
+				$(ECHO) "hdlist=hdlist_$$stem.cz" >/dev/null ; \
+				$(ECHO) "synthesis=synthesis.hdlist_$$stem.cz" >/dev/null ; \
+				$(ECHO) "info=info_$$stem.xml.lzma" >/dev/null ; \
+				$(ECHO) "changelog=changelog_$$stem.xml.lzma" >/dev/null ; \
+				$(ECHO) "files=files_$$stem.xml.lzma" >/dev/null ; \
+				$(ECHO) "name=$${branch} $${bran}" ; \
+				case "$$r" in \
+				(source) $(ECHO) "rpms=$${b:+$$b/}main" ;; \
+				(*)      $(ECHO) "srpms=$${b:+$$b/}source" ;; \
+				esac ; \
+				$(ECHO) "media_type=release:$${b:-base}:$${r:-full}" ; \
+				case "$$b:$$r" in \
+				(*:debug|*:devel|*:source|testing:*) $(ECHO) "noauto=1" ;; \
+				esac ; \
+				$(ECHO) "" ; \
+			done ; \
+		done ; \
+	) >$@
+
+INSTALL_URPMI_REPOS += $(PACKAGE)-local.media.cfg
+
+$(PACKAGE)-local.url: Makefile
+	repodir='$(rpmdistdir)'; test '$(REPODIR)' = '$(DISTDIR)' || repodir=`echo '$(rpmdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+	$(ECHO) "file://$$repodir" >$@
+
+INSTALL_URPMI_REPOS += $(PACKAGE)-local.url
+	$(ECHO) "" >$@
+
+$(PACKAGE)-local.mirrorlist: Makefile
+
+INSTALL_URPMI_REPOS += $(PACKAGE)-local.mirrorlist
+
+## MAINTAINER_MODE
+endif
+
+install-urpmi: $(INSTALL_URPMI_REPOS)
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_INSTALL)
+	@if test -n "$(urpmirepodir)" ; then \
+		d='$(DESTDIR)$(urpmirepodir)/OpenSS7-$(target_edition)-$(target_cpu)' ; \
+		test -d -- $$d || { $(ECHO) " $(MKDIR_P) '$$d'" ; $(MKDIR_P) "$$d" ; } ; \
+		for f in 'media.cfg' 'url' 'mirrorlist' ; do \
+			$(ECHO) " $(INSTALL_DATA) $(PACKAGE).$$f '$$d/$$f'" ; \
+			$(INSTALL_DATA) $(PACKAGE).$$f "$$d/$$f" ; \
+		done ; \
+	fi
+	@if test -n "$(rpmgpgdir)" ; then \
+		d='$(DESTDIR)$(rpmgpgdir)' ; \
+		test -d -- $$d || { $(ECHO) " $(MKDIR_P) '$$d'" ; $(MKDIR_P) "$$d" ; } ; \
+		$(ECHO) " $(INSTALL_DATA) $(srcdir)/scripts/OPENSS7-GPG-KEY '$$d/RPM-GPG-KEY-$(PACKAGE_UCNAME)'" ; \
+		$(INSTALL_DATA) $(srcdir)/scripts/OPENSS7-GPG-KEY "$$d/RPM-GPG-KEY-$(PACKAGE_UCNAME)" ; \
+	fi
+if MAINTAINER_MODE
+	@if test -n "$(urpmirepodir)" ; then \
+		d='$(DESTDIR)$(urpmirepodir)/OpenSS7-local-$(target_edition)-$(target_cpu)' ; \
+		test -d -- $$d || { $(ECHO) " $(MKDIR_P) '$$d'" ; $(MKDIR_P) "$$d" ; } ; \
+		for f in 'media.cfg' 'url' 'mirrorlist' ; do \
+			$(ECHO) " $(INSTALL_DATA) $(PACKAGE)-local.$$f '$$d/$$f'" ; \
+			$(INSTALL_DATA) $(PACKAGE)-local.$$f "$$d/$$f" ; \
+		done ; \
+	fi
+endif
+
+uninstall-urpmi:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_UNINSTALL)
+	rm -f -- $(DESTDIR)$(urpmirepodir)/OpenSS7-$(target_edition)-$(target_cpu)/media.cfg
+	rm -f -- $(DESTDIR)$(urpmirepodir)/OpenSS7-$(target_edition)-$(target_cpu)/url
+	rm -f -- $(DESTDIR)$(urpmirepodir)/OpenSS7-$(target_edition)-$(target_cpu)/mirrorlist
+	rmdir -- $(DESTDIR)$(urpmirepodir)/OpenSS7-$(target_edition)-$(target_cpu) 2>/dev/null || :
+	rm -f -- $(DESTDIR)$(rpmgpgdir)/RPM-GPG-KEY-$(PACKAGE_UCNAME)
+if MAINTAINER_MODE
+	rm -f -- $(DESTDIR)$(urpmirepodir)/OpenSS7-local-$(target_edition)-$(target_cpu)/media.cfg
+	rm -f -- $(DESTDIR)$(urpmirepodir)/OpenSS7-local-$(target_edition)-$(target_cpu)/url
+	rm -f -- $(DESTDIR)$(urpmirepodir)/OpenSS7-local-$(target_edition)-$(target_cpu)/mirrorlist
+	rmdir -- $(DESTDIR)$(urpmirepodir)/OpenSS7-local-$(target_edition)-$(target_cpu) 2>/dev/null || :
+endif
+
+#ALL_LOCAL		+= $(PACKAGE).media.cfg $(PACKAGE).url $(PACKAGE).mirrorlist
+#INSTALL_DATA_LOCAL	+= install-urpmi
+#UNINSTALL_LOCAL	+= uninstall-urpmi
+#CLEANFILES		+= $(PACKAGE).media.cfg $(PACKAGE).url $(PACKAGE).mirrorlist
+
+if MAINTAINER_MODE
+#ALL_LOCAL		+= $(PACKAGE)-local.media.cfg $(PACKAGE)-local.url $(PACKAGE)-local.mirrorlist
+#CLEANFILES		+= $(PACKAGE)-local.media.cfg $(PACKAGE)-local.url $(PACKAGE)-local.mirrorlist
+endif
+
+MY_PHONY		+= install-urpmi uninstall-urpmi
+
+## Install a urpmi installation source for remote repositories.  This involves downloading and
+## installing the @PACKAGE@ media.cfg, mirrorlist, and url files and performing the actions
+## associated with the urpmi.addmedia and urpmi.update command.  Note that this target only installs
+## the remote repository definitions.  This is primarily for testing the scripts in the
+## @PACKAGE@-repo package.  Credentials are stored in the distribution directory so that a single
+## set of credentials can be used by the same machine regardless of the distribution loaded.
+##
+repo-install-urpmi:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@d='$(DESTDIR)$(urpmirepodir)/OpenSS7-$(target_edition)-$(target_cpu)' ; \
+	test -d "$$d" || { $(ECHO) "$(MKDIR_P) '$$d'" ; $(MKDIR_P) "$$d" ; } ; \
+	d='$(DESTDIR)$(urpmiconfdir)' ; \
+	test -d "$$d" || { $(ECHO) "$(MKDIR_P) '$$d'" ; $(MKDIR_P) "$$d" ; } ; \
+	( \
+		umask 600 ; \
+		cd '$(DESTDIR)$(urpmiconfdir)' ; \
+		un=; pw=; o=; f='netrc' ; \
+		for s in '' '.rpmsave' '.rpmnew' ; do \
+			for p in '' .$(PACKAGE) ; do \
+				o="$$f$$p$$s" ; \
+				test -e $$o || continue ; \
+				un=`sed -n -r 's,^machine[[:space:]]*www.openss7.org[[:space:]]*login[[:space:]]*([^[:space:]]*)[[:space:]]*password[[:space:]]*([^[:space:]]*)[[:space:]]*.*$$,\1,p;t end;b;: end q' $$o` ; \
+				pw=`sed -n -r 's,^machine[[:space:]]*www.openss7.org[[:space:]]*login[[:space:]]*([^[:space:]]*)[[:space:]]*password[[:space:]]*([^[:space:]]*)[[:space:]]*.*$$,\2,p;t end;b;: end q' $$o` ; \
+				test -n "$$un" -a -n "$$pw" || continue ; \
+				break 2 ; \
+			done ; \
+		done ; \
+		test "$$o" != "$$f" || { $(ECHO) "mv -f -- $$f $$f.rpmsave" ; mv -f -- $$f $$f.rpmsave ; } ; \
+		ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`$${un:+&un=}$${un}$${pw:+&pw=}$${pw}" ; \
+		ext="$$ext"`echo '/$(reposubdir)' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'` ; \
+		url='$(reposerv)://'"$${un:+$$un$$(pw+:$$pw}@}"'$(repobase)/$(reporoot)/'"$$f$$ext" ; \
+		$(ECHO) "rm -f -- $$f" ; rm -f -- $$f ; \
+		if ! echo "$$url" | wget -i - -O $$f 2>/dev/null ; then \
+			if echo "$$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then \
+				$(ECHO) 'Authorization required for repository access.' >/dev/tty ; \
+				u='anonymous' ; p= ; \
+				read -e  -p 'Username: ' u </dev/tty >/dev/tty ; u=$${u:-anonymous} ; \
+				if test "$$u" != 'anonymous' ; then \
+				read -es -p 'Password: ' p </dev/tty >/dev/tty ; \
+				echo '' >/dev/tty ; \
+				fi ; \
+				url='$(reposerv)://'"$${u:+$$u:$$p@}"'$(repobase)/$(reporoot)/'"$$f$$ext" ; \
+				$(ECHO) "rm -f -- $$f" ; rm -f -- $$f ; \
+				if ! echo "$$url" | wget -i - -O $$f 2>/dev/null ; then \
+					test "$$o" != "$$f" || { $(ECHO) "mv -f -- $$f.rpmsave $$f" ; mv -f -- $$f.rpmsave $$f ; } ; \
+					$(ECHO) 'Authorization failed.' >/dev/tty ; \
+					exit 1 ; \
+				fi ; \
+			fi ; \
+		fi ; \
+		if test -e "$$f" ; then chmod go-rw $$f ; else \
+			test "$$o" != "$$f" -o ! -e "$$f.rpmsave" || { $(ECHO) "mv -f -- $$f.rpmsave $$f" ; mv -f -- $$f.rpmsave $$f ; } ; \
+			exit 1 ; \
+		fi ; \
+	) || exit 1 ; \
+	( \
+		cd '$(urpmiconfdir)' ; \
+		un=; pw=; f='netrc.$(PACKAGE)' ; \
+		if test -e "$$f" ; then \
+			un=`sed -n -r 's,^machine[[:space:]]*www.openss7.org[[:space:]]*login[[:space:]]*([^[:space:]]*)[[:space:]]*password[[:space:]]*([^[:space:]]*)[[:space:]]*.*$$,\1,p;t end;b;: end q' $$o` ; \
+			pw=`sed -n -r 's,^machine[[:space:]]*www.openss7.org[[:space:]]*login[[:space:]]*([^[:space:]]*)[[:space:]]*password[[:space:]]*([^[:space:]]*)[[:space:]]*.*$$,\2,p;t end;b;: end q' $$o` ; \
+		fi ; \
+		test -n "$$un" -a -n "$$pw" || exit 1 ; \
+		cd '$(urpmirepodir)/OpenSS7-$(target_edition)-$(target_cpu)' ; \
+		f='media.cfg' ; \
+		test ! -e "$$f" || { $(ECHO) "mv -f -- $$f $$f.rpmsave" ; mv -f -- $$f $$f.rpmsave ; } ; \
+		url='$(reposerv)://'"$${un:+$$un$${pw:+:$$pw}@}"'$(repobase)/$(reporoot)/$(reposubdir)/media/media_info/'"$$f" ; \
+		$(ECHO) "rm -f -- $$f" ; rm -f -- $$f ; \
+		if ! echo "$$url" | wget -i - -O $$f 2>/dev/null ; then \
+			test ! -e $$f.rpmsave || { $(ECHO) "mv -f -- $$f.rpmsave $$f" ; mv -f -- $$f.rpmsave $$f ; } ; \
+			exit 1 ; \
+		fi ; \
+		if test ! -e $$f ; then \
+			test ! -e $$f.rpmsave || { $(ECHO) "mv -f -- $$f.rpmsave $$f" ; mv -f -- $$f.rpmsave $$f ; } ; \
+			exit 1 ; \
+		fi ; \
+		echo '$(reposerv)://$(repobase)/$(reporoot)/$(reposubdir)' >url ; \
+		$(ECHO) "rm -f -- mirrorlist" ; rm -f -- mirrorlist ; \
+	) || exit 1
+	@if test -z '$(DESTDIR)$(rootdir)' ; then \
+		$(ECHO) 'urpmi.update -a' ; \
+		urpmi.update -a || : ; \
+	fi
+
+## Install a uprmi installation source for local repositories.  This involves generating and
+## installing the @PACKAGE@-local media.cfg, mirrorlist, and url files and performing the actions
+## associated with the urpmi.addmedia and urpmi.update commands.  Note that this target only
+## installs the local repository definitions.
+##
+repo-install-local-urpmi:
+	@$(ECHO_V) "Making $@ in `pwd`"
+
+repo-uninstall-urpmi:
+	@$(ECHO_V) "Making $@ in `pwd`"
+
+REPO_INSTALL			+= repo-install-urpmi
+REPO_INSTALL_LOCAL		+= repo-install-local-urpmi
+REPO_UNINSTALL			+= repo-uninstall-urpmi
+
+## WITH_INSTALL_SOURCE_URPMI
+endif
+
+if BUILD_DPKG
+## BUILD_DPKG
+
+if WITH_INSTALL_SOURCE_APT
+## WITH_INSTALL_SOURCE_APT
+
+$(PACKAGE).list: Makefile
+	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	if test "$$rb" = 'Base' ; then rlist='Base Updates Extras Testing' ; else rlist="$$rb" ; fi ; \
+	for branch in $$rlist ; do \
+		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
+		for repo in 'Main' 'Debug' 'Devel' 'Source' ; do \
+			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			if test -z '@BUILD_REPO_APT_TRUE@' ; then \
+				test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) || $(ECHO) $(ECHO_N) '#' ; \
+				$(ECHO) 'deb $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}' /' ; \
+				if test "$$repo" = 'Source' ; then \
+					$(ECHO) '#deb-src $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}' /' ; \
+				fi ; \
+			elif test -z '@BUILD_REPO_YUM_TRUE@' ; then \
+				test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) || $(ECHO) $(ECHO_N) '#' ; \
+				$(ECHO) 'repomd $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}' /' ; \
+			elif test -z '@BUILD_REPO_URPMI_TRUE@' ; then \
+				test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) || $(ECHO) $(ECHO_N) '#' ; \
+				$(ECHO) 'urpm $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)/media'$${b:+/$$b}$${d:+/$$d}'/ media_info/hdlist'$${b:+_}$${b}$${d:+_}$${d} ; \
+				if test "$$repo" = 'Source' ; then \
+					$(ECHO) '#urpm-src $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)/media'$${b:+/$$b}$${d:+/$$d}'/ media_info/synthesis.hdlist$${b+_}$${b}$${d:+_}$${d}' ; \
+				fi ; \
+			elif test -z '@BUILD_REPO_APT_RPM_TRUE@' ; then \
+				test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) || $(ECHO) $(ECHO_N) '#' ; 
+			fi ; \
+		done ; \
+	done >$@
+
+INSTALL_APT_SRCES = $(PACKAGE).list
+
+if MAINTAINER_MODE
+## MAINTAINER_MODE
+
+$(PACKAGE)-local.list: Makefile
+	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	debdistdir='$(debdistdir)'; test '$(REPODIR)' = '$(DISTDIR)' || debdistdir=`echo '$(debdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+	for branch in $$rb ; do \
+		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
+		if test -n '$(repobranch)' -a '$(debdistdir)' = '$(debdir)' ; then \
+			test "$$b" = '$(repobranch)' -o "/$$b" = '$(repobranch)' || continue ; s= ; else s="$$b" ; fi ; \
+		for repo in 'Main' 'Debug' 'Devel' 'Source' ; do \
+			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			$(ECHO) 'deb file://'$${debdistdir}$${b:+/$$b}$${d:+/$$d}' /' ; \
+			if test "$$repo" = 'Source' ; then \
+				$(ECHO) 'deb-src file://'$${debdistdir}$${b:+/$$b}$${d:+/$$d}' /' ; \
+			fi ; \
+		done ; \
+	done >$@
+
+INSTALL_APT_SRCES += $(PACKAGE)-local.list
+
+## MAINTAINER_MODE
+endif
+
+install-apt: $(INSTALL_APT_SRCES)
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_INSTALL)
+	@if test -n "$(aptrepodir)" ; then \
+		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(aptrepodir)'" ; \
+		$(MKDIR_P) "$(DESTDIR)$(aptrepodir)" ; \
+		$(ECHO) " $(INSTALL_DATA) $(PACKAGE).list '$(DESTDIR)$(aptrepodir)/$(PACKAGE).list'" ; \
+		$(INSTALL_DATA) $(PACKAGE).list "$(DESTDIR)$(aptrepodir)/$(PACKAGE).list" ; \
+	fi
+	@if test -n "$(aptgpgdir)" ; then \
+		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(aptgpgdir)'" ; \
+		$(MKDIR_P) "$(DESTDIR)$(aptgpgdir)" ; \
+		$(ECHO) " $(INSTALL_DATA) $(srcdir)/scripts/OPENSS7-GPG-KEY '$(DESTDIR)$(aptgpgdir)/gpg-pubkey-$(PACKAGE).asc'" ; \
+		$(INSTALL_DATA) $(srcdir)/scripts/OPENSS7-GPG-KEY "$(DESTDIR)$(aptgpgdir)/gpg-pubkey-$(PACKAGE).asc" ; \
+	fi
+if MAINTAINER_MODE
+	@if test -n "$(aptrepodir)" ; then \
+		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(aptrepodir)'" ; \
+		$(MKDIR_P) "$(DESTDIR)$(aptrepodir)" ; \
+		$(ECHO) " $(INSTALL_DATA) $(PACKAGE)-local.list '$(DESTDIR)$(aptrepodir)/$(PACKAGE)-local.list'" ; \
+		$(INSTALL_DATA) $(PACKAGE)-local.list "$(DESTDIR)$(aptrepodir)/$(PACKAGE)-local.list" ; \
+	fi
+endif
+
+uninstall-apt:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_UNINSTALL)
+	rm -f -- $(DESTDIR)$(aptgpgdir)/gpg-pubkey-$(PACKAGE).asc
+	rm -f -- $(DESTDIR)$(aptrepodir)/$(PACKAGE).list
+if MAINTAINER_MODE
+	rm -f -- $(DESTDIR)$(aptrepodir)/$(PACKAGE)-local.list
+endif
+
+post-apt:
+	apt-cache gencaches
+
+#ALL_LOCAL			+= $(PACKAGE).list
+#CLEANFILES			+= $(PACKAGE).list
+#INSTALL_DATA_LOCAL		+= install-apt
+#UNINSTALL_LOCAL		+= uninstall-apt
+#POST_INSTALL_AM		+= post-apt
+
+if MAINTAINER_MODE
+#ALL_LOCAL			+= $(PACKAGE)-local.list
+#CLEANFILES			+= $(PACKAGE)-local.list
+endif
+
+MY_PHONY			+= install-apt uninstall-apt post-apt
+
+## Install an apt installation source for both remote and local repositories.  This involves
+## downloading the @PACKAGE@.list file, installing the @PACKAGE@-local.list file, and performing
+## apt-cache gencaches.
+##
+repo-install-apt:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@d='$(DESTDIR)$(aptrepodir)' ; test -d $$d || { $(ECHO) "$(MKDIR_P) '$$d'" ; $(MKDIR_P) "$$d" ; }
+	@( \
+		cd $(DESTDIR)$(aptrepodir) ; \
+		un=; pw=; o=; f='$(PACKAGE).list' ; \
+		for s in '' '.dpkg-old' '.dpkg-new' ; do \
+			for p in $(PACKAGE) sources ; do \
+				o="$$p.list$$s" ; \
+				test -e $$o || continue ; \
+				un=`sed -n -r 's,^[#]?deb(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\2,p;t end;b;: end q' $$o` ; \
+				pw=`sed -n -r 's,^[#]?deb(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\4,p;t end;b;: end q' $$o` ; \
+				test -n "$$un" -a -n "$$pw" || continue ; \
+				break 2 ; \
+			done ; \
+		done ; \
+		if test -f "$$f" -a "$$o" != "$$f" ; then \
+			$(ECHO) "mv -f -- $$f $$f.dpkg-old" ; \
+			mv -f -- $$f $$f.dpkg-old || : ; \
+		fi ; \
+		ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`$${un:+&un=}$${un}$${pw:+&pw=}$${pw}" ; \
+		ext="$$ext"`echo '/$(reposubdir)' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'` ; \
+		key=; test -z "$$un" || key="$${un}$${pw:+:}$${pw}@" ; \
+		url='$(reposerv)://'"$${key}"'$(repobase)/$(reporoot)/'"$$f$$ext" ; \
+		$(ECHO) "rm -f -- $$f" ; rm -f -- $$f ; \
+		if ! echo "$$url" | wget -i - -O $$f >/dev/null ; then \
+			if echo "$$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then \
+				echo 'Authorization required for repository access.' >/dev/tty ; \
+				u='anonymous'; p= ; \
+				read -e  -p 'Username: ' u </dev/tty >/dev/tty; u=$${u:-anonymous} ; \
+				if test "$$u" != 'anonymous' ; then \
+				read -es -p 'Password: ' p </dev/tty >/dev/tty ; \
+				echo '' >/dev/tty ; \
+				fi ; \
+				key=; test -z "$$u" || key="$${u}:$${p}@" ; \
+				url='$(reposerv)://'"$${key}"'$(repobase)/$(reporoot)/'"$$f$$ext" ; \
+				$(ECHO) "rm -f -- $$f" ; \
+				rm -f -- $$f ; \
+				if ! echo "$$url" | wget -i - -O $$f 2>/dev/null ; then \
+					test ":$$o" != ":$$f" || mv -f -- $$f.dpkg-old $$f ; \
+					echo 'Authorization failed.' >/dev/tty ; \
+					exit 1 ; \
+				fi ; \
+			fi ; \
+		fi ; \
+		if test ! -e $$f ; then \
+			if test ":$$o" != ":$$f" ; then \
+				$(ECHO) "mv -f -- $$f.dpkg-old $$f" ; \
+				mv -f -- $$f.dpkg-old $$f ; \
+			fi ; \
+			exit 1 ; \
+		fi ; \
+		debdistdir='$(debdistdir)' ; test '$(DISTDIR)' = '$(REPODIR)' || debdistdir=`echo '$(debdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+		tardir='$(tardir)' ; test '$(DISTDIR)' = '$(REPODIR)' || tardir=`echo '$(tardir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+		( \
+			rb='$(repobranch)'; case "$${rb:-base}" in (base|updates|extras|testing) rb=;; esac ; \
+			for b in '' updates extras testing $$rb ; do \
+				d="$${debdistdir}$${b:+/$$b}" ; \
+				for r in main debug devel source '' ; do \
+					d="$${debdistdir}$${b:+/$$b}$${r:+/$$r}" ; \
+					test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) 'deb     file://'$$d' /' ; \
+					if test -z "$$r" -o "$$r" = 'source'; then \
+					test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) 'deb-src file://'$$d' /' ; \
+					fi ; \
+				done ; \
+			done ; \
+		) >$(PACKAGE)-local.list ; \
+	) || exit 1
+
+## Install an apt installation source for the local repository.  This involves generating the
+## @PACKAGE@-local.list file, installing it, and performing an `apt-get update'.  This target must
+## be executed as root when operating on the base directory.
+##
+## Note that I am not that terribly worried about getting $(ARCH) working correctly (as it is
+## different from the target_cpu on debian--e.g. amd64 instead of x86_64), however, $(VERSION) is
+## necessary if dist-upgrade is to be supported.
+##
+repo-install-local-apt:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test -n '$(aptrepodir)' || { $(ECHO) "D: $@: no aptrepodir" ; exit 1 ; }
+	@d='$(DESTDIR)$(aptrepodir)' ; test -d $$d || { $(ECHO) "$(MKDIR_P) $$d" ; $(MKDIR_P) $$d ; }
+	@repodir=`echo '$(rpmdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+	f='$(DESTDIR)$(aptrepodir)/$(PACKAGE)-local.list' ; \
+	test ! -e $$f || { $(ECHO) "mv -f $$f $$f.dpkg-old" ; mv -f $$f $$f.dpkg-old ; } ; \
+	rb='$(repobranch)'; case "$${rb:-base}" in (base|updates|extras|testing) rb=;; esac ; \
+	$(ECHO) "  GEN   $$(basename $$f)" ; \
+	for b in '' updates extras testing $$rb ; do \
+		for r in main debug devel source '' ; do \
+			d="$${repodir}$${b:+/$$b}$${r:+/$$r}" ; \
+			test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
+			$(ECHO) 'deb         file://$(REPODIR)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+			test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
+			$(ECHO) 'deb-src     file://$(REPODIR)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+		done ; \
+	done >$$f ; \
+	@if test -z '$(DESTDIR)$(rootdir)' ; then \
+		$(ECHO) "apt-get update" ; \
+		if apt-get update ; then \
+			$(ECHO) "apt-cache gencaches" ; \
+			apt-cache gencaches || :; \
+		fi ; \
+	fi
+
+## To remove an apt install source, disable and copy the @PACKAGE@.list file to
+## @PACKAGE@.list.dpkg-old so that the credentials will be maintained even when the repository has
+## been removed.  Next remove the @PACKAGE@.list and @PACKAGE@-local.list repositories and refresh
+## aptitude.
+##
+repo-uninstall-apt:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@f='$(DESTDIR)$(aptrepodir)/$(PACKAGE).list' ; \
+	if test -f $$f ; then \
+	$(ECHO) "sed 's,^deb,#deb,' $$f >$$f.dpkg-old" ; \
+	sed 's,^deb,#deb,' $$f >$$f.dpkg-old
+	@for s in '' '-local' ; do \
+		f='$(DESTDIR)$(aptrepodir)/$(PACKAGE)'$$s'.list' ; \
+		if test -f $$f ; then \
+			$(ECHO) "rm -f -- $$f" ; \
+			rm -f -- $$f ; \
+		fi ; \
+	done
+	@$(ECHO) "aptitude refresh" ; \
+	aptitude refresh || :
+
+REPO_INSTALL			+= repo-install-apt
+REPO_INSTALL_LOCAL		+= repo-install-local-apt
+REPO_UNINSTALL			+= repo-uninistall-apt
+
+## WITH_INSTALL_SOURCE_APT
+endif
+
+## BUILD_DPKG
+else
+## !BUILD_DPKG
+
+if BUILD_RPMS
+## BUILD_RPMS
+
+if WITH_INSTALL_SOURCE_APT
+## WITH_INSTALL_SOURCE_APT
+
+$(PACKAGE).list: Makefile
+	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	if test "$$rb" = 'Base' ; then rlist='Base Updates Extras Testing' ; else rlist="$$rb" ; fi ; \
+	for branch in $$rlist ; do \
+		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
+		for repo in 'Main' 'Debug' 'Devel' 'Source' ; do \
+			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) || $(ECHO) $(ECHO_N) '#' ; \
+			if test -z '@BUILD_REPO_APT_RPM_TRUE@' ; then \
+				$(ECHO) 'rpm $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}' /' ; \
+				if test "$$repo" = 'Source' ; then \
+					$(ECHO) '#rpm-src $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}' /' ; \
+				fi ; \
+			fi ; \
+			if test -z '@BUILD_REPO_YUM_TRUE@' ; then \
+				$(ECHO) 'repomd $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)'$${b:+:/$$b}$${d:+/$$d} ; \
+			fi ; \
+		done ; \
+	done >$@
+
+INSTALL_APT_REPOS = $(PACKAGE).list
+
+if MAINTAINER_MODE
+## MAINTAINER_MODE
+
+$(PACKAGE)-local.list: Makefile
+	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	rpmdistdir='$(rpmdistdir)'; test '$(REPODIR)' = '$(DISTDIR)' || rpmdistdir=`echo '$(rpmdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+	for branch in $$rb ; do \
+		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
+		if test -n '$(repobranch)' -a '$(rpmdistdir)' = '$(rpmdir)' ; then \
+			test "$$b" = '$(repobranch)' -o "/$b" = '$(repobranch)' || continue ; s= ; else s="$$b" ; fi ; \
+		for repo in 'Main' 'Debug' 'Devel' 'Source' ; do \
+			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			if test -z '@BUILD_REPO_APT_RPM_TRUE@' ; then \
+				$(ECHO) 'rpm file://'$${rpmdistdir}$${b:+/$$b}$${d:+/$$d}' /' ; \
+				if test "$$repo" = 'Source' ; then \
+					$(ECHO) 'rpm-src file://'$${rpmdistdir}$${b:+/$$b}$${d:+/$$d}' /' ; \
+				fi ; \
+			fi ; \
+			it test -z '@BUILD_REPO_YUM_TRUE@' ; then \
+				$(ECHO) 'repomd file://'$${rpmdistdir}$${b:+/$$b}$${d:+/$$d} ; \
+			fi ; \
+		done ; \
+	done >$@
+
+INSTALL_APT_REPOS += $(PACKAGE)-local.list
+
+## MAINTAINER_MODE
+endif
+
+install-apt-rpm: $(INSTALL_APT_REPOS)
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_INSTALL)
+	@if test -n "$(aptrepodir)" ; then \
+		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(aptrepodir)'" ; \
+		$(MKDIR_P) "$(DESTDIR)$(aptrepodir)" ; \
+		$(ECHO) " $(INSTALL_DATA) $(PACKAGE).list '$(DESTDIR)$(aptrepodir)/$(PACKAGE).list'" ; \
+		$(INSTALL_DATA) $(PACKAGE).list "$(DESTDIR)$(aptrepodir)/$(PACKAGE).list" ; \
+	fi
+	@if test -n "$(aptgpgdir)" ; then \
+		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(aptgpgdir)'" ; \
+		$(MKDIR_P) "$(DESTDIR)$(aptgpgdir)" ; \
+		$(ECHO) " $(INSTALL_DATA) $(srcdir)/scripts/OPENSS7-GPG-KEY '$(DESTDIR)$(aptgpgdir)/gpg-pubkey-$(PACKAGE).asc'" ; \
+		$(INSTALL_DATA) $(srcdir)/scripts/OPENSS7-GPG-KEY "$(DESTDIR)$(aptgpgdir)/gpg-pubkey-$(PACKAGE).asc" ; \
+	fi
+if MAINTAINER_MODE
+	@if test -n "$(aptrepodir)" ; then \
+		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(aptrepodir)'" ; \
+		$(MKDIR_P) '$(DESTDIR)$(aptrepodir)' ; \
+		$(ECHO) " $(INSTALL_DATA) $(PACKAGE)-local.list '$(DESTDIR)$(aptrepodir)/$(PACKAGE)-local.list'" ; \
+		$(INSTALL_DATA) $(PACKAGE)-local.list '$(DESTDIR)$(aptrepodir)/$(PACKAGE)-local.list' ; \
+	fi
+endif
+
+uninstall-apt-rpm:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_UNINSTALL)
+	rm -f -- $(DESTDIR)$(aptgpgdir)/gpg-pubkey-$(PACKAGE).asc
+	rm -f -- $(DESTDIR)$(aptrepodir)/$(PACKAGE).list
+if MAINTAINER_MODE
+	rm -f -- $(DESTDIR)$(aptrepodir)/$(PACKAGE)-local.list
+endif
+
+post-apt-rpm:
+	apt-cache gencaches
+
+#ALL_LOCAL		+= $(PACKAGE).list
+#CLEANFILES		+= $(PACKAGE).list
+#INSTALL_DATA_LOCAL	+= install-apt-rpm
+#UNINSTALL_LOCAL	+= uninstall-apt-rpm
+#POST_INSTALL_AM	+= post-apt-rpm
+
+if MAINTAINER_MODE
+#ALL_LOCAL		+= $(PACKAGE)-local.list
+#CLEANFILES		+= $(PACKAGE)-local.list
+endif
+
+MY_PHONY		+= install-apt-rpm uninstall-apt-rpm post-apt-rpm
+
+## Install an apt-rpm installation source for both remote and local repositories.  This involves
+## downloading the @PACKAGE@.list file, installing the @PACKAGE@-local.list file, and performing
+## apt-cache gencaches.
+##
+repo-install-apt-rpm:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@d='$(DESTDIR)$(aptrepodir)' ; test -d $$d || { $(ECHO) "$(MKDIR_P) $$d" ; $(MKDIR_P) $$d ; }
+	@( \
+		cd $(DESTDIR)$(aptrepodir) ; \
+		un=; pw=; o=; f='$(PACKAGE).list' ; \
+		test -n '$(pkgcachedir)' -a -d '$(DESTDIR)$(pkgcachedir)' || exit 1 ; \
+		o="$(DESTDIR)$(pkgcachedir)/credentials" ; \
+		test -e $$o || exit 1 ; \
+		un=`awk 'BEGIN{FS="="}{if($$1~/^username$$/){print$$2;exit}}' $$o` ; \
+		pw=`awk 'BEGIN{FS="="}{if($$1~/^password$$/){print$$2;exit}}' $$o` ; \
+		test -n "$$un" -a -n "$$pw" || exit 1 ; \
+		if test -f $$f -a $$o != $$f ; then \
+			$(ECHO) "mv -f -- $$f $$f.rpmsave" ; \
+			mv -f -- $$f $$f.rpmsave || : ; \
+		fi ; \
+		ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`$${un:+&un=}$${un}$${pw:+&pw=}$${pw}" ; \
+		ext="$$ext"`echo '/$(reposubdir)' | sed 's,//,/,g;s,/,\&distro=,;s;,/,\&relver=,;s;,/,\&osarch=,'` ; \
+		key=; test -z "$$un" || key="$${un}$${pw:+:}$${pw}@" ; \
+		url='$(reposerv)://'"$${key}"'$(repobase)/$(reporoot)/'"$$f$$ext" ; \
+		$(ECHO) "rm -f -- $$f" ; rm -f -- $f ; \
+		if ! echo "$$url" | wget -i - -O $$f >/dev/null ; then \
+			if echo "$$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then \
+				$(ECHO) "D: $@: Authorization failed." ; \
+				if test $$o != $$f -a -e $$f.rpmsave ; then \
+					$(ECHO) "mv -f -- $$f.rpmsave $$f"  ; \
+					mv -f -- $$f.rpmsave $$f ; \
+				fi ; \
+				exit 1 ; \
+			fi ; \
+		fi ; \
+		if test ! -s $$f ; then \
+			$(ECHO) "D: $@: Download failed." ; \
+			if test $$o != $$f -a -e $$f.rpmsave ; then \
+				$(ECHO) "mv -f -- $$f.rpmsave $$f" ; \
+				mv -f -- $$f.rpmsave $$f ; \
+			fi ; \
+			exit 1 ; \
+		fi ; \
+		rpmdistdir='$(rpmdistdir)' ; test '$(DISTDIR)' = '$(REPODIR)' || rpmdistdir=`echo '$(rpmdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+		tardir='$(tardir)' ; test '$(DISTDIR)' = '$(REPODIR)' || tardir=`echo '$(tardir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+		( \
+			rb='$(repobranch)'; case "$${rb:-base}" in (base|updates|extras|testing) rb=;; esac ; \
+			for b in '' updates extras testing $$rb ; do \
+				d="$${rpmdistdir}$${b:+/$$b}" ; \
+				for r in main debug devel source '' ; do \
+					d="$${rpmdistdir}$${b:+/$$b}$${r:+/$$r}" ; \
+					if test -z '@BUILD_REPO_APT_RPM_TRUE@' ; then \
+						test -f $$d/pkglist || $(ECHO) $(ECHO_N) '#'; \
+						$(ECHO) 'rpm     file://'$$d' /' ; \
+						if test -z "$$r" -o "$$r" = 'source' ; then \
+						test -f $$d/srclist || $(ECHO) $(ECHO_N) '#'; \
+						$(ECHO) 'rpm-src file://'$$d' /' ; \
+						fi ; \
+					fi ; \
+					if test -z '@BUILD_REPO_YUM_TRUE@' ; then \
+						test -f $$d/repodata/repomd.xml || $(ECHO) $(ECHO_N) '#'; \
+						$(ECHO) 'repomd  file://'$$d ; \
+					fi ; \
+				done ; \
+			done ; \
+		) >$(PACKAGE)-local.list ; \
+	) || exit 1
+
+## Install an apt-rpm installation source for the local repository.  This involves generating the
+## @PACKAGE-local.list file, installing it, and performing an `apt-get update'.  This target must be
+## executed as root when operating on the base directory.
+##
+## apt-rpm installation sources can describe URPM repositories, REPOMD repositories, or even APT4RPM
+## native rpm repositories, and raw APT4RPM rpm directories for file:// targets.
+##
+repo-install-local-apt-rpm:
+	@$(ECHO_V) "D: Makiing $@ in `pwd`"
+	@d='$(DESTDIR)$(aptrepodir)' ; test -d $$d || { $(ECHO) "$(MKDIR_P) $$d" ; $(MKDIR_P) $$d ; }
+	@rpmdistdir=`echo '$(rpmdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+	tardir=`echo '$(tardir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+	rb='$(repobranch)'; case "$${rb:-base}" in (base|updates|extras|testing) rb=;; esac ; \
+	{ \
+		if test -z '@BUILD_REPO_URPMI_TRUE@' ; then :; \
+			for b in '' updates extras testing $$rb ; do \
+				for r in main debug devel source '' ; do \
+					d="$$rpmdistdir/media$${b:+/$$b}$${r:+/$$r}" ; \
+					test -f $$d/media_info/hdlist.cz || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) 'urpm        file://'$$d' media_info/synthesis.hdlist /' ; \
+					test $${r:-full} = full -o $${r:-full} = source || continue ; \
+					test -f $$d/media_info/hdlist.cz || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) 'urpm-src    file://'$$d' media_info/synthesis.hdlist /' ; \
+					$(ECHO) '' ; \
+				done ; \
+				$(ECHO) '' ; \
+			done ; \
+			$(ECHO) '' ; \
+		fi ; \
+		if test -z '@BUILD_REPO_YUM_TRUE@' ; then \
+			for b in '' updates extras testing $$rb ; do \
+				for r in main debug devel source '' ; do \
+					d="$${rpmdistdir}$${b:+/$$b}$${r:+/$$r}" ; \
+					test -f $$d/repodata/repomd.xml || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) "repomd      file://$(REPODIR) rpms/$(reposubdir)$${b:+/$$b}$${r:+/$$r}/" ; \
+					test $${r:-full} = full -o $${r:-full} = source || continue ; \
+					test -f $$d/repodata/repomd.xml || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) "repomd-src  file://$(REPODIR) rpms/$(reposubdir)$${b:+/$$b}$${r:+/$$r}/" ; \
+					$(ECHO) '' ; \
+				done ; \
+				$(ECHO) '' ; \
+			done ; \
+			$(ECHO) '' ; \
+		fi ; \
+		if test -z '@BUILD_REPO_APT_RPM_TRUE@' ; then \
+			for b in '' updates extras testing $$rb ; do \
+				for r in main debug devel source '' ; do \
+					d="$${rpmdistdir}$${b:+/$$b}$${r:+/$$r}" ; \
+					test -f $$d/pkglist || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) 'rpm         file://'$$d' /' ; \
+					test $${r:-full} = full -o $${r:-full} = source || continue ; \
+					test -f $$d/srclist || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) 'rpm-src     file://'$$d' /' ; \
+					$(ECHO) '' ; \
+				done ; \
+				$(ECHO) '' ; \
+			done ; \
+			$(ECHO) '' ; \
+		fi ; \
+		if test -z '@BUILD_REPO_APT_RPM_TRUE@' ; then  \
+			for b in '' updates extras testing $$rb ; do \
+				for r in main debug devel source '' ; do \
+					d="$${rpmdistdir}/media$${b:+/$$b}$${r:+/$$r}" ; \
+					test -f $$d/media_info/hdlist.cz || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) 'rpm-dir     file://'$$d' /' ; \
+					test $${r:-full} = full -o $${r:-full} = source || continue ; \
+					$(ECHO) 'rpm-src-dir file://'$$d' / ' ; \
+					$(ECHO) '' ; \
+				done ; \
+				$(ECHO) '' ; \
+			done ; \
+			$(ECHO) '' ; \
+		fi ; \
+	} >$(DESTDIR)$(aptrepodir)/$(PACKAGE_UCNAME).list
+	@if test -n '$(aptvndlist)' ; then \
+		f='$(DESTDIR)$(aptvndlist)' ; \
+		if test -d $$f.d -o -n '$(DESTDIR)$(rootdir)' ; then \
+			f="$$f.d/$(PACKAGE_NAME).list" ; \
+		fi ; \
+		d=$$(dirname $$f) ; \
+		test -d $$d || { $(ECHO) "$(MKDIR_P) $$d" ; $(MKDIR_P) $$d ; } ; \
+		test -f $$f || cat /dev/null >$$f ; \
+		$(am__gpg_prepare) ; \
+		{ \
+			sed '/simple-key "$(PACKAGE_NAME)"/,/}/d' $$f | cat -s ; \
+			$(ECHO) '' ; \
+			$(ECHO) 'simple-key "$(PACKAGE_NAME)" {' ; \
+			$(GPG) $$user$$home --fingerprint $(GNUPGUSER) | sed -r -n '/Key fingerprint/{s,^.*Key fingerprint = ,,;s, ,,g;s,^,\tFingerprint ",;s,$$,";,;p};/^uid/{s,^uid *,,;s, *$$,,;s,^,\tName ",;s,$$,";,;p}' ; \
+			$(ECHO) '}' ; \
+			$(ECHO) '' ; \
+		} >$$f.tmp.$$$$ ; \
+		mv -f -- $$f.tmp.$$$$ $$f ; \
+	fi
+	@if test -z '$(DESTDIR)$(rootdir)' ; then \
+		$(ECHO) "apt-get update" ; \
+		if apt-get update ; then \
+			$(ECHO) "apt-cache gencaches" ; \
+			apt-get gencaches || : ; \
+		fi ; \
+	fi
+
+
+
+## To remove an apt-rpm install source, disable and copy the @PACKAGE@.list file to
+## @PACKAGE@.list.rpmsave so that the credentials will be maintained even when the repository has
+## been removed.  Next remove the @PACKAGE@.list and @PACKAGE@-local.list repositories and refresh
+## apt-rpm.
+##
+repo-uninstall-apt-rpm:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@f='$(DESTDIR)$(aptrepodir)/$(PACKAGE).list' ; \
+	if test -f $$f ; then \
+	$(ECHO) "sed 's,^rpm,#rpm,;s,^repomd,#repomd,' $$f >$$f.rpmsave" ; \
+	sed 's,^rpm,#rpm,;s,^repomd,#repomd,' $$f >$$f.rpmsave
+	@for s in '' '-local' ; do \
+		f='$(DESTDIR)$(aptrepodir)/$(PACKAGE)'$$s'.list' ; \
+		if test -f $$f ; then \
+			$(ECHO) "rm -f -- $$f" ; \
+			rm -f -- $$f ; \
+		fi ; \
+	done
+	@$(ECHO) "apt-cache gencaches" ; \
+	apt-cache gencaches || :
+
+REPO_INSTALL			+= repo-install-apt-rpm
+REPO_INSTALL_LOCAL		+= repo-install-local-apt-rpm
+REPO_UNINSTALL			+= repo-uninstall-apt-rpm
+
+## WITH_INSTALL_SOURCE_APT
+endif
+
+## BUILD_RPMS
+endif
+
+## !BUILD_DPKG
+endif
+
+if WITH_INSTALL_SOURCE_PACMAN
+## WITH_INSTALL_SOURCE_PACMAN
+
+REPO_INSTALL			+= repo-install-pacman
+REPO_INSTALL_LOCAL		+= repo-install-local-pacman
+REPO_UNINSTALL			+= repo-uninstall-pacman
+
+## WITH_INSTALL_SOURCE_PACMAN
+endif
+
+if WITH_INSTALL_SOURCE_SLAPT
+## WITH_INSTALL_SOURCE_SLAPT
+
+## WITH_INSTALL_SOURCE_SLAPT
+endif
+
+## PKG_BUILD_INDEP
+endif
+
+EXTRA_DIST += scripts/OPENSS7-GPG-KEY
+
+## =============================================================================
+##
+## $Log: repo.am,v $
+## Revision 1.1.2.7  2011-09-02 08:46:27  brian
+## - sync up lots of repo and build changes from git
+##
+## Revision 1.1.2.6  2011-08-07 11:14:24  brian
+## - mostly mandriva and ubuntu build updates
+##
+## Revision 1.1.2.5  2011-07-27 07:52:11  brian
+## - work to support Mageia/Mandriva compressed kernel modules and URPMI repo
+##
+## Revision 1.1.2.4  2011-05-31 09:46:00  brian
+## - new distros
+##
+## Revision 1.1.2.3  2011-03-06 08:57:19  brian
+## - repository updates
+##
+## Revision 1.1.2.2  2011-02-28 19:51:29  brian
+## - better repository build
+##
+## Revision 1.1.2.1  2011-02-17 18:34:10  brian
+## - repository and rpm build updates
+##
+## =============================================================================
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

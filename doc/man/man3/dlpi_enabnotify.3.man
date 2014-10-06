@@ -1,0 +1,578 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: dlpi_enabnotify.3.man,v 1.1.2.2 2011-02-07 02:18:00 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:00 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: dlpi_enabnotify.3.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:00  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH DLPI_ENABNOTIFY 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "OpenSS7 DLPI Library"
+.\" =========================================================================
+.SH NAME
+.B dlpi_enabnotify
+\- enable notifications.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.BR libdlpi (3),
+the
+.IR Solaris \(rg-specific,
+DLPI
+.[
+dlpi revision 2.0.0 draft 2
+.]
+Library.
+.[
+soldoc11
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.ad l
+.nh
+.PP
+.B #include <sys/dlpi.h>
+.br
+.B #include <dlpi.h>
+.HP
+\fBtypedef void dlpi_notifyfunc_t\fP(\fBdlpi_handle_t\fP, \fBdlpi_notifyinfo_t *\fP, \fBvoid *\fP);
+.HP \w'\fBint\ dlpi_enabnotify\fP('u
+\fBint\ dlpi_enabnotify\fP(\fBdlpi_handle_t\fP\ \fIdh\fP, \fBuint\fP\ \fInotes\fP, \fBdlpi_notifyfunc_t\ *\fIfuncp\fP, \fBvoid\ *\fP\fIarg\fP, \fBdlpi_notifyid_t\ *\fP\fIidp\fP);
+.ad b
+.hy 6
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'\fIfuncp\fP\(em'u
+.I dh
+the handle for the Stream.
+.PD 0
+.TP
+.I notes
+the notifications.
+.TP
+.I funcp
+the callback function.
+.TP
+.I arg
+the client argument for the callback function.
+.TP
+.I jdp
+the returned notification identifier.
+.PD
+.\"
+.\"
+.SH STRUCTURES
+.PP
+The second argument to the callback function, \fIfuncp\fP, is a pointer to a
+\fBdlpi_notifyinfo_t\fP structure.  This structure contains information about an
+event for which notification is given.
+.PP
+The \fBdlpi_notifyinfo_t\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+    uint dni_note;
+    union {
+        uint dni_speed;
+        uint dni_size;
+        struct {
+            uchar dni_physaddr[DLPI_PHYSADDR_MAX];
+            uchar dni_physaddrlen;
+        };
+    };
+} dlpi_notifyinfo_t;
+\s+1\fP
+.fi
+.PP
+The \fBdlpi_notifyinfo_t\fP structure has the following members:
+.TP
+.I dni_note
+Identifiies the event generating notification.  This may be one of:
+.RS
+.TP \w'\fBDL_NOTE_PROMISC_OFF_PHYS\fP\(em'u
+.B DL_NOTE_LINK_UP
+link has come up;
+.PD 0
+.TP
+.B DL_NOTE_LINK_DOWN
+link has gone down;
+.TP
+.B DL_NOTE_PROMISC_ON_PHYS
+physical promiscuous mode set;
+.TP
+.B DL_NOTE_PROMISC_OFF_PHYS
+physical promiscuous mode clear;
+.TP
+.B DL_NOTE_SDU_SIZE
+maximum SDU size, \fIdni_size\fP, changed or available;
+.TP
+.B DL_NOTE_SPEED
+link speed, \fIdni_speed\fP, changed or available;
+.TP
+.B DL_NOTE_PHYS_ADDR
+physical address, \fIdni_physaddr\fP(\fIlen\fP), changed or available;
+.PD
+.\".TP
+.\".B DL_NOTE_AGGR_AVAIL
+.\"link aggregation available, see
+.\".RI \*(lq COMPATIBILITY \*(rq;
+.\".PD 0
+.\".TP
+.\".B DL_NOTE_AGGR_UNAVAIL
+.\"link aggregation unavailable, see
+.\".RI \*(lq COMPATIBILITY \*(rq;
+.\".TP
+.\".B DL_NOTE_FASTPATH_FLUSH
+.\"fast path information changed; see,
+.\".RI \*(lq COMPATIBILITY \*(rq;
+.\".TP
+.\".B DL_NOTE_CAPAB_RENEG
+.\"capabilities renegotiated, see
+.\".RI \*(lq COMPATIBILITY \*(rq.
+.\".PD
+.RE
+.TP
+.I dni_speed
+only significant when \fIdni_note\fP is \fBDL_NOTE_SPEED\fP:
+the current speed of the interface in kilobits per second.
+.TP
+.I dni_size
+only significant when \fIdni_note\fP is \fBDL_NOTE_SDU_SIZE\fP:
+the current maximum SDU size of the interface in octets.
+.TP
+.I dni_physaddr
+only significant when \fIdni_note\fP is \fBDL_NOTE_PHYS_ADDR\fP:
+the current physical address binary coded.
+.TP
+.I dni_physaddrlen
+only significant when \fIdni_note\fP is \fBDL_NOTE_PHYS_ADDR\fP:
+the length of the current physical address in bytes.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B dlpi_enabnotify
+is a DLPI Library
+.[
+soldoc11
+.]
+subroutine requests that the DLS provider register the notifications specified
+in \fInotes\fP and call back the specified callback function, \fIfuncp\fP with
+the DLPI handle, \fIdh\fP, notification information, and client argument,
+\fIarg\fP, when an event occurs for which notification is registered.
+.PP
+When successful, \fBdlpi_enabnotify\fP will return a handle to the area pointed
+to by \fIidp\fP that may be used in a subsequent call to \fBdlpi_disabnotify\fP
+to de-register the notification.
+Note that \fBdlpi_notifyid_t\fP is opaque to the DLPI library user, but can be
+treated as a \fB(void *)\fP type.
+.PP
+The callback function, \fIfuncp\fP, is called with the DLPI handle, \fIdh\fP,
+the client-supplied argument, \fIarg\fP, and a pointer to a
+\fBdlpi_notifyinfo_t\fP structure describing each notification.  The callback
+function will be invoked until the DLPI Stream is closed, or the
+\fBdlpi_disabnotify\fP(3) function is invoked to disable the callback.
+.PP
+Multiple callback functions can be registered for a given notification on a DLPI
+Stream.  Callback functions can be registered and deregistered in any order.
+When invoked due to the occurence of an event, the most recently registered
+callback function will be invoked first.
+.\"
+.\"
+.SH USAGE
+.PP
+To use the
+.B dlpi_enabnotify
+function, include
+.RB < sys/dlpi.h >
+and
+.RB < dlpi.h >
+header files in C language programs.
+Add the
+.RB ` -ldlpi '
+flag to the linker command when linking C language programs that use the
+.B dlpi_enabnotify
+function or include the
+.B @libdir@/libdlpi.a
+static library object as an target of the linking.
+.\"
+.\"
+.SH MT CONTEXT
+.PP
+.B dlpi_enabnotify
+is fully thread-safe.
+.\"
+.\"
+.SH RETURN
+.PP
+When
+.B dlpi_enabnotify
+is successful, it returns \fBDLPI_SUCCESS\fP, and the handle for the
+notification in the area pointed to by \fIidp\fP.
+When
+.B dlpi_enabnotify
+fails, it returns a DLPI or DLPI Library error code.  When the DLPI error code
+is \fBDL_SYSERR\fP, the error is contained in the \fIerrno\fP(3) global
+variable.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.B dlpi_enabnotify
+fails, it returns a DLPI, DLPI Library or system error code.
+.B dlpi_enabnotify
+may fail when:
+.PP
+The following DLPI Library errors occur:
+.TP \w'[\fBDLPI_ENOTEIDINVAL\fP]\(em'u
+.RB [ DLPI_EINHANDLE ]
+The DLPI handle, \fIdh\fP, is not a valid data link handle.
+.PD 0
+.TP
+.RB [ DLPI_EINVAL ]
+The \fIfuncp\fP, \fIarg\fP or \fIidp\fP argument is invalid.
+.TP
+.RB [ DLPI_ENOTEIDINVAL ]
+The \fInotes\fP argument is invalid.
+.TP
+.RB [ DLPI_ENOTENOTSUP ]
+DLPI notifications are not supported by the link.
+.\".TP
+.\".RB [ DLPI_EBADMSG ]
+.\"Received a bad or unexpected DLPI message.
+.TP
+.RB [ DLPI_ETIMEDOUT ]
+The operation timed out awaiting an acknowledgement.
+.PD
+.PP
+The following DLPI errors occur:
+.TP \w'[\fBDLPI_ENOTEIDINVAL\fP]\(em'u
+.RB [ DL_ACCESS ]
+The DLS user did not have proper permission to make the request.
+.PD 0
+.\".TP
+.\".RB [ DL_OUTSTATE ]
+.\"The primitive was issued from an invalid state.
+.TP
+.RB [ DL_BADPRIM ]
+The DLS provider does not recognize \fB\)DL_NOTIFY_REQ\fP(7).
+.TP
+.RB [ DL_NOTSUPPORTED ]
+The DLS provider recognizes, but does support, \fB\)DL_NOTIFY_REQ\fP(7).
+.TP
+.RB [ DL_SYSERR ]
+A system error occurred and the \fBLinux\fP system error code is in the
+\fIerrno\fP(3) global variable.
+.PD
+.PP
+The following \fBLinux\fP system errors occur:
+.TP \w'[\fBDLPI_ENOTEIDINVAL\fP]\(em'u
+.RB [ EPERM ]
+Fine-grained permission for the request is incorrect.
+.PD 0
+.TP
+.RB [ ENOMEM ]
+Insufficient memory was immediately available to satisfy the request.
+.TP
+.RB [ ENOBUFS ]
+Insufficient buffers were immediately available to satisfy the request.
+.TP
+.RB [ ENOSR ]
+Insufficient \fISTREAMS\fP resources were available to satisfy the request.
+.TP
+.RB [ EAGAIN ]
+A temporary failure occured and the DLS user should reissue the request.
+.TP
+.RB [ EBUSY ]
+The control information in the request has already been subjected to the
+control request or a transient condition prevented the request.
+.TP
+.RB [ EINVAL ]
+On of the parameters of the requst for which there is no prescribed error code
+has an invalid value.
+.TP
+.RB [ ENOTSUP ]
+The request is recognized by not supported.
+.TP
+.RB [ ENOLINK ]
+The interface, Physical Point of Attachment, or underlying driver or device, is
+not connected.
+.TP
+.RB [ ENXIO ]
+Invalid device.  The interface, Physical Point of Attachment, or underlying
+driver or device is no longer installed on the system.
+.PD
+.PP
+In addition, any of the error numbers returned by
+.BR putmsg (2s)
+or
+.BR getmsg (2s)
+may also be returned in \fIerrno\fP(3) when
+.B dlpi_enabnotify
+returns \fBDL_SYSERR\fP.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B dlpi_enabnotify
+is a
+.IR Solaris \(rg-specific
+function.  It may be necessary to define the C preprocessor symbol,
+.BR _SUN_SOURCE ,
+before including the
+.RB < sys/dlpi.h >
+header file, to expose this symbolic constants, data structures and declarations
+necessary for the use of this function.
+It may also be necessary to include the
+.RB < dlpi.h >
+header file
+to expose this symbolic constants, data structures and declarations necessary
+for the use of this function.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B @includedir@/@PACKAGE@/sys/dlpi.h
+The DLPI header file.
+.TP
+.B @includedir@/@PACKAGE@/dlpi.h
+The DLPI Library header file.
+.TP
+.B @libdir@/libdlpi.a
+The static library containing the
+.BR dlpi_enabnotify
+function.
+.TP
+.B @libdir@/libdlpi.so
+The shared object library containing the
+.BR dlpi_enabnotify
+function.
+.\"
+.\"
+.SH BUGS
+.PP
+.B dlpi_enabnotify
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR dlpi_disabnotify (3),
+.BR DL_NOTIFY_REQ (7),
+.BR dlpi (3),
+.BR dlpi (7),
+.IR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B dlpi_enabnotify
+is compatible with the
+.IR Solaris \(rg
+DLPI Library,
+.[
+soldoc11
+.]
+and systems providing an interface equivalent to
+.IR Solaris \(rg
+DLPI Library,
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+The
+.B dlpi_enabnotify
+function relies upon support for the
+.BR DL_NOTIFY_REQ (7)
+primitive, which is not part of the DLPI standard.
+.[
+dlpi revision 2.0.0 draft 2
+.]
+It should, therefore, not be used by portable DLPI programs.
+.IP \(em
+.IR Solaris \(rg
+does not document values of the \fInotes\fP argument:
+.BR DL_NOTE_AGGR_AVAIL ,
+.BR DL_NOTE_AGGR_UNAVAIL ,
+.B DL_NOTE_FASTPATH_FLUSH
+and
+.BR DL_NOTE_CAPAB_RENEG .
+These values should not be used by even
+.IR Solaris \(rg
+programs.  Link aggregation and IP fast path are not necessarily supported by
+.B @PACKAGE_TITLE@
+drivers, modules, libraries and programs.
+.IP \(em
+.B DLPI Library
+functions are
+.IR Solaris \(rg-specific,
+and are provided only for porting
+.IR Solaris \(rg
+applications programs, drivers and modules to
+.BR Linux .
+They are inherently non-portable.  These functions will be avoided by portable
+DLPI programs.
+.IP \(em
+Binary compatibility is not attempted, only source compatibility: any binary
+compatibility experienced is coincidental and may change on a future release.
+It may be necessary to recompile all \fISTREAMS\fP drivers and modules that
+share definitions with the DLPI API library using
+.B @PACKAGE_TITLE@
+supplied header files.
+.PP
+For further compatibility information, see
+.BR dlpi (3),
+.BR dlpi (7),
+.IR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+DLPI,
+.[
+dlpi revision 2.0.0 draft 2
+.]
+and
+.IR Solaris \(rg
+DLPI documentation.
+.[
+soldoc11
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0 draft 2
+.]
+.BR dlpi (7),
+first appeared in SVR 4.
+.[
+svr4
+.]
+.B dlpi_enabnotify
+first appeared in the
+.IR Solaris "\(rg " 11 .
+.[
+soldoc11
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+implementation of the
+.IR "DLPI Library" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.T2

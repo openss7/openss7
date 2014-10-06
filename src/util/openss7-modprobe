@@ -1,0 +1,127 @@
+#!/bin/bash
+# =============================================================================
+# 
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date$ by $Author$
+#
+# =============================================================================
+
+#
+# The purpose of this program is to hook into the modprobe.d 'install' and
+# 'remove' functions to perform the module loading and unloading actions that
+# were formerly provided by initscripts.  This is meant to work with systemd.
+# openss7 modules that are placed in the modules-load.d directory for early
+# module loading; however, systemd does not provide a good way to perform the
+# additional necessary functions (weak-updates, subsytem shutdown) at such an
+# early stage in the boot process.  Therefore, we hook the 'install' and
+# 'remove' elements for these modules in an openss7.conf file placed in the
+# modules.d directory to perform these functions transparent to systemd.
+#
+# Hook commands are of the form:
+#
+#   install specfs /usr/sbin/openss7-modprobe specfs $COMMAND_OPTS
+#   remove  specfs /usr/sbin/openss7-modprobe -r specfs
+#
+# This script performs the necessary functions before module load (weak-updates,
+# depmod, etc).  Because primary modules are early-loaded (before the
+# systemd-sysctld service), application of sysctl's can be performed normally by
+# placing the .conf files in sysctl.d.  Also, the specfs.service can mount the
+# specfs on /dev/streams.
+#
+# Before attempting to remove the streams or specfs modules, STREAMS
+# applications can be properly shut down and the module stack can be withdrawn.
+#
+# This openss7-modprobe script can also be used from package install scripts to
+# gracefully upgrade the entire STREAMS subsystem.
+#
+
+set -e
+
+cmd=install
+
+if [ "$1" == "-r" ]; then
+    cmd=remove
+    shift
+fi
+
+case "$1" in
+    specfs)
+	case "$cmd" in
+	    install)
+		marker="/.openss7_update-`uname -r`"
+		haveit="/.openss7_haveit-`uname -r`"
+		if [ -e $marker -o ! -e $haveit ]; then
+		    /usr/sbin/openss7-modules -- -q --boot-kernel
+		    rm -f -- $marker || :
+		    touch -- $haveit || :
+		fi
+		/sbin/modprobe --ignore-install specfs
+		/usr/sbin/streams_mkdev --create || :
+		;;
+	    remove)
+		/sbin/modprobe -r --ignore-remove $@
+		;;
+	esac
+	;;
+    *)
+	case "$cmd" in
+	    install)
+		/sbin/modprobe --ignore-install $@
+		;;
+	    remove)
+		/sbin/modprobe -r --ignore-remove $@
+		;;
+	esac
+	;;
+esac
+
+# =============================================================================
+#
+# $Log$
+# =============================================================================
+# vim: sw=4 tw=80

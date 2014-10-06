@@ -1,0 +1,434 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: itot.4.man,v 1.1.2.2 2011-02-07 02:18:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:18:10 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: itot.4.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:10  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH ITOT 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.SH NAME
+.B isot, itot
+\- ISO Transport over TCP (ISOT/ITOT)
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <stropts.h>
+.HP
+.IB tcp_stream " = open(" \(lq/dev/tcp\(rq ", O_RDWR);
+.HP
+.BI ioctl( tcp_stream ", I_PUSH, " \(lqisot\(rq );
+.sp
+.HP
+.IB tcp_stream " = open(" \(lq/dev/tcp\(rq ", O_RDWR);
+.HP
+.BI ioctl( tcp_stream ", I_PUSH, " \(lqitot\(rq );
+.\"
+.\"
+.SH DESCRIPTION
+.B ISOT
+is an implementation of ISO Transport over TCP (ISOT) as described in RFC 983,
+.[
+rfc983
+.]
+superseded by RFC 1006.
+.[
+rfc1006
+.]
+.B ITOT
+is an implementation of ISO Transport over TCP (ITOT) as described in RFC
+2126.
+.[
+rfc2126
+.]
+Note that the former (RFC 1006) names the service
+.BR ISOT ;
+whereas the latter (RFC 2126) names the service
+.BR ITOT .
+.PP
+Regardless of the naming differences, these RFCs describe the use of IS 8073
+.[
+ISO/IEC 8073 X.224
+.]
+ISO Transport Class 0 over TCP/IP (ISOT/ITOT) by using TCP/IP as a
+Connection-oriented Network Service Provider instead of ISO CONS.
+.[
+ISO/IEC 8878 X.223
+.]
+.PP
+They describe adaptation of TCP to an ISO CONS
+.[
+x223
+.]
+network service provider through the use of a 4 byte header used to delimit
+NPDUs inside of the TCP stream.
+.PP
+RFC 983
+.[
+rfc983
+.]
+and RFC 1006
+.[
+rfc1006
+.]
+provided for ISO Transport Class 0 over TCP (or UDP under
+protest) (ISOT) on port number 102.
+(Note: both RFC 1006 and RFC 2126 place TP0 on port 102, and, therefore, RFC
+2126 must be backward compatible with RFC 1006.)
+RFC 1006
+is a standard (STD 35).
+.PP
+RFC 2126
+.[
+rfc2126
+.]
+also provides for ISO Transport Class 0 over TCP (or UDP under protest) (ISOT)
+on port number 102.  But, in addition to these services provided by RFC
+1006/STD 35, RFC 2126 also provides for ISO Transport Class 2 over TCP (or UDP
+under protest) (ITOT), based on RFC 1859,
+.[
+rfc1859
+.]
+using independent TCP/IP connections to port number 399, and also supports
+both IPv4 and IPv6.
+(Note: both RFC 1859 and RFC 2126 place TP2 on port 399, and, therefore, RFC
+2126 must be backward compatible with RFC 1859.)
+.\"
+.\"
+.SH USAGE
+.PP
+Not yet implemented, but here is a stab at explaining the design:
+.PP
+The following steps will be taken for use with the TP module:
+.IP 1. \w'0.\(em'u
+The user opens a
+.BR tcp "(4) or " udp "(4)
+Stream.
+.IP 2.
+The user pushes the
+.BR isot "(4) or " itot "(4)
+module.  The module, when pushed, determines the nature for the Stream below
+it, whether TCP or UDP.
+.RS
+.PP
+For ITOT Class 2 operation with expedited data, the user must open two
+.BR tcp "(4) or " udp "(4)
+Streams, or one
+.BR tcp "(4) and one " udp "(4)
+Stream, and link both under the
+.BR itot (4)
+multiplexer.  The linking is accomplished by opening a Stream on the
+.RI \(lq /dev/itot \(rq
+device and linking each Stream beneath the device Stream using the
+.BR I_LINK (7)
+STREAMS input-output control,
+.BR streamio (7).
+.RE
+.IP 3.
+The user pushes the
+.BR tp0 "(4) or " tp2 "(4)
+module.
+.IP 4.
+The user then treats the Stream as any other TP0 or TP2 Stream, with the
+obvious restrictions on NSAP and QOS.
+.PP
+The following steps will be taken for use with the TP multiplexer:
+.IP 1. \w'0.\(em'u
+A TP connection manager opens a connection management Stream on the TP
+multiplexing driver and listens for requests for the establishment of
+network connections.
+.IP 2.
+A TP user opens an upper Stream for ISO Transport Class 0 or ISO Transport
+Class 2.  The TP user then attempts to listen on the transport endpoint or
+connect the transport endpoint.  If a suitable (determined by address format,
+TSAP, and ownership) network connection is not available, it requests a
+network connection from the connection manager.  (TP2 performs multiplexing,
+so it is possible that many TP2 Streams could be opened and served by the same
+network connection.)
+.IP 3.
+When the connection manager receives the request, it uses the address format,
+TSAP and QOS parameters to determine whether an ISOT or ITOT network
+connection is requested.
+.IP 4.
+If an ISOT or ITOT network connection is requested, the connection manager
+opens a
+.BR tcp "(4) or " udp "(4)
+Stream.
+.\"to the requested address and connects the Stream to the appropriate
+.\"port number (102 for ISOT TP0 and 399 for ITOT TP2).
+.IP 5.
+The connection manager then pushes the
+.BR isot " or " itot
+module on the Stream.  This transforms the Stream into an ISO CONS provider
+and presents the
+.BR npi (7)
+service interface at the upper boundary.
+.IP 6.
+The connection manager then links the ISOT or ITOT Stream under the TP
+multiplexing driver and configures the Stream within the TP driver in response
+to the network connection request.
+.IP 7.
+TP then proceeds as normal, unaware that TCP/IP is providing the ISO CONS
+service.
+.\"
+.\"
+.SH INTERFACE
+.PP
+The service interface for the ISOT and ITOT modules at the upper boundary is
+the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0 draft 2
+.]
+.BR npi (7).
+The service interface for the ISOT and ITOT modules at the lower boundary is
+the Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0 draft 2
+.]
+.BR tpi (7).
+.\"
+.\"
+.SH ADDRESSES
+.PP
+Generic string addresses for ISOT and ITOT are described in RFC 1278.
+.[
+rfc1278
+.]
+.PP
+OSI NSAP addresses for ISOT and ITOT are described for IPv4 in RFC 1277,
+.[
+rfc1277
+.]
+for IPv6 in RFC 1888
+.[
+rfc1888
+.]
+superseded by IPv4 and IPv6 in RFC 4548.
+.[
+rfc4548
+.]
+.\"
+.\"
+.SH OPTIONS
+.PP
+.PP
+.B ISOT
+and
+.B ITOT
+modules support the ISO CONS
+options described in X.213
+.[
+x213
+.]
+and X.223.
+.[
+x223
+.]
+.\"
+.\"
+.SH PRIMITIVES
+.PP
+The
+ISOT and ITOT modules mediate
+.BR npi (7)
+primitives from its upper interface (write queue) to 
+.BR tpi (7)
+primitives at its lower interface (read queue).
+This section describes only the upper interface.  For a description of the
+lower interface, see
+.BR tcp (4)
+and
+.BR udp (4).
+.SS N_BIND_REQ\fR(7), \fPN_BIND_ACK\fR(7)
+.\"
+.\"
+.SH IOCTLS
+.PP
+ISOT and ITOT do not support any input-output controls of their own.
+.\"
+.\"
+.SH NOTICES
+.PP
+These modules are not implemented.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+These modules are not implemented.
+.\"
+.\"
+.\".SH FILES
+.\".PP
+.\"
+.\"
+.SH MODULES
+.PP
+.TP
+.B isot
+the ISOT module is a
+.I STREAMS
+module named
+.RI \(lq isot \(rq.
+.TP
+.B itot
+the ITOT module is a
+.I STREAMS
+module named
+.RI \(lq itot \(rq.
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.B /dev/tcp
+The
+.B tcp (4)
+device opened onto which ISOT or ITOT is pushed.
+.TP
+.B /dev/udp
+The
+.B udp (4)
+device opened onto which ISOT or ITOT is pushed.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.IR ISO (4).
+.\"
+.\"
+.SH BUGS
+.PP
+These modules are not implemented and so cannot have any bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+This implementation of ISOT and ITOT is specific to
+.BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+ISOT conforms to RFC 1006.
+.[
+rfc1006
+.]
+ITOT confirms to RFC 2126.
+.[
+rfc2126
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ISOT " and " ITOT
+are new for
+.BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
