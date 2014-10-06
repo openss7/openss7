@@ -847,16 +847,6 @@ sub cnt {
 }
 
 #package CallCounts;
-sub uncnt {
-	my ($self,$top) = @_;
-	if (($self->{ciccnt} -= 1) == 0) {
-		if ($self->isa('Relation')) {
-			$top->canvas->dtag('circuits',withtag=>$self->{item}) if $self->{item};
-		}
-	}
-}
-
-#package CallCounts;
 sub sim_up {
 	my ($self,$event,$dir) = @_;
 	if (my $new = $self->{sims}->{$dir}->{$event}) {
@@ -947,6 +937,7 @@ sub addfrom {
 }
 
 # -------------------------------------
+<<<<<<< HEAD
 package PktCounts; use strict;
 @PktCounts::ISA = qw(Counts);
 # -------------------------------------
@@ -986,6 +977,12 @@ sub addfrom {
 # -------------------------------------
 package History; use strict;
 @History::ISA = qw(Counts);
+=======
+package History;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Counts);
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 # -------------------------------------
 
 #package History;
@@ -3010,6 +3007,7 @@ sub cstat {
 }
 
 # -------------------------------------
+<<<<<<< HEAD
 package PktStats; use strict;
 @PktStats::ISA = qw(PktHistory);
 # -------------------------------------
@@ -3154,6 +3152,12 @@ sub pstat {
 # -------------------------------------
 package MsgCollector; use strict;
 @MsgCollector::ISA = qw(MsgStats);
+=======
+package MsgCollector;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(MsgStats);
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 # -------------------------------------
 
 #package MsgCollector;
@@ -3950,6 +3954,7 @@ sub init {
 	$self->MsgCollector::init(@args);
 	$self->CallCollector::init(@args);
 }
+<<<<<<< HEAD
 #package PktCollector;
 sub destroy {
 	my ($self,$top,@args) = @_;
@@ -4095,6 +4100,8 @@ sub destroy {
 	$self->CallCollector::destroy(@args);
 	$self->MsgCollector::destroy(@args);
 }
+=======
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 #package DualCollector;
 sub addfrom {
 	my ($self,$othr,@args) = @_;
@@ -4103,6 +4110,7 @@ sub addfrom {
 }
 
 # -------------------------------------
+<<<<<<< HEAD
 package TripleCollector; use strict;
 @TripleCollector::ISA = qw(PktCollector MsgCollector CallCollector);
 # -------------------------------------
@@ -4130,6 +4138,10 @@ sub addfrom {
 
 # -------------------------------------
 package MsgBuffer; use strict;
+=======
+package MsgBuffer;
+use strict;
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 # -------------------------------------
 #package MsgBuffer;
 sub init {
@@ -4137,17 +4149,25 @@ sub init {
 	$self->{msgbuf} = [];
 }
 #package MsgBuffer;
+<<<<<<< HEAD
 sub destroy {
 	my ($self,@args) = @_;
 	delete $self->{msgbuf};
 }
 #package MsgBuffer;
 sub pushbufmsg {
+=======
+sub pushbuf {
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 	my ($self,$msg) = @_;
 	return push @{$self->{msgbuf}}, $msg;
 }
 #package MsgBuffer;
+<<<<<<< HEAD
 sub shiftbufmsg {
+=======
+sub shiftbuf {
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 	my $self = shift;
 	return shift @{$self->{msgbuf}};
 }
@@ -4408,11 +4428,14 @@ sub init {
 	$top->widget->traceVariable(\$self->{state},'w'=>[\&Stateful::tracestate,$self,$top]);
 }
 #package Stateful;
+<<<<<<< HEAD
 sub destroy {
 	my ($self,$top) = @_;
 	$top->widget->traceVdelete(\$self->{state});
 }
 #package Stateful;
+=======
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 sub tracestate {
 	my ($ind,$val,$op,$self,$top) = @_;
 	if ($op eq 'w') {
@@ -4576,6 +4599,7 @@ sub init {
 	$self->{arcs}->{a} = [];
 	$self->{arcs}->{b} = [];
 }
+<<<<<<< HEAD
 #package Arcend;
 sub destroy {
 	my ($self,$top) = @_;
@@ -4586,6 +4610,8 @@ sub destroy {
 		$arc->destroy($top);
 	}
 }
+=======
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 
 #package Arcend;
 sub moveit {
@@ -5456,6 +5482,7 @@ use vars qw(@ISA);
 # -------------------------------------
 
 #package Circuit;
+<<<<<<< HEAD
 sub get {
 	my ($type,$top,$relation,$cic,@args) = @_;
 	return $relation->{cics}->{$cic} if $relation->{cics}->{$cic};
@@ -5467,6 +5494,11 @@ sub get {
 		active=>0,
 		state=>::CTS_UNINIT,
 	};
+=======
+sub new {
+	my ($type,$top,$group,$cic,@args) = @_;
+	my $self = {};
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 	bless $self,$type;
 	$self->{group} = $group;
 	$self->{cic} = $cic;
@@ -6163,10 +6195,16 @@ sub getmore {
 		},$self,$mc,$top,$X,$Y]);
 		$m->add('cascade',-menu=>$mc,-label=>'Links');
 	}
+<<<<<<< HEAD
 	{
 		my $node = $self->{node}->{a};
 		my $label = 'Node A '.$node->shortid;
 		my $mc = $m->Menu(-title=>"$label Menu");
+=======
+	if ($have->{routes}->{b}) {
+		my ($mc,$m3);
+		$mc = $m->Menu(-title=>'Routes Forward Menu');
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 		$mc->configure(-postcommand=>[sub {
 			my ($self,$mc,$top,$X,$Y) = @_;
 			$mc->delete(0,'end');
@@ -6181,10 +6219,16 @@ sub getmore {
 		},$self,$mc,$top,$X,$Y]);
 		$m->add('cascade',-menu=>$mc,-label=>'Routes Forward');
 	}
+<<<<<<< HEAD
 	{
 		my $node = $self->{node}->{b};
 		my $label = 'Node B '.$node->shortid;
 		my $mc = $m->Menu(-title=>"$label Menu");
+=======
+	if ($have->{routes}->{a}) {
+		my ($mc,$m3);
+		$mc = $m->Menu(-title=>'Routes Reverse Menu');
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 		$mc->configure(-postcommand=>[sub {
 			my ($self,$mc,$top,$X,$Y) = @_;
 			$mc->delete(0,'end');
@@ -6394,6 +6438,7 @@ sub getmore {
 		$mc->configure(-postcommand=>[sub {
 			my ($self,$mc,$top,$X,$Y) = @_;
 			$mc->delete(0,'end');
+<<<<<<< HEAD
 			foreach my $dli (sort {$a <=> $b} keys %{$self->{datalinks}}) {
 				my $datalink = $self->{datalinks}->{$dli};
 				my $type = ref($datalink); $type=~s/_/ /g;
@@ -6403,6 +6448,22 @@ sub getmore {
 				$datalink->getmore($m3,$top,$X,$Y);
 				$mc->add('cascade',-menu=>$m3,-label=>$label);
 			}
+=======
+			$channel->getmenu($mc,$top,$X,$Y);
+			$channel->getmore($mc,$top,$X,$Y);
+		},$self,$mc,$top,$X,$Y]);
+		$m->add('cascade', -menu=>$mc, -label=>$label);
+	}
+	if ($have->{revs}) {
+		my $channel = $self->{channelrevs};
+		my $label = 'Reverse channel';
+		my $mc = $m->Menu(-title=>"$label Menu");
+		$mc->configure(-postcommand=>[sub {
+			my ($self,$mc,$top,$X,$Y) = @_;
+			$mc->delete(0,'end');
+			$channel->getmenu($mc,$top,$X,$Y) if $channel;
+			$channel->getmore($mc,$top,$X,$Y) if $channel;
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 		},$self,$mc,$top,$X,$Y]);
 		$m->add('cascade', -menu=>$mc, -label=>$label);
 	}
@@ -6770,6 +6831,7 @@ sub absorb {
 #package Node;
 sub fillstatus {
 	my ($self,$top,$tw,$row) = @_;
+<<<<<<< HEAD
 }
 
 # -------------------------------------
@@ -6887,6 +6949,50 @@ sub iname {
 	return '' unless $ipaddr;
 	# TODO: reverse DNS lookup of ip address
 	return '(unknown)';
+=======
+	my $f;
+	my ($na,$nb);
+	($na,$nb) = (keys %{$self->{paths}->{a}},keys %{$self->{paths}->{b}});
+	if ($na or $nb) {
+		$f = $tw->TFrame(%tframestyle,-label=>'Paths:');
+		my $p = $f;
+		if ($na + $nb > 16) {
+			$f->pack(%tframepack);
+			$p = $f->Scrolled('Pane',
+				-scrollbars=>'osoe',
+				-sticky=>'we',
+				-gridded=>'y',
+			)->pack(%tframepack);
+		} else {
+			$f->pack(%tframescrunch);
+		}
+		$$row = 0;
+		my $col = 0;
+		$p->Label(%labelright,-text=>'Originating:',
+		)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
+		foreach my $ppa (sort {$a <=> $b} keys %{$self->{paths}->{a}}) {
+			my $path = $self->{paths}->{a}->{$ppa};
+			my $channel = $path->{channel};
+			$col++;
+			my $w = $p->Entry(%entrycenter,-text=>$channel->shortid,
+			)->grid(-row=>$$row,-column=>$col,-sticky=>'ewns');
+			$path->bindtowidget($top,$w);
+			if ($col > 3) { $col = 0; $$row++; }
+		}
+		if ($col != 0) { $col = 0; $$row++; }
+		$p->Label(%labelright,-text=>'Terminating:',
+		)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
+		foreach my $ppa (sort {$a <=> $b} keys %{$self->{paths}->{b}}) {
+			my $path = $self->{paths}->{b}->{$ppa};
+			my $channel = $path->{channel};
+			$col++;
+			my $w = $p->Entry(%entrycenter,-text=>$channel->shortid,
+			)->grid(-row=>$$row,-column=>$col,-sticky=>'ewns');
+			$path->bindtowidget($top,$w);
+			if ($col > 3) { $col = 0; $$row++; }
+		}
+	}
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 }
 
 # -------------------------------------
@@ -6935,9 +7041,15 @@ sub xform {
 	my $mc = $top->mycanvas;
 	$mc->delballoon($self->{items});
 
+<<<<<<< HEAD
 	if ($node->isa('SP')) {
 		print STDERR "E: $self and $node attempt to merge DENIED\n";
 		return;
+=======
+	foreach (@{$self->{items}}) {
+		$c->dtag($_,$oldtype);
+		$c->addtag($type,withtag=>$_);
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 	}
 
 	my @oldtags = ();
@@ -6946,6 +7058,7 @@ sub xform {
 	push @oldtags, 'TCAP' if $self->{orig_tcap} or $self->{term_tcap};
 	push @oldtags, 'circuits' if $self->{ciccnt} > 0;
 
+<<<<<<< HEAD
 #package SP;
 sub adjitems {
 	my ($self,$top,$c,$oldtags) = @_;
@@ -6965,6 +7078,27 @@ sub adjitems {
 	$c->itemconfigure($self->{text},-text=>$self->{pcode});
 	$c->itemconfigure($self->{ownr},-text=>$self->{pownr});
 	$self->makecol($top,::COL_NOD);
+=======
+	$c->delete($self->{item});
+	shift @{$self->{items}};
+	$self->adjitems($c,\@oldtags);
+	$c->itemconfigure($self->{ttxt}, -text=>ref($self));
+	if ($self->{alias}) {
+		$c->itemconfigure($self->{item}, -dash=>[5,2]);
+		$c->itemconfigure($self->{scri}, -dash=>[5,2]);
+	}
+	my $olditem = 'all';
+	foreach (@{$self->{items}}) {
+		$c->raise($_,$olditem);
+		$olditem = $_;
+	}
+	my $state = ($top->{show}->{"\L$type\Es"}) ? 'normal' : 'hidden';
+	foreach (@{$self->{items}}) {
+		$c->itemconfigure($_,-state=>$state);
+	}
+	$self->Clickable::attach($top);
+	$self->findaliases($top);
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 }
 
 #package SP;
@@ -7792,10 +7926,13 @@ sub adjitems {
 	$c->coords($self->{scri},
 		$x-26,$y-26,$x+26,$y+26,$x+26,$y-26,$x-26,$y+26,$x-26,$y-26,
 	);
+<<<<<<< HEAD
 	$c->itemconfigure($self->{ttxt},-text=>ref($self));
 	$c->itemconfigure($self->{text},-text=>$self->{pcode});
 	$c->itemconfigure($self->{ownr},-text=>$self->{pownr});
 	$self->makecol($top,::COL_SSP);
+=======
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 }
 
 #package SSP;
@@ -7829,6 +7966,7 @@ sub adjitems {
 		-tags=>[ref($self),'node',@{$oldtags}],
 	);
 	unshift @{$self->{items}}, $self->{item};
+<<<<<<< HEAD
 	$c->coords($self->{scri},
 		$x-23,$y-23,$x+23,$y-23,$x+23,$y+23,$x-23,$y+23,$x-23,$y-23,
 	);
@@ -7836,6 +7974,8 @@ sub adjitems {
 	$c->itemconfigure($self->{text},-text=>$self->{pcode});
 	$c->itemconfigure($self->{ownr},-text=>$self->{pownr});
 	$self->makecol($top,::COL_SCP);
+=======
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 }
 
 #package SCP;
@@ -7872,10 +8012,13 @@ sub adjitems {
 	$c->coords($self->{scri},
 		$x+38,$y-38,$x-38,$y+38,
 	);
+<<<<<<< HEAD
 	$c->itemconfigure($self->{ttxt},-text=>ref($self));
 	$c->itemconfigure($self->{text},-text=>$self->{pcode});
 	$c->itemconfigure($self->{ownr},-text=>$self->{pownr});
 	$self->makecol($top,::COL_ADJ);
+=======
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 }
 
 #package STP;
@@ -7913,10 +8056,13 @@ sub adjitems {
 	$c->coords($self->{scri},
 		$x+38,$y-38,$x-38,$y+38,
 	);
+<<<<<<< HEAD
 	$c->itemconfigure($self->{ttxt},-text=>ref($self));
 	$c->itemconfigure($self->{text},-text=>$self->{pcode});
 	$c->itemconfigure($self->{ownr},-text=>$self->{pownr});
 	$self->makecol($top,::COL_GTT);
+=======
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 }
 
 #package GTT;
@@ -8600,6 +8746,7 @@ sub setpr {
 	}
 }
 
+<<<<<<< HEAD
 # -------------------------------------
 package Channel; use strict;
 @Channel::ISA = qw(Datalink);
@@ -8655,6 +8802,8 @@ sub chan {
 	return ((($ppa >> 0) & 0x1f), (($ppa >> 5) & 0x03), (($ppa >> 7) & 0x03));
 }
 
+=======
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 #package Channel;
 sub identify {
 	my $self = shift;
@@ -8874,6 +9023,7 @@ sub new {
 # -------------------------------------
 package BitField; use strict; use vars qw(@ISA); @ISA = qw(Field);
 # -------------------------------------
+<<<<<<< HEAD
 
 #package Association;
 sub dli {
@@ -8917,11 +9067,35 @@ sub get {
 	$self->{streams}  = {0=>{},   1=>{}};	    # streams
 	$self->{chunks}   = {0=>[],   1=>[]};	    # reassembled messages
 	$self->{ulps}     = {0=>[],   1=>[]};
+=======
+sub new {
+	my ($type,$b,$p,$s,$e,@args) = @_;
+	my $self = Field::new($type,$b,$p,@args);
+	$self->{len} = int($e/8) + 1;
+	$self->{ptr} = $p;
+	$self->{beg} = $s;
+	$self->{end} = $e;
+	$self->{wid} = $e+1-$s;
+	#TODO unpack bits
+	my $sb = $p + int($s/8);
+	my $eb = $p + int($e/8);
+	my ($v,$i);
+	for (($v,$i) = (0,$eb); $i >= $sb; $i--) {
+		my ($m,$c) = (0xff,$b->[$i]);
+		if ($i == $eb) { $m &=  ((1<<(8-$e))-1); }
+		if ($i == $sb) { $m &= ~((1<<($s+1))-1); }
+		$v |= ($c & $m);
+		$v <<= 8 unless $i == $sb;
+	}
+	$v >>= $s;
+	$self->{val} = $v;
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 	return $self;
 }
 
 sub bits {
 	my $self = shift;
+<<<<<<< HEAD
 	my $name = ref($self); $name=~s/_/ /g;
 	my $id = sprintf("$name %d::%d(%08x)", $self->{sport},$self->{dport},$self->{vtag});
 	$id .= ", $self->{node}->{a}->{pcode} <=> $self->{node}->{b}->{pcode} link $self->{slc}"
@@ -8944,6 +9118,22 @@ sub hit {
 	$self->{node}->{a}->hit($msg,$dir^0x0);
 	$self->{node}->{b}->hit($msg,$dir^0x1);
 }
+=======
+	my @bytes = ();
+	my $bits = '';
+	my $word = $self->{val};
+	for (my $i = 0; $i < $self->{beg}; $i++) {
+		$bits = '-'.$bits;
+	}
+	my $p = $self->{ptr};
+	for (my $i = $self->{beg}; $i <= $self->{end}; $i++) {
+		$bits = (($word & 0x1)?'1':'0').$bits;
+		$word >>= 1;
+		if (($i&0x7) == 0x7) {
+			push @bytes, sprintf('%3d %s', $p + scalar(@bytes), $bits);
+			$bits = '';
+		}
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 
 	}
 	if (($self->{end}&0x7) != 0x7) {
@@ -9000,6 +9190,7 @@ sub new {
 	my ($type,$b,$p,@args) = @_;
 	return BitField::new($type,$b,$p,4,6,@args);
 }
+<<<<<<< HEAD
 
 #package M2PA_Association;
 sub add_pkt {
@@ -9018,6 +9209,14 @@ sub add_pkt {
 			print STDERR "W: $msg: decoding error, message discarded\n";
 		}
 	}
+=======
+# ------------------------------------
+package BsnField; use strict; use vars qw(@ISA); @ISA = qw(SnField);
+# ------------------------------------
+sub new {
+	my ($type,$b,$p,@args) = @_;
+	return SnField::new($type,$b,$p+0,@args);
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 }
 # ------------------------------------
 package BibField; use strict; use vars qw(@ISA); @ISA = qw(IbField);
@@ -9040,6 +9239,7 @@ sub new {
 	my ($type,$b,$p,@args) = @_;
 	return IbField::new($type,$b,$p+1,@args);
 }
+<<<<<<< HEAD
 
 #package M2UA_Association;
 sub add_pkt {
@@ -9058,6 +9258,14 @@ sub add_pkt {
 			print STDERR "W: $msg: decoding error, message discarded\n";
 		}
 	}
+=======
+# ------------------------------------
+package LiField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
+# ------------------------------------
+sub new {
+	my ($type,$b,$p,@args) = @_;
+	return BitField::new($type,$b,$p+2,0,5,@args);
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 }
 # ------------------------------------
 package Li0Field; use strict; use vars qw(@ISA); @ISA = qw(BitField);
@@ -9080,6 +9288,7 @@ sub new {
 	my ($type,$b,$p,@args) = @_;
 	return XsnField::new($type,$b,$p+0,@args);
 }
+<<<<<<< HEAD
 
 #package M3UA_Association;
 sub add_pkt {
@@ -9098,6 +9307,14 @@ sub add_pkt {
 			print STDERR "W: $msg: decoding error, message discarded\n";
 		}
 	}
+=======
+# ------------------------------------
+package XBsn0Field; use strict; use vars qw(@ISA); @ISA = qw(Xsn0Field);
+# ------------------------------------
+sub new {
+	my ($type,$b,$p,@args) = @_;
+	return Xsn0Field::new($type,$b,$p+1,@args);
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 }
 # ------------------------------------
 package XBibField; use strict; use vars qw(@ISA); @ISA = qw(IbField);
@@ -9127,6 +9344,7 @@ sub new {
 	my ($type,$b,$p,@args) = @_;
 	return IbField::new($type,$b,$p+3,@args);
 }
+<<<<<<< HEAD
 
 #package SUA_Association;
 sub add_pkt {
@@ -9145,6 +9363,28 @@ sub add_pkt {
 			print STDERR "W: $msg: decoding error, message discarded\n";
 		}
 	}
+=======
+# ------------------------------------
+package XliField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
+# ------------------------------------
+sub new {
+	my ($type,$b,$p,@args) = @_;
+	return BitField::new($type,$b,$p+4,0,8,@args);
+}
+# ------------------------------------
+package Xli0Field; use strict; use vars qw(@ISA); @ISA = qw(BitField);
+# ------------------------------------
+sub new {
+	my ($type,$b,$p,@args) = @_;
+	return BitField::new($type,$b,$p+5,1,7,@args);
+}
+# ------------------------------------
+package XjmpField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
+# ------------------------------------
+sub new {
+	my ($type,$b,$p,@args) = @_;
+	return BitField::new($type,$b,$p+5,6,7,@args);
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 }
 # -------------------------------------
 package SfField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
@@ -9157,6 +9397,7 @@ sub new {
 package Sf2Field; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # -------------------------------------
 sub new {
+<<<<<<< HEAD
 	my ($type,$top,$file) = @_;
 	my $self = PcapSource::new(@_);
 	my $err = '';
@@ -9174,6 +9415,10 @@ sub new {
 		return undef;
 	}
 	$top->{network} = new Network($top);
+=======
+	my ($type,$b,$p,@args) = @_;
+	return BitField::new($type,$b,$p+1,0,7,@args);
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 }
 # -------------------------------------
 package SiField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
@@ -9210,6 +9455,7 @@ sub new {
 	my ($type,$b,$p,@args) = @_;
 	return BitField::new($type,$b,$p+3,0,23,@args);
 }
+<<<<<<< HEAD
 
 sub service {
 	my ($self,$top,$network) = @_;
@@ -9223,6 +9469,14 @@ sub service {
 			$msg->process($top,$network);
 		}
 	}
+=======
+# -------------------------------------
+package Sls24Field; use strict; use vars qw(@ISA); @ISA = qw(BitField);
+# -------------------------------------
+sub new {
+	my ($type,$b,$p,@args) = @_;
+	return BitField::new($type,$b,$p+6,0,7,@args);
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 }
 # -------------------------------------
 package Dpc14Field; use strict; use vars qw(@ISA); @ISA = qw(BitField);
@@ -10557,6 +10811,7 @@ sub hlist {
 	$hl->itemCreate('1',3,-text=>'L2 Header');
 	$hl->indicator('create','1',-itemtype=>'image',-image=>$self->{tree}->{1});
 	my $sio;
+<<<<<<< HEAD
 	if ($self->{datalink}->{ht} == ::HT_EXTENDED) {
 		$self->makeentry($hl,0,0,11,$self->{bsn},'BSN','1.2','Backward Sequence Number');
 		$self->makeentry($hl,1,7,7,$self->{bib},'BIB','1.1','Backward Indicator Bit');
@@ -11524,6 +11779,8 @@ sub hlist {
 	$hl->itemCreate('1',3,-text=>'L2 Header');
 	$hl->indicator('create','1',-itemtype=>'image',-image=>$self->{tree}->{1});
 	my $sio;
+=======
+>>>>>>> f1b4cbfdf8526570964df9b31c8bb5f35c5d98c5
 	if ($self->{channel}->{ht} == ::HT_EXTENDED) {
 		$self->makeentry($hl,0,0,11,$self->{bsn},'BSN','1.2','Backward Sequence Number');
 		$self->makeentry($hl,1,7,7,$self->{bib},'BIB','1.1','Backward Indicator Bit');

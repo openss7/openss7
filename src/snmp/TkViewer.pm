@@ -99,6 +99,12 @@ sub start_timeout {
 }
 
 # ------------------------------------------
+package Viewer::Tk; our @ISA = qw(Viewer);
+package Viewer::Internet::Tk; our @ISA = qw(Viewer::Internet);
+package Viewer::Driv::Tk; our @ISA = qw(Viewer::Driv);
+# ------------------------------------------
+
+# ------------------------------------------
 package Canvas::Tk; our @ISA = qw(Canvas);
 # ------------------------------------------
 #package Canvas::Tk;
@@ -639,22 +645,22 @@ sub placing {
 }
 
 # ------------------------------------------
-package Subnetwork::Network::Draw::Tk; our @ISA = qw(Subnetwork::Network::Draw);
-package Network::Network::Draw::Tk; our @ISA = qw(Network::Network::Draw);
-package Private::Network::Draw::Tk; our @ISA = qw(Private::Network::Draw);
-package Private::Here::Network::Draw::Tk; our @ISA = qw(Private::Here::Network::Draw);
-package Local::Network::Draw::Tk; our @ISA = qw(Local::Network::Draw);
-package Local::Here::Network::Draw::Tk; our @ISA = qw(Local::Here::Network::Draw);
-package Host::Network::Draw::Tk; our @ISA = qw(Host::Network::Draw);
-package Host::Ip::Network::Draw::Tk; our @ISA = qw(Host::Ip::Network::Draw);
-package Host::Ip::Here::Network::Draw::Tk; our @ISA = qw(Host::Ip::Here::Network::Draw);
-package Subnet::Network::Draw::Tk; our @ISA = qw(Subnet::Network::Draw);
-package Lan::Network::Draw::Tk; our @ISA = qw(Lan::Network::Draw);
-package Vlan::Network::Draw::Tk; our @ISA = qw(Vlan::Network::Draw);
-package Address::Network::Draw::Tk; our @ISA = qw(Address::Network::Draw);
-package Port::Network::Draw::Tk; our @ISA = qw(Port::Network::Draw);
-package Vprt::Network::Draw::Tk; our @ISA = qw(Vprt::Network::Draw);
-package Route::Network::Draw::Tk; our @ISA = qw(Route::Network::Draw);
+package Subnetwork::Internet::Draw::Tk; our @ISA = qw(Subnetwork::Internet::Draw);
+package Internet::Internet::Draw::Tk; our @ISA = qw(Internet::Internet::Draw);
+package Private::Internet::Draw::Tk; our @ISA = qw(Private::Internet::Draw);
+package Private::Here::Internet::Draw::Tk; our @ISA = qw(Private::Here::Internet::Draw);
+package Local::Internet::Draw::Tk; our @ISA = qw(Local::Internet::Draw);
+package Local::Here::Internet::Draw::Tk; our @ISA = qw(Local::Here::Internet::Draw);
+package Host::Internet::Draw::Tk; our @ISA = qw(Host::Internet::Draw);
+package Host::Ip::Internet::Draw::Tk; our @ISA = qw(Host::Ip::Internet::Draw);
+package Host::Ip::Here::Internet::Draw::Tk; our @ISA = qw(Host::Ip::Here::Internet::Draw);
+package Subnet::Internet::Draw::Tk; our @ISA = qw(Subnet::Internet::Draw);
+package Lan::Internet::Draw::Tk; our @ISA = qw(Lan::Internet::Draw);
+package Vlan::Internet::Draw::Tk; our @ISA = qw(Vlan::Internet::Draw);
+package Address::Internet::Draw::Tk; our @ISA = qw(Address::Internet::Draw);
+package Port::Internet::Draw::Tk; our @ISA = qw(Port::Internet::Draw);
+package Vprt::Internet::Draw::Tk; our @ISA = qw(Vprt::Internet::Draw);
+package Route::Internet::Draw::Tk; our @ISA = qw(Route::Internet::Draw);
 # ------------------------------------------
 
 # ------------------------------------------
@@ -720,6 +726,11 @@ package Xcon::Driv::Draw::Tk; our @ISA = qw(Xcon::Driv::Draw);
 # ------------------------------------------
 package Window::Tk; our @ISA = qw(Window);
 # ------------------------------------------
+#package Window::Tk;
+sub destroy {
+	my $self = shift;
+	$self->{wind}->destroy;
+}
 #package Window::Tk;
 sub init {
 	my $self = shift;

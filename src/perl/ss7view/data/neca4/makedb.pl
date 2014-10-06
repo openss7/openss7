@@ -611,6 +611,7 @@ sub donecadata {
 						$data{wcvh} = "$data{wcv},$data{wch}" if $data{wcv} and $data{wch};
 						$data{ocn} = $ocn unless $ocn eq '"';
 						$data{swocn} = $ocn unless $ocn eq '"';
+						$data{lata} = $lata unless $lata eq '"';
 						$data{swlata} = $lata unless $lata eq '"';
 					} elsif (/--- Continued/) {
 						# skip these lines
@@ -633,6 +634,7 @@ sub donecadata {
 						$data{wcvh} = "$wcv,$wch";
 						$data{ocn} = $ocn;
 						$data{swocn} = $ocn;
+						$data{lata} = $lata;
 						$data{swlata} = $lata;
 						$data{sect} = $sect;
 					} elsif (/--- Continued/) {

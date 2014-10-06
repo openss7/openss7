@@ -3,7 +3,7 @@ require threads::shared;
 require Thread;
 require Thread::Queue;
 require Carp;
-use Data::Dumper;
+require Data::Dumper;
 require DBI;
 require SNMP;
 require Net::IP;
@@ -281,12 +281,12 @@ sub addchild {
 	}
 	if (exists $self->{children}{$form}{$child->no}) {
 		if ($result) {
-			$child->update() if $child->isa('Storable');
+			$child->update() if $child->isa('Stored');
 			Viewers->rekeyed($self,$child);
 		}
 	} else {
 		$self->{children}{$form}{$child->no} = $child;
-		$child->update() if $child->isa('Storable');
+		$child->update() if $child->isa('Stored');
 		Viewers->added_child($self,$child);
 	}
 	return $result;
@@ -744,6 +744,21 @@ package Tree; our @ISA = qw(Root Leaf);
 # ------------------------------------------
 
 # ------------------------------------------
+package Database::Owner; our @ISA = qw(Base);
+# ------------------------------------------
+#package Database::Owner;
+sub init {
+	my $self = shift;
+	my ($db) = @_;
+	$self->{db} = $db;
+}
+#package Database::Owner;
+sub fini {
+	my $self = shift;
+	delete $self->{db};
+}
+
+# ------------------------------------------
 package Database; our @ISA = qw(Base);
 # ------------------------------------------
 #package Database;
@@ -913,21 +928,20 @@ sub walktree {
 }
 
 # ------------------------------------------
-package Model::DBI; our @ISA = qw(Model);
+package Model::DBI; our @ISA = qw(Database::Owner Model);
 # ------------------------------------------
 #package Model::DBI;
 sub kinds {
-	return qw/Network Private Local Host Lan Vlan Subnet Port Vprt Address/;
+	return qw/Internet Private Local Host Lan Vlan Subnet Port Vprt Address/;
 }
 #package Model::DBI;
 sub init {
 	my $self = shift;
 	my ($db) = @_;
-	$self->{database} = $db;
 	$db->begin_work;
 	foreach my $kind ($self->kinds) {
 		my $name = "Table\::$kind";
-		my $table = $name->get($db,$kind);
+		my $table = $name->get($self,$kind);
 		if (my $dat = $table->getall) {
 			foreach my $id (keys %$dat) {
 				my $sub = $dat->{$id}{sub};
@@ -939,11 +953,6 @@ sub init {
 		}
 	}
 	$db->commit;
-}
-#package Model::DBI;
-sub fini {
-	my $self = shift;
-	delete $self->{database};
 }
 
 # ------------------------------------------
@@ -1097,7 +1106,7 @@ sub result_xlate_thread {
 	my ($rq,$wq,$bq,$eq) = @$queues;
 	my ($snmpargs,$table,$result,$error) = @$item;
 	if ($error) {
-		warn "Errored result:\nRaw SNMP result:\n",Dumper($item),"\n";
+		warn "Errored result:\nRaw SNMP result:\n",Data::Dumper::Dumper($item),"\n";
 		return;
 	}
 	my $xlated;
@@ -1221,7 +1230,7 @@ sub snmp_process {
 	my $item = shift;
 	my ($snmpargs,$request,$table,$result,$error) = @$item;
 	if ($error) {
-		warn "Errored result:\nRaw SNMP result:\n",Dumper($item),"\n";
+		warn "Errored result:\nRaw SNMP result:\n",Data::Dumper::Dumper($item),"\n";
 		return;
 	}
 	my ($hkey,$type,$net) = $self->keytype($snmpargs->{'-hostname'});
@@ -1234,7 +1243,7 @@ sub snmp_process {
 	my $entries = $table;
 	if ($entries =~ s/Scalars$/Data/) {}
 	elsif ($entries =~ s/Table$/Entry/) {}
-	my $db = $self->{database};
+	my $db = $self->{db};
 	$db->begin_work;
 	if ($host->can($table)) {
 		$host->$table($self,$snmpargs,$table,$result,$error,$hkey,$type,$net,$name);
@@ -1288,7 +1297,7 @@ sub xlate_bulk {
 	my ($snmpargs,$bulk,$result,$error) = @_;
 	if (0) {
 		print STDERR "\nBulk $bulk raw result:\n";
-		print STDERR Data::Dumper($result),"\n";
+		print STDERR Data::Dumper::Dumper($result),"\n";
 		foreach my $key (keys %$result) {
 			lock $lockvar;
 			my $tag = SNMP::translateObj(add_dot($key));
@@ -1314,7 +1323,7 @@ sub xlate_bulk {
 		($label,$index) = ('sysUpTime',0) if $label eq 'sysUpTimeInstance';
 		unless (length($index)) {
 			Carp::cluck "Couldn't find index in $key, tag is $tag, label is $label, index is $index";
-			print STDERR Data::Dumper($result),"\n";
+			print STDERR Data::Dumper::Dumper($result),"\n";
 		}
 		next unless length($index);
 		my $mib = $SNMP::MIB{$label};
@@ -1375,9 +1384,9 @@ sub xlate_bulk {
 						Carp::carp "Ran out of indexes in [",join('.',@inds),"] looking for ",$mib->{type};
 						Carp::cluck "processing index '$index' of table '$table' for instance $i";
 						print STDERR "$table raw result was:\n";
-						print STDERR Data::Dumper($result),"\n";
+						print STDERR Data::Dumper::Dumper($result),"\n";
 						print STDERR "$table translated result is currently:\n";
-						print STDERR Data::Dumper($xlate),"\n";
+						print STDERR Data::Dumper::Dumper($xlate),"\n";
 						@inds = ();
 					}
 				} elsif ($mib->{type} =~ /OCTETSTR/) {
@@ -1408,9 +1417,9 @@ sub xlate_bulk {
 						Carp::carp "Ran out of indexes in [",join('.',@inds),"] looking for ",$mib->{type};
 						Carp::cluck "processing index '$index' of table '$table' for instance $i";
 						print STDERR "$table raw result was:\n";
-						print STDERR Data::Dumper($result),"\n";
+						print STDERR Data::Dumper::Dumper($result),"\n";
 						print STDERR "$table translated result is currently:\n";
-						print STDERR Data::Dumper($xlate),"\n";
+						print STDERR Data::Dumper::Dumper($xlate),"\n";
 						@inds = ();
 					}
 				} elsif ($mib->{type} =~ /OBJECTID|OPAQUE/) {
@@ -1425,9 +1434,9 @@ sub xlate_bulk {
 						Carp::carp "Ran out of indexes in [",join('.',@inds),"] looking for ",$mib->{type};
 						Carp::cluck "processing index '$index' of table '$table' for instance $i";
 						print STDERR "$table raw result was:\n";
-						print STDERR Data::Dumper($result),"\n";
+						print STDERR Data::Dumper::Dumper($result),"\n";
 						print STDERR "$table translated result is currently:\n";
-						print STDERR Data::Dumper($xlate),"\n";
+						print STDERR Data::Dumper::Dumper($xlate),"\n";
 						@inds = ();
 					}
 				} elsif ($mib->{type} =~ /IPADDR|NETADDR/) {
@@ -1440,9 +1449,9 @@ sub xlate_bulk {
 						Carp::carp "Ran out of indexes in [",join('.',@inds),"] looking for ",$mib->{type};
 						Carp::cluck "processing index '$index' of table '$table' for instance $i";
 						print STDERR "$table raw result was:\n";
-						print STDERR Data::Dumper($result),"\n";
+						print STDERR Data::Dumper::Dumper($result),"\n";
 						print STDERR "$table translated result is currently:\n";
-						print STDERR Data::Dumper($xlate),"\n";
+						print STDERR Data::Dumper::Dumper($xlate),"\n";
 						@inds = ();
 					}
 				} else {
@@ -1458,7 +1467,7 @@ sub xlate_table {
 	my ($snmpargs,$table,$result,$error) = @_;
 	if (0) {
 		print STDERR "\nTable $table raw result:\n";
-		print STDERR Data::Dumper($result),"\n";
+		print STDERR Data::Dumper::Dumper($result),"\n";
 		foreach my $key (keys %$result) {
 			lock $lockvar;
 			my $tag = SNMP::translateObj(add_dot($key));
@@ -1529,9 +1538,9 @@ sub xlate_table {
 					Carp::carp "Ran out of indexes in [",join('.',@inds),"] looking for ",$mib->{type};
 					Carp::cluck "processing index '$index' of table '$table' for instance $i";
 					print STDERR "$table raw result was:\n";
-					print STDERR Data::Dumper($result),"\n";
+					print STDERR Data::Dumper::Dumper($result),"\n";
 					print STDERR "$table translated result is currently:\n";
-					print STDERR Data::Dumper($xlate),"\n";
+					print STDERR Data::Dumper::Dumper($xlate),"\n";
 					@inds = ();
 					$xlate->{$table}{$index}{$i} = undef;
 				}
@@ -1563,9 +1572,9 @@ sub xlate_table {
 					Carp::carp "Ran out of indexes in [",join('.',@inds),"] looking for ",$mib->{type};
 					Carp::cluck "processing index '$index' of table '$table' for instance $i";
 					print STDERR "$table raw result was:\n";
-					print STDERR Data::Dumper($result),"\n";
+					print STDERR Data::Dumper::Dumper($result),"\n";
 					print STDERR "$table translated result is currently:\n";
-					print STDERR Data::Dumper($xlate),"\n";
+					print STDERR Data::Dumper::Dumper($xlate),"\n";
 					@inds = ();
 					$xlate->{$table}{$index}{$i} = undef;
 				}
@@ -1581,9 +1590,9 @@ sub xlate_table {
 					Carp::carp "Ran out of indexes in [",join('.',@inds),"] looking for ",$mib->{type};
 					Carp::cluck "processing index '$index' of table '$table' for instance $i";
 					print STDERR "$table raw result was:\n";
-					print STDERR Data::Dumper($result),"\n";
+					print STDERR Data::Dumper::Dumper($result),"\n";
 					print STDERR "$table translated result is currently:\n";
-					print STDERR Data::Dumper($xlate),"\n";
+					print STDERR Data::Dumper::Dumper($xlate),"\n";
 					@inds = ();
 					$xlate->{$table}{$index}{$i} = undef;
 				}
@@ -1597,9 +1606,9 @@ sub xlate_table {
 					Carp::carp "Ran out of indexes in [",join('.',@inds),"] looking for ",$mib->{type};
 					Carp::cluck "processing index '$index' of table '$table' for instance $i";
 					print STDERR "$table raw result was:\n";
-					print STDERR Data::Dumper($result),"\n";
+					print STDERR Data::Dumper::Dumper($result),"\n";
 					print STDERR "$table translated result is currently:\n";
-					print STDERR Data::Dumper($xlate),"\n";
+					print STDERR Data::Dumper::Dumper($xlate),"\n";
 					@inds = ();
 					$xlate->{$table}{$index}{$i} = undef;
 				}
@@ -1615,7 +1624,7 @@ sub xlate_scalars {
 	my ($snmpargs,$scalars,$result,$error) = @_;
 	if (0) {
 		print STDERR "\nScalars $scalars raw result:\n";
-		print STDERR Data::Dumper($result),"\n";
+		print STDERR Data::Dumper::Dumper($result),"\n";
 		foreach my $key (keys %$result) {
 			lock $lockvar;
 			my $tag = SNMP::translateObj(add_dot($key));
@@ -1672,10 +1681,10 @@ sub xlate_scalars {
 sub netname {
 	my $type = shift;
 	my %hash = (
-		PUBLIC=>'Network',
-		PRIVATE=>'Private',
+		PUBLIC=>  'Internet',
+		PRIVATE=> 'Private',
 		LOOPBACK=>'Local',
-		RESERVED=>'Network',
+		RESERVED=>'Internet',
 	);
 	return $hash{$type};
 }
@@ -1683,8 +1692,8 @@ sub netname {
 sub typeok {
 	my ($type,$ipt) = @_;
 	my %hash = (
-		PUBLIC=>{PUBLIC=>1,PRIVATE=>0,LOOPBACK=>0,RESERVED=>0},
-		PRIVATE=>{PUBLIC=>1,PRIVATE=>1,LOOPBACK=>0,RESERVERD=>0},
+		PUBLIC  =>{PUBLIC=>1,PRIVATE=>0,LOOPBACK=>0,RESERVED=>0},
+		PRIVATE =>{PUBLIC=>1,PRIVATE=>1,LOOPBACK=>0,RESERVED=>0},
 		LOOPBACK=>{PUBLIC=>1,PRIVATE=>1,LOOPBACK=>1,RESERVED=>0},
 		RESERVED=>{PUBLIC=>0,PRIVATE=>0,LOOPBACK=>0,RESERVED=>0},
 	);
@@ -1696,7 +1705,9 @@ sub iptype {
 	my $hnip = Item::showkey($key);
 	return 'PUBLIC' if $hnip =~ /\/0$/;
 	my $ip = new Net::IP($hnip) or Carp::confess "can't decode key '$hnip'";
-	my $type = $ip->iptype; $type = 'LOOPBACK' if $type eq 'PRIVATE' and $hnip =~ /^127\./;
+	my $type = $ip->iptype;
+	$type = 'LOOPBACK' if $type eq 'PRIVATE'  and $hnip =~ /^127\./;
+#FIXME	$type = 'LOCALNET' if $type eq 'RESERVED' and $hnip =~ /^169\.254\./;
 	# LOOPBACK, PRIVATE, RESERVED, PUBLIC for IPv4
 	return $type;
 }
@@ -1727,17 +1738,17 @@ sub query {
 #package Model::SNMP;
 
 # ------------------------------------------
-package Model::Network; our @ISA = qw(Model::SNMP);
+package Model::Internet; our @ISA = qw(Model::SNMP);
 # ------------------------------------------
-#package Model::Network;
+#package Model::Internet;
 sub init {
 	my $self = shift;
-	my $glob = $self->{net}{PUBLIC} = Network->get($self,Item::makekey(-1));
+	my $glob = $self->{net}{PUBLIC} = Internet->get($self,Item::makekey(-1));
 	$glob->store(); # force storage because we looked up by object number
-	my $priv = $self->{net}{PRIVATE} = Private::Here->new($self,undef,[['Network',$glob,undef]]);
+	my $priv = $self->{net}{PRIVATE} = Private::Here->new($self,undef,[['Internet',$glob,undef]]);
 	my $locl = $self->{net}{LOOPBACK} = Local::Here->new($self,undef,[['Private::Here',$priv,undef]]);
 }
-#package Model::Network;
+#package Model::Internet;
 sub fini {
 	my $self = shift;
 	delete($self->{net}{LOOPBACK})->put();
@@ -1746,7 +1757,7 @@ sub fini {
 }
 
 # ------------------------------------------
-package Subnetwork; our @ISA = qw(Point Root);
+package Subnetwork; our @ISA = qw(Vertex Root);
 # ------------------------------------------
 #package Subnetwork;
 sub subnetbyip {
@@ -1771,14 +1782,14 @@ sub subnetbyip {
 }
 
 # ------------------------------------------
-package Network; our @ISA = qw(Storable Subnetwork Restorable);
+package Internet; our @ISA = qw(Stored Subnetwork);
 # ------------------------------------------
 # There is only really one network object.  It is the collection of the single
 # global network plus all the private and local subnetworks.  This is the root
 # of all other objects in the network.  There is no associated database table.
-# The Network id used in other tables are either -1 or NULL.
+# The Internet id used in other tables are either -1 or NULL.
 # ------------------------------------------
-#package Network;
+#package Internet;
 sub addchild {
 	my $self = shift;
 	my ($child,$key,$result) = @_;
@@ -1793,7 +1804,7 @@ sub addchild {
 }
 
 # -------------------------------------
-package Private; our @ISA = qw(Storable Subnetwork Leaf Restorable);
+package Private; our @ISA = qw(Stored Subnetwork Leaf);
 # -------------------------------------
 #package Private;
 sub them {
@@ -1819,7 +1830,7 @@ sub addchild {
 }
 
 # -------------------------------------
-package Local; our @ISA = qw(Storable Subnetwork Leaf Restorable);
+package Local; our @ISA = qw(Stored Subnetwork Leaf);
 # -------------------------------------
 #package Local;
 sub them {
@@ -1845,7 +1856,7 @@ sub addchild {
 }
 
 # -------------------------------------
-package Subnet; our @ISA = qw(Storable Host Tree Datum Restorable);
+package Subnet; our @ISA = qw(Stored Host Tree Datum);
 # -------------------------------------
 #package Subnet;
 sub link_parents {
@@ -1855,7 +1866,7 @@ sub link_parents {
 	# For convenience we need to link Vlan, Lan and Host to the networks
 	# to which their addresses belong.
 	my ($net,$nam,$key);
-	foreach (qw/Network Private Local/) {
+	foreach (qw/Internet Private Local/) {
 		($nam,$net) = ($_,$dat->{$_});
 		$key = Item::makekey($net) if $net;
 		last if $net;
@@ -1881,8 +1892,9 @@ no strict;
 #package Table;
 sub find {
 	my $type = shift;
-	my ($db) = @_;
-	Carp::confess "Passed wrong argument" unless $db->isa('Database');
+	my ($dbo) = @_;
+	Carp::confess "Passed wrong argument" unless $dbo->isa('Database::Owner');
+	my $db = $dbo->{db};
 	my $table = $type;
 	$table =~ s/^Table.*:://;
 	return $db->findtable($table);
@@ -1896,8 +1908,8 @@ sub schema {
 #package Table;
 sub init {
 	my $self = shift;
-	my ($db) = @_;
-	$self->{database} = $db;
+	my ($dbo) = @_;
+	my $db = $self->{db} = $dbo->{db};
 	my $schema = $self->schema(@_);
 	my $table = $schema->{table};
 	my %schema = (
@@ -1930,7 +1942,7 @@ sub fini {
 	delete $self->{schema}{getall};
 	delete $self->{schema}{delete};
 	delete $self->{schema}{tclear};
-	my $db = delete $self->{database};
+	my $db = delete $self->{db};
 	$db->puttable($table,$self);
 }
 #package Table;
@@ -2069,17 +2081,17 @@ sub getall {
 }
 
 # -------------------------------------
-package Table::Network; our @ISA = qw(Table);
+package Table::Internet; our @ISA = qw(Table);
 # -------------------------------------
 our %schema = (
-	table=>'Network',
+	table=>'Internet',
 	keys=>[qw/id/],
 	cols=>[qw/id name/],
 	tsql=>
-q{CREATE TABLE IF NOT EXISTS Network (
-	id INT,
+q{CREATE TABLE IF NOT EXISTS Internet (
+	id INTEGER,
 	name TEXT,
-	PRIMARY KEY(id)
+	PRIMARY KEY(id DESC)
 );},
 );
 sub schema { return \%schema; }
@@ -2091,14 +2103,14 @@ package Table::Private; our @ISA = qw(Table);
 our %schema = (
 	table=>'Private',
 	keys=>[qw/id/],
-	cols=>[qw/id name Network/],
+	cols=>[qw/id name Internet/],
 	tsql=>
 q{CREATE TABLE IF NOT EXISTS Private (
-	id INT,
+	id INTEGER,
 	name TEXT,
-	Network INT,
-	PRIMARY KEY(id),
-	FOREIGN KEY(Network) REFERENCES Network(id)
+	Internet INTEGER,
+	FOREIGN KEY(Internet) REFERENCES Internet(id),
+	PRIMARY KEY(id DESC)
 );},
 );
 sub schema { return \%schema; }
@@ -2113,11 +2125,11 @@ our %schema = (
 	cols=>[qw/id name Private/],
 	tsql=>
 q{CREATE TABLE IF NOT EXISTS Local (
-	id INT,
+	id INTEGER,
 	name TEXT,
-	Private INT,
-	PRIMARY KEY(id),
-	FOREIGN KEY(Private) REFERENCES Private(id)
+	Private INTEGER,
+	FOREIGN KEY(Private) REFERENCES Private(id),
+	PRIMARY KEY(id DESC)
 );},
 );
 sub schema { return \%schema; }
@@ -2132,10 +2144,10 @@ our %schema = (
 	cols=>[qw/id name sub/],
 	tsql=>
 q{CREATE TABLE IF NOT EXISTS Host (
-	id INT,
+	id INTEGER,
 	name TEXT,
 	sub TEXT,
-	PRIMARY KEY(id)
+	PRIMARY KEY(id DESC)
 );},
 );
 sub schema { return \%schema; }
@@ -2150,9 +2162,9 @@ our %schema = (
 	cols=>[qw/id name/],
 	tsql=>
 q{CREATE TABLE IF NOT EXISTS Lan (
-	id INT,
+	id INTEGER,
 	name TEXT,
-	PRIMARY KEY(id)
+	PRIMARY KEY(id DESC)
 );},
 );
 sub schema { return \%schema; }
@@ -2167,11 +2179,11 @@ our %schema = (
 	cols=>[qw/id name Lan/],
 	tsql=>
 q{CREATE TABLE IF NOT EXISTS Vlan (
-	id INT,
+	id INTEGER,
 	name TEXT,
-	Lan INT,
-	PRIMARY KEY(id),
-	FOREIGN KEY(Lan) REFERENCES Lan(id)
+	Lan INTEGER,
+	FOREIGN KEY(Lan) REFERENCES Lan(id),
+	PRIMARY KEY(id DESC)
 );},
 );
 sub schema { return \%schema; }
@@ -2183,23 +2195,23 @@ package Table::Subnet; our @ISA = qw(Table);
 our %schema = (
 	table=>'Subnet',
 	keys=>[qw/id/],
-	cols=>[qw/id name Vlan Network idxNetwork Private idxPrivate Local idxLocal/],
+	cols=>[qw/id name Vlan Internet idxNetwork Private idxPrivate Local idxLocal/],
 	tsql=>
 q{CREATE TABLE IF NOT EXISTS Subnet (
-	id INT,
+	id INTEGER,
 	name TEXT,
-	Vlan INT,
-	Network INT,
+	Vlan INTEGER,
+	Internet INTEGER,
 	idxNetwork TEXT,
-	Private INT,
+	Private INTEGER,
 	idxPrivate TEXT,
-	Local INT,
+	Local INTEGER,
 	idxLocal TEXT,
-	PRIMARY KEY(id),
 	FOREIGN KEY(Vlan) REFERENCES Vlan(id),
-	FOREIGN KEY(Network) REFERENCES Network(id),
+	FOREIGN KEY(Internet) REFERENCES Internet(id),
 	FOREIGN KEY(Private) REFERENCES Private(id),
-	FOREIGN KEY(Local) REFERENCES Local(id)
+	FOREIGN KEY(Local) REFERENCES Local(id),
+	PRIMARY KEY(id DESC)
 );},
 );
 sub schema { return \%schema; }
@@ -2214,15 +2226,15 @@ our %schema = (
 	cols=>[qw/id name key Host idxHost Lan/],
 	tsql=>
 q{CREATE TABLE IF NOT EXISTS Port (
-	id INT,
+	id INTEGER,
 	name TEXT,
 	key TEXT,
-	Host INT,
+	Host INTEGER,
 	idxHost INT,
-	Lan INT,
-	PRIMARY KEY(id),
+	Lan INTEGER,
 	FOREIGN KEY(Host) REFERENCES Host(id),
-	FOREIGN KEY(Lan) REFERENCES Lan(id)
+	FOREIGN KEY(Lan) REFERENCES Lan(id),
+	PRIMARY KEY(id DESC)
 );},
 );
 sub schema { return \%schema; }
@@ -2237,16 +2249,16 @@ our %schema = (
 	cols=>[qw/id name key Port Host idxHost Vlan/],
 	tsql=>
 q{CREATE TABLE IF NOT EXISTS Vprt (
-	id INT,
+	id INTEGER,
 	name TEXT,
 	key TEXT,
-	Port INT,
-	Host INT,
+	Port INTEGER,
+	Host INTEGER,
 	idxHost INT,
-	Vlan INT,
-	PRIMARY KEY(id),
+	Vlan INTEGER,
 	FOREIGN KEY(Port) REFERENCES Port(id),
-	FOREIGN KEY(Host) REFERENCES Host(id)
+	FOREIGN KEY(Host) REFERENCES Host(id),
+	PRIMARY KEY(id DESC)
 );},
 );
 sub schema { return \%schema; }
@@ -2258,29 +2270,29 @@ package Table::Address; our @ISA = qw(Table);
 our %schema = (
 	table=>'Address',
 	keys=>[qw/id/],
-	cols=>[qw/id name Vprt idxVprt Host idxHost Subnet idxSubnet Network idxNetwork Private idxPrivate Local idxLocal/],
+	cols=>[qw/id name Vprt idxVprt Host idxHost Subnet idxSubnet Internet idxNetwork Private idxPrivate Local idxLocal/],
 	tsql=>
 q{CREATE TABLE IF NOT EXISTS Address (
-	id INT,
+	id INTEGER,
 	name TEXT,
-	Vprt INT,
+	Vprt INTEGER,
 	idxVprt TEXT,
-	Host INT,
+	Host INTEGER,
 	idxHost TEXT,
-	Subnet INT,
+	Subnet INTEGER,
 	idxSubnet TEXT,
-	Network INT,
+	Internet INTEGER,
 	idxNetwork TEXT,
-	Private INT,
+	Private INTEGER,
 	idxPrivate TEXT,
-	Local INT,
+	Local INTEGER,
 	idxLocal TEXT,
-	PRIMARY KEY(id),
 	FOREIGN KEY(Vprt) REFERENCES Vprt(id),
 	FOREIGN KEY(Subnet) REFERENCES Subnet(id),
-	FOREIGN KEY(Network) REFERENCES Network(id),
+	FOREIGN KEY(Internet) REFERENCES Internet(id),
 	FOREIGN KEY(Private) REFERENCES Private(id),
-	FOREIGN KEY(Local) REFERENCES Local(id)
+	FOREIGN KEY(Local) REFERENCES Local(id),
+	PRIMARY KEY(id DESC)
 );},
 );
 sub schema { return \%schema; }
@@ -2294,8 +2306,8 @@ our %schema = (
 #package Table::SNMP;
 sub find {
 	my $type = shift;
-	my ($db,$name) = @_;
-	return $db->findtable($name);
+	my ($dbo,$name) = @_;
+	return $dbo->{db}->findtable($name);
 }
 #package Table::SNMP;
 sub getmib {
@@ -2358,7 +2370,7 @@ sub mapit {
 #package Table::SNMP;
 sub schema {
 	my $self = shift;
-	my ($db,$name) = @_;
+	my ($dbo,$name) = @_;
 	my $schema = $schema{$name};
 	return $schema if $schema;
 	# Have to create the schema for this table.
@@ -2373,10 +2385,10 @@ sub schema {
 		sort {$a->{subID}<=>$b->{subID}} @{$mib->{children}};
 	my $keys = $schema->{keys} = [ 'id', map {$_->{label}} @inds ];
 	my $cols = $schema->{cols} = [ 'id', 'oid', map {$_->{label}} @inds, @cols ];
-	my $tsql = qq{CREATE TABLE IF NOT EXISTS $name (\n\tid INT,\n\toid TEXT};
+	my $tsql = qq{CREATE TABLE IF NOT EXISTS $name (\n\tid INTEGER,\n\toid TEXT};
 	$tsql = join(",\n\t",$tsql,map {"$_->{label} ".mapit($_)} @inds, @cols);
-	$tsql = join(",\n\t",$tsql,"PRIMARY KEY(".join(',',@$keys).")");
 	$tsql = join(",\n\t",$tsql,map {$_->{parent} eq $mib?():"FOREIGN KEY($_->{label}) REFERENCES $_->{parent}->{parent}->{label}\($_->{label}\)"} @inds);
+	$tsql = join(",\n\t",$tsql,"PRIMARY KEY(".join(',',@$keys)." DESC)");
 	$tsql .= qq{\n);};
 	$schema->{tsql} = $tsql;
 	return $schema;
@@ -2391,13 +2403,13 @@ our %schema = (
 #package Table::Tables;
 sub find {
 	my $type = shift;
-	my ($db,$name) = @_;
-	return $db->findtable($name);
+	my ($dbo,$name) = @_;
+	return $dbo->{db}->findtable($name);
 }
 #package Table::Tables;
 sub schema {
 	my $self = shift;
-	my ($db,$name) = @_;
+	my ($dbo,$name) = @_;
 	my $schema = $schema{$name};
 	return $schema if $schema;
 	# Have to create schema for this table.
@@ -2410,7 +2422,7 @@ sub schema {
 #package Table::Tables;
 sub init {
 	my $self = shift;
-	my ($db,$name) = @_;
+	my ($dbo,$name) = @_;
 	$self->{tables} = {};
 	if (my $dat = $self->getall()) {
 		$self->{tables} = $dat;
@@ -2433,21 +2445,44 @@ sub alltables {
 
 
 # -------------------------------------
-package Storable; our @ISA = qw(Base);
+package Stored; our @ISA = qw(Base);
 # -------------------------------------
-#package Storable;
+#package Stored;
+sub post {
+	my $self = shift;
+	my ($model) = @_;
+	if (delete $self->{readme}) {
+		$self->read();
+	} else {
+		$self->store();
+	}
+}
+#package Stored;
+sub rel {
+	my $self = shift;
+	$self->{preserve} = 1;
+	$self->SUPER::put(@_);
+}
+#package Stored;
+sub prep {
+	my $self = shift;
+	if ($self->{preserve}) {
+		$self->store();
+	} else {
+		$self->delete();
+	}
+}
+#package Stored;
 sub table {
 	my $self = shift;
 	my $ttyp = "Table::".$self->kind;
 	my $model = $self->{model};
 	Carp::confess "No model" unless $model;
-	my $db = $model->{database};
-	Carp::confess "No database" unless $db;
-	my $table = $ttyp->get($db,@_);
+	my $table = $ttyp->get($model,@_);
 	Carp::confess "No table" unless $table;
 	return $table;
 }
-#package Storable;
+#package Stored;
 sub getvals {
 	my $self = shift;
 	my $vals = shift;
@@ -2470,7 +2505,7 @@ sub getvals {
 	}
 	return $vals;
 }
-#package Storable;
+#package Stored;
 sub store {
 	my $self = shift;
 	my $vals = shift;
@@ -2478,7 +2513,7 @@ sub store {
 	$vals = $self->getvals($vals);
 	$self->table->insert($vals);
 }
-#package Storable;
+#package Stored;
 sub update {
 	my $self = shift;
 	my $vals = shift;
@@ -2486,7 +2521,7 @@ sub update {
 	$vals = $self->getvals($vals);
 	$self->table->update($vals);
 }
-#package Storable;
+#package Stored;
 sub delete {
 	my $self = shift;
 	my $vals = shift;
@@ -2494,7 +2529,7 @@ sub delete {
 	$vals = $self->getvals($vals);
 	$self->table->delete($vals);
 }
-#package Storable;
+#package Stored;
 sub read {
 	my $self = shift;
 	my $vals = shift;
@@ -2513,7 +2548,7 @@ sub read {
 		$self->update();
 	}
 }
-#package Storable;
+#package Stored;
 sub link_parents {
 	my $self = shift;
 	warn "Linking parents for ",ref($self)," $self->{no}";
@@ -2533,25 +2568,6 @@ sub link_parents {
 }
 
 # -------------------------------------
-package Restorable; our @ISA = qw(Base);
-# -------------------------------------
-#package Restorable;
-sub init {
-	my $self = shift;
-	my ($model) = @_;
-	if (delete $self->{readme}) {
-		$self->read();
-	} else {
-		$self->store();
-	}
-}
-#package Restorable;
-sub fini {
-	my $self = shift;
-	$self->delete();
-}
-
-# -------------------------------------
 package Datum; our @ISA = qw(Base);
 # -------------------------------------
 #package Datum;
@@ -2561,8 +2577,7 @@ sub init {
 	$self->{data} = {} unless exists $self->{data};
 	my $kind = $self->kind;
 	my $name = "tables$kind";
-	my $db = $model->{database};
-	$self->{tabs} = Table::Tables->get($db,$name);
+	$self->{tabs} = Table::Tables->get($model,$name);
 	$self->restoretables() if $self->{readme};
 }
 #package Datum;
@@ -2574,7 +2589,7 @@ sub fini {
 #package Datum;
 sub dump {
 	my $self = shift;
-	print STDERR Data::Dumper($self->{data});
+	print STDERR Data::Dumper::Dumper($self->{data});
 }
 #package Datum;
 sub them {
@@ -2642,8 +2657,8 @@ sub save {
 	$names = [ keys %{$self->{data}} ] unless defined $names;
 	$names = [ $names ] unless ref($names) eq 'ARRAY';
 	foreach my $name (@$names) {
-		my $db = $self->{model}{database};
-		if (my $table = Table::SNMP->get($db,$name)) {
+		my $model = $self->{model};
+		if (my $table = Table::SNMP->get($model,$name)) {
 			my $data = $self->{data}{$name};
 			my @indexes = $name =~ /Table$/ ? ( keys %$data ) : ( undef );
 			foreach my $index (@indexes) {
@@ -2662,8 +2677,8 @@ sub restore {
 	$names = [ keys %{$self->{data}} ] unless defined $names;
 	$names = [ $names ] unless ref($names) eq 'ARRAY';
 	foreach my $name (@$names) {
-		my $db = $self->{model}{database};
-		if (my $table = Table::SNMP->get($db,$name)) {
+		my $model = $self->{model};
+		if (my $table = Table::SNMP->get($model,$name)) {
 			my $cols = {id=>$self->{no}};
 			if (my $read = $table->stable($cols)) {
 				$self->{data}{$name} = $read;
@@ -2682,8 +2697,8 @@ sub remove {
 	$names = [ keys %{$self->{data}} ] unless defined $names;
 	$names = [ $names ] unless ref($names) eq 'ARRAY';
 	foreach my $name (@$names) {
-		my $db = $self->{model}{database};
-		if (my $table = Table::SNMP->get($db,$name)) {
+		my $model = $self->{model};
+		if (my $table = Table::SNMP->get($model,$name)) {
 			my $cols = {id=>$self->{no}};
 			$table->tclear($cols);
 			delete $self->{data}{$name};
@@ -3058,7 +3073,8 @@ sub init {
 	my @keys = @{$self->{key}{n}};
 	my $kind = $self->kind;
         # any packed short key (2 bytes) is an item number
-	my $no; foreach my $key (@keys) { $no = $key if keytype($key) == OBJKEY }
+	my $no;
+	foreach my $key (@keys) { $no = $key if keytype($key) == OBJKEY }
 	if ($no) {
 		$no = $self->{no} = Item::showkey($no);
 		$model->setno($kind,$no);
@@ -3153,7 +3169,7 @@ sub add_key {
 			Viewers->labeled($self);
 		}
 	}
-	$self->update() if @keys > 0 and $self->isa('Storable');
+	$self->update() if @keys > 0 and $self->isa('Stored');
 }
 #package Item;
 sub mergechek {
@@ -3253,10 +3269,10 @@ sub mergefrom {
 		my ($targ,@others) = @$list;
 		if ($targ->isa('Root')) {
 			foreach my $off ($targ->offspring()) {
-				$off->store() if $off->isa('Storable');
+				$off->store() if $off->isa('Stored');
 			}
 		}
-		$targ->store() if $targ->isa('Storable');
+		$targ->store() if $targ->isa('Stored');
 		$targ->save()  if $targ->isa('Datum');
 	}
 }
@@ -3328,7 +3344,7 @@ sub them {
 #package Item;
 sub xform {
 	my ($type,$self) = @_;
-	if ($self->isa('Storable') and $type->kind ne $self->kind) {
+	if ($self->isa('Stored') and $type->kind ne $self->kind) {
 		$self->delete();
 		bless $self,$type;
 		$self->store();
@@ -3339,9 +3355,9 @@ sub xform {
 }
 
 # ------------------------------------------
-package Point; our @ISA = qw(Item);
+package Vertex; our @ISA = qw(Item);
 # ------------------------------------------
-#package Point;
+#package Vertex;
 sub key {
 	my $type = shift; $type = ref $type if ref $type;
 	my ($model,$item) = @_;
@@ -3349,7 +3365,7 @@ sub key {
 	$item = $item->mykey() if ref $item;
 	return $item;
 }
-#package Point;
+#package Vertex;
 sub allkeys {
 	my $type = shift; $type = ref $type if ref $type;
 	my ($model,$item) = @_;
@@ -3363,26 +3379,26 @@ sub allkeys {
 	}
 	return \@rslt;
 }
-#package Point;
+#package Vertex;
 sub init {
 	my $self= shift;
 	$self->{end} = { a => {}, b => {} };
 }
-#package Point;
+#package Vertex;
 sub fini {
 	my $self = shift;
 	delete $self->{end};
 }
-#package Point;
+#package Vertex;
 sub mypkey {
 	my $self = shift;
 	my $kind = shift;
 }
-#package Point;
+#package Vertex;
 sub mypkeys {
 	my $self = shift;
 }
-#package Point;
+#package Vertex;
 sub dump {
 	my $self = shift;
 	print STDERR "$self attaches to the following paths:\n";
@@ -3395,18 +3411,18 @@ sub dump {
 		}
 	}
 }
-#package Point;
+#package Vertex;
 sub chek {
 	my $self = shift;
 	foreach my $side (qw{a b}) {
 		foreach my $kind (keys %{$self->{end}{$side}}) {
 			foreach my $obj (values %{$self->{end}{$side}{$kind}}) {
-				Carp::confess "Point $self still attached to Path $obj";
+				Carp::confess "Vertex $self still attached to Edge $obj";
 			}
 		}
 	}
 }
-#package Point;
+#package Vertex;
 sub mark {
 	my ($self,$othr,$merge) = @_;
 	# basically if other ends of paths from merged objects are to the same object or objects
@@ -3433,7 +3449,7 @@ sub mark {
 	}
 	return 1;
 }
-#package Point;
+#package Vertex;
 sub them {
 	my ($self,@others) = @_;
 	my %sides = ( a=>'b', b=>'a' );
@@ -3460,7 +3476,7 @@ sub them {
 		}
 	}
 }
-#package Point;
+#package Vertex;
 sub mfix {
 	my ($self,$abort) = @_;
 	my $fixed = 0;
@@ -3483,7 +3499,7 @@ sub mfix {
 	}
 	Carp::croak if $fixed and $abort;
 }
-#package Point
+#package Vertex
 sub tree {
 	my ($self,$crumb,$indent,$suffix) = @_;
 	return if exists $self->{crumb} and $self->{crumb} == $crumb;
@@ -3502,7 +3518,7 @@ sub tree {
 		}
 	}
 }
-#package Point
+#package Vertex
 sub pathsx {
 	my ($self,$side,$kinds) = @_;
 	$kinds = [ keys %{$self->{end}{$side}} ] unless defined $kinds;
@@ -3514,22 +3530,24 @@ sub pathsx {
 	}
 	return @paths;
 }
-#package Point
+#package Vertex
 sub pathsa { shift->pathsx('a',@_) }
-#package Point
+#package Vertex
 sub pathsb { shift->pathsx('b',@_) }
-#package Point
+#package Vertex
 sub paths {
 	my $self = shift;
 	return ($self->pathsx('a',@_),$self->pathsx('b',@_));
 }
 
 # ------------------------------------------
-package Path; our @ISA = qw(Item);
+package Edge; our @ISA = qw(Item);
 # ------------------------------------------
-#package Path;
-sub typpair { return 'Point','Point'; }
-#package Path;
+# An Edge is an edge (or arc) in a graph.  It connects two items.
+# ------------------------------------------
+#package Edge;
+sub typpair { return 'Vertex','Vertex'; }
+#package Edge;
 sub key {
 	my $type = shift;
 	my ($model,$enda,$endb) = @_;
@@ -3539,7 +3557,7 @@ sub key {
 	return $enda.$endb if $enda and $endb;
 	return undef;
 }
-#package Path;
+#package Edge;
 sub gobj {
 	my $type = shift;
 	my ($model,$obja,$objb,$linka,$linkb,@args) = @_;
@@ -3552,7 +3570,7 @@ sub gobj {
 	} else { Carp::confess "Object $objb must be of type $typeb" unless $objb->isa($typeb); }
 	return $obja,$objb;
 }
-#package Path;
+#package Edge;
 sub init {
 	my $self = shift;
 	my $type = ref $self;
@@ -3565,13 +3583,13 @@ sub init {
 	Viewers->added_path($obja,$self);
 	Viewers->added_path($objb,$self);
 }
-#package Path;
+#package Edge;
 sub dump {
 	my $self = shift;
 	print STDERR "$self object A is $self->{obj}{a} with identity ",$self->{obj}{a}->identify(),"\n";
 	print STDERR "$self object B is $self->{obj}{b} with identity ",$self->{obj}{b}->identify(),"\n";
 }
-#package Path;
+#package Edge;
 sub fini {
 	my $self = shift;
 	my ($obja,$objb) = ($self->{obj}{a},$self->{obj}{b});
@@ -3581,7 +3599,7 @@ sub fini {
 	}
 	foreach (qw(key obj)) { delete $self->{$_} }
 }
-#package Path;
+#package Edge;
 sub identify {
 	my $self = shift;
 	my $type = ref $self;
@@ -3594,7 +3612,7 @@ sub identify {
 	$id .= $cid;
 	return ($self->{id} = $id);
 }
-#package Path;
+#package Edge;
 sub shortid {
 	my $self = shift;
 	my $conn = $self->{duplex} ? '::' : '->';
@@ -3602,22 +3620,22 @@ sub shortid {
 	$cid = ' : '.$cid if $cid and $cid = &{$cid}($self);
 	return $self->obja->shortid.$conn.$self->objb->shortid.$cid;
 }
-#package Path;
+#package Edge;
 sub chek {
 	my $self = shift;
 	if (my $obj = $self->{obj}{a}) {
-		Carp::confess "Path $self still attached from $obj";
+		Carp::confess "Edge $self still attached from $obj";
 	}
 	if (my $obj = $self->{obj}{b}) {
-		Carp::confess "Path $self still attached to $obj";
+		Carp::confess "Edge $self still attached to $obj";
 	}
 }
-#package Path;
+#package Edge;
 sub mark {
 	my ($self,$othr,$merge) = @_;
 	return 1;
 }
-#package Path;
+#package Edge;
 sub them {
 	my ($self,@others) = @_;
 	my $kind = $self->kind;
@@ -3632,7 +3650,7 @@ sub them {
 		$trgb->{end}{b}{$kind}{$trga->no} = $self if $trgb ne $objb;
 	}
 }
-#package Path;
+#package Edge;
 sub mfix {
 	my ($self,$abort) = @_;
 	my $fixed = 0;
@@ -3660,11 +3678,11 @@ sub mfix {
 		}
 		$finb->{end}{b}{$kind}{$fina->no} = $self;
 	}
-	Carp::confess "Path $self, object A $self->{obj}{a} is bad" if $self->{obj}{a}{bad};
-	Carp::confess "Path $self, object B $self->{obj}{b} is bad" if $self->{obj}{b}{bad};
+	Carp::confess "Edge $self, object A $self->{obj}{a} is bad" if $self->{obj}{a}{bad};
+	Carp::confess "Edge $self, object B $self->{obj}{b} is bad" if $self->{obj}{b}{bad};
 	Carp::croak if $fixed and $abort;
 }
-#package Path;
+#package Edge;
 sub obj {
 	my $self = shift;
 	my $side = shift;
@@ -3673,35 +3691,35 @@ sub obj {
 	Carp::confess "Returning reference to delete object $obj of path $self" if $self->{bad};
 	return $obj;
 }
-#package Path;
+#package Edge;
 sub objo {
 	my $self = shift;
 	my $side = shift;
 	$side = (($side eq 'a') ? 'b' : 'a');
 	return $self->obj($side);
 }
-#package Path;
+#package Edge;
 sub obja { return shift->obj('a') }
-#package Path;
+#package Edge;
 sub objb { return shift->obj('b') }
-#package Path;
+#package Edge;
 sub objs {
 	my $self = shift;
 	return $self->obja,$self->objb;
 }
 
 # -------------------------------------
-package Path::Duplex; our @ISA = qw(Path);
+package Edge::Undirected; our @ISA = qw(Edge);
 # -------------------------------------
-# A Path::Duplex is a bidirectional concept.  There are two directional keys
-# used to index the Path.
+# A Edge::Undirected is a bidirectional concept.  There are two directional keys
+# used to index the Edge.
 # -------------------------------------
-#package Path::Duplex;
+#package Edge::Undirected;
 sub init {
 	my $self = shift;
 	$self->{duplex} = 1;
 }
-#package Path::Duplex;
+#package Edge::Undirected;
 sub allkeys {
 	my $type = shift;
 	my ($model,$enda,$endb) = @_;
@@ -3712,7 +3730,7 @@ sub allkeys {
 }
 
 # -------------------------------------
-package Host; our @ISA = qw(Storable Point Tree Datum Restorable);
+package Host; our @ISA = qw(Stored Vertex Tree Datum);
 # -------------------------------------
 # Stations are an unidentified IP host or gateway.  We know that there are two
 # stations on the edge of a single ethernet, we just do no know which stations
@@ -3732,7 +3750,7 @@ package Host; our @ISA = qw(Storable Point Tree Datum Restorable);
 # -------------------------------------
 # A Host is an IP host.  A Host has no globally unique key of its own;
 # however, its Ports and public Addresses do.  A Host belongs to the 'Local',
-# 'Private' and 'Network' subnetworks in which it has assigned IP addresses.  It
+# 'Private' and 'Internet' subnetworks in which it has assigned IP addresses.  It
 # belongs to zero or one of each kind.  However, this is a convenience as it can
 # be determined from its assigned Addresses and need not be stored.  Because
 # only the Host id need be saved, no separate database table is needed for
@@ -3764,7 +3782,7 @@ sub systemData {
 	my ($index,$row,$model,$snmpargs,$scalars,$xlated,$error,$hkey,$type,$snet,$name) = @_;
 	if (dump_tables) {
 		print STDERR "\nScalars $scalars: for ",Item::showkey($hkey),"\n";
-		print STDERR Data::Dumper($row),"\n";
+		print STDERR Data::Dumper::Dumper($row),"\n";
 	}
 	$self->{queried} = 1;
 	$self->addrow($scalars,$row);
@@ -3775,7 +3793,7 @@ sub ifEntry {
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
 	if (dump_tables) {
 		print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-		print STDERR Data::Dumper($row),"\n";
+		print STDERR Data::Dumper::Dumper($row),"\n";
 	}
 	my $idx = $row->{ifIndex};
 	my $pid = undef;
@@ -3809,7 +3827,7 @@ sub ifXEntry {
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
 	if (dump_tables) {
 		print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-		print STDERR Data::Dumper($row),"\n";
+		print STDERR Data::Dumper::Dumper($row),"\n";
 	}
 	my $idx = $row->{ifIndex};
 	return unless $idx;
@@ -3823,7 +3841,7 @@ sub ipAddrEntry {
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
 	if (dump_tables) {
 		print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-		print STDERR Data::Dumper($row),"\n";
+		print STDERR Data::Dumper::Dumper($row),"\n";
 	}
 	my $idx = $row->{ipAdEntIfIndex};
 	return unless defined $idx;
@@ -3866,7 +3884,7 @@ sub ipAddressEntry {
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
 	if (dump_tables) {
 		print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-		print STDERR Data::Dumper($row),"\n";
+		print STDERR Data::Dumper::Dumper($row),"\n";
 	}
 	return unless $row->{ipAddressRowStatus} eq 'active(1)';
 	return unless $row->{ipAddressAddrType} eq 'ipv4(1)';
@@ -3909,7 +3927,7 @@ sub atEntry {
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
 	if (dump_tables) {
 		print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-		print STDERR Data::Dumper($row),"\n";
+		print STDERR Data::Dumper::Dumper($row),"\n";
 	}
 	my $idx = $row->{atIfIndex};
 	my $mac = Item::makekey($row->{atPhysAddress}) if $row->{atPhysAddress};
@@ -3963,7 +3981,7 @@ sub ipNetToMediaEntry {
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
 		if (dump_tables) {
 			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Data::Dumper($row),"\n";
+			print STDERR Data::Dumper::Dumper($row),"\n";
 		}
 		return unless $row->{ipNetToMediaType} ne 'invalid(2)';
 		# TODO: should also check ipNetToPhysicalType
@@ -4018,7 +4036,7 @@ sub ipNetToPhysicalEntry {
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
 	if (dump_tables) {
 		print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-		print STDERR Data::Dumper($row),"\n";
+		print STDERR Data::Dumper::Dumper($row),"\n";
 	}
 	return unless $row->{ipNetToPhysicalRowStatus} eq 'active(1)';
 	return unless $row->{ipNetToPhysicalNetAddressType} eq 'ipv4(1)';
@@ -4078,7 +4096,7 @@ sub ipRouteEntry {
 		last unless $row->{ipRouteType} eq 'direct(3)';
 		if (dump_tables) {
 			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Data::Dumper($row),"\n";
+			print STDERR Data::Dumper::Dumper($row),"\n";
 		}
 		my $idx = $row->{ipRouteIfIndex};
 		last unless $row->{ipRouteDest} and $row->{ipRouteMask};
@@ -4112,7 +4130,7 @@ sub ipRouteEntry {
 		last unless $row->{ipRouteType} eq 'indirect(4)';
 		if (dump_tables) {
 			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Data::Dumper($row),"\n";
+			print STDERR Data::Dumper::Dumper($row),"\n";
 		}
 		my $idx = $row->{ipRouteIfIndex};
 		my $ipa = Item::makekey($row->{ipRouteNextHop});
@@ -4139,7 +4157,7 @@ sub ipRouteEntry {
 		last unless $row->{ipRouteNextHop};
 		if (dump_tables) {
 			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Data::Dumper($row),"\n";
+			print STDERR Data::Dumper::Dumper($row),"\n";
 		}
 		my $idx = $row->{ipRouteIfIndex};
 		my $ipa = Item::makekey($row->{ipRouteNextHop});
@@ -4168,7 +4186,7 @@ sub ipCidrRouteEntry {
 		last unless $row->{ipCidrRouteType} eq 'local(3)';
 		if (dump_tables) {
 			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Data::Dumper($row),"\n";
+			print STDERR Data::Dumper::Dumper($row),"\n";
 		}
 		my $idx = $row->{ipCidrRouteIfIndex};
 		last unless $row->{ipCidrRouteDest} and $row->{ipCidrRouteMask};
@@ -4202,7 +4220,7 @@ sub ipCidrRouteEntry {
 		last unless $row->{ipCidrRouteType} eq 'remote(4)';
 		if (dump_tables) {
 			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Data::Dumper($row),"\n";
+			print STDERR Data::Dumper::Dumper($row),"\n";
 		}
 		my $idx = $row->{ipCidrRouteIfIndex};
 		my $ipa = Item::makekey($row->{ipCidrRouteNextHop});
@@ -4229,7 +4247,7 @@ sub ipCidrRouteEntry {
 		last unless $row->{ipCidrRouteNextHop};
 		if (dump_tables) {
 			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Data::Dumper($row),"\n";
+			print STDERR Data::Dumper::Dumper($row),"\n";
 		}
 		my $idx = $row->{ipCidrRouteIfIndex};
 		my $ipa = Item::makekey($row->{ipCidrRouteNextHop});
@@ -4258,7 +4276,7 @@ sub inetCidrRouteEntry {
 		last unless $row->{inetCidrRouteType} eq 'local(3)';
 		if (dump_tables) {
 			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Data::Dumper($row),"\n";
+			print STDERR Data::Dumper::Dumper($row),"\n";
 		}
 		last unless $row->{inetCidrRouteDestType} eq 'ipv4(1)';
 		my $idx = $row->{inetCidrRouteIfIndex};
@@ -4293,7 +4311,7 @@ sub inetCidrRouteEntry {
 		last unless $row->{inetCidrRouteType} eq 'remote(4)';
 		if (dump_tables) {
 			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Data::Dumper($row),"\n";
+			print STDERR Data::Dumper::Dumper($row),"\n";
 		}
 		last unless $row->{inetCidrRouteDestType} eq 'ipv4(1)';
 		last unless $row->{inetCidrRouteNextHopType} eq 'ipv4(1)';
@@ -4321,7 +4339,7 @@ sub inetCidrRouteEntry {
 		last unless $row->{inetCidrRouteType} eq 'remote(4)';
 		if (dump_tables) {
 			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Data::Dumper($row),"\n";
+			print STDERR Data::Dumper::Dumper($row),"\n";
 		}
 		last unless $row->{inetCidrRouteDestType} eq 'ipv4(1)';
 		last unless $row->{inetCidrRouteNextHopType} eq 'ipv4(1)';
@@ -4351,7 +4369,7 @@ sub ipSystemStatsEntry {
 	return unless $row->{ipSystemStatsIPVersion} eq 'ipv4(1)';
 	if (dump_tables) {
 		print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-		print STDERR Data::Dumper($row),"\n";
+		print STDERR Data::Dumper::Dumper($row),"\n";
 	}
 	$self->addrow($table,$row);
 }
@@ -4362,7 +4380,7 @@ sub ipIfStatsEntry {
 	return unless $row->{ipIfStatsIPVersion} eq 'ipv4(1)';
 	if (dump_tables) {
 		print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-		print STDERR Data::Dumper($row),"\n";
+		print STDERR Data::Dumper::Dumper($row),"\n";
 	}
 	$self->addrow($table,$row);
 }
@@ -4372,7 +4390,7 @@ sub lldpPortConfigEntry {
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
 	if (dump_tables) {
 		print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-		print STDERR Data::Dumper($row),"\n";
+		print STDERR Data::Dumper::Dumper($row),"\n";
 	}
 	my $idx = $row->{lldpPortConfigPortNum};
 	return unless $idx;
@@ -4387,7 +4405,7 @@ sub lldpStatsTxPortEntry {
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
 	if (dump_tables) {
 		print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-		print STDERR Data::Dumper($row),"\n";
+		print STDERR Data::Dumper::Dumper($row),"\n";
 	}
 	my $idx = $row->{lldpStatsTxPortNum};
 	return unless $idx;
@@ -4402,7 +4420,7 @@ sub lldpStatsRxPortEntry {
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
 	if (dump_tables) {
 		print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-		print STDERR Data::Dumper($row),"\n";
+		print STDERR Data::Dumper::Dumper($row),"\n";
 	}
 	my $idx = $row->{lldpStatsRxPortNum};
 	return unless $idx;
@@ -4417,7 +4435,7 @@ sub lldpLocPortEntry {
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
 	if (dump_tables) {
 		print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-		print STDERR Data::Dumper($row),"\n";
+		print STDERR Data::Dumper::Dumper($row),"\n";
 	}
 	my $idx = $row->{lldpLocPortNum};
 	return unless $idx;
@@ -4433,7 +4451,7 @@ sub lldpLocManAddrEntry {
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
 	if (dump_tables) {
 		print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-		print STDERR Data::Dumper($row),"\n";
+		print STDERR Data::Dumper::Dumper($row),"\n";
 	}
 	return; # XXX FIXME
 	my ($idx,$ipa);
@@ -4484,7 +4502,7 @@ package Host::Ip::Here; our @ISA = qw(Host::Ip);
 # -------------------------------------
 
 # -------------------------------------
-package Lan; our @ISA = qw(Storable Point Tree Restorable);
+package Lan; our @ISA = qw(Stored Vertex Tree);
 # -------------------------------------
 # An Lan is a relationship between any number of Port packages.  All ports that
 # share a hardware address with a Lan are on that LAN.
@@ -4500,7 +4518,7 @@ package Lan; our @ISA = qw(Storable Point Tree Restorable);
 # -------------------------------------
 # A Lan is a IEEE 802.1 LAN.  Lans have no globally unique key, but the Ports
 # that atttach to them do.  Each Lan belongs to the 'Local', 'Private' or
-# 'Network' subnetworks within which addresses on the LAN have been assigned.
+# 'Internet' subnetworks within which addresses on the LAN have been assigned.
 # However, this is a convenience for layout, need not be saved, and it can be
 # determined from the addresses assigned to the Vprts of the Ports that make up
 # the Lan.  Because only the Lan id need be saved, no separate database table is
@@ -4508,7 +4526,7 @@ package Lan; our @ISA = qw(Storable Point Tree Restorable);
 # -------------------------------------
 
 # -------------------------------------
-package Vlan; our @ISA = qw(Storable Point Tree Restorable);
+package Vlan; our @ISA = qw(Stored Vertex Tree);
 # -------------------------------------
 # A Vlan is an IEEE 802.1P/Q virtual LAN.  It is a relationship between any
 # number of Vprt packages.  All virtual ports that share a hardware address and
@@ -4529,13 +4547,13 @@ package Vlan; our @ISA = qw(Storable Point Tree Restorable);
 # -------------------------------------
 # A Vlan is an IEEE 802.1P/Q virtual LAN.  Vlans have no globally unique key,
 # but the Vprts that attach to them do.  Each Vlan belongs to the 'Local',
-# 'Private' or 'Network' subnetworks within which it has assigned addresses.
+# 'Private' or 'Internet' subnetworks within which it has assigned addresses.
 # Each Vlan belongs to a physical LAN.  The Vlan database table consists of a
 # tuple consisting of Vlan id and Lan id.
 # -------------------------------------
 
 # -------------------------------------
-package Address; our @ISA = qw(Storable Point Leaf Datum Restorable);
+package Address; our @ISA = qw(Stored Vertex Leaf Datum);
 # -------------------------------------
 # An Address is an IP address.  IP addresses are only gobally unique when
 # assigned in a public network so no key is used.  An Address belongs to the
@@ -4543,7 +4561,7 @@ package Address; our @ISA = qw(Storable Point Leaf Datum Restorable);
 # belongs to a Host using the IP address as an index; however, this is a
 # convenience for layout and can be determined by the hosts of the Vprt to which
 # the address is assigned..  An Address belongs to a Subnet using its IP address
-# as an index.  Each address belongs to a 'Local', 'Private' or 'Network'
+# as an index.  Each address belongs to a 'Local', 'Private' or 'Internet'
 # subnetwork with its IP address as an index.  The Address database table
 # consists of the tuple Address id, IP Address, Subnet id, Subnetwork type and
 # Subnetwork id.
@@ -4556,7 +4574,7 @@ sub link_parents {
 	# For convenience we need to link Vlan, Lan and Host to the networks
 	# to which their addresses belong.
 	my ($net,$nam,$key,$idx,$pky);
-	foreach (qw/Network Private Local/) {
+	foreach (qw/Internet Private Local/) {
 		($nam,$net,$idx) = ($_,$dat->{$_},$dat->{"idx$_"});
 		if ($net) {
 			$key = Item::makekey($net);
@@ -4587,7 +4605,7 @@ sub link_parents {
 }
 
 # -------------------------------------
-package Route; our @ISA = qw(Path Datum);
+package Route; our @ISA = qw(Edge Datum);
 # -------------------------------------
 # A route is an IP routing path from a Port to a Subnet via a gateway
 # (Host::Router).
@@ -4601,7 +4619,7 @@ sub dump {
 }
 
 # -------------------------------------
-package Port; our @ISA = qw(Storable Point Tree Datum Restorable);
+package Port; our @ISA = qw(Stored Vertex Tree Datum);
 # -------------------------------------
 # A Port is a LAN link layer interface.  Fundamentally, a Port belongs to the
 # Lan to which it is attached  (with which it shares its hardware address key).
@@ -4659,7 +4677,7 @@ sub mergefrom {
 }
 
 # -------------------------------------
-package Vprt; our @ISA = qw(Storable Point Tree Datum Restorable);
+package Vprt; our @ISA = qw(Stored Vertex Tree Datum);
 # -------------------------------------
 # A Vprt is a VLAN link layer interface.  Fundamentally, a Vprt belongs to the
 # Vlan to which it is attached (with which it shares its hardware address and
@@ -4721,7 +4739,7 @@ sub mergefrom {
 }
 
 # -------------------------------------
-package Driv; our @ISA = qw(Storable Point Tree Datum Restorable);
+package Driv; our @ISA = qw(Stored Vertex Tree Datum);
 # -------------------------------------
 # An MX driver belongs to a specific host.  The index used is the MX driver
 # name.  There is really only one driver for now.  There is really nothing more
@@ -4729,28 +4747,28 @@ package Driv; our @ISA = qw(Storable Point Tree Datum Restorable);
 # -------------------------------------
 
 # -------------------------------------
-package Card; our @ISA = qw(Storable Point Tree Datum Restorable);
+package Card; our @ISA = qw(Stored Vertex Tree Datum);
 # -------------------------------------
 # An MX card belongs to a driver on a specific host.  The index used in the
 # card number.  There is really nothing more required to model these objects.
 # -------------------------------------
 
 # -------------------------------------
-package Span; our @ISA = qw(Storable Point Tree Datum Restorable);
+package Span; our @ISA = qw(Stored Vertex Tree Datum);
 # -------------------------------------
 # An MX span belongs to a card.  The index used in ths span number.  There is
 # really nothing more required to model these objects.
 # -------------------------------------
 
 # -------------------------------------
-package Chan; our @ISA = qw(Storable Point Tree Datum Restorable);
+package Chan; our @ISA = qw(Stored Vertex Tree Datum);
 # -------------------------------------
 # An MX channel belongs to a span.  The index used is the channel number.  There
 # is really nothing more required to model these objects.
 # -------------------------------------
 
 # -------------------------------------
-package Xcon; our @ISA = qw(Storable Point Leaf Datum Restorable);
+package Xcon; our @ISA = qw(Stored Vertex Leaf Datum);
 # -------------------------------------
 # An MX cross-connect belongs to a driver.  The index used is a ppa pair: mx
 # card, span and channel triple pair.  There is really nothing more required to
