@@ -1,1 +1,0 @@
-.so man9/SV_ALLOC.9.man

@@ -1,1 +1,0 @@
-.so man7/TC_begin_ind_t.7.man

@@ -1,1 +1,0 @@
-.so man7/SL_RETRIEVE_BSNT_REQ.7.man

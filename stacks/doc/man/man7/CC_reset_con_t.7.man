@@ -1,1 +1,0 @@
-.so man7/CC_RESET_CON.7.man

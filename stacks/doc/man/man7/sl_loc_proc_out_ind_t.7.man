@@ -1,1 +1,0 @@
-.so man7/SL_LOCAL_PROCESSOR_OUTAGE_IND.7.man

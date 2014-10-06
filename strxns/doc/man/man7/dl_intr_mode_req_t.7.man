@@ -1,1 +1,0 @@
-.so man7/DL_INTR_MODE_REQ.7.man

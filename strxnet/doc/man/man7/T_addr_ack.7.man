@@ -1,1 +1,0 @@
-.so man7/T_ADDR_ACK.7.man

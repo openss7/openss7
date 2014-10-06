@@ -1,1 +1,0 @@
-.so man7/A_ASSOC_RSP.7.man

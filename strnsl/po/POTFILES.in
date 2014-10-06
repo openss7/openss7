@@ -1,5 +1,0 @@
-# translatable sources
-src/lib/netdir.c
-src/lib/netdir_inet.c
-src/lib/netselect.c
-src/lib/pthread.c

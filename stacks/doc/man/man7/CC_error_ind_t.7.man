@@ -1,1 +1,0 @@
-.so man7/CC_ERROR_IND.7.man

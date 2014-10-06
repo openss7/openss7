@@ -1,1 +1,0 @@
-.so man8/test-tcp-dc.8.man

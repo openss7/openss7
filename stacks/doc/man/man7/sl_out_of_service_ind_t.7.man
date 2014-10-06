@@ -1,1 +1,0 @@
-.so man7/SL_OUT_OF_SERVICE_IND.7.man

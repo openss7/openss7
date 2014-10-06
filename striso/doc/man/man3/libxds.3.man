@@ -1,1 +1,0 @@
-.so man3/XDS.3.man

@@ -1,1 +1,0 @@
-.so man7/npi.7.man

@@ -1,8 +1,0 @@
-                                                                                
-                              |                  |                              
-          DL_UNITDATA ----\   |                  |                              
-              request      \->|- - - - - - - - - |-------->  DL_UNITDATA        
-                              |                  |           indication         
-                              |                  |                              
-                              |                  |                              
-                                                                                

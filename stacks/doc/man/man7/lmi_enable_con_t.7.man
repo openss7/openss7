@@ -1,1 +1,0 @@
-.so man7/LMI_ENABLE_CON.7.man

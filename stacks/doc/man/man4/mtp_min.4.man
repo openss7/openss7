@@ -1,1 +1,0 @@
-.so man4/mtp-min.4.man

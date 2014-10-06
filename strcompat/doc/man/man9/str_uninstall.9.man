@@ -1,1 +1,0 @@
-.so man9/str_install_HPUX.9.man

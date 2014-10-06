@@ -1,1 +1,0 @@
-.so man4/tp.4.man

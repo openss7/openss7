@@ -1,1 +1,0 @@
-.so man9/module_info.9.man

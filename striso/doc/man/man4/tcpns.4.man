@@ -1,1 +1,0 @@
-.so man4/ns-tcp.4.man

@@ -1,1 +1,0 @@
-.so man9/ss7_undoc.9.man

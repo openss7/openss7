@@ -1,1 +1,0 @@
-.so man5/specfs.5.man

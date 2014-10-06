@@ -1,1 +1,0 @@
-.so man7/CD_INFO_ACK.7.man

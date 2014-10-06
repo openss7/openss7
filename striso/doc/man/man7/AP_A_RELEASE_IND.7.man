@@ -1,1 +1,0 @@
-.so man7/A_RELEASE_IND.7.man

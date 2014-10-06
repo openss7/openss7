@@ -1,1 +1,0 @@
-.so man3/t_rcvuderr.3.man

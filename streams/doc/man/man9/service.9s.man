@@ -1,1 +1,0 @@
-.so srv.9s.man

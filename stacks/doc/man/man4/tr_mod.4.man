@@ -1,1 +1,0 @@
-.so man4/tr-mod.4.man

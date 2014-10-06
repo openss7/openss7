@@ -1,1 +1,0 @@
-.so man9/register_strlog.9.man

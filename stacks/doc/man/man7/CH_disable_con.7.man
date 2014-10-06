@@ -1,1 +1,0 @@
-.so man7/CH_DISABLE_CON.7.man

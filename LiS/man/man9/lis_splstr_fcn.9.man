@@ -1,1 +1,0 @@
-.so man9/lis_splstr.9.man

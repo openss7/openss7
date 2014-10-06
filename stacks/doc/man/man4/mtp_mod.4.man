@@ -1,1 +1,0 @@
-.so man4/mtp-mod.4.man

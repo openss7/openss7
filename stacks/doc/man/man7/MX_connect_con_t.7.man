@@ -1,1 +1,0 @@
-.so man7/MX_CONNECT_CON.7.man

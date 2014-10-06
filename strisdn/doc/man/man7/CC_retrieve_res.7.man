@@ -1,1 +1,0 @@
-.so man7/CC_RETRIEVE_RES.7.man

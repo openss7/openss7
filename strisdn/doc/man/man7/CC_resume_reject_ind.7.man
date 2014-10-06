@@ -1,1 +1,0 @@
-.so man7/CC_RESUME_REJECT_IND.7.man

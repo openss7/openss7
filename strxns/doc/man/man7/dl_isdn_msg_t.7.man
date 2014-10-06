@@ -1,1 +1,0 @@
-.so man7/DL_ISDN_MSG.7.man

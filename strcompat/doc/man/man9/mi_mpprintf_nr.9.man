@@ -1,1 +1,0 @@
-.so man9/mi_mpprintf.9.man

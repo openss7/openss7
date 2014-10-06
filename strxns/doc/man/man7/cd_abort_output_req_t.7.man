@@ -1,1 +1,0 @@
-.so man7/CD_ABORT_OUTPUT_REQ.7.man

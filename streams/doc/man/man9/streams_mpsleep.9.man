@@ -1,1 +1,0 @@
-.so man9/sleep.9.man

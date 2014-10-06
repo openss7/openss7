@@ -1,1 +1,0 @@
-.so man7/P_SYNCMAJOR_RSP.7.man

@@ -1,1 +1,0 @@
-.so man9/qwait.9.man

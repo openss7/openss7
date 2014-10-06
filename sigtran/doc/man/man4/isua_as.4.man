@@ -1,1 +1,0 @@
-.so man4/isua-as.4.man

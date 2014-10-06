@@ -1,1 +1,0 @@
-.so man9/streams_notify.9.man

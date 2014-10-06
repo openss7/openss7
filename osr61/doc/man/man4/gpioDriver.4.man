@@ -1,1 +1,0 @@
-.so man4/gpio.4.man

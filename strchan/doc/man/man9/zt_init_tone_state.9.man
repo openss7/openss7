@@ -1,1 +1,0 @@
-.so man9/zaptel.9.man

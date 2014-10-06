@@ -1,1 +1,0 @@
-.so man7/DL_HP_SET_P_TO_REQ.7.man

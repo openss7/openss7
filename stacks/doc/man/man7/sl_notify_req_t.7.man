@@ -1,1 +1,0 @@
-.so man7/SL_NOTIFY_REQ.7.man

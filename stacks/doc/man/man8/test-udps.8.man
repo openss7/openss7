@@ -1,2 +1,0 @@
-.so man8/test-udpc.8.man
-

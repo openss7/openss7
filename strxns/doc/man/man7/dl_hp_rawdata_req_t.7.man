@@ -1,1 +1,0 @@
-.so man7/DL_HP_RAWDATA_REQ.7.man

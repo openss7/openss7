@@ -1,1 +1,0 @@
-.so man3/xti_tcp.3.man

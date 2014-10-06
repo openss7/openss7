@@ -1,1 +1,0 @@
-.so man1/netperf_sctp_stream.man

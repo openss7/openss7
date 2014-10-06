@@ -1,1 +1,0 @@
-.so man4/np_ip.4.man

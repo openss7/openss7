@@ -1,1 +1,0 @@
-.so man4/ip_to_dlpi.4.man

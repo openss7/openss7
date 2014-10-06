@@ -1,9 +1,0 @@
-[ READ-ME - Wed Sep 14 16:39:02 BST 1988 - ISODE idist utility notes - /jpo ]
-
-     This directory contains the sources to idist - an rdist analogue
-     for use with ISODE.
-
-     The idist responder should be a dynamic responder as its first
-     actions are to set the user-id which is ireversible for most users.
-
-Julian.

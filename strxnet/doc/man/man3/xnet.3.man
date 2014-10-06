@@ -1,1 +1,0 @@
-.so man3/xti.3.man

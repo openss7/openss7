@@ -1,1 +1,0 @@
-.so man4/sdt-pmod.4.man

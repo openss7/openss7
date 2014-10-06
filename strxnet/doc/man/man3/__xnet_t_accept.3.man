@@ -1,1 +1,0 @@
-.so man3/t_accept.3.man

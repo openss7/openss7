@@ -1,1 +1,0 @@
-.so man9/dlgn_undoc.9.man

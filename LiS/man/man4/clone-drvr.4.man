@@ -1,1 +1,0 @@
-.so man4/clone.4.man

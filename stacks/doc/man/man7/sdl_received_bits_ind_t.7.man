@@ -1,1 +1,0 @@
-.so man7/SDL_RECEIVED_BITS_IND.7.man

@@ -1,1 +1,0 @@
-.so man7/DL_GET_STATISTICS_ACK.7.man

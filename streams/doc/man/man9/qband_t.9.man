@@ -1,1 +1,0 @@
-.so man9/qband.9.man

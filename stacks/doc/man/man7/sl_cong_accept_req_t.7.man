@@ -1,1 +1,0 @@
-.so man7/SL_CONGESTION_ACCEPT_REQ.7.man
