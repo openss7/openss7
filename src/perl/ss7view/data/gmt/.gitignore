@@ -1,0 +1,5 @@
+# gmt 4 and 5 cruft
+.gmtcommands4
+gmt.history
+# generated files
+pscoast.db
