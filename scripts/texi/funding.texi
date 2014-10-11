@@ -5,7 +5,7 @@
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2008-2014  Monavacon Limited <http://www.monavacon.com/>
 @c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 @c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
@@ -83,6 +83,13 @@
 @c Last Modified $Date: 2010-06-09 12:58:34 $ by $Author: brian $
 @c
 @c =========================================================================
+
+@menu
+* Sponsors::	    Sponsors of OpenSS7.
+* Contributors::    Contributors to OpenSS7.
+* Supporters::	    Supporters of OpenSS7.
+* Agencies::	    Industries agencies.
+@end menu
 
 As with most open source projects, this project would not have been possible without the valiant
 efforts and productive software of the @cite{@uref{http://www.fsf.org/,, Free Software Foundation}},
@@ -173,10 +180,10 @@ Over the years a number of organizations have provided continued support in the
 form of assessment, inspection, testing, validation and certification.
 
 @menu
-* Telecommunications::
-* Aerospace and Military::
-* Financial, Business and Security.Financial:
-* Education, Health Care and Nuclear Power.Education:
+* Telecommunications::		
+* Aerospace and Military::	
+* Financial::			Financial, Business and Security.
+* Education::			Education, Health Care and Nuclear Power.
 @end menu
 
 @node Telecommunications
