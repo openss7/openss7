@@ -106,9 +106,12 @@ release.}
 @item CentOS Enterprise Linux 5.4 (centos54)
 @item CentOS Enterprise Linux 5.5 (centos55)
 @item CentOS Enterprise Linux 5.6 (centos56)
-@item CentOS Enterprise Linux 5.7 (centos57) (untested)
+@item CentOS Enterprise Linux 5.7 (centos57)
 @item CentOS Enterprise Linux 6.0 (centos60)
-@item CentOS Enterprise Linux 6.1 (centos61) (untested)
+@item CentOS Enterprise Linux 6.1 (centos61)
+@item CentOS Enterprise Linux 6.2 (centos61)
+@item CentOS Enterprise Linux 6.3 (centos61)
+@item CentOS Enterprise Linux 6.4 (centos61)
 @item Debian 3.0r2 Woody (deb3.0) TBD
 @item Debian 3.1r0a Sarge (deb3.1) TBD
 @item Debian 4.0r1 Etch (deb4.0)
@@ -150,12 +153,18 @@ release.}
 @item Oracle Linux Server 5.7 (OLS5)
 @item Oracle Linux Server 6.0 (OLS6)
 @item Oracle Linux Server 6.1 (OLS6)
+@item Oracle Linux Server 6.2 (OLS6)
+@item Oracle Linux Server 6.3 (OLS6)
+@item Oracle Linux Server 6.4 (OLS6)
 @item PUIAS Linux 5.4 (PUIAS5)
 @item PUIAS Linux 5.5 (PUIAS5)
 @item PUIAS Linux 5.6 (PUIAS5)
 @item PUIAS Linux 5.7 (PUIAS5)
 @item PUIAS Linux 6.0 (PUIAS6)
 @item PUIAS Linux 6.1 (PUIAS6)
+@item PUIAS Linux 6.2 (PUIAS6)
+@item PUIAS Linux 6.3 (PUIAS6)
+@item PUIAS Linux 6.4 (PUIAS6)
 @item RedHat Enterprise Linux 3.0 (EL3) TBD
 @item RedHat Enterprise Linux 4 (EL4) TBD
 @item RedHat Enterprise Linux 5 (EL5)
@@ -168,6 +177,9 @@ release.}
 @item RedHat Enterprise Linux 5.7 (EL5)
 @item RedHat Enterprise Linux 6 (EL6)
 @item RedHat Enterprise Linux 6.1 (EL6)
+@item RedHat Enterprise Linux 6.2 (EL6)
+@item RedHat Enterprise Linux 6.3 (EL6)
+@item RedHat Enterprise Linux 6.4 (EL6)
 @item RedHat Linux 7.2 (RH7)
 @item RedHat Linux 7.3 (RH7)
 @item RedHat Linux 8.0 (RH8) TBD
@@ -182,6 +194,9 @@ release.}
 @item Scientific Linux 5.7 (SL5)
 @item Scientific Linux 6.0 (SL6)
 @item Scientific Linux 6.1 (SL6)
+@item Scientific Linux 6.2 (SL6)
+@item Scientific Linux 6.3 (SL6)
+@item Scientific Linux 6.4 (SL6)
 @item SuSE 8.0 Professional (SuSE8.0) TBD
 @item SuSE 9.1 Personal (SuSE9.1) TBD
 @item SuSE 9.2 Professional (SuSE9.2) TBD
@@ -203,6 +218,8 @@ release.}
 @item SLES 10 SP2 (SLES10)
 @item SLES 11 (SLES11)
 @item SLES 11 SP1 (SLES11)
+@item SLES 11 SP2 (SLES11)
+@item SLES 11 SP3 (SLES11)
 @item Ubuntu 5.10 (ubu5.10) TBD
 @item Ubuntu 6.03 LTS (ubu6.03) TBD
 @item Ubuntu 6.10 (ubu6.10) TBD

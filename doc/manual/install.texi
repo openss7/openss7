@@ -196,6 +196,9 @@ For the following distributions, follow the instructions in the sections referen
 @item CentOS Enterprise Linux 5.7  @tab centos57 @tab @ref{Installing with YUM}
 @item CentOS Enterprise Linux 6.0  @tab centos60 @tab @ref{Installing with YUM}
 @item CentOS Enterprise Linux 6.1  @tab centos61 @tab @ref{Installing with YUM}
+@item CentOS Enterprise Linux 6.2  @tab centos62 @tab @ref{Installing with YUM}
+@item CentOS Enterprise Linux 6.3  @tab centos63 @tab @ref{Installing with YUM}
+@item CentOS Enterprise Linux 6.4  @tab centos64 @tab @ref{Installing with YUM}
 @item Debian 4.0 Etch              @tab deb4.0   @tab @ref{Installing with APT}
 @item Debian 4.0r1 Etch            @tab deb4.1   @tab @ref{Installing with APT}
 @item Debian 4.0r2 Etch            @tab deb4.2   @tab @ref{Installing with APT}
@@ -213,6 +216,9 @@ For the following distributions, follow the instructions in the sections referen
 @item Scientific Linux 5.7 @tab sl57 @tab @ref{Installing with YUM}
 @item Scientific Linux 6.0 @tab sl6  @tab @ref{Installing with YUM}
 @item Scientific Linux 6.1 @tab sl61 @tab @ref{Installing with YUM}
+@item Scientific Linux 6.2 @tab sl61 @tab @ref{Installing with YUM}
+@item Scientific Linux 6.3 @tab sl61 @tab @ref{Installing with YUM}
+@item Scientific Linux 6.4 @tab sl61 @tab @ref{Installing with YUM}
 @item PUIAS Linux 5.0 @tab puias5  @tab @ref{Installing with YUM}
 @item PUIAS Linux 5.1 @tab puias51 @tab @ref{Installing with YUM}
 @item PUIAS Linux 5.2 @tab puias52 @tab @ref{Installing with YUM}
@@ -223,6 +229,9 @@ For the following distributions, follow the instructions in the sections referen
 @item PUIAS Linux 5.7 @tab puias57 @tab @ref{Installing with YUM}
 @item PUIAS Linux 6.0 @tab puias6  @tab @ref{Installing with YUM}
 @item PUIAS Linux 6.1 @tab puias61 @tab @ref{Installing with YUM}
+@item PUIAS Linux 6.2 @tab puias61 @tab @ref{Installing with YUM}
+@item PUIAS Linux 6.3 @tab puias61 @tab @ref{Installing with YUM}
+@item PUIAS Linux 6.4 @tab puias61 @tab @ref{Installing with YUM}
 @item Oracle Linux Server 5.3 @tab ols53 @tab @ref{Installing with YUM}
 @item Oracle Linux Server 5.4 @tab ols54 @tab @ref{Installing with YUM}
 @item Oracle Linux Server 5.5 @tab ols55 @tab @ref{Installing with YUM}
@@ -230,6 +239,9 @@ For the following distributions, follow the instructions in the sections referen
 @item Oracle Linux Server 5.7 @tab ols57 @tab @ref{Installing with YUM}
 @item Oracle Linux Server 6.0 @tab ols6  @tab @ref{Installing with YUM}
 @item Oracle Linux Server 6.1 @tab ols61 @tab @ref{Installing with YUM}
+@item Oracle Linux Server 6.2 @tab ols61 @tab @ref{Installing with YUM}
+@item Oracle Linux Server 6.3 @tab ols61 @tab @ref{Installing with YUM}
+@item Oracle Linux Server 6.4 @tab ols61 @tab @ref{Installing with YUM}
 @item Fedora 7 @tab FC7 @tab @ref{Installing with YUM}
 @item Fedora 8 @tab FC8 @tab @ref{Installing with YUM}
 @item Fedora 9 @tab FC9 @tab @ref{Installing with YUM}
