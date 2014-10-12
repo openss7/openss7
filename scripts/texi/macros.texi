@@ -211,11 +211,11 @@
 @end macro
 
 @macro manref{name}
-@code{@uref{/man2html?\name\,\name\}}@mpindex \name\
+@code{@uref{/man2html?\name\,\name\}}
 @end macro
 
 @macro mantype{name}
-@code{@uref{/man2html?\name\,\name\}}@tindex \name\
+@code{@uref{/man2html?\name\,\name\}}
 @end macro
 
 @macro ioctlref{name}
@@ -402,7 +402,7 @@
 @end macro
 
 @macro errno{name}
-[@b{@code{\name\}}]@vindex \name\
+@b{@code{[\name\]}}@vindex \name\
 @end macro
 
 @macro stropt{name}
@@ -460,7 +460,7 @@
 
 @c @vindex \name\
 @macro errno{name}
-[@b{@code{\name\}}]
+@b{@code{[\name\]}}
 @end macro
 
 @c @vindex \name\
