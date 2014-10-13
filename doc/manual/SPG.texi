@@ -1,90 +1,90 @@
-% -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
-% =========================================================================
-%
-% @(#) $Id: SPG.texi,v 1.1.2.3 2011-07-27 07:52:12 brian Exp $
-%
-% =========================================================================
-%
-% Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
-% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
-%
-% All Rights Reserved.
-%
-% Permission is granted to copy, distribute and/or modify this document
-% under the terms of the GNU Free Documentation License, Version 1.3 or
-% any later version published by the Free Software Foundation; with no
-% Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
-% copy of the license is included in the section entitled "GNU Free
-% Documentation License".
-%
-% Permission to use, copy and distribute this documentation without
-% modification, for any purpose and without fee or royalty is hereby
-% granted, provided that both the above copyright notice and this
-% permission notice appears in all copies and that the name of OpenSS7
-% Corporation not be used in advertising or publicity pertaining to
-% distribution of this documentation or its contents without specific,
-% written prior permission.  OpenSS7 Corporation makes no representation
-% about the suitability of this documentation for any purpose.  It is
-% provided "as is" without express or implied warranty.
-% 
-% Permission is granted to process this file through Tex and print the
-% results, provided the printed document carries copying permission notice
-% identical to this one except for the removal of this paragraph (this
-% paragraph not being relevant to the printed manual).
-% 
-% OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
-% DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
-% FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
-% CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
-% IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
-% PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
-% OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
-% CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
-% USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-% OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
-% THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
-% THEREOF.
-% 
-% Since the Linux kernel and libraries are constantly changing, this
-% manual page may be incorrect or out-of-date.  The author(s) assume no
-% responsibility for errors or omissions, or for damages resulting from
-% the use of the information contained herein.  The author(s) may not have
-% taken the same level of care in the production of this manual, which is
-% licensed free of charge, as they might when working professionally.
-% 
-% Formatted or processed versions of this manual, if unaccompanied by the
-% source, must acknowledge the copyright and authors of this work.
-%
-% -------------------------------------------------------------------------
-%
-% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-% on behalf of the U.S. Government ("Government"), the following
-% provisions apply to you.  If the Software is supplied by the Department
-% of Defense ("DoD"), it is classified as "Commercial Computer Software"
-% under paragraph 252.227-7014 of the DoD Supplement to the Federal
-% Acquisition Regulations ("DFARS") (or any successor regulations) and the
-% Government is acquiring only the license rights granted herein (the
-% license rights customarily provided to non-Government users).  If the
-% Software is supplied to any unit or agency of the Government other than
-% DoD, it is classified as "Restricted Computer Software" and the
-% Government's rights in the Software are defined in paragraph 52.227-19
-% of the Federal Acquisition Regulations ("FAR") (or any successor
-% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-% NASA Supplement to the FAR (or any successor regulations).
-%
-% =========================================================================
-% 
-% Commercial licensing and support of this software is available from
-% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-% 
-% =========================================================================
-%
-% Last Modified $Date: 2011-07-27 07:52:12 $ by $Author: brian $
-%
-% =========================================================================
-
 \input texinfo
+@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
+@c =========================================================================
+@c
+@c @(#) $Id: SPG.texi,v 1.1.2.3 2011-07-27 07:52:12 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2008-2014  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to copy, distribute and/or modify this document
+@c under the terms of the GNU Free Documentation License, Version 1.3 or
+@c any later version published by the Free Software Foundation; with no
+@c Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+@c copy of the license is included in the section entitled "GNU Free
+@c Documentation License".
+@c
+@c Permission to use, copy and distribute this documentation without
+@c modification, for any purpose and without fee or royalty is hereby
+@c granted, provided that both the above copyright notice and this
+@c permission notice appears in all copies and that the name of OpenSS7
+@c Corporation not be used in advertising or publicity pertaining to
+@c distribution of this documentation or its contents without specific,
+@c written prior permission.  OpenSS7 Corporation makes no representation
+@c about the suitability of this documentation for any purpose.  It is
+@c provided "as is" without express or implied warranty.
+@c 
+@c Permission is granted to process this file through Tex and print the
+@c results, provided the printed document carries copying permission notice
+@c identical to this one except for the removal of this paragraph (this
+@c paragraph not being relevant to the printed manual).
+@c 
+@c OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+@c DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+@c FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+@c CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+@c IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+@c PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+@c OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+@c CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+@c USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+@c OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+@c THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+@c THEREOF.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not have
+@c taken the same level of care in the production of this manual, which is
+@c licensed free of charge, as they might when working professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by the
+@c source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2011-07-27 07:52:12 $ by $Author: brian $
+@c
+@c =========================================================================
+
 @setfilename SPG.info
 @include ../../scripts/texi/args.texi
 @set MANUAL_TITLE @value{PACKAGE_TITLE}
@@ -108,7 +108,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2014  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -150,14 +150,13 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
-@sp 0.5
+@sp 1
 @title @value{MANUAL_TYPE}
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
 @subtitle Updated @value{PACKAGE_PDATE}
-@sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2011  Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2014  Monavacon Limited
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
@@ -167,7 +166,6 @@ the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software a
 as platform and system applicability of the @value{MANUAL_TITLE}.
 @end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
-@sp 0.2
 @author The OpenSS7 Project <@uref{http://www.openss7.org/}>
 
 @page
@@ -184,7 +182,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2014  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -282,7 +280,6 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @end ifnottex
 
 @menu
-* Acknowledgements::
 * Preface::
 * Introduction::
 * Overview::
@@ -312,209 +309,6 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 * Copying::
 * Glossary::
 * Index::
-
- --- The Detailed Node Listing ---
-
-Acknowledgements
-
-* Sponsors::			Sponsors
-* Contributors::		Contributors
-
-Preface
-
-Introduction
-
-* Background::			STREAMS Background
-* What is STREAMS?::		STREAMS Description
-* Basic Streams Operations::	STREAMS Basic Operations
-* Components::			STREAMS Components
-* Multiplexing::		STREAMS Multiplexing
-* Benefits of STREAMS::		STREAMS Benefits
-
-Overview
-
-* Definitions::			STREAMS Definitions
-* Concepts::			STREAMS Concepts
-* Application Interface::	STREAMS Application Interface
-* Kernel Level Facilities::	STREAMS Kernel Facilities
-* Subsystems::			STREAMS Subsystems
-
-Mechanism
-
-* Mechanism Overview::		STREAMS Mechanism Overview
-* Stream Construction::		STREAMS Stream Construction
-
-Processing
-
-* Procedures::			STREAMS Put and Service Procedures
-* Asynchronous Example::	STREAMS Asynchronous Stream Example
-
-Messages
-
-* Messages Overview::		STREAMS Messages Overview
-* Message Structure::		STREAMS Message Structure
-* Queues and Priority::		STREAMS Message Queues and Priority
-* Service Interfaces::		STREAMS Service Interfaces
-* Message Allocation::		STREAMS Message Allocation and Freeing
-* Extended Buffers::		STREAMS Extended Buffers
-
-Polling
-
-* Input and Output Polling::	STREAMS Input and Output Polling
-* Controlling Terminal::	STREAMS Stream as Controlling Terminal
-
-Modules and Drivers
-
-* Environment::			STREAMS Module and Driver Environment
-* Input-Output Control::	STREAMS Input and Output Control
-* Flush Handling::		STREAMS Flush Handling
-* Driver-Kernel Interface::	STREAMS Driver-Kernel Interface
-* Design Guidelines::		STREAMS Design Guidelines
-
-STREAMS Modules
-
-* Module::			STREAMS Modules
-* Module Flow Control::		STREAMS Module Flow Control
-* Module Design Guidelines::	STREAMS Module Design Guidelines
-
-STREAMS Drivers
-
-* Driver::			STREAMS Drivers
-* Cloning::			STREAMS Driver Cloning
-* Loop-Around Driver::		STREAMS Loop-Around Driver Example
-* Driver Design Guidelines::	STREAMS Driver Design Guidelines
-
-STREAMS Multiplexing
-
-* Multiplexers::		STREAMS Multiplexing
-* Connecting and Disconnecting Lower Stream::
-				STREAMS Multiplexer Connect and Disconnect Lower Stream
-* Multiplexer Construction Example::
-				STREAMS Multiplexer Construction Example
-* Multiplexing Driver::		STREAMS Multiplexing Driver
-* Persistent Links::		STREAMS Multiplexer Persistent Links
-* Multiplexing Driver Design Guidelines::
-				STREAMS Multiplexing Driver Design Guidelines
-
-STREAMS-based Pipes and FIFOs
-
-* Pipes and FIFOs::		STREAMS-based Pipes and FIFOs
-* Flushing Pipes and FIFOs::	Flushing STREAMS-based Pipes and FIFOs
-* Named Streams::		Named STREAMS-based Pipes and FIFOs
-* Unique Connections::		Unique Connections for STREAMS-based Pipes and FIFOs
-
-STREAMS-based Terminal Subsystem
-
-* Terminal Subsystem::		STREAMS-based Terminal Subssytem
-* Pseudo-Terminal Subsystem::	STREAMS-based Pseudo-Terminal Subsystem
-
-STREAMS Synchronization
-
-* STREAMS Framework Integrity::
-* MP Message Ordering::
-* MP-UNSAFE Modules::
-* MP Put and Service Procedures::
-* MP Timeout and Buffer Callbacks::
-* MP Open and Close Procedures::
-* MP Module Unloading::
-* MP Locking::
-* MP Asynchronous Callbacks::
-* Stream Integrity::
-
-Reference
-
-* Files::			STREAMS Files
-* Modules::			STREAMS Modules
-* Drivers::			STREAMS Drivers
-* System Calls::		STREAMS System Calls
-* Input-Output Controls::	STREAMS Input-Output Controls
-* Module Entry Points::		STREAMS Module Entry Points
-* Structures::			STREAMS Structures
-* Registration::		STREAMS Module and Driver Registration Functions
-* Message Handling::		STREAMS Message Handling Functions
-* Queue Handling::		STREAMS Queue Handling Functions
-* Miscellaneous Functions::	STREAMS Miscellaneous Functions
-* Extensions::			STREAMS Extension Functions
-* Compatibility::		STREAMS Compatibility Functions
-
-Examples
-
-* Module Example::		STREAMS Module Example
-* Driver Example::		STREAMS Driver Example
-
-Device Numbers
-
-* External Device Numbers::	External Device Numbering
-* Internal Device Numbers::	Internal Device Numbering
-* spec File System::		Avoiding Device Numbering
-* Clone Device::		Clone Device Numbering
-* Named STREAMS Device::	Reusable Device Numbering
-
-Multi-Threading
-
-* MT Configuration::		MP STREAMS MT Configuration
-* Asynchronous Entry Points::	MP STREAMS Asynchronous Entry Points
-* Asynchronous Callbacks::	MP STREAMS Asynchronous Callbacks
-* Synchronous Entry Points::	MP STREAMS Synchronous Entry Points
-* Synchronous Callbacks::	MP STREAMS Synchronous Callbacks
-
-Administration
-
-* Administrative Utilities::	STREAMS Administrative Utilities
-* System Controls::		STREAMS System Controls
-* /proc File System::		STREAMS /proc File System
-
-STREAMS Data Structures
-
-* Stream Structures::
-* Queue Structures::
-* Message Structures::
-* Input Output Control Structures::
-* Link Structures::
-* Options Structures::
-
-STREAMS Message Types
-
-* Message Type::
-* Ordinary Messages::
-* High Priority Messages::
-
-STREAMS Utilities
-
-STREAMS Debugging
-
-STREAMS Configuration
-
-Conformance
-
-* SVR 4.2 Compatibility::	SVR 4.2 MP DDI/DKI Compatibility
-* AIX Compatibility::		AIX 5L Version 5.1 Compatibility
-* HP-UX Compatibility::		HP-UX 11.0i v2 Compatibility
-* OSF/1 Compatibility::		OSF/1 1.2/Digital UNIX Compatibility
-* UnixWare Compatibility::	UnixWare 7.1.3 Compatibility
-* Solaris Compatibility::	Solaris 9/SunOS 5.9 Compatibility
-* SUX Compatibility::		Super/UX Compatibility
-* UXP Compatibility::		UXP/V Compatibility
-
-Portability
-
-* Core Function Support::	Porting with Core Function Support
-* SVR 4.2 Portability::		Porting from SVR 4.2 MP
-* AIX Portability::		Porting from AIX 5L Version 5.1
-* HP-UX Portability::		Porting from HP-UX 11.0i v2
-* OSF/1 Portability::		Porting from OSF/1 1.2/Digital UNIX
-* UnixWare Portability::	Porting from UnixWare 7.1.3
-* Solaris Portability::		Porting from Solaris 9/SunOS 5.9
-* SUX Portability::		Porting from Super/UX
-* UXP Portability::		Porting from UXP/V
-
-Copying
-
-* GNU Affero General Public License::	AGPL
-* GNU General Public License::		GPL
-* GNU Lesser General Public License::	LGPL
-* GNU Free Documentation License::	FDL
-
 @end menu
 
 @c Indices
@@ -538,14 +332,22 @@ Copying
 
 @c --------------------------------------------------------------------------
 
+@node Preface
+@unnumbered Preface
+
+@menu
+* Acknowledgements::
+* Authors::
+* Maintainer::
+@end menu
+
 @node Acknowledgements
-@unnumbered Acknowledgements
+@unnumberedsec Acknowledgements
 @cindex credits
 
-@raisesections
 @include texi/funding.texi
-@lowersections
 
+@node Authors
 @unnumberedsec Authors
 
 The authors of the @cite{@value{PACKAGE_TITLE}} package include:
@@ -554,6 +356,7 @@ The authors of the @cite{@value{PACKAGE_TITLE}} package include:
 @item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
 @end multitable
 
+@node Maintainer
 @unnumberedsec Maintainer
 
 The maintainer of the @cite{@value{PACKAGE_TITLE}} package is:
@@ -566,13 +369,10 @@ Please send bug reports to @email{@value{PACKAGE_BUGREPORT}} using the @file{sen
 included in the package, only after reading the @file{BUGS} file in the release, or @xref{Problem
 Reports}.
 
-@node Preface
-@unnumbered Preface
-
-@section Document Information
+@unnumberedsec Document Information
 @cindex document information
 
-@subsection Notice
+@unnumberedsubsec Notice
 @cindex document notice
 @cindex licensing
 
@@ -584,12 +384,12 @@ Consult the permission notices contained in the documentation for more informati
 This document, is released under the @cite{GNU Free Documentation License} (@pxref{GNU Free
 Documentation License}) with no sections invariant.
 
-@subsection Abstract
+@unnumberedsubsec Abstract
 @cindex document abstract
 
 This document provides a @cite{@value{MANUAL_TYPE}} for @cite{@value{PACKAGE_TITLE}}.
 
-@subsection Objective
+@unnumberedsubsec Objective
 @cindex document objective
 
 The objective of this document is to provide a guide for the @acronym{STREAMS} programmer when
@@ -604,7 +404,7 @@ kernel levels.
 @acronym{STREAMS} provides developers with integral functions, a set of utility routines, and facilities
 that expedite software design and implementation.
 
-@subsection Intent
+@unnumberedsubsec Intent
 @cindex document intent
 
 The intent of this document is to act as an introductory guide to the @acronym{STREAMS} programmer.  It
@@ -615,7 +415,7 @@ Although this describes the features of the @cite{@value{PACKAGE_TITLE}} package
 @uref{http://www.openss7.com/,OpenSS7 Corporation} is under no obligation to provide any software,
 system or feature listed herein.
 
-@subsection Audience
+@unnumberedsubsec Audience
 @cindex document audience
 
 This document is intended for a highly technical audience.  The reader should already be familiar
@@ -629,7 +429,7 @@ user and kernel levels for @cite{Linux} and @cite{UNIX} system communication ser
 Readers of the guide are expected to possess prior knowledge of the @cite{Linux} and @cite{UNIX}
 system, programming, networking, and data communication.
 
-@subsection Revisions
+@unnumberedsubsec Revisions
 @cindex document revisions
 
 Take care that you are working with a current version of this document: you will not be notified of
@@ -640,7 +440,7 @@ Project} website for a current version.
 A current version of this document is normally distributed with the @cite{@value{PACKAGE_TITLE}}
 package.
 
-@subsubsection Version Control
+@unnumberedsubsubsec Version Control
 
 @smallexample
 @verbatim
@@ -657,7 +457,7 @@ Revision 1.1.2.1  2009-06-21 10:40:06  brian
 @end verbatim
 @end smallexample
 
-@subsubsection ISO 9000 Compliance
+@unnumberedsubsubsec ISO 9000 Compliance
 
 Only the @TeX{}, texinfo, or roff source for this document is controlled.  An opaque (printed,
 postscript or portable document format) version of this document is an @strong{UNCONTROLLED
@@ -683,7 +483,7 @@ utilization of advances in the state of the technical arts, or the reflection of
 design of any techniques, or procedures embodied, described, or referred to herein.  @cite{OpenSS7
 Corporation} is under no obligation to provide any feature listed herein.
 
-@subsubsection U.S. Government Restricted Rights
+@unnumberedsubsubsec U.S. Government Restricted Rights
 
 If you are licensing this Software on behalf of the U.S. Government ("Government"), the following
 provisions apply to you.  If the Software is supplied by the Department of Defense ("DoD"), it is
@@ -705,41 +505,6 @@ ignored by those already familiar with @acronym{STREAMS} concepts and facilities
 
 This document is organized as follows:
 
-@ifnottex
-@menu
-  Acknowledgements::
-  Preface::
-* Introduction::
-* Overview::
-* Mechanism::
-* Processing::
-* STREAMS Messages::
-* Polling::
-* Modules and Drivers::
-* STREAMS Modules::
-* STREAMS Drivers::
-* STREAMS Multiplexing::
-* STREAMS-based Pipes and FIFOs::
-* STREAMS-based Terminal Subsystem::
-* STREAMS Synchronization::
-* Reference::
-* Examples::
-* Device Numbers::
-* Multi-Threading::
-* Administration::
-* STREAMS Data Structures::
-* STREAMS Message Types::
-* STREAMS Utilities::
-* STREAMS Debugging::
-* STREAMS Configuration::
-* Conformance::
-* Portability::
-* Copying::
-* List of Figures::
-* Index::
-@end menu
-@end ifnottex
-@iftex
 @table @emph
 @item @ref{Preface}
 Describes the organization and purpose of the guide.  It also defines an intended audience and an
@@ -819,10 +584,9 @@ Portability of @acronym{STREAMS} modules and drivers written for other @cite{UNI
 @acronym{STREAMS} and how they can most easily be ported into @cite{@value{PACKAGE_TITLE}}; but, for
 more details on this topic, see the @cite{@value{PACKAGE_TITLE} - @acronym{STREAMS} Portability Guide}.
 @end table
-@end iftex
 
 
-@subsubsection Conventions Used
+@subsection Conventions Used
 
 This guide uses @cite{texinfo} typographical conventions.
 
@@ -889,7 +653,7 @@ This system conforms to @cite{UNIX System V Release 4.2} for @cite{Linux}.
 
 @subsection Copyright
 
-@copyright{} 1997-2011  Monavacon Limited.  All Rights Reserved.
+@copyright{} 1997-2014  Monavacon Limited.  All Rights Reserved.
 
 
 @node Introduction
@@ -5251,7 +5015,7 @@ At the end of the loops, the final new block is linked to @var{nmp}.  The origin
 message blocks) is returned to the pool by @manpage{freemsg(9)}.  If a new message exists, it is
 sent downstream.
 
-@subsubsection Recovering From No Buffers
+@subsection Recovering From No Buffers
 
 The @manpage{bufcall(9)} utility can be used to recover from an @manpage{allocb(9)} failure.  The
 call syntax is as follows:
@@ -5834,20 +5598,20 @@ and ends when the lifetime of the last process group that is a member of the ses
 
 The following signals manage @dfn{Job Control}: (see also @manpage{signal(5)})
 
-@vtable @signal
-@item SIGCONT
+@table @asis
+@item @signal{SIGCONT}
 Sent to a stopped process to continue it.
-@item SIGSTOP
+@item @signal{SIGSTOP}
 Sent to a process to stop it.  This signal cannot be caught or ignored.
-@item SIGTSTP
+@item @signal{SIGTSTP}
 Sent to a process to stop it.  It is typically used when a user requests to stop the foreground
 process.
-@item SIGTTIN
+@item @signal{SIGTTIN}
 Sent to a background process to stop it when it attempts to read from the controlling terminal.
-@item SIGTTOU
+@item @signal{SIGTTOU}
 Sent to a background process to stop it when one attempts to write to or modify the controlling
 terminal.
-@end vtable
+@end table
 
 A session may be allocated a controlling terminal.  For every allocated controlling terminal,
 @dfn{Job Control} elevates one process group in the controlling process's session to the status of
@@ -18643,8 +18407,8 @@ guidelines are collected here.
 * Synchronization of Drivers and Modules::
 * Special STREAMS Message Types::
 * Use of Message Allocation Priorities::
-* Device Numbering::
 * Registration and Deregistration::
+* Device Numbering::
 @end menu
 
 @node Memory Allocation
