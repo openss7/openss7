@@ -1,6 +1,6 @@
-OpenSS7 -- history of user visible changes.  2013-12-09
-$Id: NEWS,v 1.1.2.30 2011-07-27 07:52:10 brian Exp $
-Copyright (c) 2008-2013  Monavacon Limited. <http://www.monavacon.com/>
+OpenSS7 -- history of user visible changes.  2011-04-30
+$Id: NEWS,v 1.1.2.25 2011-05-10 13:45:30 brian Exp $
+Copyright (c) 2008-2011  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -8,33 +8,7 @@ See the end for copying conditions (for this file).
 The sections that follow provide information on OpenSS7 releases of the
 `OpenSS7' package.
 
- Major changes for release openss7-1.1.7.20131209
--------------------------------------------------
-
-This is the sixth release of the `OpenSS7' package.  THis is a
-production grade release.  All existing validation test suites run
-clean on supported distributions, production kernels and architectures.
-
-Major features since the last release are as follows:
-
-   - Updated GNU build chain to m4-1.4.16, autoconf-2.69,
-     automake-1.12.6, libtool-2.4.2, gettext-0.18.2, flex-2.5.37,
-     bison-2.7, swig-2.0.9, autobuild-5.3, texinfo-4.13a, xz-5.0.4.
-
-   - Updated GNU build chain to m4-1.4.16, autoconf-2.69, automake
-     1.12.1, libtool 2.4.2, gettext 0.18.1, flex 2.5.35, bison 2.5,
-     swig 2.0.7, autobuild 5.3, texinfo 4.13a, xz 5.0.3.
-
-   - Support for Archlinux.
-
-   - Support for Slackware.
-
-   - Support for 3.0.4-1-lts kernel from Archlinux.
-
-   - Support for OpenSS7 Live.
-
-
- Major changes for release openss7-1.1.1.20110510
+ Major changes for release openss7-1.1.1.20110411
 -------------------------------------------------
 
 This is the fifth release of the `OpenSS7' package.  This is a
@@ -44,29 +18,6 @@ clean on supported distributions, production kernels and architectures.
 Major features since the last release are as follows:
 
    - Support for `repomd' repository.
-
-   - Updated GNU build chain to m4-1.4.16, autoconf-2.69, automake
-     1.11.1, libtool 2.4, gettext 0.18.1, flex 2.5.35, bison 2.5, swig
-     2.0.4, autobuild 5.3.
-
-   - Support for Ubuntu 10.04.2 LTS.
-
-   - Support for Mageia 1 (2.6.38.7-desktop-1.mga).
-
-   - Support for Mandriva 2010.2.
-
-   - Support for Mandriva Linux Enterprise Server 5.2
-     (2.6.33.7-server-2mnb).
-
-   - Support for Scientific Linux 6.0.
-
-   - Support for SuSE Linux Enterprise Server 11 SP1.
-
-   - Support for OpernSUSE 11.4.
-
-   - Support for Fedora 15.
-
-   - Support for Red Hat Enterprise Linux Server 6.0.
 
 
  Major changes for release openss7-1.1.1.20110111
@@ -85,7 +36,7 @@ Major features since the last release are as follows:
    - Support for CentOS 5.5 on a 2.6.18-194.25.1.el5 kernel.
 
    - Updated GNU build chain to m4-1.4.15, autoconf-2.69, automake
-     1.11.1, libtool 2.4, gettext 0.18.1, flex 2.5.35, bison 2.4.3,
+     2.11.1, libtool 2.4, gettext 0.18.1, flex 2.5.35, bison 2.4.3,
      swig 2.0.1, autobuild 5.3.
 
    - Support for Debian Lenny on a 2.6.26-2 kernel.
@@ -239,8 +190,8 @@ the package page (http://www.openss7.org/openss7_pkg.html) for the
 repository page (http://www.openss7.org/repos.html) for information
 concerning network installation and update sources.
 
-See `http://www.openss7.org/codefiles/openss7-1.1.7.20131209/ChangeLog'
-and `http://www.openss7.org/codefiles/openss7-1.1.7.20131209/NEWS' in
+See `http://www.openss7.org/codefiles/openss7-1.1.1.20110411/ChangeLog'
+and `http://www.openss7.org/codefiles/openss7-1.1.1.20110411/NEWS' in
 the release for more information.  Also, see the `openss7.pdf' manual
 in the release (also in html
 (http://www.openss7.org/openss7_manual.html)).
@@ -343,8 +294,8 @@ SRPM, DSC, and set of binary RPMs and DEBs.  See the downloads page
 SRPMs and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs,
 see the openss7 package page (http://www.openss7.org/openss7_pkg.html).
 
-See `http://www.openss7.org/codefiles/openss7-1.1.7.20131209/ChangeLog'
-and `http://www.openss7.org/codefiles/openss7-1.1.7.20131209/NEWS' in
+See `http://www.openss7.org/codefiles/openss7-1.1.1.20110411/ChangeLog'
+and `http://www.openss7.org/codefiles/openss7-1.1.1.20110411/NEWS' in
 the release for more information.  Also, see the `openss7.pdf' manual
 in the release (also in html
 `http://www.openss7.org/openss7_manual.html').
