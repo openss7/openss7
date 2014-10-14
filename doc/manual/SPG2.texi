@@ -1,90 +1,90 @@
-% -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
-% =========================================================================
-%
-% @(#) $Id: SPG2.texi,v 1.1.2.3 2011-07-27 07:52:12 brian Exp $
-%
-% =========================================================================
-%
-% Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
-% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
-%
-% All Rights Reserved.
-%
-% Permission is granted to copy, distribute and/or modify this document
-% under the terms of the GNU Free Documentation License, Version 1.3 or
-% any later version published by the Free Software Foundation; with no
-% Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
-% copy of the license is included in the section entitled "GNU Free
-% Documentation License".
-%
-% Permission to use, copy and distribute this documentation without
-% modification, for any purpose and without fee or royalty is hereby
-% granted, provided that both the above copyright notice and this
-% permission notice appears in all copies and that the name of OpenSS7
-% Corporation not be used in advertising or publicity pertaining to
-% distribution of this documentation or its contents without specific,
-% written prior permission.  OpenSS7 Corporation makes no representation
-% about the suitability of this documentation for any purpose.  It is
-% provided "as is" without express or implied warranty.
-% 
-% Permission is granted to process this file through Tex and print the
-% results, provided the printed document carries copying permission notice
-% identical to this one except for the removal of this paragraph (this
-% paragraph not being relevant to the printed manual).
-% 
-% OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
-% DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
-% FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
-% CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
-% IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
-% PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
-% OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
-% CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
-% USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-% OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
-% THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
-% THEREOF.
-% 
-% Since the Linux kernel and libraries are constantly changing, this
-% manual page may be incorrect or out-of-date.  The author(s) assume no
-% responsibility for errors or omissions, or for damages resulting from
-% the use of the information contained herein.  The author(s) may not have
-% taken the same level of care in the production of this manual, which is
-% licensed free of charge, as they might when working professionally.
-% 
-% Formatted or processed versions of this manual, if unaccompanied by the
-% source, must acknowledge the copyright and authors of this work.
-%
-% -------------------------------------------------------------------------
-%
-% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-% on behalf of the U.S. Government ("Government"), the following
-% provisions apply to you.  If the Software is supplied by the Department
-% of Defense ("DoD"), it is classified as "Commercial Computer Software"
-% under paragraph 252.227-7014 of the DoD Supplement to the Federal
-% Acquisition Regulations ("DFARS") (or any successor regulations) and the
-% Government is acquiring only the license rights granted herein (the
-% license rights customarily provided to non-Government users).  If the
-% Software is supplied to any unit or agency of the Government other than
-% DoD, it is classified as "Restricted Computer Software" and the
-% Government's rights in the Software are defined in paragraph 52.227-19
-% of the Federal Acquisition Regulations ("FAR") (or any successor
-% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-% NASA Supplement to the FAR (or any successor regulations).
-%
-% =========================================================================
-% 
-% Commercial licensing and support of this software is available from
-% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-% 
-% =========================================================================
-%
-% Last Modified $Date: 2011-07-27 07:52:12 $ by $Author: brian $
-%
-% =========================================================================
-
 \input texinfo
+@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
+@c =========================================================================
+@c
+@c @(#) $Id: SPG2.texi,v 1.1.2.3 2011-07-27 07:52:12 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2008-2014  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to copy, distribute and/or modify this document
+@c under the terms of the GNU Free Documentation License, Version 1.3 or
+@c any later version published by the Free Software Foundation; with no
+@c Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+@c copy of the license is included in the section entitled "GNU Free
+@c Documentation License".
+@c
+@c Permission to use, copy and distribute this documentation without
+@c modification, for any purpose and without fee or royalty is hereby
+@c granted, provided that both the above copyright notice and this
+@c permission notice appears in all copies and that the name of OpenSS7
+@c Corporation not be used in advertising or publicity pertaining to
+@c distribution of this documentation or its contents without specific,
+@c written prior permission.  OpenSS7 Corporation makes no representation
+@c about the suitability of this documentation for any purpose.  It is
+@c provided "as is" without express or implied warranty.
+@c 
+@c Permission is granted to process this file through Tex and print the
+@c results, provided the printed document carries copying permission notice
+@c identical to this one except for the removal of this paragraph (this
+@c paragraph not being relevant to the printed manual).
+@c 
+@c OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+@c DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+@c FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+@c CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+@c IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+@c PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+@c OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+@c CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+@c USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+@c OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+@c THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+@c THEREOF.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not have
+@c taken the same level of care in the production of this manual, which is
+@c licensed free of charge, as they might when working professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by the
+@c source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2011-07-27 07:52:12 $ by $Author: brian $
+@c
+@c =========================================================================
+
 @setfilename SPG2.info
 @include ../../scripts/texi/args.texi
 @set MANUAL_TITLE @value{PACKAGE_TITLE}
@@ -108,7 +108,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2014  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -150,14 +150,13 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
-@sp 0.5
+@sp 1
 @title @value{MANUAL_TYPE}
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
 @subtitle Updated @value{PACKAGE_PDATE}
-@sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2011  Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2014  Monavacon Limited
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
@@ -167,7 +166,6 @@ the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software a
 as platform and system applicability of the @value{MANUAL_TITLE}.
 @end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
-@sp 0.2
 @author The OpenSS7 Project <@uref{http://www.openss7.org/}>
 
 @page
@@ -184,7 +182,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2014  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -282,7 +280,6 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @end ifnottex
 
 @menu
-* Acknowledgements::
 * Preface::
 * Introduction::
 * Overview::
@@ -311,221 +308,6 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 * Copying::
 * Glossary::
 * Index::
-
- --- The Detailed Node Listing ---
-
-Acknowledgements
-
-* Sponsors::			Sponsors
-* Contributors::		Contributors
-
-Preface
-Introduction
-
-* Background::			STREAMS Background
-* What is STREAMS?::		STREAMS Description
-* Basic Streams Operations::	STREAMS Basic Operations
-* Components::			STREAMS Components
-* Multiplexing of Streams::	STREAMS Multiplexing
-* Benefits of STREAMS::		STREAMS Benefits
-
-Overview
-
-* Definitions::			STREAMS Definitions
-* Concepts::			STREAMS Concepts
-* Application Interface::	STREAMS Application Interface
-* Kernel Level Facilities::	STREAMS Kernel Facilities
-* Subsystems::			STREAMS Subsystems
-
-Mechanism
-
-* Mechanism Overview::		STREAMS Mechanism Overview
-* Stream Construction::		STREAMS Stream Construction
-
-Processing
-
-* Procedures::			STREAMS Put and Service Procedures
-* Asynchronous Example::	STREAMS Asynchronous Stream Example
-
-Messages
-
-* Messages Overview::		STREAMS Messages Overview
-* Message Structure::		STREAMS Message Structure
-* Queues and Priority::		STREAMS Message Queues and Priority
-* Service Interfaces::		STREAMS Service Interfaces
-* Message Allocation::		STREAMS Message Allocation and Freeing
-* Extended Buffers::		STREAMS Extended Buffers
-
-Polling
-
-* Input and Output Polling::	STREAMS Input and Output Polling
-* Controlling Terminal::	STREAMS Stream as Controlling Terminal
-
-Modules and Drivers
-
-* Environment::			STREAMS Module and Driver Environment
-* Input-Output Control::	STREAMS Input and Output Control
-* Flush Handling::		STREAMS Flush Handling
-* Driver-Kernel Interface::	STREAMS Driver-Kernel Interface
-* Design Guidelines::		STREAMS Design Guidelines
-
-Modules
-
-* Module::			STREAMS Modules
-* Module Flow Control::		STREAMS Module Flow Control
-* Module Design Guidelines::	STREAMS Module Design Guidelines
-
-Drivers
-
-* External Device Numbers::	External Device Numbering
-* Internal Device Numbers::	Internal Device Numbering
-* spec File System::		Avoiding Device Numbering
-* Clone Device::		Clone Device Numbering
-* Named STREAMS Device::	Reusable Device Numbering
-
-* Driver::			STREAMS Drivers
-* Cloning::			STREAMS Driver Cloning
-* Loop-Around Driver::		STREAMS Loop-Around Driver Example
-* Driver Design Guidelines::	STREAMS Driver Design Guidelines
-
-Multiplexing
-
-* Multiplexors::		STREAMS Multiplexing
-* Connecting and Disconnecting Lower Stream::
-				STREAMS Multiplexor Connect and Disconnect Lower Stream
-* Multiplexor Construction Example::
-				STREAMS Multiplexor Construction Example
-* Multiplexing Driver::		STREAMS Multiplexing Driver
-* Persistent Links::		STREAMS Multiplexor Persistent Links
-* Multiplexing Driver Design Guidelines::
-				STREAMS Multiplexing Driver Design Guidelines
-
-Pipes and FIFOs
-
-* Pipes and FIFOs::		STREAMS-based Pipes and FIFOs
-* Flushing Pipes and FIFOs::	Flushing STREAMS-based Pipes and FIFOs
-* Named Streams::		Named STREAMS-based Pipes and FIFOs
-* Unique Connections::		Unique Connections for STREAMS-based Pipes and FIFOs
-
-Terminal Subsystem
-
-* Terminal Subsystem::		STREAMS-based Terminal Subssytem
-* Pseudo-Terminal Subsystem::	STREAMS-based Pseudo-Terminal Subsystem
-
-Synchronization
-
-* MT Configuration::		MP STREAMS MT Configuration
-* Synchronous Entry Points::	MP STREAMS Synchronous Entry Points
-* Synchronous Callbacks::	MP STREAMS Synchronous Callbacks
-* Synchronous Callouts::	MP STREAMS Synchronous Callouts
-* Asynchronous Entry Points::	MP STREAMS Asynchronous Entry Points
-* Asynchronous Callbacks::	MP STREAMS Asynchronous Callbacks
-* Asynchronous Callouts::	MP STREAMS Asynchronous Callouts
-
-* STREAMS Framework Integrity::
-* MP Message Ordering::
-* MP-UNSAFE Modules::
-* MP-SAFE Modules::
-* Stream Integrity::
-
-Reference
-
-* Files::			STREAMS Files
-* Modules::			STREAMS Modules
-* Drivers::			STREAMS Drivers
-* System Calls::		STREAMS System Calls
-* Input-Output Controls::	STREAMS Input-Output Controls
-* Module Entry Points::		STREAMS Module Entry Points
-* Structures::			STREAMS Structures
-* Registration::		STREAMS Module and Driver Registration Functions
-* Message Handling::		STREAMS Message Handling Functions
-* Queue Handling::		STREAMS Queue Handling Functions
-* Miscellaneous Functions::	STREAMS Miscellaneous Functions
-* Extensions::			STREAMS Extension Functions
-* Compatibility::		STREAMS Compatibility Functions
-
-Conformance
-
-* SVR 4.2 Compatibility::	SVR 4.2 MP DDI/DKI Compatibility
-* AIX Compatibility::		AIX 5L Version 5.1 Compatibility
-* HP-UX Compatibility::		HP-UX 11.0i v2 Compatibility
-* OSF/1 Compatibility::		OSF/1 1.2/Digital UNIX Compatibility
-* UnixWare Compatibility::	UnixWare 7.1.3 Compatibility
-* Solaris Compatibility::	Solaris 9/SunOS 5.9 Compatibility
-* SUX Compatibility::		Super/UX Compatibility
-* UXP Compatibility::		UXP/V Compatibility
-
-Portability
-
-* Core Function Support::	Porting with Core Function Support
-* SVR 4.2 Portability::		Porting from SVR 4.2 MP
-* AIX Portability::		Porting from AIX 5L Version 5.1
-* HP-UX Portability::		Porting from HP-UX 11.0i v2
-* OSF/1 Portability::		Porting from OSF/1 1.2/Digital UNIX
-* UnixWare Portability::	Porting from UnixWare 7.1.3
-* Solaris Portability::		Porting from Solaris 9/SunOS 5.9
-* SUX Portability::		Porting from Super/UX
-* UXP Portability::		Porting from UXP/V
-
-Development
-
-* Memory Allocation::
-* Alignment of Message Buffers::
-* Disabling and Enabling Queue Procedures::
-* Freezing and Unfreezing Streams::
-* Passing Messages from Interrupt Service Routines::
-* Timeout Call Back and Link Identifiers::
-* Synchronization with Timeouts and Callback Functions::
-* Synchronization with Callout Functions::
-* Synchronization of Drivers and Modules::
-* Special STREAMS Message Types::
-* Use of Message Allocation Priorities::
-* Device Numbering::
-* Registration and Deregistration::
-
-Data Structures
-
-* Stream Structures::
-* Queue Structures::
-* Message Structures::
-* Input Output Control Structures::
-* Link Structures::
-* Options Structures::
-
-Message Types
-
-* Message Type::
-* Ordinary Messages::
-* High Priority Messages::
-
-Utilities
-
-Debugging
-
-Configuration
-
-Administration
-
-* Administrative Utilities::	STREAMS Administrative Utilities
-* System Controls::		STREAMS System Controls
-* /proc File System::		STREAMS /proc File System
-
-Examples
-
-* Module Example::		STREAMS Module Example
-* Driver Example::		STREAMS Driver Example
-
-Copying
-
-* GNU Affero General Public License::	AGPL
-* GNU General Public License::		GPL
-* GNU Lesser General Public License::	LGPL
-* GNU Free Documentation License::	FDL
-
-Glossary
-
-Index
-
 @end menu
 
 @iftex
@@ -541,12 +323,22 @@ Index
 @c --------------------------------------------------------------------------
 @c --------------------------------------------------------------------------
 
+@node Preface
+@unnumbered Preface
+
+@menu
+* Acknowledgements::
+* Authors::
+* Maintainer::
+@end menu
+
 @node Acknowledgements
-@unnumbered Acknowledgements
+@unnumberedsec Acknowledgements
 @cindex credits
 
 @include texi/funding.texi
 
+@node Authors
 @unnumberedsec Authors
 
 The authors of the @cite{@value{PACKAGE_TITLE}} package include:
@@ -555,6 +347,7 @@ The authors of the @cite{@value{PACKAGE_TITLE}} package include:
 @item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
 @end multitable
 
+@node Maintainer
 @unnumberedsec Maintainer
 
 The maintainer of the @cite{@value{PACKAGE_TITLE}} package is:
@@ -566,9 +359,6 @@ The maintainer of the @cite{@value{PACKAGE_TITLE}} package is:
 Please send bug reports to @email{@value{PACKAGE_BUGREPORT}} using the @file{send-pr} script
 included in the package, only after reading the @file{BUGS} file in the release, or @xref{Problem
 Reports}.
-
-@node Preface
-@unnumbered Preface
 
 @section Document Information
 @cindex document information
@@ -707,40 +497,6 @@ ignored by those already familiar with @acronym{STREAMS} concepts and facilities
 
 This document is organized as follows:
 
-@ifnottex
-@menu
-  Acknowledgements::
-  Preface::
-* Introduction::
-* Overview::
-* Mechanism::
-* Processing::
-* Messages::
-* Polling::
-* Modules and Drivers::
-* Modules::
-* Drivers::
-* Multiplexing::
-* Pipes and FIFOs::
-* Terminal Subsystem::
-* Synchronization::
-* Reference::
-* Conformance::
-* Portability::
-* Development::
-* Data Structures::
-* Message Types::
-* Utilities::
-* Debugging::
-* Configuration::
-* Administration::
-* Examples::
-* Copying::
-* Glossary::
-* Index::
-@end menu
-@end ifnottex
-@iftex
 @table @emph
 @item @ref{Preface}
 Describes the organization and purpose of the guide.  It also defines an intended audience and an
@@ -826,10 +582,9 @@ Collected examples.
 @c @item @ref{Multi-Threading}
 @c Syncrhonization for Symmetrical Multiprocessor (SMP) architectures.
 @end table
-@end iftex
 
 
-@subsubsection Conventions Used
+@subsection Conventions Used
 
 This guide uses @cite{texinfo} typographical conventions.
 
@@ -896,7 +651,7 @@ This system conforms to @cite{UNIX System V Release 4.2} for @cite{Linux}.
 
 @subsection Copyright
 
-@copyright{} 1997-2011  Monavacon Limited.  All Rights Reserved.
+@copyright{} 1997-2014  Monavacon Limited.  All Rights Reserved.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -1274,10 +1029,9 @@ An basic example of opening, reading from and writing to a @dfn{Stream} driver i
 @ref{Listing 1.1}.
 
 @cartouche
-@iftex
 @float Listing,Listing 1.1
-@end iftex
 @smallexample
+@verbatim
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/uio.h>
@@ -1285,32 +1039,27 @@ An basic example of opening, reading from and writing to a @dfn{Stream} driver i
 #include <fcntl.h>
 #include <stdio.h>
 main()
-@{
+{
         char buf[1024]
         int fd, count;
 
-        if ((fd = open("/dev/streams/comm/1", O_RDWR)) < 0) @{
+        if ((fd = open("/dev/streams/comm/1", O_RDWR)) < 0) {
                 perror("open failed");
                 exit(1);
-        @}
+        }
 
-        while ((count = read(fd, buf, 1024)) > 0) @{
-                if (write(fd, buf, count) != count) @{
+        while ((count = read(fd, buf, 1024)) > 0) {
+                if (write(fd, buf, count) != count) {
                         perror("write failed");
                         break;
-                @}
-        @}
+                }
+        }
         exit(0);
-@}
+}
+@end verbatim
 @end smallexample
-@iftex
 @caption{@emph{Basic Operations}}
 @end float
-@end iftex
-@ifnottex
-@anchor{Listing 1.1}
-@center @emph{Listing 1.1.@:  Basic Operations}
-@end ifnottex
 @end cartouche
 
 The example in @ref{Listing 1.1} is for a communications device that provide a communications
@@ -2343,12 +2092,14 @@ the following format:
 
 @cartouche
 @smallexample
-struct streamtab @{
+@verbatim
+struct streamtab {
     struct qinit *st_rdinit;
     struct qinit *st_wrinit;
     struct qinit *st_muxrinit;
     struct qinit *st_muxwinit;
-@};
+};
+@end verbatim
 @end smallexample
 @end cartouche
 
@@ -2670,10 +2421,9 @@ characters.
 The declarations for the user program are shown in @ref{Listing 3.1}.
 
 @cartouche
-@iftex
 @float Listing,Listing 3.1
-@end iftex
 @smallexample
+@verbatim
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -2694,67 +2444,53 @@ The declarations for the user program are shown in @ref{Listing 3.1}.
 #define   DUPLICATE   3         /* duplicate char */
 
 main()
-@{
+{
     char buf[BUFLE];
     int fd, count;
     struct strioct1 strioctl;
+@end verbatim
 @end smallexample
-@iftex
 @caption{@emph{Inserting Modules Example}}
 @end float
-@end iftex
-@ifnottex
-@anchor{Listing 3.1}
-@center @emph{Listing 3.1.@:  Inserting Modules Example}
-@end ifnottex
 @end cartouche
+@noindent
 
 As in the previous example of @ref{Listing 1.1}, first a @dfn{Stream} is opened using the
 @manref{open(2s)} system call.  In this example, the @acronym{STREAMS} device driver is
 @file{/dev/streams/comm/01}.
 
 @cartouche
-@iftex
 @float Listing,Listing 3.2
-@end iftex
 @smallexample
-    if ((fd = open("/dev/streams/comm/01", O_RDWR)) < 0) @{
+@verbatim
+    if ((fd = open("/dev/streams/comm/01", O_RDWR)) < 0) {
         perror("open failed");
         exit(1);
-    @}
+    }
+@end verbatim
 @end smallexample
-@iftex
 @caption{@emph{Inserting Modules Example (cont'd)}}
 @end float
-@end iftex
-@ifnottex
-@anchor{Listing 3.2}
-@center @emph{Listing 3.2.@:  Inserting Modules Example (cont'd)}
-@end ifnottex
 @end cartouche
+@noindent
 
 Next, the character conversion module (named @file{chconv}) is pushed onto the open @dfn{Stream}
 using the @ioctlref{I_PUSH} @manref{ioctl(2s)} command.
 
 @cartouche
-@iftex
 @float Listing,Listing 3.3
-@end iftex
 @smallexample
-    if (ioctl(fd, I_PUSH, "chconv") < 0) @{
+@verbatim
+    if (ioctl(fd, I_PUSH, "chconv") < 0) {
         perror("ioctl  I_PUSH failed");
         exit(2);
-    @}
+    }
+@end verbatim
 @end smallexample
-@iftex
 @caption{@emph{Inserting Modules Example (cont'd)}}
 @end float
-@end iftex
-@ifnottex
-@anchor{Listing 3.3}
-@center @emph{Listing 3.3.@:  Inserting Modules Example (cont'd)}
-@end ifnottex
 @end cartouche
+@noindent
 
 The difference in creating an instance of a @acronym{STREAMS} driver and module are illustrated in
 @ref{Listing 3.2} and @ref{Listing 3.3}.  An instance of a driver is created with the
@@ -2793,10 +2529,9 @@ to execute on which string of characters.  A sequence that achieves this is show
 special files.
 
 @cartouche
-@iftex
 @float Listing,Listing 3.4
-@end iftex
 @smallexample
+@verbatim
 /* change all uppercase vowels to lowercase */
 strioctl.ic_cmd = XCASE;
 strioctl.ic_timout = 0;         /* default timeout (15 sec) */
@@ -2817,16 +2552,12 @@ if (ioctl(fd, I_STR, &strioctl) < 0) @{
     perror("ioctl I_STR failed");
     exit(4);
 @}
+@end verbatim
 @end smallexample
-@iftex
 @caption{@emph{Module and Driver Control Example}}
 @end float
-@end iftex
-@ifnottex
-@anchor{Listing 3.4}
-@center @emph{Listing 3.4.@:  Module and Driver Control Example}
-@end ifnottex
 @end cartouche
+@noindent
 
 There exist two methods for controlling modules and drivers using the @manref{ioctl(2s)} system call:
 
@@ -2854,14 +2585,17 @@ The @type{strioctl} structure, defined in @header{sys/stropts.h}, has the follow
 
 @cartouche
 @smallexample
-struct strioctl @{
+@verbatim
+struct strioctl {
     int ic_cmd;                         /* ioctl request */
     int ic_timout;                      /* ACK/NAK timeout */
     int ic_len;                         /* length of data argument */
     char *ic_dp;                        /* ptr to data argument */
-@};
+};
+@end verbatim
 @end smallexample
 @end cartouche
+@noindent
 
 @multitable @columnfractions .15 .85
 @item @member{ic_cmd}
@@ -2927,28 +2661,23 @@ As shown in @ref{Listing 3.5}, the remainder of this example follows the example
 the @dfn{Stream}.
 
 @cartouche
-@iftex
 @float Listing,Listing 3.5
-@end iftex
 @smallexample
-    while ((count = read(fd, buf, BUFLEN)) > 0) @{
-        if (write(fd, buf, count) != count) @{
+@verbatim
+    while ((count = read(fd, buf, BUFLEN)) > 0) {
+        if (write(fd, buf, count) != count) {
             perror("write failed");
             break;
-        @}
-    @}
+        }
+    }
     exit(0);
-@}
+}
+@end verbatim
 @end smallexample
-@iftex
 @caption{@emph{Module and Driver Control Example (cont'd)}}
 @end float
-@end iftex
-@ifnottex
-@anchor{Listing 3.5}
-@center @emph{Listing 3.5.@:  Module and Driver Control Example (cont'd)}
-@end ifnottex
 @end cartouche
+@noindent
 
 The @manref{exit(2)} system call in @ref{Listing 3.5} will results in the dismantling of the
 @dfn{Stream} as it is closed.  However, in this example, when the @dfn{Stream} is closed with the
@@ -3540,7 +3269,8 @@ members:
 
 @cartouche
 @smallexample
-typedef struct msgb @{
+@verbatim
+typedef struct msgb {
         struct msgb *b_next;            /* next msgb on queue */
         struct msgb *b_prev;            /* prev msgb on queue */
         struct msgb *b_cont;            /* next msgb in message */
@@ -3551,9 +3281,11 @@ typedef struct msgb @{
         unsigned char b_pad1;           /* padding */
         unsigned short b_flag;          /* message flags */
         long b_pad2;                    /* padding */
-@} mblk_t;
+} mblk_t;
+@end verbatim
 @end smallexample
 @end cartouche
+@noindent
 
 The members of the @mantype{msgb(9)} structure are described as follows:
 
@@ -3597,6 +3329,7 @@ The values that can be used in @member{b_flag} are exposed when @header{sys/stre
 
 @cartouche
 @smallexample
+@verbatim
 #define MSGMARK         (1<<0)  /* last byte of message is marked */
 #define MSGNOLOOP       (1<<1)  /* don't loop mesage at stream head */
 #define MSGDELIM        (1<<2)  /* message is delimited */
@@ -3608,8 +3341,10 @@ The values that can be used in @member{b_flag} are exposed when @header{sys/stre
 #define MSGNOTMARKNEXT  (1<<5)  /* Solaris */
 #define MSGCOMPRESS     (1<<8)  /* OSF: compress like messages as space allows */
 #define MSGNOTIFY       (1<<9)  /* OSF: notify when message consumed */
+@end verbatim
 @end smallexample
 @end cartouche
+@noindent
 
 The following flags are defined by @cite{SVR 4.2}:
 
@@ -3635,16 +3370,17 @@ implementation:
 
 @cartouche
 @smallexample
-typedef struct free_rtn @{
+@verbatim
+typedef struct free_rtn {
         void (*free_func) (caddr_t);
         caddr_t free_arg;
-@} frtn_t;
+} frtn_t;
 
-typedef struct datab @{
-        union @{
+typedef struct datab {
+        union {
                 struct datab *freep;
                 struct free_rtn *frtnp;
-        @} db_f;
+        } db_f;
         unsigned char *db_base;
         unsigned char *db_lim;
         unsigned char db_ref;
@@ -3661,12 +3397,14 @@ typedef struct datab @{
 #endif
         /* Linux Fast-STREAMS specific members */
         atomic_t db_users;
-@} dblk_t;
+} dblk_t;
 
 #define db_freep db_f.freep
 #define db_frtnp db_f.frtnp
+@end verbatim
 @end smallexample
 @end cartouche
+@noindent
 
 The following members are defined by @cite{SVR 4.2}:
 
@@ -3767,10 +3505,10 @@ by the module or driver write: an appropriate @acronym{STREAMS} message utility 
 @node Sending and Receiving Messages
 @subsection Sending and Receiving Messages
 @menu
-* putmsg(2s)::			Message oriented write(2s)-like system call.
-* getmsg(2s)::			Message oriented read(2s)-like system call.
-* putpmsg(2s)::			Priority message write(2s)-like system call.
-* getpmsg(2s)::			Priority message read(2s)-like system call.
+* putmsg(2s)::	Message oriented write(2s)-like system call.
+* getmsg(2s)::	Message oriented read(2s)-like system call.
+* putpmsg(2s)::	Priority message write(2s)-like system call.
+* getpmsg(2s)::	Priority message read(2s)-like system call.
 @end menu
 
 As shown in the message lists of @ref{Messages Overview}, a large subset of the available message
@@ -3868,13 +3606,16 @@ members as follows:
 
 @cartouche
 @smallexample
-struct strbuf @{
+@verbatim
+struct strbuf {
         int maxlen;     /* maximum buffer length */
         int len;        /* length of data */
         char *buf;      /* pointer to buffer */
-@};
+};
+@end verbatim
 @end smallexample
 @end cartouche
+@noindent
 
 The members of the @mantype{strbuf(5)} structure are interpreted by @manref{putmsg(2s)} as follows:
 
@@ -3916,6 +3657,7 @@ int @b{getmsg}(int @i{fildes}, struct strbuf *@i{ctlptr}, struct strbuf *@i{data
            int *@i{flagsp});
 @end example
 @end cartouche
+@noindent
 
 Where the arguments are interpreted as follows:
 
@@ -3975,6 +3717,7 @@ int @b{putpmsg}(int @i{fildes}, const struct strbuf *@i{ctlptr},
             const struct strbuf *@i{dataptr}, int @i{band}, int @i{flags});
 @end example
 @end cartouche
+@noindent
 
 The arguments to @manref{putpmsg(2s)} are interpreted the same as those for @manref{putmsg(2s)} as
 described in @ref{putmsg(2s)} with the exception of the @var{band} and @var{flags} arguments.
@@ -4017,6 +3760,7 @@ int @b{getpmsg}(int @i{fildes}, struct strbuf *@i{ctlptr}, struct strbuf *@i{dat
             int *@i{bandp}, int *@i{flagsp});
 @end example
 @end cartouche
+@noindent
 
 The arguments to @manref{getpmsg(2s)} are interpreted the same as those for @manref{getmsg(2s)} as
 described in @ref{getmsg(2s)}, with the exception of the @var{bandp} and @var{flags} arguments.
@@ -4073,6 +3817,8 @@ For additional details, see the @manref{getpmsg(2s)} or @manref{getpmsg(2p)} ref
 @subsection Control of Stream Head Processing
 @menu
 * Read Options::
+* Read Mode::
+* Read Protocol::
 * Write Options::
 * Write Offset::
 @end menu
@@ -4103,6 +3849,7 @@ structure contained in an @msg{M_SETOPTS} message passed upstream.
 Two flags, each selected from two sets of flags, can be set in this manner.  The two sets of flags
 are as follows:
 
+@node Read Mode
 @subsubsection Read Mode
 
 The read mode affects how the @manref{read(2s)} and @manref{readv(2s)} system calls treat message
@@ -4129,6 +3876,7 @@ cooperating module and @msg{M_READ} messages.@footnote{The @constant{RFILL} opti
 @cite{SVR 4.2}, but is defined by some implementations based on @cite{SVR 4.2}.}
 @end table
 
+@node Read Protocol
 @subsubsection Read Protocol
 
 The read protocol affects hos @manref{read(2s)} and @manref{readv(2s)} system calls treat the control
@@ -4218,12 +3966,12 @@ attempting to use them.
 @node Queues and Priority
 @section Queues and Priority
 @menu
-Queue Priority Utilities::
-Queue Priority Commands::
-The queue Structure::
-The qband Structure::
-Message Processing::
-Scheduling::
+* Queue Priority Utilities::
+* Queue Priority Commands::
+* The queue Structure::
+* The qband Structure::
+* Message Processing::
+* Scheduling::
 @end menu
 
 Each queue in a @dfn{Stream} has associated with it a message queue that consists of a double linked
@@ -4286,22 +4034,22 @@ The following @acronym{STREAMS} utilities are provided to module and driver writ
 @command{put} and @command{service} procedures.  These utilities assist with handling flow control
 within a @dfn{Stream}.
 
-@table @manref
-@item flushq(9)
-@itemx flushband(9)
+@table @asis
+@item @manref{flushq(9)}
+@itemx @manref{flushband(9)}
 These utilities provide the ability to flush specific messages from a message queue.  They are
 discussed under @ref{Flush Handling}, and under @ref{Utilities}.  These utilities are also described
 in the corresponding manual page.
-@item canput(9)
-@itemx bcanput(9)
-@itemx canputnext(9)
-@itemx bcanputnext(9)
+@item @manref{canput(9)}
+@itemx @manref{bcanput(9)}
+@itemx @manref{canputnext(9)}
+@itemx @manref{bcanputnext(9)}
 These utilities provide the ability to test the current or next queue for a flow control condition
 for normal (band zero) messages or priority messages within a message band.  They are discussed
 under @ref{Flow Control}, and under @ref{Utilities}.  These utilities are also described in the
 corresponding manual page.
-@item strqset(9)
-@itemx strqget(9)
+@item @manref{strqset(9)}
+@itemx @manref{strqget(9)}
 These utilities provide the ability to examine and modify flow control parameters associated with a
 queue (@mantype{queue(9)}) or queue band (@mantype{qband(9)}).  They are discussed below, and under
 @ref{Utilities}.  These utilities are also described in the corresponding manual page.
@@ -4335,6 +4083,7 @@ kernel header file.  The prototype is as follows:
 int @b{strqget}(queue_t *@i{q}, qfields_t @i{what}, unsigned char @i{band}, long *@i{val});
 @end example
 @end cartouche
+@noindent
 
 Where the arguments are interpreted as follows:
 
@@ -4357,7 +4106,8 @@ The @mantype{qfields_t(9)} enumeration is defined as follows:
 
 @cartouche
 @smallexample
-typedef enum qfields @{
+@verbatim
+typedef enum qfields {
         QHIWAT,         /* hi water mark */
         QLOWAT,         /* lo water mark */
         QMAXPSZ,        /* max packet size */
@@ -4367,9 +4117,11 @@ typedef enum qfields @{
         QLAST,          /* last message in queue */
         QFLAG,          /* state */
         QBAD,           /* last (AIX and SUPER-UX) */
-@} qfields_t;
+} qfields_t;
+@end verbatim
 @end smallexample
 @end cartouche
+@noindent
 
 Each value of the @mantype{qfields_t} enumeration specifies a different member to be set by
 @manref{strqset(9)} or retrieved by @manref{strqget(9)}.  When @var{band} is zero, the member to be
@@ -4409,6 +4161,7 @@ kernel header file.  The prototype is as follows:
 int @b{strqset}(queue_t *@i{q}, qfields_t @i{what}, unsigned char @i{band}, long @i{val});
 @end example
 @end cartouche
+@noindent
 
 Where the arguments are interpreted as follows:
 
@@ -4448,27 +4201,27 @@ Aside from the @manref{putpmsg(2s)} and @manref{getpmsg(2s)} system calls, a num
 process using the @manref{ioctl(2s)} system call.  The input output controls that accept a queue
 band or indicate a queue band event are as follows:
 
-@table @ioctlref
-@item I_FLUSHBAND
+@table @asis
+@item @ioctlref{I_FLUSHBAND}
 Flushes the @dfn{Stream} for a specified band.
 This @manref{ioctl(2s)} command is equivalent to the @manref{flushq(9)} and @manref{flushband(9)}
 utilities available to modules and drivers.  It is discussed under @ref{Flush Handling}.
-@item I_CKBAND
+@item @ioctlref{I_CKBAND}
 Checks whether a message is available to be read from a specified queue band.
 It is discussed below.
-@item I_GETBAND
+@item @ioctlref{I_GETBAND}
 Gets the priority band associated with the next message on the @dfn{Stream head} read queue.
 It is discussed below.
-@item I_CANPUT
+@item @ioctlref{I_CANPUT}
 Checks whether messages can be written to a specified queue band.
 This @manref{ioctl(2s)} command is equivalent to the @manref{canput(9)} and @manref{bcanput(9)}
 utilities available to modules and drivers.  It is discussed under @ref{Flow Control}.
-@item I_ATMARK
+@item @ioctlref{I_ATMARK}
 This @manref{ioctl(2s)} command supports @dfn{Transmission Control Protocol (TCP)} urgent data in a
 byte-stream.  It indicates when a marked message has arrived at the @dfn{Stream head}.
 It is discussed below.
-@item I_GETSIG
-@itemx I_SETSIG
+@item @ioctlref{I_GETSIG}
+@itemx @ioctlref{I_SETSIG}
 Sets the mask of events for which the @dfn{Stream} head will send a calling process a
 @signal{SIGPOLL} or @signal{SIGURG} signal.  Events include @constant{S_RDBAND}, @constant{S_WRBAND}
 and @constant{S_BANDURG}.
@@ -4482,6 +4235,7 @@ The @manref{streamio(7)} input output controls in the following sections are all
 int @b{ioctl}(int @i{fildes}, int @i{cmd}, long @i{arg});
 @end example
 @end cartouche
+@noindent
 
 @node I_FLUSHBAND
 @subsubsection @code{I_FLUSHBAND}
@@ -4501,12 +4255,15 @@ file.  Its format and members are as follows:
 
 @cartouche
 @smallexample
-struct bandinfo @{
+@verbatim
+struct bandinfo {
         unsigned char bi_pri;
         int bi_flag;
-@};
+};
+@end verbatim
 @end smallexample
 @end cartouche
+@noindent
 
 where,
 
@@ -4547,6 +4304,7 @@ The @ioctlref{I_CANPUT} @manref{ioctl(2s)} command has the following form:
 int @b{ioctl}(int @i{fildes}, int @b{cmd}, long @i{arg});
 @end example
 @end cartouche
+@noindent
 
 where,
 
@@ -4575,21 +4333,21 @@ error number.
 When the @ioctlref{I_CANPUT} @manref{ioctl(2s)} command fails, it returns @samp{-1} and sets
 @manref{errno(3)} to one of the following errors:
 
-@table @errno
-@item EINVAL
+@table @asis
+@item @errno{EINVAL}
 @var{arg} is outside the range @samp{0} to @samp{255} and does not represent a valid priority band,
 or is not @constant{ANYBAND}.
-@item EIO
+@item @errno{EIO}
 @var{fildes} refers to a @dfn{Stream} that is closing.
-@item ENXIO
+@item @errno{ENXIO}
 @var{fildes} refers to a @dfn{Stream} that has received a hangup.
-@item EPIPE
+@item @errno{EPIPE}
 @var{fildes} refers to a @acronym{STREAMS}-based pipe and the other end of the pipe is closed.
-@item ESTRPIPE
+@item @errno{ESTRPIPE}
 @var{fildes} refers to a @acronym{STREAMS}-based pipe and a write operation was attempted with no
 readers at the other end, or a read operation was attempted, the pipe is empty, and there are no
 readers writers the other end.
-@item EINVAL
+@item @errno{EINVAL}
 @var{fildes} refers to a @dfn{Stream} that is linked under a multiplexing driver.  If a @dfn{Stream}
 is linked under a multiplexing driver, all @manref{ioctl(2s)} commands other than
 @ioctlref{I_UNLINK} or @ioctlref{I_PUNLINK} will return @errno{EINVAL}.
@@ -4620,6 +4378,7 @@ The @ioctlref{I_ATMARK} @manref{ioctl(2s)} command has the following form:
 int @b{ioctl}(int @i{fildes}, int @b{cmd}, long @i{arg});
 @end example
 @end cartouche
+@noindent
 
 where,
 
@@ -4684,8 +4443,8 @@ failure, the @ioctlref{I_ATMARK} @manref{ioctl(2s)} command returns @samp{-1} an
 When the @ioctlref{I_ATMARK} @manref{ioctl(2s)} command fails, it returns @samp{-1} and sets
 @manref{errno(3)} to one of the following errors:
 
-@table @errno
-@item EINVAL
+@table @asis
+@item @errno{EINVAL}
 @var{arg} was other than @constant{ANYMARK} or @constant{LASTMARK}, or a bitwise-@emph{OR} of the
 two.
 @end table
@@ -4696,50 +4455,50 @@ can also be returned in response to @ioctlref{I_ATMARK}.  See also @manref{ioctl
 @ignore
 In general, any @manref{ioctl(2s)} command can fail if:
 
-@table @errno
-@item EFAULT
+@table @asis
+@item @errno{EFAULT}
 @var{arg}, or a member of @var{arg}, points to an address that is outside the caller's valid address
 space.
-@item EINVAL
+@item @errno{EINVAL}
 @var{fildes}, @var{cmd}, @var{arg} or a member of @var{arg} is invalid.
-@item EBADF
+@item @errno{EBADF}
 @var{fildes} is not a valid open file descriptor.
-@item ENOSTR
+@item @errno{ENOSTR}
 @var{fildes} is not a @acronym{STREAMS} special character device.
-@item EOPNOTSUPP
+@item @errno{EOPNOTSUPP}
 @var{fildes} does not support the requested operation.
-@item EIO
+@item @errno{EIO}
 @var{fildes} refers to a @dfn{Stream} that is closing.
-@item ENOTTY
+@item @errno{ENOTTY}
 @var{fildes} does not refer to a @acronym{STREAMS} device that supports I/O controls.
-@item ENODEV
+@item @errno{ENODEV}
 @var{fildes} refers to a @acronym{STREAMS} device that does not support the @manref{ioctl(2s)} system
 call.
-@item ENXIO
+@item @errno{ENXIO}
 @var{fildes} refers to a @dfn{Stream} that has received a hangup (@msg{M_HANGUP}).
-@item ENXIO
+@item @errno{ENXIO}
 the I/O control command cannot be performed by this particular subdevice.
-@item EPIPE
+@item @errno{EPIPE}
 @var{fildes} refers to a @acronym{STREAMS}-based pipe and the other end of the pipe is closed.
-@item ESTRPIPE
+@item @errno{ESTRPIPE}
 @var{fildes} refers to a @acronym{STREAMS}-based pipe and a write operation was attempted with no
 readers at the other end, or a read operation was attempted, the pipe is empty, and there are no
 readers at the other end.
-@item EINVAL
+@item @errno{EINVAL}
 @var{fildes} referes to a @dfn{Stream} that is linked under a multiplexing driver.  If a
 @dfn{Stream} is linked under a multiplexing driver, all @manref{ioctl(2s)} commands other than
 @ioctlref{I_UNLINK} or @manref{I_PUNLINK} will return @errno{EINVAL}.
-@item ERESTARTSYS
+@item @errno{ERESTARTSYS}
 a signal was received before the operation could begin.
-@item EINTR
+@item @errno{EINTR}
 a signal was received before the operation could complete.
-@item EAGAIN
+@item @errno{EAGAIN}
 a file is set for asynchronous I/O and the operation would block.
-@item EWOULDBLOCK
+@item @errno{EWOULDBLOCK}
 same as @errno{EAGAIN}.
-@item ETIME
+@item @errno{ETIME}
 the operation timed out awaiting an acknowledgement or response from the driver.
-@item ENOSR
+@item @errno{ENOSR}
 a message block could not be allocated during the operation and the operation is not permitted to
 block.
 @end table
@@ -4823,7 +4582,8 @@ The @mantype{queue(9)} structure is exposed by including @header{sys/stream.h}.
 
 @cartouche
 @smallexample
-typedef struct queue @{
+@verbatim
+typedef struct queue {
         struct qinit *q_qinfo;          /* info structure for the queue */
         struct msgb *q_first;           /* head of queued messages */
         struct msgb *q_last;            /* tail of queued messages */
@@ -4845,9 +4605,11 @@ typedef struct queue @{
                                            mblks, we count msgs */
         rwlock_t q_lock;                /* lock for this queue structure */
         int (*q_ftmsg) (mblk_t *);      /* message filter ala AIX */
-@} queue_t;
+} queue_t;
+@end verbatim
 @end smallexample
 @end cartouche
+@noindent
 
 The following members are defined in @cite{SVR 4.2}:
 
@@ -4887,6 +4649,7 @@ The following members are not defined in @cite{SVR 4.2} and are
 
 @cartouche
 @smallexample
+@verbatim
 #define QENAB           (1<< 0) /* queue is enabled to run */
 #define QWANTR          (1<< 1) /* flow controlled forward */
 #define QWANTW          (1<< 2) /* back-enable necessary */
@@ -4905,8 +4668,10 @@ The following members are not defined in @cite{SVR 4.2} and are
 #define QSVCBUSY        (1<<15) /* service procedure running */
 #define QWCLOSE         (1<<16) /* q in close wait */
 #define QPROCS          (1<<17) /* putp, srvp disabled */
+@end verbatim
 @end smallexample
 @end cartouche
+@noindent
 
 The following @mantype{queue(9)} flags are defined by @cite{SVR 4.2}:
 
@@ -4949,7 +4714,8 @@ The @mantype{qband(9)} structure and @mantype{qband_t(9)} type are exposed when
 
 @cartouche
 @smallexample
-typedef struct qband @{
+@verbatim
+typedef struct qband {
         struct qband *qb_next;          /* next (lower) priority band */
         size_t qb_count;                /* number of bytes queued */
         struct msgb *qb_first;          /* first queue message in this band */
@@ -4958,11 +4724,13 @@ typedef struct qband @{
         size_t qb_lowat;                /* lo water mark for flow control */
         unsigned long qb_flag;          /* flags */
         long qb_pad1;                   /* OSF: reserved */
-@} qband_t;
+} qband_t;
 
 #define qb_msgs qb_pad1
+@end verbatim
 @end smallexample
 @end cartouche
+@noindent
 
 Where the members are interpreted as follows:
 
@@ -5441,38 +5209,38 @@ flag.
 @dfn{Synchronous Entry Points} are those entry points into the @acronym{STREAMS} driver or module that
 will be synchronized according to the specified synchronization level.
 
-@table @manpage
-@item put(9s)
+@table @asis
+@item @manpage{put(9s)}
 @emph{Queue put procedure.}
 If the module has any synchronization level other than @constant{SQLVL_NOP},
 the put procedure will be exclusive.  Attempts to enter the put procedure while another thread is
 running within the synchronization level will result in the call being postponed until the thread
 currently in the synchronization level exits.
-@item srv(9s)
+@item @manpage{srv(9s)}
 If the module has any synchronization level other than @constant{SQLVL_NOP},
 @emph{Queue service procedure.}
 the service procedure will be exclusive.  Attempts to enter the service procedure while another
 thread is running within the synchronization level will result in the service procedure being
 postponed until the thread currently in the synchronization level exits.
-@item qopen(9)
+@item @manpage{qopen(9)}
 @emph{Queue open procedure.}
 The queue open procedure is synchronous and exclusive before the call to @manpage{qprocson(9)},
 or in any event, until return from the procedure.  If the module has synchronization level of
 global, elsewhere or per-module; the call to the @manref{qopen(9)} procedure is exclusive.
-@item qclose(9)
+@item @manpage{qclose(9)}
 @emph{Queue close procedure.}
 The queue close procedure is synchronous and exclusive after the call to @manpage{qprocsoff(9)},
 or in any event, after return from the procedure.  If the module has synchronization level of
 global, elsewhere or per-module; the call to the @manref{qclose(9)} procedure is exclusive.
-@item qprocson(9)
+@item @manpage{qprocson(9)}
 @emph{Queue procedures on.}
-@item qprocsoff(9)
+@item @manpage{qprocsoff(9)}
 @emph{Queue procedures off.}
-@item freezestr(9)
+@item @manpage{freezestr(9)}
 @emph{Freeze stream.}
-@item unfreezestr(9)
+@item @manpage{unfreezestr(9)}
 @emph{Thaw stream.}
-@item qwriter(9)
+@item @manpage{qwriter(9)}
 @emph{Queue writer.}
 @end table
 
@@ -6884,8 +6652,8 @@ guidelines are collected here.
 * Synchronization of Drivers and Modules::
 * Special STREAMS Message Types::
 * Use of Message Allocation Priorities::
-* Device Numbering::
 * Registration and Deregistration::
+* Device Numbering::
 @end menu
 
 @node Memory Allocation
@@ -6975,7 +6743,13 @@ loose the precision of the identifier.
 
 @node Device Numbering
 @section Device Numbering
+@menu
+* UNIX Device Numbering::
+* Linux Device Numbering::
+* @value{PACKAGE_TITLE} Device Numbering::
+@end menu
 
+@node UNIX Device Numbering
 @subsection UNIX Device Numbering
 
 @quotation
@@ -6998,6 +6772,7 @@ example, the function @manref{etoimajor(9)} and so on, give a machine independen
 device number mapping.@footnote{@cite{The Magic Garden Explained}}
 @end quotation
 
+@node Linux Device Numbering
 @subsection Linux Device Numbering
 
 Versions of the @b{Linux} kernel in the 2.4 kernel series and prior to 2.6 also provided an 8 bit
@@ -7006,6 +6781,7 @@ Linux 2.6 and 3.x kernels (and some patched 2.4 kernels) now have larger device 
 extended device numbers are 12 bits for major device number and 20 bits for minor device number,
 with 32 bits for the combined device number.
 
+@node @value{PACKAGE_TITLE} Device Numbering
 @subsection @value{PACKAGE_TITLE} Device Numbering
 
 @dfn{@value{PACKAGE_TITLE}} began with extended device numbering.  The @file{specfs} shadow special
