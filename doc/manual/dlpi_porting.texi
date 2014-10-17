@@ -1,90 +1,90 @@
-% -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
-% =========================================================================
-%
-% @(#) $Id: dlpi_porting.texi,v 1.1.2.2 2011-02-07 02:21:33 brian Exp $
-%
-% =========================================================================
-%
-% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
-% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
-%
-% All Rights Reserved.
-%
-% Permission is granted to copy, distribute and/or modify this document
-% under the terms of the GNU Free Documentation License, Version 1.3 or
-% any later version published by the Free Software Foundation; with no
-% Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
-% copy of the license is included in the section entitled "GNU Free
-% Documentation License".
-%
-% Permission to use, copy and distribute this documentation without
-% modification, for any purpose and without fee or royalty is hereby
-% granted, provided that both the above copyright notice and this
-% permission notice appears in all copies and that the name of OpenSS7
-% Corporation not be used in advertising or publicity pertaining to
-% distribution of this documentation or its contents without specific,
-% written prior permission.  OpenSS7 Corporation makes no representation
-% about the suitability of this documentation for any purpose.  It is
-% provided "as is" without express or implied warranty.
-% 
-% Permission is granted to process this file through Tex and print the
-% results, provided the printed document carries copying permission notice
-% identical to this one except for the removal of this paragraph (this
-% paragraph not being relevant to the printed manual).
-% 
-% OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
-% DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
-% FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
-% CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
-% IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
-% PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
-% OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
-% CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
-% USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-% OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
-% THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
-% THEREOF.
-% 
-% Since the Linux kernel and libraries are constantly changing, this
-% manual page may be incorrect or out-of-date.  The author(s) assume no
-% responsibility for errors or omissions, or for damages resulting from
-% the use of the information contained herein.  The author(s) may not have
-% taken the same level of care in the production of this manual, which is
-% licensed free of charge, as they might when working professionally.
-% 
-% Formatted or processed versions of this manual, if unaccompanied by the
-% source, must acknowledge the copyright and authors of this work.
-%
-% -------------------------------------------------------------------------
-%
-% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-% on behalf of the U.S. Government ("Government"), the following
-% provisions apply to you.  If the Software is supplied by the Department
-% of Defense ("DoD"), it is classified as "Commercial Computer Software"
-% under paragraph 252.227-7014 of the DoD Supplement to the Federal
-% Acquisition Regulations ("DFARS") (or any successor regulations) and the
-% Government is acquiring only the license rights granted herein (the
-% license rights customarily provided to non-Government users).  If the
-% Software is supplied to any unit or agency of the Government other than
-% DoD, it is classified as "Restricted Computer Software" and the
-% Government's rights in the Software are defined in paragraph 52.227-19
-% of the Federal Acquisition Regulations ("FAR") (or any successor
-% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-% NASA Supplement to the FAR (or any successor regulations).
-%
-% =========================================================================
-% 
-% Commercial licensing and support of this software is available from
-% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-% 
-% =========================================================================
-%
-% Last Modified $Date: 2011-02-07 02:21:33 $ by $Author: brian $
-%
-% =========================================================================
-
 \input texinfo
+@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
+@c =========================================================================
+@c
+@c @(#) $Id: dlpi_porting.texi,v 1.1.2.2 2011-02-07 02:21:33 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2008-2014  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to copy, distribute and/or modify this document
+@c under the terms of the GNU Free Documentation License, Version 1.3 or
+@c any later version published by the Free Software Foundation; with no
+@c Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+@c copy of the license is included in the section entitled "GNU Free
+@c Documentation License".
+@c
+@c Permission to use, copy and distribute this documentation without
+@c modification, for any purpose and without fee or royalty is hereby
+@c granted, provided that both the above copyright notice and this
+@c permission notice appears in all copies and that the name of OpenSS7
+@c Corporation not be used in advertising or publicity pertaining to
+@c distribution of this documentation or its contents without specific,
+@c written prior permission.  OpenSS7 Corporation makes no representation
+@c about the suitability of this documentation for any purpose.  It is
+@c provided "as is" without express or implied warranty.
+@c 
+@c Permission is granted to process this file through Tex and print the
+@c results, provided the printed document carries copying permission notice
+@c identical to this one except for the removal of this paragraph (this
+@c paragraph not being relevant to the printed manual).
+@c 
+@c OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+@c DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+@c FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+@c CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+@c IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+@c PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+@c OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+@c CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+@c USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+@c OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+@c THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+@c THEREOF.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not have
+@c taken the same level of care in the production of this manual, which is
+@c licensed free of charge, as they might when working professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by the
+@c source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2011-02-07 02:21:33 $ by $Author: brian $
+@c
+@c =========================================================================
+
 @setfilename dlpi_porting.info
 @include ../../scripts/texi/args.texi
 @set MANUAL_TITLE @value{PACKAGE_TITLE}
@@ -108,7 +108,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2014  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -150,14 +150,13 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
-@sp 0.5
+@sp 1
 @title @value{MANUAL_TYPE}
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
 @subtitle Updated @value{PACKAGE_PDATE}
-@sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2014  Monavacon Limited
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
@@ -167,7 +166,6 @@ the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software a
 as platform and system applicability of the @value{MANUAL_TITLE}.
 @end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
-@sp 0.2
 @author The OpenSS7 Project <@uref{http://www.openss7.org/}>
 
 @page
@@ -184,7 +182,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2014  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -610,21 +608,32 @@ X.25} package (@file{strx25}).
 Porting information is organized into sections as follows:
 
 @ifnottex
-@menu
-* General Porting Considerations::
-* Porting from DLPI::
-* Porting from AIX::
-* Porting from AIXlink/X.25::
-* Porting from HP-UX::
-* Porting from IRIX::
-* Porting from OSF::
-* Porting from PowerMAX::
-* Porting from Solaris::
-* Porting from Solstice X.25::
-* Porting from SVR4.2::
-* Porting from UnixWare::
-* Developing on OpenSS7::
-@end menu
+@multitable @columnfractions .50 .50
+@item @ref{Porting from DLPI}
+@tab Porting general DLPI applications.
+@item @ref{Porting from AIX}
+@tab Porting AIX DLPI applications.
+@item @ref{Porting from AIXlink/X.25}
+@tab Porting AIXlink/X.25 DLPI applications.
+@item @ref{Porting from HP-UX}
+@tab Porting HP-UX DLPI applications.
+@item @ref{Porting from IRIX}
+@tab Porting IRIX DLPI applications.
+@item @ref{Porting from OSF}
+@tab Porting OSF DLPI applications.
+@item @ref{Porting from PowerMAX}
+@tab Porting PowerMAX DLPI applications.
+@item @ref{Porting from Solaris}
+@tab Porting Solaris DLPI applications.
+@item @ref{Porting from Solstice X.25}
+@tab Porting Solstice X.25 DLPI applications.
+@item @ref{Porting from SVR4.2}
+@tab Porting SVR4.2 DLPI applications.
+@item @ref{Porting from UnixWare}
+@tab Porting UnixWare DLPI applications.
+@item @ref{Developing on OpenSS7}
+@tab Developing DLPI applications on OpenSS7.
+@end multitable
 @end ifnottex
 @ifnotinfo
 @multitable @columnfractions .50 .50
@@ -1311,14 +1320,14 @@ detailed in the specific porting section.
 Nearly all of the implementations provide two ipso-facto standard modules for
 use with DLPI device drivers:
 
-@table @manref
-@item bufmod(4)
+@table @asis
+@item @manref{bufmod(4)}
 
 The buffer module is used to collect many packets into a single data transfer to
 user space.  It is particularly useful when used with a DLPI driver in raw mode
 and when in promiscuous mode, to group individual packets into blocks.
 
-@item pfmod(4)
+@item @manref{pfmod(4)}
 
 The packet filter module is used to filter packets arriving on a DLPI stream,
 particularly in raw or promiscuous modes, to reduce the number of packets
@@ -2540,7 +2549,9 @@ do not support or are not bound in a connectionless mode.
 Care should be taken when porting @cite{AIXlink/X.25} DLPI drivers, modules or
 applications to @cite{@value{PACKAGE_TITLE}} that the DLS User does not reply
 upon the DLS provider returning a non-fatal error in the event that this
-primitive is issued.  @end itemize
+primitive is issued.
+
+@end itemize
 
 @subsection AIXlink/X.25 Extension Primitives
 
@@ -4378,6 +4389,7 @@ See @manref{dlpi_ioctl(4)} for more detail.
 * SVR4.2 Driver Addressing::
 * SVR4.2 Driver Features::
 * SVR4.2 Primitives::
+* SVR4.2 Extension Primitives::
 * SVR4.2 Input-Output Controls::
 * SVR4.2 Drivers and Modules::
 * SVR4.2 Libraries::
@@ -4581,6 +4593,7 @@ See @manref{dlpi_ioctl(4)} for more detail.
 * UnixWare Driver Addressing::
 * UnixWare Driver Features::
 * UnixWare Primitives::
+* UnixWare Extension Primitives::
 * UnixWare Input-Output Controls::
 * UnixWare Drivers and Modules::
 * UnixWare Libraries::
@@ -5067,9 +5080,9 @@ See @manref{dlpi_ioctl(4)} for more detail.
 @cindex development
 
 @menu
+* OpenSS7 Primitives::
 * OpenSS7 Driver Addressing::
 * OpenSS7 Driver Features::
-* OpenSS7 Primitives::
 * OpenSS7 Input-Output Controls::
 * OpenSS7 Drivers and Modules::
 * OpenSS7 Libraries::
