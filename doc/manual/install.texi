@@ -5,7 +5,7 @@
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2008-2014  Monavacon Limited <http://www.monavacon.com/>
 @c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 @c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
@@ -144,11 +144,12 @@ special needs (such as cross-compiling for embedded targets or for development),
 method is to download, configure, build and install from the tarball.
 
 @menu
-Repository Access::			access to the repositories
-Repositories for YUM::			the @manpage{yum(8)} repository
-Repositories for YAST::			the @manpage{yast(8)} repository
-Repositories for URPMI::		the @manpage{urpmi(8)} repository
-Repositories for APT::			the @manpage{apt(8)} repository
+* Repository Access::			access to the repositories
+* Repositories for YUM::		the @manpage{yum(8)} repository
+* Repositories for YAST::		the @manpage{yast(8)} repository
+* Repositories for URPMI::		the @manpage{urpmi(8)} repository
+* Repositories for APT::		the @manpage{apt(8)} repository
+* Repositories for ALPM::		the @manpage{pacman(8)} repository
 @end menu
 
 @node Repository Access
@@ -305,13 +306,13 @@ The @manpage{yum(8)} repositories are based on @file{repo-md} XML and are provid
 This includes all current (supported) @cite{RHEL} systems.
 
 @menu
-Setting up YUM::			setting up repository access with YUM
-Using the YUM Repository::		using the repository with YUM
-YUM Kernel Updates::			updating kernels with YUM
-Setting up ZYPPER::			setting up repository access with ZYPPER
-Using the ZYPPER Repository::		using the repository with ZYPPER
-ZYPPER Kernel Updates::			updating kernels with ZYPPER
-General REPO-MD Repository::		setting up repository access for general use
+* Setting up YUM::			setting up repository access with YUM
+* Using the YUM Repository::		using the repository with YUM
+* YUM Kernel Updates::			updating kernels with YUM
+* Setting up ZYPPER::			setting up repository access with ZYPPER
+* Using the ZYPPER Repository::		using the repository with ZYPPER
+* ZYPPER Kernel Updates::		updating kernels with ZYPPER
+* General REPO-MD Repository::		setting up repository access for general use
 @end menu
 
 @node Setting up YUM
@@ -618,7 +619,7 @@ Setting up the installation source as a @cite{YaST} installation source instead 
 can provide the additional features associated with @cite{YaST} install sources.
 
 @menu
-Setting up YAST::			setting up repository access with YAST
+* Setting up YAST::			setting up repository access with YAST
 @end menu
 
 @node Setting up YAST
@@ -644,9 +645,9 @@ For distributions that support @manpage{urmpi(8)}, such as @cite{Mageia}, @cite{
 associated with @manpage{urpmi(8)} install sources.
 
 @menu
-Setting up URPMI::			setting up repository access with URPMI
-Using the URPMI Repository::		using the repostory with URPMI
-URPMI Kernel Updates::			updating kernels with UPRMI
+* Setting up URPMI::			setting up repository access with URPMI
+* Using the URPMI Repository::		using the repostory with URPMI
+* URPMI Kernel Updates::		updating kernels with UPRMI
 @end menu
 
 @node Setting up URPMI
@@ -748,12 +749,12 @@ updated kernel.
 For assistance with specific DEBs, see @ref{Downloading the Debian DEB}.
 
 @menu
-Setting up APT::			setting up repository access with APT
-Using the APT Repository::		using the repository with APT
-APT Kernel Updates::			updating kernels with APT
-Setting up APT-RPM::			setting up repository access with APT-RPM
-Using the APT-RPM Repository::		using the repository with APT-RPM
-APT-RPM Kernel Updates::		updating kernels with APT-RPM
+* Setting up APT::			setting up repository access with APT
+* Using the APT Repository::		using the repository with APT
+* APT Kernel Updates::			updating kernels with APT
+* Setting up APT-RPM::			setting up repository access with APT-RPM
+* Using the APT-RPM Repository::	using the repository with APT-RPM
+* APT-RPM Kernel Updates::		updating kernels with APT-RPM
 @end menu
 
 @node Setting up APT
@@ -971,6 +972,30 @@ kernel will be installed automatically.
 updated to compatible kernels (e.g. for security upgrades, or normally for any updated within an
 Enterprise (LTS) distribution), kernel modules are automatically applied against the updated kernel.
 
+@node Repositories for ALPM
+@subsection Repositories for ALPM
+@cindex repositories, ALPM
+@cindex pacman
+
+@menu
+* Setting up ALPM::			setting up repository access with ALPM
+* Using the ALPM Repository::		using the repository with ALPM
+* ALPM Kernel Updates::			updating kernels with ALPM
+@end menu
+
+@node Setting up ALPM
+@subsubsection Setting up ALPM
+@cindex ALPM
+
+@node Using the ALPM Repository
+@subsubsection Using the ALPM Repository
+@cindex pacman
+
+@node ALPM Kernel Updates
+@subsubsection ALPM Kernel Updates
+@cindex pacman
+@cindex kernel updates
+
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -1004,10 +1029,10 @@ way to build and install @cite{@value{PACKAGE_TITLE}} packages is from tarball.@
 however, that @cite{OpenSS7 Corporation} restricts access to tarballs.}
 
 @menu
-* Downloading with YUM:			the easiest approach for YUM based systems
-* Downloading with ZYPPER:		the easiest approach for ZYPPER based systems
-* Downloading with URPMI:		the easiest approach for URPMI based systems
-* Downloading with APT:			the easiest approach for APT based systems
+* Downloading with YUM::		the easiest approach for YUM based systems
+* Downloading with ZYPPER::		the easiest approach for ZYPPER based systems
+* Downloading with URPMI::		the easiest approach for URPMI based systems
+* Downloading with APT::		the easiest approach for APT based systems
 * Downloading the Binary RPM::		the easiest approach
 * Downloading the Debian DEB::		the easiest approach for Debian
 * Downloading the Source RPM::		the next best approach
@@ -1065,8 +1090,9 @@ installing.
 Once the repository definitions have been established, downloading DEBs with @manref{apt(8)} is
 automatic.  See @refman{Setting up APT}, for instructions on downloading the repository DEB and
 using it to set up for @manref{apt(8)}.  See @refman{Setting up APT-RPM}, for instructions on
-downloading the repository RPM and using it to set up for @manref{apt(8)}.  See @refman{Installing
-with APT}, for instructions on installing subsequent packages.  See @manref{apt(8)} for more
+downloading the repository RPM and using it to set up for @manref{apt(8)}.  See
+@refman{Installing with APT},
+for instructions on installing subsequent packages.  See @manref{apt(8)} for more
 information on downloading without installing.
 
 @c ----------------------------------------------------------------------------
@@ -3418,8 +3444,8 @@ be specified with declarations such as @samp{CC=/usr/@-lib/@-ppc-@-linux/@-gcc} 
 @cindex yum
 
 If you have set up the necessary repository definitions (@pxrefman{Setting up YUM}), then the
-following instructions will install the RPMs on your system.@footnote{For additional information on
-@manpage{yum(8)}, see @manref{yum(8)}.}
+following instructions will install the RPMs on your
+system.@footnote{For additional information on @manpage{yum(8)}, see @manref{yum(8)}.}
 The repository includes groups (patterns) and virtual packages that ease the installation and
 removal of kernel modules, libraries and utilities.
 
@@ -3506,8 +3532,8 @@ To add @cite{@value{PACKAGE_TITLE}} development documentation, use (one of):
 @cindex zypper
 
 If you have set up the necessary repository definitions (@pxrefman{Setting up ZYPPER}), then the
-following instructions will install the RPMs on your system.@footnote{For additional information on
-@manpage{zypper(8)}, see @manref{zypper(8)}.}
+following instructions will install the RPMs on your
+system.@footnote{For additional information on @manpage{zypper(8)}, see @manref{zypper(8)}.}
 The repository includes groups (patterns) and virtual packages that ease the installation and
 removal of kernel modules, libraries and utilities.
 
@@ -3590,8 +3616,8 @@ To add @cite{@value{PACKAGE_TITLE}} development documentation, use (one of):
 @cindex urpmi
 
 If you have set up the necessary repository definitions (@pxrefman{Setting up URPMI}), then the
-following instructions will install the RPMs on your system.@footnote{For additional information on
-@manpage{urpmi(8)}, see @manref{urpmi(8)}.}
+following instructions will install the RPMs on your
+system.@footnote{For additional information on @manpage{urpmi(8)}, see @manref{urpmi(8)}.}
 The repository includes groups (patterns) and virtual packages that ease the installation and removal
 of kernel modules, libraries and utilities.
 
@@ -3669,14 +3695,14 @@ To add @cite{@value{PACKAGE_TITLE}} development documentation, use (one of):
 @cindex apt
 
 If you have set up the necessary repository definitions (@pxrefman{Setting up APT}), then the
-following instructions will install the DEBs on your system.@footnote{For additional information on
-@manpage{apt(8)}, see @manref{apt(8)}.}
+following instructions will install the DEBs on your
+system.@footnote{For additional information on @manpage{apt(8)}, see @manref{apt(8)}.}
 The repository includes groups (patterns) and virtual packages that ease the installation and
 removal of kernel modules, libraries and utilities.
 
 To install the @cite{@value{PACKAGE_TITLE}} run-time components for a single-kernel distribution
-installation, use (one of):@footnote{Note that @manref{aptitude(8)} is not always available on
-systems supporting APT-RPM.}
+installation, use (one
+of):@footnote{Note that @manref{aptitude(8)} is not always available on systems supporting APT-RPM.}
 
 @cartouche
 @smallexample
