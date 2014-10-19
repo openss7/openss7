@@ -1,90 +1,90 @@
-% -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
-% =========================================================================
-%
-% @(#) $Id: libxnet.texi,v 1.1.2.2 2011-02-07 02:21:33 brian Exp $
-%
-% =========================================================================
-%
-% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
-% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
-%
-% All Rights Reserved.
-%
-% Permission is granted to copy, distribute and/or modify this document
-% under the terms of the GNU Free Documentation License, Version 1.3 or
-% any later version published by the Free Software Foundation; with no
-% Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
-% copy of the license is included in the section entitled "GNU Free
-% Documentation License".
-%
-% Permission to use, copy and distribute this documentation without
-% modification, for any purpose and without fee or royalty is hereby
-% granted, provided that both the above copyright notice and this
-% permission notice appears in all copies and that the name of OpenSS7
-% Corporation not be used in advertising or publicity pertaining to
-% distribution of this documentation or its contents without specific,
-% written prior permission.  OpenSS7 Corporation makes no representation
-% about the suitability of this documentation for any purpose.  It is
-% provided "as is" without express or implied warranty.
-% 
-% Permission is granted to process this file through Tex and print the
-% results, provided the printed document carries copying permission notice
-% identical to this one except for the removal of this paragraph (this
-% paragraph not being relevant to the printed manual).
-% 
-% OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
-% DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
-% FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
-% CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
-% IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
-% PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
-% OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
-% CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
-% USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-% OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
-% THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
-% THEREOF.
-% 
-% Since the Linux kernel and libraries are constantly changing, this
-% manual page may be incorrect or out-of-date.  The author(s) assume no
-% responsibility for errors or omissions, or for damages resulting from
-% the use of the information contained herein.  The author(s) may not have
-% taken the same level of care in the production of this manual, which is
-% licensed free of charge, as they might when working professionally.
-% 
-% Formatted or processed versions of this manual, if unaccompanied by the
-% source, must acknowledge the copyright and authors of this work.
-%
-% -------------------------------------------------------------------------
-%
-% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-% on behalf of the U.S. Government ("Government"), the following
-% provisions apply to you.  If the Software is supplied by the Department
-% of Defense ("DoD"), it is classified as "Commercial Computer Software"
-% under paragraph 252.227-7014 of the DoD Supplement to the Federal
-% Acquisition Regulations ("DFARS") (or any successor regulations) and the
-% Government is acquiring only the license rights granted herein (the
-% license rights customarily provided to non-Government users).  If the
-% Software is supplied to any unit or agency of the Government other than
-% DoD, it is classified as "Restricted Computer Software" and the
-% Government's rights in the Software are defined in paragraph 52.227-19
-% of the Federal Acquisition Regulations ("FAR") (or any successor
-% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-% NASA Supplement to the FAR (or any successor regulations).
-%
-% =========================================================================
-% 
-% Commercial licensing and support of this software is available from
-% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-% 
-% =========================================================================
-%
-% Last Modified $Date: 2011-02-07 02:21:33 $ by $Author: brian $
-%
-% =========================================================================
-
 \input texinfo
+@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
+@c =========================================================================
+@c
+@c @(#) $Id: libxnet.texi,v 1.1.2.2 2011-02-07 02:21:33 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2008-2014  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to copy, distribute and/or modify this document
+@c under the terms of the GNU Free Documentation License, Version 1.3 or
+@c any later version published by the Free Software Foundation; with no
+@c Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+@c copy of the license is included in the section entitled "GNU Free
+@c Documentation License".
+@c
+@c Permission to use, copy and distribute this documentation without
+@c modification, for any purpose and without fee or royalty is hereby
+@c granted, provided that both the above copyright notice and this
+@c permission notice appears in all copies and that the name of OpenSS7
+@c Corporation not be used in advertising or publicity pertaining to
+@c distribution of this documentation or its contents without specific,
+@c written prior permission.  OpenSS7 Corporation makes no representation
+@c about the suitability of this documentation for any purpose.  It is
+@c provided "as is" without express or implied warranty.
+@c 
+@c Permission is granted to process this file through Tex and print the
+@c results, provided the printed document carries copying permission notice
+@c identical to this one except for the removal of this paragraph (this
+@c paragraph not being relevant to the printed manual).
+@c 
+@c OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+@c DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+@c FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+@c CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+@c IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+@c PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+@c OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+@c CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+@c USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+@c OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+@c THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+@c THEREOF.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not have
+@c taken the same level of care in the production of this manual, which is
+@c licensed free of charge, as they might when working professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by the
+@c source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2011-02-07 02:21:33 $ by $Author: brian $
+@c
+@c =========================================================================
+
 @setfilename libxnet.info
 @include ../../scripts/texi/args.texi
 @set MANUAL_TITLE OpenSS7 XNS/XTI Library
@@ -108,7 +108,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2014  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -150,24 +150,26 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
-@sp 0.5
+@sp 1
 @title @value{MANUAL_TYPE}
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
 @subtitle Updated @value{PACKAGE_PDATE}
-@sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2014  Monavacon Limited
 @subtitle All Rights Reserved.
+@ignore
 @sp 4
 @quotation
 @chapheading Abstract:
 This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
 the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
-as platform and system applicability of the @value{MANUAL_TITLE}.
+as platform and system applicability of the @value{MANUAL_TITLE}.  It provides abstraction of the
+@value{LONG} (@value{SHORT}) interface to these components as well as providing a basis for
+@value{LONG} control for other @value{LONG} protocols.
 @end quotation
+@end ignore
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
-@sp 0.2
 @author The OpenSS7 Project <@uref{http://www.openss7.org/}>
 
 @page
@@ -184,7 +186,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2014  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -261,8 +263,8 @@ this document or the performance or implementation of the contents thereof.}
 @syncodeindex pe cp
 @syncodeindex st cp
 @syncodeindex mp cp
-@syncodeindex tp cp
-@syncodeindex vr cp
+@c @syncodeindex tp cp
+@c @syncodeindex vr cp
 @syncodeindex ct cp
 @syncodeindex mo cp
 @c @end ifnottex
@@ -282,7 +284,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @end ifnottex
 
 @menu
-* Acknowledgements::
+* Preface::
 * Introduction::
 * Reference::
 * Conformance::
@@ -290,119 +292,26 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 * Error Handling::
 * Installation::
 * Bugs::
-
-* Public License::
-* Documentation License::
-
-* Concept Index::
-* Type Index::
-* Function Index::
-* Variable Index::
-* File Index::
-
- --- The Detailed Node Listing ---
-
-Acknowledgements
-
-* Sponsors::                    Sponsors of the XTI Library
-* Contributors::                People who contributed to development of the XTI Library
-
-Reference
-
-* Overview::                    An overview of XTI Functions and Header Files
-* XTI Function Reference::      Reference manual of XTI Functions
-* XTI Header File Reference::   Reference manual of XTI Header Files
-
-XTI Function Reference
-
-* t_accept::                    Accept a connection request.
-* t_addleaf::                   Add a leaf to a point-multi-point connection.
-* t_alloc::                     Allocate an XTI library structure.
-* t_bind::                      Bind a transport endpoint to a transport address.
-* t_close::                     Close a transport endpoint.
-* t_connect::                   Connect a transport endpoint to a transport address.
-* t_errno::                     Report XTI library errors.
-* t_error::                     Generate an XTI error message.
-* t_free::                      Free an XTI library structure.
-* t_getinfo::                   Get protocol-specific transport endpoint information.
-* t_getprotaddr::               Get local and remote transport addresses.
-* t_getstate::                  Get the state of the transport endpoint.
-* t_listen::                    Listen for connection requests.
-* t_look::                      Retrieve an asynchronous event.
-* t_open::                      Open a transport endpoint.
-* t_optmgmt::                   Perform options management for a transport endpoint.
-* t_rcv::                       Receive data on a connection-oriented transport endpoint.
-* t_rcvconnect::                Receive connection confirmation.
-* t_rcvdis::                    Receive disconnect indication.
-* t_rcvleafchange::             Receive a leaf change on a point-multi-point connection.
-* t_rcvrel::                    Receive an orderly release indication.
-* t_rcvreldata::                Receive an orderly release indication with user data.
-* t_rcvudata::                  Receive a unit data indication.
-* t_rcvuderr::                  Receive a unit data error indication.
-* t_rcvv::                      Receive data a place in gather buffers.
-* t_rcvvudata::                 Receive a unit data indication an place in gather buffers.
-* t_removeleaf::                Remove a leaf from a point-to-multi-point connection.
-* t_snd::                       Send data.
-* t_snddis::                    Send disconnect request.
-* t_sndrel::                    Send an orderly release request.
-* t_sndreldata::                Send an orderly release request with data.
-* t_sndudata::                  Send a unit data.
-* t_sndv::                      Send data from non-contiguous buffers.
-* t_sndvudata::                 Send a unit data from non-contiguous buffers.
-* t_strerror::                  Provide a descriptive string for an XTI error.
-* t_sync::                      Synchronize the XTI library to a new file descriptor.
-* t_sysconf::                   Examine XTI library system configuration parameters.
-* t_unbind::                    Unbind a transport endpoint from a transport adddress.
-
-XTI Header File Reference
-
-* xti::                         XTI Library header file.
-* xti_ip::                      Internet Protocol header file.
-* xti_mtp::                     SS7 Message Transfer Part header file.
-* xti_sccp::                    SS7 Signalling Connection Control Part header file.
-* xti_sctp::                    Stream Control Transmission Protocol header file.
-* xti_ss7::                     SS7 header file.
-* xti_sscop::                   Service Specific Connection Oriented Protocol header file.
-* xti_tcap::                    SS7 Transaction Capabilities Application Part header file.
-* xti_tcp::                     Transmission Control Protocol header file.
-* xti_udp::                     User Datagram Protocol header file.
+* Licenses::
+* Indices::
 @end menu
 
 @c --------------------------------------------------------------------------
 
-@ifnottex
-@node Acknowledgements, Introduction, Top, Top
-@end ifnottex
-@unnumbered Acknowledgements
+@node Preface
+@unnumbered Preface
+
+@menu
+* Acknowledgements::
+@end menu
+
+@node Acknowledgements
+@section Acknowledgements
 @cindex credits
 
 @include texi/funding.texi
 
-@ignore
-@menu
-* Sponsors::                    Sponsors of the XTI Library
-* Contributors::                People who contributed to development of the XTI Library
-@end menu
-
-@node Sponsors,  ,  , Acknowledgements
-@unnumberedsec Sponsors of the OpenSS7 XTI Library
-@cindex sponsors
-
-Funding for completion of the OpenSS7 XTI Library was provided by:
-
-HOB International.
-
-Additional funding for The OpenSS7 Project was provided by:
-
-@node Contributors,  ,  , Acknowledgements
-@unnumberedsec Contributors to the OpenSS7 XTI Library
-@cindex contributors
-
-The primary contributor to the OpenSS7 XTI Library is Brian F. G. Bidulock.
-
-@end ignore
-
-@node Introduction, Reference, Acknowledgements, Top
+@node Introduction
 @chapter Introduction to the XTI Library
 @cindex introduction
 
@@ -410,7 +319,7 @@ This manual documents how to run, install and port the OpenSS7 XTI Library,
 and how to report bugs.
 
 
-@node Reference, Conformance, Introduction, Top
+@node Reference
 @chapter Reference
 @cpindex reference
 
@@ -418,9 +327,17 @@ and how to report bugs.
 * Overview::                    An overview of XTI Functions and Header Files
 * XTI Function Reference::      Reference manual of XTI Functions
 * XTI Header File Reference::   Reference manual of XTI Header Files
+@end menu
 
-XTI Function Reference
+@node Overview
+@section Overview
+@cpindex overview
 
+@node XTI Function Reference
+@section XTI Function Reference
+@cpindex functions
+
+@menu
 * t_accept::                    Accept a connection request.
 * t_addleaf::                   Add a leaf to a point-multi-point connection.
 * t_alloc::                     Allocate an XTI library structure.
@@ -459,32 +376,10 @@ XTI Function Reference
 * t_sync::                      Synchronize the XTI library to a new file descriptor.
 * t_sysconf::                   Examine XTI library system configuration parameters.
 * t_unbind::                    Unbind a transport endpoint from a transport adddress.
-
-XTI Header File Reference
-
-* xti::                         XTI Library header file.
-* xti_ip::                      Internet Protocol header file.
-* xti_mtp::                     SS7 Message Transfer Part header file.
-* xti_sccp::                    SS7 Signalling Connection Control Part header file.
-* xti_sctp::                    Stream Control Transmission Protocol header file.
-* xti_ss7::                     SS7 header file.
-* xti_sscop::                   Service Specific Connection Oriented Protocol header file.
-* xti_tcap::                    SS7 Transaction Capabilities Application Part header file.
-* xti_tcp::                     Transmission Control Protocol header file.
-* xti_udp::                     User Datagram Protocol header file.
-
 @end menu
 
-@node Overview,  ,  , Reference
-@section Overview
-@cpindex overview
-
-@node XTI Function Reference,  ,  , Reference
-@section XTI Function Reference
-@cpindex functions
-
 @page
-@node t_accept,  ,  , Reference
+@node t_accept
 @unnumberedsubsec t_accept
 @fnindex t_accept
 
@@ -604,68 +499,70 @@ and sets t_errno(3) to an appropriate error number.
 When t_accept() fails, it returns -1 and sets t_errno(3) to an appropriate
 error number as follows:
 
-@vtable @error
-@item TACCES
+@table @asis
+
+@item @errno{TACCES}
 The caller did not have sufficient permissions to accept a connection on the
 @var{resfd} file descriptor, or did not have sufficient permissions to use the
 responding address specified in @code{@var{call}->addr}.  
 
-@item TBADADDR
+@item @errno{TBADADDR}
 The address specified was of an invalid format or contained invalid
 information. This error is returned from the transport service provider.
 
-@item TBADDATA
+@item @errno{TBADDATA}
 The amount of data specified for the @var{call} and underlying transport
 service provider was invalid (i.e. was outside the protocol limits). See
 t_getinfo(3) and t_open(3) for more information.
 
-@item TBADF
+@item @errno{TBADF}
 The @var{fd} or @var{resfd} file descriptor was invalid.
 
-@item TBADOPT
+@item @errno{TBADOPT}
 The options specified were of an invalid for­ mat or contained invalid
 information. This error is returned from the transport service provider.  See
 t_optmgmt(3) for more information on option formats.
 
-@item TBADSEQ
+@item @errno{TBADSEQ}
 The sequence number provided was invalid, or is not associated with an
 outstanding connection indication.
 
-@item TINDOUT
+@item @errno{TINDOUT}
 The file descriptor @var{resfd} has outstanding connection indications.
 
-@item TLOOK
+@item @errno{TLOOK}
 An asynchronous event occurred before the @var{call} could complete. See
 t_look(3) for more information.
 
-@item TNOTSUPPORT
+@item @errno{TNOTSUPPORT}
 The @var{call} requires the use of a TLI primitive not supported by the
 underlying transport provider.
 
-@item TOUTSTATE
+@item @errno{TOUTSTATE}
 The @var{call} was issued with the interface in an incorrect state.
 
-@item TPROTO
+@item @errno{TPROTO}
 A protocol error occurred between the XTI library and the underlying transport
 provider.
 
-@item TPROVMISMATCH
+@item @errno{TPROVMISMATCH}
 The transport provider associated with @var{resfd} is not the same as the
 transport provider associated with @var{fd}.
 
-@item TRESADDR
+@item @errno{TRESADDR}
 The file descriptor @var{resfd} was bound to a different address than the
 responding address.
 
-@item TRESQLEN
+@item @errno{TRESQLEN}
 The file descriptor @var{resfd} is listening (i.e. it was bound with a
 @var{qlen} > 0).
 
 @vindex qlen
 
-@item TSYSERR
+@item @errno{TSYSERR}
 A Linux system error occurred and the Linux error number is set in errno(3).
-@end vtable
+
+@end table
 
 @subsubheading SEE ALSO
 netbuf(3), t_listen(3).
@@ -709,7 +606,7 @@ Other trademarks are the property of their respective owners.
 
 
 @page
-@node t_addleaf,  ,  , Reference
+@node t_addleaf
 @subsection t_addleaf
 @fnindex t_addleaf
 
@@ -761,7 +658,7 @@ connection management.
 In synchronous mode, @emph{t_addleaf()} blocks until a leaf  change
 confirmation  is  received.   In  asynchronous  mode where no leaf change
 confirmation is immediately available, @emph{t_addleaf()} fails, returns -1
-and sets t_errno(3) to @error{TNODATA}.
+and sets t_errno(3) to @errno{TNODATA}.
 
 @subsubheading RETURN VALUE
 Upon success, @emph{t_addleaf()} returns zero (0) and confirms the addition of
@@ -772,40 +669,42 @@ t_errno(3) to an appropriate error number.
 When @emph{t_addleaf()} fails, it returns -1 and sets t_errno(3) to an
 appropriate error number as follows:
 
-@table @error
-@item TBADF
+@table @asis
+
+@item @errno{TBADF}
 @var{fd} is invalid.
 
-@item TADDRBUSY
+@item @errno{TADDRBUSY}
 address specificed was already in use by another transport endpoint.
 
-@item TBADADDR
+@item @errno{TBADADDR}
 address specified was of an invalid format or contained invalid information.
 
-@item TLOOK
+@item @errno{TLOOK}
 asynchronous  event  occurred  before the call could complete.  See
 @ref{t_look}, for more information.
 
-@item TNOADDR
+@item @errno{TNOADDR}
 address was not specified and the transport provider could not assign one.
 
-@item TNODATA
+@item @errno{TNODATA}
 attempt was made to read the add leaf confirmation but no add  leaf
 confirmation  was available.
 
-@item TNOTSUPPORT
+@item @errno{TNOTSUPPORT}
 call  requires  the use of a TLI primitive not supported by the underlying
 transport provider.
 
-@item TOUTSTATE
+@item @errno{TOUTSTATE}
 call was issued with the interface in an incorrect state.
 
-@item TPROTO
+@item @errno{TPROTO}
 protocol error occurred between the XTI library and the underlying transport
 provider.
 
-@item TSYSERR
+@item @errno{TSYSERR}
 Linux system error occurred and the Linux error number is set in errno(3).
+
 @end table
 
 @subsubheading SEE ALSO
@@ -874,194 +773,207 @@ Other trademarks are the property of their respective owners.
 @end format
 
 @page
-@node t_alloc,  ,  , Reference
+@node t_alloc
 @subsection t_alloc
 @fnindex t_alloc
 
 @page
-@node t_bind,  ,  , Reference
+@node t_bind
 @subsection t_bind
 @fnindex t_bind
 
 @page
-@node t_close,  ,  , Reference
+@node t_close
 @subsection t_close
 @fnindex t_close
 
 @page
-@node t_connect,  ,  , Reference
+@node t_connect
 @subsection t_connect
 @fnindex t_connect
 
 @page
-@node t_errno,  ,  , Reference
+@node t_errno
 @subsection t_errno
 @fnindex t_errno
 
 @page
-@node t_error,  ,  , Reference
+@node t_error
 @subsection t_error
 @fnindex t_error
 
 @page
-@node t_free,  ,  , Reference
+@node t_free
 @subsection t_free
 @fnindex t_free
 
 @page
-@node t_getinfo,  ,  , Reference
+@node t_getinfo
 @subsection t_getinfo
 @fnindex t_getinfo
 
 @page
-@node t_getprotaddr,  ,  , Reference
+@node t_getprotaddr
 @subsection t_geprotaddr
 @fnindex t_geprotaddr
 
 @page
-@node t_getstate,  ,  , Reference
+@node t_getstate
 @subsection t_getstate
 @fnindex t_getstate
 
 @page
-@node t_listen,  ,  , Reference
+@node t_listen
 @subsection t_listen
 @fnindex t_listen
 
 @page
-@node t_look,  ,  , Reference
+@node t_look
 @subsection t_look
 @fnindex t_look
 
 @page
-@node t_open,  ,  , Reference
+@node t_open
 @subsection t_open
 @fnindex t_open
 
 @page
-@node t_optmgmt,  ,  , Reference
+@node t_optmgmt
 @subsection t_optmgmt
 @fnindex t_optmgmt
 
 @page
-@node t_rcv,  ,  , Reference
+@node t_rcv
 @subsection t_rcv
 @fnindex t_rcv
 
 @page
-@node t_rcvconnect,  ,  , Reference
+@node t_rcvconnect
 @subsection t_rcvconnect
 @fnindex t_rcvconnect
 
 @page
-@node t_rcvdis,  ,  , Reference
+@node t_rcvdis
 @subsection t_rcvdis
 @fnindex t_rcvdis
 
 @page
-@node t_rcvleafchange,  ,  , Reference
+@node t_rcvleafchange
 @subsection t_rcvleafchange
 @fnindex t_rcvleafchange
 
 @page
-@node t_rcvrel,  ,  , Reference
+@node t_rcvrel
 @subsection t_rcvrel
 @fnindex t_rcvrel
 
 @page
-@node t_rcvreldata,  ,  , Reference
+@node t_rcvreldata
 @subsection t_rcvreldata
 @fnindex t_rcvreldata
 
 @page
-@node t_rcvudata,  ,  , Reference
+@node t_rcvudata
 @subsection t_rcvudata
 @fnindex t_rcvudata
 
 @page
-@node t_rcvuderr,  ,  , Reference
+@node t_rcvuderr
 @subsection t_rcvuderr
 @fnindex t_rcvuderr
 
 @page
-@node t_rcvv,  ,  , Reference
+@node t_rcvv
 @subsection t_rcvv
 @fnindex t_rcvv
 
 @page
-@node t_rcvvudata,  ,  , Reference
+@node t_rcvvudata
 @subsection t_rcvvudata
 @fnindex t_rcvvudata
 
 @page
-@node t_removeleaf,  ,  , Reference
+@node t_removeleaf
 @subsection t_removeleaf
 @fnindex t_removeleaf
 
 @page
-@node t_snd,  ,  , Reference
+@node t_snd
 @subsection t_snd
 @fnindex t_snd
 
 @page
-@node t_snddis,  ,  , Reference
+@node t_snddis
 @subsection t_snddis
 @fnindex t_snddis
 
 @page
-@node t_sndrel,  ,  , Reference
+@node t_sndrel
 @subsection t_sndrel
 @fnindex t_sndrel
 
 @page
-@node t_sndreldata,  ,  , Reference
+@node t_sndreldata
 @subsection t_sndreldata
 @fnindex t_sndreldata
 
 @page
-@node t_sndudata,  ,  , Reference
+@node t_sndudata
 @subsection t_sndudata
 @fnindex t_sndudata
 
 @page
-@node t_sndv,  ,  , Reference
+@node t_sndv
 @subsection t_sndv
 @fnindex t_sndv
 
 @page
-@node t_sndvudata,  ,  , Reference
+@node t_sndvudata
 @subsection t_sndvudata
 @fnindex t_sndvudata
 
 @page
-@node t_strerror,  ,  , Reference
+@node t_strerror
 @subsection t_strerror
 @fnindex t_strerror
 
 @page
-@node t_sync,  ,  , Reference
+@node t_sync
 @subsection t_sync
 @fnindex t_sync
 
 @page
-@node t_sysconf,  ,  , Reference
+@node t_sysconf
 @subsection t_sysconf
 @fnindex t_sysconf
 
 @page
-@node t_unbind,  ,  , Reference
+@node t_unbind
 @subsection t_unbind
 @fnindex t_unbind
 
 
 @page
-@node XTI Header File Reference,  ,  , Reference
+@node XTI Header File Reference
 @section XTI Header File Reference
 
 @cpindex header files
 
+@menu
+* xti::                         XTI Library header file.
+* xti_ip::                      Internet Protocol header file.
+* xti_mtp::                     SS7 Message Transfer Part header file.
+* xti_sccp::                    SS7 Signalling Connection Control Part header file.
+* xti_sctp::                    Stream Control Transmission Protocol header file.
+* xti_ss7::                     SS7 header file.
+* xti_sscop::                   Service Specific Connection Oriented Protocol header file.
+* xti_tcap::                    SS7 Transaction Capabilities Application Part header file.
+* xti_tcp::                     Transmission Control Protocol header file.
+* xti_udp::                     User Datagram Protocol header file.
+@end menu
+
 @page
-@node xti,  ,  , Reference
+@node xti
 @subsection xti
 @pgindex xti
 
@@ -1069,7 +981,7 @@ Other trademarks are the property of their respective owners.
 @cpindex xti header file
 
 @page
-@node xti_ip,  ,  , Reference
+@node xti_ip
 @subsection xti_ip
 @pgindex xti_ip
 
@@ -1078,42 +990,42 @@ Other trademarks are the property of their respective owners.
 @cpindex ip, xti header file
 
 @page
-@node xti_mtp,  ,  , Reference
+@node xti_mtp
 @subsection xti_mtp
 @pgindex xti_mtp
 
 @page
-@node xti_sccp,  ,  , Reference
+@node xti_sccp
 @subsection xti_sccp
 @pgindex xti_sccp
 
 @page
-@node xti_sctp,  ,  , Reference
+@node xti_sctp
 @subsection xti_sctp
 @pgindex xti_sctp
 
 @page
-@node xti_ss7,  ,  , Reference
+@node xti_ss7
 @subsection xti_ss7
 @pgindex xti_ss7
 
 @page
-@node xti_sscop,  ,  , Reference
+@node xti_sscop
 @subsection xti_sccop
 @pgindex xti_sccop
 
 @page
-@node xti_tcap,  ,  , Reference
+@node xti_tcap
 @subsection xti_tcap
 @pgindex xti_tcap
 
 @page
-@node xti_tcp,  ,  , Reference
+@node xti_tcp
 @subsection xti_tcp
 @pgindex xti_tcp
 
 @page
-@node xti_udp,  ,  , Reference
+@node xti_udp
 @subsection xti_udp
 @pgindex xti_udp
 
@@ -1121,7 +1033,7 @@ Other trademarks are the property of their respective owners.
 
 
 @page
-@node Conformance, Multi-Threading, Reference, Top
+@node Conformance
 @chapter Conformance
 @cindex conformance
 
@@ -1130,12 +1042,12 @@ This section lists the standards conformance of the OpenSS7 XTI Library.
 
 
 
-@node Multi-Threading, Error Handling, Conformance, Top
+@node Multi-Threading
 @chapter Multi-Threading
 @cindex thread safety
 
 
-@node Error Handling, Installation, Multi-Threading, Top
+@node Error Handling
 @chapter Error Handling
 @cindex error handling
 
@@ -1143,7 +1055,7 @@ This chapter describes error handling in the XTI Library.
 
 
 
-@node Installation, Bugs, Error Handling, Top
+@node Installation
 @chapter Installation
 @cindex installation
 
@@ -1152,48 +1064,65 @@ library.
 
 
 
-@node Bugs, Public License, Installation, Top
+@node Bugs
 @chapter Bugs
 @cindex bugs
 
 This is a description of the known bugs, installation troubles, known causes of
 trouble, troubleshooting.
 
-@node Public License, Documentation License, Bugs, Top
-@appendix Public License
-@include texi/lgpl3.texi
+@node Licenses
+@appendix Licenses
+@cindex Licenses
 
-@node Documentation License, Concept Index, Public License, Top
-@appendix Dcoumentation License
-@include texi/fdl13.texi
+@menu
+* GNU Lesser General Public License::	The LGPL license
+* GNU Free Documentation License::	The FDL license
+@end menu
 
 @page
-@node Concept Index, Type Index, Documentation License, Top
+@include texi/lgpl3.texi
+@page
+@include texi/fdl13.texi
+
+@node Indices
 @appendix Indices
+@cindex Indices
+
+@menu
+* Concept Index::
+* Type Index::
+* Function Index::
+* Variable Index::
+* File Index::
+@end menu
+
+@page
+@node Concept Index
 @appendixsec Concept Index
 
 @printindex cp
 
 @page
-@node Type Index, Function Index, Concept Index, Top
+@node Type Index
 @appendixsec Type Index
 
 @printindex tp
 
 @page
-@node Function Index, Variable Index, Type Index, Top
+@node Function Index
 @appendixsec Function and Macro Index
 
 @printindex fn
 
 @page
-@node Variable Index, File Index, Function Index, Top
+@node Variable Index
 @appendixsec Variable and Constant Macro Index
 
 @printindex vr
 
 @page
-@node File Index, , Variable Index, Top
+@node File Index
 @appendixsec Program and File Index
 
 @printindex pg
