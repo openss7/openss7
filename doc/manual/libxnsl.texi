@@ -1,98 +1,95 @@
-% -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
-% =========================================================================
-%
-% @(#) $Id: libxnsl.texi,v 1.1.2.2 2011-02-07 02:21:34 brian Exp $
-%
-% =========================================================================
-%
-% Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
-% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
-%
-% All Rights Reserved.
-%
-% Permission is granted to copy, distribute and/or modify this document
-% under the terms of the GNU Free Documentation License, Version 1.3 or
-% any later version published by the Free Software Foundation; with no
-% Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
-% copy of the license is included in the section entitled "GNU Free
-% Documentation License".
-%
-% Permission to use, copy and distribute this documentation without
-% modification, for any purpose and without fee or royalty is hereby
-% granted, provided that both the above copyright notice and this
-% permission notice appears in all copies and that the name of OpenSS7
-% Corporation not be used in advertising or publicity pertaining to
-% distribution of this documentation or its contents without specific,
-% written prior permission.  OpenSS7 Corporation makes no representation
-% about the suitability of this documentation for any purpose.  It is
-% provided "as is" without express or implied warranty.
-% 
-% Permission is granted to process this file through Tex and print the
-% results, provided the printed document carries copying permission notice
-% identical to this one except for the removal of this paragraph (this
-% paragraph not being relevant to the printed manual).
-% 
-% OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
-% DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
-% FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
-% CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
-% IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
-% PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
-% OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
-% CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
-% USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-% OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
-% THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
-% THEREOF.
-% 
-% Since the Linux kernel and libraries are constantly changing, this
-% manual page may be incorrect or out-of-date.  The author(s) assume no
-% responsibility for errors or omissions, or for damages resulting from
-% the use of the information contained herein.  The author(s) may not have
-% taken the same level of care in the production of this manual, which is
-% licensed free of charge, as they might when working professionally.
-% 
-% Formatted or processed versions of this manual, if unaccompanied by the
-% source, must acknowledge the copyright and authors of this work.
-%
-% -------------------------------------------------------------------------
-%
-% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-% on behalf of the U.S. Government ("Government"), the following
-% provisions apply to you.  If the Software is supplied by the Department
-% of Defense ("DoD"), it is classified as "Commercial Computer Software"
-% under paragraph 252.227-7014 of the DoD Supplement to the Federal
-% Acquisition Regulations ("DFARS") (or any successor regulations) and the
-% Government is acquiring only the license rights granted herein (the
-% license rights customarily provided to non-Government users).  If the
-% Software is supplied to any unit or agency of the Government other than
-% DoD, it is classified as "Restricted Computer Software" and the
-% Government's rights in the Software are defined in paragraph 52.227-19
-% of the Federal Acquisition Regulations ("FAR") (or any successor
-% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-% NASA Supplement to the FAR (or any successor regulations).
-%
-% =========================================================================
-% 
-% Commercial licensing and support of this software is available from
-% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-% 
-% =========================================================================
-%
-% Last Modified $Date: 2011-02-07 02:21:34 $ by $Author: brian $
-%
-% =========================================================================
+\input texinfo
+@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
+@c =========================================================================
+@c
+@c @(#) $Id: libxnsl.texi,v 1.1.2.2 2011-02-07 02:21:34 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2008-2014  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to copy, distribute and/or modify this document
+@c under the terms of the GNU Free Documentation License, Version 1.3 or
+@c any later version published by the Free Software Foundation; with no
+@c Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+@c copy of the license is included in the section entitled "GNU Free
+@c Documentation License".
+@c
+@c Permission to use, copy and distribute this documentation without
+@c modification, for any purpose and without fee or royalty is hereby
+@c granted, provided that both the above copyright notice and this
+@c permission notice appears in all copies and that the name of OpenSS7
+@c Corporation not be used in advertising or publicity pertaining to
+@c distribution of this documentation or its contents without specific,
+@c written prior permission.  OpenSS7 Corporation makes no representation
+@c about the suitability of this documentation for any purpose.  It is
+@c provided "as is" without express or implied warranty.
+@c 
+@c Permission is granted to process this file through Tex and print the
+@c results, provided the printed document carries copying permission notice
+@c identical to this one except for the removal of this paragraph (this
+@c paragraph not being relevant to the printed manual).
+@c 
+@c OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+@c DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+@c FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+@c CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+@c IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+@c PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+@c OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+@c CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+@c USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+@c OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+@c THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+@c THEREOF.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not have
+@c taken the same level of care in the production of this manual, which is
+@c licensed free of charge, as they might when working professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by the
+@c source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2011-02-07 02:21:34 $ by $Author: brian $
+@c
+@c =========================================================================
 
-\input texinfo @c -*- texinfo -*-
-@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
-@c %**start of header
 @setfilename libxnsl.info
 @include ../../scripts/texi/args.texi
 @set MANUAL_TITLE OpenSS7 XNS Library
 @set MANUAL_TYPE Reference Manual
 @settitle @value{MANUAL_TITLE}
-@c %**end of header
 
 @dircategory GNU libraries
 @direntry
@@ -111,7 +108,7 @@ This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of t
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2014  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -153,14 +150,13 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
-@sp 0.5
+@sp 1
 @title @value{MANUAL_TYPE}
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
 @subtitle Updated @value{PACKAGE_PDATE}
-@sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2011  Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2014  Monavacon Limited
 @subtitle All Rights Reserved.
 @ignore
 @sp 4
@@ -174,7 +170,6 @@ as platform and system applicability of the @value{MANUAL_TITLE}.  It provides a
 @end quotation
 @end ignore
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
-@sp 0.2
 @author The OpenSS7 Project <@uref{http://www.openss7.org/}>
 
 @page
@@ -191,7 +186,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2014  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -268,8 +263,8 @@ this document or the performance or implementation of the contents thereof.}
 @syncodeindex pe cp
 @syncodeindex st cp
 @syncodeindex mp cp
-@syncodeindex tp cp
-@syncodeindex vr cp
+@c @syncodeindex tp cp
+@c @syncodeindex vr cp
 @syncodeindex ct cp
 @syncodeindex mo cp
 @c @end ifnottex
@@ -289,7 +284,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @end ifnottex
 
 @menu
-* Acknowledgements::
+* Preface::
 * Introduction::
 * Reference::
 * Conformance::
@@ -297,48 +292,24 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 * Error Handling::
 * Installation::
 * Bugs::
-
-* Public License::
-* Documentation License::
-
-* Concept Index::
-* Type Index::
-* Function Index::
-* Variable Index::
-* File Index::
-
+* Licenses::
+* Indices::
 @end menu
-
-@c  --- The Detailed Node Listing ---
-@c 
-@c Acknowledgements
-@c 
-@c * Sponsors::                    Sponsors of the XNS Library
-@c * Contributors::                People who contributed to development of the XNS Library
-@c 
-@c Reference
-@c 
-@c * Overview::                    An overview of XNS Functions and Header Files
-@c * XNS Function Reference::      Reference manual of XNS Functions
-@c * XNS Header File Reference::   Reference manual of XNS Header Files
-@c 
-@c XNS Function Reference
-@c 
-@c * getnetconfig::		Get network configuration database entry.
-@c 
-@c XNS Header File Reference
-@c 
-@c * netconfig::			Network Configuration header file.
 
 @c --------------------------------------------------------------------------
 
+@node Preface
+@unnumbered Preface
+
+@menu
+* Acknowledgements::
+@end menu
+
 @node Acknowledgements
-@unnumbered Acknowledgements
+@section Acknowledgements
 @cindex credits
 
-@raisesections
 @include texi/funding.texi
-@lowersections
 
 @node Introduction
 @chapter Introduction to the XNS Library
@@ -451,15 +422,15 @@ access subroutines for accessing the Network Configuration database.
 @manpage{endnetconfig(3)} provide a mechanism to sequentially access each
 entry in the Network Configuration database.
 
-@table @manpage
+@table @asis
 
-@item setnetconfig(3)
+@item @manpage{setnetconfig(3)}
 Returns a pointer to an opaque data structure used as a handle to the
 @manpage{getnetconfig(3)} subroutine.  @manpage{setnetconfig(3)} is used to
 initialize client access to the database entries and set the access point to
 the first entry.
 
-@item getnetconfig(3)
+@item @manpage{getnetconfig(3)}
 When called successively with the @var{handle} returned by the call to
 @manpage{setnetconfig(3)}, returns each Network Configuration database entry
 starting with the first.  When no additional entries remain that have not
@@ -467,7 +438,7 @@ already been retrieved since the call to @manpage{setnetconfig(3)},
 @manpage{getnetconfig(3)} returns a @var{NULL} pointer to indicate that the
 end of the database has been reached.
 
-@item endnetconfig(3)
+@item @manpage{endnetconfig(3)}
 Releases client access to the database and frees for reuse any resources that
 were held by @manpage{setnetconfig(3)} for use by @manpage{getnetconfig(3)}.
 @manpage{endnetconfig(3)} must only be called with a @var{handle} returned
@@ -482,13 +453,13 @@ argument.
 @manpage{freenetconfigent(3)} provide a mechanism to access Network
 Configuration database entries by network identification name strings.
 
-@table @manpage
-@item getnetconfigent(3)
+@table @asis
+@item @manpage{getnetconfigent(3)}
 Returns a pointer to the @type{netconfig} structure corresponding to the
 network configuration entry with the same network identification name as that
 supplied in the @var{netid} argument.
 
-@item freenetconfigent(3)
+@item @manpage{freenetconfigent(3)}
 Frees the network configuration entry returned as a pointer to a
 @type{netconfig} structure, from a previous call to
 @manpage{getnetconfigent(3)}.  @manpage{freenetconfigent(3)} must be called
@@ -502,13 +473,13 @@ providing diagnostic messages upon failure.  These subroutines can be used
 both for these @manpage{netconfig(3)} subroutines, as well as the
 @manpage{netpath(3)} subroutines.
 
-@table @manpage
-@item nc_perror(3)
+@table @asis
+@item @manpage{nc_perror(3)}
 Prints a diagnostic message to standard error with the string provided in the
 @var{msg} argument used as a prefix followed by a colon.  Diagnostic messages
 printed to standard error are followed by a NEWLINE.
 
-@item nc_sperror(3)
+@item @manpage{nc_sperror(3)}
 Similar to @manpage{nc_perror(3)}, but, instead of printing the message to
 standard error, only a pointer to the diagnostic message string is returned.
 This allows the caller to subsequently format and store a message according to
@@ -683,46 +654,46 @@ pointer, if: no error exists.
 
 The following errors can be returned:
 
-@vtable @error
-@item NC_NOERROR
+@table @asis
+@item @errno{NC_NOERROR}
 "@i{no error}" @*
 The last network selection function called was successful or no network
 selection function has yet been called.
 
-@item NC_NOMEM
+@item @errno{NC_NOMEM}
 "@i{out of memory}" @*
 There was not sufficient memory for the last network selection function called
 to complete.
 
-@item NC_NOSET
+@item @errno{NC_NOSET}
 "@i{routine called before calling setnetpath() or setnetconfig()}" @*
 The last call to @manpage{endnetconfig(3)} or @manpage{getnetconfig(3)} was
 called (incorrectly) before calling @manpage{setnetconfig(3)}.
 
-@item NC_OPENFAIL
+@item @errno{NC_OPENFAIL}
 "@i{cannot open /etc/netconfig}" @*
 The last call to a network selection function, @manpage{setnetconfig(3)},
 could not open the @file{/etc/netconfig} file.
 
-@item NC_BADLINE
+@item @errno{NC_BADLINE}
 "@i{error in /etc/netconfig : field %d of line %d}" @*
 The last call to a network selection function detected a syntax error in the
 @file{/etc/netconfig} file at field %d of line %d.
 
-@item NC_NOTFOUND
+@item @errno{NC_NOTFOUND}
 "@i{netid not found in /etc/netconfig}" @*
 The @var{netid} argument to the last call to @manpage{getnetconfigent(3)} was
 not found in @file{/etc/netconfig}.
 
-@item NC_NOMOREENTRIES
+@item @errno{NC_NOMOREENTRIES}
 "@i{no more entries in /etc/netconfig}" @*
 The last call to a network selection function, @manpage{getnetpath(3)},
 exhausted the entries in the @file{/etc/netconfig} file.
 
-@item (unknown)
+@item @errno{(unknown)}
 "@i{unknown error}" @*
 An internal error occurred in the @manpage{libxnsl(3)} library.
-@end vtable
+@end table
 
 An error string associated with the error number can be obtained using
 @manpage{nc_sperror(3)} or printed to standard error with
@@ -887,46 +858,46 @@ is returned and @manpage{nc_error(3)} is set to indicate the error.
 When @manpage{setnetconfig(3)} fails, it returns @var{NULL} and sets
 @manpage{nc_error(3)} to one of the following error numbers:
 
-@vtable @error
-@item NC_NOERROR
+@table @asis
+@item @errno{NC_NOERROR}
 "@i{no error}" @*
 The last network selection function called was successful or no network
 selection function has yet been called.
 
-@item NC_NOMEM
+@item @errno{NC_NOMEM}
 "@i{out of memory}" @*
 There was not sufficient memory for the last network selection function called
 to complete.
 
-@item NC_NOSET
+@item @errno{NC_NOSET}
 "@i{routine called before calling setnetpath() or setnetconfig()}" @*
 The last call to @manpage{endnetconfig(3)} or @manpage{getnetconfig(3)} was
 called (incorrectly) before calling @manpage{setnetconfig(3)}.
 
-@item NC_OPENFAIL
+@item @errno{NC_OPENFAIL}
 "@i{cannot open /etc/netconfig}" @*
 The last call to a network selection function, @manpage{setnetconfig(3)},
 could not open the @file{/etc/netconfig} file.
 
-@item NC_BADLINE
+@item @errno{NC_BADLINE}
 "@i{error in /etc/netconfig : field %d of line %d}" @*
 The last call to a network selection function detected a syntax error in the
 @file{/etc/netconfig} file at field %d of line %d.
 
-@item NC_NOTFOUND
+@item @errno{NC_NOTFOUND}
 "@i{netid not found in /etc/netconfig}" @*
 The @var{netid} argument to the last call to @manpage{getnetconfigent(3)} was
 not found in @file{/etc/netconfig}.
 
-@item NC_NOMOREENTRIES
+@item @errno{NC_NOMOREENTRIES}
 "@i{no more entries in /etc/netconfig}" @*
 The last call to a network selection function, @manpage{getnetpath(3)},
 exhausted the entries in the @file{/etc/netconfig} file.
 
-@item (unknown)
+@item @errno{(unknown)}
 "@i{unknown error}" @*
 An internal error occurred in the @manpage{libxnsl(3)} library.
-@end vtable
+@end table
 
 An error string associated with the error number can be obtained using
 @manpage{nc_sperror(3)} or printed to standard error with
@@ -1462,97 +1433,97 @@ error.
 
 A name-to-address mapping function will fail if:
 
-@table @error
-@item ND_TRY_AGAIN
+@table @asis
+@item @errno{ND_TRY_AGAIN}
 "@i{n2a: non-authoritative host not found}" @*
 The host was not found, however, a name-to-address mapping function suffered a temporary failure
 (such as a timeout).
 
-@item ND_NO_RECOVERY
+@item @errno{ND_NO_RECOVERY}
 "@i{n2a: non-recoverable error}" @*
 The last name-to-address translation function suffered an unrecoverable error in one of its lookup
 libraries.
 
-@item ND_NO_DATA
+@item @errno{ND_NO_DATA}
 "@i{n2a: no data record of requested type}" @*
 The last name-to-address translation function could find no data of the requested type in one of its
 lookup libraries.
 
-@item ND_NO_ADDRESS
+@item @errno{ND_NO_ADDRESS}
 "@i{n2a: no data record of requested type}" @*
 The last name-to-address translation function could find no address of the requested type in one of
 its lookup libraries.
 
-@item ND_BADARG
+@item @errno{ND_BADARG}
 "@i{n2a: bad arguments passed to routine}" @*
 The last name-to-address translation function was passed a bad argument.
 
-@item ND_NOMEM
+@item @errno{ND_NOMEM}
 "@i{n2a: memory allocation failed}" @*
 The last name-to-address translation function could not allocate memory necessary to complete the
 operation.
 
-@item ND_OK
+@item @errno{ND_OK}
 "@i{n2a: successful completion}" @*
 The last name-to-address translation function completed successfully, or there was no previous
 name-to-address translation function called.
 
-@item ND_NOHOST
+@item @errno{ND_NOHOST}
 "@i{n2a: hostname not found}" @*
 The last name-to-address translation function, @manpage{netdir_getbyname(3)},
 could not find, or does not support, the specified host name.
 
-@item ND_NOSERV
+@item @errno{ND_NOSERV}
 "@i{n2a: service name not found}" @*
 The last name-to-address translation function, @manpage{netdir_getbyname(3)},
 could not find, or does not support, the specified service name.
 
-@item ND_NOSYM
+@item @errno{ND_NOSYM}
 "@i{n2a: symbol missing in shared object : %s}" @*
 One of the required symbols, see @manpage{netdir(5)}, was missing from a
 shared object specified in the @member{nc_lookup} member of the
 @manpage{netconfig(5s)} structure referenced by a @var{config} argument.
 @samp{%s} is replaced with the last @manpage{dlerror(3)} string.
 
-@item ND_OPEN
+@item @errno{ND_OPEN}
 "@i{n2a: could not open shared object : %s}" @*
 One of the shared objects specified in the @member{nc_lookup} member of the
 @manpage{netconfig(5s)} structure referenced by a @var{config} argument could
 not be opened.  @samp{%s} is replaced with the last @manpage{dlerror(3)}
 string.
 
-@item ND_ACCESS
+@item @errno{ND_ACCESS}
 "@i{n2a: access denied for shared object}" @*
 One of the shared objects specified in the @member{nc_lookup} member of the
 @manpage{netconfig(5s)} structure referenced by a @var{config} argument could
 not be opened due to access permission.
 
-@item ND_UKNWN
+@item @errno{ND_UKNWN}
 "@i{n2a: attempt to free unknown object}" @*
 @manpage{netdir_free(3)} was called with an unknown @var{struct_type} argument
 value.
 
-@item ND_NOCTRL
+@item @errno{ND_NOCTRL}
 "@i{n2a: unknown option passed}" @*
 @manpage{netdir_options(3)} was passed an unknown @var{option} argument value.
 
-@item ND_FAILCTRL
+@item @errno{ND_FAILCTRL}
 "@i{n2a: control operation failed}" @*
 The @manpage{netdir_options(3)} control operation failed.
 
-@item ND_SYSTEM
+@item @errno{ND_SYSTEM}
 "@i{n2a: system error}" @*
 During the last name-to-address translation function, a system error occurred.
 The @cite{Linux} system error is in @manpage{errno(3)}.
 The @manpage{xti(3)} error in @manpage{t_errno(3)} might also provide some
 insight into the error.
 
-@item ND_NOCONVERT
+@item @errno{ND_NOCONVERT}
 "@i{n2a: conversion not possible}" @*
 During the last name-to-address translation function it was discovered that character string
 conversion was not possible.
 
-@item other
+@item @errno{other}
 "@i{n2a: unknown error %d}" @*
 An internal error occured in the @manpage{libxnsl(3)} library or a loaded
 shared object.  @samp{%d} is the decimal number of the error number that was
@@ -1813,74 +1784,74 @@ error.
 When @manpage{netdir_getbyname()} fails, it returned minus one (@samp{-1}) and
 sets @manpage{_nderror(3)} to one of the following error codes:
 
-@table @error
-@item ND_TRY_AGAIN
+@table @asis
+@item @errno{ND_TRY_AGAIN}
 "@i{n2a: non-authoritative host not found}" @*
 The host was not found, however, a name-to-address mapping function suffered a temporary failure
 (such as a timeout).
 
-@item ND_NO_RECOVERY
+@item @errno{ND_NO_RECOVERY}
 "@i{n2a: non-recoverable error}" @*
 The last name-to-address translation function suffered an unrecoverable error in one of its lookup
 libraries.
 
-@item ND_NO_DATA
+@item @errno{ND_NO_DATA}
 "@i{n2a: no data record of requested type}" @*
 The last name-to-address translation function could find no data of the requested type in one of its
 lookup libraries.
 
-@item ND_NO_ADDRESS
+@item @errno{ND_NO_ADDRESS}
 "@i{n2a: no data record of requested type}" @*
 The last name-to-address translation function could find no address of the requested type in one of
 its lookup libraries.
 
-@item ND_BADARG
+@item @errno{ND_BADARG}
 "@i{n2a: bad arguments passed to routine}" @*
 The last name-to-address translation function was passed a bad argument.
 
-@item ND_NOMEM
+@item @errno{ND_NOMEM}
 "@i{n2a: memory allocation failed}" @*
 The last name-to-address translation function could not allocate memory necessary to complete the
 operation.
 
-@item ND_NOHOST
+@item @errno{ND_NOHOST}
 "@i{n2a: hostname not found}" @*
 The last name-to-address translation function, @manpage{netdir_getbyname(3)},
 could not find, or does not support, the specified host name.
 
-@item ND_NOSERV
+@item @errno{ND_NOSERV}
 "@i{n2a: service name not found}" @*
 The last name-to-address translation function, @manpage{netdir_getbyname(3)},
 could not find, or does not support, the specified service name.
 
-@item ND_NOSYM
+@item @errno{ND_NOSYM}
 "@i{n2a: symbol missing in shared object : %s}" @*
 One of the required symbols, see @manpage{netdir(5)}, was missing from a
 shared object specified in the @member{nc_lookup} member of the
 @manpage{netconfig(5s)} structure referenced by a @var{config} argument.
 @samp{%s} is replaced with the last @manpage{dlerror(3)} string.
 
-@item ND_OPEN
+@item @errno{ND_OPEN}
 "@i{n2a: could not open shared object : %s}" @*
 One of the shared objects specified in the @member{nc_lookup} member of the
 @manpage{netconfig(5s)} structure referenced by a @var{config} argument could
 not be opened.  @samp{%s} is replaced with the last @manpage{dlerror(3)}
 string.
 
-@item ND_ACCESS
+@item @errno{ND_ACCESS}
 "@i{n2a: access denied for shared object}" @*
 One of the shared objects specified in the @member{nc_lookup} member of the
 @manpage{netconfig(5s)} structure referenced by a @var{config} argument could
 not be opened due to access permission.
 
-@item ND_SYSTEM
+@item @errno{ND_SYSTEM}
 "@i{n2a: system error}" @*
 During the last name-to-address translation function, a system error occurred.
 The @cite{Linux} system error is in @manpage{errno(3)}.
 The @manpage{xti(3)} error in @manpage{t_errno(3)} might also provide some
 insight into the error.
 
-@item other
+@item @errno{other}
 "@i{n2a: unknown error %d}" @*
 An internal error occurred in the @manpage{libxnsl(3)} library or a loaded
 shared object.  @samp{%d} is the decimal number of the error number that was
@@ -1919,7 +1890,7 @@ lookup functions will be used.
 libraries to implement @manpage{netdir_getbyname(3)}.  If the library does not
 implement @manpage{_netdir_getbyname}, @manpage{netdir_getbyname(3)} will
 fail, return minus one (@samp{-1}) and set @manpage{_nderror(3)} to
-@error{ND_NOSYM}.
+@errno{ND_NOSYM}.
 
 @subsubheading Files
 
@@ -1943,7 +1914,7 @@ The X/Open Network Services Library static library.
 @manref{netpath(3)},
 @cite{RFC 1833}.
 
-@subsubheading
+@subsubheading Bugs
 
 @manpage{netdir_getbyname} has no known bugs.
 
@@ -2145,17 +2116,34 @@ library.
 This is a description of the known bugs, installation troubles, known causes of
 trouble, troubleshooting.
 
-@node Public License
-@appendix Public License
-@include texi/lgpl3.texi
+@node Licenses
+@appendix Licenses
+@cindex Licenses
 
-@node Documentation License
-@appendix Dcoumentation License
+@menu
+* GNU Lesser General Public License::	The LGPL license
+* GNU Free Documentation License::	The FDL license
+@end menu
+
+@page
+@include texi/lgpl3.texi
+@page
 @include texi/fdl13.texi
+
+@node Indices
+@appendix Indices
+@cindex Indices
+
+@menu
+* Concept Index::
+* Type Index::
+* Function Index::
+* Variable Index::
+* File Index::
+@end menu
 
 @page
 @node Concept Index
-@appendix Indices
 @appendixsec Concept Index
 
 @printindex cp
