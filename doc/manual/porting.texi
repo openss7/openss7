@@ -1,92 +1,92 @@
-% -*- texinfo -*- vim: ft=texinfo
-% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
-% =========================================================================
-%
-% @(#) $Id: porting.texi,v 1.1.2.3 2011-07-27 07:52:13 brian Exp $
-%
-% =========================================================================
-%
-% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
-% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
-%
-% All Rights Reserved.
-%
-% Permission is granted to copy, distribute and/or modify this document
-% under the terms of the GNU Free Documentation License, Version 1.3 or
-% any later version published by the Free Software Foundation; with no
-% Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
-% copy of the license is included in the section entitled "GNU Free
-% Documentation License".
-%
-% Permission to use, copy and distribute this documentation without
-% modification, for any purpose and without fee or royalty is hereby
-% granted, provided that both the above copyright notice and this
-% permission notice appears in all copies and that the name of OpenSS7
-% Corporation not be used in advertising or publicity pertaining to
-% distribution of this documentation or its contents without specific,
-% written prior permission.  OpenSS7 Corporation makes no representation
-% about the suitability of this documentation for any purpose.  It is
-% provided "as is" without express or implied warranty.
-% 
-% Permission is granted to process this file through Tex and print the
-% results, provided the printed document carries copying permission
-% notice identical to this one except for the removal of this paragraph
-% (this paragraph not being relevant to the printed manual).
-% 
-% OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
-% DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
-% FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
-% CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
-% IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
-% PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
-% OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
-% CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
-% USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-% OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
-% THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
-% THEREOF.
-% 
-% Since the Linux kernel and libraries are constantly changing, this
-% manual page may be incorrect or out-of-date.  The author(s) assume no
-% responsibility for errors or omissions, or for damages resulting from
-% the use of the information contained herein.  The author(s) may not
-% have taken the same level of care in the production of this manual,
-% which is licensed free of charge, as they might when working
-% professionally.
-% 
-% Formatted or processed versions of this manual, if unaccompanied by
-% the source, must acknowledge the copyright and authors of this work.
-%
-% -------------------------------------------------------------------------
-%
-% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-% on behalf of the U.S. Government ("Government"), the following
-% provisions apply to you.  If the Software is supplied by the Department
-% of Defense ("DoD"), it is classified as "Commercial Computer Software"
-% under paragraph 252.227-7014 of the DoD Supplement to the Federal
-% Acquisition Regulations ("DFARS") (or any successor regulations) and the
-% Government is acquiring only the license rights granted herein (the
-% license rights customarily provided to non-Government users).  If the
-% Software is supplied to any unit or agency of the Government other than
-% DoD, it is classified as "Restricted Computer Software" and the
-% Government's rights in the Software are defined in paragraph 52.227-19
-% of the Federal Acquisition Regulations ("FAR") (or any successor
-% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-% NASA Supplement to the FAR (or any successor regulations).
-%
-% =========================================================================
-% 
-% Commercial licensing and support of this software is available from
-% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-% 
-% =========================================================================
-%
-% Last Modified $Date: 2011-07-27 07:52:13 $ by $Author: brian $
-%
-% =========================================================================
-
 \input texinfo
+@c -*- texinfo -*- vim: ft=texinfo
+@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+@c =========================================================================
+@c
+@c @(#) $Id: porting.texi,v 1.1.2.3 2011-07-27 07:52:13 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2008-2014  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to copy, distribute and/or modify this document
+@c under the terms of the GNU Free Documentation License, Version 1.3 or
+@c any later version published by the Free Software Foundation; with no
+@c Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+@c copy of the license is included in the section entitled "GNU Free
+@c Documentation License".
+@c
+@c Permission to use, copy and distribute this documentation without
+@c modification, for any purpose and without fee or royalty is hereby
+@c granted, provided that both the above copyright notice and this
+@c permission notice appears in all copies and that the name of OpenSS7
+@c Corporation not be used in advertising or publicity pertaining to
+@c distribution of this documentation or its contents without specific,
+@c written prior permission.  OpenSS7 Corporation makes no representation
+@c about the suitability of this documentation for any purpose.  It is
+@c provided "as is" without express or implied warranty.
+@c 
+@c Permission is granted to process this file through Tex and print the
+@c results, provided the printed document carries copying permission
+@c notice identical to this one except for the removal of this paragraph
+@c (this paragraph not being relevant to the printed manual).
+@c 
+@c OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+@c DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+@c FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+@c CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+@c IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+@c PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+@c OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+@c CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+@c USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+@c OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+@c THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+@c THEREOF.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2011-07-27 07:52:13 $ by $Author: brian $
+@c
+@c =========================================================================
+
 @setfilename porting.info
 @include ../../scripts/texi/args.texi
 @set MANUAL_TITLE Linux Fast-STREAMS
@@ -110,7 +110,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2014  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -152,14 +152,13 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
-@sp 0.5
+@sp 1
 @title @value{MANUAL_TYPE}
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
 @subtitle Updated @value{PACKAGE_PDATE}
-@sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2014  Monavacon Limited
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
@@ -169,7 +168,6 @@ the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software a
 as platform and system applicability of the @value{MANUAL_TITLE}.
 @end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
-@sp 0.2
 @author The OpenSS7 Project <@uref{http://www.openss7.org/}>
 
 @page
@@ -186,7 +184,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2014  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -263,8 +261,8 @@ this document or the performance or implementation of the contents thereof.}
 @syncodeindex pe cp
 @syncodeindex st cp
 @syncodeindex mp cp
-@syncodeindex tp cp
-@syncodeindex vr cp
+@c @syncodeindex tp cp
+@c @syncodeindex vr cp
 @syncodeindex ct cp
 @syncodeindex mo cp
 @c @end ifnottex
@@ -284,94 +282,27 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @end ifnottex
 
 @menu
-* Acknowledgements::
-* Overview::
+* Preface::
 * Porting::
 * Development::
-* Copying::                     Copying information for this Software
-* Documentation License::       Copying information for this Manual
+* Licenses::
 * Indices::
-
- --- The Detailed Node Listing ---
-
-Acknowledgements
-
-* Sponsors::                    Sponsors of Linux Fast-STREAMS
-* Contributors::                Contributors to Linux Fast-STREAMS
-
-Overview
-
-* Introduction::                An Introduction to Linux Fast-STREAMS
-* Concepts::                    STREAMS Concepts
-
-Porting
-
-* Porting from SVR 3.2::
-* Porting from SVR 4.2 MP::
-* Porting from AIX 5L Version 5.1::
-* Porting from HP-UX 11.0i v2::
-* Porting from OSF/1 1.2/Digital UNIX::
-* Porting from UnixWare 7.1.3 (OpenUnix 8)::
-* Porting from Solaris 9/SunOS 5.9::
-* Porting from SUPER-UX::
-* Porting from UXP/V::
-* Porting from Mac Open Transport::
-* Porting from Mentat Portable STREAMS::
-
-Development
-
-* Portable STREAMS Drivers and Modules::
 @end menu
 
 @c --------------------------------------------------------------------------
 
+@node Preface
+@unnumbered Preface
+
+@menu
+* Acknowledgements::
+@end menu
+
 @node Acknowledgements
-@unnumbered Acknowledgements
+@section Acknowledgements
 @cindex credits
 
 @include texi/funding.texi
-
-@ignore
-@menu
-* Sponsors::                    Sponsors of Linux Fast-STREAMS
-* Contributors::                Contributors to Linux Fast-STREAMS
-@end menu
-
-@node Sponsors
-@unnumberedsec Sponsors of Linux Fast-STREAMS
-@cindex sponsors
-
-Funding for completion of Linux Fast-STREAMS was provided by:
-
-OpenSS7 Corporation
-
-Additional funding for The OpenSS7 Project was provided by:
-
-@node Contributors
-@unnumberedsec Contributors to Linux Fast-STREAMS
-@cindex contributors
-
-The primary contributor to Linux Fast-STREAMS is Brian F. G. Bidulock.
-
-@node Overview
-@chapter Overview of Linux Fast-STREAMS
-@cindex overview
-@menu
-* Introduction::                An Introduction to Linux Fast-STREAMS
-* Concepts::                    STREAMS Concepts
-@end menu
-
-This manual documents how to develop and port STREAMS drivers and modules for
-Linux Fast-STREAMS.
-@end ignore
-
-@node Introduction
-@section Introduction
-@cpindex introduction
-
-@node Concepts
-@section Concepts
-@cpindex concepts
 
 @node Porting
 @chapter Porting
@@ -402,7 +333,6 @@ Porting information is organized into sections as follows:
 * Porting from UXP/V::
 * Porting from Mac Open Transport::
 * Porting from Mentat Portable STREAMS::
-* Development::
 @end menu
 
 @section Base Functions
@@ -450,13 +380,13 @@ alignment of the data buffer, priority of allocation, disposition of unused
 message blocks, handling of @var{NULL} pointer arguments, buffer callback and
 message free routine handling.
 
-@ftable @manref
+@table @asis
 
-@item @b{adjmsg}(9)
+@item @manref{@b{adjmsg}(9)}
 Trim bytes from the front or back of a @acronym{STREAMS} message.  Trimmed message blocks are not freed
 but simply have their @var{b_wptr} set to their @var{b_rptr}.
 
-@item @b{allocb}(9)
+@item @manref{@b{allocb}(9)}
 Allocate a @acronym{STREAMS} message and data block.  This function also accepts the @var{BPRI_WAITOK}
 flag which allocates all parts of the message 3-tuple using @var{KM_SLEEP} allocation.  Allocation
 of less than @var{FASTBUF} bytes will allocate a data buffer of size @var{FASTBUF}.  @var{FASTBUF}
@@ -464,74 +394,74 @@ sized data buffers are internal to the data block, and message block, data block
 3-types are allocated as a unit for speed.  Data buffers are allocated on a memory boundary that is
 the same as the next power of two sized buffer.
 
-@item @b{bufcall}(9)
+@item @manref{@b{bufcall}(9)}
 Install a buffer callback.  @cite{@value{PACKAGE_TITLE}} provides the additional assurance that the
 callback routine will not be called until the caller returns from the calling function block.
 
-@item @b{copyb}(9)
+@item @manref{@b{copyb}(9)}
 Copy a @acronym{STREAMS} message block.  A @var{NULL} pointer passed as an argument will panic the
 kernel.
 
-@item @b{copymsg}(9)
+@item @manref{@b{copymsg}(9)}
 Copy a @acronym{STREAMS} message.  Performs a block-wise copy using @manpage{@b{copyb}(9)}.
 
-@item @b{datamsg}(9)
+@item @manref{@b{datamsg}(9)}
 Tests a @acronym{STREAMS} message type for data.
 
-@item @b{dupb}(9)
+@item @manref{@b{dupb}(9)}
 Duplicate a @acronym{STREAMS} message block.  @cite{@value{PACKAGE_TITLE}} uses a global lock to
 protect the @var{db_refs} member of the data block.
 
-@item @b{dupmsg}(9)
+@item @manref{@b{dupmsg}(9)}
 Duplicate a @acronym{STREAMS} message.  Performs a block-wise duplication using @manpage{@b{dupb}(9)}.
 
-@item @b{esballoc}(9)
+@item @manref{@b{esballoc}(9)}
 Allocate a @acronym{STREAMS} message and data block with a caller supplied data buffer.  This is the
 most portable method of allocating a data buffer that requires some particular alignment.  The
 callback free routine is inherently unsafe when the function is provided by a module and modules are
 permitted to unload.
 
-@item @b{freeb}(9)
+@item @manref{@b{freeb}(9)}
 Frees a @acronym{STREAMS} message block.
 
-@item @b{freemsg}(9)
+@item @manref{@b{freemsg}(9)}
 Frees a @acronym{STREAMS} message.  Performs a block-wise free using @manpage{@b{freeb}(9)}.
 
-@item @b{linkb}(9)
+@item @manref{@b{linkb}(9)}
 Link a message block to a @acronym{STREAMS} message.  Panics if either argument is @var{NULL}.
 
-@item @b{msgdsize}(9)
+@item @manref{@b{msgdsize}(9)}
 Calculate the size of the data in a @acronym{STREAMS} message.  Accepts a @var{NULL} pointer, in which
 case the function returns zero (@samp{0}).
 
-@item @b{msgpullup}(9)
+@item @manref{@b{msgpullup}(9)}
 Pull up bytes in a @acronym{STREAMS} message.  Might allocate a new message to satisfy the request.
 
-@item @b{pcmsg}(9)
+@item @manref{@b{pcmsg}(9)}
 Test a data block message type for priority control.
 
-@item @b{pullupmsg}(9)
+@item @manref{@b{pullupmsg}(9)}
 Pull up the bytes in a @acronym{STREAMS} message.  Does not allocate a new initial message block, but
 may allocate a new initial data block and data buffer.  The pointers @samp{mp->b_wptr} and
 @samp{mp->b_rptr} are potentially invalidated by the call.
 
-@item @b{rmvb}(9)
+@item @manref{@b{rmvb}(9)}
 Remove a message block from a @acronym{STREAMS} message.  The message block must exist in the message.
 Passing @var{NULL} pointers will panic the kernel.
 
-@item @b{testb}(9)
+@item @manref{@b{testb}(9)}
 Test if a @acronym{STREAMS} message can be allocated.  Because the test is not atomic, when this
 function returns true, a subsequent call to @manpage{@b{allocb}(9)} could still fail.
 
-@item @b{unbufcall}(9)
+@item @manref{@b{unbufcall}(9)}
 Remove a @acronym{STREAMS} buffer callback.  @cite{@value{PACKAGE_TITLE}} provides the @cite{SVR 4}
 assurance that before the call returns the callback function will either have been cancelled or
 execution of the callback will be complete.
 
-@item @b{unlinkb}(9)
+@item @manref{@b{unlinkb}(9)}
 Unlink a message block from a @acronym{STREAMS} message.
 
-@end ftable
+@end table
 
 @subsection UP Queue Functions
 @cindex UP queue functions
@@ -544,44 +474,44 @@ manipulating queues.  @cite{@value{PACKAGE_TITLE}} provides the added assurance
 that @var{q_next} pointers can always be reliably dereferenced from within a
 queue put, service, open, close or synchronized callback procedure.
 
-@ftable @manref
+@table @asis
 
-@item @b{backq}(9)
+@item @manref{@b{backq}(9)}
 Find the upstream or downstream queue.  @cite{@value{PACKAGE_TITLE}} protects
 this pointer dereference when called from within a put, service, open, close or
 callback procedure.
 
-@item @b{bcanput}(9)
+@item @manref{@b{bcanput}(9)}
 Test flow control on a @acronym{STREAMS} message queue.
 @cite{@value{PACKAGE_TITLE}} follows @cite{SVR 4} semantics for queue enabling,
 queue flags and back-enabling.
 
-@item @b{canenable}(9)
+@item @manref{@b{canenable}(9)}
 Test whether a @acronym{STREAMS} message queue can be scheduled.  This only effects
 normal priority messages as per @cite{SVR 4} semantics.
 
-@item @b{enableok}(9)
+@item @manref{@b{enableok}(9)}
 Allow a @acronym{STREAMS} message queue to be scheduled.  This only effects normal
 priority messages as per @cite{SVR 4} semantics.
 
-@item @b{flushband}(9)
+@item @manref{@b{flushband}(9)}
 Flushes band @acronym{STREAMS} messages from a message queue.
 @cite{@value{PACKAGE_TITLE}} provides a mechanism that efficiently flushes large
 numbers of messages from a queue: messages are unlinked from the queue and freed
 later by the @acronym{STREAMS} scheduler.
 
-@item @b{flushq}(9)
+@item @manref{@b{flushq}(9)}
 Flushes messages from a @acronym{STREAMS} message queue.
 @cite{@value{PACKAGE_TITLE}} provides a mechanism that efficiently flushes large
 numbers of messages from a queue: messages are unlinked from the queue and freed
 later by the @acronym{STREAMS} scheduler.
 
-@item @b{getq}(9)
+@item @manref{@b{getq}(9)}
 Gets a message from a @acronym{STREAMS} message queue.
 @cite{@value{PACKAGE_TITLE}} follows @cite{SVR 4} semantics for queue enabling,
 queue flags and back-enabling.
 
-@item @b{insq}(9)
+@item @manref{@b{insq}(9)}
 Inserts a message into a @acronym{STREAMS} message queue.
 @cite{@value{PACKAGE_TITLE}} recommends, but does not require, that the Stream
 be first frozen by the caller with a call to
@@ -590,44 +520,44 @@ module or driver writer can make such assurances with mechanisms other than
 @manpage{@b{freezestr}(9)}.  See the @manref{@b{freezestr}(9)} manual page for
 more information.}
 
-@item @b{noenable}(9)
+@item @manref{@b{noenable}(9)}
 Disable a @acronym{STREAMS} message queue from being scheduled.  This only effects
 normal priority messages as per @cite{SVR 4} semantics.
 
-@item @b{OTHERQ}(9)
+@item @manref{@b{OTHERQ}(9)}
 Return the other queue of a @acronym{STREAMS} queue pair.
 
-@item @b{putbq}(9)
+@item @manref{@b{putbq}(9)}
 Put a message back on a @acronym{STREAMS} message queue.
 @cite{@value{PACKAGE_TITLE}} follows @cite{SVR 4} semantics for queue enabling,
 queue flags and back-enabling.
 
-@item @b{putctl}(9)
+@item @manref{@b{putctl}(9)}
 Put a control message on a @acronym{STREAMS} message queue.
 
-@item @b{putctl1}(9)
+@item @manref{@b{putctl1}(9)}
 Put a 1 byte control message on a @acronym{STREAMS} message queue.
 
-@item @b{putq}(9)
+@item @manref{@b{putq}(9)}
 Put a message on a @acronym{STREAMS} message queue.  @cite{@value{PACKAGE_TITLE}}
 follows @cite{SVR 4} semantics for queue enabling, queue flags and back-enabling.
 
-@item @b{qenable}(9)
+@item @manref{@b{qenable}(9)}
 Schedules a @acronym{STREAMS} message queue service routine.
 
-@item @b{qreply}(9)
+@item @manref{@b{qreply}(9)}
 Replies to a message from a @acronym{STREAMS} message queue.
 
-@item @b{qsize}(9)
+@item @manref{@b{qsize}(9)}
 Return the number of messages on a queue.
 
-@item @b{RD}(9)
+@item @manref{@b{RD}(9)}
 Return the read queue of a @acronym{STREAMS} queue pair.  Although
 @cite{@value{PACKAGE_TITLE}} accepts a read queue pointer as an argument, doing
 so could panic some implementations.  The macro @manpage{@b{_RD}(9)} is also
 provided that has this stricter behaviour.
 
-@item @b{rmvq}(9)
+@item @manref{@b{rmvq}(9)}
 Remove a message from a @acronym{STREAMS} message queue.
 @cite{@value{PACKAGE_TITLE}} recommends, but does not require, that the Stream
 be first frozen by the caller with a call to
@@ -636,16 +566,16 @@ module or driver writer can make such assurances with mechanisms other than
 @manpage{@b{freezestr}(9)}.  See the @manref{@b{freezestr}(9)} manual page for
 more information.}
 
-@item @b{SAMESTR}(9)
+@item @manref{@b{SAMESTR}(9)}
 Test for @acronym{STREAMS} pipe or fifo.
 
-@item @b{WR}(9)
+@item @manref{@b{WR}(9)}
 Return the write queue of a @acronym{STREAMS} queue pair.  Although
 @cite{@value{PACKAGE_TITLE}} accepts a write queue pointer as an argument, doing
 so could panic some implementations.  The macro @manpage{@b{_WR}(9)} is also
 provided that has this stricter behaviour.
 
-@end ftable
+@end table
 
 @subsection MP Queue Functions
 @cindex MP queue functions
@@ -665,9 +595,9 @@ procedures within the Stream.  This means that a function call such as
 @samp{canput(q->q_next)} and @samp{canputnext(q)} have identical effect within
 the synchronous procedure.
 
-@ftable @manref
+@table @asis
 
-@item @b{bcanputnext}(9)
+@item @manref{@b{bcanputnext}(9)}
 Test flow control on a message queue.
 @cite{@value{PACKAGE_TITLE}} ensures the validity of @var{q_next} pointer
 dereferencing for any queue in the queue pair for which a queue put, service,
@@ -677,7 +607,7 @@ across a multiplexing driver), the @manpage{@b{bcanputnext}(9)} utility should
 be used instead of the @manpage{@b{bcanput}(9)} utility.  @samp{bcanputnext(q,
 band)} should always be preferred over @samp{bcanput(q->q_next, band)}.
 
-@item @b{canputnext}(9)
+@item @manref{@b{canputnext}(9)}
 Test flow control on a message queue.
 @cite{@value{PACKAGE_TITLE}} ensures the validity of @var{q_next} pointer
 dereferencing for any queue in the queue pair for which a queue put, service,
@@ -687,7 +617,7 @@ across a multiplexing driver), the @manpage{@b{canputnext}(9)} utility should be
 used instead of the @manpage{@b{canput}(9)} utility.  @samp{canputnext(q)}
 should always be preferred over @samp{canput(q->q_next)}.
 
-@item @b{freezestr}(9)
+@item @manref{@b{freezestr}(9)}
 Freeze the state of a stream queue.
 @manpage{@b{freezestr}(9)} was provided in the MP environment to behave in the
 same fashion as @manpage{@b{spl}(9)} did in the UP environment.  In the UP
@@ -695,14 +625,14 @@ environment it was a simply matter to suppress interrupts before directly
 manipulating queue structures and then re-enable interrupts after queue
 manipulation was complete.
 
-@item @b{put}(9)
+@item @manref{@b{put}(9)}
 Invoke the put procedure for a @acronym{STREAMS} module or driver with a @acronym{STREAMS} message.
 In the UP environment, the queue at a Stream end could be called directly such
 as @samp{(*q->q_qinfo->qi_putp)(q, mp)}.  In the MP environment, this would
 circumvent the @acronym{STREAMS} synchronization model and the @manpage{@b{put}(9)}
 utility function should be used instead.
 
-@item @b{putnext}(9)
+@item @manref{@b{putnext}(9)}
 Put a message on the downstream @acronym{STREAMS} message queue.
 In the UP environment, the adjacent queue put procedure could be called directly
 such as @samp{(*q->q_next->q_qinfo->qi_putp)(q, mp)}.  In the MP environment,
@@ -711,22 +641,22 @@ this would circumvent the @acronym{STREAMS} synchronization model and the
 @samp{putnext(q, mp)} should always be used in preference to
 @samp{put(q->q_next, mp)}.
 
-@item @b{putnextctl1}(9)
+@item @manref{@b{putnextctl1}(9)}
 Put a 1 byte control message on the downstream @acronym{STREAMS} message queue.
 A @var{q_next} pointer dereferencing version of @manpage{@b{putctl1}(9)}.
 @samp{putnextctl1(q, type, param)} should always be used in preference to
 @samp{putctl1(q->q_next, type, param)}.
 
-@item @b{putnextctl}(9)
+@item @manref{@b{putnextctl}(9)}
 Put a control message on the downstream @acronym{STREAMS} message queue.
 A @var{q_next} pointer dereferencing version of @manpage{@b{putctl}(9)}.
 @samp{putnextctl(q, type)} should always be used in preference to
 @samp{putctl(q->q_next, type)}.
 
-@item @b{qprocsoff}(9)
+@item @manref{@b{qprocsoff}(9)}
 Disables @acronym{STREAMS} message queue processing for multi-processing.
 
-@item @b{qprocson}(9)
+@item @manref{@b{qprocson}(9)}
 Enables @acronym{STREAMS} message queue processing for multi-processing.
 In the UP environment, it was possible to prepare the queue service and put
 procedures for proper operation before returning and permitting the queue to run
@@ -739,7 +669,7 @@ the function implicitly if it is not called before the queue open routine
 returns (but must still be called explicitly if the queue open routine blocks
 awaiting an event on the queue).
 
-@item @b{strqget}(9)
+@item @manref{@b{strqget}(9)}
 Gets information about a @acronym{STREAMS} message queue.
 In the UP environment, it was possible to directly manipulate streamtab or queue
 structures after suppressing interrupts.  The @manpage{@b{strqget}(9)} utility
@@ -749,7 +679,7 @@ Some implementations conflict on whether a Stream must first be frozen with
 the Stream be frozen across a call to @manpage{@b{strqget}(9)}, but it is not
 required.
 
-@item @b{strqset}(9)
+@item @manref{@b{strqset}(9)}
 Sets attributes of a @acronym{STREAMS} message queue.
 In the UP environment, it was possible to directly manipulate streamtab or queue
 structures after suppressing interrupts.  The @manpage{@b{strqset}(9)} utility
@@ -759,12 +689,12 @@ Some implementations conflict on whether a Stream must first be frozen with
 the Stream be frozen across a call to @manpage{@b{strqset}(9)}, but it is not
 required.
 
-@item @b{unfreezestr}(9)
+@item @manref{@b{unfreezestr}(9)}
 Thaw the state of a stream queue.
 @manpage{@b{unfreezestr}(9)} was provided in the MP environment to behave in the
 same fashion as @manpage{@b{splx}(9)} did in the UP environment.
 
-@end ftable
+@end table
 
 @subsection DDI/DKI Functions
 @cindex DDI/DKI functions
@@ -776,119 +706,119 @@ have survived into kernel/driver interfaces today in one form or another.  Some 
 Additional functions are supported by Compatibility Modules, and the base @cite{SVR 4} functions are
 provided by the base @cite{@value{PACKAGE_TITLE}} package.
 
-@ftable @manref
+@table @asis
 
-@item @b{kmem_alloc}(9)
+@item @manref{@b{kmem_alloc}(9)}
 Allocate kernel memory.
 
-@item @b{kmem_free}(9)
+@item @manref{@b{kmem_free}(9)}
 Deallocates kernel memory.
 
-@item @b{kmem_zalloc}(9)
+@item @manref{@b{kmem_zalloc}(9)}
 Allocate and zero kernel memory.
 
-@item @b{cmn_err}(9)
+@item @manref{@b{cmn_err}(9)}
 Print a kernel command error.
 
-@item @b{bcopy}(9)
+@item @manref{@b{bcopy}(9)}
 Copy byte strings.
 This is the basic BSD-style function for copying bytes.  Traditionally @acronym{STREAMS} has used the
 BSD-style function @manpage{@b{bcopy}(9)} instead of the SVR3-style
 @manpage{@b{memcpy}(9)}.@footnote{Perhaps this has something to do with @acronym{STREAMS} first being
 implemented on BSD 4.2.}
 
-@item @b{bzero}(9)
+@item @manref{@b{bzero}(9)}
 Zero a byte string.
 This is the basic BSD-style function for zeroing bytes.  Traditionally @acronym{STREAMS} has used the
 BSD-style function @manpage{@b{bzero}(9)} instead of the SVR3-style
 @manpage{@b{memset}(9)}.@footnote{Perhaps this has something to do with @acronym{STREAMS} first being
 implemented on BSD 4.2.}
 
-@item @b{copyin}(9)
+@item @manref{@b{copyin}(9)}
 Copy user data in from user space to kernel space.
 In the UP environment, the top module put procedure was called in user context and it was possible
 to copy bytes directly from the user and block in this context.  In the MP environment and with an
 MP @acronym{STREAMS} synchronization model, the top module put procedure could be called outside of the
 Stream head user context.  Therefore, this function has little use under @acronym{STREAMS}.
 
-@item @b{copyout}(9)
+@item @manref{@b{copyout}(9)}
 Copy user data in from kernel space to user space.
 In the UP environment, the top module put procedure was called in user context and it was possible
 to copy bytes directly to the user and block in this context.  In the MP environment and with an
 MP @acronym{STREAMS} synchronization model, the top module put procedure could be called outside of the
 Stream head user context.  Therefore, this function has little use under @acronym{STREAMS}.
 
-@item @b{delay}(9)
+@item @manref{@b{delay}(9)}
 Postpone the calling process for a number of clock ticks.
 
-@item @b{drv_getparm}(9)
+@item @manref{@b{drv_getparm}(9)}
 Driver retrieve kernel parameter.
 
-@item @b{drv_hztomsec}(9)
+@item @manref{@b{drv_hztomsec}(9)}
 Convert kernel tick time between microseconds or milliseconds.
 
-@item @b{drv_htztousec}(9)
+@item @manref{@b{drv_htztousec}(9)}
 Convert kernel tick time between microseconds or milliseconds.
 
-@item @b{drv_msectohz}(9)
+@item @manref{@b{drv_msectohz}(9)}
 Convert kernel tick time between microseconds or milliseconds.
 
-@item @b{drv_priv}(9)
+@item @manref{@b{drv_priv}(9)}
 Check if the current process is privileged.
 
-@item @b{drv_usectohz}(9)
+@item @manref{@b{drv_usectohz}(9)}
 Convert kernel tick time between microseconds or milliseconds.
 
-@item @b{drv_usecwait}(9)
+@item @manref{@b{drv_usecwait}(9)}
 Delay for a number of microseconds.
 
-@item @b{min}(9)
+@item @manref{@b{min}(9)}
 Determine the minimum of two integers.
 
-@item @b{max}(9)
+@item @manref{@b{max}(9)}
 Determine the maximum of two integers.
 
-@item @b{getmajor}(9)
+@item @manref{@b{getmajor}(9)}
 Get the internal major device number for a device.
 
-@item @b{getminor}(9)
+@item @manref{@b{getminor}(9)}
 Get the extended minor device number for a device.
 
-@item @b{makedevice}(9)
+@item @manref{@b{makedevice}(9)}
 Create a device from a major and minor device numbers.
 
-@item @b{strlog}(9)
+@item @manref{@b{strlog}(9)}
 Pass a message to the @acronym{STREAMS} logger.
 
-@item @b{timeout}(9)
+@item @manref{@b{timeout}(9)}
 Start a timer.
 Although general purpose in nature, the @manpage{@b{timeout}(9)} and @manpage{@b{untimeout}(9)}
 utilities were most often used for @acronym{STREAMS} modules and drivers.  Some implementations only
 support these functions for @acronym{STREAMS}.
 
-@item @b{untimeout}(9)
+@item @manref{@b{untimeout}(9)}
 Stop a timer.
 Although general purpose in nature, the @manpage{@b{timeout}(9)} and @manpage{@b{untimeout}(9)}
 utilities were most often used for @acronym{STREAMS} modules and drivers.  Some implementations only
 support these functions for @acronym{STREAMS}.
 
-@end ftable
+@end table
 
-@ftable @manref
+@table @asis
 
-@item @b{mknod}(9)
+@item @manref{@b{mknod}(9)}
 Make block or character special files.
 
-@item @b{mount}(9)
+@item @manref{@b{mount}(9)}
 Mount and unmount file systems.
 
-@item @b{umount}(9)
+@item @manref{@b{umount}(9)}
 Mount and unmount file systems.
 
-@item @b{unlink}(9)
+@item @manref{@b{unlink}(9)}
 Remove a file.
 
-@end ftable
+@end table
 
 @subsection Some Common Extension Functions
 @cindex some common extension functions
@@ -911,24 +841,24 @@ arrangements while maintaining queue synchronization.  The two utilities
 provide this facility.  @cite{@value{PACKAGE_TITLE}} supports these functions as
 part of the base package.
 
-@ftable @manref
+@table @asis
 
-@item @b{linkmsg}(9)
+@item @manref{@b{linkmsg}(9)}
 Link a message block to a @acronym{STREAMS} message.
 
-@item @b{putctl2}(9)
+@item @manref{@b{putctl2}(9)}
 Put a two byte control message on a @acronym{STREAMS} message queue.
 
-@item @b{putnextctl2}(9)
+@item @manref{@b{putnextctl2}(9)}
 Put a two byte control message on the downstream @acronym{STREAMS} message queue.
 
-@item @b{weldq}(9)
+@item @manref{@b{weldq}(9)}
 Weld two (or four) queues together.
 
-@item @b{unweldq}(9)
+@item @manref{@b{unweldq}(9)}
 Unweld two (or four) queues.
 
-@end ftable
+@end table
 
 @subsection Some Internal Functions
 @cindex some internal functions
@@ -944,67 +874,67 @@ specialized drivers or modules such as the @manref{@b{clone}(4)} driver or
 Following are some of the exposed functions that are typically exposed by other
 @acronym{STREAMS} implementations as well:
 
-@ftable @manref
+@table @asis
 
-@item @b{allocq}(9)
+@item @manref{@b{allocq}(9)}
 Allocate a @acronym{STREAMS} queue pair.
 
-@item @b{bcanget}(9)
+@item @manref{@b{bcanget}(9)}
 Test for message arrival on a band on a stream.
 
-@item @b{canget}(9)
+@item @manref{@b{canget}(9)}
 Test for message arrival on a stream.
 
-@item @b{freeq}(9)
+@item @manref{@b{freeq}(9)}
 Deallocate a @acronym{STREAMS} queue pair.
 
-@item @b{qattach}(9)
+@item @manref{@b{qattach}(9)}
 Attach a module onto a @acronym{STREAMS} file.
 
-@item @b{qclose}(9)
+@item @manref{@b{qclose}(9)}
 Close a @acronym{STREAMS} module or driver.
 
-@item @b{qdetach}(9)
+@item @manref{@b{qdetach}(9)}
 Detach a module from a @acronym{STREAMS} file.
 
-@item @b{qopen}(9)
+@item @manref{@b{qopen}(9)}
 Call a @acronym{STREAMS} module or driver open routine.
 
-@item @b{setq}(9)
+@item @manref{@b{setq}(9)}
 Set sizes and procedures associated with a @acronym{STREAMS} message queue.
 
-@end ftable
+@end table
 
 @subsection Some Oddball Functions
 @cindex some oddball functions
 
-@ftable @manref
+@table @asis
 
-@item @b{appq}(9)
+@item @manref{@b{appq}(9)}
 Append one @acronym{STREAMS} message after another.
 
-@item @b{esbbcall}(9)
+@item @manref{@b{esbbcall}(9)}
 Install a buffer callback for an extended @acronym{STREAMS} message block.
 
-@item @b{isdatablk}(9)
+@item @manref{@b{isdatablk}(9)}
 Test a @acronym{STREAMS} data block for data type.
 
-@item @b{isdatamsg}(9)
+@item @manref{@b{isdatamsg}(9)}
 Test a @acronym{STREAMS} data block for data type.
 
-@item @b{kmem_zalloc_node}(9)
+@item @manref{@b{kmem_zalloc_node}(9)}
 Allocate and zero a NUMA memory extent.
 
-@item @b{msgsize}(9)
+@item @manref{@b{msgsize}(9)}
 Calculate the size of the message blocks in a @acronym{STREAMS} message.
 
-@item @b{qcountstrm}(9)
+@item @manref{@b{qcountstrm}(9)}
 Add all counts on all @acronym{STREAMS} message queues in a stream.
 
-@item @b{xmsgsize}(9)
+@item @manref{@b{xmsgsize}(9)}
 Calculate the size of message blocks in a @acronym{STREAMS} message.
 
-@end ftable
+@end table
 
 @page
 @node Porting from SVR 3.2
@@ -1072,18 +1002,18 @@ present in @cite{SVR 3.2} appear in the @cite{SVR 4.2 MP} DDI/DKI.
 @subsection Compatibility functions for SVR 3.2
 @cindex Compatibility functions for SVR 3.2
 
-@ftable @manref
+@table @asis
 
-@item @b{alloc_proto}(9)
+@item @manref{@b{alloc_proto}(9)}
 Allocate control and data message blocks.
 
-@item @b{emajor}(9)
+@item @manref{@b{emajor}(9)}
 Get the external (real) major device number from the device number.
 
-@item @b{eminor}(9)
+@item @manref{@b{eminor}(9)}
 Get the external extended minor device number from the device number.
 
-@end ftable
+@end table
 
 @node Configuration ala SVR 3.2
 @subsection Configuration ala SVR 3.2
@@ -1192,21 +1122,21 @@ These locks are not normally used by @acronym{STREAMS} modules and drivers and a
 @cite{SVR 4.2 MP} Compatibility Module, @file{streams_svr4compat.ko}, from the @acronym{STREAMS}
 Compatibility Modules package, @file{strcompat}.
 
-@ftable @manref
+@table @asis
 
-@item @b{MPSTR_QLOCK}(9)
+@item @manref{@b{MPSTR_QLOCK}(9)}
 Release a queue from exclusive access.
 
-@item @b{MPSTR_QRELE}(9)
+@item @manref{@b{MPSTR_QRELE}(9)}
 Acquire a queue for exclusive access.
 
-@item @b{MPSTR_STPLOCK}(9)
+@item @manref{@b{MPSTR_STPLOCK}(9)}
 Acquire a stream head for exclusive access.
 
-@item @b{MPSTR_STPRELE}(9)
+@item @manref{@b{MPSTR_STPRELE}(9)}
 Release a stream head from exclusive access.
 
-@end ftable
+@end table
 
 @subsubsection Basic Locks
 
@@ -1217,218 +1147,218 @@ It is rather typical for @cite{OpenSS7 Project} @acronym{STREAMS} modules and dr
 the @cite{SVR 4.2 MP} Compatibility Module, @file{streams_svr4compat.ko}, from the @acronym{STREAMS}
 Compatibility Modules package, @file{strcompat}.
 
-@ftable @manref
+@table @asis
 
-@item @b{LOCK}(9)
+@item @manref{@b{LOCK}(9)}
 Lock a basic lock.
 
-@item @b{LOCK_ALLOC}(9)
+@item @manref{@b{LOCK_ALLOC}(9)}
 Allocate a basic lock.
 
-@item @b{LOCK_DEALLOC}(9)
+@item @manref{@b{LOCK_DEALLOC}(9)}
 Deallocate a basic lock.
 
-@item @b{LOCK_OWNED}(9)
+@item @manref{@b{LOCK_OWNED}(9)}
 Determine whether a basic lock is head by the caller.
 
-@item @b{TRYLOCK}(9)
+@item @manref{@b{TRYLOCK}(9)}
 Try to lock a basic lock.
 
-@item @b{UNLOCK}(9)
+@item @manref{@b{UNLOCK}(9)}
 Unlock a basic lock.
 
-@end ftable
+@end table
 
 @subsubsection Read-Write Locks
 
 Read-write locks are similar to @cite{Linux} read-write locks and can be used as an ABI replacement
 for @cite{Linux} read-write locks.
 
-@ftable @manref
+@table @asis
 
-@item @b{RW_ALLOC}(9)
+@item @manref{@b{RW_ALLOC}(9)}
 Allocate and initialize a read/write lock.
 
-@item @b{RW_DEALLOC}(9)
+@item @manref{@b{RW_DEALLOC}(9)}
 Deallocate a read/write lock.
 
-@item @b{RW_RDLOCK}(9)
+@item @manref{@b{RW_RDLOCK}(9)}
 Acquire a read/write lock in read mode.
 
-@item @b{RW_TRYRDLOCK}(9)
+@item @manref{@b{RW_TRYRDLOCK}(9)}
 Attempt to acquire a read/write lock in read mode.
 
-@item @b{RW_TRYWRLOCK}(9)
+@item @manref{@b{RW_TRYWRLOCK}(9)}
 Attempt to acquire a read/write lock in write mode.
 
-@item @b{RW_UNLOCK}(9)
+@item @manref{@b{RW_UNLOCK}(9)}
 Release a read/write lock.
 
-@item @b{RW_WRLOCK}(9)
+@item @manref{@b{RW_WRLOCK}(9)}
 Acquire a read/write lock in write mode.
 
-@end ftable
+@end table
 
 @subsubsection Sleep Locks
 
 Sleep locks are similar to @cite{Linux} semaphores or mutexes.
 
-@ftable @manref
+@table @asis
 
-@item @b{SLEEP_ALLOC}(9)
+@item @manref{@b{SLEEP_ALLOC}(9)}
 Allocate a sleep lock.
 
-@item @b{SLEEP_DEALLOC}(9)
+@item @manref{@b{SLEEP_DEALLOC}(9)}
 Deallocate a sleep lock.
 
-@item @b{SLEEP_LOCK}(9)
+@item @manref{@b{SLEEP_LOCK}(9)}
 Acquire a sleep lock.
 
-@item @b{SLEEP_LOCKAVAIL}(9)
+@item @manref{@b{SLEEP_LOCKAVAIL}(9)}
 Determine whether a sleep lock is available.
 
-@item @b{SLEEP_LOCKOWNED}(9)
+@item @manref{@b{SLEEP_LOCKOWNED}(9)}
 Determine whether a sleep lock is held by the caller.
 
-@item @b{SLEEP_LOCK_SIG}(9)
+@item @manref{@b{SLEEP_LOCK_SIG}(9)}
 Acquire a sleep lock.
 
-@item @b{SLEEP_TRYLOCK}(9)
+@item @manref{@b{SLEEP_TRYLOCK}(9)}
 Attempt to acquire a sleep lock.
 
-@item @b{SLEEP_UNLOCK}(9)
+@item @manref{@b{SLEEP_UNLOCK}(9)}
 Release a sleep lock.
 
-@end ftable
+@end table
 
 @subsubsection Synchronization Variables
 
 Synchronization variables are similar to @cite{Linux} wait queues.
 
-@ftable @manref
+@table @asis
 
-@item @b{SV_ALLOC}(9)
+@item @manref{@b{SV_ALLOC}(9)}
 Allocate a basic condition variable.
 
-@item @b{SV_BROADCAST}(9)
+@item @manref{@b{SV_BROADCAST}(9)}
 Broadcast a basic condition variable.
 
-@item @b{SV_DEALLOC}(9)
+@item @manref{@b{SV_DEALLOC}(9)}
 Deallocate a basic condition variable.
 
-@item @b{SV_SIGNAL}(9)
+@item @manref{@b{SV_SIGNAL}(9)}
 Signal a basic condition variable.
 
-@item @b{SV_WAIT}(9)
+@item @manref{@b{SV_WAIT}(9)}
 Wait on a basic condition variable.
 
-@item @b{SV_WAIT_SIG}(9)
+@item @manref{@b{SV_WAIT_SIG}(9)}
 Interruptible wait on a basic condition variable.
 
-@end ftable
+@end table
 
 @subsubsection Atomic Integers
 
 Atomic Integers are similar to @cite{Linux} atomic integers.
 
-@ftable @manref
+@table @asis
 
-@item @b{ATOMIC_INT_ADD}(9)
+@item @manref{@b{ATOMIC_INT_ADD}(9)}
 Add an integer value to an atomic integer.
 
-@item @b{ATOMIC_INT_ALLOC}(9)
+@item @manref{@b{ATOMIC_INT_ALLOC}(9)}
 Allocate and initalize an atomic integer.
 
-@item @b{ATOMIC_INT_DEALLOC}(9)
+@item @manref{@b{ATOMIC_INT_DEALLOC}(9)}
 Deallocate an atomic integer.
 
-@item @b{ATOMIC_INT_DECR}(9)
+@item @manref{@b{ATOMIC_INT_DECR}(9)}
 Decrement and test an atomic integer.
 
-@item @b{ATOMIC_INT_INCR}(9)
+@item @manref{@b{ATOMIC_INT_INCR}(9)}
 Increment an atomic integer.
 
-@item @b{ATOMIC_INT_INIT}(9)
+@item @manref{@b{ATOMIC_INT_INIT}(9)}
 Initialize an atomic integer.
 
-@item @b{ATOMIC_INT_READ}(9)
+@item @manref{@b{ATOMIC_INT_READ}(9)}
 Read an atomic integer.
 
-@item @b{ATOMIC_INT_SUB}(9)
+@item @manref{@b{ATOMIC_INT_SUB}(9)}
 Subtract and integer value from an atomic integer.
 
-@item @b{ATOMIC_INT_WRITE}(9)
+@item @manref{@b{ATOMIC_INT_WRITE}(9)}
 Write an integer value to an atomic integer.
 
-@end ftable
+@end table
 
 @subsubsection Set Processor Level
 
 Processor levels are similar to @cite{Linux} local irq or soft irq suppression.
 
-@ftable @manref
+@table @asis
 
-@item @b{spl0}(9)
+@item @manref{@b{spl0}(9)}
 Set priority level 0.
 
-@item @b{spl1}(9)
+@item @manref{@b{spl1}(9)}
 Set priority level 1.
 
-@item @b{spl2}(9)
+@item @manref{@b{spl2}(9)}
 Set priority level 2.
 
-@item @b{spl3}(9)
+@item @manref{@b{spl3}(9)}
 Set priority level 3.
 
-@item @b{spl4}(9)
+@item @manref{@b{spl4}(9)}
 Set priority level 4.
 
-@item @b{spl5}(9)
+@item @manref{@b{spl5}(9)}
 Set priority level 5.
 
-@item @b{spl6}(9)
+@item @manref{@b{spl6}(9)}
 Set priority level 6.
 
-@item @b{spl7}(9)
+@item @manref{@b{spl7}(9)}
 Set priority level 7.
 
-@item @b{spl}(9)
+@item @manref{@b{spl}(9)}
 Set priority level.
 
-@item @b{splx}(9)
+@item @manref{@b{splx}(9)}
 Set priority level x.
 
-@end ftable
+@end table
 
 @subsubsection Additional Compatibility Functions
 
-@ftable @manref
+@table @asis
 
-@item @b{itimeout}(9)
+@item @manref{@b{itimeout}(9)}
 Perform a timeout at an interrupt level.
 
-@item @b{lbolt}(9)
+@item @manref{@b{lbolt}(9)}
 Time in ticks since reboot.
 
-@item @b{major}(9)
+@item @manref{@b{major}(9)}
 Get the internal major number of a device.
 
-@item @b{makedev}(9)
+@item @manref{@b{makedev}(9)}
 Make a device number from internal major and minor device numbers.
 
-@item @b{minor}(9)
+@item @manref{@b{minor}(9)}
 Get the internal minor number of a device.
 
-@item @b{sleep}(9)
+@item @manref{@b{sleep}(9)}
 Put a process to sleep.
 
-@item @b{vtop}(9)
+@item @manref{@b{vtop}(9)}
 Convert virtual to physical address.
 
-@item @b{wakeup}(9)
+@item @manref{@b{wakeup}(9)}
 Wake a process.
 
-@end ftable
+@end table
 
 @node Configuration ala SVR 4.2 MP
 @subsection Configuration ala SVR 4.2 MP
@@ -1479,57 +1409,57 @@ provided also with other implementations (such as @cite{OSF/1} or
 The following functions are typically also provided by @emph{most} @acronym{STREAMS}
 implementations:
 
-@ftable @manref
+@table @asis
 
-@item @b{putctl2}(9)
+@item @manref{@b{putctl2}(9)}
 Put a 2 byte control message on a @acronym{STREAMS}.
 
-@item @b{splstr}(9)
+@item @manref{@b{splstr}(9)}
 Set processor level for @acronym{STREAMS}.
 
-@item @b{splx}(9)
+@item @manref{@b{splx}(9)}
 Set or restore processor level.
 
-@item @b{unweldq}(9)
+@item @manref{@b{unweldq}(9)}
 Unweld two pairs of streams queues.
 
-@item @b{weldq}(9)
+@item @manref{@b{weldq}(9)}
 Weld together two pairs of streams queues.
 
-@end ftable
+@end table
 
 The following functions are really just @cite{Mentat Portable @acronym{STREAMS}}
 functions that made their way into @cite{AIX}:  (Portability considerations for
 @cite{Mentat Portable @acronym{STREAMS}} functions is described in.)
 
-@ftable @manref
+@table @asis
 
-@item @b{mi_bufcall}(9)
+@item @manref{@b{mi_bufcall}(9)}
 Reliable alternative to @manpage{@b{buffcall}(9)}.
 This is really just a @cite{Mentat Portable @acronym{STREAMS}} function that made
 its way into @cite{AIX}.
 
-@item @b{mi_close_comm}(9)
+@item @manref{@b{mi_close_comm}(9)}
 @acronym{STREAMS} common minor device close utility.
 This is really just a @cite{Mentat Portable @acronym{STREAMS}} function that made
 its way into @cite{AIX}.
 
-@item @b{mi_next_ptr}(9)
+@item @manref{@b{mi_next_ptr}(9)}
 @acronym{STREAMS} minor device list traversal.
 This is really just a @cite{Mentat Portable @acronym{STREAMS}} function that made
 its way into @cite{AIX}.
 
-@item @b{mi_open_comm}(9)
+@item @manref{@b{mi_open_comm}(9)}
 @acronym{STREAMS} common minor device open utility.
 This is really just a @cite{Mentat Portable @acronym{STREAMS}} function that made
 its way into @cite{AIX}.
 
-@item @b{mi_prev_ptr}(9)
+@item @manref{@b{mi_prev_ptr}(9)}
 @acronym{STREAMS} minor device list traversal.
 This is really just a @cite{Mentat Portable @acronym{STREAMS}} function that made
 its way into @cite{AIX}.
 
-@end ftable
+@end table
 
 The following functions are unique to @cite{AIX}:
 
@@ -1540,23 +1470,23 @@ facilities are incredibly convoluted and complex and only documented by
 @acronym{STREAMS} Compatibility Module package, @file{strcompat}) as faithfully as
 possible, their use should be completely avoided by portable programs.
 
-@ftable @manref
+@table @asis
 
-@item @b{wantio}(9)
+@item @manref{@b{wantio}(9)}
 Perform direct I/O from a @acronym{STREAMS} driver.
 
-@item @b{wantmsg}(9)
+@item @manref{@b{wantmsg}(9)}
 Provide a filter of wanted messages from a @acronym{STREAMS} module.
 
-@end ftable
+@end table
 
 @node Configuration ala AIX 5L Version 5.1
 @subsection Configuration ala AIX 5L Version 5.1
 @cindex configuration ala aix 5l version 5.1
 
-@ftable @manref
+@table @asis
 
-@item @b{str_install}(9)
+@item @manref{@b{str_install}(9)}
 Install a @acronym{STREAMS} module or driver.
 Each implementation has a different mechanism for registration and
 deregistration of @acronym{STREAMS} modules and drivers.  This is the mechanism
@@ -1566,7 +1496,7 @@ is implemented in the @cite{AIX} Compatibility Module,
 @file{streams_aixcompat.ko}, from the @acronym{STREAMS} Compatibility Module package,
 @file{strcompat}.
 
-@end ftable
+@end table
 
 @page
 @node Porting from HP-UX 11.0i v2
@@ -1612,21 +1542,21 @@ Company, HP.  @url{http://docs.hp.com/}} Because of this, it is recommended that
 The following compatibility functions are typical extensions and are also
 provided by the @cite{@value{PACKAGE_TITLE}} base package:
 
-@ftable @manref
+@table @asis
 
-@item @b{putctl2}(9)
+@item @manref{@b{putctl2}(9)}
 put a 2 byte control message on a @acronym{STREAMS} message queue
 
-@item @b{putnextctl2}(9)
+@item @manref{@b{putnextctl2}(9)}
 put a 2 byte control message on the downstream @acronym{STREAMS} message queue
 
-@item @b{unweldq}(9)
+@item @manref{@b{unweldq}(9)}
 unweld two pairs of streams queues
 
-@item @b{weldq}(9)
+@item @manref{@b{weldq}(9)}
 weld together two pairs of streams queues
 
-@end ftable
+@end table
 
 The following compatibility functions are peculiar to
 @cite{HP-UX}@footnote{@i{STREAMS/UX for the HP 9000 Reference Manual}, 1995,
@@ -1635,21 +1565,21 @@ The following compatibility functions are peculiar to
 module, @file{streams_hpuxcompat.ko}, from the @acronym{STREAMS} Compatibility
 Modules, @file{strcompat}, package:
 
-@ftable @manref
+@table @asis
 
-@item @b{get_sleep_lock}(9)
+@item @manref{@b{get_sleep_lock}(9)}
 Provide access to the global sleep lock.
 
-@item @b{streams_get_sleep_lock}(9)
+@item @manref{@b{streams_get_sleep_lock}(9)}
 Provide access to the global sleep lock.
 
-@item @b{streams_mpsleep}(9)
+@item @manref{@b{streams_mpsleep}(9)}
 Put a process to sleep.
 
-@item @b{streams_put}(9)
+@item @manref{@b{streams_put}(9)}
 Invoke the put procedure for a @acronym{STREAMS} module or driver with a @acronym{STREAMS} message.
 
-@end ftable
+@end table
 
 
 @node Configuration ala HP-UX 11.0i v2
@@ -1663,15 +1593,15 @@ drivers is one of the least standardized mechanisms across the various
 @cite{HP-UX} specific @acronym{STREAMS} driver installation, registration and
 deregistration style:
 
-@ftable @manref
+@table @asis
 
-@item @b{str_install}(9)
+@item @manref{@b{str_install}(9)}
 Install a @acronym{STREAMS} module or driver.
 
-@item @b{str_uninstall}(9)
+@item @manref{@b{str_uninstall}(9)}
 Uninstall a @acronym{STREAMS} module or driver.
 
-@end ftable
+@end table
 
 @page
 @node Porting from OSF/1 1.2/Digital UNIX
@@ -1704,51 +1634,51 @@ functions.
 @subsection Compatibility Functions for OSF/1 1.2/Digial UNIX
 @cindex compatibility functions for osf/1 1.2/digial unix
 
-@ftable @manref
+@table @asis
 
-@item @b{unweldq}(9)
+@item @manref{@b{unweldq}(9)}
 Unweld two pairs of streams queues.
 
-@item @b{weldq}(9)
+@item @manref{@b{weldq}(9)}
 Weld together two pairs of streams queues.
 
-@end ftable
+@end table
 
-@ftable @manref
+@table @asis
 
-@item @b{lbolt}(9)
+@item @manref{@b{lbolt}(9)}
 Time in ticks since reboot.
 
-@item @b{puthere}(9)
+@item @manref{@b{puthere}(9)}
 Invoke the put procedure for a @acronym{STREAMS} module or driver with a @acronym{STREAMS} message.
 
-@item @b{streams_close_comm}(9)
+@item @manref{@b{streams_close_comm}(9)}
 Common minor device close utility.
 
-@item @b{streams_open_comm}(9)
+@item @manref{@b{streams_open_comm}(9)}
 Common minor device open utility.
 
-@item @b{streams_open_ocomm}(9)
+@item @manref{@b{streams_open_ocomm}(9)}
 Common minor device open utility.
 
-@item @b{time}(9)
+@item @manref{@b{time}(9)}
 (undoc)
 
-@end ftable
+@end table
 
 @node Configuration ala OSF/1 1.2/Digial UNIX
 @subsection Configuration ala OSF/1 1.2/Digial UNIX
 @cindex configuration ala osf/1 1.2/digial unix
 
-@ftable @manref
+@table @asis
 
-@item @b{strmod_add}(9)
+@item @manref{@b{strmod_add}(9)}
 Add a @acronym{STREAMS} module.
 
-@item @b{strmod_del}(9)
+@item @manref{@b{strmod_del}(9)}
 Delete a @acronym{STREAMS} module or driver from the kernel.
 
-@end ftable
+@end table
 
 @page
 @node Porting from UnixWare 7.1.3 (OpenUnix 8)
@@ -1784,46 +1714,42 @@ functions.
 The following compatibility functions are in addition to all SVR 4.2
 compatibility functions.
 
-@ftable @manref
+@table @asis
 
-@end ftable
-
-@ftable @manref
-
-@item @b{allocb_physreq}(9)
+@item @manref{@b{allocb_physreq}(9)}
 Allocate a @acronym{STREAMS} message and data block.
 
-@item @b{emajor}(9)
+@item @manref{@b{emajor}(9)}
 Get the external (real) major device number from the device number.
 
-@item @b{eminor}(9)
+@item @manref{@b{eminor}(9)}
 Get the external extended minor device number from the device number.
 
-@item @b{etoimajor}(9)
+@item @manref{@b{etoimajor}(9)}
 Convert an external major device number to an internal major device number.
 
-@item @b{getemajor}(9)
+@item @manref{@b{getemajor}(9)}
 Get the external (real) major device number.
 
-@item @b{geteminor}(9)
+@item @manref{@b{geteminor}(9)}
 Get the external minor device number.
 
-@item @b{itoemajor}(9)
+@item @manref{@b{itoemajor}(9)}
 Convert an internal major device number to an external major device number.
 
-@item @b{msgphysreq}(9)
+@item @manref{@b{msgphysreq}(9)}
 Cause a message block to meet physical requirements.
 
-@item @b{msgpullup_physreq}(9)
+@item @manref{@b{msgpullup_physreq}(9)}
 Pull up bytes in a @acronym{STREAMS} message.
 
-@item @b{msgscgth}(9)
+@item @manref{@b{msgscgth}(9)}
 (undoc)
 
-@item @b{strioccall}(9)
+@item @manref{@b{strioccall}(9)}
 (undoc)
 
-@end ftable
+@end table
 
 @node Configuration ala UnixWare 7.1.3 (OpenUnix 8)
 @subsection Configuration ala UnixWare 7.1.3 (OpenUnix 8)
@@ -1860,118 +1786,118 @@ functions.
 @subsection Compatibility Functions for Solaris 9/SunOS 5.9
 @cindex compatibility functions for solaris 9/sunos 5.9
 
-@ftable @manref
+@table @asis
 
-@item @b{ddi_create_minor_node}(9)
+@item @manref{@b{ddi_create_minor_node}(9)}
 Create a minor node for this device.
 
-@item @b{ddi_driver_major}(9)
+@item @manref{@b{ddi_driver_major}(9)}
 Find the major device number associated with a driver.
 
-@item @b{ddi_driver_name}(9)
+@item @manref{@b{ddi_driver_name}(9)}
 Return normalized driver name.
 
-@item @b{ddi_get_cred}(9)
+@item @manref{@b{ddi_get_cred}(9)}
 Get a reference to the credentials of the current user.
 
-@item @b{ddi_getiminor}(9)
+@item @manref{@b{ddi_getiminor}(9)}
 
-@item @b{ddi_get_instance}(9)
+@item @manref{@b{ddi_get_instance}(9)}
 Get device instance number.
 
-@item @b{ddi_get_lbolt}(9)
+@item @manref{@b{ddi_get_lbolt}(9)}
 Get the current value of the system tick clock.
 
-@item @b{ddi_get_pid}(9)
+@item @manref{@b{ddi_get_pid}(9)}
 
-@item @b{ddi_get_soft_state}(9)
+@item @manref{@b{ddi_get_soft_state}(9)}
 
-@item @b{ddi_get_time}(9)
+@item @manref{@b{ddi_get_time}(9)}
 Get the current time in seconds since the epoch.
 
-@item @b{ddi_remove_minor_node}(9)
+@item @manref{@b{ddi_remove_minor_node}(9)}
 Remove a minor node for a device.
 
-@item @b{ddi_removing_power}(9)
+@item @manref{@b{ddi_removing_power}(9)}
 
-@item @b{ddi_soft_state}(9)
+@item @manref{@b{ddi_soft_state}(9)}
 
-@item @b{ddi_soft_state_fini}(9)
+@item @manref{@b{ddi_soft_state_fini}(9)}
 
-@item @b{ddi_soft_state_free}(9)
+@item @manref{@b{ddi_soft_state_free}(9)}
 
-@item @b{ddi_soft_state_init}(9)
+@item @manref{@b{ddi_soft_state_init}(9)}
 
-@item @b{ddi_soft_state_zalloc}(9)
+@item @manref{@b{ddi_soft_state_zalloc}(9)}
 
-@item @b{ddi_umem_alloc}(9)
+@item @manref{@b{ddi_umem_alloc}(9)}
 Allocate page aligned kernel memory.
 
-@item @b{ddi_umem_free}(9)
+@item @manref{@b{ddi_umem_free}(9)}
 
-@item @b{power}(9)
+@item @manref{@b{power}(9)}
 Power a device attached to the system.
 
-@item @b{probe}(9)
+@item @manref{@b{probe}(9)}
 
-@item @b{qbufcall}(9)
+@item @manref{@b{qbufcall}(9)}
 Install a buffer callback.
 
-@item @b{qtimeout}(9)
+@item @manref{@b{qtimeout}(9)}
 Start a timer associated with a queue.
 
-@item @b{queclass}(9)
+@item @manref{@b{queclass}(9)}
 
-@item @b{qunbufcall}(9)
+@item @manref{@b{qunbufcall}(9)}
 
-@item @b{quntimeout}(9)
+@item @manref{@b{quntimeout}(9)}
 
-@item @b{qwait}(9)
+@item @manref{@b{qwait}(9)}
 Wait for a queue message.
 
-@item @b{qwait_sig}(9)
+@item @manref{@b{qwait_sig}(9)}
 Wait for a queue message or signal.
 
-@item @b{qwriter}(9)
+@item @manref{@b{qwriter}(9)}
 
-@end ftable
+@end table
 
 @node Configuration ala Solaris 9/SunOS 5.9
 @subsection Configuration ala Solaris 9/SunOS 5.9
 @cindex configuration ala solaris 9/sunos 5.9
 
-@ftable @manref
+@table @asis
 
-@item @b{_fini}(9)
+@item @manref{@b{_fini}(9)}
 
-@item @b{_info}(9)
+@item @manref{@b{_info}(9)}
 
-@item @b{_init}(9)
+@item @manref{@b{_init}(9)}
 
-@item @b{attach}(9)
+@item @manref{@b{attach}(9)}
 Attach a device to the system or resume a suspended device.
 
-@item @b{detach}(9)
+@item @manref{@b{detach}(9)}
 Detach a device from the system or suspend a device.
 
-@item @b{getinfo}(9)
+@item @manref{@b{getinfo}(9)}
 
-@item @b{identify}(9)
+@item @manref{@b{identify}(9)}
 Determine if a driver is associated with a device.
 
-@item @b{install_driver}(9)
+@item @manref{@b{install_driver}(9)}
 Install a device driver.
 
-@item @b{mod_info}(9)
+@item @manref{@b{mod_info}(9)}
 Provides information on a loadable kernel module to the @acronym{STREAMS} executive.
 
-@item @b{mod_install}(9)
+@item @manref{@b{mod_install}(9)}
 Installs a loadable kernel module in the @acronym{STREAMS} executive.
 
-@item @b{mod_remove}(9)
+@item @manref{@b{mod_remove}(9)}
 Removes a loadable module from the @acronym{STREAMS} executive.
 
-@end ftable
+@end table
 
 @page
 @node Porting from SUPER-UX
@@ -2004,12 +1930,12 @@ functions.
 @subsection Compatibility Functions for SUPER-UX
 @cindex compatibility functions for super-ux
 
-@ftable @manref
+@table @asis
 
-@item @b{lbolt}(9)
+@item @manref{@b{lbolt}(9)}
 Time in ticks since reboot.
 
-@end ftable
+@end table
 
 @node Configuration ala SUPER-UX
 @subsection Configuration ala SUPER-UX
@@ -2116,238 +2042,238 @@ functions.
 @subsection Compatibility Functions for Mentat Portable STREAMS
 @cindex compatibility functions for mentat portable streams
 
-@ftable @manref
+@table @asis
 
-@item @b{mi_alloc}(9)
+@item @manref{@b{mi_alloc}(9)}
 Allocate and free kernel memory without later regard to size.
 
-@item @b{mi_allocq}(9)
+@item @manref{@b{mi_allocq}(9)}
 @manpage{@b{allocq}(9)} replacement.
 
-@item @b{mi_alloc_sleep}(9)
+@item @manref{@b{mi_alloc_sleep}(9)}
 @manpage{@b{kmem_alloc}(9)} replacement.
 
-@item @b{mi_attach}(9)
+@item @manref{@b{mi_attach}(9)}
 Associate instance data with a @acronym{STREAMS} queue.
 
-@item @b{mi_bcmp}(9)
+@item @manref{@b{mi_bcmp}(9)}
 @manpage{@b{bcmp}(9)} replacement.
 
-@item @b{mi_bufcall}(9)
+@item @manref{@b{mi_bufcall}(9)}
 Reliable alternative to @manpage{@b{bufcall}(9)}.
 
-@item @b{mi_close_comm}(9)
+@item @manref{@b{mi_close_comm}(9)}
 @acronym{STREAMS} common minor device close utility.
 
-@item @b{mi_close_detached}(9)
+@item @manref{@b{mi_close_detached}(9)}
 Release instance data from the @acronym{STREAMS} queue and perform close cleanup.
 
-@item @b{mi_close_free}(9)
+@item @manref{@b{mi_close_free}(9)}
 Free a @acronym{STREAMS} driver or module instance on close.
 
-@item @b{mi_copy_done}(9)
+@item @manref{@b{mi_copy_done}(9)}
 @manpage{@b{ioctl}(2s)} complete.
 
-@item @b{mi_copyin}(9)
+@item @manref{@b{mi_copyin}(9)}
 Copy data to a user buffer.
 
-@item @b{mi_copyin_n}(9)
+@item @manref{@b{mi_copyin_n}(9)}
 Copy data to a user buffer.
 
-@item @b{mi_copyout}(9)
+@item @manref{@b{mi_copyout}(9)}
 Copy data from a user buffer.
 
-@item @b{mi_copyout_alloc}(9)
+@item @manref{@b{mi_copyout_alloc}(9)}
 Allocate a buffer to be copied out using @manpage{@b{mi_copyout}(9)}.
 
-@item @b{mi_copy_set_rval}(9)
+@item @manref{@b{mi_copy_set_rval}(9)}
 Set return value for input-output control.
 
-@item @b{mi_copy_state}(9)
+@item @manref{@b{mi_copy_state}(9)}
 Current state of the input-output control process.
 
-@item @b{mi_detach}(9)
+@item @manref{@b{mi_detach}(9)}
 Disassociate instance data from the @acronym{STREAMS} queue.
 
-@item @b{mi_first_dev_ptr}(9)
+@item @manref{@b{mi_first_dev_ptr}(9)}
 Obtain first device instance pointer.
 
-@item @b{mi_first_ptr}(9)
+@item @manref{@b{mi_first_ptr}(9)}
 Obtain first instance pointer.
 
-@item @b{mi_free}(9)
+@item @manref{@b{mi_free}(9)}
 @manpage{@b{kmem_free}(9)} replacement.
 
-@item @b{mi_freeq}(9)
+@item @manref{@b{mi_freeq}(9)}
 @manpage{@b{freeq}(9)} replacement.
 
-@item @b{mi_mpprintf}(9)
+@item @manref{@b{mi_mpprintf}(9)}
 Print a formatted string to a message buffer.
 
-@item @b{mi_mpprintf_nr}(9)
+@item @manref{@b{mi_mpprintf_nr}(9)}
 Continue to print a formatted string to a message buffer.
 
-@item @b{mi_next_dev_ptr}(9)
+@item @manref{@b{mi_next_dev_ptr}(9)}
 Obtain next device instance pointer.
 
-@item @b{mi_next_ptr}(9)
+@item @manref{@b{mi_next_ptr}(9)}
 @acronym{STREAMS} minor device list traversal.
 
-@item @b{mi_offset_param}(9)
+@item @manref{@b{mi_offset_param}(9)}
 Obtain parameter location within @acronym{STREAMS} message block.
 
-@item @b{mi_offset_paramc}(9)
+@item @manref{@b{mi_offset_paramc}(9)}
 Obtain parameter location within @acronym{STREAMS} message block chain.
 
-@item @b{mi_open_alloc}(9)
+@item @manref{@b{mi_open_alloc}(9)}
 Allocate a @acronym{STREAMS} module or driver instance.
 
-@item @b{mi_open_alloc_sleep}(9)
+@item @manref{@b{mi_open_alloc_sleep}(9)}
 Allocate a @acronym{STREAMS} module or driver instance (may sleep).
 
-@item @b{mi_open_comm}(9)
+@item @manref{@b{mi_open_comm}(9)}
 @acronym{STREAMS} common minor device open utility.
 
-@item @b{mi_open_detached}(9)
+@item @manref{@b{mi_open_detached}(9)}
 @acronym{STREAMS} create detached instance data.
 
-@item @b{mi_open_link}(9)
+@item @manref{@b{mi_open_link}(9)}
 Link a @acronym{STREAMS} driver or module instance on open.
 
-@item @b{mi_prev_ptr}(9)
+@item @manref{@b{mi_prev_ptr}(9)}
 @acronym{STREAMS} minor list traversal.
 
-@item @b{mi_timer_q_switch}(9)
+@item @manref{@b{mi_timer_q_switch}(9)}
 Switch @acronym{STREAMS} queues for a timer message.
 
-@item @b{mi_reallocb}(9)
+@item @manref{@b{mi_reallocb}(9)}
 Reallocated a @acronym{STREAMS} message block.
 
-@item @b{mi_reuse_proto}(9)
+@item @manref{@b{mi_reuse_proto}(9)}
 Reuse a @acronym{STREAMS} protocol message block.
 
-@item @b{mi_set_sth_copyopt}(9)
+@item @manref{@b{mi_set_sth_copyopt}(9)}
 Set the @acronym{STREAMS} Stream head copy options.
 
-@item @b{mi_set_sth_hiwat}(9)
+@item @manref{@b{mi_set_sth_hiwat}(9)}
 Set the @acronym{STREAMS} Stream head high water mark.
 
-@item @b{mi_set_sth_lowat}(9)
+@item @manref{@b{mi_set_sth_lowat}(9)}
 Set the @acronym{STREAMS} Stream head low water mark.
 
-@item @b{mi_set_sth_maxblk}(9)
+@item @manref{@b{mi_set_sth_maxblk}(9)}
 Set the @acronym{STREAMS} Stream head maximum block size.
 
-@item @b{mi_set_sth_wroff}(9)
+@item @manref{@b{mi_set_sth_wroff}(9)}
 Set the @acronym{STREAMS} Stream head write offset.
 
-@item @b{mi_sprintf}(9)
+@item @manref{@b{mi_sprintf}(9)}
 @manpage{@b{sprintf}(9)} replacement.
 
-@item @b{mi_sprintf_putc}(9)
+@item @manref{@b{mi_sprintf_putc}(9)}
 Put a character in a sprintf buffer.
 
-@item @b{mi_strcmp}(9)
+@item @manref{@b{mi_strcmp}(9)}
 @manpage{@b{strcmp}(9)} replacement.
 
-@item @b{mi_strlen}(9)
+@item @manref{@b{mi_strlen}(9)}
 @manpage{@b{strlen}(9)} replacement.
 
-@item @b{mi_strlog}(9)
+@item @manref{@b{mi_strlog}(9)}
 @manpage{@b{strlog}(9)} replacement.
 
-@item @b{mi_strtol}(9)
+@item @manref{@b{mi_strtol}(9)}
 @manpage{@b{strtol}(9)} replacement.
 
-@item @b{mi_timer}(9)
+@item @manref{@b{mi_timer}(9)}
 Process a @acronym{STREAMS} timer.
 
-@item @b{mi_timer_alloc}(9)
+@item @manref{@b{mi_timer_alloc}(9)}
 Allocate a @acronym{STREAMS} timer.
 
-@item @b{mi_timer_cancel}(9)
+@item @manref{@b{mi_timer_cancel}(9)}
 Cancel a @acronym{STREAMS} timer.
 
-@item @b{mi_timer_free}(9)
+@item @manref{@b{mi_timer_free}(9)}
 Free a @acronym{STREAMS} timer.
 
-@item @b{mi_timer_move}(9)
+@item @manref{@b{mi_timer_move}(9)}
 Move a @acronym{STREAMS} timer.
 
-@item @b{mi_timer_q_switch}(9)
+@item @manref{@b{mi_timer_q_switch}(9)}
 Switch queues for a @acronym{STREAMS} timer.
 
-@item @b{mi_timer_stop}(9)
+@item @manref{@b{mi_timer_stop}(9)}
 Stop a @acronym{STREAMS} timer.
 
-@item @b{mi_timer_valid}(9)
+@item @manref{@b{mi_timer_valid}(9)}
 Check a @acronym{STREAMS} timer.
 
-@item @b{mi_zalloc}(9)
+@item @manref{@b{mi_zalloc}(9)}
 @manpage{@b{kmem_zalloc}(9)} replacement.
 
-@item @b{mi_zalloc_sleep}(9)
+@item @manref{@b{mi_zalloc_sleep}(9)}
 @manpage{@b{kmem_zalloc}(9)} replacement.
 
-@end ftable
+@end table
 
-@ftable @manref
+@table @asis
 
-@item @b{mi_tpi_ack_alloc}(9)
+@item @manref{@b{mi_tpi_ack_alloc}(9)}
 Allocate a @manpage{@b{T_OK_ACK}(7)} or @manpage{@b{T_ERROR_ACK}(7)} primitive.
 
-@item @b{mi_tpi_conn_con}(9)
+@item @manref{@b{mi_tpi_conn_con}(9)}
 Generate a @manpage{@b{T_CONN_CON}(7)} primitive.
 
-@item @b{mi_tpi_conn_ind}(9)
+@item @manref{@b{mi_tpi_conn_ind}(9)}
 Generate a @manpage{@b{T_CONN_IND}(7)} primitive.
 
-@item @b{mi_tpi_conn_req}(9)
+@item @manref{@b{mi_tpi_conn_req}(9)}
 Generate a @manpage{@b{T_CONN_REQ}(7)} primitive.
 
-@item @b{mi_tpi_data_ind}(9)
+@item @manref{@b{mi_tpi_data_ind}(9)}
 Generate a @manpage{@b{T_DATA_IND}(7)} primitive.
 
-@item @b{mi_tpi_data_req}(9)
+@item @manref{@b{mi_tpi_data_req}(9)}
 Generate a @manpage{@b{T_DATA_REQ}(7)} primitive.
 
-@item @b{mi_tpi_discon_ind}(9)
+@item @manref{@b{mi_tpi_discon_ind}(9)}
 Generate a @manpage{@b{T_DISCON_IND}(7)} primitive.
 
-@item @b{mi_tpi_discon_req}(9)
+@item @manref{@b{mi_tpi_discon_req}(9)}
 Generate a @manpage{@b{T_DISCON_REQ}(7)} primitive.
 
-@item @b{mi_tpi_err_ack_alloc}(9)
+@item @manref{@b{mi_tpi_err_ack_alloc}(9)}
 Generate a @manpage{@b{T_ERROR_ACK}(7)} primitive.
 
-@item @b{mi_tpi_exdata_ind}(9)
+@item @manref{@b{mi_tpi_exdata_ind}(9)}
 Generate a @manpage{@b{T_EXDATA_IND}(7)} primitive.
 
-@item @b{mi_tpi_exdata_req}(9)
+@item @manref{@b{mi_tpi_exdata_req}(9)}
 Generate a @manpage{@b{T_EXDATA_REQ}(7)} primitive.
 
-@item @b{mi_tpi_info_req}(9)
+@item @manref{@b{mi_tpi_info_req}(9)}
 Generate a @manpage{@b{T_INFO_REQ}(7)} primitive.
 
-@item @b{mi_tpi_ok_ack_alloc}(9)
+@item @manref{@b{mi_tpi_ok_ack_alloc}(9)}
 Generate a @manpage{@b{T_OK_ACK}(7)} primitive.
 
-@item @b{mi_tpi_ordrel_ind}(9)
+@item @manref{@b{mi_tpi_ordrel_ind}(9)}
 Generate a @manpage{@b{T_ORDREL_IND}(7)} primitive.
 
-@item @b{mi_tpi_ordrel_req}(9)
+@item @manref{@b{mi_tpi_ordrel_req}(9)}
 Generate a @manpage{@b{T_ORDREL_REQ}(7)} primitive.
 
-@item @b{mi_tpi_uderror_ind}(9)
+@item @manref{@b{mi_tpi_uderror_ind}(9)}
 Generate a @manpage{@b{T_UDERROR_IND}(7)} primitive.
 
-@item @b{mi_tpi_unitdata_ind}(9)
+@item @manref{@b{mi_tpi_unitdata_ind}(9)}
 Generate a @manpage{@b{T_UNITDATA_IND}(7)} primitive.
 
-@item @b{mi_tpi_unitdata_req}(9)
+@item @manref{@b{mi_tpi_unitdata_req}(9)}
 Generate a @manpage{@b{T_UNITDATA_REQ}(7)} primitive.
 
-@end ftable
+@end table
 
 @node Configuration ala Mentat Portable STREAMS
 @subsection Configuration ala Mentat Portable STREAMS
@@ -2662,28 +2588,35 @@ situations, an internal device number can exists with no corresponding external 
 (accessed only via a clone device or direct access to the mounted @file{specfs} shadow special
 character device file system).
 
-@ftable @manref
+@table @asis
 
-@item @b{etoimajor}(9)
+@item @manref{@b{etoimajor}(9)}
 change external to internal major device number
 
-@item @b{getemajor}(9)
+@item @manref{@b{getemajor}(9)}
 get external major device number
 
-@item @b{geteminor}(9)
+@item @manref{@b{geteminor}(9)}
 get external minor device number
 
-@item @b{itoemajor}(9)
+@item @manref{@b{itoemajor}(9)}
 change internal to external major device number
 
-@end ftable
+@end table
 
-@node Copying
-@appendix Copying
+@node Licenses
+@appendix Licenses
+@cindex Licenses
+
+@menu
+* GNU General Public License::		The GPL license
+* GNU Free Documentation License::	The FDL license
+@end menu
+
+@page
 @include texi/gpl3.texi
 
-@node Documentation License
-@appendix Documentation License
+@page
 @include texi/fdl13.texi
 
 @page
