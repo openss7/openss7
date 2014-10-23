@@ -5,7 +5,7 @@
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2008-2014  Monavacon Limited <http://www.monavacon.com/>
 @c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 @c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
@@ -1449,9 +1449,9 @@ into the @file{src} directory.
 
 @end itemize
 
+@ignore
 @itemize @bullet
 
-@ignore
 @item
 Create a skeleton directory and manual and place @command{@value{PACKAGE}} as
 a sub-package in the @cite{OpenSS7 Master Package}.
@@ -1461,9 +1461,9 @@ a sub-package in the @cite{OpenSS7 Master Package}.
 
 You are reading it.
 @end table
-@end ignore
 
 @end itemize
+@end ignore
 
 The @command{@value{PACKAGE}} package is currently incomplete.
 
@@ -1636,9 +1636,9 @@ only perform the IP packet-level testing later.
 
 @end itemize
 
+@ignore
 @itemize @bullet
 
-@ignore
 @item
 Retest performance using the OpenSS7 Modified Netperf package.
 
@@ -1648,9 +1648,7 @@ Retest performance using the OpenSS7 Modified Netperf package.
 Performance testing on loopback using the @file{netperf} package has been completed.  A performance
 results paper is included in the distribution.
 @end table
-@end ignore
 
-@ignore
 @item
 Perform profiling and use the hot text techniques from Linux Fast-STREAMS to make the package run
 even faster.
@@ -1661,9 +1659,7 @@ even faster.
 Common performance profiling and text sections have been incorporated into the code as a part of
 performance testing.
 @end table
-@end ignore
 
-@ignore
 @item
 SCTP Interoperability testing.  Take the STREAMS package to the SCTP Interop tests at UBC and
 perform interoperability testing.
@@ -1675,9 +1671,7 @@ Tested perfect against all functional implementations present.  Passed 720 Mbps 
 optimizations and debugging assertions turned on.  Still have to go through the logs and collect
 warnings and investigate them.  Still have to complete optimized performance testing.
 @end table
-@end ignore
 
-@ignore
 @item
 Testing and Validation using existing test suites.
 
@@ -1686,9 +1680,7 @@ Testing and Validation using existing test suites.
 
 Full regression performed.
 @end table
-@end ignore
 
-@ignore
 @item
 Complete documentation.  Particularly the npi_sctp(7) and tpi_sctp(7) manual pages.  The xti_sctp
 manual page is fairly complete but needs updating in several places where there are gaps.
@@ -1700,9 +1692,9 @@ npi_sctp(7) manual page heavily updated and now complete.
 tpi_sctp(7) close to complete, a few options undocumented.
 xti_sctp(3) quite complete, a few options undocumented in a few sections.
 @end table
-@end ignore
 
 @end itemize
+@end ignore
 
 
 @c --------------------------------------------------------------------

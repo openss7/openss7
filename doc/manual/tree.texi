@@ -5,7 +5,7 @@
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2008-2014  Monavacon Limited <http://www.monavacon.com/>
 @c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 @c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
@@ -673,7 +673,7 @@ releases.}
 
 @table @asis
 
-@item 
+@item streams-ch
 
 This add-on package currently installs no kernel modules.  Modules will be added from the commercial
 release of @command{strss7} as they are re-validated on @cite{Linux Fast-STREAMS}.
@@ -798,7 +798,7 @@ drivers and modules were originally part of the commercial @command{strss7} pack
 
 @table @asis
 
-@item 
+@item streams-isdn
 
 This add-on package currently installs no kernel modules.  Modules will be added from the commercial
 release of @command{strss7} as they are re-validated on @cite{Linux Fast-STREAMS}.
@@ -818,7 +818,7 @@ modules were originally part of the commercial @command{strss7} package releases
 
 @table @asis
 
-@item 
+@item streams-aal1
 
 This add-on package currently installs no kernel modules.  Modules will be added from the commercial
 release of @command{strss7} as they are re-validated on @cite{Linux Fast-STREAMS}.
@@ -1009,7 +1009,7 @@ were originally part of the commercial @command{strss7} package releases.}
 
 @table @asis
 
-@item 
+@item streams-mgcp
 
 This add-on package currently installs no kernel modules.  Modules will be added from the commercial
 release of @command{strss7} as they are re-validated on @cite{Linux Fast-STREAMS}.
