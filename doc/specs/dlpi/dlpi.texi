@@ -1,92 +1,92 @@
-% -*- texinfo -*- vim: ft=texinfo
-% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
-% =========================================================================
-%
-% @(#) $Id: dlpi.texi,v 1.1.2.2 2011-02-07 02:21:39 brian Exp $
-%
-% =========================================================================
-%
-% Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
-% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
-%
-% All Rights Reserved.
-%
-% Permission is granted to copy, distribute and/or modify this document
-% under the terms of the GNU Free Documentation License, Version 1.3 or
-% any later version published by the Free Software Foundation; with no
-% Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
-% copy of the license is included in the section entitled "GNU Free
-% Documentation License".
-%
-% Permission to use, copy and distribute this documentation without
-% modification, for any purpose and without fee or royalty is hereby
-% granted, provided that both the above copyright notice and this
-% permission notice appears in all copies and that the name of OpenSS7
-% Corporation not be used in advertising or publicity pertaining to
-% distribution of this documentation or its contents without specific,
-% written prior permission.  OpenSS7 Corporation makes no representation
-% about the suitability of this documentation for any purpose.  It is
-% provided "as is" without express or implied warranty.
-% 
-% Permission is granted to process this file through Tex and print the
-% results, provided the printed document carries copying permission
-% notice identical to this one except for the removal of this paragraph
-% (this paragraph not being relevant to the printed manual).
-% 
-% OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
-% DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
-% FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
-% CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
-% IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
-% PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
-% OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
-% CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
-% USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-% OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
-% THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
-% THEREOF.
-% 
-% Since the Linux kernel and libraries are constantly changing, this
-% manual page may be incorrect or out-of-date.  The author(s) assume no
-% responsibility for errors or omissions, or for damages resulting from
-% the use of the information contained herein.  The author(s) may not
-% have taken the same level of care in the production of this manual,
-% which is licensed free of charge, as they might when working
-% professionally.
-% 
-% Formatted or processed versions of this manual, if unaccompanied by
-% the source, must acknowledge the copyright and authors of this work.
-%
-% -------------------------------------------------------------------------
-%
-% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-% on behalf of the U.S. Government ("Government"), the following
-% provisions apply to you.  If the Software is supplied by the Department
-% of Defense ("DoD"), it is classified as "Commercial Computer Software"
-% under paragraph 252.227-7014 of the DoD Supplement to the Federal
-% Acquisition Regulations ("DFARS") (or any successor regulations) and the
-% Government is acquiring only the license rights granted herein (the
-% license rights customarily provided to non-Government users).  If the
-% Software is supplied to any unit or agency of the Government other than
-% DoD, it is classified as "Restricted Computer Software" and the
-% Government's rights in the Software are defined in paragraph 52.227-19
-% of the Federal Acquisition Regulations ("FAR") (or any successor
-% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-% NASA Supplement to the FAR (or any successor regulations).
-%
-% =========================================================================
-% 
-% Commercial licensing and support of this software is available from
-% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-% 
-% =========================================================================
-%
-% Last Modified $Date: 2011-02-07 02:21:39 $ by $Author: brian $
-%
-% =========================================================================
-
 \input texinfo
+@c -*- texinfo -*- vim: ft=texinfo
+@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+@c =========================================================================
+@c
+@c @(#) $Id: dlpi.texi,v 1.1.2.2 2011-02-07 02:21:39 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2008-2014  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to copy, distribute and/or modify this document
+@c under the terms of the GNU Free Documentation License, Version 1.3 or
+@c any later version published by the Free Software Foundation; with no
+@c Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+@c copy of the license is included in the section entitled "GNU Free
+@c Documentation License".
+@c
+@c Permission to use, copy and distribute this documentation without
+@c modification, for any purpose and without fee or royalty is hereby
+@c granted, provided that both the above copyright notice and this
+@c permission notice appears in all copies and that the name of OpenSS7
+@c Corporation not be used in advertising or publicity pertaining to
+@c distribution of this documentation or its contents without specific,
+@c written prior permission.  OpenSS7 Corporation makes no representation
+@c about the suitability of this documentation for any purpose.  It is
+@c provided "as is" without express or implied warranty.
+@c 
+@c Permission is granted to process this file through Tex and print the
+@c results, provided the printed document carries copying permission
+@c notice identical to this one except for the removal of this paragraph
+@c (this paragraph not being relevant to the printed manual).
+@c 
+@c OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+@c DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+@c FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+@c CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+@c IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+@c PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+@c OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+@c CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+@c USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+@c OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+@c THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+@c THEREOF.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2011-02-07 02:21:39 $ by $Author: brian $
+@c
+@c =========================================================================
+
 @setfilename dlpi.info
 @include ../../../scripts/texi/args.texi
 @set MANUAL_TITLE Data Link Provider Interface
@@ -112,7 +112,7 @@ published by @uref{http://www.openss7.com/,OpenSS7 Corporation}.
 This specification was originally published by UNIX International OSI Work Group
 in Revision: 2.0.0 (1991/08/20).
 
-Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2014  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 Copyright @copyright{} 1991       UNIX International, Inc.
@@ -151,19 +151,18 @@ under the above conditions for modified versions.
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
-@sp 0.5
+@sp 1
 @title @value{MANUAL_TYPE}
 @subtitle UNIX International
 @subtitle OSI Work Group
 @subtitle Revision: 2.0.0
 @subtitle August 20, 1991
-@sp 0.2
+@sp 1
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
 @subtitle Updated @value{PACKAGE_DATE}
-@sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2011  Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2014  Monavacon Limited
 @subtitle Copyright @copyright{} 2001-2008  OpenSS7 Corporation
 @subtitle Copyright @copyright{} 1991 UNIX International, Inc.
 @subtitle All Rights Reserved.
@@ -177,7 +176,6 @@ data link interface to these components as well as providing a basis for data li
 data link protocols.
 @end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
-@sp 0.2
 @author The OpenSS7 Project <@uref{http://www.openss7.org/}>
 
 @page
@@ -268,7 +266,7 @@ Fax: (65) 776-0421
 @end ignore
 
 @noindent
-Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2014  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 Copyright @copyright{} 1991       UNIX International, Inc. @*
@@ -334,7 +332,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2014  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 All Rights Reserved.
@@ -1958,14 +1956,14 @@ is returned and the resulting state is unchanged.
 
 @subsubheading Reasons for Failure
 
-@table @perr
-@item DL_BADPPA
+@table @asis
+@item @perr{DL_BADPPA}
 The specified @acronym{PPA} is invalid.
-@item DL_ACCESS
+@item @perr{DL_ACCESS}
 The DLS user did not have proper permission to use the requested @acronym{PPA}.
-@item DL_OUTSTATE
+@item @perr{DL_OUTSTATE}
 The primitive was issued from an invalid state.
-@item DL_SYSERR
+@item @perr{DL_SYSERR}
 A system error has occurred and the UNIX system error is indicated in the
 @prim{DL_ERROR_ACK}.
 @end table
@@ -2018,10 +2016,10 @@ is returned and the resulting state is unchanged.
 
 @subsubheading Reasons for Failure
 
-@table @perr
-@item DL_OUTSTATE
+@table @asis
+@item @perr{DL_OUTSTATE}
 The primitive was issued from an invalid state.
-@item DL_SYSERR
+@item @perr{DL_SYSERR}
 A system error has occurred and the UNIX system error is indicated in the
 @prim{DL_ERROR_ACK}.
 @end table
@@ -2242,36 +2240,36 @@ is returned and the resulting state is unchanged.
 
 @subsubheading Reasons for Failure
 
-@table @perr
-@item DL_BADADDR
+@table @asis
+@item @perr{DL_BADADDR}
 The @acronym{DLSAP} address information was invalid or was in an incorrect
 format.
-@item DL_INITFAILED
+@item @perr{DL_INITFAILED}
 Automatic initialization of the @acronym{PPA} failed.
-@item DL_NOTINIT
+@item @perr{DL_NOTINIT}
 The @acronym{PPA} had not been initialized prior to this request.
-@item DL_ACCESS
+@item @perr{DL_ACCESS}
 The DLS user did not have proper permission to use the requested @acronym{DLSAP}
 address.
-@item DL_BOUND
+@item @perr{DL_BOUND}
 The DLS user attempted to bind a second stream to a @acronym{DLSAP} with
 dl_max_conindgreater than zero, or the DLS user attempted to bind a second
 @cpindex Connection management stream
 "connection management" stream to a @acronym{PPA}.
-@item DL_OUTSTATE
+@item @perr{DL_OUTSTATE}
 The primitive was issued from an invalid state.
-@item DL_NOADDR
+@item @perr{DL_NOADDR}
 The DLS provider could not allocate a @acronym{DLSAP} address for this stream.
-@item DL_UNSUPPORTED
+@item @perr{DL_UNSUPPORTED}
 The DLS provider does not support requested service mode on this stream.
-@item DL_SYSERR
+@item @perr{DL_SYSERR}
 A system error has occurred and the UNIX system error is indicated in
 the @prim{DL_ERROR_ACK}.
-@item DL_NOAUTO
+@item @perr{DL_NOAUTO}
 Automatic handling of XID and TEST responses not supported.
-@item DL_NOXIDAUTO
+@item @perr{DL_NOXIDAUTO}
 Automatic handling of XID response not supported.
-@item DL_NOTESTAUTO
+@item @perr{DL_NOTESTAUTO}
 Automatic handling of TEST response not supported.
 @end table
 
@@ -2407,10 +2405,10 @@ is returned and the resulting state is unchanged.
 
 @subsubheading Reasons for Failure
 
-@table @perr
-@item DL_OUTSTATE
+@table @asis
+@item @perr{DL_OUTSTATE}
 The primitive was issued from an invalid state.
-@item DL_SYSERR
+@item @perr{DL_SYSERR}
 A system error has occurred and the UNIX system error is indicated in
 the
 @prim{DL_ERROR_ACK}.
@@ -2488,26 +2486,26 @@ is returned and the resulting state is unchanged.
 
 @subsubheading Reasons for Failure
 
-@table @perr
-@item DL_BADADDR
+@table @asis
+@item @perr{DL_BADADDR}
 The @acronym{DLSAP} address information was invalid or was in an incorrect
 format.
 
-@item DL_ACCESS
+@item @perr{DL_ACCESS}
 The DLS user did not have proper permission to use the requested @acronym{DLSAP}
 address.
 
-@item DL_OUTSTATE
+@item @perr{DL_OUTSTATE}
 The primitive was issued from an invalid state.
 
-@item DL_SYSERR
+@item @perr{DL_SYSERR}
 A System error has occurred and the UNIX system error is indicated in the
 @prim{DL_ERROR_ACK}.
 
-@item DL_UNSUPPORTED
+@item @perr{DL_UNSUPPORTED}
 Requested addressing class not supported.
 
-@item DL_TOOMANY
+@item @perr{DL_TOOMANY}
 Limit exceeded on the maximum number of DLSAPs per stream.
 @end table
 
@@ -2606,13 +2604,13 @@ is returned and the resulting state is unchanged.
 
 @subsubheading Reasons for failure
 
-@table @perr
-@item DL_OUTSTATE
+@table @asis
+@item @perr{DL_OUTSTATE}
 The primitive was issued from an invalid state
-@item DL_SYSERR
+@item @perr{DL_SYSERR}
 A system error has occurred and the UNIX system error is indicated in
 the @prim{DL_ERROR_ACK}.
-@item DL_BADADDR
+@item @perr{DL_BADADDR}
 The @acronym{DLSAP} address information was invalid or was in an incorrect format.
 @end table
 
@@ -2670,14 +2668,14 @@ is returned and the resulting state is unchanged.
 
 @subsubheading Reasons for failure
 
-@table @perr
-@item DL_BADADDR
+@table @asis
+@item @perr{DL_BADADDR}
 Address information was invalid or was in an incorrect format.
-@item DL_TOOMANY
+@item @perr{DL_TOOMANY}
 Too many multicast address enable attempts.  Limit exceeded.
-@item DL_OUTSTATE
+@item @perr{DL_OUTSTATE}
 The primitive was issued from an invalid state
-@item DL_NOTSUPPORTED
+@item @perr{DL_NOTSUPPORTED}
 The primitive is known, but not supported by the DLS Provider.
 @end table
 
@@ -2733,14 +2731,14 @@ If the request fails, message
 is returned and the resulting state is unchanged.
 
 @subsubheading Reasons for failure
-@table @perr
-@item DL_BADADDR
+@table @asis
+@item @perr{DL_BADADDR}
 Address information was invalid or in an incorrect format.
-@item DL_NOTENAB
+@item @perr{DL_NOTENAB}
 Address specified is not enabled.
-@item DL_OUTSTATE
+@item @perr{DL_OUTSTATE}
 The primitive was issued from an invalid state.
-@item DL_NOTSUPPORTED
+@item @perr{DL_NOTSUPPORTED}
 Primitive is known, but not supported by the DLS Provider.
 @end table
 
@@ -2802,15 +2800,15 @@ is returned.  Otherwise, a
 is returned.
 
 @subsubheading Reasons for Failure
-@table @perr
-@item DL_OUTSTATE
+@table @asis
+@item @perr{DL_OUTSTATE}
 The primitive was issued from an invalid state
-@item DL_SYSERR
+@item @perr{DL_SYSERR}
 A System error has occurred and the UNIX System error is indicated in the
 @prim{DL_ERROR_ACK}.
-@item DL_NOTSUPPORTED
+@item @perr{DL_NOTSUPPORTED}
 Primitive is known but not supported by the DLS Provider
-@item DL_UNSUPPORTED
+@item @perr{DL_UNSUPPORTED}
 Requested service is not supplied by the provider.
 @end table
 
@@ -2865,15 +2863,16 @@ is returned.  Otherwise, a
 is returned.
 
 @subsubheading Reasons for Failure
-@table @perr
-@item DL_OUTSTATE
+@table @asis
+@item @perr{DL_OUTSTATE}
 The primitive was issued from an invalid state
-@item DL_SYSERR
+@item @perr{DL_SYSERR}
 A System error has occurred and the UNIX System error is indicated in the
 @prim{DL_ERROR_ACK}.
-@item DL_NOTSUPPORTED
+@item @perr{DL_NOTSUPPORTED}
 Primitive is known but not supported by the DLS Provider
-@item DL_NOTENAB Mode not enabled.
+@item @perr{DL_NOTENAB}
+Mode not enabled.
 @end table
 
 @page
@@ -3148,20 +3147,20 @@ If the request is erroneous, message
 is returned and the resulting state is unchanged.
 
 @subsubheading Reasons for Failure
-@table @perr
-@item DL_BADADDR
+@table @asis
+@item @perr{DL_BADADDR}
 The destination @acronym{DLSAP} address was in an incorrect format or contained
 invalid information.
-@item DL_BADQOSPARAM
+@item @perr{DL_BADQOSPARAM}
 The quality of service parameters contained invalid values.
-@item DL_BADQOSTYPE
+@item @perr{DL_BADQOSTYPE}
 The quality of service structure type was not supported by the DLS provider.
-@item DL_ACCESS
+@item @perr{DL_ACCESS}
 The DLS user did not have proper permission to use the requested @acronym{DLSAP}
 address.
-@item DL_OUTSTATE
+@item @perr{DL_OUTSTATE}
 The primitive was issued from an invalid state.
-@item DL_SYSERR
+@item @perr{DL_SYSERR}
 A system error has occurred and the UNIX system error is indicated in the
 @prim{DL_ERROR_ACK}.
 @end table
@@ -3393,25 +3392,25 @@ primitive was received, and the resulting state of that stream and the
 responding stream is unchanged.
 
 @subsubheading Reasons for Failure
-@table @perr
-@item DL_BADTOKEN
+@table @asis
+@item @perr{DL_BADTOKEN}
 The token for the responding stream was not associated with a currently open
 stream.  The quality of service parameters contained invalid values.
-@item DL_BADQOSTYPE
+@item @perr{DL_BADQOSTYPE}
 The quality of service structure type was not supported by the DLS provider.
-@item DL_BADCORR
+@item @perr{DL_BADCORR}
 The correlation number specified in this primitive did not correspond to a
 pending connect indication.
-@item DL_ACCESS
+@item @perr{DL_ACCESS}
 The DLS user did not have proper permission to use the responding stream.
-@item DL_OUTSTATE
+@item @perr{DL_OUTSTATE}
 The primitive was issued from an invalid state, or the responding stream was not
 in a valid state for establishing a connection.
-@item DL_SYSERR
+@item @perr{DL_SYSERR}
 A system error has occurred and the UNIX system error is indicated in
 the
 @prim{DL_ERROR_ACK}.
-@item DL_PENDING
+@item @perr{DL_PENDING}
 Current stream and responding stream is the same and there is more than
 one outstanding connect indication.
 @end table
@@ -3672,19 +3671,6 @@ conveys
 @prim{DL_DISCONNECT_REQ}.
 @item dl_reason
 conveys the reason for the disconnect.
-@subsubheading Reasons for Disconnect
-@table @pval
-@item DL_DISC_NORMAL_CONDITION
-normal release of a data link connection
-@item DL_DISC_ABNORMAL_CONDITION
-abnormal release of a data link connection
-@item DL_CONREJ_PERMANENT_COND
-a permanent condition caused the rejection of a connect request
-@item DL_CONREJ_TRANSIENT_COND
-a transient condition caused the rejection of a connect request
-@item DL_DISC_UNSPECIFIED
-reason unspecified
-@end table
 
 @item dl_correlation
 if non-zero, conveys the correlation number that was contained in the
@@ -3699,6 +3685,20 @@ previously sent
 the value of dl_correlation should be zero.
 @end table
 
+@subsubheading Reasons for Disconnect
+
+@table @pval
+@item DL_DISC_NORMAL_CONDITION
+normal release of a data link connection
+@item DL_DISC_ABNORMAL_CONDITION
+abnormal release of a data link connection
+@item DL_CONREJ_PERMANENT_COND
+a permanent condition caused the rejection of a connect request
+@item DL_CONREJ_TRANSIENT_COND
+a transient condition caused the rejection of a connect request
+@item DL_DISC_UNSPECIFIED
+reason unspecified
+@end table
 
 @subsubheading State
 The message is valid in any of the states:
@@ -3723,15 +3723,15 @@ If the request fails, message
 is returned, and the resulting state is unchanged.
 
 @subsubheading Reasons for Failure
-@table @perr
-@item DL_BADCORR
+@table @asis
+@item @perr{DL_BADCORR}
 The correlation number specified in this primitive did not correspond to a
 pending connect indication.
 
-@item DL_OUTSTATE
+@item @perr{DL_OUTSTATE}
 The primitive was issued from an invalid state.
 
-@item DL_SYSERR
+@item @perr{DL_SYSERR}
 A system error has occurred and the UNIX system error is indicated in
 the @prim{DL_ERROR_ACK}.
 
@@ -3778,6 +3778,16 @@ respectively).
 @item dl_reason
 conveys the reason for the disconnect.
 
+@item dl_correlation
+if non-zero, conveys the correlation number that was contained in the
+@prim{DL_CONNECT_IND} that is being aborted (@pxref{Multi-threaded Connection
+Establishment}).  This value permits the DLS user to associate the message with
+the proper @prim{DL_CONNECT_IND}.  If the disconnect indication is indicating
+the release of a connection that is already established, or is indicating the
+rejection of a previously sent @prim{DL_CONNECT_REQ}, the value of
+dl_correlation will be zero.
+@end table
+
 @subsubheading Reasons for Disconnect
 
 @table @pval
@@ -3808,16 +3818,6 @@ connection establishment
 
 @item DL_DISC_UNSPECIFIED
 reason unspecified
-@end table
-
-@item dl_correlation
-if non-zero, conveys the correlation number that was contained in the
-@prim{DL_CONNECT_IND} that is being aborted (@pxref{Multi-threaded Connection
-Establishment}).  This value permits the DLS user to associate the message with
-the proper @prim{DL_CONNECT_IND}.  If the disconnect indication is indicating
-the release of a connection that is already established, or is indicating the
-rejection of a previously sent @prim{DL_CONNECT_REQ}, the value of
-dl_correlation will be zero.
 @end table
 
 @subsubheading State
@@ -3878,10 +3878,10 @@ If the request fails, message
 is returned and the resulting state is unchanged.
 
 @subsubheading Reasons for Failure
-@table @perr
-@item DL_OUTSTATE
+@table @asis
+@item @perr{DL_OUTSTATE}
 The primitive was issued from an invalid state.
-@item DL_SYSERR
+@item @perr{DL_SYSERR}
 A system error has occurred and the UNIX system error is indicated in the
 @prim{DL_ERROR_ACK}.
 @end table
@@ -3924,6 +3924,8 @@ respectively).
 @item dl_reason
 conveys the reason for the reset.
 
+@end table
+
 @subsubheading Reasons for Reset
 
 @table @pval
@@ -3938,8 +3940,6 @@ indicates a data link error situation
 indicates a request for resynchronization of a data link connection.
 
 @end table
-@end table
-
 @subsubheading State
 The message is valid in state
 @psta{DL_DATAXFER}.
@@ -3996,11 +3996,11 @@ If the reset response is erroneous,
 is returned and the resulting state is unchanged.
 
 @subsubheading Reasons for Failure
-@table @perr
-@item DL_OUTSTATE
+@table @asis
+@item @perr{DL_OUTSTATE}
 The primitive was issued from an invalid state.
 
-@item DL_SYSERR
+@item @perr{DL_SYSERR}
 A system error has occurred and the UNIX system error is indicated in
 the
 @prim{DL_ERROR_ACK}.
@@ -4137,18 +4137,18 @@ report will be generated for all undeliverable data units, since connectionless
 data transfer is not a confirmed service.
 
 @subsubheading Reasons for Failure
-@table @perr
-@item DL_BADADDR
+@table @asis
+@item @perr{DL_BADADDR}
 The destination @acronym{DLSAP} address was in an incorrect format or contained
 invalid information.
 
-@item DL_BADDATA
+@item @perr{DL_BADDATA}
 The amount of data in the current @acronym{DLSDU} exceeded the DLS provider's @acronym{DLSDU} limit.
 
-@item DL_OUTSTATE
+@item @perr{DL_OUTSTATE}
 The primitive was issued from an invalid state.
 
-@item DL_UNSUPPORTED
+@item @perr{DL_UNSUPPORTED}
 Requested priority not supplied by provider.
 
 @end table
@@ -4357,15 +4357,15 @@ If the request fails, message
 is returned and the resulting state is unchanged.
 
 @subsubheading Reasons for Failure
-@table @perr
-@item DL_BADQOSPARAM
+@table @asis
+@item @perr{DL_BADQOSPARAM}
 The quality of service parameters contained values outside the range of those
 supported by the DLS provider.
 
-@item DL_BADQOSTYPE
+@item @perr{DL_BADQOSTYPE}
 The quality of service structure type was not supported by the DLS provider.
 
-@item DL_OUTSTATE
+@item @perr{DL_OUTSTATE}
 The primitive was issued from an invalid state.
 
 @end table
@@ -4459,24 +4459,24 @@ procedure to recover from a situation when there is no response from the peer
 DLS User.
 
 @subsubheading Reasons for failure
-@table @perr
-@item DL_OUTSTATE
+@table @asis
+@item @perr{DL_OUTSTATE}
 The primitive was issued from an invalid state
 
-@item DL_BADADDR
+@item @perr{DL_BADADDR}
 The @acronym{DLSAP} address information was invalid or was in an incorrect format.
 
-@item DL_SYSERR
+@item @perr{DL_SYSERR}
 A System error has occurred and the UNIX System error is indicated in
 the @prim{DL_ERROR_ACK}.
 
-@item DL_NOTSUPPORTED
+@item @perr{DL_NOTSUPPORTED}
 Primitive is known but not supported by the DLS Provider
 
-@item DL_TESTAUTO
+@item @perr{DL_TESTAUTO}
 Previous bind request specified automatic handling of TEST responses.
 
-@item DL_UNSUPPORTED
+@item @perr{DL_UNSUPPORTED}
 Requested service not supplied by provider.
 
 @end table
@@ -4745,24 +4745,24 @@ procedure on an XID_REQ.  The timeout may be used if the remote side does not
 respond to the XID request.
 
 @subsubheading Reasons for failure
-@table @perr
-@item DL_BADDATA
+@table @asis
+@item @perr{DL_BADDATA}
 The amount of data in the current @acronym{DLSDU} exceeded the DLS Provider's @acronym{DLSDU} limit.
 
-@item DL_XIDAUTO
+@item @perr{DL_XIDAUTO}
 Previous bind request specified Provider would handle XID.
 
-@item DL_OUTSTATE
+@item @perr{DL_OUTSTATE}
 The primitive was issued from an invalid state
 
-@item DL_BADADDR
+@item @perr{DL_BADADDR}
 The @acronym{DLSAP} address information was invalid or was in an incorrect format.
 
-@item DL_SYSERR
+@item @perr{DL_SYSERR}
 A System error has occurred and the UNIX System error is indicated in
 the @prim{DL_ERROR_ACK}.
 
-@item DL_NOTSUPPORTED
+@item @perr{DL_NOTSUPPORTED}
 Primitive is known but not supported by the DLS Provider
 
 @end table
@@ -5085,21 +5085,21 @@ Although the exchange service is connectionless, in-sequence delivery is
 guaranteed for data sent by the initiating station.
 
 @subsubheading Reasons for Failure
-@table @perr
-@item DL_OUTSTATE
+@table @asis
+@item @perr{DL_OUTSTATE}
 The primitive was issued from an invalid state.
 
-@item DL_BADADDR
+@item @perr{DL_BADADDR}
 The destination @acronym{DLSAP} address was in an incorrect format or contained invalid
 information.
 
-@item DL_NOTSUPPORTED
+@item @perr{DL_NOTSUPPORTED}
 Primitive is valid, but not supported.
 
-@item DL_BADDATA
+@item @perr{DL_BADDATA}
 The amount of data in the current @acronym{DLSDU} exceeded the DLS provider's @acronym{DLSDU} limit.
 
-@item DL_UNSUPPORTED
+@item @perr{DL_UNSUPPORTED}
 Requested service or priority not supported by Provider (Request with response at
 the Medium Access Control sublayer).
 
@@ -5333,21 +5333,21 @@ This will indicate the success or failure of the previous associated acknowledge
 connectionless-mode data unit exchange.
 
 @subsubheading Reasons for Failure
-@table @perr
-@item DL_OUTSTATE
+@table @asis
+@item @perr{DL_OUTSTATE}
 The primitive was issued from an invalid state.
 
-@item DL_BADADDR
+@item @perr{DL_BADADDR}
 The destination @acronym{DLSAP} address was in an incorrect format or contained
 invalid information.
 
-@item DL_NOTSUPPORTED
+@item @perr{DL_NOTSUPPORTED}
 Primitive is valid, but not supported.
 
-@item DL_BADDATA
+@item @perr{DL_BADDATA}
 The amount of data in the current @acronym{DLSDU} exceeded the DLS provider's @acronym{DLSDU} limit.
 
-@item DL_UNSUPPORTED
+@item @perr{DL_UNSUPPORTED}
 Requested service not supported by Provider (Request with response at the Medium
 Access Control sublayer).
 
@@ -5575,15 +5575,15 @@ is returned, which indicates the success or failure of the
 @prim{DL_REPLY_UPDATE_REQ}.
 
 @subsubheading Reasons for failure
-@table @perr
-@item DL_OUTSTATE
+@table @asis
+@item @perr{DL_OUTSTATE}
 The primitive was issued from an invalid state.
 
-@item DL_BADDATA
+@item @perr{DL_BADDATA}
 The amount of data in the @acronym{DLSDU} exceeded the DLS Provider's
 @acronym{DLSDU} limit.
 
-@item DL_NOTSUPPORTED
+@item @perr{DL_NOTSUPPORTED}
 Primitive is known, but not supported.
 
 @end table
@@ -6774,10 +6774,10 @@ if the request is supported.  Otherwise, a
 is returned.
 
 @subsubheading Reasons for failure
-@table @perr
-@item DL_NOTSUPPORTED
+@table @asis
+@item @perr{DL_NOTSUPPORTED}
 Primitive is known, but not supported by the DLS Provider.
-@item DL_OUTSTATE
+@item @perr{DL_OUTSTATE}
 The primitive was issued from an invalid state.
 @end table
 
@@ -6872,16 +6872,16 @@ on successful completion.  Otherwise, a
 is returned.
 
 @subsubheading Reasons for failure
-@table @perr
-@item DL_BADADDR
+@table @asis
+@item @perr{DL_BADADDR}
 The address information was invalid or was in an incorrect format.
-@item DL_NOTSUPPORTED
+@item @perr{DL_NOTSUPPORTED}
 Primitive is known, but not supported by the DLS Provider.
-@item DL_SYSERR
+@item @perr{DL_SYSERR}
 A system error has occurred
-@item DL_OUTSTATE
+@item @perr{DL_OUTSTATE}
 The primitive was issued from an invalid state.
-@item DL_BUSY
+@item @perr{DL_BUSY}
 One or more streams for that particular @acronym{PPA} are in the bound
 (@psta{DL_IDLE})
 state.
@@ -6906,7 +6906,8 @@ typedef struct @{
 
 @subsubheading Parameters
 @table @parm
-dl_primitive conveys
+@item dl_primitive
+conveys
 @prim{DL_GET_STATISTICS_REQ}
 @end table
 
@@ -6925,8 +6926,8 @@ primitive is supported.  Otherwise, a
 is returned.
 
 @subsubheading Reasons for failure
-@table @perr
-@item DL_NOTSUPPORTED
+@table @asis
+@item @perr{DL_NOTSUPPORTED}
 Primitive is known but not supported by the DLS Provider.
 @end table
 
