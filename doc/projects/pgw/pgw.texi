@@ -1,93 +1,93 @@
-% -*- texinfo -*-
-% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
-% =========================================================================
-%
-% @(#) $Id: pgw.texi,v 1.1.2.3 2011-02-07 02:21:36 brian Exp $
-%
-% =========================================================================
-%
-% Copyright (c) 2010-2011  Optranex Incorporated <http://www.optranex.com/>
-% Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
-% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
-%
-% All Rights Reserved.
-%
-% Permission is granted to copy, distribute and/or modify this document
-% under the terms of the GNU Free Documentation License, Version 1.3 or
-% any later version published by the Free Software Foundation; with no
-% Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
-% copy of the license is included in the section entitled "GNU Free
-% Documentation License".
-%
-% Permission to use, copy and distribute this documentation without
-% modification, for any purpose and without fee or royalty is hereby
-% granted, provided that both the above copyright notice and this
-% permission notice appears in all copies and that the name of OpenSS7
-% Corporation not be used in advertising or publicity pertaining to
-% distribution of this documentation or its contents without specific,
-% written prior permission.  Monavacon Limited makes no representation
-% about the suitability of this documentation for any purpose.  It is
-% provided "as is" without express or implied warranty.
-% 
-% Permission is granted to process this file through Tex and print the
-% results, provided the printed document carries copying permission
-% notice identical to this one except for the removal of this paragraph
-% (this paragraph not being relevant to the printed manual).
-% 
-% OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
-% DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
-% FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
-% CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
-% IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
-% PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
-% OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
-% CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
-% USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-% OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
-% THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
-% THEREOF.
-% 
-% Since the Linux kernel and libraries are constantly changing, this
-% manual page may be incorrect or out-of-date.  The author(s) assume no
-% responsibility for errors or omissions, or for damages resulting from
-% the use of the information contained herein.  The author(s) may not
-% have taken the same level of care in the production of this manual,
-% which is licensed free of charge, as they might when working
-% professionally.
-% 
-% Formatted or processed versions of this manual, if unaccompanied by
-% the source, must acknowledge the copyright and authors of this work.
-%
-% -------------------------------------------------------------------------
-%
-% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-% on behalf of the U.S. Government ("Government"), the following
-% provisions apply to you.  If the Software is supplied by the Department
-% of Defense ("DoD"), it is classified as "Commercial Computer Software"
-% under paragraph 252.227-7014 of the DoD Supplement to the Federal
-% Acquisition Regulations ("DFARS") (or any successor regulations) and the
-% Government is acquiring only the license rights granted herein (the
-% license rights customarily provided to non-Government users).  If the
-% Software is supplied to any unit or agency of the Government other than
-% DoD, it is classified as "Restricted Computer Software" and the
-% Government's rights in the Software are defined in paragraph 52.227-19
-% of the Federal Acquisition Regulations ("FAR") (or any successor
-% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-% NASA Supplement to the FAR (or any successor regulations).
-%
-% =========================================================================
-% 
-% Commercial licensing and support of this software is available from
-% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-% 
-% =========================================================================
-%
-% Last Modified $Date: 2011-02-07 02:21:36 $ by $Author: brian $
-%
-% =========================================================================
-
 \input texinfo
+@c -*- texinfo -*-
+@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+@c =========================================================================
+@c
+@c @(#) $Id: pgw.texi,v 1.1.2.3 2011-02-07 02:21:36 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2010-2011  Optranex Incorporated <http://www.optranex.com/>
+@c Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to copy, distribute and/or modify this document
+@c under the terms of the GNU Free Documentation License, Version 1.3 or
+@c any later version published by the Free Software Foundation; with no
+@c Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+@c copy of the license is included in the section entitled "GNU Free
+@c Documentation License".
+@c
+@c Permission to use, copy and distribute this documentation without
+@c modification, for any purpose and without fee or royalty is hereby
+@c granted, provided that both the above copyright notice and this
+@c permission notice appears in all copies and that the name of OpenSS7
+@c Corporation not be used in advertising or publicity pertaining to
+@c distribution of this documentation or its contents without specific,
+@c written prior permission.  Monavacon Limited makes no representation
+@c about the suitability of this documentation for any purpose.  It is
+@c provided "as is" without express or implied warranty.
+@c 
+@c Permission is granted to process this file through Tex and print the
+@c results, provided the printed document carries copying permission
+@c notice identical to this one except for the removal of this paragraph
+@c (this paragraph not being relevant to the printed manual).
+@c 
+@c OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+@c DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+@c FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+@c CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+@c IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+@c PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+@c OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+@c CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+@c USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+@c OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+@c THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+@c THEREOF.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2011-02-07 02:21:36 $ by $Author: brian $
+@c
+@c =========================================================================
+
 @setfilename pgw.info
 @include ../../../scripts/texi/args.texi
 @set MANUAL_TITLE Optranex 248 PSTN Gateway
@@ -155,11 +155,10 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
-@sp 0.5
+@sp 1
 @title @value{MANUAL_TYPE}
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
 @subtitle Updated @value{PACKAGE_PDATE}
-@sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
 @subtitle Copyright @copyright{} 2010-2011  Optranex Incorporated
@@ -170,7 +169,6 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 This document provides a @value{MANUAL_TYPE} for the @value{MANUAL_TITLE}.
 @end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
-@sp 0.2
 @author The OpenSS7 Project <@uref{http://www.openss7.org/}>
 
 @page
@@ -277,8 +275,6 @@ any use of this document or the performance or implementation of the contents th
 @include texi/versions.texi
 @include texi/prims.texi
 
-@paragraphindent 1.5
-
 @ifnottex
 @node Top
 @top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
@@ -304,8 +300,13 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 * Management Architecture::
 * System Architecture::
 * Logistics::
+* Provisioning Plan::
+* Test Plan::
+* Alternate Hardware::
+* Protocol Values::
 * Programmatic Interfaces::
 * Platform Sizing::
+* Bibliography::
 * Licenses::
 * Index::
 @end menu
@@ -495,27 +496,6 @@ Corporation} is under no obligation to provide any feature listed herein.
 
 This document is organized as follows:
 
-@ifnottex
-@menu
-* Introduction::
-* Application Architecture::
-* Solution Architecture::
-* Network Architecture::
-* Reference Architecture::
-* Protocol Architecture::
-* Software Architecture::
-* Hardware Architecture::
-* Platform Architecture::
-* Management Architecture::
-* System Architecture::
-* Logistics::
-* Programmatic Interfaces::
-* Platform Sizing::
-* Licenses::
-* Index::
-@end menu
-@end ifnottex
-@iftex
 @table @emph
 @item @ref{Introduction}
 Introduction to the @cite{@value{MANUAL_TITLE}} application.
@@ -548,7 +528,6 @@ Detailed platform sizing considerations.
 @item @ref{Index}
 Index of concepts.
 @end table
-@end iftex
 
 
 @node Introduction
@@ -928,6 +907,11 @@ In @figref{1}, the @cite{Optranex 248} switch acts as a set of implicitly regist
 subscriber User Agents towards the customer SIP proxies, and as an originating, terminating or
 tandem local switch to the PSTN.
 
+@menu
+* Ethernet Connections::
+* SONET/SDH Connections::
+@end menu
+
 @node Ethernet Connections
 @section Ethernet Connections
 
@@ -1261,7 +1245,6 @@ the @dfn{SIGTRAN M3UA} signaling gateway(s) should be restricted to the MAC and 
 of those servers.  PoE or GRE may be used between the router and @cite{Optranex 248} switch servers
 to simplify firewall designs for, and further isolate, this traffic.
 
-@node SIGTRAN M3UA Network Configuration
 @subsubsection SIGTRAN M3UA Network Configuration
 
 SCTP Multihoming (@cite{RFC 4960}) is necessary to provide path and network interface redundancy for
@@ -1381,7 +1364,6 @@ When connected to the SONET network, both the A- and B-sides of the @cite{Optran
 switch should be configured to take their timing directly from the SONET receive line, with a
 fallback to the local stratum 3 clock (and a possible further fall back to DPLL hold).
 
-@node Test-Bed Copper OC-48 Loop Back
 @subsection Test-Bed Copper OC-48 Loop Back
 
 For the purpose of capacity and performance testing, an additional SONET/SDH connection will be
@@ -1574,6 +1556,13 @@ external specifications (i.e. SIP).
 @node Protocol Architecture
 @chapter Protocol Architecture
 @cindex Protocol architecture
+@menu
+* C-SCP Interworking Call Flows::
+* Calls from PSTN to SIP::
+* Calls from SIP to PSTN::
+* ENUM Calls from PSTN to SIP::
+* ENUM Calls from SIP to PSTN::
+@end menu
 
 @node C-SCP Interworking Call Flows
 @section C-SCP Interworking Call Flows
@@ -1811,7 +1800,6 @@ in @cite{3GPP TS 24.229 V9.2.0 (2009-12)} and do not further involve the @i{C-SC
 
 @end enumerate
 
-@node Translation of IAM to INVITE
 @subsection Translation of IAM to INVITE
 
 
@@ -1819,7 +1807,6 @@ The translation from the @msg{IAM} to the @msg{INVITE} at the @cite{Optranex 248
 the @cite{Carrier Proxy} will be in accordance with @cite{3GPP TS 29.163 V9.0.0 (2009-12)
 7.2.3.2.2.}, summarized and with additional features as follows:
 
-@node B Number
 @subsubsection B Number
 
 The @prim{Request-URI} and @prim{To} field will always contain the non-ported or ported called
@@ -1869,7 +1856,6 @@ To: "Joe" <tel:+19996665555>
 ...
 @end smallexample
 
-@node A Number
 @subsubsection A Number
 
 If the @parm{Calling Party Number} is not present, or the @parm{Calling Party Number} is
@@ -2011,7 +1997,6 @@ Privacy: user
 @end verbatim
 @end smallexample
 
-@node Charging Information
 @subsubsection Charging Information
 
 Charging information from the received @msg{IAM} will be translated to a @prim{P-Charge-Info} header
@@ -2095,7 +2080,6 @@ P-Charge-Info: <tel:+12223334444;oli=00;rn=+1830660
 @end verbatim
 @end smallexample
 
-@node Example IAM to INVITE Translation
 @subsubsection Example IAM to INVITE Translation
 
 For this example the @msg{IAM} has the contents shown in @ref{iam:ex1}.
@@ -2223,13 +2207,11 @@ the specification is for PCM mu-law 8000 samples per second audio (speech).
 @end enumerate
 
 
-@node Processing of Calls Terminating from the PSTN
 @subsection Processing of Calls Terminating from the PSTN
 
 The requirements for @i{C-SCP} processing of the @msg{INVITE} from the @cite{Carrier Proxy}
 for calls terminating from the PSTN are described in this subsection.
 
-@node Extracting Information from the INVITE
 @subsubsection Extracting Information from the INVITE
 
 The @i{C-SCP} platform should largely ignore the @prim{From} and @prim{To} headers in the
@@ -2273,7 +2255,6 @@ details.
 
 @tabfig{pgwt05,T-5,P-Charge-Info Parameter Mapping}
 
-@node 305 Use Proxy Response
 @subsubsection 305 Use Proxy Response
 
 Using the B number parameters in the @prim{Request-URI} of the @msg{INVITE} as listed in
@@ -2410,7 +2391,6 @@ Content-Length: 0
 @end float
 @end cartouche
 
-@node Processing of the 305 Use Proxy Reponse
 @subsubsection Processing of the 305 Use Proxy Reponse
 
 The @cite{Carrier Proxy} switch may adjust the @prim{To} and @prim{From} fields on the @msg{INVITE}
@@ -2436,7 +2416,6 @@ skipped and the IP address is used to address the @msg{INVITE} to the customer p
 from the previous step is a name, a DNS @prim{QUERY} query is performed on the name.
 @end enumerate
 
-@node Example of a Successful Call from PSTN to SIP
 @subsubsection Example of a Successful Call from PSTN to SIP
 
 Refer to @figref{2} for the messages exchanged that correspond with the numbers below.
@@ -2770,7 +2749,7 @@ An example of the @msg{ACK} message is shown in @ref{message:msg28}.
 
 The @cite{Carrier Proxy}, upon receiving the @msg{ACK} from the @cite{Optranex 248} gateway switch,
 propagates the @msg{ACK} message to the @i{C-SCP}.
-An example of the @msg{ACK} message is shown in @ref{message:msg56}.
+An example of the @msg{ACK} message is shown in @ref{message:msg58}.
 
 @item Point (10) in @figref{4}.
 
@@ -2784,7 +2763,6 @@ The previous PSTN switch acknowledges the release with an ISUP @msg{RLC} message
 
 @end enumerate
 
-@node Treatment of PSTN Calls
 @subsubsection Treatment of PSTN Calls
 
 At point (6) in @figref{4}, the @i{C-SCP} platform should examine the B Number information
@@ -3106,7 +3084,6 @@ Content-Length: 0
 @end float
 @end cartouche
 
-@node Example of an Unsuccessful Call from PSTN to SIP
 @subsubsection Example of an Unsuccessful Call from PSTN to SIP
 
 Refer to @figref{2} for the messages exchanged that correspond with the numbers below.
@@ -3363,7 +3340,7 @@ The @cite{Carrier Proxy}, upon receiving the @msg{ACK} from the @cite{Optranex 2
 request to the @i{C-SCP}.
 
 @cartouche
-@float Message,message:msg56
+@float Message,message:msg58
 @smallformat
 @verbatim
 ACK sip:anonymous@gw1.heramax.com SIP/2.0
@@ -3399,6 +3376,7 @@ The originating PSTN switch completes the release of the call by sending a @msg{
 @end enumerate
 
 @page
+@node Calls from SIP to PSTN
 @section Calls from SIP to PSTN
 
 Calls from SIP (IMS CN) to the PSTN (CS Domain) are illustrated in @figref{3}.
@@ -3810,7 +3788,6 @@ Q.1912.5} and @cite{3GPP TS 29.163}.@footnote{Note that the IP address and UDP p
 circuit selected for the call.}
 @end enumerate
 
-@node Translation of INVITE to IAM
 @subsection Translation of INVITE to IAM
 
 Fields from the received @msg{INVITE} are mapped to the outgoing @msg{IAM} parameter by the
@@ -3909,7 +3886,6 @@ outgoing @msg{IAM} marked @pval{presentation-allowed} (if one is not already pre
 
 @end itemize
 
-@node Example of INVITE to IAM Translation
 @subsubsection Example of INVITE to IAM Translation
 
 So, for the SIP @msg{INVITE} message last presented, and repeated in @ref{message:msg38},
@@ -3970,7 +3946,6 @@ the outgoing IAM would be as shown in @ref{iam:ex5}.
 @end float
 @end cartouche
 
-@node Processing of Calls Terminating on the PSTN
 @subsection Processing of Calls Terminating on the PSTN
 
 For calls terminating on the PSTN, the @cite{Carrier Proxy} is responsible for controlling
@@ -4001,7 +3976,6 @@ at the @cite{Carrier Proxy}.  This is detailed in @ref{302-Moved-Temporarily Res
 @noindent
 A complete example is provided in @ref{Example of a Successful Call from SIP to PSTN}.
 
-@node Forwarding the Initial SIP INVITE
 @subsubsection Forwarding the Initial SIP INVITE
 
 When the @cite{Carrier Proxy} receives a SIP @msg{INVITE} message from a @cite{Customer Proxy}, it
@@ -4018,25 +3992,20 @@ stripped unless the customer proxy is within the same trust domain as the @cite{
 
 Examples are provided in @ref{SIP to PSTN Example Point 3}, for Point (3) and (4) in @figref{3}.
 
-@node Extracting Information from the SIP INVITE
 @subsubsection Extracting Information from the SIP INVITE
 
 Examples are provided in @ref{SIP to PSTN Example Point 5}, for Point (5) and (6) in @figref{3}.
 
-@node 302-Moved-Temporarily Response
 @subsubsection 302-Moved-Temporarily Response
 
-@node Formulating the 302-Moved-Temporarily Response
 @subsubheading Formulating the 302-Moved-Temporarily Response
 
 Examples are provided in @ref{SIP to PSTN Example Point 6}, for Point (6) and (7) in @figref{3}.
 
-@node Processing the 302-Moved-Temporarily Response
 @subsubheading Processing the 302-Moved-Temporarily Response
 
 Examples are provided in @ref{SIP to PSTN Example Point 8}, for Point (8) and (9) in @figref{3}.
 
-@node Generating the Gateway INVITE
 @subsection Generating the Gateway INVITE
 
 The @cite{Carrier Proxy} is responsible for analyzing information from the received @msg{302 Moved
@@ -4059,7 +4028,6 @@ the @msg{302 Moved Temporarily} response message or to be added by the @cite{Car
 be forwarded to the @cite{Optranex 248} platform.
 @end itemize
 
-@node Example of a Successful Call from SIP to PSTN
 @subsubsection Example of a Successful Call from SIP to PSTN
 
 @enumerate
@@ -4141,10 +4109,8 @@ to continue receiving requests or not.
 
 @end enumerate
 
-@node Treatment of SIP Originating Calls
 @subsection Treatment of SIP Originating Calls
 
-@node Treatment of SIP Calls
 @subsubsection Treatment of SIP Calls
 
 @noindent
@@ -4227,7 +4193,6 @@ Content-Length: 0
 @end float
 @end cartouche
 
-@node Examples of Unsuccessful Calls from SIP to PSTN
 @subsubsection Examples of Unsuccessful Calls from SIP to PSTN
 
 @page
@@ -4268,10 +4233,8 @@ redundancy, a DNS query will be required per call anyway.  See
 URI associated with the B Number and the results of a lookup attempt.
 @end enumerate
 
-@node ENUM Call Flows from PSTN to SIP
 @subsection ENUM Call Flows from PSTN to SIP
 
-@node Successful ENUM Call Flow from PSTN to SIP
 @subsubsection Successful ENUM Call Flow from PSTN to SIP
 
 A successful ENUM call flow from the PSTN to SIP is illustrated in @figref{10}.
@@ -4619,7 +4582,6 @@ NS  ns.heramax.com.
 @end float
 @end cartouche
 
-@node Unsuccessful ENUM Call Flow from PSTN to SIP
 @subsubsection Unsuccessful ENUM Call Flow from PSTN to SIP
 
 When the ENUM call flow from PSTN to SIP is unsuccessful, it can be treated in four locations:
@@ -4672,7 +4634,6 @@ DNS-based approach.
 per-call lookups to be local to the @cite{Optranex 248}.
 @end enumerate
 
-@node ENUM Call Flow from SIP to PSTN
 @subsection ENUM Call Flow from SIP to PSTN
 
 @enumerate
@@ -4738,7 +4699,6 @@ verification on the originator, or for the termination), a @parm{P-Asserted-Iden
 As a fall-back for the NP ENUM dip, the gateway can launch an SS7 LNP dip or perform the @msg{302
 Moved Temporarily} proceedure with the @i{C-SCP} when necessary.
 
-@node ENUM Tables (DNS Zones)
 @subsubsection ENUM Tables (DNS Zones)
 
 The following ENUM trees are required by the @cite{Optranex 248} gateway to implement the call flow
@@ -4780,6 +4740,11 @@ for routing.
 @node Software Architecture
 @chapter Software Architecture
 @cindex Software architecture
+@menu
+* General Software Architecture::
+* SIP to ISUP Interworking::
+* Carrier Proxy::
+@end menu
 
 The software architecture of the @cite{Optranex 248} switch contains select components of the
 @cite{OpenSS7} @acronym{STREAMS} and Signaling Protocol Stacks.  Also included are the @cite{Optranex
@@ -4805,6 +4770,13 @@ configure, measure, monitor, alarm and manage the signaling and media stacks in 
 248} (@pxref{Management Subsystem}).
 @end enumerate
 
+@menu
+* Signaling Stack::
+* Media Stack::
+* Application Subsystem::
+* Management Subsystem::
+@end menu
+
 @page
 @node Signaling Stack
 @subsection Signaling Stack
@@ -4820,6 +4792,11 @@ The signaling stack consists of the following primary subsystems:
 @item An ISUP driver (@pxref{ISUP Driver}).
 @item The SIGTRAN stack providing SS7 connectivity for the ISUP driver (@pxref{SIGTRAN Stack}).
 @end enumerate
+
+@menu
+* ISUP Driver::
+* SIGTRAN Stack::
+@end menu
 
 @node ISUP Driver 
 @subsubsection ISUP Driver 
@@ -4894,6 +4871,12 @@ These primary subsystems are described in the sections that follow.  All subsyst
 exception of the @cite{Optranex 248 SONET/SDH Driver} are licensed under the @ref{GNU Affero General
 Public License} and the @ref{GNU General Public License}.  The @cite{Optranex 248 SONET/SDH Driver}
 is distributed under a proprietary license and is protected by pending patents.
+
+@menu
+* Media Gateway Driver::
+* TDM Stack::
+* Ephemeral Stack::
+@end menu
 
 @node Media Gateway Driver
 @subsubsection Media Gateway Driver
@@ -5058,6 +5041,14 @@ for processing of SIP signaling.  The @var{nta} module is used for interworking 
 calls with ISUP calls.  A purpose-developed interworking function exits at the control nexus between
 the @cite{sofia-SIP} and @cite{OpenSS7 ISUP} stacks.
 
+@menu
+* Interworking Calls from SIP to PSTN::
+* Interworking Calls from PSTN to SIP::
+* Interworking of Established Calls::
+* Interworking of Call Release::
+* SDP Handling::
+@end menu
+
 @subsubheading OpenSS7 ISUP Stack
 
 The @cite{OpenSS7 ISUP} stack is illustrated in @figref{11} and interactions between the
@@ -5134,6 +5125,12 @@ transaction.  CCI primitives sent to and received from the ISUP stack will be is
 second ISUP stream described above.  CCI primitives issued to the ISUP stack will be issued from the
 @dfn{nta} message callbacks.  CCI primitives will be received on the installed callback for the
 second ISUP stream.
+
+@menu
+* Mapping SIP INVITE to ISUP IAM::
+* Successful Setup of Calls from SIP to PSTN::
+* Unsuccessful Setup of Calls from SIP to PSTN::
+@end menu
 
 @node Mapping SIP INVITE to ISUP IAM
 @subsubsection Mapping SIP INVITE to ISUP IAM
@@ -5832,6 +5829,12 @@ for the third ISUP stream, and issued and received subsequently on the third ISU
 issued to the ISUP stack will be issued from within the @dfn{nta} message callbacks.  CCI primitives
 will be received on the installed callbacks for the first and third ISUP streams.
 
+@menu
+* Mapping of ISUP IAM to SIP INVITE::
+* Successful Calls from PSTN to SIP::
+* Unsuccessful Calls from PSTN to SIP::
+@end menu
+
 @node Mapping of ISUP IAM to SIP INVITE
 @subsubsection Mapping of ISUP IAM to SIP INVITE
 
@@ -6192,6 +6195,12 @@ interworking function.  To process events (callbacks) from the @cite{sofia-SIP} 
 identifier is used to retrieve the call context.  To process primivites received from the ISUP
 stack, the provider call reference is used to retrieve the call context.
 
+@menu
+* Successful Established Calls::
+* Failed Established Calls::
+@end menu
+
+
 @node Successful Established Calls
 @subsubsection Successful Established Calls
 
@@ -6249,6 +6258,10 @@ This applies to all established calls.
 
 @node Interworking of Call Release
 @subsection Interworking of Call Release
+@menu
+* Calls Released by the SIP Network::
+* Calls Released by the ISUP Network::
+@end menu
 
 @node Calls Released by the SIP Network
 @subsubsection Calls Released by the SIP Network
@@ -6487,6 +6500,11 @@ hot-pluggable.
 @node Management Architecture
 @chapter Management Architecture
 @cindex Management architecture
+@menu
+* Local Alarms::
+* Remote Management::
+* SNMP Management::
+@end menu
 
 @node Local Alarms
 @section Local Alarms
@@ -6592,6 +6610,13 @@ of the MIBs will be provided for in-service.
 @node Logistics
 @chapter Logistics
 @cindex Logistics
+@menu
+* Site Preparation::
+* Equipment List::
+* Installation::
+* Spares::
+* Schedule::
+@end menu
 
 @node Site Preparation
 @section Site Preparation
@@ -6814,7 +6839,14 @@ The cabinet layout for the Dallas trial is illustrated in @figref{13}.
 
 @figuresized{pgw13,13,Cabinet Layout,3.5in}
 
+@menu
+* Rack::
+* Power::
+* Cooling::
+@end menu
+
 @noindent
+@node Rack
 @subsection Rack
 
 Two or more people are require to install the server chassis in the rack.  Room air temperature must
@@ -6831,11 +6863,17 @@ Rack installation requires flat-blade and phillips screwdrivers and rack mount k
 the rack in which the server chassis are to be installed.  There are two rack mount kits: one for
 19" 2- and 4-post racks; another for 23" 2- and 4-post racks.
 
+@node Power
 @subsection Power
 
 Servers can be installed using one or two (redundant) AC or DC power supplies.  For evaluation and
 laboratory installations, only one AC or DC power supply is required.  Requirements for DC and AC
 power feeds are discussed in @ref{DC Power} and @ref{AC Power}.
+
+@menu
+* DC Power::
+* AC Power::
+@end menu
 
 @node DC Power
 @subsubsection DC Power
@@ -6852,7 +6890,6 @@ mains disconnect must be readily accessible, and it must be labeled as controlli
 servers.  The UL Listed circuit breaker of a centralized DC power system may be used as a disconnect
 device when easily accessilble and should be rated no more than 10 amps.
 
-@node Grounding the Server
 @subsubheading Grounding the Server
 The servers are inteneded for installation with an isolated DC return (DC-I) and is to be installed
 in a Commong Bonding Network (CBN) per NEBS GR-1089.  To avoid the potential for an electrical shock
@@ -6920,6 +6957,7 @@ an approved IEC (International Electrotechnical Commission) 320, sheet C13, type
 @item Cord length and flexibility:-- Cores must be less than 4.5 meters (14.8 feet) long.
 @end itemize
 
+@node Cooling
 @subsection Cooling
 
 @subsubheading Temperature
@@ -7248,6 +7286,10 @@ only) to the OpenSIPs and C-SCP platforms.
 @appendix Alternate Hardware
 @cindex Alternate Hardware
 
+@menu
+* Alternate SFP Modules::
+@end menu
+
 @node Alternate SFP Modules
 @section Alternate SFP Modules
 
@@ -7309,6 +7351,9 @@ These modules are available from @uref{http://www.nstnetwork.com/,Newstar}.
 @node Protocol Values
 @appendix Protocol Values
 @cindex Protocol values
+@menu
+* Cause Values::
+@end menu
 
 @node Cause Values
 @section Cause Values
@@ -7318,6 +7363,11 @@ This section described cause values applicable to US networks and how they inter
 the @prim{Reason} header in accordance with @cite{RFC 3326}.@footnote{One extension to @cite{RFC
 3326} is provided in that the @pval{ANSI} token will be recognized in addition to the @pval{Q.850}
 token.}
+
+@menu
+* Cause Value to SIP Response Mapping::
+* Default SIP Response to Cause Value Mapping::
+@end menu
 
 @node Cause Value to SIP Response Mapping
 @subsection Cause Value to SIP Response Mapping
