@@ -1,92 +1,92 @@
-% -*- texinfo -*- vim: ft=texinfo
-% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
-% =========================================================================
-%
-% @(#) $Id: sgp.texi,v 1.1.2.4 2011-08-07 11:14:30 brian Exp $
-%
-% =========================================================================
-%
-% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
-% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
-%
-% All Rights Reserved.
-%
-% Permission is granted to copy, distribute and/or modify this document
-% under the terms of the GNU Free Documentation License, Version 1.3 or
-% any later version published by the Free Software Foundation; with no
-% Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
-% copy of the license is included in the section entitled "GNU Free
-% Documentation License".
-%
-% Permission to use, copy and distribute this documentation without
-% modification, for any purpose and without fee or royalty is hereby
-% granted, provided that both the above copyright notice and this
-% permission notice appears in all copies and that the name of OpenSS7
-% Corporation not be used in advertising or publicity pertaining to
-% distribution of this documentation or its contents without specific,
-% written prior permission.  OpenSS7 Corporation makes no representation
-% about the suitability of this documentation for any purpose.  It is
-% provided "as is" without express or implied warranty.
-% 
-% Permission is granted to process this file through Tex and print the
-% results, provided the printed document carries copying permission
-% notice identical to this one except for the removal of this paragraph
-% (this paragraph not being relevant to the printed manual).
-% 
-% OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
-% DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
-% FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
-% CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
-% IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
-% PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
-% OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
-% CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
-% USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-% OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
-% THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
-% THEREOF.
-% 
-% Since the Linux kernel and libraries are constantly changing, this
-% manual page may be incorrect or out-of-date.  The author(s) assume no
-% responsibility for errors or omissions, or for damages resulting from
-% the use of the information contained herein.  The author(s) may not
-% have taken the same level of care in the production of this manual,
-% which is licensed free of charge, as they might when working
-% professionally.
-% 
-% Formatted or processed versions of this manual, if unaccompanied by
-% the source, must acknowledge the copyright and authors of this work.
-%
-% -------------------------------------------------------------------------
-%
-% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-% on behalf of the U.S. Government ("Government"), the following
-% provisions apply to you.  If the Software is supplied by the Department
-% of Defense ("DoD"), it is classified as "Commercial Computer Software"
-% under paragraph 252.227-7014 of the DoD Supplement to the Federal
-% Acquisition Regulations ("DFARS") (or any successor regulations) and the
-% Government is acquiring only the license rights granted herein (the
-% license rights customarily provided to non-Government users).  If the
-% Software is supplied to any unit or agency of the Government other than
-% DoD, it is classified as "Restricted Computer Software" and the
-% Government's rights in the Software are defined in paragraph 52.227-19
-% of the Federal Acquisition Regulations ("FAR") (or any successor
-% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-% NASA Supplement to the FAR (or any successor regulations).
-%
-% =========================================================================
-% 
-% Commercial licensing and support of this software is available from
-% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-% 
-% =========================================================================
-%
-% Last Modified $Date: 2011-08-07 11:14:30 $ by $Author: brian $
-%
-% =========================================================================
-
 \input texinfo
+@c -*- texinfo -*- vim: ft=texinfo
+@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+@c =========================================================================
+@c
+@c @(#) $Id: sgp.texi,v 1.1.2.4 2011-08-07 11:14:30 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to copy, distribute and/or modify this document
+@c under the terms of the GNU Free Documentation License, Version 1.3 or
+@c any later version published by the Free Software Foundation; with no
+@c Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+@c copy of the license is included in the section entitled "GNU Free
+@c Documentation License".
+@c
+@c Permission to use, copy and distribute this documentation without
+@c modification, for any purpose and without fee or royalty is hereby
+@c granted, provided that both the above copyright notice and this
+@c permission notice appears in all copies and that the name of OpenSS7
+@c Corporation not be used in advertising or publicity pertaining to
+@c distribution of this documentation or its contents without specific,
+@c written prior permission.  OpenSS7 Corporation makes no representation
+@c about the suitability of this documentation for any purpose.  It is
+@c provided "as is" without express or implied warranty.
+@c 
+@c Permission is granted to process this file through Tex and print the
+@c results, provided the printed document carries copying permission
+@c notice identical to this one except for the removal of this paragraph
+@c (this paragraph not being relevant to the printed manual).
+@c 
+@c OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+@c DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+@c FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+@c CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+@c IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+@c PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+@c OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+@c CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+@c USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+@c OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+@c THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+@c THEREOF.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2011-08-07 11:14:30 $ by $Author: brian $
+@c
+@c =========================================================================
+
 @setfilename sgp.info
 @include ../../../scripts/texi/args.texi
 @set MANUAL_TITLE OpenSS7 Signalling Gateway Platform
@@ -152,11 +152,10 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
-@sp 0.5
+@sp 1
 @title @value{MANUAL_TYPE}
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
 @subtitle Updated @value{PACKAGE_PDATE}
-@sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
 @subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
@@ -167,7 +166,6 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 This document provides a @value{MANUAL_TYPE} for the @value{MANUAL_TITLE}.
 @end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
-@sp 0.2
 @author The OpenSS7 Project <@uref{http://www.openss7.org/}>
 
 @page
@@ -260,7 +258,7 @@ this document or the performance or implementation of the contents thereof.}
 @syncodeindex pv cp
 @syncodeindex pe cp
 @syncodeindex st cp
-@syncodeindex mp cp
+@c @syncodeindex mp cp
 @syncodeindex tp cp
 @syncodeindex vr cp
 @syncodeindex ct cp
@@ -287,6 +285,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 * Introduction::
 * Application Architecture::
 * Network Architecture::
+* Reference Architecture::
 * System Architecture::
 * Platform Architecture::
 * Protocol Architecture::
@@ -304,7 +303,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 * Optional Management Support::
 * Programmatic Interfaces::
 * Platform Sizing::
-* Licences::
+* Licenses::
 * Indices::
 @end menu
 
@@ -495,32 +494,6 @@ no obligation to provide any feature listed herein.
 
 This document is organized as follows:
 
-@ifnottex
-@menu
-* Introduction::
-* Application Architecture::
-* Network Architecture::
-* Reference Architecture::
-* System Architecture::
-* Platform Architecture::
-* Protocol Architecture::
-* Software Architecture::
-* Hardware Architecture::
-* Management Architecture::
-* Logistics::
-* Optional Application Support::
-* Optional Network Support::
-* Optional Protocol Support::
-* Optional Software Support::
-* Optional Hardware Support::
-* Optional Management Support::
-* Programmatic Interfaces::
-* Platform Sizing::
-* Licences::
-* Indices::
-@end menu
-@end ifnottex
-@iftex
 @table @emph
 @item @ref{Introduction}
 Introduction to the @value{MANUAL_TITLE} application.
@@ -563,7 +536,6 @@ Detailed platform sizing considerations.
 @item @ref{Indices}
 Index of concepts, manual pages, etc.
 @end table
-@end iftex
 
 
 @node Introduction
@@ -985,7 +957,7 @@ driver and the driver provides the functions of a SCCP endpoint or relay with fu
 translations.  Signalling Connection Control Part streams bound to TCAP SCCP-SAPs are linked under
 the TCAP driver to form a complete SS7 stack in support of call transactions.
 
-@figuresized{sccp,6.1,Signalling Connection Control Part (SCCP) Module,3in}
+@figuresized{sccp,6.2,Signalling Connection Control Part (SCCP) Module,3in}
 
 The SCCP driver supports all CCITT/ITU-T versions (Blue Book forward), ETSI and ANSI versions (1992
 forward), including both connectionless and connection-oriented protocol classes 0 through 3.  The
@@ -1087,7 +1059,7 @@ complete SS7 stack in support of call switching.  Message Transfer Part streams 
 MTP-SAPs are linked under the SCCP driver above to form a complete SS7 stack in support of
 transaction services.}
 
-@figuresized{mtp3,6.2,Message Transfer Part (MTP) Level 3 (MTP3) Module,3in}
+@figuresized{mtp3,6.3,Message Transfer Part (MTP) Level 3 (MTP3) Module,3in}
 
 The MTP driver supports all CCITT/ITU-T versions (Blue Book forward), ETSI and ANSI versions (1992
 forward), including full transfer function.  The MTP driver provides a specialized MTP interface to
@@ -1102,7 +1074,7 @@ its users.
 The Message Transfer Part (MTP) Level 2 (MTP2) module is responsible for providing MTP services to
 its users.
 
-@figuresized{mtp2,6.3,Message Transfer Part (MTP) Level 2 (MTP2) Module,3in}
+@figuresized{mtp2,6.4,Message Transfer Part (MTP) Level 2 (MTP2) Module,3in}
 
 These are an existing OpenSS7 SS7 stack components; for documentation, see: @manref{mtp(4)}.
 @dfn{Phase 1} activities for MTP3 and MTP2 include integration testing with the SG components.
@@ -1179,7 +1151,7 @@ The SL module is a @acronym{STREAMS} module that runs in the Linux kernel for ma
 
 The Signalling Link (SL) module is responsible for providing SL services to its users.
 
-@figuresized{sl,6.4,Signalling Link (SL) Module,3in}
+@figuresized{sl,6.5,Signalling Link (SL) Module,3in}
 
 This is an existing OpenSS7 SS7 stack component; for documentation, see: @manref{sl(4)}.
 @dfn{Phase 1} activities for MTP2 include integration testing with the SG components.
@@ -1203,7 +1175,7 @@ Revision 2.0 Style 2 connectionless interface.
 
 The Signalling Data Terminal (SDT) module is responsible for providing SDT services to its users.
 
-@figuresized{sdt,6.5,Signalling Data Terminal (SDT) Module,3in}
+@figuresized{sdt,6.6,Signalling Data Terminal (SDT) Module,3in}
 
 This is an existing OpenSS7 SS7 stack component; for documentation see: @manref{sdt(4)}.
 @dfn{Phase 1} activities for SDT include integration testing with the SG components.
@@ -1226,7 +1198,7 @@ Revision 2.0 Style 2 connectionless interface.
 
 The Signalling Data Link (SDL) module is responsible for providing SDL services to its users.
 
-@figuresized{sdt,6.5b,Signalling Data Link (SDL) Module,3in}
+@figuresized{sdt,6.6b,Signalling Data Link (SDL) Module,3in}
 
 This is an existing OpenSS7 SS7 stack component; for documentation see: @manref{sdl(4)}.
 @dfn{Phase 1} activities for SDL include integration testing with the SG components.
