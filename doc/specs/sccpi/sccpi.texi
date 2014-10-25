@@ -1,92 +1,92 @@
-% -*- texinfo -*- vim: ft=texinfo
-% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
-% =========================================================================
-%
-% @(#) $Id: sccpi.texi,v 1.1.2.2 2011-02-07 02:21:42 brian Exp $
-%
-% =========================================================================
-%
-% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
-% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
-%
-% All Rights Reserved.
-%
-% Permission is granted to copy, distribute and/or modify this document
-% under the terms of the GNU Free Documentation License, Version 1.3 or
-% any later version published by the Free Software Foundation; with no
-% Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
-% copy of the license is included in the section entitled "GNU Free
-% Documentation License".
-%
-% Permission to use, copy and distribute this documentation without
-% modification, for any purpose and without fee or royalty is hereby
-% granted, provided that both the above copyright notice and this
-% permission notice appears in all copies and that the name of OpenSS7
-% Corporation not be used in advertising or publicity pertaining to
-% distribution of this documentation or its contents without specific,
-% written prior permission.  OpenSS7 Corporation makes no representation
-% about the suitability of this documentation for any purpose.  It is
-% provided "as is" without express or implied warranty.
-% 
-% Permission is granted to process this file through Tex and print the
-% results, provided the printed document carries copying permission
-% notice identical to this one except for the removal of this paragraph
-% (this paragraph not being relevant to the printed manual).
-% 
-% OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
-% DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
-% FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
-% CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
-% IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
-% PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
-% OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
-% CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
-% USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-% OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
-% THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
-% THEREOF.
-% 
-% Since the Linux kernel and libraries are constantly changing, this
-% manual page may be incorrect or out-of-date.  The author(s) assume no
-% responsibility for errors or omissions, or for damages resulting from
-% the use of the information contained herein.  The author(s) may not
-% have taken the same level of care in the production of this manual,
-% which is licensed free of charge, as they might when working
-% professionally.
-% 
-% Formatted or processed versions of this manual, if unaccompanied by
-% the source, must acknowledge the copyright and authors of this work.
-%
-% -------------------------------------------------------------------------
-%
-% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-% on behalf of the U.S. Government ("Government"), the following
-% provisions apply to you.  If the Software is supplied by the Department
-% of Defense ("DoD"), it is classified as "Commercial Computer Software"
-% under paragraph 252.227-7014 of the DoD Supplement to the Federal
-% Acquisition Regulations ("DFARS") (or any successor regulations) and the
-% Government is acquiring only the license rights granted herein (the
-% license rights customarily provided to non-Government users).  If the
-% Software is supplied to any unit or agency of the Government other than
-% DoD, it is classified as "Restricted Computer Software" and the
-% Government's rights in the Software are defined in paragraph 52.227-19
-% of the Federal Acquisition Regulations ("FAR") (or any successor
-% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-% NASA Supplement to the FAR (or any successor regulations).
-%
-% =========================================================================
-% 
-% Commercial licensing and support of this software is available from
-% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-% 
-% =========================================================================
-%
-% Last Modified $Date: 2011-02-07 02:21:42 $ by $Author: brian $
-%
-% =========================================================================
-
 \input texinfo
+@c -*- texinfo -*- vim: ft=texinfo
+@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+@c =========================================================================
+@c
+@c @(#) $Id: sccpi.texi,v 1.1.2.2 2011-02-07 02:21:42 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2008-2014  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to copy, distribute and/or modify this document
+@c under the terms of the GNU Free Documentation License, Version 1.3 or
+@c any later version published by the Free Software Foundation; with no
+@c Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+@c copy of the license is included in the section entitled "GNU Free
+@c Documentation License".
+@c
+@c Permission to use, copy and distribute this documentation without
+@c modification, for any purpose and without fee or royalty is hereby
+@c granted, provided that both the above copyright notice and this
+@c permission notice appears in all copies and that the name of OpenSS7
+@c Corporation not be used in advertising or publicity pertaining to
+@c distribution of this documentation or its contents without specific,
+@c written prior permission.  OpenSS7 Corporation makes no representation
+@c about the suitability of this documentation for any purpose.  It is
+@c provided "as is" without express or implied warranty.
+@c 
+@c Permission is granted to process this file through Tex and print the
+@c results, provided the printed document carries copying permission
+@c notice identical to this one except for the removal of this paragraph
+@c (this paragraph not being relevant to the printed manual).
+@c 
+@c OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+@c DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+@c FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+@c CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+@c IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+@c PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+@c OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+@c CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+@c USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+@c OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+@c THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+@c THEREOF.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2011-02-07 02:21:42 $ by $Author: brian $
+@c
+@c =========================================================================
+
 @setfilename sccpi.info
 @include ../../../scripts/texi/args.texi
 @set MANUAL_TITLE Signalling Connection Control Part Interface (SCCPI)
@@ -110,7 +110,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2014  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -157,14 +157,13 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
-@sp 0.5
+@sp 1
 @title @value{MANUAL_TYPE}
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
 @subtitle Updated @value{PACKAGE_PDATE}
-@sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2014  Monavacon Limited
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
@@ -176,7 +175,6 @@ Signalling Connection Control Part (SCCP) interface to these components as well 
 Signalling Connection Control Part control for other Signalling Connection Control Part protocols.
 @end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
-@sp 0.2
 @author The OpenSS7 Project <@uref{http://www.openss7.org/}>
 
 @page
@@ -193,7 +191,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2014  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -1053,23 +1051,21 @@ described in addendum @ref{Addendum for SCCP Conformance}, and rules for JITC co
 @section Local Management Primitives
 
 @menu
-* SCCP Information Request::
-* SCCP Information Acknowledgement::
-* Bind Protocol Address Request::
-* Bind Protocol Address Acknowledgement::
-* Unbind Protocol Address Request::
-* SCCP Options Management Request::
-* Error Acknowledgement::
-* Successful Receipt Acknowledgements::
+* N_INFO_REQ::
+* N_INFO_ACK::
+* N_BIND_REQ::
+* N_BIND_ACK::
+* N_UNBIND_REQ::
+* N_OPTMGMT_REQ::
+* N_ERROR_ACK::
+* N_OK_ACK::
 @end menu
 
 These primitives apply to CLNS and CONS.
 
-@node SCCP Information Request
+@node N_INFO_REQ
 @subsection SCCP Information Request
-
 @subsubheading N_INFO_REQ
-@anchor{N_INFO_REQ}
 @prindex N_INFO_REQ
 
 This primitive requests the NS provider to return the values of all supported protocol parameters
@@ -1602,10 +1598,9 @@ primitive.
 @end itemize
 
 @page
-@node SCCP Options Management Request
+@node N_OPTMGMT_REQ
 @subsection SCCP Options Management Request
 @subsubheading N_OPTMGMT_REQ
-@anchor{N_OPTMGMT_REQ}
 @prindex N_OPTMGMT_REQ
 This primitive allows the NS user to manage QOS parameter values associated with the Stream.
 @subsubheading Format
@@ -2448,8 +2443,8 @@ is indicated to the NS user with a @msg{M_ERROR} @acronym{STREAMS} message type 
 number value of @errno{EPROTO}) that results in the failure of all system calls on that Stream.  The
 applicable errors are defined as follows:
 
-@table @errno
-@item EPROTO
+@table @asis
+@item @errno{EPROTO}
 This indicates one of the following unrecoverable protocol conditions:
 @itemize ---
 @item The network interface was found to be in an incorrect state.
@@ -3289,6 +3284,10 @@ selected with the @prim{N_OPTMGMT_REQ} primitive.
 
 @node Unit Data Transfer
 @subsection Unit Data Transfer
+@menu
+* N_UNITDATA_REQ::
+* N_UNITDATA_IND::
+@end menu
 
 @node N_UNITDATA_REQ
 @subsubsection Unit Data Request
@@ -3428,6 +3427,10 @@ The resulting state remains unchanged.
 @page
 @node Unit Data Error
 @subsection Unit Data Error
+@menu
+* N_UDERROR_IND::
+* N_NOTICE_IND::
+@end menu
 
 @node N_UDERROR_IND
 @subsubsection Unit Data Error Indication
@@ -3476,10 +3479,9 @@ The resulting state remains unchanged.
 
 
 @page
-@node Notice Indication
+@node N_NOTICE_IND
 @subsubsection Notice Indication
 @subsubheading N_NOTICE_IND
-@anchor{N_NOTICE_IND}
 @prindex N_NOTICE_IND
 This primitive indicates to the NS user that a datagram with the specifid destination address,
 source address and Quality of Service parameters has been returned due to an error.
@@ -3931,7 +3933,7 @@ addendum must be used along with the generic SCCPI as defined in the main docume
 the EN 300 009-1 conformance defined in Addendum 2, when implementing an SCCP that will be
 configured with the EN 300 008-1 Signalling Connection Control Part.
 
-@unnumberedsec Primitives and Rules for ETSI EN 300 009-1 V3.2.2 Conformance
+@unnumberedsubsec Primitives and Rules for ETSI EN 300 009-1 V3.2.2 Conformance
 
 The following are the additional rules that apply to the SCCPI primitives for ETSI EN
 300 009-1 V3.2.2 compatibility.
