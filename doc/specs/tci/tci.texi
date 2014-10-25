@@ -1,92 +1,92 @@
-% -*- texinfo -*- vim: ft=texinfo
-% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
-% =========================================================================
-%
-% @(#) $Id: tci.texi,v 1.1.2.2 2011-02-07 02:21:46 brian Exp $
-%
-% =========================================================================
-%
-% Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
-% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
-%
-% All Rights Reserved.
-%
-% Permission is granted to copy, distribute and/or modify this document
-% under the terms of the GNU Free Documentation License, Version 1.3 or
-% any later version published by the Free Software Foundation; with no
-% Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
-% copy of the license is included in the section entitled "GNU Free
-% Documentation License".
-%
-% Permission to use, copy and distribute this documentation without
-% modification, for any purpose and without fee or royalty is hereby
-% granted, provided that both the above copyright notice and this
-% permission notice appears in all copies and that the name of OpenSS7
-% Corporation not be used in advertising or publicity pertaining to
-% distribution of this documentation or its contents without specific,
-% written prior permission.  OpenSS7 Corporation makes no representation
-% about the suitability of this documentation for any purpose.  It is
-% provided "as is" without express or implied warranty.
-% 
-% Permission is granted to process this file through Tex and print the
-% results, provided the printed document carries copying permission
-% notice identical to this one except for the removal of this paragraph
-% (this paragraph not being relevant to the printed manual).
-% 
-% OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
-% DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
-% FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
-% CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
-% IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
-% PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
-% OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
-% CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
-% USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-% OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
-% THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
-% THEREOF.
-% 
-% Since the Linux kernel and libraries are constantly changing, this
-% manual page may be incorrect or out-of-date.  The author(s) assume no
-% responsibility for errors or omissions, or for damages resulting from
-% the use of the information contained herein.  The author(s) may not
-% have taken the same level of care in the production of this manual,
-% which is licensed free of charge, as they might when working
-% professionally.
-% 
-% Formatted or processed versions of this manual, if unaccompanied by
-% the source, must acknowledge the copyright and authors of this work.
-%
-% -------------------------------------------------------------------------
-%
-% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-% on behalf of the U.S. Government ("Government"), the following
-% provisions apply to you.  If the Software is supplied by the Department
-% of Defense ("DoD"), it is classified as "Commercial Computer Software"
-% under paragraph 252.227-7014 of the DoD Supplement to the Federal
-% Acquisition Regulations ("DFARS") (or any successor regulations) and the
-% Government is acquiring only the license rights granted herein (the
-% license rights customarily provided to non-Government users).  If the
-% Software is supplied to any unit or agency of the Government other than
-% DoD, it is classified as "Restricted Computer Software" and the
-% Government's rights in the Software are defined in paragraph 52.227-19
-% of the Federal Acquisition Regulations ("FAR") (or any successor
-% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-% NASA Supplement to the FAR (or any successor regulations).
-%
-% =========================================================================
-% 
-% Commercial licensing and support of this software is available from
-% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-% 
-% =========================================================================
-%
-% Last Modified $Date: 2011-02-07 02:21:46 $ by $Author: brian $
-%
-% =========================================================================
-
 \input texinfo
+@c -*- texinfo -*- vim: ft=texinfo
+@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+@c =========================================================================
+@c
+@c @(#) $Id: tci.texi,v 1.1.2.2 2011-02-07 02:21:46 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2008-2014  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to copy, distribute and/or modify this document
+@c under the terms of the GNU Free Documentation License, Version 1.3 or
+@c any later version published by the Free Software Foundation; with no
+@c Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+@c copy of the license is included in the section entitled "GNU Free
+@c Documentation License".
+@c
+@c Permission to use, copy and distribute this documentation without
+@c modification, for any purpose and without fee or royalty is hereby
+@c granted, provided that both the above copyright notice and this
+@c permission notice appears in all copies and that the name of OpenSS7
+@c Corporation not be used in advertising or publicity pertaining to
+@c distribution of this documentation or its contents without specific,
+@c written prior permission.  OpenSS7 Corporation makes no representation
+@c about the suitability of this documentation for any purpose.  It is
+@c provided "as is" without express or implied warranty.
+@c 
+@c Permission is granted to process this file through Tex and print the
+@c results, provided the printed document carries copying permission
+@c notice identical to this one except for the removal of this paragraph
+@c (this paragraph not being relevant to the printed manual).
+@c 
+@c OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+@c DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+@c FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+@c CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+@c IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+@c PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+@c OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+@c CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+@c USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+@c OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+@c THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+@c THEREOF.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2011-02-07 02:21:46 $ by $Author: brian $
+@c
+@c =========================================================================
+
 @setfilename tci.info
 @include ../../../scripts/texi/args.texi
 @set MANUAL_TITLE Transaction Component Interface (TCI)
@@ -110,7 +110,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2014  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -157,14 +157,13 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
-@sp 0.5
+@sp 1
 @title @value{MANUAL_TYPE}
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
 @subtitle Updated @value{PACKAGE_PDATE}
-@sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2011  Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2014  Monavacon Limited
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
@@ -176,7 +175,6 @@ as platform and system applicability of the @value{MANUAL_TITLE}.  It provides a
 @value{LONG} control for other @value{LONG} protocols.
 @end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
-@sp 0.2
 @author The OpenSS7 Project <@uref{http://www.openss7.org/}>
 
 @page
@@ -193,7 +191,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2014  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -1534,9 +1532,9 @@ The state is unchanged.
 
 The following rules apply when the TC provider issues the @prim{TC_INFO_ACK} primitive:
 
-@itemize ---
+@c @itemize ---
 
-@end itemize
+@c @end itemize
 
 @page
 @node Transaction Protocol Address Management
@@ -1654,27 +1652,27 @@ Correct acknowledgement of the primitive is indicated with the @prim{TC_BIND_ACK
 These errore will be indicated with the @prim{TC_ERROR_ACK} primitive described in
 @ref{TC_ERROR_ACK}.  The allowable errors are as follows:
 
-@table @perr
+@table @asis
 
-@item TCACCES
+@item @perr{TCACCES}
 This error indicates that the TC user did not have proper permissions for the use of the requested
 address.
 
-@item TCADDRBUSY
+@item @perr{TCADDRBUSY}
 This error indicates that the requested address is in use.
 
-@item TCBADADDR
+@item @perr{TCBADADDR}
 This error indicates that the protocol address was in an incorrect format or the address contained
 invalid information.  It is not intended to indicate protocol errors.
 
-@item TCNOADDR
+@item @perr{TCNOADDR}
 This error indicates that the TC provider could not allocate an address.
 
-@item TCOUTSTATE
+@item @perr{TCOUTSTATE}
 This error indicates that the primitive would place the transaction component interface out of
 state.
 
-@item TCSYSERR
+@item @perr{TCSYSERR}
 This error indicates that a system error has occurred and that the Linux system error is indicated
 in the primitive.
 
@@ -1871,12 +1869,12 @@ in @ref{TC_OK_ACK}.
 These errrors will be indicated with the @prim{TC_ERROR_ACK} primitive described in
 @ref{TC_ERROR_ACK}.  The allowable errors are as follows:
 
-@table @perr
+@table @asis
 
-@item TCOUTSTATE
+@item @perr{TCOUTSTATE}
 The primitive would place the transaction component interface out of state.
 
-@item TCSYSERR
+@item @perr{TCSYSERR}
 A system error has occurred and the @cite{Linux} system error is indicated in the primitive.
 
 @end table
@@ -2069,24 +2067,24 @@ These errors will be indicated via the @prim{TC_ERROR_ACK} primitive described i
 
 The allowable non-fatal errors are as follows:
 
-@table @perr
+@table @asis
 
-@item TCACCES
+@item @perr{TCACCES}
 The TC user did not have proper permissions for the use of the requested options.
 
-@item TCBADFLAG
+@item @perr{TCBADFLAG}
 The flags as specified were incorrect or invalid.
 
-@item TCBADOPT
+@item @perr{TCBADOPT}
 The options as specified were in an incorrect ofrmat, or they contained invalid information.
 
-@item TCOUTSTATE
+@item @perr{TCOUTSTATE}
 The primitive would place the transaction interface out of state.
 
-@item TCNOTSUPPORT
+@item @perr{TCNOTSUPPORT}
 This primitive is not supported by the TC provider.
 
-@item TCSYSERR
+@item @perr{TCSYSERR}
 A system error has occurred and the @cite{Linux} system error is indicated in the primitive.
 
 @end table
@@ -2384,53 +2382,53 @@ also indicates to the user that no action was taken on the primtiive that caused
 
 The TC provider is allowed to return any of the following TC error codes:
 
-@table @perr
+@table @asis
 
-@item TCBADADDR
+@item @perr{TCBADADDR}
 Indicates that the protocol address as specified in the primitive was of an
 incorrect format or the address contained illegal information.
 
-@item TCBADOPT
+@item @perr{TCBADOPT}
 Indicates that the options as specified in the primitive were in an incorrect
 format, or they contained illegal information.
 
-@item TCBADF
+@item @perr{TCBADF}
 Indicates that the @dfn{Stream} queue pointer as specified in the primitive was
 illegal.
 
-@item TCNOADDR
+@item @perr{TCNOADDR}
 Indicates that the TC provider could not allocate a protocol address.
 
-@item TCACCES
+@item @perr{TCACCES}
 Indicates that the user did not have proper permissions to use the protocol
 address or options specified in the primitive.
 
-@item TCOUTSTATE
+@item @perr{TCOUTSTATE}
 Indicates that the primitive would place the interface out of state.
 
-@item TCBADSEQ
+@item @perr{TCBADSEQ}
 Indicates that the transaction identifier specified in the primitive was
 incorrect or illegal.
 
-@item TCBADFLAG
+@item @perr{TCBADFLAG}
 Indicates that the flags specified in the primitive were incorrect or illegal.
 
-@item TCBADDATA
+@item @perr{TCBADDATA}
 Indicates that the amount of user data specified was illegal.
 
-@item TCSYSERR
+@item @perr{TCSYSERR}
 Indicates that a system error has occurred and that the UNIX System error is
 indicated in the primitive.
 
-@item TCADDRBUSY
+@item @perr{TCADDRBUSY}
 Indicates that the requested address is already in use.
 
-@item TCRESADDR
+@item @perr{TCRESADDR}
 Indicates that the TC provider requires the responding @dfn{Stream} be bound to
 the same protocol address as the @dfn{Stream} on which the dialogue ``begin''
 indication (@pxref{TC_BEGIN_IND}) was received.
 
-@item TCNOTSUPPORT
+@item @perr{TCNOTSUPPORT}
 Indicates that the TC provider does not support the requested capability.
 
 @end table
@@ -2656,36 +2654,36 @@ in @ref{TC_OK_ACK}.
 These are indicated with the @prim{TC_ERROR_ACK} primitive.  The applicable non-fatal errors are
 defined as follows:
 
-@table @perr
+@table @asis
 
-@item TCACCES
+@item @perr{TCACCES}
 This indicates that the user did not have proper permissions for the use of the requested protocol
 address or protocol options.
 
-@item TCBADADDR
+@item @perr{TCBADADDR}
 This indicates that the protocol address was in an incorrect format or the address contained illegal
 information.  It is not intended to indicate protocol connection errors, such as an unreachable
 destination.  Those types of errors are indicated with the @prim{TC_ABORT_IND} primitive described
 in @ref{TC_ABORT_IND}.
 
-@item TCBADOPT
+@item @perr{TCBADOPT}
 This indicates that the options were in an incorrect format or they contained illegal information.
 
-@item TCOUTSTATE
+@item @perr{TCOUTSTATE}
 The primitive would place the transaction interface out of state.
 
-@item TCBADDATA
+@item @perr{TCBADDATA}
 The amount of user data specified was illegal (@pxref{TC_INFO_ACK}).
 
-@item TCBADFLAG
+@item @perr{TCBADFLAG}
 The flags specified were incorrect, not supported by the provider, or contained illegal information.
 
-@item TCBADSEQ
+@item @perr{TCBADSEQ}
 The specified dialogue identifier @parm{DIALOG_id} was incorrect, or contained illegal information.
 This error would normally occur if the TC user selected a dialogue identifier reserved for the
 provider (high bit set to 0).
 
-@item TCSYSERR
+@item @perr{TCSYSERR}
 A system error has occured and the UNIX System error is indicated in the primitive.
 
 @end table
@@ -2925,40 +2923,40 @@ in @ref{TC_OK_ACK}.
 These errors will be indicated with the @prim{TC_ERROR_ACK} primitive described in
 @ref{TC_ERROR_ACK}.  The allowable errors are as follows:
 
-@table @perr
+@table @asis
 
-@item TCBADF
+@item @perr{TCBADF}
 The token specified is not associated with an open @dfn{Stream}.
 
-@item TCBADOPT
+@item @perr{TCBADOPT}
 The options were in an incorrect format, or they contained illegal information.
 
-@item TCACCES
+@item @perr{TCACCES}
 The user did not have proper permissions for the use of the responding protocol address or protocol
 options.
 
-@item TCOUTSTATE
+@item @perr{TCOUTSTATE}
 The primitive would place the transaction interface out of state for the indicated transaction.
 
-@item TCBADDATA
+@item @perr{TCBADDATA}
 The amount of user data specified was outside the range supported by the transaction provider.
 
-@item TCBADFLAG
+@item @perr{TCBADFLAG}
 The flags specified were incorrect, not supported by the provider, or contained illegal information.
 
-@item TCBADSEQ
+@item @perr{TCBADSEQ}
 The specified dialogue identifier @parm{DIALOG_id} was incorrect, or contained illegal information.
 This error would normally occur if the TC user selected a dialogue identifier reserved for the
 provider (high bit set to 0).
 
-@item TCSYSERR
+@item @perr{TCSYSERR}
 A system error occurred and the UNIX System error is indicated in the primitive.
 
-@item TCRESADDR
+@item @perr{TCRESADDR}
 The transaction provider requires that the responding @dfn{Stream} is bound to the same address as
 the @dfn{Stream} on which the transaction dialogue begin indication was received.
 
-@item TCBADADDR
+@item @perr{TCBADADDR}
 This indicates that the protocol address was in an incorrect format or the protocol address
 contained illegal information.
 
