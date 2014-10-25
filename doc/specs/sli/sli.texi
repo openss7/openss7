@@ -1,92 +1,92 @@
-% -*- texinfo -*- vim: ft=texinfo
-% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
-% =========================================================================
-%
-% @(#) $Id: sli.texi,v 1.1.2.2 2011-02-07 02:21:46 brian Exp $
-%
-% =========================================================================
-%
-% Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
-% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
-%
-% All Rights Reserved.
-%
-% Permission is granted to copy, distribute and/or modify this document
-% under the terms of the GNU Free Documentation License, Version 1.3 or
-% any later version published by the Free Software Foundation; with no
-% Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
-% copy of the license is included in the section entitled "GNU Free
-% Documentation License".
-%
-% Permission to use, copy and distribute this documentation without
-% modification, for any purpose and without fee or royalty is hereby
-% granted, provided that both the above copyright notice and this
-% permission notice appears in all copies and that the name of OpenSS7
-% Corporation not be used in advertising or publicity pertaining to
-% distribution of this documentation or its contents without specific,
-% written prior permission.  OpenSS7 Corporation makes no representation
-% about the suitability of this documentation for any purpose.  It is
-% provided "as is" without express or implied warranty.
-% 
-% Permission is granted to process this file through Tex and print the
-% results, provided the printed document carries copying permission
-% notice identical to this one except for the removal of this paragraph
-% (this paragraph not being relevant to the printed manual).
-% 
-% OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
-% DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
-% FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
-% CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
-% IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
-% PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
-% OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
-% CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
-% USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-% OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
-% THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
-% THEREOF.
-% 
-% Since the Linux kernel and libraries are constantly changing, this
-% manual page may be incorrect or out-of-date.  The author(s) assume no
-% responsibility for errors or omissions, or for damages resulting from
-% the use of the information contained herein.  The author(s) may not
-% have taken the same level of care in the production of this manual,
-% which is licensed free of charge, as they might when working
-% professionally.
-% 
-% Formatted or processed versions of this manual, if unaccompanied by
-% the source, must acknowledge the copyright and authors of this work.
-%
-% -------------------------------------------------------------------------
-%
-% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-% on behalf of the U.S. Government ("Government"), the following
-% provisions apply to you.  If the Software is supplied by the Department
-% of Defense ("DoD"), it is classified as "Commercial Computer Software"
-% under paragraph 252.227-7014 of the DoD Supplement to the Federal
-% Acquisition Regulations ("DFARS") (or any successor regulations) and the
-% Government is acquiring only the license rights granted herein (the
-% license rights customarily provided to non-Government users).  If the
-% Software is supplied to any unit or agency of the Government other than
-% DoD, it is classified as "Restricted Computer Software" and the
-% Government's rights in the Software are defined in paragraph 52.227-19
-% of the Federal Acquisition Regulations ("FAR") (or any successor
-% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-% NASA Supplement to the FAR (or any successor regulations).
-%
-% =========================================================================
-% 
-% Commercial licensing and support of this software is available from
-% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-% 
-% =========================================================================
-%
-% Last Modified $Date: 2011-02-07 02:21:46 $ by $Author: brian $
-%
-% =========================================================================
-
 \input texinfo
+@c -*- texinfo -*- vim: ft=texinfo
+@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+@c =========================================================================
+@c
+@c @(#) $Id: sli.texi,v 1.1.2.2 2011-02-07 02:21:46 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2008-2014  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to copy, distribute and/or modify this document
+@c under the terms of the GNU Free Documentation License, Version 1.3 or
+@c any later version published by the Free Software Foundation; with no
+@c Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+@c copy of the license is included in the section entitled "GNU Free
+@c Documentation License".
+@c
+@c Permission to use, copy and distribute this documentation without
+@c modification, for any purpose and without fee or royalty is hereby
+@c granted, provided that both the above copyright notice and this
+@c permission notice appears in all copies and that the name of OpenSS7
+@c Corporation not be used in advertising or publicity pertaining to
+@c distribution of this documentation or its contents without specific,
+@c written prior permission.  OpenSS7 Corporation makes no representation
+@c about the suitability of this documentation for any purpose.  It is
+@c provided "as is" without express or implied warranty.
+@c 
+@c Permission is granted to process this file through Tex and print the
+@c results, provided the printed document carries copying permission
+@c notice identical to this one except for the removal of this paragraph
+@c (this paragraph not being relevant to the printed manual).
+@c 
+@c OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+@c DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+@c FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+@c CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+@c IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+@c PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+@c OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+@c CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+@c USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+@c OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+@c THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+@c THEREOF.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2011-02-07 02:21:46 $ by $Author: brian $
+@c
+@c =========================================================================
+
 @setfilename sli.info
 @include ../../../scripts/texi/args.texi
 @set MANUAL_TITLE Signalling Link Interface (SLI)
@@ -110,7 +110,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2014  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -157,14 +157,13 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
-@sp 0.5
+@sp 1
 @title @value{MANUAL_TYPE}
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
 @subtitle Updated @value{PACKAGE_PDATE}
-@sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2011  Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2014  Monavacon Limited
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
@@ -177,7 +176,6 @@ as platform and system applicability of the @value{MANUAL_TITLE}.  It provides a
 @value{LONG} control for other @value{LONG} protocols.
 @end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
-@sp 0.2
 @author The OpenSS7 Project <@uref{http://www.openss7.org/}>
 
 @page
@@ -194,7 +192,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2014  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -1620,82 +1618,82 @@ Indicates the primitive type.  Always @prim{LMI_ERROR_ACK}.
 Indicates the LM error number.
 This field can have one of the following values:
 
-@table @perr
-@item LMI_UNSPEC
+@table @asis
+@item @perr{LMI_UNSPEC}
 Unknown or unspecified.
-@item LMI_BADADDRESS
+@item @perr{LMI_BADADDRESS}
 Address was invalid.
-@item LMI_BADADDRTYPE
+@item @perr{LMI_BADADDRTYPE}
 Invalid address type.
-@item LMI_BADDIAL
+@item @perr{LMI_BADDIAL}
 (Not used.)
-@item LMI_BADDIALTYPE
+@item @perr{LMI_BADDIALTYPE}
 (Not used.)
-@item LMI_BADDISPOSAL
+@item @perr{LMI_BADDISPOSAL}
 Invalid disposal parameter.
-@item LMI_BADFRAME
+@item @perr{LMI_BADFRAME}
 Defective SDU received.
-@item LMI_BADPPA
+@item @perr{LMI_BADPPA}
 Invalid PPA identifier.
-@item LMI_BADPRIM
+@item @perr{LMI_BADPRIM}
 Unrecognized primitive.
-@item LMI_DISC
+@item @perr{LMI_DISC}
 Disconnected.
-@item LMI_EVENT
+@item @perr{LMI_EVENT}
 Protocol-specific event occurred.
-@item LMI_FATALERR
+@item @perr{LMI_FATALERR}
 Device has become unusable.
-@item LMI_INITFAILED
+@item @perr{LMI_INITFAILED}
 Link initialization failed.
-@item LMI_NOTSUPP
+@item @perr{LMI_NOTSUPP}
 Primitive not supported by this device.
-@item LMI_OUTSTATE
+@item @perr{LMI_OUTSTATE}
 Primitive was issued from invalid state.
-@item LMI_PROTOSHORT
+@item @perr{LMI_PROTOSHORT}
 @msg{M_PROTO} block too short.
-@item LMI_SYSERR
+@item @perr{LMI_SYSERR}
 UNIX system error.
-@item LMI_WRITEFAIL
+@item @perr{LMI_WRITEFAIL}
 Unitdata request failed.
-@item LMI_CRCERR
+@item @perr{LMI_CRCERR}
 CRC or FCS error.
-@item LMI_DLE_EOT
+@item @perr{LMI_DLE_EOT}
 DLE EOT detected.
-@item LMI_FORMAT
+@item @perr{LMI_FORMAT}
 Format error detected.
-@item LMI_HDLC_ABORT
+@item @perr{LMI_HDLC_ABORT}
 Aborted frame detected.
-@item LMI_OVERRUN
+@item @perr{LMI_OVERRUN}
 Input overrun.
-@item LMI_TOOSHORT
+@item @perr{LMI_TOOSHORT}
 Frame too short.
-@item LMI_INCOMPLETE
+@item @perr{LMI_INCOMPLETE}
 Partial frame received.
-@item LMI_BUSY
+@item @perr{LMI_BUSY}
 Telephone was busy.
-@item LMI_NOANSWER
+@item @perr{LMI_NOANSWER}
 Connection went unanswered.
-@item LMI_CALLREJECT
+@item @perr{LMI_CALLREJECT}
 Connection rejected.
-@item LMI_HDLC_IDLE
+@item @perr{LMI_HDLC_IDLE}
 HDLC line went idle.
-@item LMI_HDLC_NOTIDLE
+@item @perr{LMI_HDLC_NOTIDLE}
 HDLC link no longer idle.
-@item LMI_QUIESCENT
+@item @perr{LMI_QUIESCENT}
 Line being reassigned.
-@item LMI_RESUMED
+@item @perr{LMI_RESUMED}
 Line has been reassigned.
-@item LMI_DSRTIMEOUT
+@item @perr{LMI_DSRTIMEOUT}
 Did not see DSR in time.
-@item LMI_LAN_COLLISIONS
+@item @perr{LMI_LAN_COLLISIONS}
 LAN excessive collisions.
-@item LMI_LAN_REFUSED
+@item @perr{LMI_LAN_REFUSED}
 LAN message refused.
-@item LMI_LAN_NOSTATION
+@item @perr{LMI_LAN_NOSTATION}
 LAN no such station.
-@item LMI_LOSTCTS
+@item @perr{LMI_LOSTCTS}
 Lost Clear to Send signal.
-@item LMI_DEVERR
+@item @perr{LMI_DEVERR}
 Start of device-specific error codes.
 @end table
 
@@ -1850,83 +1848,83 @@ primitive, and include the reason for failure in the primitive.
 
 @b{Non-Fatal Errors}: applicable non-fatal errors are as follows:
 
-@table @perr
+@table @asis
 
-@item LMI_UNSPEC
+@item @perr{LMI_UNSPEC}
 Unknown or unspecified.
-@item LMI_BADADDRESS
+@item @perr{LMI_BADADDRESS}
 Address was invalid.
-@item LMI_BADADDRTYPE
+@item @perr{LMI_BADADDRTYPE}
 Invalid address type.
-@item LMI_BADDIAL
+@item @perr{LMI_BADDIAL}
 (Not used.)
-@item LMI_BADDIALTYPE
+@item @perr{LMI_BADDIALTYPE}
 (Not used.)
-@item LMI_BADDISPOSAL
+@item @perr{LMI_BADDISPOSAL}
 Invalid disposal parameter.
-@item LMI_BADFRAME
+@item @perr{LMI_BADFRAME}
 Defective SDU received.
-@item LMI_BADPPA
+@item @perr{LMI_BADPPA}
 Invalid PPA identifier.
-@item LMI_BADPRIM
+@item @perr{LMI_BADPRIM}
 Unrecognized primitive.
-@item LMI_DISC
+@item @perr{LMI_DISC}
 Disconnected.
-@item LMI_EVENT
+@item @perr{LMI_EVENT}
 Protocol-specific event occurred.
-@item LMI_FATALERR
+@item @perr{LMI_FATALERR}
 Device has become unusable.
-@item LMI_INITFAILED
+@item @perr{LMI_INITFAILED}
 Link initialization failed.
-@item LMI_NOTSUPP
+@item @perr{LMI_NOTSUPP}
 Primitive not supported by this device.
-@item LMI_OUTSTATE
+@item @perr{LMI_OUTSTATE}
 Primitive was issued from invalid state.
-@item LMI_PROTOSHORT
+@item @perr{LMI_PROTOSHORT}
 @msg{M_PROTO} block too short.
-@item LMI_SYSERR
+@item @perr{LMI_SYSERR}
 UNIX system error.
-@item LMI_WRITEFAIL
+@item @perr{LMI_WRITEFAIL}
 Unitdata request failed.
-@item LMI_CRCERR
+@item @perr{LMI_CRCERR}
 CRC or FCS error.
-@item LMI_DLE_EOT
+@item @perr{LMI_DLE_EOT}
 DLE EOT detected.
-@item LMI_FORMAT
+@item @perr{LMI_FORMAT}
 Format error detected.
-@item LMI_HDLC_ABORT
+@item @perr{LMI_HDLC_ABORT}
 Aborted frame detected.
-@item LMI_OVERRUN
+@item @perr{LMI_OVERRUN}
 Input overrun.
-@item LMI_TOOSHORT
+@item @perr{LMI_TOOSHORT}
 Frame too short.
-@item LMI_INCOMPLETE
+@item @perr{LMI_INCOMPLETE}
 Partial frame received.
-@item LMI_BUSY
+@item @perr{LMI_BUSY}
 Telephone was busy.
-@item LMI_NOANSWER
+@item @perr{LMI_NOANSWER}
 Connection went unanswered.
-@item LMI_CALLREJECT
+@item @perr{LMI_CALLREJECT}
 Connection rejected.
-@item LMI_HDLC_IDLE
+@item @perr{LMI_HDLC_IDLE}
 HDLC line went idle.
-@item LMI_HDLC_NOTIDLE
+@item @perr{LMI_HDLC_NOTIDLE}
 HDLC link no longer idle.
-@item LMI_QUIESCENT
+@item @perr{LMI_QUIESCENT}
 Line being reassigned.
-@item LMI_RESUMED
+@item @perr{LMI_RESUMED}
 Line has been reassigned.
-@item LMI_DSRTIMEOUT
+@item @perr{LMI_DSRTIMEOUT}
 Did not see DSR in time.
-@item LMI_LAN_COLLISIONS
+@item @perr{LMI_LAN_COLLISIONS}
 LAN excessive collisions.
-@item LMI_LAN_REFUSED
+@item @perr{LMI_LAN_REFUSED}
 LAN message refused.
-@item LMI_LAN_NOSTATION
+@item @perr{LMI_LAN_NOSTATION}
 LAN no such station.
-@item LMI_LOSTCTS
+@item @perr{LMI_LOSTCTS}
 Lost Clear to Send signal.
-@item LMI_DEVERR
+@item @perr{LMI_DEVERR}
 Start of device-specific error codes.
 
 @end table
@@ -2120,83 +2118,83 @@ The LMS provider acknowledges receipt of the primitive and failure of the attach
 
 @b{Non-Fatal Errors}:  applicable non-fatal errors are as follows:
 
-@table @perr
+@table @asis
 
-@item LMI_UNSPEC
+@item @perr{LMI_UNSPEC}
 Unknown or unspecified.
-@item LMI_BADADDRESS
+@item @perr{LMI_BADADDRESS}
 Address was invalid.
-@item LMI_BADADDRTYPE
+@item @perr{LMI_BADADDRTYPE}
 Invalid address type.
-@item LMI_BADDIAL
+@item @perr{LMI_BADDIAL}
 (Not used.)
-@item LMI_BADDIALTYPE
+@item @perr{LMI_BADDIALTYPE}
 (Not used.)
-@item LMI_BADDISPOSAL
+@item @perr{LMI_BADDISPOSAL}
 Invalid disposal parameter.
-@item LMI_BADFRAME
+@item @perr{LMI_BADFRAME}
 Defective SDU received.
-@item LMI_BADPPA
+@item @perr{LMI_BADPPA}
 Invalid PPA identifier.
-@item LMI_BADPRIM
+@item @perr{LMI_BADPRIM}
 Unrecognized primitive.
-@item LMI_DISC
+@item @perr{LMI_DISC}
 Disconnected.
-@item LMI_EVENT
+@item @perr{LMI_EVENT}
 Protocol-specific event occurred.
-@item LMI_FATALERR
+@item @perr{LMI_FATALERR}
 Device has become unusable.
-@item LMI_INITFAILED
+@item @perr{LMI_INITFAILED}
 Link initialization failed.
-@item LMI_NOTSUPP
+@item @perr{LMI_NOTSUPP}
 Primitive not supported by this device.
-@item LMI_OUTSTATE
+@item @perr{LMI_OUTSTATE}
 Primitive was issued from invalid state.
-@item LMI_PROTOSHORT
+@item @perr{LMI_PROTOSHORT}
 @msg{M_PROTO} block too short.
-@item LMI_SYSERR
+@item @perr{LMI_SYSERR}
 UNIX system error.
-@item LMI_WRITEFAIL
+@item @perr{LMI_WRITEFAIL}
 Unitdata request failed.
-@item LMI_CRCERR
+@item @perr{LMI_CRCERR}
 CRC or FCS error.
-@item LMI_DLE_EOT
+@item @perr{LMI_DLE_EOT}
 DLE EOT detected.
-@item LMI_FORMAT
+@item @perr{LMI_FORMAT}
 Format error detected.
-@item LMI_HDLC_ABORT
+@item @perr{LMI_HDLC_ABORT}
 Aborted frame detected.
-@item LMI_OVERRUN
+@item @perr{LMI_OVERRUN}
 Input overrun.
-@item LMI_TOOSHORT
+@item @perr{LMI_TOOSHORT}
 Frame too short.
-@item LMI_INCOMPLETE
+@item @perr{LMI_INCOMPLETE}
 Partial frame received.
-@item LMI_BUSY
+@item @perr{LMI_BUSY}
 Telephone was busy.
-@item LMI_NOANSWER
+@item @perr{LMI_NOANSWER}
 Connection went unanswered.
-@item LMI_CALLREJECT
+@item @perr{LMI_CALLREJECT}
 Connection rejected.
-@item LMI_HDLC_IDLE
+@item @perr{LMI_HDLC_IDLE}
 HDLC line went idle.
-@item LMI_HDLC_NOTIDLE
+@item @perr{LMI_HDLC_NOTIDLE}
 HDLC link no longer idle.
-@item LMI_QUIESCENT
+@item @perr{LMI_QUIESCENT}
 Line being reassigned.
-@item LMI_RESUMED
+@item @perr{LMI_RESUMED}
 Line has been reassigned.
-@item LMI_DSRTIMEOUT
+@item @perr{LMI_DSRTIMEOUT}
 Did not see DSR in time.
-@item LMI_LAN_COLLISIONS
+@item @perr{LMI_LAN_COLLISIONS}
 LAN excessive collisions.
-@item LMI_LAN_REFUSED
+@item @perr{LMI_LAN_REFUSED}
 LAN message refused.
-@item LMI_LAN_NOSTATION
+@item @perr{LMI_LAN_NOSTATION}
 LAN no such station.
-@item LMI_LOSTCTS
+@item @perr{LMI_LOSTCTS}
 Lost Clear to Send signal.
-@item LMI_DEVERR
+@item @perr{LMI_DEVERR}
 Start of device-specific error codes.
 
 @end table
@@ -2264,83 +2262,83 @@ The LMS provider acknowledges receipt of the primitive and failure of the detach
 
 @b{Non-Fatal Errors}:  applicable non-fatal errors are as follows:
 
-@table @perr
+@table @asis
 
-@item LMI_UNSPEC
+@item @perr{LMI_UNSPEC}
 Unknown or unspecified.
-@item LMI_BADADDRESS
+@item @perr{LMI_BADADDRESS}
 Address was invalid.
-@item LMI_BADADDRTYPE
+@item @perr{LMI_BADADDRTYPE}
 Invalid address type.
-@item LMI_BADDIAL
+@item @perr{LMI_BADDIAL}
 (Not used.)
-@item LMI_BADDIALTYPE
+@item @perr{LMI_BADDIALTYPE}
 (Not used.)
-@item LMI_BADDISPOSAL
+@item @perr{LMI_BADDISPOSAL}
 Invalid disposal parameter.
-@item LMI_BADFRAME
+@item @perr{LMI_BADFRAME}
 Defective SDU received.
-@item LMI_BADPPA
+@item @perr{LMI_BADPPA}
 Invalid PPA identifier.
-@item LMI_BADPRIM
+@item @perr{LMI_BADPRIM}
 Unrecognized primitive.
-@item LMI_DISC
+@item @perr{LMI_DISC}
 Disconnected.
-@item LMI_EVENT
+@item @perr{LMI_EVENT}
 Protocol-specific event occurred.
-@item LMI_FATALERR
+@item @perr{LMI_FATALERR}
 Device has become unusable.
-@item LMI_INITFAILED
+@item @perr{LMI_INITFAILED}
 Link initialization failed.
-@item LMI_NOTSUPP
+@item @perr{LMI_NOTSUPP}
 Primitive not supported by this device.
-@item LMI_OUTSTATE
+@item @perr{LMI_OUTSTATE}
 Primitive was issued from invalid state.
-@item LMI_PROTOSHORT
+@item @perr{LMI_PROTOSHORT}
 @msg{M_PROTO} block too short.
-@item LMI_SYSERR
+@item @perr{LMI_SYSERR}
 UNIX system error.
-@item LMI_WRITEFAIL
+@item @perr{LMI_WRITEFAIL}
 Unitdata request failed.
-@item LMI_CRCERR
+@item @perr{LMI_CRCERR}
 CRC or FCS error.
-@item LMI_DLE_EOT
+@item @perr{LMI_DLE_EOT}
 DLE EOT detected.
-@item LMI_FORMAT
+@item @perr{LMI_FORMAT}
 Format error detected.
-@item LMI_HDLC_ABORT
+@item @perr{LMI_HDLC_ABORT}
 Aborted frame detected.
-@item LMI_OVERRUN
+@item @perr{LMI_OVERRUN}
 Input overrun.
-@item LMI_TOOSHORT
+@item @perr{LMI_TOOSHORT}
 Frame too short.
-@item LMI_INCOMPLETE
+@item @perr{LMI_INCOMPLETE}
 Partial frame received.
-@item LMI_BUSY
+@item @perr{LMI_BUSY}
 Telephone was busy.
-@item LMI_NOANSWER
+@item @perr{LMI_NOANSWER}
 Connection went unanswered.
-@item LMI_CALLREJECT
+@item @perr{LMI_CALLREJECT}
 Connection rejected.
-@item LMI_HDLC_IDLE
+@item @perr{LMI_HDLC_IDLE}
 HDLC line went idle.
-@item LMI_HDLC_NOTIDLE
+@item @perr{LMI_HDLC_NOTIDLE}
 HDLC link no longer idle.
-@item LMI_QUIESCENT
+@item @perr{LMI_QUIESCENT}
 Line being reassigned.
-@item LMI_RESUMED
+@item @perr{LMI_RESUMED}
 Line has been reassigned.
-@item LMI_DSRTIMEOUT
+@item @perr{LMI_DSRTIMEOUT}
 Did not see DSR in time.
-@item LMI_LAN_COLLISIONS
+@item @perr{LMI_LAN_COLLISIONS}
 LAN excessive collisions.
-@item LMI_LAN_REFUSED
+@item @perr{LMI_LAN_REFUSED}
 LAN message refused.
-@item LMI_LAN_NOSTATION
+@item @perr{LMI_LAN_NOSTATION}
 LAN no such station.
-@item LMI_LOSTCTS
+@item @perr{LMI_LOSTCTS}
 Lost Clear to Send signal.
-@item LMI_DEVERR
+@item @perr{LMI_DEVERR}
 Start of device-specific error codes.
 
 @end table
@@ -2434,83 +2432,83 @@ When unsuccessful, the LMS provider acknowledges the failure of the  enable serv
 
 @b{Non-Fatal Errors}:  applicable non-fatal errors are as follows:
 
-@table @perr
+@table @asis
 
-@item LMI_UNSPEC
+@item @perr{LMI_UNSPEC}
 Unknown or unspecified.
-@item LMI_BADADDRESS
+@item @perr{LMI_BADADDRESS}
 Address was invalid.
-@item LMI_BADADDRTYPE
+@item @perr{LMI_BADADDRTYPE}
 Invalid address type.
-@item LMI_BADDIAL
+@item @perr{LMI_BADDIAL}
 (Not used.)
-@item LMI_BADDIALTYPE
+@item @perr{LMI_BADDIALTYPE}
 (Not used.)
-@item LMI_BADDISPOSAL
+@item @perr{LMI_BADDISPOSAL}
 Invalid disposal parameter.
-@item LMI_BADFRAME
+@item @perr{LMI_BADFRAME}
 Defective SDU received.
-@item LMI_BADPPA
+@item @perr{LMI_BADPPA}
 Invalid PPA identifier.
-@item LMI_BADPRIM
+@item @perr{LMI_BADPRIM}
 Unrecognized primitive.
-@item LMI_DISC
+@item @perr{LMI_DISC}
 Disconnected.
-@item LMI_EVENT
+@item @perr{LMI_EVENT}
 Protocol-specific event occurred.
-@item LMI_FATALERR
+@item @perr{LMI_FATALERR}
 Device has become unusable.
-@item LMI_INITFAILED
+@item @perr{LMI_INITFAILED}
 Link initialization failed.
-@item LMI_NOTSUPP
+@item @perr{LMI_NOTSUPP}
 Primitive not supported by this device.
-@item LMI_OUTSTATE
+@item @perr{LMI_OUTSTATE}
 Primitive was issued from invalid state.
-@item LMI_PROTOSHORT
+@item @perr{LMI_PROTOSHORT}
 @msg{M_PROTO} block too short.
-@item LMI_SYSERR
+@item @perr{LMI_SYSERR}
 UNIX system error.
-@item LMI_WRITEFAIL
+@item @perr{LMI_WRITEFAIL}
 Unitdata request failed.
-@item LMI_CRCERR
+@item @perr{LMI_CRCERR}
 CRC or FCS error.
-@item LMI_DLE_EOT
+@item @perr{LMI_DLE_EOT}
 DLE EOT detected.
-@item LMI_FORMAT
+@item @perr{LMI_FORMAT}
 Format error detected.
-@item LMI_HDLC_ABORT
+@item @perr{LMI_HDLC_ABORT}
 Aborted frame detected.
-@item LMI_OVERRUN
+@item @perr{LMI_OVERRUN}
 Input overrun.
-@item LMI_TOOSHORT
+@item @perr{LMI_TOOSHORT}
 Frame too short.
-@item LMI_INCOMPLETE
+@item @perr{LMI_INCOMPLETE}
 Partial frame received.
-@item LMI_BUSY
+@item @perr{LMI_BUSY}
 Telephone was busy.
-@item LMI_NOANSWER
+@item @perr{LMI_NOANSWER}
 Connection went unanswered.
-@item LMI_CALLREJECT
+@item @perr{LMI_CALLREJECT}
 Connection rejected.
-@item LMI_HDLC_IDLE
+@item @perr{LMI_HDLC_IDLE}
 HDLC line went idle.
-@item LMI_HDLC_NOTIDLE
+@item @perr{LMI_HDLC_NOTIDLE}
 HDLC link no longer idle.
-@item LMI_QUIESCENT
+@item @perr{LMI_QUIESCENT}
 Line being reassigned.
-@item LMI_RESUMED
+@item @perr{LMI_RESUMED}
 Line has been reassigned.
-@item LMI_DSRTIMEOUT
+@item @perr{LMI_DSRTIMEOUT}
 Did not see DSR in time.
-@item LMI_LAN_COLLISIONS
+@item @perr{LMI_LAN_COLLISIONS}
 LAN excessive collisions.
-@item LMI_LAN_REFUSED
+@item @perr{LMI_LAN_REFUSED}
 LAN message refused.
-@item LMI_LAN_NOSTATION
+@item @perr{LMI_LAN_NOSTATION}
 LAN no such station.
-@item LMI_LOSTCTS
+@item @perr{LMI_LOSTCTS}
 Lost Clear to Send signal.
-@item LMI_DEVERR
+@item @perr{LMI_DEVERR}
 Start of device-specific error codes.
 
 @end table
@@ -2651,83 +2649,83 @@ When unsuccessful, the LMS provider acknowledges the failure of the disable serv
 
 @b{Non-Fatal Errors}:  applicable non-fatal errors are as follows:
 
-@table @perr
+@table @asis
 
-@item LMI_UNSPEC
+@item @perr{LMI_UNSPEC}
 Unknown or unspecified.
-@item LMI_BADADDRESS
+@item @perr{LMI_BADADDRESS}
 Address was invalid.
-@item LMI_BADADDRTYPE
+@item @perr{LMI_BADADDRTYPE}
 Invalid address type.
-@item LMI_BADDIAL
+@item @perr{LMI_BADDIAL}
 (Not used.)
-@item LMI_BADDIALTYPE
+@item @perr{LMI_BADDIALTYPE}
 (Not used.)
-@item LMI_BADDISPOSAL
+@item @perr{LMI_BADDISPOSAL}
 Invalid disposal parameter.
-@item LMI_BADFRAME
+@item @perr{LMI_BADFRAME}
 Defective SDU received.
-@item LMI_BADPPA
+@item @perr{LMI_BADPPA}
 Invalid PPA identifier.
-@item LMI_BADPRIM
+@item @perr{LMI_BADPRIM}
 Unrecognized primitive.
-@item LMI_DISC
+@item @perr{LMI_DISC}
 Disconnected.
-@item LMI_EVENT
+@item @perr{LMI_EVENT}
 Protocol-specific event occurred.
-@item LMI_FATALERR
+@item @perr{LMI_FATALERR}
 Device has become unusable.
-@item LMI_INITFAILED
+@item @perr{LMI_INITFAILED}
 Link initialization failed.
-@item LMI_NOTSUPP
+@item @perr{LMI_NOTSUPP}
 Primitive not supported by this device.
-@item LMI_OUTSTATE
+@item @perr{LMI_OUTSTATE}
 Primitive was issued from invalid state.
-@item LMI_PROTOSHORT
+@item @perr{LMI_PROTOSHORT}
 @msg{M_PROTO} block too short.
-@item LMI_SYSERR
+@item @perr{LMI_SYSERR}
 UNIX system error.
-@item LMI_WRITEFAIL
+@item @perr{LMI_WRITEFAIL}
 Unitdata request failed.
-@item LMI_CRCERR
+@item @perr{LMI_CRCERR}
 CRC or FCS error.
-@item LMI_DLE_EOT
+@item @perr{LMI_DLE_EOT}
 DLE EOT detected.
-@item LMI_FORMAT
+@item @perr{LMI_FORMAT}
 Format error detected.
-@item LMI_HDLC_ABORT
+@item @perr{LMI_HDLC_ABORT}
 Aborted frame detected.
-@item LMI_OVERRUN
+@item @perr{LMI_OVERRUN}
 Input overrun.
-@item LMI_TOOSHORT
+@item @perr{LMI_TOOSHORT}
 Frame too short.
-@item LMI_INCOMPLETE
+@item @perr{LMI_INCOMPLETE}
 Partial frame received.
-@item LMI_BUSY
+@item @perr{LMI_BUSY}
 Telephone was busy.
-@item LMI_NOANSWER
+@item @perr{LMI_NOANSWER}
 Connection went unanswered.
-@item LMI_CALLREJECT
+@item @perr{LMI_CALLREJECT}
 Connection rejected.
-@item LMI_HDLC_IDLE
+@item @perr{LMI_HDLC_IDLE}
 HDLC line went idle.
-@item LMI_HDLC_NOTIDLE
+@item @perr{LMI_HDLC_NOTIDLE}
 HDLC link no longer idle.
-@item LMI_QUIESCENT
+@item @perr{LMI_QUIESCENT}
 Line being reassigned.
-@item LMI_RESUMED
+@item @perr{LMI_RESUMED}
 Line has been reassigned.
-@item LMI_DSRTIMEOUT
+@item @perr{LMI_DSRTIMEOUT}
 Did not see DSR in time.
-@item LMI_LAN_COLLISIONS
+@item @perr{LMI_LAN_COLLISIONS}
 LAN excessive collisions.
-@item LMI_LAN_REFUSED
+@item @perr{LMI_LAN_REFUSED}
 LAN message refused.
-@item LMI_LAN_NOSTATION
+@item @perr{LMI_LAN_NOSTATION}
 LAN no such station.
-@item LMI_LOSTCTS
+@item @perr{LMI_LOSTCTS}
 Lost Clear to Send signal.
-@item LMI_DEVERR
+@item @perr{LMI_DEVERR}
 Start of device-specific error codes.
 
 @end table
@@ -2915,83 +2913,83 @@ The state remains unchanged.
 
 @b{Non-Fatal Errors}:  applicable non-fatal errors are as follows:
 
-@table @perr
+@table @asis
 
-@item LMI_UNSPEC
+@item @perr{LMI_UNSPEC}
 Unknown or unspecified.
-@item LMI_BADADDRESS
+@item @perr{LMI_BADADDRESS}
 Address was invalid.
-@item LMI_BADADDRTYPE
+@item @perr{LMI_BADADDRTYPE}
 Invalid address type.
-@item LMI_BADDIAL
+@item @perr{LMI_BADDIAL}
 (Not used.)
-@item LMI_BADDIALTYPE
+@item @perr{LMI_BADDIALTYPE}
 (Not used.)
-@item LMI_BADDISPOSAL
+@item @perr{LMI_BADDISPOSAL}
 Invalid disposal parameter.
-@item LMI_BADFRAME
+@item @perr{LMI_BADFRAME}
 Defective SDU received.
-@item LMI_BADPPA
+@item @perr{LMI_BADPPA}
 Invalid PPA identifier.
-@item LMI_BADPRIM
+@item @perr{LMI_BADPRIM}
 Unrecognized primitive.
-@item LMI_DISC
+@item @perr{LMI_DISC}
 Disconnected.
-@item LMI_EVENT
+@item @perr{LMI_EVENT}
 Protocol-specific event occurred.
-@item LMI_FATALERR
+@item @perr{LMI_FATALERR}
 Device has become unusable.
-@item LMI_INITFAILED
+@item @perr{LMI_INITFAILED}
 Link initialization failed.
-@item LMI_NOTSUPP
+@item @perr{LMI_NOTSUPP}
 Primitive not supported by this device.
-@item LMI_OUTSTATE
+@item @perr{LMI_OUTSTATE}
 Primitive was issued from invalid state.
-@item LMI_PROTOSHORT
+@item @perr{LMI_PROTOSHORT}
 @msg{M_PROTO} block too short.
-@item LMI_SYSERR
+@item @perr{LMI_SYSERR}
 UNIX system error.
-@item LMI_WRITEFAIL
+@item @perr{LMI_WRITEFAIL}
 Unitdata request failed.
-@item LMI_CRCERR
+@item @perr{LMI_CRCERR}
 CRC or FCS error.
-@item LMI_DLE_EOT
+@item @perr{LMI_DLE_EOT}
 DLE EOT detected.
-@item LMI_FORMAT
+@item @perr{LMI_FORMAT}
 Format error detected.
-@item LMI_HDLC_ABORT
+@item @perr{LMI_HDLC_ABORT}
 Aborted frame detected.
-@item LMI_OVERRUN
+@item @perr{LMI_OVERRUN}
 Input overrun.
-@item LMI_TOOSHORT
+@item @perr{LMI_TOOSHORT}
 Frame too short.
-@item LMI_INCOMPLETE
+@item @perr{LMI_INCOMPLETE}
 Partial frame received.
-@item LMI_BUSY
+@item @perr{LMI_BUSY}
 Telephone was busy.
-@item LMI_NOANSWER
+@item @perr{LMI_NOANSWER}
 Connection went unanswered.
-@item LMI_CALLREJECT
+@item @perr{LMI_CALLREJECT}
 Connection rejected.
-@item LMI_HDLC_IDLE
+@item @perr{LMI_HDLC_IDLE}
 HDLC line went idle.
-@item LMI_HDLC_NOTIDLE
+@item @perr{LMI_HDLC_NOTIDLE}
 HDLC link no longer idle.
-@item LMI_QUIESCENT
+@item @perr{LMI_QUIESCENT}
 Line being reassigned.
-@item LMI_RESUMED
+@item @perr{LMI_RESUMED}
 Line has been reassigned.
-@item LMI_DSRTIMEOUT
+@item @perr{LMI_DSRTIMEOUT}
 Did not see DSR in time.
-@item LMI_LAN_COLLISIONS
+@item @perr{LMI_LAN_COLLISIONS}
 LAN excessive collisions.
-@item LMI_LAN_REFUSED
+@item @perr{LMI_LAN_REFUSED}
 LAN message refused.
-@item LMI_LAN_NOSTATION
+@item @perr{LMI_LAN_NOSTATION}
 LAN no such station.
-@item LMI_LOSTCTS
+@item @perr{LMI_LOSTCTS}
 Lost Clear to Send signal.
-@item LMI_DEVERR
+@item @perr{LMI_DEVERR}
 Start of device-specific error codes.
 
 @end table
@@ -3153,83 +3151,83 @@ Indicates the service primitive type.  Always @prim{LMI_ERROR_IND}.
 Indicates the LMI error number describing the error.  This field can have one of the following
 values:
 
-@table @perr
+@table @asis
 
-@item LMI_UNSPEC
+@item @perr{LMI_UNSPEC}
 Unknown or unspecified.
-@item LMI_BADADDRESS
+@item @perr{LMI_BADADDRESS}
 Address was invalid.
-@item LMI_BADADDRTYPE
+@item @perr{LMI_BADADDRTYPE}
 Invalid address type.
-@item LMI_BADDIAL
+@item @perr{LMI_BADDIAL}
 (Not used.)
-@item LMI_BADDIALTYPE
+@item @perr{LMI_BADDIALTYPE}
 (Not used.)
-@item LMI_BADDISPOSAL
+@item @perr{LMI_BADDISPOSAL}
 Invalid disposal parameter.
-@item LMI_BADFRAME
+@item @perr{LMI_BADFRAME}
 Defective SDU received.
-@item LMI_BADPPA
+@item @perr{LMI_BADPPA}
 Invalid PPA identifier.
-@item LMI_BADPRIM
+@item @perr{LMI_BADPRIM}
 Unrecognized primitive.
-@item LMI_DISC
+@item @perr{LMI_DISC}
 Disconnected.
-@item LMI_EVENT
+@item @perr{LMI_EVENT}
 Protocol-specific event occurred.
-@item LMI_FATALERR
+@item @perr{LMI_FATALERR}
 Device has become unusable.
-@item LMI_INITFAILED
+@item @perr{LMI_INITFAILED}
 Link initialization failed.
-@item LMI_NOTSUPP
+@item @perr{LMI_NOTSUPP}
 Primitive not supported by this device.
-@item LMI_OUTSTATE
+@item @perr{LMI_OUTSTATE}
 Primitive was issued from invalid state.
-@item LMI_PROTOSHORT
+@item @perr{LMI_PROTOSHORT}
 @msg{M_PROTO} block too short.
-@item LMI_SYSERR
+@item @perr{LMI_SYSERR}
 UNIX system error.
-@item LMI_WRITEFAIL
+@item @perr{LMI_WRITEFAIL}
 Unitdata request failed.
-@item LMI_CRCERR
+@item @perr{LMI_CRCERR}
 CRC or FCS error.
-@item LMI_DLE_EOT
+@item @perr{LMI_DLE_EOT}
 DLE EOT detected.
-@item LMI_FORMAT
+@item @perr{LMI_FORMAT}
 Format error detected.
-@item LMI_HDLC_ABORT
+@item @perr{LMI_HDLC_ABORT}
 Aborted frame detected.
-@item LMI_OVERRUN
+@item @perr{LMI_OVERRUN}
 Input overrun.
-@item LMI_TOOSHORT
+@item @perr{LMI_TOOSHORT}
 Frame too short.
-@item LMI_INCOMPLETE
+@item @perr{LMI_INCOMPLETE}
 Partial frame received.
-@item LMI_BUSY
+@item @perr{LMI_BUSY}
 Telephone was busy.
-@item LMI_NOANSWER
+@item @perr{LMI_NOANSWER}
 Connection went unanswered.
-@item LMI_CALLREJECT
+@item @perr{LMI_CALLREJECT}
 Connection rejected.
-@item LMI_HDLC_IDLE
+@item @perr{LMI_HDLC_IDLE}
 HDLC line went idle.
-@item LMI_HDLC_NOTIDLE
+@item @perr{LMI_HDLC_NOTIDLE}
 HDLC link no longer idle.
-@item LMI_QUIESCENT
+@item @perr{LMI_QUIESCENT}
 Line being reassigned.
-@item LMI_RESUMED
+@item @perr{LMI_RESUMED}
 Line has been reassigned.
-@item LMI_DSRTIMEOUT
+@item @perr{LMI_DSRTIMEOUT}
 Did not see DSR in time.
-@item LMI_LAN_COLLISIONS
+@item @perr{LMI_LAN_COLLISIONS}
 LAN excessive collisions.
-@item LMI_LAN_REFUSED
+@item @perr{LMI_LAN_REFUSED}
 LAN message refused.
-@item LMI_LAN_NOSTATION
+@item @perr{LMI_LAN_NOSTATION}
 LAN no such station.
-@item LMI_LOSTCTS
+@item @perr{LMI_LOSTCTS}
 Lost Clear to Send signal.
-@item LMI_DEVERR
+@item @perr{LMI_DEVERR}
 Start of device-specific error codes.
 
 @end table
@@ -3506,25 +3504,25 @@ the management interface is in the @psta{LMI_ENABLED} state and the link state i
 
 @b{Non-Fatal Errors:} applicable non-fatal errors are as follows:
 
-@table @perr
+@table @asis
 
-@item LMI_UNSPEC
+@item @perr{LMI_UNSPEC}
 Unknown or unspecified.
-@item LMI_DISC
+@item @perr{LMI_DISC}
 Disconnected.
-@item LMI_EVENT
+@item @perr{LMI_EVENT}
 Protocol-specific event occurred.
-@item LMI_FATALERR
+@item @perr{LMI_FATALERR}
 Device has become unusable.
-@item LMI_INITFAILED
+@item @perr{LMI_INITFAILED}
 Link initialization failed.
-@item LMI_OUTSTATE
+@item @perr{LMI_OUTSTATE}
 Primitive was issued from invalid state.
-@item LMI_PROTOSHORT
+@item @perr{LMI_PROTOSHORT}
 @msg{M_PROTO} block too short.
-@item LMI_SYSERR
+@item @perr{LMI_SYSERR}
 UNIX system error.
-@item LMI_DEVERR
+@item @perr{LMI_DEVERR}
 Start of device-specific error codes.
 
 @end table
@@ -3593,21 +3591,21 @@ When unsuccessful, the SLS provider negatively acknowledges the primitive with a
 
 @b{Non-Fatal Errors:} applicable non-fatal errors are as follows:
 
-@table @perr
+@table @asis
 
-@item LMI_UNSPEC
+@item @perr{LMI_UNSPEC}
 Unknown or unspecified.
-@item LMI_EVENT
+@item @perr{LMI_EVENT}
 Protocol-specific event occurred.
-@item LMI_FATALERR
+@item @perr{LMI_FATALERR}
 Device has become unusable.
-@item LMI_OUTSTATE
+@item @perr{LMI_OUTSTATE}
 Primitive was issued from invalid state.
-@item LMI_PROTOSHORT
+@item @perr{LMI_PROTOSHORT}
 @msg{M_PROTO} block too short.
-@item LMI_SYSERR
+@item @perr{LMI_SYSERR}
 UNIX system error.
-@item LMI_DEVERR
+@item @perr{LMI_DEVERR}
 Start of device-specific error codes.
 
 @end table
@@ -3677,21 +3675,21 @@ When unsuccessful, the SLS provider negatively acknowledges the primitive with a
 
 @b{Non-Fatal Errors:} applicable non-fatal errors are as follows:
 
-@table @perr
+@table @asis
 
-@item LMI_UNSPEC
+@item @perr{LMI_UNSPEC}
 Unknown or unspecified.
-@item LMI_EVENT
+@item @perr{LMI_EVENT}
 Protocol-specific event occurred.
-@item LMI_FATALERR
+@item @perr{LMI_FATALERR}
 Device has become unusable.
-@item LMI_OUTSTATE
+@item @perr{LMI_OUTSTATE}
 Primitive was issued from invalid state.
-@item LMI_PROTOSHORT
+@item @perr{LMI_PROTOSHORT}
 @msg{M_PROTO} block too short.
-@item LMI_SYSERR
+@item @perr{LMI_SYSERR}
 UNIX system error.
-@item LMI_DEVERR
+@item @perr{LMI_DEVERR}
 Start of device-specific error codes.
 
 @end table
@@ -3772,55 +3770,55 @@ ignore the @prim{SL_START_REQ} primitive and not generate a non-fatal error.
 
 Applicable reasons for unsuccessful link start are as follows:
 
-@table @perr
+@table @asis
 
-@item SL_FAIL_UNSPECIFIED
+@item @perr{SL_FAIL_UNSPECIFIED}
 The signalling link failed for an unspecified reason.
-@item SL_FAIL_CONG_TIMEOUT
+@item @perr{SL_FAIL_CONG_TIMEOUT}
 The signalling link failed because of congestion timeout (T6 expiry).
-@item SL_FAIL_ACK_TIMEOUT
+@item @perr{SL_FAIL_ACK_TIMEOUT}
 The signalling link failed because of acknowledgement timeout (T7 expiry).
-@item SL_FAIL_ABNORMAL_BSNR
+@item @perr{SL_FAIL_ABNORMAL_BSNR}
 The signalling link failed because of receipt of an abnormal backward sequence number (BSNR).
-@item SL_FAIL_ABNORMAL_FIBR
+@item @perr{SL_FAIL_ABNORMAL_FIBR}
 The signalling link failed because of receipt of an abnormal forward indicator bit (FIBR).
-@item SL_FAIL_SUERM_EIM
+@item @perr{SL_FAIL_SUERM_EIM}
 The signalling link failed because the SUERM or EIM error rate threshold was exceeded.
-@item SL_FAIL_ALIGNMENT_NOT_POSSIBLE
+@item @perr{SL_FAIL_ALIGNMENT_NOT_POSSIBLE}
 The signalling link failed because the AERM threshold was exceeded and the maximum number of proving
 periods was exceeded.
-@item SL_FAIL_RECEIVED_SIO
+@item @perr{SL_FAIL_RECEIVED_SIO}
 The signalling link failed due to receipt of an SIO during or after alignment.
-@item SL_FAIL_RECEIVED_SIN
+@item @perr{SL_FAIL_RECEIVED_SIN}
 The signalling link failed due to receipt of an SIN after proving.
-@item SL_FAIL_RECEIVED_SIE
+@item @perr{SL_FAIL_RECEIVED_SIE}
 The signalling link failed due to receipt of an SIE after proving.
-@item SL_FAIL_RECEIVED_SIOS
+@item @perr{SL_FAIL_RECEIVED_SIOS}
 The signalling link failed due to receipt of an SIOS.
-@item SL_FAIL_T1_TIMEOUT
+@item @perr{SL_FAIL_T1_TIMEOUT}
 The signalling link failed due to failure to align with remote (T1 timeout).
 
 @end table
 
 Applicable non-fatal errors are as follows:
 
-@table @perr
+@table @asis
 
-@item LMI_UNSPEC
+@item @perr{LMI_UNSPEC}
 Unknown or unspecified.
-@item LMI_DISC
+@item @perr{LMI_DISC}
 Disconnected.
-@item LMI_EVENT
+@item @perr{LMI_EVENT}
 Protocol-specific event occurred.
-@item LMI_FATALERR
+@item @perr{LMI_FATALERR}
 Device has become unusable.
-@item LMI_OUTSTATE
+@item @perr{LMI_OUTSTATE}
 Primitive was issued from invalid state.
-@item LMI_PROTOSHORT
+@item @perr{LMI_PROTOSHORT}
 @msg{M_PROTO} block too short.
-@item LMI_SYSERR
+@item @perr{LMI_SYSERR}
 UNIX system error.
-@item LMI_DEVERR
+@item @perr{LMI_DEVERR}
 Start of device-specific error codes.
 
 @end table
@@ -4064,21 +4062,21 @@ ignore the @prim{SL_STOP_REQ} primitive and not generate a non-fatal error.
 
 @b{Non-Fatal Errors:} applicable non-fatal errors are as follows:
 
-@table @perr
+@table @asis
 
-@item LMI_UNSPEC
+@item @perr{LMI_UNSPEC}
 Unknown or unspecified.
-@item LMI_EVENT
+@item @perr{LMI_EVENT}
 Protocol-specific event occurred.
-@item LMI_FATALERR
+@item @perr{LMI_FATALERR}
 Device has become unusable.
-@item LMI_OUTSTATE
+@item @perr{LMI_OUTSTATE}
 Primitive was issued from invalid state.
-@item LMI_PROTOSHORT
+@item @perr{LMI_PROTOSHORT}
 @msg{M_PROTO} block too short.
-@item LMI_SYSERR
+@item @perr{LMI_SYSERR}
 UNIX system error.
-@item LMI_DEVERR
+@item @perr{LMI_DEVERR}
 Start of device-specific error codes.
 
 @end table
@@ -4524,21 +4522,21 @@ generated.
 
 @b{Non-Fatal Errors:} applicable non-fatal errors are as follows:
 
-@table @perr
+@table @asis
 
-@item LMI_UNSPEC
+@item @perr{LMI_UNSPEC}
 Unknown or unspecified.
-@item LMI_EVENT
+@item @perr{LMI_EVENT}
 Protocol-specific event occurred.
-@item LMI_FATALERR
+@item @perr{LMI_FATALERR}
 Device has become unusable.
-@item LMI_OUTSTATE
+@item @perr{LMI_OUTSTATE}
 Primitive was issued from invalid state.
-@item LMI_PROTOSHORT
+@item @perr{LMI_PROTOSHORT}
 @msg{M_PROTO} block too short.
-@item LMI_SYSERR
+@item @perr{LMI_SYSERR}
 UNIX system error.
-@item LMI_DEVERR
+@item @perr{LMI_DEVERR}
 Start of device-specific error codes.
 
 @end table
@@ -4610,21 +4608,21 @@ generated.
 
 @b{Non-Fatal Errors:} applicable non-fatal errors are as follows:
 
-@table @perr
+@table @asis
 
-@item LMI_UNSPEC
+@item @perr{LMI_UNSPEC}
 Unknown or unspecified.
-@item LMI_EVENT
+@item @perr{LMI_EVENT}
 Protocol-specific event occurred.
-@item LMI_FATALERR
+@item @perr{LMI_FATALERR}
 Device has become unusable.
-@item LMI_OUTSTATE
+@item @perr{LMI_OUTSTATE}
 Primitive was issued from invalid state.
-@item LMI_PROTOSHORT
+@item @perr{LMI_PROTOSHORT}
 @msg{M_PROTO} block too short.
-@item LMI_SYSERR
+@item @perr{LMI_SYSERR}
 UNIX system error.
-@item LMI_DEVERR
+@item @perr{LMI_DEVERR}
 Start of device-specific error codes.
 
 @end table
@@ -4696,21 +4694,21 @@ generated.
 
 @b{Non-Fatal Errors:} applicable non-fatal errors are as follows:
 
-@table @perr
+@table @asis
 
-@item LMI_UNSPEC
+@item @perr{LMI_UNSPEC}
 Unknown or unspecified.
-@item LMI_EVENT
+@item @perr{LMI_EVENT}
 Protocol-specific event occurred.
-@item LMI_FATALERR
+@item @perr{LMI_FATALERR}
 Device has become unusable.
-@item LMI_OUTSTATE
+@item @perr{LMI_OUTSTATE}
 Primitive was issued from invalid state.
-@item LMI_PROTOSHORT
+@item @perr{LMI_PROTOSHORT}
 @msg{M_PROTO} block too short.
-@item LMI_SYSERR
+@item @perr{LMI_SYSERR}
 UNIX system error.
-@item LMI_DEVERR
+@item @perr{LMI_DEVERR}
 Start of device-specific error codes.
 
 @end table
@@ -4845,23 +4843,23 @@ failing to retrieve the BSNT value are as follows:
 
 Applicable non-fatal errors are as follows:
 
-@table @perr
+@table @asis
 
-@item LMI_UNSPEC
+@item @perr{LMI_UNSPEC}
 Unknown or unspecified.
-@item LMI_DISC
+@item @perr{LMI_DISC}
 Disconnected.
-@item LMI_EVENT
+@item @perr{LMI_EVENT}
 Protocol-specific event occurred.
-@item LMI_FATALERR
+@item @perr{LMI_FATALERR}
 Device has become unusable.
-@item LMI_OUTSTATE
+@item @perr{LMI_OUTSTATE}
 Primitive was issued from invalid state.
-@item LMI_PROTOSHORT
+@item @perr{LMI_PROTOSHORT}
 @msg{M_PROTO} block too short.
-@item LMI_SYSERR
+@item @perr{LMI_SYSERR}
 UNIX system error.
-@item LMI_DEVERR
+@item @perr{LMI_DEVERR}
 Start of device-specific error codes.
 
 @end table
@@ -5111,23 +5109,23 @@ retransmission buffer.
 
 @b{Non-Fatal Errors:} applicable non-fatal errors are as follows:
 
-@table @perr
+@table @asis
 
-@item LMI_UNSPEC
+@item @perr{LMI_UNSPEC}
 Unknown or unspecified.
-@item LMI_DISC
+@item @perr{LMI_DISC}
 Disconnected.
-@item LMI_EVENT
+@item @perr{LMI_EVENT}
 Protocol-specific event occurred.
-@item LMI_FATALERR
+@item @perr{LMI_FATALERR}
 Device has become unusable.
-@item LMI_OUTSTATE
+@item @perr{LMI_OUTSTATE}
 Primitive was issued from invalid state.
-@item LMI_PROTOSHORT
+@item @perr{LMI_PROTOSHORT}
 @msg{M_PROTO} block too short.
-@item LMI_SYSERR
+@item @perr{LMI_SYSERR}
 UNIX system error.
-@item LMI_DEVERR
+@item @perr{LMI_DEVERR}
 Start of device-specific error codes.
 
 @end table
@@ -5451,23 +5449,23 @@ unchanged.
 
 @b{Non-Fatal Errors:} applicable non-fatal errors are as follows:
 
-@table @perr
+@table @asis
 
-@item LMI_UNSPEC
+@item @perr{LMI_UNSPEC}
 Unknown or unspecified.
-@item LMI_DISC
+@item @perr{LMI_DISC}
 Disconnected.
-@item LMI_EVENT
+@item @perr{LMI_EVENT}
 Protocol-specific event occurred.
-@item LMI_FATALERR
+@item @perr{LMI_FATALERR}
 Device has become unusable.
-@item LMI_OUTSTATE
+@item @perr{LMI_OUTSTATE}
 Primitive was issued from invalid state.
-@item LMI_PROTOSHORT
+@item @perr{LMI_PROTOSHORT}
 @msg{M_PROTO} block too short.
-@item LMI_SYSERR
+@item @perr{LMI_SYSERR}
 UNIX system error.
-@item LMI_DEVERR
+@item @perr{LMI_DEVERR}
 Start of device-specific error codes.
 
 @end table
@@ -5540,23 +5538,23 @@ unchanged.
 
 @b{Non-Fatal Errors:} applicable non-fatal errors are as follows:
 
-@table @perr
+@table @asis
 
-@item LMI_UNSPEC
+@item @perr{LMI_UNSPEC}
 Unknown or unspecified.
-@item LMI_DISC
+@item @perr{LMI_DISC}
 Disconnected.
-@item LMI_EVENT
+@item @perr{LMI_EVENT}
 Protocol-specific event occurred.
-@item LMI_FATALERR
+@item @perr{LMI_FATALERR}
 Device has become unusable.
-@item LMI_OUTSTATE
+@item @perr{LMI_OUTSTATE}
 Primitive was issued from invalid state.
-@item LMI_PROTOSHORT
+@item @perr{LMI_PROTOSHORT}
 @msg{M_PROTO} block too short.
-@item LMI_SYSERR
+@item @perr{LMI_SYSERR}
 UNIX system error.
-@item LMI_DEVERR
+@item @perr{LMI_DEVERR}
 Start of device-specific error codes.
 
 @end table
@@ -5788,23 +5786,23 @@ unchanged.
 
 @b{Non-Fatal Errors:} applicable non-fatal errors are as follows:
 
-@table @perr
+@table @asis
 
-@item LMI_UNSPEC
+@item @perr{LMI_UNSPEC}
 Unknown or unspecified.
-@item LMI_DISC
+@item @perr{LMI_DISC}
 Disconnected.
-@item LMI_EVENT
+@item @perr{LMI_EVENT}
 Protocol-specific event occurred.
-@item LMI_FATALERR
+@item @perr{LMI_FATALERR}
 Device has become unusable.
-@item LMI_OUTSTATE
+@item @perr{LMI_OUTSTATE}
 Primitive was issued from invalid state.
-@item LMI_PROTOSHORT
+@item @perr{LMI_PROTOSHORT}
 @msg{M_PROTO} block too short.
-@item LMI_SYSERR
+@item @perr{LMI_SYSERR}
 UNIX system error.
-@item LMI_DEVERR
+@item @perr{LMI_DEVERR}
 Start of device-specific error codes.
 
 @end table
@@ -5949,23 +5947,23 @@ unchanged.
 
 @b{Non-Fatal Errors:} applicable non-fatal errors are as follows:
 
-@table @perr
+@table @asis
 
-@item LMI_UNSPEC
+@item @perr{LMI_UNSPEC}
 Unknown or unspecified.
-@item LMI_DISC
+@item @perr{LMI_DISC}
 Disconnected.
-@item LMI_EVENT
+@item @perr{LMI_EVENT}
 Protocol-specific event occurred.
-@item LMI_FATALERR
+@item @perr{LMI_FATALERR}
 Device has become unusable.
-@item LMI_OUTSTATE
+@item @perr{LMI_OUTSTATE}
 Primitive was issued from invalid state.
-@item LMI_PROTOSHORT
+@item @perr{LMI_PROTOSHORT}
 @msg{M_PROTO} block too short.
-@item LMI_SYSERR
+@item @perr{LMI_SYSERR}
 UNIX system error.
-@item LMI_DEVERR
+@item @perr{LMI_DEVERR}
 Start of device-specific error codes.
 
 @end table
@@ -6252,23 +6250,23 @@ unchanged.
 
 @b{Non-Fatal Errors:} applicable non-fatal errors are as follows:
 
-@table @perr
+@table @asis
 
-@item LMI_UNSPEC
+@item @perr{LMI_UNSPEC}
 Unknown or unspecified.
-@item LMI_DISC
+@item @perr{LMI_DISC}
 Disconnected.
-@item LMI_EVENT
+@item @perr{LMI_EVENT}
 Protocol-specific event occurred.
-@item LMI_FATALERR
+@item @perr{LMI_FATALERR}
 Device has become unusable.
-@item LMI_OUTSTATE
+@item @perr{LMI_OUTSTATE}
 Primitive was issued from invalid state.
-@item LMI_PROTOSHORT
+@item @perr{LMI_PROTOSHORT}
 @msg{M_PROTO} block too short.
-@item LMI_SYSERR
+@item @perr{LMI_SYSERR}
 UNIX system error.
-@item LMI_DEVERR
+@item @perr{LMI_DEVERR}
 Start of device-specific error codes.
 
 @end table
@@ -6389,83 +6387,83 @@ The state remains unchanged.
 
 @b{Non-Fatal Errors}:  applicable non-fatal errors are as follows:
 
-@table @perr
+@table @asis
 
-@item LMI_UNSPEC
+@item @perr{LMI_UNSPEC}
 Unknown or unspecified.
-@item LMI_BADADDRESS
+@item @perr{LMI_BADADDRESS}
 Address was invalid.
-@item LMI_BADADDRTYPE
+@item @perr{LMI_BADADDRTYPE}
 Invalid address type.
-@item LMI_BADDIAL
+@item @perr{LMI_BADDIAL}
 (Not used.)
-@item LMI_BADDIALTYPE
+@item @perr{LMI_BADDIALTYPE}
 (Not used.)
-@item LMI_BADDISPOSAL
+@item @perr{LMI_BADDISPOSAL}
 Invalid disposal parameter.
-@item LMI_BADFRAME
+@item @perr{LMI_BADFRAME}
 Defective SDU received.
-@item LMI_BADPPA
+@item @perr{LMI_BADPPA}
 Invalid PPA identifier.
-@item LMI_BADPRIM
+@item @perr{LMI_BADPRIM}
 Unrecognized primitive.
-@item LMI_DISC
+@item @perr{LMI_DISC}
 Disconnected.
-@item LMI_EVENT
+@item @perr{LMI_EVENT}
 Protocol-specific event occurred.
-@item LMI_FATALERR
+@item @perr{LMI_FATALERR}
 Device has become unusable.
-@item LMI_INITFAILED
+@item @perr{LMI_INITFAILED}
 Link initialization failed.
-@item LMI_NOTSUPP
+@item @perr{LMI_NOTSUPP}
 Primitive not supported by this device.
-@item LMI_OUTSTATE
+@item @perr{LMI_OUTSTATE}
 Primitive was issued from invalid state.
-@item LMI_PROTOSHORT
+@item @perr{LMI_PROTOSHORT}
 @msg{M_PROTO} block too short.
-@item LMI_SYSERR
+@item @perr{LMI_SYSERR}
 UNIX system error.
-@item LMI_WRITEFAIL
+@item @perr{LMI_WRITEFAIL}
 Unitdata request failed.
-@item LMI_CRCERR
+@item @perr{LMI_CRCERR}
 CRC or FCS error.
-@item LMI_DLE_EOT
+@item @perr{LMI_DLE_EOT}
 DLE EOT detected.
-@item LMI_FORMAT
+@item @perr{LMI_FORMAT}
 Format error detected.
-@item LMI_HDLC_ABORT
+@item @perr{LMI_HDLC_ABORT}
 Aborted frame detected.
-@item LMI_OVERRUN
+@item @perr{LMI_OVERRUN}
 Input overrun.
-@item LMI_TOOSHORT
+@item @perr{LMI_TOOSHORT}
 Frame too short.
-@item LMI_INCOMPLETE
+@item @perr{LMI_INCOMPLETE}
 Partial frame received.
-@item LMI_BUSY
+@item @perr{LMI_BUSY}
 Telephone was busy.
-@item LMI_NOANSWER
+@item @perr{LMI_NOANSWER}
 Connection went unanswered.
-@item LMI_CALLREJECT
+@item @perr{LMI_CALLREJECT}
 Connection rejected.
-@item LMI_HDLC_IDLE
+@item @perr{LMI_HDLC_IDLE}
 HDLC line went idle.
-@item LMI_HDLC_NOTIDLE
+@item @perr{LMI_HDLC_NOTIDLE}
 HDLC link no longer idle.
-@item LMI_QUIESCENT
+@item @perr{LMI_QUIESCENT}
 Line being reassigned.
-@item LMI_RESUMED
+@item @perr{LMI_RESUMED}
 Line has been reassigned.
-@item LMI_DSRTIMEOUT
+@item @perr{LMI_DSRTIMEOUT}
 Did not see DSR in time.
-@item LMI_LAN_COLLISIONS
+@item @perr{LMI_LAN_COLLISIONS}
 LAN excessive collisions.
-@item LMI_LAN_REFUSED
+@item @perr{LMI_LAN_REFUSED}
 LAN message refused.
-@item LMI_LAN_NOSTATION
+@item @perr{LMI_LAN_NOSTATION}
 LAN no such station.
-@item LMI_LOSTCTS
+@item @perr{LMI_LOSTCTS}
 Lost Clear to Send signal.
-@item LMI_DEVERR
+@item @perr{LMI_DEVERR}
 Start of device-specific error codes.
 
 @end table
@@ -6642,23 +6640,23 @@ The state remains unchanged.
 
 @b{Non-Fatal Errors:} applicable non-fatal errors are as follows:
 
-@table @perr
+@table @asis
 
-@item LMI_UNSPEC
+@item @perr{LMI_UNSPEC}
 Unknown or unspecified.
-@item LMI_DISC
+@item @perr{LMI_DISC}
 Disconnected.
-@item LMI_EVENT
+@item @perr{LMI_EVENT}
 Protocol-specific event occurred.
-@item LMI_FATALERR
+@item @perr{LMI_FATALERR}
 Device has become unusable.
-@item LMI_OUTSTATE
+@item @perr{LMI_OUTSTATE}
 Primitive was issued from invalid state.
-@item LMI_PROTOSHORT
+@item @perr{LMI_PROTOSHORT}
 @msg{M_PROTO} block too short.
-@item LMI_SYSERR
+@item @perr{LMI_SYSERR}
 UNIX system error.
-@item LMI_DEVERR
+@item @perr{LMI_DEVERR}
 Start of device-specific error codes.
 
 @end table
