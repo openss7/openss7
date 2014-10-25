@@ -1,92 +1,92 @@
-% -*- texinfo -*- vim: ft=texinfo
-% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
-% =========================================================================
-%
-% @(#) $Id: mapi.texi,v 1.1.2.2 2011-02-07 02:21:40 brian Exp $
-%
-% =========================================================================
-%
-% Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
-% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
-%
-% All Rights Reserved.
-%
-% Permission is granted to copy, distribute and/or modify this document
-% under the terms of the GNU Free Documentation License, Version 1.3 or
-% any later version published by the Free Software Foundation; with no
-% Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
-% copy of the license is included in the section entitled "GNU Free
-% Documentation License".
-%
-% Permission to use, copy and distribute this documentation without
-% modification, for any purpose and without fee or royalty is hereby
-% granted, provided that both the above copyright notice and this
-% permission notice appears in all copies and that the name of OpenSS7
-% Corporation not be used in advertising or publicity pertaining to
-% distribution of this documentation or its contents without specific,
-% written prior permission.  OpenSS7 Corporation makes no representation
-% about the suitability of this documentation for any purpose.  It is
-% provided "as is" without express or implied warranty.
-% 
-% Permission is granted to process this file through Tex and print the
-% results, provided the printed document carries copying permission
-% notice identical to this one except for the removal of this paragraph
-% (this paragraph not being relevant to the printed manual).
-% 
-% OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
-% DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
-% FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
-% CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
-% IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
-% PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
-% OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
-% CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
-% USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-% OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
-% THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
-% THEREOF.
-% 
-% Since the Linux kernel and libraries are constantly changing, this
-% manual page may be incorrect or out-of-date.  The author(s) assume no
-% responsibility for errors or omissions, or for damages resulting from
-% the use of the information contained herein.  The author(s) may not
-% have taken the same level of care in the production of this manual,
-% which is licensed free of charge, as they might when working
-% professionally.
-% 
-% Formatted or processed versions of this manual, if unaccompanied by
-% the source, must acknowledge the copyright and authors of this work.
-%
-% -------------------------------------------------------------------------
-%
-% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-% on behalf of the U.S. Government ("Government"), the following
-% provisions apply to you.  If the Software is supplied by the Department
-% of Defense ("DoD"), it is classified as "Commercial Computer Software"
-% under paragraph 252.227-7014 of the DoD Supplement to the Federal
-% Acquisition Regulations ("DFARS") (or any successor regulations) and the
-% Government is acquiring only the license rights granted herein (the
-% license rights customarily provided to non-Government users).  If the
-% Software is supplied to any unit or agency of the Government other than
-% DoD, it is classified as "Restricted Computer Software" and the
-% Government's rights in the Software are defined in paragraph 52.227-19
-% of the Federal Acquisition Regulations ("FAR") (or any successor
-% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-% NASA Supplement to the FAR (or any successor regulations).
-%
-% =========================================================================
-% 
-% Commercial licensing and support of this software is available from
-% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-% 
-% =========================================================================
-%
-% Last Modified $Date: 2011-02-07 02:21:40 $ by $Author: brian $
-%
-% =========================================================================
-
 \input texinfo
+@c -*- texinfo -*- vim: ft=texinfo
+@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+@c =========================================================================
+@c
+@c @(#) $Id: mapi.texi,v 1.1.2.2 2011-02-07 02:21:40 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2008-2014  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to copy, distribute and/or modify this document
+@c under the terms of the GNU Free Documentation License, Version 1.3 or
+@c any later version published by the Free Software Foundation; with no
+@c Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+@c copy of the license is included in the section entitled "GNU Free
+@c Documentation License".
+@c
+@c Permission to use, copy and distribute this documentation without
+@c modification, for any purpose and without fee or royalty is hereby
+@c granted, provided that both the above copyright notice and this
+@c permission notice appears in all copies and that the name of OpenSS7
+@c Corporation not be used in advertising or publicity pertaining to
+@c distribution of this documentation or its contents without specific,
+@c written prior permission.  OpenSS7 Corporation makes no representation
+@c about the suitability of this documentation for any purpose.  It is
+@c provided "as is" without express or implied warranty.
+@c 
+@c Permission is granted to process this file through Tex and print the
+@c results, provided the printed document carries copying permission
+@c notice identical to this one except for the removal of this paragraph
+@c (this paragraph not being relevant to the printed manual).
+@c 
+@c OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+@c DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+@c FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+@c CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+@c IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+@c PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+@c OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+@c CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+@c USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+@c OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+@c THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+@c THEREOF.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2011-02-07 02:21:40 $ by $Author: brian $
+@c
+@c =========================================================================
+
 @setfilename mapi.info
 @include ../../../scripts/texi/args.texi
 @set MANUAL_TITLE Mobile Application Part Interface (MAPI)
@@ -110,7 +110,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2014  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -157,14 +157,13 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
-@sp 0.5
+@sp 1
 @title @value{MANUAL_TYPE}
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
 @subtitle Updated @value{PACKAGE_PDATE}
-@sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2011  Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2014  Monavacon Limited
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
@@ -176,7 +175,6 @@ as platform and system applicability of the @value{MANUAL_TITLE}.  It provides a
 @value{LONG} control for other @value{LONG} protocols.
 @end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
-@sp 0.2
 @author The OpenSS7 Project <@uref{http://www.openss7.org/}>
 
 @page
@@ -193,7 +191,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2014  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -1234,11 +1232,11 @@ report information on the supported parameter values.
 This service provides information on the options supported by the MAP provider.
 
 @itemize @bullet
-@item @code{MAP_INFO_REQ}:
+@item @prim{MAP_INFO_REQ}:
 This primitive requests that the MAP provider return the values of all the supported protocol parameters.  This request
 may be invoked during any phase.
-@item @code{MAP_INFO_ACK}:
-This primitive is in response to the @code{MAP_INFO_REQ} primitive and returns the values of the supported protocol
+@item @prim{MAP_INFO_ACK}:
+This primitive is in response to the @prim{MAP_INFO_REQ} primitive and returns the values of the supported protocol
 parameters to the MAP user.
 @end itemize
 
@@ -1258,11 +1256,11 @@ a mechanism that allows a stream (bound to a network address of the MAP user) to
 dialogues only.  This stream is referred to as the listener stream.
 
 @itemize @bullet
-@item @code{MAP_BIND_REQ}:
+@item @prim{MAP_BIND_REQ}:
 This primitive requests that the MAP user be bound to a particular network address and application context, and
 negotiate the number of allowable outstanding open indications for that address.
-@item @code{MAP_BIND_ACK}:
-This primitive is in response to the @code{MAP_BIND_REQ} primitive and indicates to the user that the specified MAP
+@item @prim{MAP_BIND_ACK}:
+This primitive is in response to the @prim{MAP_BIND_REQ} primitive and indicates to the user that the specified MAP
 user has been bound to a network address and application context.
 @end itemize
 
@@ -1278,7 +1276,7 @@ The sequence of primitives for the MAP user bind service is shown in Figure 3.
 This service allows the MAP user to be unbound from a network address and application context.
 
 @itemize @bullet
-@item @code{MAP_UNBIND_REQ}:
+@item @prim{MAP_UNBIND_REQ}:
 This primitive requests that the MAP user be unbound from the network address and application context(s) to which it was
 previously bound.
 @end itemize
@@ -1293,7 +1291,7 @@ The sequence of primitives for MAP user unbind service is shown in Figure 4.
 @subsection Receipt Acknowledgement Service
 
 @itemize @bullet
-@item @code{MAP_OK_ACK}:
+@item @prim{MAP_OK_ACK}:
 This primitive indicates to the MAP user that the previous MAP user originated primitive was received successfully by
 the MAP provider.
 @end itemize
@@ -1305,7 +1303,7 @@ An example showing the sequence of primitives for successful receipt acknowledge
 This service allows the MAP user to manage the QOS parameter values and other options associated with the MAP provider.
 
 @itemize @bullet
-@item @code{MAP_OPTMGMT_REQ}:
+@item @prim{MAP_OPTMGMT_REQ}:
 This primitive allows the MAP user to select default values for QoS parameters within the range supported by the MAP
 provider, and to indicate the default selection of additional options supported by the MAP provider.
 @end itemize
@@ -1320,7 +1318,7 @@ Figure 5 shows the sequence of primitives for MAP options management service.
 @subsection Error Acknowledgement Service
 
 @itemize @bullet
-@item @code{MAP_ERROR_ACK}:
+@item @prim{MAP_ERROR_ACK}:
 This primitive indicates to the MAP user that a non-fatal error has occurred in the last MAP user originated request or
 response primitive (listed in Figure 6), on the stream.
 @end itemize
@@ -1391,34 +1389,34 @@ Indicates that Object X will not occur in a position succeeding Object Y in a va
 @subsection Dialogue Establishment Phase
 
 A pair of queues is associated with a MAP dialogue between two MAP user entities when the MAP provider receives a
-@code{MAP_OPEN_REQ} primitive at one of the MAP user interfaces resulting in the ``begin'' object being entered into
-the queue.  The queues will remain associated with the MAP dialogue until a @code{MAP_CLOSE_REQ} or @dfn{indication}
+@prim{MAP_OPEN_REQ} primitive at one of the MAP user interfaces resulting in the ``begin'' object being entered into
+the queue.  The queues will remain associated with the MAP dialogue until a @prim{MAP_CLOSE_REQ} or @dfn{indication}
 primitive (resulting in an ``end'' object) is either entered or removed from a queue.  Similarly, in the queue from the
 called MAP user, objects can be entered into the queue only after the ``continue'' object associated with the
-@code{MAP_OPEN_RES} primitive has been entered into the queue.  Alternatively, the called MAP user can enter a
+@prim{MAP_OPEN_RES} primitive has been entered into the queue.  Alternatively, the called MAP user can enter a
 an ``end'' or ``abort'' object into the queue instead of the ``continue'' object to terminate the dialogue.
 
 The MAP dialogue establishment procedure will fail if the MAP provider is unable to establish a TCAP dialogue, or if the
-destination MAP user is unable to accept the @code{MAP_OPEN_IND}.
+destination MAP user is unable to accept the @prim{MAP_OPEN_IND}.
 @c (see NC Release primitive definition).
 
 @subsubsection User Primitives for Successful MAP Dialogue Establishment
 
 @itemize @bullet
-@item @code{MAP_OPEN_REQ}:
+@item @prim{MAP_OPEN_REQ}:
 This primitive requests that the MAP provider establish a dialogue to the specified destination under an application
 context.
-@item @code{MAP_OPEN_RES}:
+@item @prim{MAP_OPEN_RES}:
 This primitives requests that the MAP provider accept a previous dialogue indication.
 @end itemize
 
 @subsubsection Provider Primitives for Successful MAP Dialogue Establishment
 
 @itemize @bullet
-@item @code{MAP_OPEN_IND}:
+@item @prim{MAP_OPEN_IND}:
 This primitive indicates to the MAP user that a dialogue request has been made within an application context by a user
 at the specified source address.
-@item @code{MAP_OPEN_CON}:
+@item @prim{MAP_OPEN_CON}:
 This primitive indicates to the MAP user that a dialogue request has been confirmed on the specified responding address.
 @end itemize
 
@@ -1469,7 +1467,7 @@ components.
 @item @b{Service Specific Responses}:
 These primitives request that the MAP provider return result for a service invocation and transfer the specified
 (and any subsequent) components.
-@item @code{MAP_DELIM_IND}:
+@item @prim{MAP_DELIM_IND}:
 This primitive requests that the MAP provider deliver any accumulated components from previous service specific request
 or response primitives.
 @end itemize
@@ -1482,7 +1480,7 @@ These primitives indicate to the MAP user an invocation and the indicated (and a
 subsequent) components.
 @item @b{Service Specific Confirmations}:
 These primitives indicate to the MAP user a return result and the indicated (and any subsequent) components.
-@item @code{MAP_DELIM_IND}:
+@item @prim{MAP_DELIM_IND}:
 This primitive indicates that the MAP provider has delivered any accumulated components belonging to the previous service
 specific indication or confirmation primitive.
 @end itemize
@@ -1539,18 +1537,18 @@ indication to the other.
 @subsubsection User Primitives for Dialogue Abort
 
 @itemize @bullet
-@item @code{MAP_ABORT_REQ}:
-This primitive requests that the MAP provider deny an outstanding request for an association (@code{MAP_OPEN_IND}) or
+@item @prim{MAP_ABORT_REQ}:
+This primitive requests that the MAP provider deny an outstanding request for an association (@prim{MAP_OPEN_IND}) or
 abort an existing association.
 @end itemize
 
 @subsubsection Provider Primitives for Dialogue Abort
 
 @itemize @bullet
-@item @code{MAP_UABORT_IND}:
+@item @prim{MAP_UABORT_IND}:
 This primitive indicates to the MAP user that either a request for association has been denied or an existing
 association has been terminated.
-@item @code{MAP_PABORT_IND}:
+@item @prim{MAP_PABORT_IND}:
 This primitive indicates to the MAP user that either a request for association has been denied or an existing
 association has been terminated.
 @end itemize
@@ -1577,8 +1575,8 @@ The sequence of primitives are shown in the time sequence diagrams in n Figures 
 @center @b{Simultaneous MAP User and MAP Provider Invoked Abort.}
 @end cartouche
 
-A MAP user may reject a MAP association establishment by issuing a @code{MAP_ABORT_REQ}.  The originator parameter in
-the @code{MAP_UABORT_IND} primitive will indicate MAP user invoked release.  The sequence of events is shown in Figure
+A MAP user may reject a MAP association establishment by issuing a @prim{MAP_ABORT_REQ}.  The originator parameter in
+the @prim{MAP_UABORT_IND} primitive will indicate MAP user invoked release.  The sequence of events is shown in Figure
 20.
 
 @cartouche
@@ -1587,7 +1585,7 @@ the @code{MAP_UABORT_IND} primitive will indicate MAP user invoked release.  The
 @end cartouche
 
 If the MAP provider is unable to establish a MAP association, it indicates this to the requester by a
-@code{MAP_PABORT_IND}.  The originator in this primitive indicates a MAP provider invoked release.  This is shown in
+@prim{MAP_PABORT_IND}.  The originator in this primitive indicates a MAP provider invoked release.  This is shown in
 Figure 21.
 
 @cartouche
@@ -1597,6 +1595,14 @@ Figure 21.
 
 @node MAPI Primitives
 @chapter MAPI Primitives
+@menu
+* Management Primitives::
+* Association Establishment Phase::
+* Component Transfer Phase::
+* Association Termination Phase::
+* Secure Transport Primitives::
+* Service Specific Primitives::
+@end menu
 
 This section describes the format and parameters of the MAPI primitives (Appendix A shows the mapping of the MAPI
 primitives to the primitives defined in 3GPP TS 29.002 and ANSI41-D).  Also, it discusses the states in which the
@@ -1608,13 +1614,13 @@ Rules for 3GPP and ANSI conformance are described in Addendum to this document.
 @center @b{Tabel 4. Local Management Service Primitives.}
 @multitable @columnfractions .2 .3 .5
 @item @b{SERVICE} @tab @b{PRIMITIVE} @tab @b{PARAMETERS}
-@item Information	@tab @code{MAP_INFO_REQ}	@tab
-@item Reporting		@tab @code{MAP_INFO_ACK}	@tab
-@item Bind		@tab @code{MAP_BIND_REQ}	@tab
-@item			@tab @code{MAP_BIND_ACK}	@tab
-@item Unbind		@tab @code{MAP_UNBIND_REQ}	@tab
-@item Error		@tab @code{MAP_ERROR_ACK}	@tab
-@item Success		@tab @code{MAP_OK_ACK}		@tab
+@item Information	@tab @prim{MAP_INFO_REQ}	@tab
+@item Reporting		@tab @prim{MAP_INFO_ACK}	@tab
+@item Bind		@tab @prim{MAP_BIND_REQ}	@tab
+@item			@tab @prim{MAP_BIND_ACK}	@tab
+@item Unbind		@tab @prim{MAP_UNBIND_REQ}	@tab
+@item Error		@tab @prim{MAP_ERROR_ACK}	@tab
+@item Success		@tab @prim{MAP_OK_ACK}		@tab
 @end multitable
 
 Tables 5, 6 and 7 provide a summary of the MAP primitives and their parameters.
@@ -1623,13 +1629,13 @@ Tables 5, 6 and 7 provide a summary of the MAP primitives and their parameters.
 @center @b{Table 5.  Association Establishment MAP Service Primitives.}
 @multitable @columnfractions .2 .3 .5
 @item @b{SERVICE} @tab @b{PRIMITIVE} @tab @b{PARAMETERS}
-@item Association	@tab @code{MAP_OPEN_REQ}	@tab
+@item Association	@tab @prim{MAP_OPEN_REQ}	@tab
 (Application context name, Destination address, Destination reference, Originating address, Originating reference, Specific information)
-@item Establishment	@tab @code{MAP_OPEN_IND}	@tab
+@item Establishment	@tab @prim{MAP_OPEN_IND}	@tab
 (Application context name, Destination address, Destination reference, Originating address, Originating reference, Specific information)
-@item			@tab @code{MAP_OPEN_RES}	@tab
+@item			@tab @prim{MAP_OPEN_RES}	@tab
 (Application context name, Responding address, Result, Refuse-reason, Specific information)
-@item			@tab @code{MAP_OPEN_CON}	@tab
+@item			@tab @prim{MAP_OPEN_CON}	@tab
 (Application context name, Responding address, Result, Refuse-reason, Specific information, Provider-error)
 @end multitable
 
@@ -1645,9 +1651,9 @@ Tables 5, 6 and 7 provide a summary of the MAP primitives and their parameters.
 (Specific information)
 @item			@tab @code{MAP_@i{XXX}_CON}	@tab
 (Specific information)
-@item Delimitation	@tab @code{MAP_DELIM_REQ}	@tab
+@item Delimitation	@tab @prim{MAP_DELIM_REQ}	@tab
 (none)
-@item			@tab @code{MAP_DELIM_IND}	@tab
+@item			@tab @prim{MAP_DELIM_IND}	@tab
 (none)
 @end multitable
 
@@ -1655,17 +1661,17 @@ Tables 5, 6 and 7 provide a summary of the MAP primitives and their parameters.
 @center @b{Table 7.  Association Termination MAP Service Primitives.}
 @multitable @columnfractions .2 .3 .5
 @item @b{SERVICE} @tab @b{PRIMITIVE} @tab @b{PARAMETERS}
-@item Association	@tab @code{MAP_CLOSE_REQ}	@tab
+@item Association	@tab @prim{MAP_CLOSE_REQ}	@tab
 (Release method, Specific information)
-@item Termination	@tab @code{MAP_CLOSE_IND}	@tab
+@item Termination	@tab @prim{MAP_CLOSE_IND}	@tab
 (Specific information)
-@item Assocation	@tab @code{MAP_ABORT_REQ}	@tab
+@item Assocation	@tab @prim{MAP_ABORT_REQ}	@tab
 (User reason, Diagnostic information, Specific information)
-@item Abort		@tab @code{MAP_UABORT_IND}	@tab
+@item Abort		@tab @prim{MAP_UABORT_IND}	@tab
 (User reason, Diagnostic information, Specific information)
-@item Abort		@tab @code{MAP_PABORT_IND}	@tab
+@item Abort		@tab @prim{MAP_PABORT_IND}	@tab
 (Provider reason, Source)
-@item Notice		@tab @code{MAP_NOTICE_IND}	@tab
+@item Notice		@tab @prim{MAP_NOTICE_IND}	@tab
 ()
 @end multitable
 
@@ -1684,7 +1690,21 @@ Tables 5, 6 and 7 provide a summary of the MAP primitives and their parameters.
 @end multitable
 
 @page
+@node Management Primitives
 @section Management Primitives
+@menu
+* MAP_INFO_REQ::
+* MAP_INFO_ACK::
+* MAP_BIND_REQ::
+* MAP_BIND_ACK::
+* MAP_UNBIND_REQ::
+* MAP_OPTMGMT_REQ::
+* MAP_ADDR_REQ::
+* MAP_ADDR_ACK::
+* MAP_OPTMGMT_ACK::
+* MAP_ERROR_ACK::
+* MAP_OK_ACK::
+@end menu
 
 These primitives appy to all protocol classes.
 
@@ -1695,7 +1715,7 @@ These primitives appy to all protocol classes.
 
 This primitive requests the MAP provider to return the values of all supported protocol parameters
 (@pxref{MAP_INFO_ACK}), and also the current state of the MAP provider.
-@footnote{The @code{MAP_INFO_REQ} and @code{MAP_INFO_ACK} primitives have no effect on the state of the MAP provider and
+@footnote{The @prim{MAP_INFO_REQ} and @prim{MAP_INFO_ACK} primitives have no effect on the state of the MAP provider and
 do not appear in the state tables in @ref{State/Event Tables}.}
 
 @subsubheading Format
@@ -1731,7 +1751,7 @@ pirmitive:
 
 @itemize ---
 @item @b{Successful:}
-Acknowledgement of the primitive with the @code{MAP_INFO_ACK} primitive described in @ref{MAP_INFO_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_INFO_ACK} primitive described in @ref{MAP_INFO_ACK}.
 @item @b{Non-fatal Errors:}
 There are no errors associated with the issuance of this primitive.
 @end itemize
@@ -1744,7 +1764,7 @@ There are no errors associated with the issuance of this primitive.
 
 This primitive indicates to the MAP users any relevant protocol-dependent parameters.
 @footnote{}
-It should be initiated in response to the @code{MAP_INFO_REQ} primitive described above in @ref{MAP_INFO_REQ}.
+It should be initiated in response to the @prim{MAP_INFO_REQ} primitive described above in @ref{MAP_INFO_REQ}.
 
 @subsubheading Format
 @tpindex MAP_info_ack_t
@@ -1797,8 +1817,8 @@ operations class 1, 2 and 3 operation.
 Specifies the maximum size (in decimal digits) of a network address.
 @item ADDR_length, ADDR_offset
 Specifies the length in bytes and offset from the beginning of the @code{M_PCPROTO} message block of the network address
-bound on the stream on which the @code{MAP_INFO_REQ} was issued (a network address is bound to a stream via a
-@code{MAP_BIND_REQ}).
+bound on the stream on which the @prim{MAP_INFO_REQ} was issued (a network address is bound to a stream via a
+@prim{MAP_BIND_REQ}).
 @item QOS_length, QOS_offset
 
 @item QOS_range_length, QOS_range_offset
@@ -1820,8 +1840,8 @@ following flags may be set by the provider:
 @item SENDZERO
 This flag indicates that the MAP provider support the sending of zero-length (component-less) TSDUs.
 @item XPG4_1
-This indicates that the MAP provider conforms to XTI in XPG4 and supports primitives @code{MAP_ADDR_REQ} and
-@code{MAP_ADDR_ACK}.
+This indicates that the MAP provider conforms to XTI in XPG4 and supports primitives @prim{MAP_ADDR_REQ} and
+@prim{MAP_ADDR_ACK}.
 @end table
 
 @item TODU_size
@@ -1902,10 +1922,10 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Successful:}
-Correct acknowledgement of the primitive is indicated with the @code{MAP_BIND_ACK} primitive described in
+Correct acknowledgement of the primitive is indicated with the @prim{MAP_BIND_ACK} primitive described in
 @ref{MAP_BIND_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TBADADDR
@@ -2007,10 +2027,10 @@ and that the MAP user must wait for the acknowledgement before issuing any other
 
 @itemize ---
 @item @b{Successful:}
-Correct acknowledgement of the primitive is indicated with the @code{MAP_OK_ACK} primitive described in
+Correct acknowledgement of the primitive is indicated with the @prim{MAP_OK_ACK} primitive described in
 @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in
 @ref{MAP_ERROR_ACK}.  The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -2072,7 +2092,7 @@ Return the default options.
 
 @subsubheading Rules
 
-For the rules governing the requests made by this primitive, see the @code{MAP_OPTMGMT_ACK} primitive described in
+For the rules governing the requests made by this primitive, see the @prim{MAP_OPTMGMT_ACK} primitive described in
 @ref{MAP_OPTMGMT_ACK}.
 
 @subsubheading Valid States
@@ -2084,9 +2104,9 @@ and that the MAP user await the acknowledgement before issuing any othe primitiv
 
 @itemize ---
 @item @b{Successful:}
-Acknowledgement of the primitive with the @code{MAP_OPTMGMT_ACK} primitive described in @ref{MAP_OPTMGMT_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OPTMGMT_ACK} primitive described in @ref{MAP_OPTMGMT_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.  The allowable
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.  The allowable
 errors are as follows:
 @table @code
 @item TACCES
@@ -2141,7 +2161,7 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Successful:}
-Correct acknowledgement of the primitive is indicated with the @code{MAP_ADDR_ACK} primitive described in
+Correct acknowledgement of the primitive is indicated with the @prim{MAP_ADDR_ACK} primitive described in
 @ref{MAP_ADDR_ACK}.
 @item @b{Non-fatal errors:}
 There are no errors associated with the issuance of this primitive.
@@ -2191,7 +2211,14 @@ There are no errors associated with the issuance of this primitive.
 @subsubheading New State
 
 @page
+@node Association Establishment Phase
 @section Association Establishment Phase
+@menu
+* MAP_OPEN_REQ::
+* MAP_OPEN_IND::
+* MAP_OPEN_RES::
+* MAP_OPEN_CON::
+@end menu
 
 @node MAP_OPEN_REQ
 @subsection Association Establishment Request
@@ -2241,9 +2268,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -2265,7 +2292,12 @@ A system error has occured and the UNIX System error in indicated in the primiti
 @subsubheading New State
 
 @page
+@node Component Transfer Phase
 @section Component Transfer Phase
+@menu
+* MAP_DELIM_REQ::
+* MAP_DELIM_IND::
+@end menu
 
 @node MAP_DELIM_REQ
 @subsection Component Delimitation Request
@@ -2283,9 +2315,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -2307,7 +2339,16 @@ A system error has occured and the UNIX System error in indicated in the primiti
 @subsubheading New State
 
 @page
+@node Association Termination Phase
 @section Association Termination Phase
+@menu
+* MAP_CLOSE_REQ::
+* MAP_CLOSE_IND::
+* MAP_ABORT_REQ::
+* MAP_UABORT_IND::
+* MAP_PABORT_IND::
+* MAP_NOTICE_IND::
+@end menu
 
 @node MAP_CLOSE_REQ
 @subsection Association Release Request
@@ -2325,9 +2366,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -2365,9 +2406,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -2411,7 +2452,18 @@ A system error has occured and the UNIX System error in indicated in the primiti
 @subsubheading New State
 
 @page
+@node Secure Transport Primitives
 @section Secure Transport Primitives
+@menu
+* MAP_STC1_REQ::
+* MAP_STC1_IND::
+* MAP_STC2_REQ::
+* MAP_STC2_IND::
+* MAP_STC3_REQ::
+* MAP_STC3_IND::
+* MAP_STC4_REQ::
+* MAP_STC4_IND::
+@end menu
 
 @node MAP_STC1_REQ
 @subsection Secure Transport Class 1 Request
@@ -2429,9 +2481,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -2469,9 +2521,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -2509,9 +2561,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -2549,9 +2601,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -2573,7 +2625,318 @@ A system error has occured and the UNIX System error in indicated in the primiti
 @subsubheading New State
 
 @page
+@node Service Specific Primitives
 @section Service Specific Primitives
+@menu
+* MAP_ACTSS_REQ::
+* MAP_ACTSS_IND::
+* MAP_ACTSS_RES::
+* MAP_ACTSS_CON::
+* MAP_ACTTM_REQ::
+* MAP_ACTTM_IND::
+* MAP_ACTTM_RES::
+* MAP_ACTTM_CON::
+* MAP_ALERTSC_REQ::
+* MAP_ALERTSC_IND::
+* MAP_ALERTSC_RES::
+* MAP_ALERTSC_CON::
+* MAP_ALLOCHN_REQ::
+* MAP_ALLOCHN_IND::
+* MAP_ALLOCHN_RES::
+* MAP_ALLOCHN_CON::
+* MAP_ANYMOD_REQ::
+* MAP_ANYMOD_IND::
+* MAP_ANYMOD_RES::
+* MAP_ANYMOD_CON::
+* MAP_ANYQRY_REQ::
+* MAP_ANYQRY_IND::
+* MAP_ANYQRY_RES::
+* MAP_ANYQRY_CON::
+* MAP_ANYSUB_REQ::
+* MAP_ANYSUB_IND::
+* MAP_ANYSUB_RES::
+* MAP_ANYSUB_CON::
+* MAP_AUTHFAIL_REQ::
+* MAP_AUTHFAIL_IND::
+* MAP_AUTHFAIL_RES::
+* MAP_AUTHFAIL_CON::
+* MAP_AUTH_REQ::
+* MAP_AUTH_IND::
+* MAP_AUTH_RES::
+* MAP_AUTH_CON::
+* MAP_CANCLOC_REQ::
+* MAP_CANCLOC_IND::
+* MAP_CANCLOC_RES::
+* MAP_CANCLOC_CON::
+* MAP_RESET_REQ::
+* MAP_RESET_IND::
+* MAP_RESET_CON::
+* MAP_RESET_RES::
+* MAP_RESTORE_REQ::
+* MAP_RESTORE_IND::
+* MAP_RESTORE_CON::
+* MAP_RESTORE_RES::
+* MAP_RESUME_REQ::
+* MAP_RESUME_IND::
+* MAP_RESUME_RES::
+* MAP_RESUME_CON::
+* MAP_SEARCH_REQ::
+* MAP_SEARCH_IND::
+* MAP_SEARCH_RES::
+* MAP_SEARCH_CON::
+* MAP_CKIEMI_REQ::
+* MAP_CKIEMI_IND::
+* MAP_CKIEMI_RES::
+* MAP_CKIEMI_CON::
+* MAP_DEACTSS_REQ::
+* MAP_DEACTSS_IND::
+* MAP_DEACTSS_RES::
+* MAP_DEACTSS_CON::
+* MAP_DEACTTM_REQ::
+* MAP_DEACTTM_IND::
+* MAP_DEACTTM_RES::
+* MAP_DEACTTM_CON::
+* MAP_DELSUBD_REQ::
+* MAP_DELSUBD_IND::
+* MAP_DELSUBD_RES::
+* MAP_DELSUBD_CON::
+* MAP_ERASECC_REQ::
+* MAP_ERASECC_IND::
+* MAP_ERASECC_RES::
+* MAP_ERASECC_CON::
+* MAP_ERASESS_REQ::
+* MAP_ERASESS_IND::
+* MAP_ERASESS_RES::
+* MAP_ERASESS_CON::
+* MAP_FAILURE_REQ::
+* MAP_FAILURE_IND::
+* MAP_FAILURE_RES::
+* MAP_FAILURE_CON::
+* MAP_FAS_REQ::
+* MAP_FAS_IND::
+* MAP_FAS_RES::
+* MAP_FAS_CON::
+* MAP_FCKSSIND_REQ::
+* MAP_FCKSSIND_IND::
+* MAP_FCKSSIND_RES::
+* MAP_FCKSSIND_CON::
+* MAP_FGRCSIG_REQ::
+* MAP_FGRCSIG_IND::
+* MAP_FGRCSIG_RES::
+* MAP_FGRCSIG_CON::
+* MAP_FNEWIMSI_REQ::
+* MAP_FNEWIMSI_IND::
+* MAP_FNEWIMSI_RES::
+* MAP_FNEWIMSI_CON::
+* MAP_GETIEMI_REQ::
+* MAP_GETIEMI_IND::
+* MAP_GETIEMI_RES::
+* MAP_GETIEMI_CON::
+* MAP_GETPASS_REQ::
+* MAP_GETPASS_IND::
+* MAP_GETPASS_RES::
+* MAP_GETPASS_CON::
+* MAP_INFORMSC_REQ::
+* MAP_INFORMSC_IND::
+* MAP_INFORMSC_RES::
+* MAP_INFORMSC_CON::
+* MAP_INSSUBSD_REQ::
+* MAP_INSSUBSD_IND::
+* MAP_INSSUBSD_RES::
+* MAP_INSSUBSD_CON::
+* MAP_INTERGSS_REQ::
+* MAP_INTERGSS_IND::
+* MAP_INTERGSS_RES::
+* MAP_INTERGSS_CON::
+* MAP_ISTALERT_REQ::
+* MAP_ISTALERT_IND::
+* MAP_ISTALERT_RES::
+* MAP_ISTALERT_CON::
+* MAP_ISTCMD_REQ::
+* MAP_ISTCMD_IND::
+* MAP_ISTCMD_RES::
+* MAP_ISTCMD_CON::
+* MAP_MMEVENT_REQ::
+* MAP_MMEVENT_IND::
+* MAP_MMEVENT_RES::
+* MAP_MMEVENT_CON::
+* MAP_MOFSMS_REQ::
+* MAP_MOFSMS_IND::
+* MAP_MOFSMS_RES::
+* MAP_MOFSMS_CON::
+* MAP_MSGRPSPRES_REQ::
+* MAP_MSGRPSPRES_IND::
+* MAP_MSGRPSPRES_RES::
+* MAP_MSGRPSPRES_CON::
+* MAP_MTFSMS_REQ::
+* MAP_MTFSMS_IND::
+* MAP_MTFSMS_RES::
+* MAP_MTFSMS_CON::
+* MAP_PAGE_REQ::
+* MAP_PAGE_IND::
+* MAP_PAGE_RES::
+* MAP_PAGE_CON::
+* MAP_PREPGC_REQ::
+* MAP_PREPGC_IND::
+* MAP_PREPGC_RES::
+* MAP_PREPGC_CON::
+* MAP_PREPHO_REQ::
+* MAP_PREPHO_IND::
+* MAP_PREPHO_RES::
+* MAP_PREPHO_CON::
+* MAP_PREPSH_REQ::
+* MAP_PREPSH_IND::
+* MAP_PREPSH_RES::
+* MAP_PREPSH_CON::
+* MAP_PROCAS_REQ::
+* MAP_PROCAS_IND::
+* MAP_PROCAS_RES::
+* MAP_PROCAS_CON::
+* MAP_PROCGC_REQ::
+* MAP_PROCGC_IND::
+* MAP_PROCGC_RES::
+* MAP_PROCGC_CON::
+* MAP_PROCUSS_REQ::
+* MAP_PROCUSS_IND::
+* MAP_PROCUSS_RES::
+* MAP_PROCUSS_CON::
+* MAP_PROVIMSI_REQ::
+* MAP_PROVIMSI_IND::
+* MAP_PROVIMSI_RES::
+* MAP_PROVIMSI_CON::
+* MAP_PROVRN_REQ::
+* MAP_PROVRN_IND::
+* MAP_PROVRN_RES::
+* MAP_PROVRN_CON::
+* MAP_PROVSLOC_REQ::
+* MAP_PROVSLOC_IND::
+* MAP_PROVSLOC_RES::
+* MAP_PROVSLOC_CON::
+* MAP_PROVSUBI_REQ::
+* MAP_PROVSUBI_IND::
+* MAP_PROVSUBI_RES::
+* MAP_PROVSUBI_CON::
+* MAP_PURGEMS_REQ::
+* MAP_PURGEMS_IND::
+* MAP_PURGEMS_RES::
+* MAP_PURGEMS_CON::
+* MAP_RDYSM_REQ::
+* MAP_RDYSM_IND::
+* MAP_RDYSM_RES::
+* MAP_RDYSM_CON::
+* MAP_REGCC_REQ::
+* MAP_REGCC_IND::
+* MAP_REGCC_RES::
+* MAP_REGCC_CON::
+* MAP_REGPW_REQ::
+* MAP_REGPW_IND::
+* MAP_REGPW_RES::
+* MAP_REGPW_CON::
+* MAP_REGSS_REQ::
+* MAP_REGSS_IND::
+* MAP_REGSS_RES::
+* MAP_REGSS_CON::
+* MAP_REMUSRFREE_REQ::
+* MAP_REMUSRFREE_IND::
+* MAP_REMUSRFREE_RES::
+* MAP_REMUSRFREE_CON::
+* MAP_SENDID_REQ::
+* MAP_SENDID_IND::
+* MAP_SENDID_RES::
+* MAP_SENDID_CON::
+* MAP_SETCM_REQ::
+* MAP_SETCM_IND::
+* MAP_SETCM_RES::
+* MAP_SETCM_CON::
+* MAP_SETREP_REQ::
+* MAP_SETREP_IND::
+* MAP_SETREP_RES::
+* MAP_SETREP_CON::
+* MAP_SMDELIVSTAT_REQ::
+* MAP_SMDELIVSTAT_IND::
+* MAP_SMDELIVSTAT_RES::
+* MAP_SMDELIVSTAT_CON::
+* MAP_SENDAUTHI_REQ::
+* MAP_SENDAUTHI_IND::
+* MAP_SENDAUTHI_RES::
+* MAP_SENDAUTHI_CON::
+* MAP_SENDEND_REQ::
+* MAP_SENDEND_IND::
+* MAP_SENDEND_RES::
+* MAP_SENDEND_CON::
+* MAP_SENDGCEND_REQ::
+* MAP_SENDGCEND_IND::
+* MAP_SENDGCEND_RES::
+* MAP_SENDGCEND_CON::
+* MAP_SENDGPRSRI_REQ::
+* MAP_SENDGPRSRI_IND::
+* MAP_SENDGPRSRI_RES::
+* MAP_SENDGPRSRI_CON::
+* MAP_SENDHOREP_REQ::
+* MAP_SENDHOREP_IND::
+* MAP_SENDHOREP_RES::
+* MAP_SENDHOREP_CON::
+* MAP_SENDIMSI_REQ::
+* MAP_SENDIMSI_IND::
+* MAP_SENDIMSI_RES::
+* MAP_SENDIMSI_CON::
+* MAP_SENDLCSRI_REQ::
+* MAP_SENDLCSRI_IND::
+* MAP_SENDLCSRI_RES::
+* MAP_SENDLCSRI_CON::
+* MAP_SENDMOSMSI_REQ::
+* MAP_SENDMOSMSI_IND::
+* MAP_SENDMOSMSI_RES::
+* MAP_SENDMOSMSI_CON::
+* MAP_SENDMTSMSI_REQ::
+* MAP_SENDMTSMSI_IND::
+* MAP_SENDMTSMSI_RES::
+* MAP_SENDMTSMSI_CON::
+* MAP_SENDRI_REQ::
+* MAP_SENDRI_IND::
+* MAP_SENDRI_RES::
+* MAP_SENDRI_CON::
+* MAP_SENDSMSRI_REQ::
+* MAP_SENDSMSRI_IND::
+* MAP_SENDSMSRI_RES::
+* MAP_SENDSMSRI_CON::
+* MAP_SSINV_REQ::
+* MAP_SSINV_IND::
+* MAP_SSINV_RES::
+* MAP_SSINV_CON::
+* MAP_STATUS_REQ::
+* MAP_STATUS_IND::
+* MAP_STATUS_RES::
+* MAP_STATUS_CON::
+* MAP_SUBLOCREP_REQ::
+* MAP_SUBLOCREP_IND::
+* MAP_SUBLOCREP_RES::
+* MAP_SUBLOCREP_CON::
+* MAP_SUBSDATAMOD_REQ::
+* MAP_SUBSDATAMOD_IND::
+* MAP_SUBSDATAMOD_RES::
+* MAP_SUBSDATAMOD_CON::
+* MAP_TRACESA_REQ::
+* MAP_TRACESA_IND::
+* MAP_TRACESA_RES::
+* MAP_TRACESA_CON::
+* MAP_UDGRPSLOC_REQ::
+* MAP_UDGRPSLOC_IND::
+* MAP_UDGRPSLOC_RES::
+* MAP_UDGRPSLOC_CON::
+* MAP_UDLOC_REQ::
+* MAP_UDLOC_IND::
+* MAP_UDLOC_RES::
+* MAP_UDLOC_CON::
+* MAP_USSDNTFY_REQ::
+* MAP_USSDNTFY_IND::
+* MAP_USSDNTFY_RES::
+* MAP_USSDNTFY_CON::
+* MAP_USSDREQ_REQ::
+* MAP_USSDREQ_IND::
+* MAP_USSDREQ_RES::
+* MAP_USSDREQ_CON::
+@end menu
 
 
 @node MAP_ACTSS_REQ
@@ -2592,9 +2955,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -2632,9 +2995,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -2672,9 +3035,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -2712,9 +3075,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -2752,9 +3115,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -2792,9 +3155,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -2832,9 +3195,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -2872,9 +3235,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -2912,9 +3275,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -2952,9 +3315,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -2992,9 +3355,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -3032,9 +3395,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -3072,9 +3435,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -3112,9 +3475,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -3152,9 +3515,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -3192,9 +3555,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -3232,9 +3595,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -3272,9 +3635,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -3312,9 +3675,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -3352,9 +3715,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -3392,9 +3755,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -3432,9 +3795,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -3472,9 +3835,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -3512,9 +3875,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -3552,9 +3915,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -3603,9 +3966,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -3632,9 +3995,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -3683,9 +4046,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -3712,9 +4075,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -3752,9 +4115,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -3792,9 +4155,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -3832,9 +4195,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -3872,9 +4235,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -3912,9 +4275,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -3952,9 +4315,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -3992,9 +4355,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -4032,9 +4395,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -4072,9 +4435,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -4112,9 +4475,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -4152,9 +4515,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -4192,9 +4555,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -4232,9 +4595,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -4272,9 +4635,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -4312,9 +4675,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -4374,9 +4737,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -4414,9 +4777,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -4454,9 +4817,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -4494,9 +4857,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -4534,9 +4897,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -4574,9 +4937,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -4614,9 +4977,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -4654,9 +5017,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -4694,9 +5057,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -4734,9 +5097,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -4774,9 +5137,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -4814,9 +5177,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -4854,9 +5217,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -4894,9 +5257,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -4934,9 +5297,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -4974,9 +5337,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -5014,9 +5377,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -5054,9 +5417,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -5094,9 +5457,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -5134,9 +5497,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -5174,9 +5537,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -5214,9 +5577,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -5254,9 +5617,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -5294,9 +5657,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -5334,9 +5697,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -5374,9 +5737,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -5414,9 +5777,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -5454,9 +5817,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -5494,9 +5857,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -5534,9 +5897,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -5574,9 +5937,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -5614,9 +5977,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -5654,9 +6017,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -5694,9 +6057,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -5734,9 +6097,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -5774,9 +6137,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -5814,9 +6177,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -5854,9 +6217,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -5894,9 +6257,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -5934,9 +6297,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -5974,9 +6337,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -6014,9 +6377,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -6054,9 +6417,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -6094,9 +6457,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -6134,9 +6497,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -6174,9 +6537,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -6214,9 +6577,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -6254,9 +6617,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -6294,9 +6657,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -6334,9 +6697,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -6374,9 +6737,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -6414,9 +6777,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -6454,9 +6817,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -6494,9 +6857,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -6534,9 +6897,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -6574,9 +6937,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -6614,9 +6977,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -6654,9 +7017,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -6694,9 +7057,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -6734,9 +7097,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -6774,9 +7137,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -6814,9 +7177,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -6854,9 +7217,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -6894,9 +7257,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -6934,9 +7297,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -6974,9 +7337,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -7014,9 +7377,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -7054,9 +7417,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -7094,9 +7457,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -7134,9 +7497,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -7174,9 +7537,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -7214,9 +7577,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -7254,9 +7617,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -7294,9 +7657,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -7334,9 +7697,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -7374,9 +7737,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -7414,9 +7777,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -7454,9 +7817,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -7494,9 +7857,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -7534,9 +7897,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -7574,9 +7937,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -7614,9 +7977,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -7654,9 +8017,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -7694,9 +8057,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -7734,9 +8097,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -7774,9 +8137,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -7814,9 +8177,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -7854,9 +8217,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -7894,9 +8257,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -7934,9 +8297,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -7974,9 +8337,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -8014,9 +8377,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -8054,9 +8417,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -8094,9 +8457,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -8134,9 +8497,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -8174,9 +8537,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -8214,9 +8577,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -8254,9 +8617,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -8294,9 +8657,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -8334,9 +8697,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -8374,9 +8737,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -8414,9 +8777,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -8454,9 +8817,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -8494,9 +8857,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -8534,9 +8897,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -8574,9 +8937,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -8614,9 +8977,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -8654,9 +9017,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -8694,9 +9057,9 @@ primitive, and the MAP user must wait for the acknowledgement before issuing any
 
 @itemize ---
 @item @b{Success:}
-Acknowledgement of the primitive with the @code{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
+Acknowledgement of the primitive with the @prim{MAP_OK_ACK} primitive described in @ref{MAP_OK_ACK}.
 @item @b{Non-fatal errors:}
-These errors will be indicated with the @code{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
+These errors will be indicated with the @prim{MAP_ERROR_ACK} primitive described in @ref{MAP_ERROR_ACK}.
 The allowable errors are as follows:
 @table @code
 @item TOUTSTATE
@@ -8728,7 +9091,7 @@ to handle fatal errors.
 
 These are errors that do not change the state of the MAP service interface as seen by the MAP service user and provide
 the user with the option of reissuing the MAP primitive with the corrected options specification.  The non-fatal error
-handling is provided only to those primitives that require acknowledgements, and uses the @code{MAP_ERROR_ACK} to report
+handling is provided only to those primitives that require acknowledgements, and uses the @prim{MAP_ERROR_ACK} to report
 these errors.  These errors retain the state of the MAP service interface the same as it was before the MAP provider
 received the primitive that was in error.  Syntax errors and rule violations are reported via the non-fatal error
 handling facility.
@@ -8767,18 +9130,18 @@ Release 6.6.0.
 @center @b{Table A-1.  Mapping of MAPI Primitives to 3GPP TS 29.002}
 @multitable {@code{MAP_SMDELIVSTAT_REQ}}{MAP-ANY-TIME-SUBSCRIPTION-INTERROGATION @b{req}}
 @item @b{MAP Primitive}		@tab @b{3GPP Service Primitive}
-@item @code{MAP_OPEN_REQ}	@tab MAP-OPEN @b{req}
-@item @code{MAP_OPEN_IND}	@tab MAP-OPEN @b{ind}
-@item @code{MAP_OPEN_RES}	@tab MAP-OPEN @b{rsp}
-@item @code{MAP_OPEN_CON}	@tab MAP-OPEN @b{cnf}
-@item @code{MAP_CLOSE_REQ}	@tab MAP-CLOSE @b{req}
-@item @code{MAP_CLOSE_IND}	@tab MAP-CLOSE @b{ind}
-@item @code{MAP_DELIM_REQ}	@tab MAP-DELIMITER @b{req}
-@item @code{MAP_DELIM_IND}	@tab MAP-DELIMITER @b{ind}
-@item @code{MAP_ABORT_REQ}	@tab MAP-U-ABORT @b{req}
-@item @code{MAP_UABORT_IND}	@tab MAP-U-ABORT @b{ind}
-@item @code{MAP_PABORT_IND}	@tab MAP-P-ABORT @b{ind}
-@item @code{MAP_NOTICE_IND}	@tab MAP-NOTICE @b{ind}
+@item @prim{MAP_OPEN_REQ}	@tab MAP-OPEN @b{req}
+@item @prim{MAP_OPEN_IND}	@tab MAP-OPEN @b{ind}
+@item @prim{MAP_OPEN_RES}	@tab MAP-OPEN @b{rsp}
+@item @prim{MAP_OPEN_CON}	@tab MAP-OPEN @b{cnf}
+@item @prim{MAP_CLOSE_REQ}	@tab MAP-CLOSE @b{req}
+@item @prim{MAP_CLOSE_IND}	@tab MAP-CLOSE @b{ind}
+@item @prim{MAP_DELIM_REQ}	@tab MAP-DELIMITER @b{req}
+@item @prim{MAP_DELIM_IND}	@tab MAP-DELIMITER @b{ind}
+@item @prim{MAP_ABORT_REQ}	@tab MAP-U-ABORT @b{req}
+@item @prim{MAP_UABORT_IND}	@tab MAP-U-ABORT @b{ind}
+@item @prim{MAP_PABORT_IND}	@tab MAP-P-ABORT @b{ind}
+@item @prim{MAP_NOTICE_IND}	@tab MAP-NOTICE @b{ind}
 @item @code{MAP_STC1_REQ}	@tab MAP-SECURE-TRANSPORT-CLASS-1 @b{req}
 @item @code{MAP_STC1_IND}	@tab MAP-SECURE-TRANSPORT-CLASS-1 @b{ind}
 @item @code{MAP_STC2_REQ}	@tab MAP-SECURE-TRANSPORT-CLASS-2 @b{req}
