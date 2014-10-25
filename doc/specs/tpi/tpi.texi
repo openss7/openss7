@@ -1,92 +1,92 @@
-% -*- texinfo -*- vim: ft=texinfo
-% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
-% =========================================================================
-%
-% @(#) $Id: tpi.texi,v 1.1.2.2 2011-02-07 02:21:47 brian Exp $
-%
-% =========================================================================
-%
-% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
-% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
-%
-% All Rights Reserved.
-%
-% Permission is granted to copy, distribute and/or modify this document
-% under the terms of the GNU Free Documentation License, Version 1.3 or
-% any later version published by the Free Software Foundation; with no
-% Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
-% copy of the license is included in the section entitled "GNU Free
-% Documentation License".
-%
-% Permission to use, copy and distribute this documentation without
-% modification, for any purpose and without fee or royalty is hereby
-% granted, provided that both the above copyright notice and this
-% permission notice appears in all copies and that the name of OpenSS7
-% Corporation not be used in advertising or publicity pertaining to
-% distribution of this documentation or its contents without specific,
-% written prior permission.  OpenSS7 Corporation makes no representation
-% about the suitability of this documentation for any purpose.  It is
-% provided "as is" without express or implied warranty.
-% 
-% Permission is granted to process this file through Tex and print the
-% results, provided the printed document carries copying permission
-% notice identical to this one except for the removal of this paragraph
-% (this paragraph not being relevant to the printed manual).
-% 
-% OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
-% DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
-% FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
-% CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
-% IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
-% PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
-% OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
-% CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
-% USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-% OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
-% THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
-% THEREOF.
-% 
-% Since the Linux kernel and libraries are constantly changing, this
-% manual page may be incorrect or out-of-date.  The author(s) assume no
-% responsibility for errors or omissions, or for damages resulting from
-% the use of the information contained herein.  The author(s) may not
-% have taken the same level of care in the production of this manual,
-% which is licensed free of charge, as they might when working
-% professionally.
-% 
-% Formatted or processed versions of this manual, if unaccompanied by
-% the source, must acknowledge the copyright and authors of this work.
-%
-% -------------------------------------------------------------------------
-%
-% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-% on behalf of the U.S. Government ("Government"), the following
-% provisions apply to you.  If the Software is supplied by the Department
-% of Defense ("DoD"), it is classified as "Commercial Computer Software"
-% under paragraph 252.227-7014 of the DoD Supplement to the Federal
-% Acquisition Regulations ("DFARS") (or any successor regulations) and the
-% Government is acquiring only the license rights granted herein (the
-% license rights customarily provided to non-Government users).  If the
-% Software is supplied to any unit or agency of the Government other than
-% DoD, it is classified as "Restricted Computer Software" and the
-% Government's rights in the Software are defined in paragraph 52.227-19
-% of the Federal Acquisition Regulations ("FAR") (or any successor
-% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-% NASA Supplement to the FAR (or any successor regulations).
-%
-% =========================================================================
-% 
-% Commercial licensing and support of this software is available from
-% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-% 
-% =========================================================================
-%
-% Last Modified $Date: 2011-02-07 02:21:47 $ by $Author: brian $
-%
-% =========================================================================
-
 \input texinfo
+@c -*- texinfo -*- vim: ft=texinfo
+@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+@c =========================================================================
+@c
+@c @(#) $Id: tpi.texi,v 1.1.2.2 2011-02-07 02:21:47 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2008-2014  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to copy, distribute and/or modify this document
+@c under the terms of the GNU Free Documentation License, Version 1.3 or
+@c any later version published by the Free Software Foundation; with no
+@c Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+@c copy of the license is included in the section entitled "GNU Free
+@c Documentation License".
+@c
+@c Permission to use, copy and distribute this documentation without
+@c modification, for any purpose and without fee or royalty is hereby
+@c granted, provided that both the above copyright notice and this
+@c permission notice appears in all copies and that the name of OpenSS7
+@c Corporation not be used in advertising or publicity pertaining to
+@c distribution of this documentation or its contents without specific,
+@c written prior permission.  OpenSS7 Corporation makes no representation
+@c about the suitability of this documentation for any purpose.  It is
+@c provided "as is" without express or implied warranty.
+@c 
+@c Permission is granted to process this file through Tex and print the
+@c results, provided the printed document carries copying permission
+@c notice identical to this one except for the removal of this paragraph
+@c (this paragraph not being relevant to the printed manual).
+@c 
+@c OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+@c DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+@c FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+@c CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+@c IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+@c PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+@c OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+@c CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+@c USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+@c OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+@c THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+@c THEREOF.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2011-02-07 02:21:47 $ by $Author: brian $
+@c
+@c =========================================================================
+
 @setfilename tpi.info
 @include ../../../scripts/texi/args.texi
 @set MANUAL_TITLE Transport Provider Interface
@@ -112,7 +112,7 @@ published by @uref{http://www.openss7.com/,OpenSS7 Corporation}.
 This specification was originally published by UNIX International OSI Special
 Interest Group in Revision: 1.5 (1992/12/10).
 
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2014  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 Copyright @copyright{} 1992       UNIX International, Inc.
@@ -151,19 +151,18 @@ under the above conditions for modified versions.
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
-@sp 0.5
+@sp 1
 @title @value{MANUAL_TYPE}
 @subtitle UNIX International
 @subtitle OSI Special Interest Group
 @subtitle Revision: 1.5
 @subtitle December 10, 1992
-@sp 0.2
+@sp 1
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
 @subtitle Updated @value{PACKAGE_PDATE}
-@sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2014  Monavacon Limited
 @subtitle Copyright @copyright{} 2001-2008  OpenSS7 Corporation
 @subtitle Copyright @copyright{} 1992 UNIX International, Inc.
 @subtitle All Rights Reserved.
@@ -177,7 +176,6 @@ transport interface to these components as well as providing a basis for transpo
 transport protocols.
 @end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
-@sp 0.2
 @author The OpenSS7 Project <@uref{http://www.openss7.org/}>
 
 @page
@@ -268,7 +266,7 @@ Fax: (65) 776-0421
 @end ignore
 
 @noindent
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2014  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 Copyright @copyright{} 1992       UNIX International, Inc. @*
@@ -334,7 +332,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2014  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 All Rights Reserved.
@@ -563,10 +561,6 @@ them are described in sections 2.1, 2.2, and 2.3.
 @menu
 * Management User-Originated Primitives::
 * Management Provider-Originated Primitives::
-* COTS User-Originated Primitives::
-* COTS Provider-Originated Primitives::
-* CLTS User-Originated Primitives::
-* CLTS Provider-Originated Primitives::
 @end menu
 
 The following transport primitives are common to both the connection-mode
@@ -690,28 +684,28 @@ primitive.
 These errors will be indicated via the @prim{T_ERROR_ACK} primitive described in
 @ref{T_ERROR_ACK,,T_ERROR_ACK}.  The allowable errors are as follows:
 
-@table @perr
+@table @asis
 
-@item TBADADDR
+@item @perr{TBADADDR}
 This indicates that the protocol address was in an incorrect format or the
 address contained illegal information. It is not intended to indicate protocol
 errors.
 
-@item TNOADDR
+@item @perr{TNOADDR}
 This indicates that the transport provider could not allocate an address.
 
-@item TACCES
+@item @perr{TACCES}
 This indicates that the user did not have proper permissions for the use of the
 requested address.
 
-@item TOUTSTATE
+@item @perr{TOUTSTATE}
 The primitive would place the transport interface out of state.
 
-@item TSYSERR
+@item @perr{TSYSERR}
 A system error has occurred and the @cite{UNIX@registeredsymbol{}} System error
 is indicated in the primitive.
 
-@item TADDRBUSY
+@item @perr{TADDRBUSY}
 This indicates that the requested address is already in use.
 
 @end table
@@ -756,12 +750,12 @@ primitive described in @ref{T_OK_ACK,,T_OK_ACK}.
 These errors will be indicated via the @prim{T_ERROR_ACK} primitive described in
 @ref{T_ERROR_ACK,,T_ERROR_ACK}. The allowable errors are as follows:
 
-@table @perr
+@table @asis
 
-@item TOUTSTATE
+@item @perr{TOUTSTATE}
 The primitive would place the transport interface out of state.
 
-@item TSYSERR
+@item @perr{TSYSERR}
 A system error has occurred and the @cite{UNIX@registeredsymbol{}} System error
 is indicated in the primitive.
 
@@ -826,27 +820,27 @@ Acknowledgement of the primitive via the @prim{T_OPTMGMT_ACK}.
 These errors will be indicated via the @prim{T_ERROR_ACK} primitive described in
 @ref{T_ERROR_ACK,,T_ERROR_ACK}. The allowable errors are as follows:
 
-@table @perr
+@table @asis
 
-@item TACCES
+@item @perr{TACCES}
 This indicates that the user did not have proper permissions for the use of the
 requested options.
 
-@item TOUTSTATE
+@item @perr{TOUTSTATE}
 The primitive would place the transport interface out of state.
 
-@item TBADOPT
+@item @perr{TBADOPT}
 This indicates that the options as specified were in an incorrect format, or
 they contained illegal information.
 
-@item TBADFLAG
+@item @perr{TBADFLAG}
 This indicates that the flags as specified were incorrect or illegal.
 
-@item TSYSERR
+@item @perr{TSYSERR}
 A system error has occurred and the @cite{UNIX@registeredsymbol{}} System error
 is indicated in the primitive.
 
-@item TNOTSUPPORT
+@item @perr{TNOTSUPPORT}
 This transport provider does not support the requested flag (@pval{T_CHECK} or
 @pval{T_CURRENT}).
 
@@ -1237,50 +1231,50 @@ the @cite{UNIX@registeredsymbol{}} System error code. This may only be non zero
 if @parm{TLI_error} is equal to @perr{TSYSERR}.  The following Transport Level
 Interface error codes are allowed to be returned:
 
-@table @perr
+@table @asis
 
-@item TBADADDR
+@item @perr{TBADADDR}
 This indicates that the protocol address as specified in the primitive was in an
 incorrect format or the address contained illegal information.
 
-@item TBADOPT
+@item @perr{TBADOPT}
 This indicates that the options as specified in the primitive were in an
 incorrect format, or they contained illegal information.
 
-@item TBADF
+@item @perr{TBADF}
 This indicates that the stream queue pointer as specified in the primitive was
 illegal.
 
-@item TNOADDR 
+@item @perr{TNOADDR }
 This indicates that the transport provider could not allocate an address.
 
-@item TACCES
+@item @perr{TACCES}
 This indicates that the user did not have proper permissions.
 
-@item TOUTSTATE
+@item @perr{TOUTSTATE}
 The primitive would place the interface out of state.
 
-@item TBADSEQ
+@item @perr{TBADSEQ}
 The sequence number specified in the primitive was incorrect or illegal.
 
-@item TBADFLAG
+@item @perr{TBADFLAG}
 The flags specified in the primitive were incorrect or illegal.
 
-@item TBADDATA
+@item @perr{TBADDATA}
 The amount of user data specified was illegal.
 
-@item TSYSERR
+@item @perr{TSYSERR}
 A system error has occurred and the @cite{UNIX@registeredsymbol{}} System error
 is indicated in the primitive.
 
-@item TADDRBUSY
+@item @perr{TADDRBUSY}
 The requested address is in use.
 
-@item TRESADDR
+@item @perr{TRESADDR}
 The transport provider requires that the responding stream is bound to the same
 address as the stream on which the connection indication was received.
 
-@item TNOTSUPPORT
+@item @perr{TNOTSUPPORT}
 The transport provider does not support the requested capability.
 
 @end table
@@ -1365,6 +1359,11 @@ values returned for @parm{LOCADDR_length} and @parm{LOCADDR_offset} must be
 @section Connection-Mode Transport Primitives
 @cindex Connection-mode transport primitives
 
+@menu
+* COTS User-Originated Primitives::
+* COTS Provider-Originated Primitives::
+@end menu
+
 The following transport primitives pertain only to the connection-mode transport
 service.
 
@@ -1438,33 +1437,33 @@ primitive described in @ref{T_OK_ACK,,T_OK_ACK}.
 These errors will be indicated via the @prim{T_ERROR_ACK} primitive described in
 @ref{T_ERROR_ACK,,T_ERROR_ACK}. The allowable errors are as follows:
 
-@table @perr
+@table @asis
 
-@item TACCES
+@item @perr{TACCES}
 This indicates that the user did not have proper permissions for the use of the
 requested address or options.
 
-@item TBADADDR
+@item @perr{TBADADDR}
 This indicates that the protocol address was in an incorrect format or the
 address contained illegal information. It is not intended to indicate protocol
 connection errors, such as an unreachable destination. Those error types are
 indicated via the @prim{T_DISCON_IND} primitive.
 
-@item TBADOPT
+@item @perr{TBADOPT}
 This indicates that the options were in an incorrect format, or they contained
 illegal information.
 
-@item TOUTSTATE
+@item @perr{TOUTSTATE}
 The primitive would place the transport interface out of state.
 
-@item TBADDATA
+@item @perr{TBADDATA}
 The amount of user data specified was illegal.
 
-@item TSYSERR
+@item @perr{TSYSERR}
 A system error has occurred and the @cite{UNIX@registeredsymbol{}} System error
 is indicated in the primitive.
 
-@item TADDRBUSY
+@item @perr{TADDRBUSY}
 This transport provider does not support multiple connections with the same
 local and remote addresses.
 
@@ -1526,37 +1525,37 @@ primitive described in @ref{T_OK_ACK,,T_OK_ACK}.
 These errors will be indicated via the @prim{T_ERROR_ACK} primitive described in
 @ref{T_ERROR_ACK,,T_ERROR_ACK}. The allowable errors are as follows:
 
-@table @perr
+@table @asis
 
-@item TBADF
+@item @perr{TBADF}
 This indicates that the response queue pointer was illegal.
 
-@item TBADOPT
+@item @perr{TBADOPT}
 This indicates that the options were in an incorrect format, or they contained
 illegal information.
 
-@item TACCES
+@item @perr{TACCES}
 This indicates that the user did not have proper permissions for the use of the
 options or response id.
 
-@item TOUTSTATE
+@item @perr{TOUTSTATE}
 The primitive would place the transport interface out of state.
 
-@item TBADDATA
+@item @perr{TBADDATA}
 The amount of user data specified was illegal.
 
-@item TBADSEQ
+@item @perr{TBADSEQ}
 The sequence number specified in the primitive was incorrect or illegal.
 
-@item TSYSERR
+@item @perr{TSYSERR}
 A system error has occurred and the @cite{UNIX@registeredsymbol{}} System error
 is indicated in the primitive.
 
-@item TRESADDR
+@item @perr{TRESADDR}
 The transport provider requires that the responding stream is bound to the same
 address as the stream on which the connection indication was received.
 
-@item TBADADDR
+@item @perr{TBADADDR}
 This indicates that the protocol address was in an incorrect format or the
 address contained illegal information.
 
@@ -1606,18 +1605,18 @@ primitive described in @ref{T_OK_ACK,,T_OK_ACK}.
 These errors will be indicated via the @prim{T_ERROR_ACK} primitive described in
 @ref{T_ERROR_ACK,,T_ERROR_ACK}. The allowable errors are as follows:
 
-@table @perr
+@table @asis
 
-@item TOUTSTATE
+@item @perr{TOUTSTATE}
 The primitive would place the transport interface out of state.
 
-@item TBADDATA
+@item @perr{TBADDATA}
 The amount of user data specified was illegal.
 
-@item TBADSEQ
+@item @perr{TBADSEQ}
 The sequence number specified in the primitive was incorrect or illegal.
 
-@item TSYSERR
+@item @perr{TSYSERR}
 A system error has occurred and the @cite{UNIX@registeredsymbol{}} System error
 is indicated in the primitive.
 
@@ -1672,9 +1671,9 @@ fatal error.  This is indicated via a @msg{M_ERROR} message type which results
 in the failure of all operating system service routines on the stream. The
 allowable errors are as follows:
 
-@table @errno
+@table @asis
 
-@item EPROTO
+@item @errno{EPROTO}
 
 This indicates one of the following unrecoverable protocol conditions:
 
@@ -1728,9 +1727,9 @@ fatal error. This is indicated via a @msg{M_ERROR} message type which results in
 the failure of all operating system service routines on the stream. The
 allowable errors are as follows:
 
-@table @errno
+@table @asis
 
-@item EPROTO
+@item @errno{EPROTO}
 This indicates one of the following unrecoverable protocol conditions:
 
 @itemize ---
@@ -1774,9 +1773,9 @@ fatal error. This is indicated via a @msg{M_ERROR} message type which results in
 the failure of all operating system service routines on the stream. The
 allowable errors are as follows:
 
-@table @errno
+@table @asis
 
-@item EPROTO
+@item @errno{EPROTO}
 This indicates one of the following unrecoverable protocol conditions:
 
 @itemize ---
@@ -1998,6 +1997,11 @@ Where @parm{PRIM_type} identifies the primitive type.
 The following transport primitives pertain only to the connectionless-mode
 transport service.
 
+@menu
+* CLTS User-Originated Primitives::
+* CLTS Provider-Originated Primitives::
+@end menu
+
 @node CLTS User-Originated Primitives
 @subsection User-Originated Primitives
 @cindex CLTS user-originated primitives
@@ -2046,9 +2050,9 @@ occurs, it is the responsibility of the transport provider to report it via the
 message type which results in the failure of all operating system service
 routines on the stream. The allowable fatal errors are as follows:
 
-@table @errno
+@table @asis
 
-@item EPROTO
+@item @errno{EPROTO}
 This indicates one of the following unrecoverable protocol conditions:
 
 @itemize ---
