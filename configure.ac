@@ -246,6 +246,8 @@ AC_CONFIG_FILES([Makefile
 		 doc/papers/sctp/Makefile
 		 doc/papers/sigtran/Makefile
 		 doc/papers/streams/Makefile
+		 doc/papers/optranex/Makefile
+		 doc/papers/chan/Makefile
 		 doc/projects/Makefile
 		 doc/projects/carrier/Makefile
 		 doc/projects/cnam/Makefile
