@@ -262,10 +262,11 @@ official @url{http://www.kernel.org/, kernel.org} sources.
 
 The @cite{@value{PACKAGE_TITLE}} package is compatible with 2.4 kernel series after 2.4.10 and has
 been tested up to and including 2.4.33.  It has been tested from 2.6.3 up to and including 2.6.38
-(with @cite{RHEL 6.0}, @cite{SLES 11.1} and @cite{Debian  6.0} patch sets).  Please note that your
-mileage may vary if you use a kernel more recent than 2.6.38: it is difficult to anticipate changes
-that kernel developers will make in the future.  Many kernels in the 2.6 and 3.x series now vary
-widely by release version and if you encounter problems, try a kernel within the supported series.
+(with @cite{RHEL 6.0}, @cite{SLES 11.1} and @cite{Debian  6.0} patch sets).  It has been tested from
+3.0 up to and including 3.14.  Please note that your mileage may vary if you use a kernel more
+recent than 3.2: it is difficult to anticipate changes that kernel developers will make in the
+future.  Many kernels in the 2.6 and 3.x series now vary widely by release version and if you
+encounter problems, try a kernel within the supported series.
 
 @subsubheading SMP Kernels
 
