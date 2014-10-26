@@ -104,9 +104,11 @@ installed.  For more information, see @refman{Compatibility}.
 A fairly LSB compliant GNU/Linux distribution.@footnote{See @refman{GNU/Linux Distributions}, for
 more information.}
 @item @tab @minus{}
-Linux 2.4 kernel (2.4.10 - 2.4.27), or
+Linux 2.4 kernel (2.4.10 - 2.4.27),
 @item @tab @minus{}
-Linux 2.6 kernel (2.6.3 - 2.6.38);
+Linux 2.6 kernel (2.6.3 - 2.6.39), or
+@item @tab @minus{}
+Linux 3.x kernel (3.0 - 3.14);
 @item @tab @minus{}
 glibc2 or better.
 @item @tab @minus{}
@@ -119,7 +121,7 @@ GNU texinfo (for info files).
 GNU bison and flex (for config programs).
 @item @tab @minus{}
 net-snmp (for SNMP agents).@footnote{A wide range of net-snmp releases are supported, from UCD-SNMP
-4.2.5 through net-snmp 5.4.}
+4.2.5 through net-snmp 5.7.2.}
 @item @tab @minus{}
 GNU gcj and classpath (for Java modules).
 @item @tab @minus{}
