@@ -116,7 +116,7 @@ Fully deprecated by this release and no longer released by the
 @uref{http://www.openss7.org/,, OpenSS7 Project} are the following former
 subpackages of the OpenSS7 Master Package:@footnote{With the exception of Linux
 Native Sockets SCTP, these packages can be obtained from the projects or
-companites that originated them.}
+companies that originated them.}
 
 @multitable @columnfractions 0.05 0.95
 @item @tab @bullet{} Linux Native Sockets SCTP
