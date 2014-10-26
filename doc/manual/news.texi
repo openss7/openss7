@@ -89,6 +89,21 @@ The sections that follow provide information on OpenSS7 releases of the
 
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::	Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
+* Release @value{PACKAGE}-1.1.7.20131209::	Release 7.20131209
+* Release @value{PACKAGE}-1.1.7.20131123::	Release 7.20131123
+* Release @value{PACKAGE}-1.1.7.20130209::	Release 7.20130209
+* Release @value{PACKAGE}-1.1.7.20130129::	Release 7.20130129
+* Release @value{PACKAGE}-1.1.7.20130125::	Release 7.20130125
+* Release @value{PACKAGE}-1.1.6.20130125::	Release 6.20130125
+* Release @value{PACKAGE}-1.1.3.20130125::	Release 3.20130125
+* Release @value{PACKAGE}-1.1.3.20130123::	Release 3.20130123
+* Release @value{PACKAGE}-1.1.3.20130121::	Release 3.20130121
+* Release @value{PACKAGE}-1.1.3.20130111::	Release 3.20130111
+* Release @value{PACKAGE}-1.1.1.20121229::	Release 1.20121229
+* Release @value{PACKAGE}-1.1.1.20120725::	Release 1.20120725
+* Release @value{PACKAGE}-1.1.1.20120715::	Release 1.20120715
+* Release @value{PACKAGE}-1.1.1.20120708::	Release 1.20120708
+* Release @value{PACKAGE}-1.1.1.20120618::	Release 1.20120618
 * Release @value{PACKAGE}-1.1.1.20110510::	Release 1.20110510
 * Release @value{PACKAGE}-1.1.1.20110111::	Release 1.20110111
 * Release @value{PACKAGE}-1.1.1.20090908::	Release 1.20090908
@@ -113,13 +128,442 @@ The sections that follow provide information on OpenSS7 releases of the
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
-This is the sixth release of the @cite{@value{PACKAGE_TITLE}} package.  THis is a production grade
+This is the seventh release of the @cite{@value{PACKAGE_TITLE}} package.  This is a production grade
 release.  All existing validation test suites run clean on supported distributions, production
 kernels and architectures.
 
 Major features since the last release are as follows:
 
 @itemize -
+@item
+Source code release on GitHub.
+
+@end itemize
+
+@node Release @value{PACKAGE}-1.1.7.20131209
+@unnumberedsubsec Major changes for release @value{PACKAGE}-1.1.7.20131209
+@cindex release @value{PACKAGE}-1.1.7.20131209
+
+This is the seventh release of the @cite{@value{PACKAGE_TITLE}} package.  This is a production grade
+release.  All existing validation test suites run clean on supported distributions, production
+kernels and architectures.
+
+Major features since the last release are as follows:
+
+@itemize -
+@item
+Build corrections for RHEL 6.4.
+
+@item
+Scripts for country boundary, shoreline and rivers database preparation.
+
+@item
+Database for ANSI T1.101 point code assignments.
+
+@item
+Suppress extransous /proc/1/comm error messages when testing for systemd.
+
+@item
+Handle PUIAS to Springdale rename for PUIAS distribution.
+
+@end itemize
+
+@node Release @value{PACKAGE}-1.1.7.20131123
+@unnumberedsubsec Major changes for release @value{PACKAGE}-1.1.7.20131123
+@cindex release @value{PACKAGE}-1.1.7.20131123
+
+This is the sixth release of the @cite{@value{PACKAGE_TITLE}} package.  This is a production grade
+release.  All existing validation test suites run clean on supported distributions, production
+kernels and architectures.
+
+Major features since the last release are as follows:
+
+@itemize -
+@item
+Correction to ca-cert handling in RHEL 6 install scriptlet.
+
+@item
+RHEL 6 build changes.
+
+@item
+Set permissions correctly when applying kernel module patch.
+
+@item
+Do not duplicate certs when including ca-cert.
+
+@item
+Avoid conflicting shelll variable in RPM install scriplet.
+
+@item
+Remove /proc/1/comm checks for systemd in module loader.
+
+@end itemize
+
+@node Release @value{PACKAGE}-1.1.7.20130209
+@unnumberedsubsec Major changes for release @value{PACKAGE}-1.1.7.20130209
+@cindex release @value{PACKAGE}-1.1.7.20130209
+
+This is the sixth release of the @cite{@value{PACKAGE_TITLE}} package.  This is a production grade
+release.  All existing validation test suites run clean on supported distributions, production
+kernels and architectures.
+
+Major features since the last release are as follows:
+
+@itemize -
+@item
+Corrections to RPM spec file.
+
+@end itemize
+
+@node Release @value{PACKAGE}-1.1.7.20130129
+@unnumberedsubsec Major changes for release @value{PACKAGE}-1.1.7.20130129
+@cindex release @value{PACKAGE}-1.1.7.20130129
+
+This is the sixth release of the @cite{@value{PACKAGE_TITLE}} package.  This is a production grade
+release.  All existing validation test suites run clean on supported distributions, production
+kernels and architectures.
+
+Major features since the last release are as follows:
+
+@itemize -
+@item
+Compensate for RHEL6 lack of c_rehash.
+
+@item
+Do not create sysfs nodes: they do not work properly.
+
+@item
+Use no foreground flag in strace.service file.
+
+@item
+More error traces for strerr logger.
+
+@item
+Remove static device names (the do not work either).
+
+@item
+Changes to support weak kernel modules.
+
+@item
+Clean up weak module support.
+
+@end itemize
+
+@node Release @value{PACKAGE}-1.1.7.20130125
+@unnumberedsubsec Major changes for release @value{PACKAGE}-1.1.7.20130125
+@cindex release @value{PACKAGE}-1.1.7.20130125
+
+This is the sixth release of the @cite{@value{PACKAGE_TITLE}} package.  This is a production grade
+release.  All existing validation test suites run clean on supported distributions, production
+kernels and architectures.
+
+Major features since the last release are as follows:
+
+@itemize -
+@item
+Better Archlinux install script support.
+
+@end itemize
+
+@node Release @value{PACKAGE}-1.1.6.20130125
+@unnumberedsubsec Major changes for release @value{PACKAGE}-1.1.6.20130125
+@cindex release @value{PACKAGE}-1.1.6.20130125
+
+This is the sixth release of the @cite{@value{PACKAGE_TITLE}} package.  This is a production grade
+release.  All existing validation test suites run clean on supported distributions, production
+kernels and architectures.
+
+Major features since the last release are as follows:
+
+@itemize -
+@item
+Remove use of kill_litter_super().
+
+@end itemize
+
+@node Release @value{PACKAGE}-1.1.3.20130125
+@unnumberedsubsec Major changes for release @value{PACKAGE}-1.1.3.20130125
+@cindex release @value{PACKAGE}-1.1.3.20130125
+
+This is the sixth release of the @cite{@value{PACKAGE_TITLE}} package.  This is a production grade
+release.  All existing validation test suites run clean on supported distributions, production
+kernels and architectures.
+
+Major features since the last release are as follows:
+
+@itemize -
+@item
+Updates and corrections to weak kernel module builds.
+
+@item
+Repo support and corrections for Archlinux packages.
+
+@end itemize
+
+@node Release @value{PACKAGE}-1.1.3.20130123
+@unnumberedsubsec Major changes for release @value{PACKAGE}-1.1.3.20130123
+@cindex release @value{PACKAGE}-1.1.3.20130123
+
+This is the sixth release of the @cite{@value{PACKAGE_TITLE}} package.  This is a production grade
+release.  All existing validation test suites run clean on supported distributions, production
+kernels and architectures.
+
+Major features since the last release are as follows:
+
+@itemize -
+@item
+Additional support for Archlinux.
+
+@item
+Add udev rules for strace and strerr.
+
+@item
+Add system unit files for strace and strerr.
+
+@item
+Add repo support for Archlinux packages.
+
+@item
+Build Archlinux packages better.
+
+@end itemize
+
+@node Release @value{PACKAGE}-1.1.3.20130121
+@unnumberedsubsec Major changes for release @value{PACKAGE}-1.1.3.20130121
+@cindex release @value{PACKAGE}-1.1.3.20130121
+
+This is the sixth release of the @cite{@value{PACKAGE_TITLE}} package.  This is a production grade
+release.  All existing validation test suites run clean on supported distributions, production
+kernels and architectures.
+
+Major features since the last release are as follows:
+
+@itemize -
+@item
+Build support for SLES 11.
+
+@item
+Handle certificates better.
+
+@item
+Get configuration files in the right places for SLES 11.
+
+@item
+Support in RPM spec file for certificates on SLES 11.
+
+@item
+Create a new OpenSS7 certificate.
+
+@item
+Repository support for SLES 11.
+
+@item
+RPM spec file reworked for new RPM release.
+
+@item
+Better certificate handling for RHEL.
+
+@item
+Additional build support for RHEL 6 with certificates.
+
+@item
+Certificate support in Archlinux PKGBUILD.
+
+@item
+Build support for RHEL 6.
+
+@end itemize
+
+@node Release @value{PACKAGE}-1.1.3.20130111
+@unnumberedsubsec Major changes for release @value{PACKAGE}-1.1.3.20130111
+@cindex release @value{PACKAGE}-1.1.3.20130111
+
+This is the sixth release of the @cite{@value{PACKAGE_TITLE}} package.  This is a production grade
+release.  All existing validation test suites run clean on supported distributions, production
+kernels and architectures.
+
+Major features since the last release are as follows:
+
+@itemize -
+@item
+Build and install support for repository.
+
+@item
+Install SSL certificates.
+
+@item
+Cannot open /dev/log anymore.
+
+@item
+Add support for automake-1.13.
+
+@item
+Support systemd modules-load.d and module patching on Archlinux.
+
+@item
+Full detection and support for systemd installations.
+
+@item
+Changes for sysfs device creation and specfs locking.
+
+@item
+Updates to kernel module descriptions and module aliases.
+
+@item
+Use devname aliases where possible.
+
+@end itemize
+
+@node Release @value{PACKAGE}-1.1.1.20121229
+@unnumberedsubsec Major changes for release @value{PACKAGE}-1.1.1.20121229
+@cindex release @value{PACKAGE}-1.1.1.20121229
+
+This is the sixth release of the @cite{@value{PACKAGE_TITLE}} package.  This is a production grade
+release.  All existing validation test suites run clean on supported distributions, production
+kernels and architectures.
+
+Major features since the last release are as follows:
+
+@itemize -
+@item
+Added XMON MIB implementation and active agent.
+
+@item
+Updated GNU build chain to m4-1.4.16, autoconf-2.69, automake-1.12.6, libtool-2.4.2, gettext-0.18.2, flex-2.5.37, bison-2.7, swig-2.0.9, autobuild-5.3, texinfo-4.13a, xz-5.0.4.
+
+@item
+Added documentation for monitoring.
+
+@item
+Added pcapng conversion utilities.
+
+@item
+Added LLDP MIBs.
+
+@item
+Added pcapng library and manual pages.
+
+@item
+Enhanced MIB support.
+
+@item
+Add monitoring and new card support to OPENSS7-MX-MIB.
+
+@item
+Support for Allo cards.
+
+@item
+Updated GNU build chain to m4-1.4.16, autoconf-2.69, automake-1.12.1, libtool-2.4.2, gettext-0.18.1, flex-2.5.35, bison-2.5, swig-2.0.7, autobuild-5.3, texinfo-4.13a, xz-5.0.3.
+
+@item
+Support for Archlinux.
+
+@item
+Support for Slackware.
+
+@item
+Support for 3.0.4-1-lts kernel from Archlinux.
+
+@item
+Support for OpenSS7 Live.
+
+@item
+Support for Debian Wheezy.
+
+@item
+Added (IP) network discovery analyzer.
+
+@item
+Added mxconfig graphical card manager.
+
+@end itemize
+
+@node Release @value{PACKAGE}-1.1.1.20120725
+@unnumberedsubsec Major changes for release @value{PACKAGE}-1.1.1.20120725
+@cindex release @value{PACKAGE}-1.1.1.20120725
+
+This is the sixth release of the @cite{@value{PACKAGE_TITLE}} package.  This is a production grade
+release.  All existing validation test suites run clean on supported distributions, production
+kernels and architectures.
+
+Major features since the last release are as follows:
+
+@itemize -
+@item
+Added new OPENSS7-MX-MON-MIB for monitoring (probe).
+
+@item
+Created new X400P-MX driver with full monitoring capabilities to work under Archlinux.
+
+@end itemize
+
+@node Release @value{PACKAGE}-1.1.1.20120715
+@unnumberedsubsec Major changes for release @value{PACKAGE}-1.1.1.20120715
+@cindex release @value{PACKAGE}-1.1.1.20120715
+
+This is the sixth release of the @cite{@value{PACKAGE_TITLE}} package.  This is a production grade
+release.  All existing validation test suites run clean on supported distributions, production
+kernels and architectures.
+
+Major features since the last release are as follows:
+
+@itemize -
+@item
+Started new X400P-MX driver to support monitoring and multiple uses of channels with SS7.
+
+@item
+Updates to DS1-EXT-MIB.
+
+@item
+General update of DS0/DS1 MIBS and active agents.
+
+@item
+Corrected bad bug by inspection in pullupmsg().
+
+@item
+Corrected bug in mi_copyin().
+
+@item
+Added BPF driver for tcpdump operation.
+
+@end itemize
+
+@node Release @value{PACKAGE}-1.1.1.20120708
+@unnumberedsubsec Major changes for release @value{PACKAGE}-1.1.1.20120708
+@cindex release @value{PACKAGE}-1.1.1.20120708
+
+This is the sixth release of the @cite{@value{PACKAGE_TITLE}} package.  This is a production grade
+release.  All existing validation test suites run clean on supported distributions, production
+kernels and architectures.
+
+Major features since the last release are as follows:
+
+@itemize -
+@item
+Converted X400P-SS7 driver for automatic line detection and monitoring.
+
+@end itemize
+
+@node Release @value{PACKAGE}-1.1.1.20120618
+@unnumberedsubsec Major changes for release @value{PACKAGE}-1.1.1.20120618
+@cindex release @value{PACKAGE}-1.1.1.20120618
+
+This is the sixth release of the @cite{@value{PACKAGE_TITLE}} package.  This is a production grade
+release.  All existing validation test suites run clean on supported distributions, production
+kernels and architectures.
+
+Major features since the last release are as follows:
+
+@itemize -
+@item
+Correct statistics structures for SS7 link operation and monitoring.
+
+@item
+Build for Archlinux 3.0.36-1-lts kernel.
+
+@item
+Changes to support 3.0 kernel.
+
 @item
 Updated GNU build chain to m4-1.4.16, autoconf-2.69, automake-1.12.6, libtool-2.4.2, gettext-0.18.2,
 flex-2.5.37, bison-2.7, swig-2.0.9, autobuild-5.3, texinfo-4.13a, xz-5.0.4.
