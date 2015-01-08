@@ -2382,6 +2382,32 @@ dnl *** 2 arguments or whether it takes 3 arguments.
 dnl *** ])
 dnl 	fi
 	fi
+	AC_CACHE_CHECK([for kernel ip_select_ident_more takes sk_buff], [linux_cv_have_ip_select_ident_more_sk_buff], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
+#include NEED_LINUX_AUTOCONF_H
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/inet.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <linux/skbuff.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter_ipv4.h>]],
+		[[void (*my_autoconf_function_pointer)(struct sk_buff *, struct dst_entry *, struct sock *, int) = &ip_select_ident_more;]]) ],
+		[linux_cv_have_ip_select_ident_more_sk_buff='yes'],
+		[linux_cv_have_ip_select_ident_more_sk_buff='no'])
+	])
+	if test :$linux_cv_have_ip_select_ident_more_sk_buff = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_IP_SELECT_IDENT_MORE_SK_BUFF], [1], [Define if
+		function ip_select_ident_more takes sk_buff.])
+	fi
 	AC_CACHE_CHECK([for kernel skb_linearize with 1 argument], [linux_cv_have_skb_linearize_1_arg], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[

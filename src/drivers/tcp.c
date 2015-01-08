@@ -4466,7 +4466,11 @@ t_tpi_queue_xmit(struct sk_buff *skb)
 	struct iphdr *iph = (typeof(iph)) skb_network_header(skb);
 
 #if defined NETIF_F_TSO
+#if defined HAVE_KFUNC_IP_SELECT_IDENT_MORE_SK_BUFF
+	ip_select_ident_more(skb, rt_dst(rt), NULL, 0);
+#else				/* !defined HAVE_KFUNC_IP_SELECT_IDENT_MORE_SK_BUFF */
 	ip_select_ident_more(iph, rt_dst(rt), NULL, 0);
+#endif				/* defined HAVE_KFUNC_IP_SELECT_IDENT_MORE_SK_BUFF */
 #else				/* !defined NETIF_F_TSO */
 	ip_select_ident(iph, rt_dst(rt), NULL);
 #endif				/* defined NETIF_F_TSO */
