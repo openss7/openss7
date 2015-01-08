@@ -904,7 +904,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILDDIR], [dnl
 	    else
 		linux_cv_k_autoconf='<linux/autoconf.h>'
 	    fi],[with_k_build],
-	    [-a \( -f "$bld_dir/include/linux/autoconf.h" -o -f "$bld_dir/include/generated/autoconf.h" \) -a -f "$bld_dir/include/linux/version.h"])
+	    [-a \( -f "$bld_dir/include/linux/autoconf.h" -o -f "$bld_dir/include/generated/autoconf.h" \) -a \( -f "$bld_dir/include/linux/version.h" -o -f "$bld_dir/include/generated/uapi/linux/version.h" \)])
     _kbuilddir="$linux_cv_k_build_eval"
     kbuilddir="$linux_cv_k_build"
     AC_SUBST([kbuilddir])dnl
@@ -2447,6 +2447,13 @@ dnl
 	linux_cv_k_cppflags=`echo " $linux_cv_k_cppflags " | sed -e "s| -Iinclude | -Iinclude -I${_kbuilddir}/include -I${_khdrdir}/include -I${_ksrcdir}/include |g;s|^[[[:space:]]]*||;s|[[[:space:]]]*$||"`
 	linux_dir="${_kbuilddir}/include2" ; if test -d "$linux_dir" ; then
 	linux_cv_k_cppflags=`echo " $linux_cv_k_cppflags " | sed -e "s| -Iinclude2 | -I${_kbuilddir}/include2 |g;s|^[[[:space:]]]*||;s|[[[:space:]]]*$||"`
+	fi
+dnl
+dnl	Some recent 3.x kernels place version.h in include/generated/uapi instead of
+dnl	include/linux as was true of previous kernels.
+dnl
+	linux_dir="${_kbuilddir}/include/generated/uapi" ; if test -d "$linux_dir" ; then
+	linux_cv_k_cppflags=`echo " $linux_cv_k_cppflags " | sed -e "s| -Iinclude/generated/uapi | -I${_kbuilddir}/include/generated/uapi |g;s|^[[[:space:]]]*||;s|[[[:space:]]]*$||"`
 	fi
 dnl
 dnl	Only ppc and um currently include architecture directories.  The rest include asm
