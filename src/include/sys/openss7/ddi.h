@@ -226,8 +226,13 @@ __STRUTIL_EXTERN_INLINE int
 drv_priv(cred_t *crp)
 {
 	/* FIXME: also need to check for capabilities */
+#ifdef KUIDT_INIT
+	if (crp->cr_uid.val == 0 || crp->cr_ruid.val == 0)
+		return (0);
+#else
 	if (crp->cr_uid == 0 || crp->cr_ruid == 0)
 		return (0);
+#endif
 	return (EPERM);
 }
 __STRUTIL_EXTERN_INLINE void
