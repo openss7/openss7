@@ -126,10 +126,10 @@ extern FILE *yyin, *yyout;
 %debug
 %defines
 %locations
-%token_table
+%token-table
 %verbose
 
-/* %token_table */
+/* %token-table */
 
 %token TOK_EOL
 %token TOK_USAGE

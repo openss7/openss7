@@ -148,7 +148,7 @@ static struct select sel = { "/dev/x400p-sl", "", 0, 1, 1, 1, 0 };
 %debug
 %defines
 %locations
-%token_table
+%token-table
 %verbose
 
 %union {
@@ -156,7 +156,7 @@ static struct select sel = { "/dev/x400p-sl", "", 0, 1, 1, 1, 0 };
     char *str;
 }
 
-/* %token_table */
+/* %token-table */
 
 %token <val> TOK_EOL
 %token <val> TOK_EQUALS

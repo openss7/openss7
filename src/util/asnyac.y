@@ -109,7 +109,7 @@ extern FILE *yyin, *yyout;
 %debug
 %defines
 %locations
-%token_table
+%token-table
 %verbose
 
 %union {

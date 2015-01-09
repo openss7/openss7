@@ -419,7 +419,7 @@ struct select sel[MAX_HANDLES] = {
 %debug
 %defines
 %locations
-%token_table
+%token-table
 %verbose
 
 %union {
@@ -427,7 +427,7 @@ struct select sel[MAX_HANDLES] = {
     char *str;
 }
 
-/* %token_table */
+/* %token-table */
 
 %token <val> TOK_EOL
 %token <val> TOK_USAGE
