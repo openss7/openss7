@@ -5939,7 +5939,14 @@ takeover_strsched(unsigned int cpu)
 	streams_local_restore(flags);
 }
 #endif				/* defined CONFIG_HOTPLUG_CPU */
-STATIC int __devinit
+#ifndef __cpuinit
+#ifdef __devinit
+#define __cpuinit __devinit
+#else
+#define __cpuinit
+#endif
+#endif
+STATIC int __cpuinit
 str_cpu_callback(struct notifier_block *nfb, unsigned long action, void *hcpu)
 {
 	int cpu = (long) hcpu;
@@ -6001,7 +6008,14 @@ str_cpu_callback(struct notifier_block *nfb, unsigned long action, void *hcpu)
 	}
 	return (NOTIFY_OK);
 }
-STATIC struct notifier_block __devinitdata str_cpu_nfb = {
+#ifndef __cpuinitdata
+#ifdef __devinitdata
+#define __cpuinitdata __devinitdata
+#else
+#define __cpuinitdata
+#endif
+#endif
+STATIC struct notifier_block __cpuinitdata str_cpu_nfb = {
 	.notifier_call = str_cpu_callback,
 };
 

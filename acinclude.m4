@@ -861,6 +861,8 @@ dnl----------------------------------------------------------------------------
 	ip_dst_output \
 	ip_route_output_flow \
 	ip_route_output_key \
+	i_readcount_inc \
+	i_readcount_dec \
 	kern_umount \
 	kill_litter_super \
 	kill_proc \
@@ -869,6 +871,8 @@ dnl----------------------------------------------------------------------------
 	nf_reset \
 	num_online_cpus \
 	path_lookup \
+	path_get \
+	path_put \
 	pci_dac_dma_supported \
 	pci_dac_dma_sync_single \
 	pci_dac_dma_sync_single_for_cpu \
@@ -1163,6 +1167,9 @@ dnl----------------------------------------------------------------------------
 	struct file.f_cred,
 	struct file.f_gid,
 	struct file.f_uid,
+	struct file.f_path,
+	struct file.f_vfsmnt,
+	struct file.f_inode,
 	struct file_operations.compat_ioctl,
 	struct file_operations.flush,
 	struct file_operations.iotcl,
@@ -1879,6 +1886,46 @@ dnl----------------------------------------------------------------------------
 	    if test :$linux_cv_have_iop_lookup_nameidata = :yes ; then
 		AC_DEFINE([HAVE_INODE_OPERATIONS_LOOKUP_NAMEIDATA], [1],
 		    [Set if inode_operation lookup function takes nameidata pointer.])
+	    fi
+	    AC_CACHE_CHECK([for kernel inode_operation lookup with flags],
+			   [linux_cv_have_iop_lookup_flags], [dnl
+		AC_COMPILE_IFELSE([
+		    AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
+#include NEED_LINUX_AUTOCONF_H
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#ifdef HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
+#ifdef HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#ifdef HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#ifdef HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#ifdef HAVE_KINC_LINUX_NAMEI_H
+#include <linux/namei.h>
+#endif
+#ifdef HAVE_KINC_LINUX_PATH_H
+#include <linux/path.h>
+#endif]],
+			[[struct inode_operations temp;
+(*temp.lookup)((struct inode *)0, (struct dentry *)0, (unsigned int)0);]]) ],
+		    [linux_cv_have_iop_lookup_flags='yes'],
+		    [linux_cv_have_iop_lookup_flags='no'])
+	    ])
+	    if test :$linux_cv_have_iop_lookup_flags = :yes ; then
+		AC_DEFINE([HAVE_INODE_OPERATIONS_LOOKUP_FLAGS], [1],
+		    [Set if inode_operation lookup function takes flags.])
 	    fi
 	    AC_CACHE_CHECK([for kernel file_operations flush with fl_owner_t],
 			   [linux_cv_have_fop_flush_fl_owner_t], [dnl

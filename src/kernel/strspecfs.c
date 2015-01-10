@@ -473,12 +473,29 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 		fops_put(file->f_op);
 		file->f_op = (struct file_operations *) f_op;
 	}
+#ifdef HAVE_KFUNC_I_READCOUNT_INC
+	if ((file->f_mode & (FMODE_READ | FMODE_WRITE)) == FMODE_READ)
+		i_readcount_dec(file->f_dentry->d_inode);
+#endif
+#ifdef HAVE_KMEMB_STRUCT_FILE_F_VFSMNT
 	if (file->f_dentry != NULL)
 		dput(file->f_dentry);
 	file->f_dentry = dentry;
 	if (file->f_vfsmnt != NULL)
 		mntput(file->f_vfsmnt);
 	file->f_vfsmnt = mnt;
+#else
+	path_put(&file->f_path);
+	file->f_path.dentry = dentry;
+	file->f_path.mnt = mnt;
+#endif
+#ifdef HAVE_KFUNC_I_READCOUNT_INC
+	if ((file->f_mode & (FMODE_READ | FMODE_WRITE)) == FMODE_READ)
+		i_readcount_inc(snode);
+#endif
+#ifdef HAVE_KMEMB_STRUCT_FILE_F_INODE
+	file->f_inode = snode;
+#endif
 #if   defined HAVE_FILE_MOVE_SYMBOL
 	file_move(file, &mnt->mnt_sb->s_files);
 #elif defined HAVE_FILE_SB_LIST_ADD_SYMBOL
@@ -501,14 +518,23 @@ EXPORT_SYMBOL_GPL(spec_reparent);
 streams_fastcall int
 spec_open(struct file *file, struct cdevsw *cdev, dev_t dev, int sflag)
 {
+#ifdef HAVE_KMEMB_STRUCT_FILE_F_VFSMNT
 	struct dentry *dentry;
 	struct vfsmount *mnt;
+#else
+	struct path path;
+#endif
 	int err;
 
+#ifdef HAVE_KMEMB_STRUCT_FILE_F_VFSMNT
 	/* I wish dentry_open() would use what's in the file pointer instead of what it has in
 	   local variables */
 	dentry = dget(file->f_dentry);
 	mnt = mntget(file->f_vfsmnt);
+#else
+	path = file->f_path;
+	path_get(&path);
+#endif
 
 	if (!(err = spec_reparent(file, cdev, dev))) {
 		file->f_flags =
@@ -516,8 +542,12 @@ spec_open(struct file *file, struct cdevsw *cdev, dev_t dev, int sflag)
 		err = file->f_op->open(file->f_dentry->d_inode, file);
 		file->f_flags &= ~O_CLONE;
 		if (!err) {
+#ifdef HAVE_KMEMB_STRUCT_FILE_F_VFSMNT
 			dput(dentry);
 			mntput(mnt);
+#else
+			path_put(&path);
+#endif
 			return (0);
 
 		} else
@@ -525,8 +555,12 @@ spec_open(struct file *file, struct cdevsw *cdev, dev_t dev, int sflag)
 	} else
 		_ptrace(("Error path taken!\n"));
 
+#ifdef HAVE_KMEMB_STRUCT_FILE_F_VFSMNT
 	dput(file->f_dentry);
 	mntput(file->f_vfsmnt);
+#else
+	path_put(&file->f_path);
+#endif
 	return (err > 0 ? -err : err);
 }
 
@@ -566,6 +600,9 @@ EXPORT_SYMBOL_GPL(spec_open);
 #if defined HAVE_INODE_OPERATIONS_LOOKUP_NAMEIDATA
 STATIC struct dentry *
 spec_dir_i_lookup(struct inode *dir, struct dentry *new, struct nameidata *dummy)
+#elif defined HAVE_INODE_OPERATIONS_LOOKUP_FLAGS
+STATIC struct dentry *
+spec_dir_i_lookup(struct inode *dir, struct dentry *new, unsigned int flags)
 #else
 STATIC struct dentry *
 spec_dir_i_lookup(struct inode *dir, struct dentry *new)
@@ -778,6 +815,9 @@ STATIC struct file_operations spec_dir_f_ops = {
 #if defined HAVE_INODE_OPERATIONS_LOOKUP_NAMEIDATA
 STATIC struct dentry *
 spec_root_i_lookup(struct inode *dir, struct dentry *new, struct nameidata *dummy)
+#elif defined HAVE_INODE_OPERATIONS_LOOKUP_FLAGS
+STATIC struct dentry *
+spec_root_i_lookup(struct inode *dir, struct dentry *new, unsigned int flags)
 #else
 STATIC struct dentry *
 spec_root_i_lookup(struct inode *dir, struct dentry *new)
