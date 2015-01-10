@@ -93,7 +93,7 @@ $(top_srcdir)/AUTHORS: MANUAL
 	 $(ECHO) "Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>" >> $@ ; \
 	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
 	 $(ECHO) -e "\f" >> $@ ; \
-	 cat $${d}MANUAL | sed '\|^ Authors|,\|^ Quick|!d;\| Quick|,$$d' >> $@ ;\
+	 cat $${d}MANUAL | sed -r '\|^ ?Authors|,\|^ ?Quick|!d;\|^ ?Quick|,$$d' >> $@ ;\
 	 cat $(top_srcdir)/README | sed '\|^-----$$|,$$!d' >> $@
 
 $(top_srcdir)/BUGS: MANUAL $(top_srcdir)/AUTHORS
@@ -123,7 +123,7 @@ $(top_srcdir)/LICENSES: MANUAL $(top_srcdir)/AUTHORS
 	 $(ECHO) "Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>" >> $@ ; \
 	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
 	 $(ECHO) -e "\f" >> $@ ; \
-	 cat $${d}MANUAL | sed '\|^ Licenses|,\|^ Indices|!d;\|^ Indices|,$$d' >> $@ ;\
+	 cat $${d}MANUAL | sed -r '\|^ ?Licenses|,\|^ ?Indices|!d;\|^ ?Indices|,$$d' >> $@ ;\
 	 cat $(top_srcdir)/AUTHORS | sed '\|^-----$$|,$$!d' >> $@
 
 $(top_srcdir)/PROBLEMS: MANUAL $(top_srcdir)/AUTHORS
@@ -138,7 +138,7 @@ $(top_srcdir)/PROBLEMS: MANUAL $(top_srcdir)/AUTHORS
 	 $(ECHO) "Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>" >> $@ ; \
 	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
 	 $(ECHO) -e "\f" >> $@ ; \
-	 cat $${d}MANUAL | sed '\|[0-9].[0-9] Problem Reports|,\|^ Licenses|!d;\|^ Licenses|,$$d' >> $@ ;\
+	 cat $${d}MANUAL | sed -r '\|[0-9].[0-9] Problem Reports|,\|^ ?Licenses|!d;\|^ ?Licenses|,$$d' >> $@ ;\
 	 cat $(top_srcdir)/AUTHORS | sed '\|^-----$$|,$$!d' >> $@
 
 $(top_srcdir)/NEWS: MANUAL $(top_srcdir)/AUTHORS
@@ -168,7 +168,7 @@ $(top_srcdir)/THANKS: MANUAL $(top_srcdir)/AUTHORS
 	 $(ECHO) "Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>" >> $@ ; \
 	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
 	 $(ECHO) -e "\f" >> $@ ; \
-	 cat $${d}MANUAL | sed '\|^ Acknowledgements|,\|^ Authors|!d;\| Authors|,$$d' >> $@ ;\
+	 cat $${d}MANUAL | sed -r '\|^ ?Acknowledgements|,\|^ ?Authors|!d;\| Authors|,$$d' >> $@ ;\
 	 cat $(top_srcdir)/AUTHORS | sed '\|^-----$$|,$$!d' >> $@
 
 $(top_srcdir)/TODO: MANUAL $(top_srcdir)/AUTHORS
