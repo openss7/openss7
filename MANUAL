@@ -1,7 +1,7 @@
 This file provides the Installation and Reference Manual for OpenSS7.
 
-This is Edition 7.20141001, last updated 2014-10-25, of the 'OpenSS7
-Installation and Reference Manual', for Version 1.1 Release 7.20141001.
+This is Edition 7.20131209, last updated 2015-01-10, of the 'OpenSS7
+Installation and Reference Manual', for Version 1.1 Release 7.20131209.
 
 Copyright (C) 2008-2014 Monavacon Limited (http://www.monavacon.com/)
 Copyright (C) 2001-2008 OpenSS7 Corporation (http://www.openss7.com/)
@@ -45,8 +45,8 @@ OpenSS7 Installation and Reference Manual
 About This Manual
 =================
 
-This is Edition 7.20141001, last updated 2014-10-25, of 'The OpenSS7
-Installation and Reference Manual', for Version 1.1 release 7.20141001
+This is Edition 7.20131209, last updated 2015-01-10, of 'The OpenSS7
+Installation and Reference Manual', for Version 1.1 release 7.20131209
 of the OpenSS7 package.
 
 Preface
@@ -129,7 +129,7 @@ with a current version, contact the Author
 (http://www.openss7.org/) website for a current version.
 
 A current version of this manual is normally distributed with the
-'OpenSS7' package, 'openss7-1.1.7.20141001'.(1)
+'OpenSS7' package, 'openss7-1.1.7.20131209'.(1)
 
 Version Control
 ---------------
@@ -176,7 +176,7 @@ manual is an *UNCONTROLLED VERSION*.
    ---------- Footnotes ----------
 
    (1) 
-<http://www.openss7.org/repos/tarballs/openss7-1.1.7.20141001.tar.bz2>
+<http://www.openss7.org/repos/tarballs/openss7-1.1.7.20131209.tar.bz2>
 
 Disclaimer
 ==========
@@ -606,7 +606,7 @@ Quick Start Guide
 OpenSS7
 =======
 
-Package openss7-1.1.7.20141001 was released under AGPLv3 2014-10-25.
+Package openss7-1.1.7.20131209 was released under AGPLv3 2015-01-10.
 
 This is the 'OpenSS7' package.  It contains all of the OpenSS7 Project
 release code.  This is the only package released by the OpenSS7 Project.
@@ -648,12 +648,12 @@ should build and install for other architectures as well.
 Release
 -------
 
-This is the 'openss7-1.1.7.20141001' package, released 2014-10-25.  This
-'1.1.7.20141001' release, and the latest version, can be obtained from
+This is the 'openss7-1.1.7.20131209' package, released 2015-01-10.  This
+'1.1.7.20131209' release, and the latest version, can be obtained from
 the download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
 
-     $> wget http://www.openss7.org/tarballs/openss7-1.1.7.20141001.tar.xz
+     $> wget http://www.openss7.org/tarballs/openss7-1.1.7.20131209.tar.xz
 
 The release is available as an 'autoconf(1)' tarball, 'src.rpm' or
 'dsc', as a set of binary 'rpm's or 'deb's, or as a 'yum(8)',
@@ -874,7 +874,7 @@ You also need the same version of 'gcc(1)' compiler with which the
 kernel was built.  If it is not the default, add 'CC=kgcc' on the line
 after './configure', for example:
 
-     $> ../openss7-1.1.7.20141001/configure CC='gcc-3.4'
+     $> ../openss7-1.1.7.20131209/configure CC='gcc-3.4'
 
 The package builds and installs SNMP agents.  When configuring and
 building the package, it is necessary to have the net-snmp development
@@ -906,11 +906,11 @@ Installation
 The following commands will download, configure, build, check, install,
 validate, uninstall and remove the package:
 
-     $> wget http://www.openss7.org/tarballs/openss7-1.1.7.20141001.tar.xz
-     $> tar -xJvf openss7-1.1.7.20141001.tar.xz
+     $> wget http://www.openss7.org/tarballs/openss7-1.1.7.20131209.tar.xz
+     $> tar -xJvf openss7-1.1.7.20131209.tar.xz
      $> mkdir build
      $> pushd build
-     $> ../openss7-1.1.7.20141001/configure --enable-autotest --enable-silent-rules
+     $> ../openss7-1.1.7.20131209/configure --enable-autotest --enable-silent-rules
      $> make V=0
      $> make check
      $> sudo make install
@@ -918,8 +918,8 @@ validate, uninstall and remove the package:
      $> sudo make uninstall
      $> popd
      $> sudo rm -rf build
-     $> rm -rf openss7-1.1.7.20141001
-     $> rm -f openss7-1.1.7.20141001.tar.xz
+     $> rm -rf openss7-1.1.7.20131209
+     $> rm -f openss7-1.1.7.20131209.tar.xz
 
 If you have problems, try building with the logging targets instead.  If
 the make of a logging target fails, an automatic problem report will be
@@ -927,11 +927,11 @@ generated that can be mailed to The OpenSS7 Project
 <bugs@openss7.org>.(6)  Installation steps using the logging targets
 proceed as follows:
 
-     $> wget http://www.openss7.org/tarballs/openss7-1.1.7.20141001.tar.xz
-     $> tar -xJvf openss7-1.1.7.20141001.tar.xz
+     $> wget http://www.openss7.org/tarballs/openss7-1.1.7.20131209.tar.xz
+     $> tar -xJvf openss7-1.1.7.20131209.tar.xz
      $> mkdir build
      $> pushd build
-     $> ../openss7-1.1.7.20141001/configure --enable-autotest --enable-silent-rules
+     $> ../openss7-1.1.7.20131209/configure --enable-autotest --enable-silent-rules
      $> make V=1 compile.log
      $> make check.log
      $> sudo make install.log
@@ -939,8 +939,8 @@ proceed as follows:
      $> sudo make uninstall.log
      $> popd
      $> sudo rm -rf build
-     $> rm -rf openss7-1.1.7.20141001
-     $> rm -f openss7-1.1.7.20141001.tar.xz
+     $> rm -rf openss7-1.1.7.20131209
+     $> rm -f openss7-1.1.7.20131209.tar.xz
 
 See 'README-make' for additional specialized make targets.
 
@@ -955,14 +955,14 @@ The OpenSS7 package is available from the downloads area of The OpenSS7
 Project website (http://www.openss7.org/download.html) using a command
 such as:
 
-     $> wget http://www.openss7.org/tarballs/openss7-1.1.7.20141001.tar.xz
+     $> wget http://www.openss7.org/tarballs/openss7-1.1.7.20131209.tar.xz
 
 Unpack the tarball using a command such as:
 
-     $> tar -xJvf openss7-1.1.7.20141001.tar.xz
+     $> tar -xJvf openss7-1.1.7.20131209.tar.xz
 
 The tarball will unpack into the relative subdirectory named after the
-package name: openss7-1.1.7.20141001.
+package name: openss7-1.1.7.20131209.
 
 The package builds using the GNU 'autoconf' utilities and the
 'configure' script.  To build the package, we recommend using a separate
@@ -970,19 +970,19 @@ The package builds using the GNU 'autoconf' utilities and the
 
      $> mkdir build
      $> cd build
-     $> ../openss7-1.1.7.20141001/configure
+     $> ../openss7-1.1.7.20131209/configure
 
 In general, the package configures and builds without adding any special
 options to the 'configure' script.  For general options to the
 'configure' script, see the GNU 'INSTALL' file in the distribution:
 
-     $> less ../openss7-1.1.7.20141001/INSTALL
+     $> less ../openss7-1.1.7.20131209/INSTALL
 
 For specific options to the 'configure' script, see the
 'INSTALL-openss7' file in the distribution, or simply execute the
 configure script with the '--help' option like so:
 
-     $> ../openss7-1.1.7.20141001/configure --help
+     $> ../openss7-1.1.7.20131209/configure --help
 
 After configuring the package, the package can be compiled simply by
 issuing the 'make' command:
@@ -1029,8 +1029,8 @@ Then the build directory and tarball can be simply removed:
 
      $> cd ..
      $> rm -rf build
-     $> rm -rf openss7-1.1.7.20141001
-     $> rm -f openss7-1.1.7.20141001.tar.xz
+     $> rm -rf openss7-1.1.7.20131209
+     $> rm -f openss7-1.1.7.20131209.tar.xz
 
 Detailed Installation Instructions
 ----------------------------------
@@ -1039,7 +1039,7 @@ More detailed installation instructions can be found in the *note
 Installation::, contained in the distribution in 'text', 'info', 'html'
 and 'pdf' formats:
 
-     $> cd ../openss7-1.1.7.20141001
+     $> cd ../openss7-1.1.7.20131209
      $> less doc/manual/openss7.txt
      $> lynx doc/manual/openss7.html
      $> info doc/manual/openss7.info
@@ -1178,26 +1178,26 @@ organized by protocol suite and application.
 
 The disposition of the old subpackages is as follows:
 
-'openss7-1.1.20141001'
+'openss7-1.1.20131209'
      All 'OpenSS7 Master Package' components have been incorporated into
-     the 'openss7-1.1.7.20141001' release.  The last subpackage release
-     was 'streams-1.1.20141001'.
+     the 'openss7-1.1.7.20131209' release.  The last subpackage release
+     was 'streams-1.1.20131209'.
 
 'streams-0.9.2.4'
      All 'Linux Fast-STREAMS' components have been incorporated into the
-     'openss7-1.1.7.20141001' release.  The last subpackage release was
+     'openss7-1.1.7.20131209' release.  The last subpackage release was
      'streams-0.9.2.4'.
 
 'strutil-0.9.2.7'
      The 'strutil' package was a package that provided utilities that
      were missing in other implementations, but which were
      incoporporated into 'Linux Fast-STREAMS'. All components are
-     represented in the 'openss7-1.1.7.20141001' release.  The last
+     represented in the 'openss7-1.1.7.20131209' release.  The last
      subpackage release was 'strutil-0.9.2.4'.
 
 'strcompat-0.9.2.7'
      All 'STREAMS Compatibility Module' components have been
-     incorporated into the 'openss7-1.1.7.20141001' release with the
+     incorporated into the 'openss7-1.1.7.20131209' release with the
      exception of the deprecated compatibility modules, which have been
      discarded.  All STREAMS compatibility modules now load as part of
      the STREAMS base subsystem.  The last subpackage release was
@@ -1205,20 +1205,20 @@ The disposition of the old subpackages is as follows:
 
 'strbcm-0.9.2.5'
      All 'STREAMS Binary Compatibility Modules' components have been
-     incorporated into the 'openss7-1.1.7.20141001' build system.  The
+     incorporated into the 'openss7-1.1.7.20131209' build system.  The
      last subpackage release was 'strbcm-0.9.2.5'.
 
 'strtty-0.9.2.4'
      All 'STREAMS Terminal Subsystem' pseudo-device drivers, modules,
      library functions utilities and documentation have been
-     incorporated into the 'openss7-1.1.7.20141001' release.  All
+     incorporated into the 'openss7-1.1.7.20131209' release.  All
      STREAMS terminal modules now load as part of the STREAMS base
      subsystem.  The last subpackage release was 'strtty-0.9.2.4'.
 
 'strxns-0.9.2.7'
      All 'STREAMS X/Open Network Services' pseudo-device drivers,
      modules, library functions utilities, head files, and documentation
-     have been incorporated into the 'openss7-1.1.7.20141001' release.
+     have been incorporated into the 'openss7-1.1.7.20131209' release.
      All IP, UDP, TCP, SCTP, and Ethernet networking device drivers now
      load as part of the STREAMS base subsystem.  The last subpackage
      release was 'strxns-0.9.2.7'.
@@ -1228,7 +1228,7 @@ The disposition of the old subpackages is as follows:
      (*note (*manpages*)libxnet(3)::)) and coordinating STREAMS modules,
      including 'timod(4)' (*note (*manpages*)timod(4)::) and 'tirdwr(4)'
      (*note (*manpages*)tirdwr(4)::) have been incorporated into the
-     'openss7-1.1.7.20141001' release.  All 'XTI' modules now load as
+     'openss7-1.1.7.20131209' release.  All 'XTI' modules now load as
      part of the STREAMS base subsystem.  The last subpackage release
      was 'strxnet-0.9.2.12'.
 
@@ -1238,77 +1238,77 @@ The disposition of the old subpackages is as follows:
      (*manpages*)libsockmod(3)::)) and coordinating STREAMS drivers and
      modules ('sockmod(4)' (*note (*manpages*)sockmod(4)::),
      'socksys(4)' (*note (*manpages*)socksys(4)::)) have been
-     incorporated into the 'openss7-1.1.7.20141001' release.  All
+     incorporated into the 'openss7-1.1.7.20131209' release.  All
      modules now load as part of the STREAMS base subsystem.  The last
      subpackage release was 'strsock-0.9.2.4'.
 
 'strinet-0.9.2.7'
      The 'OpenSS7 STREAMS INET' driver ('inet(4)' (*note
      (*manpages*)inet(4)::)) has been incorporated into the
-     'openss7-1.1.7.20141001' package and now loads as part of the
+     'openss7-1.1.7.20131209' package and now loads as part of the
      STREAMS base subsystem.  The last subpackage release was
      'strinet-0.9.2.7'.
 
 'strsctp-0.9.2.9'
      The 'OpenSS7 STREAMS SCTP' driver ('sctp(4)' (*note
      (*manpages*)sctp(4)::)) has been incorporated into the
-     'openss7-1.1.7.20141001' package and now loads as part of the
+     'openss7-1.1.7.20131209' package and now loads as part of the
      STREAMS base subsystem.  The last subpackage release was
      'strsctp-0.9.2.9'.
 
 'strchan-0.9.2.4'
      All 'STREAM Channels' libraries, drivers and modules, header files,
      documentation, and SNMP agents, have been incorporated into the
-     'openss7-1.1.7.20141001' release.  They initially optionally load
+     'openss7-1.1.7.20131209' release.  They initially optionally load
      as kernel modules.  The last subpackage release was
      'strchan-0.9.2.4'.
 
 'strx25-0.9.2.1'
      All 'STREAMS X.25' and 'STREAMS Frame Relay' libraries, drivers and
      modules, header files, documentation, and SNMP agents, have been
-     incorporated into the 'openss7-1.1.7.20141001' release.  They
+     incorporated into the 'openss7-1.1.7.20131209' release.  They
      initially optionally load as optional kernel modules.  The last
      subpackage release was 'strx25-0.9.2.1'.
 
 'striso-0.9.2.4'
      All 'STREAMS ISO/OSI' libraries, drivers and modules, header files,
      documentation, and SNMP agents, have been incorporated into the
-     'openss7-1.1.7.20141001' release.  They initially optionally load
+     'openss7-1.1.7.20131209' release.  They initially optionally load
      as optional kernel modules.  The last subpackage release was
      'striso-0.9.2.4'.
 
 'strisdn-0.9.2.4'
      All 'STREAMS ISDN' libraries, drivers and modules, header files,
      documentation, and SNMP agents, have been incorporated into the
-     'openss7-1.1.7.20141001' release.  They initially optionally load
+     'openss7-1.1.7.20131209' release.  They initially optionally load
      as optional kernel modules.  The last subpackage release was
      'strisdn-0.9.2.4'.
 
 'stratm-0.9.2.1'
      All 'STREAMS ATM' libraries, drivers and modules, header files,
      documentation, and SNMP agents, have been incorporated into the
-     'openss7-1.1.7.20141001' release.  They initially optionally load
+     'openss7-1.1.7.20131209' release.  They initially optionally load
      as optional kernel modules.  The last subpackage release was
      'stratm-0.9.2.1'.
 
 'strss7-0.9a.8'
      All 'STREAMS SS7' libraries, drivers and modules, header files,
      documentation, and SNMP agents, have been incorporated into the
-     'openss7-1.1.7.20141001' release.  They initially optionally load
+     'openss7-1.1.7.20131209' release.  They initially optionally load
      as optional kernel modules.  The last subpackage release was
      'strss7-0.9a.8'.
 
 'sigtran-0.9.2.4'
      All 'STREAMS SIGTRAN' libraries, drivers and modules, header files,
      documentation, and SNMP agents, have been incorporated into the
-     'openss7-1.1.7.20141001' release.  They initially optionally load
+     'openss7-1.1.7.20131209' release.  They initially optionally load
      as optional kernel modules.  The last subpackage release was
      'sigtran-0.9.2.4'.
 
 'strvoip-0.9.2.4'
      All 'STREAMS VOIP' libraries, drivers and modules, header files,
      documentation, and SNMP agents, have been incorporated into the
-     'openss7-1.1.7.20141001' release.  They initially optionally load
+     'openss7-1.1.7.20131209' release.  They initially optionally load
      as optional kernel modules.  The last subpackage release was
      'strvoip-0.9.2.4'.
 
@@ -2766,7 +2766,7 @@ subdirectory.  To use the header files from the package,
 preprocessor option.
 
 Following are the user visible header files provided by the
-'openss7-1.1.7.20141001' package in the directory
+'openss7-1.1.7.20131209' package in the directory
 '/usr/include/openss7':
 
 4.1.1 User Space Programs
@@ -3015,7 +3015,7 @@ drivers written to the Transport Provider Interface.
 =============
 
 Shared or static version of the 'libxnet' library may be linked when
-using the 'openss7-1.1.7.20141001' package.(1)  The library may either
+using the 'openss7-1.1.7.20131209' package.(1)  The library may either
 be specified on the 'gcc' command line as a shared library (e.g.
 '-lxnet') or as a static library (e.g.  '/usr/lib/libxnet.a').
 
@@ -3241,14 +3241,14 @@ important intricacies should be considered:
 
    * The 'gcc' command line must include several important files
      directly on the command line, such as, '--include
-     /lib/modules/3.0.99-1-unx/build/include/linux/autoconf.h' and
+     /lib/modules/3.4.92-1-lts34/build/include/linux/autoconf.h' and
      '--include
-     /lib/modules/3.0.99-1-unx/build/include/linux/modversions.h'.(1)
+     /lib/modules/3.4.92-1-lts34/build/include/linux/modversions.h'.(1)
 
    ---------- Footnotes ----------
 
-   (1) The kernel version, '3.0.99-1-unx', is just an example.  For the
-running kernel, use the output of 'uname -r'.
+   (1) The kernel version, '3.4.92-1-lts34', is just an example.  For
+the running kernel, use the output of 'uname -r'.
 
 4.3.1 Kernel Module Building
 ----------------------------
@@ -3557,7 +3557,7 @@ To assist in the development of user programs and STREAMS driver or
 modules using the 'OpenSS7' protocol module, the following manual pages
 are provided:
 
-The 'openss7-1.1.7.20141001' package installs a number of manual pages
+The 'openss7-1.1.7.20131209' package installs a number of manual pages
 in the '/usr/share/man' directory as follows:
 
 The following manual pages are installed in Section 3 of the manual (in
@@ -3969,7 +3969,7 @@ welcome to sponsor the project with a test machine.
 The sections that follow provide information on OpenSS7 releases of the
 'OpenSS7' package.
 
-Major changes for release openss7-1.1.7.20141001
+Major changes for release openss7-1.1.7.20131209
 ------------------------------------------------
 
 This is the seventh release of the 'OpenSS7' package.  This is a
@@ -4498,8 +4498,8 @@ and DEBs for popular distributions.  See the package page
 DEBs.  See the repository page (http://www.openss7.org/repos.html) for
 information concerning network installation and update sources.
 
-See <http://www.openss7.org/codefiles/openss7-1.1.7.20141001/ChangeLog>
-and <http://www.openss7.org/codefiles/openss7-1.1.7.20141001/NEWS> in
+See <http://www.openss7.org/codefiles/openss7-1.1.7.20131209/ChangeLog>
+and <http://www.openss7.org/codefiles/openss7-1.1.7.20131209/NEWS> in
 the release for more information.  Also, see the 'openss7.pdf' manual in
 the release (also in html (http://www.openss7.org/openss7_manual.html)).
 
@@ -4600,8 +4600,8 @@ SRPM, DSC, and set of binary RPMs and DEBs.  See the downloads page
 SRPMs and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs, see
 the openss7 package page (http://www.openss7.org/openss7_pkg.html).
 
-See <http://www.openss7.org/codefiles/openss7-1.1.7.20141001/ChangeLog>
-and <http://www.openss7.org/codefiles/openss7-1.1.7.20141001/NEWS> in
+See <http://www.openss7.org/codefiles/openss7-1.1.7.20131209/ChangeLog>
+and <http://www.openss7.org/codefiles/openss7-1.1.7.20131209/NEWS> in
 the release for more information.  Also, see the 'openss7.pdf' manual in
 the release (also in html <http://www.openss7.org/openss7_manual.html>).
 
@@ -7990,7 +7990,7 @@ Independent RPM
 
 Independent RPM are not dependent on the Linux kernel version.  For
 example, the source package
-'openss7-source-1.1.7.20141001-1.noarch.rpm', is not dependent on
+'openss7-source-1.1.7.20131209-1.noarch.rpm', is not dependent on
 kernel.
 
 All of the following kernel independent RPM are required for your
@@ -8006,21 +8006,21 @@ Architecture independent RPMs are not dependent upon the processor
 architecture.  That is, they are 'noarch' RPMs.  The architecture
 independent RPMs in the 'OpenSS7' components are as follows:
 
-'openss7-repo-1.1.7.20141001-1.noarch.rpm'
+'openss7-repo-1.1.7.20131209-1.noarch.rpm'
 
      This packages can be used to install or remove the repository
      source definitions for all OpenSS7 release packages.  On systems
      that support repository access, this package is required by the
      other packages.
 
-'openss7-1.1.7.20141001-1.noarch.rpm'
+'openss7-1.1.7.20131209-1.noarch.rpm'
 
      This package can be used to install or remove the entire OpenSS7
      package.  When installing, kernel modules will be installed
      automatically for the highest version kernel on your system.  When
      removing, all corresponding kernel modules will also be removed.
 
-'openss7-base-1.1.7.20141001-1.noarch.rpm'
+'openss7-base-1.1.7.20131209-1.noarch.rpm'
 
      The 'openss7-base' binary package contains the init scripts, test
      scripts, maintenance scripts and base system configuration files
@@ -8031,7 +8031,7 @@ independent RPMs in the 'OpenSS7' components are as follows:
      package is required for any installation of the OpenSS7 package and
      is not architecture specific ('noarch').
 
-'openss7-doc-1.1.7.20141001-1.noarch.rpm'
+'openss7-doc-1.1.7.20131209-1.noarch.rpm'
 
      The 'openss7-doc' binary package contains the documentation used in
      the development of applications and programs that use the package.
@@ -8044,7 +8044,7 @@ independent RPMs in the 'OpenSS7' components are as follows:
      normally necessary except on a development system.  The package is
      not architecture specific ('noarch').
 
-'openss7-javadoc-1.1.7.20141001-1.noarch.rpm'
+'openss7-javadoc-1.1.7.20131209-1.noarch.rpm'
 
      The 'openss7-javadoc' binary package contains Javadoc documentation
      for the OpenSS7 package.  Install this binary package if you are
@@ -8057,10 +8057,10 @@ Architecture Dependent
 
 Architecture dependent RPMs are dependent upon the processor
 architecture (but not on the specific kernel version).  That is, they
-are 'i686' RPMs.  The architecture dependent RPMs in the 'OpenSS7'
+are 'x86_64' RPMs.  The architecture dependent RPMs in the 'OpenSS7'
 components are as follows:
 
-'openss7-lib-1.1.7.20141001-1.i686.rpm'
+'openss7-lib-1.1.7.20131209-1.x86_64.rpm'
 
      The 'openss7-lib' binary package contains the run-time (shared
      object) libraries necessary to run applications programs and
@@ -8072,7 +8072,7 @@ components are as follows:
      that these utilities are needed for running the validation test
      suites contained in the 'openss7-base' binary package.
 
-'openss7-java-1.1.7.20141001-1.i686.rpm'
+'openss7-java-1.1.7.20131209-1.x86_64.rpm'
 
      The 'openss7-java' binary package contains JAIN implementations for
      OpenSS7 Linux Fast-STREAMS and the associated protocol suites.  It
@@ -8080,7 +8080,7 @@ components are as follows:
      libraries.  It also includes SWIG implementations of Java
      interfaces for OpenSS7 API libraries.
 
-'openss7-devel-1.1.7.20141001-1.i686.rpm'
+'openss7-devel-1.1.7.20131209-1.x86_64.rpm'
 
      The 'openss7-devel' binary package contains library archives for
      static compilation, and header files to develop Linux Fast-STREAMS
@@ -8099,7 +8099,7 @@ components are as follows:
      will also be installed.  When removing, the development package and
      all kernel module development packages will also be removed.
 
-'openss7-debuginfo-1.1.7.20141001-1.i686.rpm'
+'openss7-debuginfo-1.1.7.20131209-1.x86_64.rpm'
 
      The 'openss7-debuginfo' binary package contains debugging
      information stripped from C-language libraries and C-language
@@ -8116,7 +8116,7 @@ components are as follows:
      information package and all kernel module debug information
      packages will also be removed.
 
-'openss7-debugsource-1.1.7.20141001-1.i686.rpm'
+'openss7-debugsource-1.1.7.20131209-1.x86_64.rpm'
 
      The 'openss7-debugsource' binary package contains debugging source
      references stripped from C-language libraries and C-language binary
@@ -8145,7 +8145,7 @@ architecture and kernel version.  If your architecture or kernel version
 is not available, you can build binary RPM from the source RPM (see
 *note Building from the Source RPM::).(1)
 
-'openss7-3.0.99-1-unx-1.1.7.20141001-1.i686.rpm'
+'openss7-3.4.92-1-lts34-1.1.7.20131209-1.x86_64.rpm'
 
      The 'openss7-kernel' binary package contains the kernel modules
      that provide the Linux kernel Linux Fast-STREAMS drivers and
@@ -8154,7 +8154,7 @@ is not available, you can build binary RPM from the source RPM (see
      This binary package also includes modprobe configuration files for
      the associated kernel modules.  This package is heavily tied to the
      kernel for which it and dependent components were compiled.  This
-     package applies to kernel version 3.0.99-1-unx and requires
+     package applies to kernel version 3.4.92-1-lts34 and requires
      components compiled for the same kernel.  If you cannot find a
      binary package that matches your kernel, rebuild for your kernel
      from the OpenSS7 package source rpm.
@@ -8164,19 +8164,19 @@ is not available, you can build binary RPM from the source RPM (see
      will also be installed if necessary.  When removing the last kernel
      module package, the 'openss7' package will also be removed.
 
-     Note that the version '3.0.99-1-unx' is just an example.  Use the
+     Note that the version '3.4.92-1-lts34' is just an example.  Use the
      version returned by '$(uname -r)' for the kernel for which you wish
      to install or remove the packages.
 
-'openss7-devel-3.0.99-1-unx-1.1.7.20141001-1.i686.rpm'
+'openss7-devel-3.4.92-1-lts34-1.1.7.20131209-1.x86_64.rpm'
 
-     The 'openss7-devel-3.0.99-1-unx' binary package contains the kernel
-     modules symbol information for development of additional Linux
-     Fast-STREAMS kernel modules against the core kernel modules
-     included in the 'openss7-3.0.99-1-unx' binary package.  This
+     The 'openss7-devel-3.4.92-1-lts34' binary package contains the
+     kernel modules symbol information for development of additional
+     Linux Fast-STREAMS kernel modules against the core kernel modules
+     included in the 'openss7-3.4.92-1-lts34' binary package.  This
      package is heavily tied to the core kernel modules and kernel for
      which it was compiled.  This package applies to core kernel modules
-     '3.0.99-1-unx' for kernel version '3.0.99-1-unx'.  This package
+     '3.4.92-1-lts34' for kernel version '3.4.92-1-lts34'.  This package
      provides kernel debug information for the OpenSS7 package.  Kernel
      debug information is useful when developing kernel modules that use
      this package or when debugging kernel modules contained in the
@@ -8189,41 +8189,41 @@ is not available, you can build binary RPM from the source RPM (see
      modules for the last kernel, the 'openss7-devel' package will also
      be removed.
 
-     Note that the version '3.0.99-1-unx' is just an example.  Use the
+     Note that the version '3.4.92-1-lts34' is just an example.  Use the
      version returned by '$(uname -r)' for the kernel for which you wish
      to install or remove the packages.
 
-     The 'openss7-devel-3.0.99-1-unx' package contains the module symbol
-     version information for the 'kernel' package, above.  It is
+     The 'openss7-devel-3.4.92-1-lts34' package contains the module
+     symbol version information for the 'kernel' package, above.  It is
      possible to load this package and compile modules that use the
      exported symbols without loading the actual kernel modules (from
      the 'kernel' package above).  This package is heavily tied to the
      kernel for which it was compiled.  This particular package applies
-     to kernel version '3.0.99-1-unx'.(2)
+     to kernel version '3.4.92-1-lts34'.(2)
 
-'openss7-debuginfo-3.0.99-1-unx-1.1.7.20141001-1.i686.rpm'
+'openss7-debuginfo-3.4.92-1-lts34-1.1.7.20131209-1.x86_64.rpm'
 
-'openss7-debugsource-3.0.99-1-unx-1.1.7.20141001-1.i686.rpm'
+'openss7-debugsource-3.4.92-1-lts34-1.1.7.20131209-1.x86_64.rpm'
 
-'openss7-source-3.0.99-1-unx-1.1.7.20141001-1.i686.rpm'
+'openss7-source-3.4.92-1-lts34-1.1.7.20131209-1.x86_64.rpm'
 
-     The 'openss7-source-3.0.99-1-unx' package contains the configured
+     The 'openss7-source-3.4.92-1-lts34' package contains the configured
      source for a specific kernel.  This package contains source that is
      configured to the kernel for which it was configured.  This
      particular package contains configured source for kernel version
-     '3.0.99-1-unx'(3) The 'openss7-source' package contains the source
-     code necessary for building the OpenSS7 release.  It includes the
-     'autoconf(1)' configuration utilities necessary to create and
-     distribute tarballs, 'rpm' and 'deb'/'dsc'.
+     '3.4.92-1-lts34'(3) The 'openss7-source' package contains the
+     source code necessary for building the OpenSS7 release.  It
+     includes the 'autoconf(1)' configuration utilities necessary to
+     create and distribute tarballs, 'rpm' and 'deb'/'dsc'.
 
-     The 'openss7-source-3.0.99-1-unx' binary package contains the
+     The 'openss7-source-3.4.92-1-lts34' binary package contains the
      source code necessary for building the OpenSS7 release for the
-     kernel version '3.0.99-1-unx'.  It also includes the 'autoconf(1)'
-     configuration utilities necessary to create and distribute this
-     rpm.  However, to develop on the package, it would be better to use
-     the tarball release.  Load this package if you need some files from
-     the build that are not present in the 'openss7-devel-3.0.99-1-unx'
-     package.
+     kernel version '3.4.92-1-lts34'.  It also includes the
+     'autoconf(1)' configuration utilities necessary to create and
+     distribute this rpm.  However, to develop on the package, it would
+     be better to use the tarball release.  Load this package if you
+     need some files from the build that are not present in the
+     'openss7-devel-3.4.92-1-lts34' package.
 
 Configuration and Installation
 ..............................
@@ -8239,9 +8239,9 @@ placed in i586 architecture packages regardless of the true processor
 architecture of the kernel package.  'configure' detects this and builds
 the appropriate packages.
 
-   (2) Note that the '_kversion' of '3.0.99-1-unx' is only an example.
+   (2) Note that the '_kversion' of '3.4.92-1-lts34' is only an example.
 
-   (3) Note that the '_kversion' of '3.0.99-1-unx' is only an example.
+   (3) Note that the '_kversion' of '3.4.92-1-lts34' is only an example.
 
 7.2.6 Downloading the Debian DEB
 --------------------------------
@@ -8260,7 +8260,7 @@ Independent DEB
 ...............
 
 Independent DEB are not dependent on the Linux kernel version.  For
-example, the source package 'openss7-source_1.1.7.20141001-0_i386.deb',
+example, the source package 'openss7-source_1.1.7.20131209-0_i386.deb',
 is not dependent on kernel.
 
 All of the following kernel independent DEB are required for your
@@ -8272,25 +8272,25 @@ is not available, you can build binary DEB from the Debian DSC (see
 Architecture Independent
 ........................
 
-openss7-repo_1.1.7.20141001-0_all.deb
+openss7-repo_1.1.7.20131209-0_all.deb
 
-openss7-dev_1.1.7.20141001-0_all.deb
+openss7-dev_1.1.7.20131209-0_all.deb
      The 'openss7-dev' package contains the device definitions necessary
      to run applications programs developed for OpenSS7.  (1)
 
-openss7-doc_1.1.7.20141001-0_all.deb
+openss7-doc_1.1.7.20131209-0_all.deb
      The 'openss7-doc' package contains this manual in plain text,
      postscript, 'pdf' and 'html' forms, along with the meta-information
      from the 'OpenSS7' package.  It also contains all of the manual
      pages necessary for developing OpenSS7 applications and OpenSS7
      STREAMS modules or drivers.
 
-openss7-init_1.1.7.20141001-0_all.deb
+openss7-init_1.1.7.20131209-0_all.deb
      The 'openss7-init' package contains the 'init' scripts and provides
      the 'postinst' scripts necessary to create kernel module preloads
      and modules definitions for all kernel module 'core' subpackages.
 
-openss7-source_1.1.7.20141001-0_all.deb
+openss7-source_1.1.7.20131209-0_all.deb
      The 'openss7-source' package contains the source code necessary for
      building the OpenSS7 release.  It includes the 'autoconf(1)'
      configuration utilities necessary to create and distribute
@@ -8299,20 +8299,20 @@ openss7-source_1.1.7.20141001-0_all.deb
 Architecture Dependent
 ......................
 
-openss7-devel_1.1.7.20141001-0_i386.deb
+openss7-devel_1.1.7.20131209-0_i386.deb
      The 'openss7-devel' package contains library archives for static
      compilation, header files to develop OpenSS7 modules and drivers.
      This also includes the header files and static libraries required
      to compile OpenSS7 applications programs.
 
-openss7-lib_1.1.7.20141001-0_i386.deb
+openss7-lib_1.1.7.20131209-0_i386.deb
      The 'openss7-lib' package contains the run-time shared libraries
      necessary to run application programs and utilities developed for
      the 'OpenSS7' package.
 
-openss7-debuginfo_1.1.7.20141001-0_i386.deb
+openss7-debuginfo_1.1.7.20131209-0_i386.deb
 
-openss7-debugsource_1.1.7.20141001-0_i386.deb
+openss7-debugsource_1.1.7.20131209-0_i386.deb
 
 Kernel-Dependent DEB
 ....................
@@ -8327,20 +8327,20 @@ architecture and kernel version.  If your architecture or kernel version
 is not on the list, you can build binary DEB from the source DEB (see
 *note Building from the Debian DSC::).(2)
 
-openss7-core-3.0.99-1-unx_1.1.7.20141001-0_i386.deb
+openss7-core-3.4.92-1-lts34_1.1.7.20131209-0_i386.deb
      The 'openss7-core' package contains the loadable kernel modules
      that depend only on the kernel.  This package is heavily tied to
      the kernel for which it was compiled.  This particular package
-     applies to kernel version '3.0.99-1-unx'.(3)
+     applies to kernel version '3.4.92-1-lts34'.(3)
 
-openss7-info-3.0.99-1-unx_1.1.7.20141001-0_i386.deb
+openss7-info-3.4.92-1-lts34_1.1.7.20131209-0_i386.deb
      The 'openss7-info' package(4) contains the module symbol version
      information for the 'core' subpackage, above.  It is possible to
      load this subpackage and compile modules that use the exported
      symbols without loading the actual kernel modules (from the 'core'
      subpackage above).  This package is heavily tied to the kernel for
      which it was compiled.  This particular package applies to kernel
-     version '3.0.99-1-unx'.(5)
+     version '3.4.92-1-lts34'.(5)
 
 Configuration and Installation
 ..............................
@@ -8360,7 +8360,7 @@ placed in i586 architecture packages regardless of the true processor
 architecture of the kernel package.  'configure' detects this and builds
 the appropriate packages.
 
-   (3) Note that the '_kversion' of '3.0.99-1-unx' is only an example.
+   (3) Note that the '_kversion' of '3.4.92-1-lts34' is only an example.
 Note also that only release packages that contain kernel modules will
 contain a 'core' subpackage.
 
@@ -8369,7 +8369,7 @@ that export versioned symbols will contain a 'info' subpackage.  Also,
 this subpackage is only applicable to 2.4 series kernels and is not
 necessary and not built for 2.6 or 3.x series kernels.
 
-   (5) Note that the '_kversion' of '3.0.99-1-unx' is only an example.
+   (5) Note that the '_kversion' of '3.4.92-1-lts34' is only an example.
 
 7.2.7 Downloading the Source RPM
 --------------------------------
@@ -8377,7 +8377,7 @@ necessary and not built for 2.6 or 3.x series kernels.
 If you cannot obtain a binary RPM for your architecture, or would like
 to roll you own binary RPM, download the following source RPM.
 
-openss7-1.1.7.20141001-1.src.rpm
+openss7-1.1.7.20131209-1.src.rpm
      This is the source RPM for the package.  From this source RPM it is
      possible to build binary RPM for any supported architecture and for
      any 2.4, 2.6 or 3.x kernel.
@@ -8393,8 +8393,8 @@ To configure the source RPM, *note Configuring the Source RPM::.
 If you cannot obtain a binary DEB for your architecture, or would like
 to roll your own DEB, download the following Debian DSC.
 
-openss7_1.1.7.20141001-0.dsc
-openss7_1.1.7.20141001-0.tar.gz
+openss7_1.1.7.20131209-0.dsc
+openss7_1.1.7.20131209-0.tar.gz
      This is the Debian DSC for the package.  From this Debian DSC it is
      possible to build binary DEB for any supported architecture and for
      any 2.4, 2.6 or 3.x kernel.
@@ -8410,8 +8410,8 @@ To configure the source RPM, *note Configuring the Debian DSC::.
 For non-'rpm(8)' and non-'dpkg(1)' architectures, download the tarball
 as follows:
 
-openss7-1.1.7.20141001.tar.bz2
-openss7-1.1.7.20141001.tar.xz
+openss7-1.1.7.20131209.tar.bz2
+openss7-1.1.7.20131209.tar.xz
      These are the 'tar(1)' balls for the release.  These 'tar(1)' balls
      contain the 'autoconf(1)' distribution which includes all the
      source necessary for building and installing the package.  These
@@ -8420,11 +8420,11 @@ openss7-1.1.7.20141001.tar.xz
 
 The tar ball may be downloaded easily with 'wget(1)' as follows:
 
-     % wget https://www.openss7.org/repo/tarballs/openss7-1.1.7.20141001.tar.bz2
+     % wget https://www.openss7.org/repo/tarballs/openss7-1.1.7.20131209.tar.bz2
 
 or
 
-     % wget https://www.openss7.org/repo/tarballs/openss7-1.1.7.20141001.tar.xz
+     % wget https://www.openss7.org/repo/tarballs/openss7-1.1.7.20131209.tar.xz
 
 Note that you will need an 'OpenSS7 Project' user name and password to
 download release candidates (which are only available to subscribers and
@@ -8436,15 +8436,15 @@ Unpacking the Archive
 After downloading one of the tar balls, unpack the archive using one of
 the following commands:
 
-     % wget https://www.openss7.org/repo/tarballs/openss7-1.1.7.20141001.tar.bz2
-     % tar -xjvf openss7-1.1.7.20141001.tar.bz2
+     % wget https://www.openss7.org/repo/tarballs/openss7-1.1.7.20131209.tar.bz2
+     % tar -xjvf openss7-1.1.7.20131209.tar.bz2
 
 or
 
-     % wget https://www.openss7.org/repo/tarballs/openss7-1.1.7.20141001.tar.xz
-     % tar -xJvf openss7-1.1.7.20141001.tar.xz
+     % wget https://www.openss7.org/repo/tarballs/openss7-1.1.7.20131209.tar.xz
+     % tar -xJvf openss7-1.1.7.20131209.tar.xz
 
-Either will create a subdirectory name 'openss7-1.1.7.20141001'
+Either will create a subdirectory name 'openss7-1.1.7.20131209'
 containing all of the files and subdirectories for the 'OpenSS7'
 package.
 
@@ -8470,7 +8470,7 @@ commands to check out a version from the archive:
      % export CVSROOT=':pserver:USERNAME@cvs.openss7.org:2401/var/cvs'
      % cvs login
      Password: *********
-     % cvs co -r openss7_1.1.7.20141001 openss7
+     % cvs co -r openss7_1.1.7.20131209 openss7
      % cvs logout
 
 It is, of course, possible to check out by date or by other criteria.
@@ -8637,39 +8637,39 @@ during installation it is possible to relocate some of the installation
 directories.  This allows some degree of customization.  Relocations
 that are available on the binary RPM are as follows:
 
-'openss7-core-3.0.99-1-unx-1.1.7.20141001-1.i686.rpm'
-     '/lib/modules/3.0.99-1-unx'
+'openss7-core-3.4.92-1-lts34-1.1.7.20131209-1.i686.rpm'
+     '/lib/modules/3.4.92-1-lts34'
           This relocatable directory contains the kernel modules that
           provide the OpenSS7 core, drivers and modules.(1)
 
-'openss7-info-3.0.99-1-unx-1.1.7.20141001-1.i686.rpm'
-     '/usr/include/openss7/3.0.99-1-unx'
+'openss7-info-3.4.92-1-lts34-1.1.7.20131209-1.i686.rpm'
+     '/usr/include/openss7/3.4.92-1-lts34'
           This relocatable directory contains the kernel module exported
           symbol information that allows other kernel modules to be
           compiled against the correct version of the openss7
           package.(2)
 
-'openss7-dev-1.1.7.20141001-1.i686.rpm'
+'openss7-dev-1.1.7.20131209-1.i686.rpm'
      (not relocatable)
 
-'openss7-devel-1.1.7.20141001-1.i686.rpm'
+'openss7-devel-1.1.7.20131209-1.i686.rpm'
      '/usr/lib'
           This relocatable directory contains openss7 libraries.
      '/usr/include/openss7'
           This relocatable directory contains openss7 header files.
 
-'openss7-doc-1.1.7.20141001-1.i686.rpm'
+'openss7-doc-1.1.7.20131209-1.i686.rpm'
      '/usr/share/doc'
           This relocatable directory contains all package specific
           documentation (including this manual).  The subdirectory in
-          this directory is the 'openss7-1.1.7.20141001' directory.
+          this directory is the 'openss7-1.1.7.20131209' directory.
      '/usr/share/info'
           This relocatable directory contains info files (including the
           info version of this manual).
      '/usr/share/man'
           This relocatable directory contains manual pages.
 
-'openss7-lib-1.1.7.20141001-1.i686.rpm'
+'openss7-lib-1.1.7.20131209-1.i686.rpm'
      '/usr/lib'
           This relocatable directory contains the run-time shared
           libraries necessary to run applications programs and utilities
@@ -8678,11 +8678,11 @@ that are available on the binary RPM are as follows:
           This relocatable directory contains the locale information for
           shared library files.
 
-'openss7-source-1.1.7.20141001-1.i686.rpm'
+'openss7-source-1.1.7.20131209-1.i686.rpm'
      '/usr/src'
           This relocatable directory contains the source code.
 
-'openss7-util-1.1.7.20141001-1.i686.rpm'
+'openss7-util-1.1.7.20131209-1.i686.rpm'
      '/usr/bin'
           This relocatable directory contains binary programs and
           utilities.
@@ -8702,9 +8702,9 @@ To install the binary RPM, *note Installing the Binary RPM::.
 
    ---------- Footnotes ----------
 
-   (1) Note that the '_kversion' of '3.0.99-1-unx' is only an example.
+   (1) Note that the '_kversion' of '3.4.92-1-lts34' is only an example.
 
-   (2) Note that the '_kversion' of '3.0.99-1-unx' is only an example.
+   (2) Note that the '_kversion' of '3.4.92-1-lts34' is only an example.
 Also, note that the 'info' subpackage is only applicable to the 2.4
 kernel series.
 
@@ -11226,8 +11226,8 @@ them as described above (*note Installing the Binary RPM::).
 
 The source RPM is rebuilt to binary RPMs as follows:
 
-     % wget https://www.openss7.org/repo/rpms/SRPMS/openss7-1.1.7.20141001-1.src.rpm
-     % rpmbuild --rebuild -vv openss7-1.1.7.20141001-1.src.rpm
+     % wget https://www.openss7.org/repo/rpms/SRPMS/openss7-1.1.7.20131209-1.src.rpm
+     % rpmbuild --rebuild -vv openss7-1.1.7.20131209-1.src.rpm
 
 The rebuild process can also recognize a number of options that can be
 used to tweak the resulting binaries, *note Configuring the Source
@@ -11235,10 +11235,10 @@ RPM::.  These options are provided on the 'rpm(8)' command line.  For
 example:
 
      % rpmbuild --rebuild -vv --target athlon-redhat-linux \
-       --define "_kversion 3.0.99-1-unx" \
-       -- openss7-1.1.7.20141001-1.src.rpm
+       --define "_kversion 3.4.92-1-lts34" \
+       -- openss7-1.1.7.20131209-1.src.rpm
 
-will rebuild binary RPM for the '3.0.99-1-unx' kernel for the 'athlon'
+will rebuild binary RPM for the '3.4.92-1-lts34' kernel for the 'athlon'
 architecture.  (1)
 
 Installation
@@ -11248,7 +11248,7 @@ To install the resulting binary RPM, *note Installing the Binary RPM::.
 
    ---------- Footnotes ----------
 
-   (1) Note that the '_kversion' of '3.0.99-1-unx' is only an example.
+   (1) Note that the '_kversion' of '3.4.92-1-lts34' is only an example.
 
 7.4.2 Building from the Debian DSC
 ----------------------------------
@@ -11260,9 +11260,9 @@ them as described above (*note Installing the Debian DEB::).
 
 The Debian DSC is rebuilt to binary DEBs as follows:
 
-     % wget http://www.openss7.org/debian/openss7_1.1.7.20141001-0.dsc
-     % wget http://www.openss7.org/debian/openss7_1.1.7.20141001-0.tar.gz
-     % dpkg-buildpackage -v openss7_1.1.7.20141001-0.dsc
+     % wget http://www.openss7.org/debian/openss7_1.1.7.20131209-0.dsc
+     % wget http://www.openss7.org/debian/openss7_1.1.7.20131209-0.tar.gz
+     % dpkg-buildpackage -v openss7_1.1.7.20131209-0.dsc
 
 The rebuild process can also recognize a number of options that can be
 used to tweak the resulting binaries, *note Configuring the Debian
@@ -11271,12 +11271,12 @@ BUILD_DPKGOPTIONS and have the same form as the options to 'configure',
 *note Configuring the Tar Ball::.  For example:
 
      % BUILD_DEBOPTIONS='
-             --with-k-release=3.0.99-1-unx
+             --with-k-release=3.4.92-1-lts34
              --host=athlon-debian-linux-gnu'
        dpkg-buildpackage -v \
-       openss7_1.1.7.20141001-0.dsc
+       openss7_1.1.7.20131209-0.dsc
 
-will rebuild binary DEB for the '3.0.99-1-unx' kernel for the 'athlon'
+will rebuild binary DEB for the '3.4.92-1-lts34' kernel for the 'athlon'
 architecture.  (1)
 
 Installation
@@ -11286,7 +11286,7 @@ To install the resulting binary DEB, *note Installing the Debian DEB::.
 
    ---------- Footnotes ----------
 
-   (1) Note that the '_kversion' of '3.0.99-1-unx' is only an example.
+   (1) Note that the '_kversion' of '3.4.92-1-lts34' is only an example.
 
 7.4.3 Building from the Tar Ball
 --------------------------------
@@ -11300,9 +11300,9 @@ then the following instructions will rebuild the package on your system.
 
 Following is an example of a native build against the running kernel:
 
-     % wget https://www.openss7.org/repo/tarballs/openss7-1.1.7.20141001.tar.xz
-     % tar -xJvf openss7-1.1.7.20141001.tar.xz
-     % pushd openss7-1.1.7.20141001
+     % wget https://www.openss7.org/repo/tarballs/openss7-1.1.7.20131209.tar.xz
+     % tar -xJvf openss7-1.1.7.20131209.tar.xz
+     % pushd openss7-1.1.7.20131209
      % ./configure
      % make
      % popd
@@ -11319,9 +11319,9 @@ usual places where GNU 'autoconf(1)' can find them, or they must be
 specified with declarations such as 'CC=/usr/lib/ppc-linux/gcc' on the
 'configure' command line.
 
-     % wget https://www.openss7.org/repo/tarballs/openss7-1.1.7.20141001.tar.xz
-     % tar -xJvf openss7-1.1.7.20141001.tar.xz
-     % pushd openss7-1.1.7.20141001
+     % wget https://www.openss7.org/repo/tarballs/openss7-1.1.7.20131209.tar.xz
+     % tar -xJvf openss7-1.1.7.20131209.tar.xz
+     % pushd openss7-1.1.7.20131209
      % ./configure DESTDIR="/some/other/root" \
      	--with-k-release=2.4.18 --host sparc-linux
      % make
@@ -11362,10 +11362,10 @@ To add an additional 'OpenSS7' kernel run-time component to the
 installation, use (one of):
 
      % sudo yum install openss7-$(uname -r)
-     % sudo yum install openss7-3.0.99-1-unx
+     % sudo yum install openss7-3.4.92-1-lts34
 
 Here, '$(uname -r)' is simply a way of specifying the running kernel.
-The value '3.0.99-1-unx' is just an example.  Use the specific kernel
+The value '3.4.92-1-lts34' is just an example.  Use the specific kernel
 version that you want to add to the installation.
 
 To install the 'OpenSS7' development components for a single-kernel
@@ -11379,10 +11379,10 @@ To add an additional 'OpenSS7' kernel development component to the
 installation, use (one of):
 
      % sudo yum install openss7-devel-$(uname -r)
-     % sudo yum install openss7-devel-3.0.99-1-unx
+     % sudo yum install openss7-devel-3.4.92-1-lts34
 
 Here, '$(uname -r)' is simply a way of specifying the running kernel.
-The value '3.0.99-1-unx' is just an example.  Use the specific kernel
+The value '3.4.92-1-lts34' is just an example.  Use the specific kernel
 version that you want to add to the installation.
 
 To add 'OpenSS7' development documentation, use (one of):
@@ -11420,10 +11420,10 @@ To add an additional 'OpenSS7' kernel run-time component to the
 installation, use (one of):
 
      % sudo zypper install openss7-$(uname -r)
-     % sudo zypper install openss7-3.0.99-1-unx
+     % sudo zypper install openss7-3.4.92-1-lts34
 
 Here, '$(uname -r)' is simply a way of specifying the running kernel.
-The value '3.0.99-1-unx' is just an example.  Use the specific kernel
+The value '3.4.92-1-lts34' is just an example.  Use the specific kernel
 version that you want to add to the installation.
 
 To install the 'OpenSS7' development components for a single-kernel
@@ -11436,10 +11436,10 @@ To add an additional 'OpenSS7' kernel development component to the
 installation, use (one of):
 
      % sudo zypper install openss7-devel-$(uname -r)
-     % sudo zypper install openss7-devel-3.0.99-1-unx
+     % sudo zypper install openss7-devel-3.4.92-1-lts34
 
 Here, '$(uname -r)' is simply a way of specifying the running kernel.
-The value '3.0.99-1-unx' is just an example.  Use the specific kernel
+The value '3.4.92-1-lts34' is just an example.  Use the specific kernel
 version that you want to add to the installation.
 
 To add 'OpenSS7' development documentation, use (one of):
@@ -11474,10 +11474,10 @@ To add an additional 'OpenSS7' kernel run-time component to the
 installation, use (one of):
 
      % sudo urpmi openss7-$(uname -r)
-     % sudo urpmi openss7-3.0.99-1-unx
+     % sudo urpmi openss7-3.4.92-1-lts34
 
 Here, '$(uname -r)' is simply a way of specifying the running kernel.
-The value '3.0.99-1-unx' is just an example.  Use the specific kernel
+The value '3.4.92-1-lts34' is just an example.  Use the specific kernel
 version that you want to add to the installation.
 
 To install the 'OpenSS7' development components for a single-kernel
@@ -11491,7 +11491,7 @@ installation, use (one of):
      % sudo urpmi openss7-devel-$(uname -r)
 
 Here, '$(uname -r)' is simply a way of specifying the running kernel.
-The value '3.0.99-1-unx' is just an example.  Use the specific kernel
+The value '3.4.92-1-lts34' is just an example.  Use the specific kernel
 version that you want to add to the installation.
 
 To add 'OpenSS7' development documentation, use (one of):
@@ -11527,12 +11527,12 @@ To add an additional 'OpenSS7' kernel run-time component to the
 installation, use (one of):
 
      % sudo apt-get install openss7-$(uname -r)
-     % sudo apt-get install openss7-3.0.99-1-unx
+     % sudo apt-get install openss7-3.4.92-1-lts34
      % sudo aptitude install openss7-$(uname -r)
-     % sudo aptitude install openss7-3.0.99-1-unx
+     % sudo aptitude install openss7-3.4.92-1-lts34
 
 Here, '$(uname -r)' is simply a way of specifying the running kernel.
-The value '3.0.99-1-unx' is just an example.  Use the specific kernel
+The value '3.4.92-1-lts34' is just an example.  Use the specific kernel
 version that you want to add to the installation.
 
 To install the 'OpenSS7' development components for a single-kernel
@@ -11548,7 +11548,7 @@ installation, use (one of):
      % sudo aptitude install openss7-devel-$(uname -r)
 
 Here, '$(uname -r)' is simply a way of specifying the running kernel.
-The value '3.0.99-1-unx' is just an example.  Use the specific kernel
+The value '3.4.92-1-lts34' is just an example.  Use the specific kernel
 version that you want to add to the installation.
 
 To add 'OpenSS7' development documentation, use (one of):
@@ -11574,7 +11574,7 @@ install the RPMs on your system.  For additional information on
 'rpm(8)', see 'rpm(8)' (*note (*manpages*)rpm(8)::).
 
      % pushd RPMS/i686
-     % rpm -ihv openss7-*-1.1.7.20141001-1.i686.rpm
+     % rpm -ihv openss7-*-1.1.7.20131209-1.i686.rpm
 
 You must have the correct binary RPMs downloaded or built for this to be
 successful.
@@ -11588,7 +11588,7 @@ relocate the documentation and info directories:
      % rpm -ihv \
              --relocate '/usr/share/doc=/usr/local/share/doc' \
              --relocate '/usr/share/info=/usr/local/share/info' \
-             -- openss7-doc-1.1.7.20141001-1.i686.rpm
+             -- openss7-doc-1.1.7.20131209-1.i686.rpm
 
 The previous example will install the 'openss7-doc' package by will
 relocate the documentation an info directory contents to the
@@ -11604,7 +11604,7 @@ install the DEBs on your system.  For additional information see
 'dpkg(8)' (*note (*manpages*)dpkg(8)::).
 
      % pushd debian
-     % dpkg -iv openss7-*_1.1.7.20141001-0_*.deb
+     % dpkg -iv openss7-*_1.1.7.20131209-0_*.deb
 
 You must have the correct '.deb' files downloaded or build for this to
 be successful.(1)
@@ -11660,13 +11660,14 @@ To remove the 'OpenSS7' run-time components for a specific kernel, use
 (one of):
 
      $> sudo yum remove openss7-$(uname -r)
-     $> sudo yum remove openss7-3.0.99-1-unx
+     $> sudo yum remove openss7-3.4.92-1-lts34
 
-Where, '$(uname -r)' will remove for the running kernel.  '3.0.99-1-unx'
-is just an example.  Note also that 'OpenSS7' does not install a kernel
-package for each and every kernel version, nor is it normally necessary.
-When the kernel run-time being removed is the last kernel run-time, the
-remainder of the 'OpenSS7' components will also be removed.
+Where, '$(uname -r)' will remove for the running kernel.
+'3.4.92-1-lts34' is just an example.  Note also that 'OpenSS7' does not
+install a kernel package for each and every kernel version, nor is it
+normally necessary.  When the kernel run-time being removed is the last
+kernel run-time, the remainder of the 'OpenSS7' components will also be
+removed.
 
 To remove all 'OpenSS7' development components, use (one of):
 
@@ -11678,12 +11679,12 @@ To remove the 'OpenSS7' development components for a specific kernel,
 use (one of):
 
      $> sudo yum remove openss7-develop-$(uname -r)
-     $> sudo yum remove openss7-develop-3.0.99-1-unx
+     $> sudo yum remove openss7-develop-3.4.92-1-lts34
 
-Where, '$(uname -r)' will remove for the running kernel.  '3.0.99-1-unx'
-is just an example.  When the kernel development component being removed
-is the last kernel development component, the remainder of the 'OpenSS7'
-development components will also be removed.
+Where, '$(uname -r)' will remove for the running kernel.
+'3.4.92-1-lts34' is just an example.  When the kernel development
+component being removed is the last kernel development component, the
+remainder of the 'OpenSS7' development components will also be removed.
 
 To remove just documentation components, use (one of):
 
@@ -11711,13 +11712,14 @@ To remove the 'OpenSS7' run-time components for a specific kernel, use
 (one of):
 
      $> sudo zypper remove openss7-$(uname -r)
-     $> sudo zypper remove openss7-3.0.99-1-unx
+     $> sudo zypper remove openss7-3.4.92-1-lts34
 
-Where, '$(uname -r)' will remove for the running kernel.  '3.0.99-1-unx'
-is just an example.  Note also that 'OpenSS7' does not install a kernel
-package for each and every kernel version, nor is it normally necessary.
-When the kernel run-time being removed is the last kernel run-time, the
-remainder of the 'OpenSS7' components will also be removed.
+Where, '$(uname -r)' will remove for the running kernel.
+'3.4.92-1-lts34' is just an example.  Note also that 'OpenSS7' does not
+install a kernel package for each and every kernel version, nor is it
+normally necessary.  When the kernel run-time being removed is the last
+kernel run-time, the remainder of the 'OpenSS7' components will also be
+removed.
 
 To remove all 'OpenSS7' development components, use (one of):
 
@@ -11727,12 +11729,12 @@ To remove the 'OpenSS7' development components for a specific kernel,
 use (one of):
 
      $> sudo zypper remove openss7-develop-$(uname -r)
-     $> sudo zypper remove openss7-develop-3.0.99-1-unx
+     $> sudo zypper remove openss7-develop-3.4.92-1-lts34
 
-Where, '$(uname -r)' will remove for the running kernel.  '3.0.99-1-unx'
-is just an example.  When the kernel development component being removed
-is the last kernel development component, the remainder of the 'OpenSS7'
-development components will also be removed.
+Where, '$(uname -r)' will remove for the running kernel.
+'3.4.92-1-lts34' is just an example.  When the kernel development
+component being removed is the last kernel development component, the
+remainder of the 'OpenSS7' development components will also be removed.
 
 To remove just documentation components, use (one of):
 
@@ -11757,13 +11759,14 @@ To remove the 'OpenSS7' run-time components for a specific kernel, use
 (one of):
 
      $> sudo urpme openss7-$(uname -r)
-     $> sudo urpme openss7-3.0.99-1-unx
+     $> sudo urpme openss7-3.4.92-1-lts34
 
-Where, '$(uname -r)' will remove for the running kernel.  '3.0.99-1-unx'
-is just an example.  Note also that 'OpenSS7' does not install a kernel
-package for each and every kernel version, nor is it normally necessary.
-When the kernel run-time being removed is the last kernel run-time, the
-remainder of the 'OpenSS7' components will also be removed.
+Where, '$(uname -r)' will remove for the running kernel.
+'3.4.92-1-lts34' is just an example.  Note also that 'OpenSS7' does not
+install a kernel package for each and every kernel version, nor is it
+normally necessary.  When the kernel run-time being removed is the last
+kernel run-time, the remainder of the 'OpenSS7' components will also be
+removed.
 
 To remove all 'OpenSS7' development components, use (one of):
 
@@ -11773,12 +11776,12 @@ To remove the 'OpenSS7' development components for a specific kernel,
 use (one of):
 
      $> sudo urpme openss7-develop-$(uname -r)
-     $> sudo urpme openss7-develop-3.0.99-1-unx
+     $> sudo urpme openss7-develop-3.4.92-1-lts34
 
-Where, '$(uname -r)' will remove for the running kernel.  '3.0.99-1-unx'
-is just an example.  When the kernel development component being removed
-is the last kernel development component, the remainder of the 'OpenSS7'
-development components will also be removed.
+Where, '$(uname -r)' will remove for the running kernel.
+'3.4.92-1-lts34' is just an example.  When the kernel development
+component being removed is the last kernel development component, the
+remainder of the 'OpenSS7' development components will also be removed.
 
 To remove just documentation components, use (one of):
 
@@ -11886,9 +11889,9 @@ directory where the package was built and use the 'uninstall'
      % cd /usr/src/openss7
      % make uninstall
      % cd ..
-     % rm -fr openss7-1.1.7.20141001
-     % rm -f openss7-1.1.7.20141001.tar.bz2
-     % rm -f openss7-1.1.7.20141001.tar.xz
+     % rm -fr openss7-1.1.7.20131209
+     % rm -f openss7-1.1.7.20131209.tar.bz2
+     % rm -f openss7-1.1.7.20131209.tar.xz
 
 If you have inadvertently removed the build directory and, therefore, no
 longer have a configured directory from which to execute 'make
@@ -11906,11 +11909,11 @@ When OpenSS7 installs, modules and drivers belonging to release packages
 are normally configured for demand loading.  The 'install' and
 'install-strip' 'automake(1)' targets will make the necessary changes to
 the '/etc/modules.conf' file and place the modules in an appropriate
-place in '/lib/modules/3.0.99-1-unx/openss7'.  The 'make install'
+place in '/lib/modules/3.4.92-1-lts34/openss7'.  The 'make install'
 process should have copied the kernel module files 'streams-*.o' to the
-directory '/lib/modules/3.0.99-1-unx/openss7'.  This means that to load
-any of these modules, you can simply execute, for example, 'modprobe
-stream-SOMEDRIVER'.(1)
+directory '/lib/modules/3.4.92-1-lts34/openss7'.  This means that to
+load any of these modules, you can simply execute, for example,
+'modprobe stream-SOMEDRIVER'.(1)
 
 7.7.1.1 Linux Fast-STREAMS Module Loading
 .........................................
@@ -11920,8 +11923,8 @@ new 'kmod' mechanisms for demand loading kernel modules.
 
 The convention for 'openss7' kernel loadable object files is:
    * Their name start with "streams-".
-   * They are placed in '/lib/modules/3.0.99-1-unx/streams/', where
-     '3.0.99-1-unx' is an example kernel version.
+   * They are placed in '/lib/modules/3.4.92-1-lts34/streams/', where
+     '3.4.92-1-lts34' is an example kernel version.
 
 If your kernel has been built using the 'kerneld' daemon, then 'OpenSS7'
 kernel modules will automatically load as soon as the STREAMS module is
@@ -11952,7 +11955,7 @@ module loading under 'Linux Fast-STREAMS', *Note About This Manual:
 
    ---------- Footnotes ----------
 
-   (1) Note that the '_kversion' of '3.0.99-1-unx' is only an example.
+   (1) Note that the '_kversion' of '3.4.92-1-lts34' is only an example.
 
 7.8 Maintenance
 ===============
@@ -12110,8 +12113,8 @@ to 'configure'.)
      Creates a distribution package (tarball) in the top level build
      directory.  'OpenSS7 Project' packages distribute two archives: a
      'gzip tar' archive and a 'bzip tar' archive.  These archives will
-     have the name 'openss7-1.1.7.20141001.tar.bz2' and
-     'openss7-1.1.7.20141001.tar.xz'.
+     have the name 'openss7-1.1.7.20131209.tar.bz2' and
+     'openss7-1.1.7.20131209.tar.xz'.
 
      This is a standard 'GNU' 'automake(1)' makefile target.  This
      target does not require root privilege.
@@ -12418,8 +12421,8 @@ directory is the top build directory.
 
      The files generated are named:
 
-     'openss7-1.1.7.20141001.tar.bz2' and
-     'openss7-1.1.7.20141001.tar.xz'
+     'openss7-1.1.7.20131209.tar.bz2' and
+     'openss7-1.1.7.20131209.tar.xz'
 
      You can change this distribution directory with the
      '--with-pkg-distdir' option to 'configure'.  See './configure
@@ -12439,8 +12442,8 @@ directory is the top build directory.
 
      Signature files will be named:
 
-     'openss7-1.1.7.20141001.tar.bz2.asc' and
-     'openss7-1.1.7.20141001.tar.xz.asc'
+     'openss7-1.1.7.20131209.tar.bz2.asc' and
+     'openss7-1.1.7.20131209.tar.xz.asc'
 
      These files will be moved to the package distribution directory
      with the plain text archives.
@@ -12470,7 +12473,7 @@ We always use release number '1'.  You can use release numbers above
 'srpm'
      This target generates the source rpm for the package (without
      signing the source rpm).  The source rpm will be named:
-     'openss7-1.1.7.20141001-1.srpm'.
+     'openss7-1.1.7.20131209-1.srpm'.
 
      This is an 'OpenSS7 Project' specific makefile target.  This target
      does not require root privilege.
@@ -12479,7 +12482,7 @@ We always use release number '1'.  You can use release numbers above
      This target is responsible for generating all of the package binary
      rpms for the architecture.  The binary rpms will be named:
 
-     'openss7-*-1.1.7.20141001-1.*.rpm'
+     'openss7-*-1.1.7.20131209-1.*.rpm'
 
      where the stars indicate the subpackage and the architecture.  Both
      the architecture specific subpackages (binary objects) and the
@@ -12539,7 +12542,7 @@ file, or with the '--with-debrelease=RELEASENUMBER' option to
      included in the 'dsc' file.  You can use release number '1' for the
      same purposes.  Release numbers above '1' will not include the
      entire tarball.  The '.dsc' file will be named:
-     'openss7_1.1.7.20141001-0.dsc'.
+     'openss7_1.1.7.20131209-0.dsc'.
 
      This is an 'OpenSS7 Project' specific makefile target.  This target
      does not require root privilege.
@@ -12555,7 +12558,7 @@ file, or with the '--with-debrelease=RELEASENUMBER' option to
      This target will build the Debian binary package ('.deb' file) from
      the '.dsc' created above.  (This target will also create the '.dsc'
      if it has not been created already.)  The subpackage '.deb' files
-     will be named: 'openss7-*_1.1.7.20141001-0_*.deb', where the stars
+     will be named: 'openss7-*_1.1.7.20131209-0_*.deb', where the stars
      indicate the subpackage and the architecture.
 
      This is an 'OpenSS7 Project' specific makefile target.  This target
@@ -12614,9 +12617,9 @@ Pre-installation checks are performed by invoking the 'check' or
 'check.log' target to 'make' when building the package, as shown in
 *note Example 8.1: testsuite:ex0.
 
-     % wget http://www.openss7.org/openss7-1.1.7.20141001.tar.bz2
-     % tar -xjvf openss7-1.1.7.20141001.tar.bz2
-     % pushd openss7-1.1.7.20141001
+     % wget http://www.openss7.org/openss7-1.1.7.20131209.tar.bz2
+     % tar -xjvf openss7-1.1.7.20131209.tar.bz2
+     % pushd openss7-1.1.7.20131209
      % ./configure
      % make
      % make check  # <------- invoke pre-installation checks
@@ -12639,9 +12642,9 @@ only "System Checks" will be performed.
 For example, the steps shown in *note Example 8.2: testsuite:ex1. will
 perform "System" checks.
 
-     % wget http://www.openss7.org/openss7-1.1.7.20141001.tar.bz2
-     % tar -xjvf openss7-1.1.7.20141001.tar.bz2
-     % pushd openss7-1.1.7.20141001
+     % wget http://www.openss7.org/openss7-1.1.7.20131209.tar.bz2
+     % tar -xjvf openss7-1.1.7.20131209.tar.bz2
+     % pushd openss7-1.1.7.20131209
      % ./configure
      % make
      % make check  # <------ invokes System pre-installation checks
@@ -12662,9 +12665,9 @@ performed.
 For example, the steps shown in *note Example 8.3: testsuite:ex2. will
 perform "Maintenance" checks.
 
-     % wget http://www.openss7.org/openss7-1.1.7.20141001.tar.bz2
-     % tar -xjvf openss7-1.1.7.20141001.tar.bz2
-     % pushd openss7-1.1.7.20141001
+     % wget http://www.openss7.org/openss7-1.1.7.20131209.tar.bz2
+     % tar -xjvf openss7-1.1.7.20131209.tar.bz2
+     % pushd openss7-1.1.7.20131209
      % ./configure --enable-maintainer-mode
      % make
      % make check  # <------ invokes Maintenance pre-installation checks
@@ -12853,9 +12856,9 @@ There are several ways of invoking the conformance test suites:
 Typical steps for invoking the test suites directly from 'make' are
 shown in *note Example 8.4: testsuite:ex3.
 
-     % wget http://www.openss7.org/openss7-1.1.7.20141001.tar.bz2
-     % tar -xjvf openss7-1.1.7.20141001.tar.bz2
-     % pushd openss7-1.1.7.20141001
+     % wget http://www.openss7.org/openss7-1.1.7.20131209.tar.bz2
+     % tar -xjvf openss7-1.1.7.20131209.tar.bz2
+     % pushd openss7-1.1.7.20131209
      % ./configure
      % make
      % make check  # <------ invokes System pre-installation checks
@@ -14575,7 +14578,7 @@ Index of Concepts
                                                             (line  7964)
 * apt <5>:                               Installing with APT.
                                                             (line 11508)
-* apt <6>:                               Removing with APT. (line 11791)
+* apt <6>:                               Removing with APT. (line 11794)
 * apt-rpm:                               Setting up APT-RPM.
                                                             (line  7790)
 * apt-rpm <1>:                           Using the APT-RPM Repository.
@@ -14593,7 +14596,7 @@ Index of Concepts
 * binary debs <2>:                       Installing the Debian DEB.
                                                             (line 11599)
 * binary debs <3>:                       Removing the Debian DEB.
-                                                            (line 11820)
+                                                            (line 11823)
 * binary rpms:                           Downloading the Binary RPM.
                                                             (line  7977)
 * binary rpms <1>:                       Configuring the Binary RPM.
@@ -14601,18 +14604,18 @@ Index of Concepts
 * binary rpms <2>:                       Installing the Binary RPM.
                                                             (line 11569)
 * binary rpms <3>:                       Removing the Binary RPM.
-                                                            (line 11795)
+                                                            (line 11798)
 * bug reports, automatic generation:     Automatic Problem Reports.
-                                                            (line 13007)
+                                                            (line 13010)
 * bug reports, generating:               Generating Problem Reports.
-                                                            (line 12953)
+                                                            (line 12956)
 * bug reports, stand along generation:   Stand Alone Problem Reports.
-                                                            (line 13052)
+                                                            (line 13055)
 * bugs:                                  Bugs.              (line  4982)
 * bugs, history:                         Historical Defects.
                                                             (line  5020)
 * bugs, known:                           Known Defects.     (line  5012)
-* bugs, reporting:                       Problem Reports.   (line 12893)
+* bugs, reporting:                       Problem Reports.   (line 12896)
 * building:                              Building.          (line 11210)
 * building, source dscs:                 Building from the Debian DSC.
                                                             (line 11255)
@@ -14668,24 +14671,24 @@ Index of Concepts
 * drivers:                               Drivers.           (line  2266)
 * files:                                 Files.             (line  1454)
 * generating bug reports:                Generating Problem Reports.
-                                                            (line 12953)
+                                                            (line 12956)
 * generating bug reports <1>:            Stand Alone Problem Reports.
-                                                            (line 13052)
+                                                            (line 13055)
 * generating bug reports automatically:  Automatic Problem Reports.
-                                                            (line 13007)
+                                                            (line 13010)
 * generating problem reports:            Generating Problem Reports.
-                                                            (line 12953)
+                                                            (line 12956)
 * generating problem reports automatically: Automatic Problem Reports.
-                                                            (line 13007)
+                                                            (line 13010)
 * generating problem reports stand alone: Stand Alone Problem Reports.
-                                                            (line 13052)
+                                                            (line 13055)
 * GNU/Linux Distributions:               GNU/Linux Distributions.
                                                             (line  3726)
 * history:                               History.           (line  7126)
 * history bugs:                          Historical Defects.
                                                             (line  5020)
 * IETF conformance:                      IETF Conformance.  (line  3618)
-* indices:                               Indices.           (line 14559)
+* indices:                               Indices.           (line 14562)
 * installation:                          Installation.      (line  7132)
 * installing:                            Installing.        (line 11338)
 * installing, apt:                       Installing with APT.
@@ -14721,37 +14724,37 @@ Index of Concepts
 * KMP:                                   Kernel Module Packages.
                                                             (line  3476)
 * known bugs:                            Known Defects.     (line  5012)
-* known problems:                        Known Problems.    (line 13095)
+* known problems:                        Known Problems.    (line 13098)
 * libraries:                             Libraries.         (line  2302)
 * libraries, shared object:              Libraries.         (line  2306)
 * license, AGPL:                         GNU Affero General Public License.
-                                                            (line 13595)
+                                                            (line 13598)
 * license, BSD:                          BSD/USL Combined License.
-                                                            (line 14507)
+                                                            (line 14510)
 * license, BSD/USL combined:             BSD/USL Combined License.
-                                                            (line 14507)
+                                                            (line 14510)
 * license, FDL:                          GNU Free Documentation License.
-                                                            (line 13113)
+                                                            (line 13116)
 * license, GNU Affero General Public License: GNU Affero General Public License.
-                                                            (line 13595)
+                                                            (line 13598)
 * license, GNU Free Documentation License: GNU Free Documentation License.
-                                                            (line 13113)
-* license, Sun RPC:                      Sun RPC License.   (line 14467)
+                                                            (line 13116)
+* license, Sun RPC:                      Sun RPC License.   (line 14470)
 * license, UI DLPI:                      UNIX International DLPI License.
-                                                            (line 14296)
+                                                            (line 14299)
 * license, UI NPI:                       UNIX International NPI License.
-                                                            (line 14354)
+                                                            (line 14357)
 * license, UI TPI:                       UNIX International TPI License.
-                                                            (line 14410)
+                                                            (line 14413)
 * license, UNIX International Inc.:      UNIX International DLPI License.
-                                                            (line 14296)
+                                                            (line 14299)
 * license, UNIX International Inc. <1>:  UNIX International NPI License.
-                                                            (line 14354)
+                                                            (line 14357)
 * license, UNIX International Inc. <2>:  UNIX International TPI License.
-                                                            (line 14410)
-* licenses:                              Licenses.          (line 13110)
+                                                            (line 14413)
+* licenses:                              Licenses.          (line 13113)
 * licensing:                             Notice.            (line    57)
-* loading:                               Loading.           (line 11900)
+* loading:                               Loading.           (line 11903)
 * maintainer:                            Maintainer.        (line   464)
 * manual abstract:                       Abstract.          (line    77)
 * manual audience:                       Abstract.          (line   107)
@@ -14765,21 +14768,21 @@ Index of Concepts
 * NPI interface conformance:             NPI Interface Conformance.
                                                             (line  3582)
 * objective:                             Objective.         (line  1087)
-* openss7-core-3.0.99-1-unx-1.1.7.20141001-1.i686.rpm: Configuring the Binary RPM.
+* openss7-core-3.4.92-1-lts34-1.1.7.20131209-1.i686.rpm: Configuring the Binary RPM.
                                                             (line  8640)
-* openss7-dev-1.1.7.20141001-1.i686.rpm: Configuring the Binary RPM.
+* openss7-dev-1.1.7.20131209-1.i686.rpm: Configuring the Binary RPM.
                                                             (line  8652)
-* openss7-devel-1.1.7.20141001-1.i686.rpm: Configuring the Binary RPM.
+* openss7-devel-1.1.7.20131209-1.i686.rpm: Configuring the Binary RPM.
                                                             (line  8655)
-* openss7-doc-1.1.7.20141001-1.i686.rpm: Configuring the Binary RPM.
+* openss7-doc-1.1.7.20131209-1.i686.rpm: Configuring the Binary RPM.
                                                             (line  8661)
-* openss7-info-3.0.99-1-unx-1.1.7.20141001-1.i686.rpm: Configuring the Binary RPM.
+* openss7-info-3.4.92-1-lts34-1.1.7.20131209-1.i686.rpm: Configuring the Binary RPM.
                                                             (line  8645)
-* openss7-lib-1.1.7.20141001-1.i686.rpm: Configuring the Binary RPM.
+* openss7-lib-1.1.7.20131209-1.i686.rpm: Configuring the Binary RPM.
                                                             (line  8672)
-* openss7-source-1.1.7.20141001-1.i686.rpm: Configuring the Binary RPM.
+* openss7-source-1.1.7.20131209-1.i686.rpm: Configuring the Binary RPM.
                                                             (line  8681)
-* openss7-util-1.1.7.20141001-1.i686.rpm: Configuring the Binary RPM.
+* openss7-util-1.1.7.20131209-1.i686.rpm: Configuring the Binary RPM.
                                                             (line  8685)
 * organization:                          Organization.      (line  1101)
 * overview:                              Overview.          (line  1120)
@@ -14791,12 +14794,12 @@ Index of Concepts
 * pacman <2>:                            ALPM Kernel Updates.
                                                             (line  7890)
 * post-installation checks:              Post-installation Checks.
-                                                            (line 12822)
+                                                            (line 12825)
 * pre-installation checks:               Pre-installation Checks.
-                                                            (line 12594)
+                                                            (line 12597)
 * prerequisites:                         Prerequisites.     (line  3634)
-* problem reports:                       Problem Reports.   (line 12893)
-* problems, known:                       Known Problems.    (line 13095)
+* problem reports:                       Problem Reports.   (line 12896)
+* problems, known:                       Known Problems.    (line 13098)
 * quick start guide:                     Quick Start Guide. (line   604)
 * reference:                             Reference.         (line  1370)
 * release notes:                         Release Notes.     (line  3968)
@@ -14861,28 +14864,27 @@ Index of Concepts
 * release openss7-1.1.7.20131123:        Release openss7-1.1.7.20131123.
                                                             (line  4006)
 * release openss7-1.1.7.20131209:        Release openss7-1.1.7.20131209.
-                                                            (line  3985)
-* release openss7-1.1.7.20141001:        Release openss7-1.1.7.20141001.
                                                             (line  3974)
+* release openss7-1.1.7.20131209 <1>:    .                  (line  3985)
 * releases:                              Releases.          (line  3622)
 * removing:                              Removing.          (line 11639)
-* removing, apt:                         Removing with APT. (line 11792)
+* removing, apt:                         Removing with APT. (line 11795)
 * removing, binary debs:                 Removing the Debian DEB.
-                                                            (line 11820)
+                                                            (line 11823)
 * removing, binary rpms:                 Removing the Binary RPM.
-                                                            (line 11795)
+                                                            (line 11798)
 * removing, source dscs:                 Removing the Debian DSC.
-                                                            (line 11861)
+                                                            (line 11864)
 * removing, source srpm:                 Removing the Source RPM.
-                                                            (line 11845)
+                                                            (line 11848)
 * removing, tar ball:                    Removing the Tar Ball.
-                                                            (line 11881)
+                                                            (line 11884)
 * removing, urpmi:                       Removing with URPMI.
-                                                            (line 11743)
+                                                            (line 11745)
 * removing, yum:                         Removing with YUM. (line 11642)
 * removing, zypper:                      Removing with ZYPPER.
-                                                            (line 11696)
-* reporting bugs:                        Problem Reports.   (line 12893)
+                                                            (line 11697)
+* reporting bugs:                        Problem Reports.   (line 12896)
 * repositories:                          Repositories.      (line  7144)
 * repositories, ALPM:                    Repositories for ALPM.
                                                             (line  7881)
@@ -14908,7 +14910,7 @@ Index of Concepts
 * source dscs <2>:                       Building from the Debian DSC.
                                                             (line 11255)
 * source dscs <3>:                       Removing the Debian DSC.
-                                                            (line 11861)
+                                                            (line 11864)
 * source rpms:                           Downloading the Source RPM.
                                                             (line  8376)
 * source rpms <1>:                       Configuring the Source RPM.
@@ -14916,7 +14918,7 @@ Index of Concepts
 * source rpms <2>:                       Building from the Source RPM.
                                                             (line 11221)
 * source rpms <3>:                       Removing the Source RPM.
-                                                            (line 11845)
+                                                            (line 11848)
 * sponsors:                              Sponsors.          (line   233)
 * supporters:                            Supporters.        (line   274)
 * tar ball:                              Downloading the Tar Ball.
@@ -14928,13 +14930,13 @@ Index of Concepts
 * tar ball <3>:                          Installing the Tar Ball.
                                                             (line 11621)
 * tar ball <4>:                          Removing the Tar Ball.
-                                                            (line 11881)
-* test suites:                           Test Suites.       (line 12591)
+                                                            (line 11884)
+* test suites:                           Test Suites.       (line 12594)
 * test suites, running:                  Running Test Suites.
-                                                            (line 12837)
+                                                            (line 12840)
 * TPI interface conformance:             TPI Interface Conformance.
                                                             (line  3594)
-* troubleshooting:                       Troubleshooting.   (line 12588)
+* troubleshooting:                       Troubleshooting.   (line 12591)
 * urpmi:                                 Repositories for URPMI.
                                                             (line  7607)
 * urpmi <1>:                             Setting up URPMI.  (line  7616)
@@ -14947,7 +14949,7 @@ Index of Concepts
 * urpmi <5>:                             Installing with URPMI.
                                                             (line 11457)
 * urpmi <6>:                             Removing with URPMI.
-                                                            (line 11743)
+                                                            (line 11745)
 * utilities:                             Utilities.         (line  2371)
 * web resources:                         Web Resources.     (line   475)
 * XTI interface conformance:             XTI Interface Conformance.
@@ -14977,7 +14979,7 @@ Index of Concepts
 * zypper <4>:                            Installing with ZYPPER.
                                                             (line 11401)
 * zypper <5>:                            Removing with ZYPPER.
-                                                            (line 11696)
+                                                            (line 11697)
 
 Index of Data Types
 ===================
@@ -15208,7 +15210,7 @@ Index of Files and Programs
 * /etc/init.d/streams.sh:                Utilities.         (line  2396)
 * /etc/init.d/strerr:                    Utilities.         (line  2425)
 * /etc/init.d/strerr.sh:                 Utilities.         (line  2426)
-* /lib/modules/3.0.99-1-unx/streams/:    Loading.           (line 11923)
+* /lib/modules/3.4.92-1-lts34/streams/:  Loading.           (line 11926)
 * openss7:                               Utilities.         (line  2413)
 * openss7.sh:                            Utilities.         (line  2414)
 * specfs:                                Utilities.         (line  2380)
@@ -15541,78 +15543,78 @@ Index of Makefile Targets
 
 * Menu:
 
-* all:                                   Loading.           (line 11906)
-* all <1>:                               User Targets.      (line 11977)
-* check:                                 User Targets.      (line 11999)
-* check-clean:                           Clean Targets.     (line 12182)
-* check.log:                             Logging Targets.   (line 12297)
-* clean:                                 Clean Targets.     (line 12144)
-* compile.log:                           Logging Targets.   (line 12293)
+* all:                                   Loading.           (line 11909)
+* all <1>:                               User Targets.      (line 11980)
+* check:                                 User Targets.      (line 12002)
+* check-clean:                           Clean Targets.     (line 12185)
+* check.log:                             Logging Targets.   (line 12300)
+* clean:                                 Clean Targets.     (line 12147)
+* compile.log:                           Logging Targets.   (line 12296)
 * csig:                                  Debian Build Targets.
-                                                            (line 12564)
+                                                            (line 12567)
 * debs:                                  Debian Build Targets.
-                                                            (line 12554)
+                                                            (line 12557)
 * dist:                                  Maintainer Targets.
-                                                            (line 12109)
-* dist.log:                              Logging Targets.   (line 12325)
+                                                            (line 12112)
+* dist.log:                              Logging Targets.   (line 12328)
 * distcheck:                             Maintainer Targets.
-                                                            (line 12119)
-* distcheck.log:                         Logging Targets.   (line 12329)
-* distclean:                             Clean Targets.     (line 12155)
+                                                            (line 12122)
+* distcheck.log:                         Logging Targets.   (line 12332)
+* distclean:                             Clean Targets.     (line 12158)
 * doxy:                                  Documentation Targets.
-                                                            (line 12578)
+                                                            (line 12581)
 * dsc:                                   Debian Build Targets.
-                                                            (line 12536)
-* forced-release:                        Release Targets.   (line 12242)
-* forced-release-sign:                   Release Targets.   (line 12259)
-* install:                               Loading.           (line 11906)
-* install <1>:                           User Targets.      (line 12020)
+                                                            (line 12539)
+* forced-release:                        Release Targets.   (line 12245)
+* forced-release-sign:                   Release Targets.   (line 12262)
+* install:                               Loading.           (line 11909)
+* install <1>:                           User Targets.      (line 12023)
 * install-mans:                          Manual Page Targets.
-                                                            (line 12211)
-* install-strip:                         Loading.           (line 11906)
-* install-strip <1>:                     User Targets.      (line 12020)
-* install.log:                           Logging Targets.   (line 12301)
-* installcheck:                          User Targets.      (line 12031)
-* installcheck.log:                      Logging Targets.   (line 12305)
-* maintainer-clean:                      Clean Targets.     (line 12167)
+                                                            (line 12214)
+* install-strip:                         Loading.           (line 11909)
+* install-strip <1>:                     User Targets.      (line 12023)
+* install.log:                           Logging Targets.   (line 12304)
+* installcheck:                          User Targets.      (line 12034)
+* installcheck.log:                      Logging Targets.   (line 12308)
+* maintainer-clean:                      Clean Targets.     (line 12170)
 * mans:                                  Manual Page Targets.
-                                                            (line 12205)
-* mostlyclean:                           Clean Targets.     (line 12136)
+                                                            (line 12208)
+* mostlyclean:                           Clean Targets.     (line 12139)
 * pr:                                    Problem Report Targets.
-                                                            (line 12376)
+                                                            (line 12379)
 * pr <1>:                                Generating Problem Reports.
-                                                            (line 12972)
-* rebuild:                               RPM Build Targets. (line 12506)
-* rebuild.log:                           Logging Targets.   (line 12338)
-* release:                               Release Targets.   (line 12231)
+                                                            (line 12975)
+* rebuild:                               RPM Build Targets. (line 12509)
+* rebuild.log:                           Logging Targets.   (line 12341)
+* release:                               Release Targets.   (line 12234)
 * release-archives:                      Release Archive Targets.
-                                                            (line 12413)
-* release-clean:                         Release Targets.   (line 12267)
+                                                            (line 12416)
+* release-clean:                         Release Targets.   (line 12270)
 * release-clean-archives:                Release Archive Targets.
-                                                            (line 12451)
-* release-sign:                          Release Targets.   (line 12250)
+                                                            (line 12454)
+* release-sign:                          Release Targets.   (line 12253)
 * release-sign-archives:                 Release Archive Targets.
-                                                            (line 12431)
-* release-sign.log:                      Logging Targets.   (line 12350)
-* release.log:                           Logging Targets.   (line 12346)
-* remove:                                User Targets.      (line 12079)
-* remove.log:                            Logging Targets.   (line 12315)
-* resign:                                RPM Build Targets. (line 12516)
-* resign.log:                            Logging Targets.   (line 12342)
-* retest:                                User Targets.      (line 12048)
-* rpms:                                  RPM Build Targets. (line 12478)
+                                                            (line 12434)
+* release-sign.log:                      Logging Targets.   (line 12353)
+* release.log:                           Logging Targets.   (line 12349)
+* remove:                                User Targets.      (line 12082)
+* remove.log:                            Logging Targets.   (line 12318)
+* resign:                                RPM Build Targets. (line 12519)
+* resign.log:                            Logging Targets.   (line 12345)
+* retest:                                User Targets.      (line 12051)
+* rpms:                                  RPM Build Targets. (line 12481)
 * send-pr:                               Problem Report Targets.
-                                                            (line 12388)
-* sign:                                  RPM Build Targets. (line 12495)
+                                                            (line 12391)
+* sign:                                  RPM Build Targets. (line 12498)
 * sigs:                                  Debian Build Targets.
-                                                            (line 12547)
-* srpm:                                  RPM Build Targets. (line 12470)
-* srpm-sign:                             RPM Build Targets. (line 12495)
-* srpm.log:                              Logging Targets.   (line 12334)
-* uninstall:                             User Targets.      (line 12063)
+                                                            (line 12550)
+* srpm:                                  RPM Build Targets. (line 12473)
+* srpm-sign:                             RPM Build Targets. (line 12498)
+* srpm.log:                              Logging Targets.   (line 12337)
+* uninstall:                             User Targets.      (line 12066)
 * uninstall-mans:                        Manual Page Targets.
-                                                            (line 12217)
-* uninstall.log:                         Logging Targets.   (line 12310)
+                                                            (line 12220)
+* uninstall.log:                         Logging Targets.   (line 12313)
 
 Index of Manual Pages Referenced
 ================================
@@ -15768,7 +15770,7 @@ Quick Start Guide
       6.2.2.2 Linux Kernel Upgrades
     6.2.3 Architectures
   6.3 Release Notes
-    Major changes for release openss7-1.1.7.20141001
+    Major changes for release openss7-1.1.7.20131209
     Major changes for release openss7-1.1.7.20131209
     Major changes for release openss7-1.1.7.20131123
     Major changes for release openss7-1.1.7.20130209

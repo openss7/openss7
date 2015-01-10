@@ -1,12 +1,12 @@
-OpenSS7 -- acknowledgements.  2013-12-09
-$Id: THANKS,v 1.1.2.30 2011-07-27 07:52:10 brian Exp $
-Copyright (c) 2008-2013  Monavacon Limited. <http://www.monavacon.com/>
+OpenSS7 -- acknowledgements.  2015-01-10
+$Id$
+Copyright (c) 2008-2015  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
- Acknowledgements
-=================
+Acknowledgements
+================
 
 The OpenSS7 Project was funded in part by:
 
@@ -18,13 +18,13 @@ Without their support, open software like this would not be possible.
 
 As with most open source projects, this project would not have been
 possible without the valiant efforts and productive software of the
-`Free Software Foundation', the `Linux Kernel Community', and the open
+'Free Software Foundation', the 'Linux Kernel Community', and the open
 source software movement at large.
 
- Sponsors
----------
+Sponsors
+--------
 
-Funding for completion of the `OpenSS7 OpenSS7' package was provided in
+Funding for completion of the 'OpenSS7 OpenSS7' package was provided in
 part by:
 
      * Monavacon Limited
@@ -38,16 +38,16 @@ Additional funding for The OpenSS7 Project was provided by:
      * France Telecom                       * GeoLink SA
      * HOB International                    * Lockheed Martin Co.
      * Motorola                             * NetCentrex S. A.
-     * Newnet Communications Inc.           * Nortel Networks
-     * Peformance Technologies Inc.         * Sonus Networks Inc.
+     * Newnet Communications, Inc.          * Nortel Networks
+     * Peformance Technologies, Inc.        * Sonus Networks Inc.
      * SS8 Networks Inc.                    * SysMaster Corporation
      * TECORE                               * Tumsan Oy
      * Verisign                             * Vodare Ltd.
 
- Contributors
--------------
+Contributors
+------------
 
-The primary contributor to the `OpenSS7 OpenSS7' package is Brian F. G.
+The primary contributor to the 'OpenSS7 OpenSS7' package is Brian F. G.
 Bidulock <bidulock@openss7.org>.  The following is a list of notable
 contributors to The OpenSS7 Project:
 
@@ -62,15 +62,15 @@ contributors to The OpenSS7 Project:
      - Omer Tunali                         - Tony Abo
      - John Hodgkinson                     - Others
 
- Supporters
------------
+Supporters
+----------
 
-Over the years a number of organizations have provided continued
-support in the form of assessment, inspection, testing, validation and
+Over the years a number of organizations have provided continued support
+in the form of assessment, inspection, testing, validation and
 certification.
 
- Telecommunications
-...................
+Telecommunications
+..................
 
      * Integrated Telecom Solutions         * AASTRA
      * Accuris Networks                     * Aculab
@@ -82,7 +82,8 @@ certification.
      * Alaska Power & Telephone             * Aricent
      * Artesyn (now Emerson)                * Arthus Technologies
      * Bharti Telesoft                      * BubbleMotion
-     * Continuous Computing (Trillium)      * Cellnext Solutions Limited
+     * Continuous Computing                 * Cellnext Solutions Limited
+       (Trillium)
      * Cisco                                * Codent Networks
      * Cogeco Cable Inc.                    * Comverse Ltd.
      * Condor Networks                      * Coral Telecom
@@ -103,24 +104,25 @@ certification.
      * Kineto Wireless                      * Lucent
      * Maestro Communications               * MCI
      * Mindspeed                            * Mobis
-     * Mobixell                             * Motivity Telecom Inc.
+     * Mobixell                             * Motivity Telecom, Inc.
      * Motorola                             * Mpathix Inc.
      * m-Wise Inc.                          * Myriad Group
      * Net2Phone                            * NetCentrex S. A.
      * NetTest A/S (now Anritsu)            * NeuvaTel PCS
-     * Newnet Communications Inc.           * NMS (now Dialogic)
+     * Newnet Communications, Inc.          * NMS (now Dialogic)
      * Noble Systems Corporation            * Nokia
-     * Nortel Networks                      * j2 Global Communications Inc.
+     * Nortel Networks                      * j2 Global Communications,
+                                              Inc.
      * OnMobile                             * Orange
      * Ouroboros                            * P3 Solutions GmbH
      * Primal Technologies Inc.             * Propolys Pte Ltd.
-     * Peformance Technologies Inc.         * Pulse Voice Inc.
+     * Peformance Technologies, Inc.        * Pulse Voice Inc.
      * Reliance Communications              * Roamware Inc.
      * SONORYS Technology GmbH              * Sonus Networks Inc.
-     * Spider Ltd. (now Emerson)            * SS8 Networks Inc.
+     * Spider Ltd.  (now Emerson)           * SS8 Networks Inc.
      * Oasis Systems                        * Stratus
      * Stratus Technologies Bermuda         * Sicap AG
-       Ltd.                                   
+       Ltd.
      * Switchlab Ltd.                       * Synapse Mobile Networks SA
      * SysMaster Corporation                * Tata Communications
      * Tecore                               * Tekno Telecom LLC
@@ -134,13 +136,14 @@ certification.
      * VSE NET GmbH                         * The Software Group Limited
      * WINGcon GmbH                         * Wipro Technologies
      * Xentel Inc.                          * YCOM SA
-     * ZTE Corporation                        
+     * ZTE Corporation
 
- Aerospace and Military
-.......................
+Aerospace and Military
+......................
 
      * Advanced Technologies                * Altobridge
-     * Altobridge                           * BBN (Bolt, Beranek, and Neuman)
+     * Altobridge                           * BBN (Bolt, Beranek, and
+                                              Neuman)
      * ARINC                                * Boldon James
      * ATOS Origin                          * Lockheed Martin Co.
      * Boeing                               * Northrop Grumman Corporation
@@ -148,67 +151,70 @@ certification.
      * CRNA                                 * SAAB
      * DSNA-DGAC (1)                        * Sandia National Laboratories
      * DLR (2)                              * Thales
-     * DSNA-DTI                             * Wright-Patterson Air Force Base
-     * Egis-Avia (Sofreavia)                  
-     * MetaSlash Inc.                         
-     * Sofreavia                              
-     * FAA WJHTC(3)                           
-     * Thales ATM/Air Systems                 
+     * DSNA-DTI                             * Wright-Patterson Air Force
+                                              Base
+     * Egis-Avia (Sofreavia)
+     * MetaSlash, Inc.
+     * Sofreavia
+     * FAA WJHTC(3)
+     * Thales ATM/Air Systems
 
----------- Footnotes ----------
+   ---------- Footnotes ----------
 
-(1) La Direction des Services de la Navigation Aérienne - La Direction
-Général de l'Aviation Civile
+   (1) La Direction des Services de la Navigation Aérienne - La
+Direction Général de l'Aviation Civile
 
-(2) Deutsches Zentrum für Luft- unde Raumfarht
+   (2) Deutsches Zentrum für Luft- unde Raumfarht
 
-(3) Federal Aviation Administration - William J. Hughes Technical Center
+   (3) Federal Aviation Administration - William J. Hughes Technical
+Center
 
- Financial, Business and Security
-.................................
+Financial, Business and Security
+................................
 
      * Alebra                               * Alebra
      * Automated Trading Desk (now          * Boldon James
-       Citi)                                  
+       Citi)
      * Banco Credicoop                      * Fujitsu-Seimens
      * BeMac                                * FutureSoft
      * Boldon James                         * GSX
      * CyberSource Corporation              * HOB International
      * Fujitsu-Seimens                      * HP (Hewlett-Packard)
      * FutureSoft                           * IBM
-     * Gcom Inc.                              
-     * GSX                                    
-     * HOB International                      
-     * HP (Hewlett-Packard)                   
-     * IBM                                    
-     * Lightbride (now CyberSource)           
+     * Gcom, Inc.
+     * GSX
+     * HOB International
+     * HP (Hewlett-Packard)
+     * IBM
+     * Lightbride (now CyberSource)
      * MasterCard                           * Alert Logic
-     * Network Executive Software Inc.      * Apani
+     * Network Executive Software           * Apani
+       Inc.
      * Packetware Inc.                      * BeMac
      * Packetware Inc.                      * ERCOM
      * Prism Holdings Ltd.                  * Hitech Systems
      * S2 Systems (now ACI)                 * iMETRIK
      * Symicron Computer                    * Intrado Inc.
-       Communications Limited                 
+       Communications Limited
 
- Education, Health Care and Nuclear Power
-.........................................
+Education, Health Care and Nuclear Power
+........................................
 
      * IEEE Computer Society                * Ateb
      * ENST (1)                             * Mandexin Systems Corporation
-     * HTW-Saarland (2)                       
+     * HTW-Saarland (2)
      * Kansas State University              * Areva NP
      * University of North Carolina         * European Organization for
        Charlotte                              Nuclear Research
 
----------- Footnotes ----------
+   ---------- Footnotes ----------
 
-(1) Ecole Nationale Supérieure des Télécommunications
+   (1) Ecole Nationale Supérieure des Télécommunications
 
-(2) Hochschule für Technik und Wirtschaft des Saarlandes
+   (2) Hochschule für Technik und Wirtschaft des Saarlandes
 
- Agencies
----------
+Agencies
+--------
 
 It would be difficult for the OpenSS7 Project to attain the conformance
 and certifications that it has without the free availability of
@@ -236,6 +242,7 @@ others have, that to remain current as a standards organization in
 today's digital economy requires providing individuals with free access
 to documents.
 
+Authors
 -----
 
 =========================================================================
