@@ -1500,6 +1500,12 @@ np_route_output(struct np *np, const uint32_t daddr, struct rtable **rtp)
 	return np_route_output_slow(np, daddr, rtp);
 }
 
+#ifdef NETIF_F_NO_CSUM
+#define DONT_CHECKSUM (NETIF_F_NO_CSUM|NETIF_F_HW_CSUM|NETIF_F_IP_CSUM|NETIF_F_LOOPBACK)
+#else
+#define DONT_CHECKSUM (NETIF_F_HW_CSUM|NETIF_F_IP_CSUM|NETIF_F_LOOPBACK)
+#endif
+
 /**
  * np_senddata - process a unit data request
  * @np: Stream private structure
@@ -1540,7 +1546,7 @@ np_senddata(struct np *np, uint8_t protocol, const unsigned short dport, uint32_
 			skb->csum = 0;
 			if (unlikely(np->qos.checksum == 0))
 				goto no_csum;
-			if (likely(dev->features & (NETIF_F_NO_CSUM | NETIF_F_HW_CSUM)))
+			if (likely(dev->features & DONT_CHECKSUM))
 				goto no_csum;
 			skb->ip_summed = 0;
 			skb->csum = csum_tcpudp_nofold(saddr, daddr, skb->len, IPPROTO_UDP, 0);

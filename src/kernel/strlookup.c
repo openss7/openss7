@@ -1259,7 +1259,11 @@ EXPORT_SYMBOL_GPL(sdev_ini);
 streams_fastcall int
 sdev_add(struct cdevsw *cdev)
 {
+#ifdef HAVE_KFUNC_SET_NLINK
+	inode_inc_link_count(cdev->d_inode->i_sb->s_root->d_inode);
+#else
 	cdev->d_inode->i_sb->s_root->d_inode->i_nlink++;
+#endif
 	/* add to list and hash */
 	list_add(&cdev->d_list, &cdevsw_list);
 	list_add(&cdev->d_hash, strmod_hash_slot(cdev->d_modid));
@@ -1279,7 +1283,11 @@ EXPORT_SYMBOL_GPL(sdev_add);
 streams_fastcall void
 sdev_del(struct cdevsw *cdev)
 {
+#ifdef HAVE_KFUNC_SET_NLINK
+	inode_dec_link_count(cdev->d_inode->i_sb->s_root->d_inode);
+#else
 	cdev->d_inode->i_sb->s_root->d_inode->i_nlink--;
+#endif
 	/* remove from list and hash */
 	list_del_init(&cdev->d_list);
 	list_del_init(&cdev->d_hash);
@@ -1369,7 +1377,11 @@ cmin_add(struct devnode *cmin, struct cdevsw *cdev)
 {
 	ensure(cdev->d_minors.next, INIT_LIST_HEAD(&cdev->d_minors));
 
+#ifdef HAVE_KFUNC_SET_NLINK
+	inode_inc_link_count(cdev->d_inode);
+#else
 	cdev->d_inode->i_nlink++;
+#endif
 	/* add to list and hash */
 	list_add(&cmin->n_list, &cdev->d_minors);
 	list_add(&cmin->n_hash, strnod_hash_slot(cmin->n_minor));
@@ -1389,7 +1401,11 @@ cmin_del(struct devnode *cmin, struct cdevsw *cdev)
 {
 	ensure(cdev->d_minors.next, INIT_LIST_HEAD(&cdev->d_minors));
 
+#ifdef HAVE_KFUNC_SET_NLINK
+	inode_dec_link_count(cdev->d_inode);
+#else
 	cdev->d_inode->i_nlink--;
+#endif
 	/* remove from list and hash */
 	list_del_init(&cmin->n_list);
 	list_del_init(&cmin->n_hash);

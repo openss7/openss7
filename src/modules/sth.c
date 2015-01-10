@@ -448,7 +448,11 @@ strinsert(struct inode *inode, struct stdata *sd)
 		list_add(&sd->sd_list, &cdev->d_stlist);
 		write_unlock(&cdevsw_lock);
 		assert(cdev->d_inode);
+#ifdef HAVE_KFUNC_SET_NLINK
+		inode_inc_link_count(cdev->d_inode);
+#else
 		cdev->d_inode->i_nlink++;
+#endif
 		/* should always be successful */
 		assert(sd->sd_inode != NULL);
 		/* link into clone list */
@@ -488,7 +492,11 @@ strremove_locked(struct inode *inode, struct stdata *sd)
 		assert(cdev);
 		assert(cdev->d_inode);
 		write_lock(&cdevsw_lock);
+#ifdef HAVE_KFUNC_SET_NLINK
+		inode_dec_link_count(cdev->d_inode);
+#else
 		cdev->d_inode->i_nlink--;
+#endif
 		list_del_init(&sd->sd_list);
 		write_unlock(&cdevsw_lock);
 		sd->sd_inode = NULL;
@@ -1237,12 +1245,43 @@ kill_proc_(pid_t sess, int sig, int priv)
 #undef kill_sl
 #endif
 
-/* How to send a signal with information to a process: just use kill_proc_info(6) in the code */
-#if   defined HAVE_KILL_PID_INFO_AS_UID_SYMBOL
+/* How to send a signal with information to a process: just use kill_proc_info(7) in the code */
+#if   defined HAVE_KILL_PID_INFO_AS_CRED_SYMBOL
+/* 3.4 kernel approach: */
+#if   defined HAVE_KILL_PID_INFO_AS_CRED_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern int kill_pid_info_as_cred(int sig, struct siginfo *info, struct pid *pid, const struct cred *cred, u32 secid);
+int kill_pid_info_(int sig, struct siginfo *info, struct pid *pid, uid_t uid, uid_t euid, u32 secid, struct user_namespace *user_ns)
+{
+	struct cred cr = {
+		.uid = uid,
+		.euid = euid,
+		.user_ns = user_ns,
+	};
+	return kill_pid_info_as_cred(sig, info, pid, &cr, secid);
+}
+#define kill_proc_info(a,b,c,d,e,f,g) kill_pid_info_(a,b,c,d,e,f,g)
+#else
+extern int kill_pid_info_as_cred(int sig, struct siginfo *info, struct pid *pid, const struct cred *cred, u32 secid)
+	__attribute__((__weak__));
+int kill_pid_info_(int sig, struct siginfo *info, struct pid *pid, uid_t uid, uid_t euid, u32 secid, struct user_namespace *user_ns)
+{
+	if (kill_pid_info_as_cred) {
+		struct cred cr = {
+			.uid = uid,
+			.euid = euid,
+			.user_ns = user_ns,
+		};
+		return kill_pid_info_as_cred(sig, info, pid, &cr, secid);
+	}
+	return kill_pid(pid, sig, 1);
+}
+#define kill_proc_info(a,b,c,d,e,f,g) kill_pid_info_(a,b,c,d,e,f,g)
+#endif
+#elif   defined HAVE_KILL_PID_INFO_AS_UID_SYMBOL
 /* 2.6.32 kernel approach: */
 #if   defined HAVE_KILL_PID_INFO_AS_UID_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern int kill_pid_info_as_uid(int sig, struct siginfo *info, struct pid *pid, uid_t uid, uid_t euid, u32 secid);
-#define kill_proc_info(a,b,c,d,e,f) kill_pid_info_as_uid(a,b,c,d,e,f)
+#define kill_proc_info(a,b,c,d,e,f,g) kill_pid_info_as_uid(a,b,c,d,e,f)
 #else
 extern int kill_pid_info_as_uid(int sig, struct siginfo *info, struct pid *pid, uid_t uid, uid_t euid, u32 secid)
 	__attribute__((__weak__));
@@ -1250,15 +1289,15 @@ int kill_pid_info_(int sig, struct siginfo *info, struct pid *pid, uid_t uid, ui
 {
 	if (kill_pid_info_as_uid)
 		return kill_pid_info_as_uid(sig, info, pid, uid, euid, secid);
-	return kill_pid(sig, pid, 1);
+	return kill_pid(pid, sig, 1);
 }
-#define kill_proc_info(a,b,c,d,e,f) kill_proc_info_(a,b,c,d,e,f)
+#define kill_proc_info(a,b,c,d,e,f,g) kill_proc_info_(a,b,c,d,e,f)
 #endif
 #elif defined HAVE_KILL_PROC_INFO_AS_UID_SYMBOL
 /* 2.6.18 kernel approach: */
 #if   defined HAVE_KILL_PROC_INFO_AS_UID_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern int kill_proc_info_as_uid(int sig, struct siginfo *info, pid_t pid, uid_t uid, uid_t euid, u32 secid);
-#define kill_proc_info(a,b,c,d,e,f) kill_proc_info_as_uid(a,b,c,d,e,f)
+#define kill_proc_info(a,b,c,d,e,f,g) kill_proc_info_as_uid(a,b,c,d,e,f)
 #else
 extern int kill_proc_info_as_uid(int sig, struct siginfo *info, pid_t pid, uid_t uid, uid_t euid, u32 secid)
 	__attribute__((__weak__));
@@ -1268,13 +1307,13 @@ int kill_proc_info_(int sig, struct siginfo *info, pid_t pid, uid_t uid, uid_t e
 		return kill_proc_info_as_uid(sig, info, pid, uid, euid, secid);
 	return kill_proc(sig, pid, 1);
 }
-#define kill_proc_info(a,b,c,d,e,f) kill_proc_info_(a,b,c,d,e,f)
+#define kill_proc_info(a,b,c,d,e,f,g) kill_proc_info_(a,b,c,d,e,f)
 #endif
 #elif defined HAVE_KILL_PROC_INFO_SYMBOL
 /* 2.4.33 kernel approach: */
 #if   defined HAVE_KILL_PROC_INFO_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern int kill_proc_info(int sig, struct siginfo *info, pid_t pid);
-#define kill_proc_info(a,b,c,d,e,f) kill_proc_info(a,b,c)
+#define kill_proc_info(a,b,c,d,e,f,g) kill_proc_info(a,b,c)
 #else
 extern int kill_proc_info(int sig, struct siginfo *info, pid_t pid) __attribute__((__weak__));
 int kill_proc_info_(int sig, struct siginfo *info, pid_t pid, uid_t uid, uid_t euid, u32 secid)
@@ -1283,7 +1322,7 @@ int kill_proc_info_(int sig, struct siginfo *info, pid_t pid, uid_t uid, uid_t e
 		return kill_proc_info(sig, info, pid);
 	return (-ENOSYS);
 }
-#define kill_proc_info(a,b,c,d,e,f) kill_proc_info_(a,b,c,d,e,f)
+#define kill_proc_info(a,b,c,d,e,f,g) kill_proc_info_(a,b,c,d,e,f)
 #endif
 #else
 #error Need a way to signal with info to a process.
@@ -1957,10 +1996,13 @@ __strevent_register(const struct file *file, struct stdata *sd, const unsigned l
 		se->se_tgid = get_pid(current_tgid());
 		se->se_events = events;
 		se->se_fd = fd;
-#if defined HAVE_KILL_PROC_INFO_AS_UID_SYMBOL || defined HAVE_KILL_PID_INFO_AS_UID_SYMBOL
+#if defined HAVE_KILL_PROC_INFO_AS_UID_SYMBOL || defined HAVE_KILL_PID_INFO_AS_UID_SYMBOL || defined HAVE_KILL_PID_INFO_AS_CRED_SYMBOL
 		se->se_uid = current_creds->cr_ruid;
 		se->se_euid = current_creds->cr_uid;
 		security_task_getsecid(procp, &se->se_secid);
+#if defined HAVE_KILL_PID_INFO_AS_CRED_SYMBOL
+		se->se_user_ns = current_creds->cr_user_ns;
+#endif
 #endif
 		_printd(("%s: creating siglist events %lu, proc %p, fd %d\n", __FUNCTION__, events, procp, fd));
 		/* calc sig flags */
@@ -2022,7 +2064,7 @@ strsiglist(struct stdata *sd, const int events, unsigned char band, int code)
 		}
 
 		if (likely(kill_proc_info(sig, &si, se->se_pid, se->se_uid, se->se_euid,
-					  se->se_secid) == 0))
+					  se->se_secid, se->se_user_ns) == 0))
 			continue;
 		kill_pid(se->se_pid, sig, 1);
 	}

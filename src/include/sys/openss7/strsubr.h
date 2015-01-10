@@ -135,10 +135,13 @@ struct strevent {
 #endif
 			long events;
 			int fd;
-#if defined HAVE_KILL_PROC_INFO_AS_UID_SYMBOL || defined HAVE_KILL_PID_INFO_AS_UID_SYMBOL
+#if defined HAVE_KILL_PROC_INFO_AS_UID_SYMBOL || defined HAVE_KILL_PID_INFO_AS_UID_SYMBOL || defined HAVE_KILL_PID_INFO_AS_CRED_SYMBOL
 			uid_t uid;
 			uid_t euid;
 			uint32_t secid;
+#if defined HAVE_KILL_PID_INFO_AS_CRED_SYMBOL
+			struct user_namespace *user_ns;
+#endif
 #endif
 		} e;			/* stream event */
 		struct {
@@ -180,6 +183,7 @@ struct strevent {
 #define se_uid	    x.e.uid
 #define se_euid	    x.e.euid
 #define se_secid    x.e.secid
+#define se_user_ns  x.e.user_ns
 
 #define se_func	    x.b.func
 #define se_arg	    x.b.arg

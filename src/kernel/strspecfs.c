@@ -1129,7 +1129,11 @@ spec_read_inode(struct inode *inode)
 		inode->i_mode |= ((inode->i_mode & S_IRUGO) >> 2);
 		inode->i_op = &spec_dir_i_ops;
 		inode->i_fop = &spec_dir_f_ops;
+#if defined HAVE_KFUNC_SET_NLINK
+		set_nlink(inode, 2);
+#else
 		inode->i_nlink = 2;
+#endif
 	}
 	inode->i_mtime = inode->i_atime = inode->i_ctime = CURRENT_TIME;
 	inode->i_private = NULL;	/* done with it */
@@ -1349,6 +1353,7 @@ specfs_fill_super(struct super_block *sb, void *data, int silent)
 {
 	struct inode *inode;
 	struct spec_sb_info *sbi;
+	struct dentry *root;
 	int err;
 
 	_ptrace(("filling superblock %p\n", sb));
@@ -1378,18 +1383,32 @@ specfs_fill_super(struct super_block *sb, void *data, int silent)
 	inode->i_mode = S_IFDIR | S_IRUGO | S_IXUGO | S_IWUSR;
 	inode->i_op = &spec_root_i_ops;
 	inode->i_fop = &spec_root_f_ops;
+#if defined HAVE_KFUNC_SET_NLINK
+	set_nlink(inode, 2);
+#else
 	inode->i_nlink = 2;
-	if (!(sb->s_root = d_alloc_root(inode)))
+#endif
+#ifdef HAVE_KFUNC_D_MAKE_ROOT
+	root = d_make_root(inode);
+	if (!root)
+		goto error;
+#else
+	root = d_alloc_root(inode);
+	if (!root)
 		goto iput_error;
+#endif
+	sb->s_root = root;
 	SPECFS_SB(sb) = sbi;
 #ifdef HAVE_KMEMB_STRUCT_SUPER_BLOCK_S_D_OP
 	sb->s_d_op = &spec_root_d_ops;
 #endif
 	return (0);
+#ifndef HAVE_KFUNC_D_MAKE_ROOT
       iput_error:
 	_ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
 		 atomic_read(&inode->i_count) - 1));
 	iput(inode);
+#endif
       free_error:
 	spec_sbi_free(sbi);
       error:

@@ -383,4 +383,14 @@
 #define streamscall
 #endif
 
+/* Symbol kill_pid_info_as_cred is available. */
+#undef HAVE_KILL_PID_INFO_AS_CRED_SYMBOL
+
+/* Define to 1 if you have the <asm/system.h> header file. */
+#undef HAVE_KINC_ASM_SYSTEM_H
+
+/* Defined when the header file $linux_cv_k_autoconf needs to be explicitly
+   included. */
+#undef NEED_LINUX_AUTOCONF_H
+
 #endif				/* __SYS_OPENSS7_CONFIG_H__ */

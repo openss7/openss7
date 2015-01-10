@@ -95,7 +95,9 @@
 #include <linux/types.h>
 #include <linux/kernel.h>
 #include <linux/sched.h>
+#ifdef HAVE_KINC_ASM_SYSTEM_H
 #include <asm/system.h>
+#endif
 #include <linux/irq.h>
 #include <linux/interrupt.h>
 #include <linux/kdev_t.h>

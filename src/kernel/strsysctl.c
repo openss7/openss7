@@ -135,6 +135,9 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
 	 NULL,
 #endif
@@ -152,6 +155,9 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
 	 NULL,
 #endif
@@ -169,6 +175,9 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
 	 NULL,
 #endif
@@ -186,6 +195,9 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
 	 NULL,
 #endif
@@ -206,6 +218,9 @@ STATIC ctl_table streams_table[] = {
 	 &proc_dointvec_ms_jiffies,
 #else
 	 &proc_doulongvec_ms_jiffies_minmax,
+#endif
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
+	 NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
 	 NULL,
@@ -228,6 +243,9 @@ STATIC ctl_table streams_table[] = {
 #else
 	 &proc_doulongvec_ms_jiffies_minmax,
 #endif
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
 	 NULL,
 #endif
@@ -249,6 +267,9 @@ STATIC ctl_table streams_table[] = {
 #else
 	 &proc_doulongvec_ms_jiffies_minmax,
 #endif
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
 	 NULL,
 #endif
@@ -266,6 +287,9 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
 	 NULL,
 #endif
@@ -283,6 +307,9 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
 	 NULL,
 #endif
@@ -304,6 +331,9 @@ STATIC ctl_table streams_table[] = {
 #else
 	 &proc_doulongvec_ms_jiffies_minmax,
 #endif
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
 	 NULL,
 #endif
@@ -321,6 +351,9 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
 	 NULL,
 #endif
@@ -338,6 +371,9 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
 	 NULL,
 #endif
@@ -354,6 +390,9 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
 	 NULL,
 #endif
@@ -371,6 +410,9 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
 	 NULL,
 #endif
@@ -387,6 +429,9 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_dointvec,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
 	 NULL,
 #endif
@@ -404,6 +449,9 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
 	 NULL,
 #endif
@@ -420,6 +468,9 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
 	 NULL,
 #endif
@@ -437,6 +488,9 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
 	 NULL,
 #endif
@@ -454,6 +508,9 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
 	 NULL,
 #endif
@@ -471,6 +528,9 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
 	 NULL,
 #endif
@@ -487,6 +547,9 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_dointvec,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
 	 NULL,
 #endif
@@ -513,13 +576,13 @@ strsysctl_init(void)
 	sysctl_str_minpsz = STRMINPSZ;	/* stream head default min packet size */
 	sysctl_str_hiwat = STRHIGH;	/* stream head default hi water mark */
 	sysctl_str_lowat = STRLOW;	/* stream head default lo water mark */
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
+#if defined HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT || defined HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
 	if ((streams_sysctl_handle = register_sysctl_table(streams_root_table)))
 		return (0);
-#else				/* HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT */
+#else
 	if ((streams_sysctl_handle = register_sysctl_table(streams_root_table, 1)))
 		return (0);
-#endif				/* HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT */
+#endif
 	return (-EIO);
 }
 

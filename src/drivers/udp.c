@@ -4100,7 +4100,11 @@ tp_skb_destructor_slow(struct tp *tp, struct sk_buff *skb)
 		spin_unlock_irqrestore(&tp->qlock, flags);
 	}
 #if 0				/* destructor is nulled by skb_orphan */
+#ifdef HAVE_KMEMB_STRUCT_SKB_FRAG_STRUCT_PAGE_P
+	skb_shinfo(skb)->frags[0].page.p = NULL;
+#else
 	skb_shinfo(skb)->frags[0].page = NULL;
+#endif
 	skb->destructor = NULL;
 #endif
 	tp_put(tp);
@@ -4127,7 +4131,11 @@ tp_skb_destructor(struct sk_buff *skb)
 	struct tp *tp;
 	unsigned long flags;
 
+#ifdef HAVE_KMEMB_STRUCT_SKB_FRAG_STRUCT_PAGE_P
+	tp = (typeof(tp)) skb_shinfo(skb)->frags[0].page.p;
+#else
 	tp = (typeof(tp)) skb_shinfo(skb)->frags[0].page;
+#endif
 	dassert(tp != NULL);
 	if (likely(tp->sndblk == 0)) {
 		/* technically we could have multiple processors freeing sk_buffs at the same time */
@@ -4136,7 +4144,11 @@ tp_skb_destructor(struct sk_buff *skb)
 		tp->sndmem -= skb->truesize;
 		spin_unlock_irqrestore(&tp->qlock, flags);
 #if 0				/* destructor is nulled by skb_orphan */
+#ifdef HAVE_KMEMB_STRUCT_SKB_FRAG_STRUCT_PAGE_P
+		skb_shinfo(skb)->frags[0].page.p = NULL;
+#else
 		skb_shinfo(skb)->frags[0].page = NULL;
+#endif
 		skb->destructor = NULL;
 #endif
 		tp_put(tp);
@@ -4187,7 +4199,11 @@ tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 		/* we never have any page fragments, so we can steal a pointer from the page
 		   fragement list. */
 		assert(skb_shinfo(skb)->nr_frags == 0);
+#ifdef HAVE_KMEMB_STRUCT_SKB_FRAG_STRUCT_PAGE_P
+		skb_shinfo(skb)->frags[0].page.p = (struct page *) tp_get(tp);
+#else
 		skb_shinfo(skb)->frags[0].page = (struct page *) tp_get(tp);
+#endif
 		skb->destructor = tp_skb_destructor;
 		spin_lock_irqsave(&tp->qlock, flags);
 		tp->sndmem += skb->truesize;
@@ -4352,7 +4368,11 @@ tp_alloc_skb_old(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	/* we never have any page fragments, so we can steal a pointer from the page fragement
 	   list. */
 	assert(skb_shinfo(skb)->nr_frags == 0);
+#ifdef HAVE_KMEMB_STRUCT_SKB_FRAG_STRUCT_PAGE_P
+	skb_shinfo(skb)->frags[0].page.p = (struct page *) tp_get(tp);
+#else
 	skb_shinfo(skb)->frags[0].page = (struct page *) tp_get(tp);
+#endif
 	skb->destructor = tp_skb_destructor;
 	spin_lock_irqsave(&tp->qlock, flags);
 	tp->sndmem += skb->truesize;
@@ -4421,7 +4441,11 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	/* we never have any page fragments, so we can steal a pointer from the page fragement
 	   list. */
 	assert(skb_shinfo(skb)->nr_frags == 0);
+#ifdef HAVE_KMEMB_STRUCT_SKB_FRAG_STRUCT_PAGE_P
+	skb_shinfo(skb)->frags[0].page.p = (struct page *) tp_get(tp);
+#else
 	skb_shinfo(skb)->frags[0].page = (struct page *) tp_get(tp);
+#endif
 	skb->destructor = tp_skb_destructor;
 	spin_lock_irqsave(&tp->qlock, flags);
 	tp->sndmem += skb->truesize;
@@ -4464,6 +4488,12 @@ tp_route_output(struct tp *tp, const struct tp_options *opt, struct rtable **rtp
 	}
 	return tp_route_output_slow(tp, opt, rtp);
 }
+
+#ifdef NETIF_F_NO_CSUM
+#define DONT_CHECKSUM (NETIF_F_NO_CSUM|NETIF_F_HW_CSUM|NETIF_F_IP_CSUM|NETIF_F_LOOPBACK)
+#else
+#define DONT_CHECKSUM (NETIF_F_HW_CSUM|NETIF_F_IP_CSUM|NETIF_F_LOOPBACK)
+#endif
 
 /**
  * tp_senddata - process a unit data request
@@ -4514,7 +4544,7 @@ tp_senddata(struct tp *tp, mblk_t *db, const unsigned short dport, const struct 
 			skb->csum = 0;
 			if (unlikely(opt->udp.checksum != T_YES))
 				goto no_csum;
-			if (likely(dev->features & (NETIF_F_NO_CSUM | NETIF_F_HW_CSUM)))
+			if (likely(dev->features & DONT_CHECKSUM))
 				goto no_csum;
 			skb->ip_summed = 0;
 			skb->csum = csum_tcpudp_nofold(saddr, daddr, skb->len, IPPROTO_UDP, 0);

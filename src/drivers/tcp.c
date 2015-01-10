@@ -4508,6 +4508,12 @@ cksum_generate(struct tcphdr *th, size_t plen)
 	return (0);
 }
 
+#ifdef NETIF_F_NO_CSUM
+#define DONT_CHECKSUM (NETIF_F_NO_CSUM|NETIF_F_HW_CSUM|NETIF_F_IP_CSUM|NETIF_F_LOOPBACK)
+#else
+#define DONT_CHECKSUM (NETIF_F_HW_CSUM|NETIF_F_IP_CSUM|NETIF_F_LOOPBACK)
+#endif
+
 /**
  * t_tpi_xmitmsg - send a message from a Stream
  * @q: active queue in queue pair (write queue)
@@ -4603,7 +4609,7 @@ t_tpi_xmitmsg(queue_t *q, mblk_t *dp, struct sockaddr_in *sin, struct tpi_option
 			}
 			th->check = 0;
 			fixme(("Need a checksum function."));
-			if (!(dev->features & (NETIF_F_NO_CSUM | NETIF_F_HW_CSUM)))
+			if (!(dev->features & DONT_CHECKSUM))
 				th->check = htonl(cksum_generate(th, plen));
 			// TCP_INC_STATS(UdpOutPackets);
 #if defined HAVE_KFUNC_DST_OUTPUT

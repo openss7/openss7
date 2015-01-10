@@ -3816,7 +3816,11 @@ tp_skb_destructor_slow(struct tp *tp, struct sk_buff *skb)
 		spin_unlock_irqrestore(&tp->qlock, flags);
 	}
 #if 0				/* destructor is nulled by skb_orphan */
+#ifdef HAVE_KMEMB_STRUCT_SKB_FRAG_STRUCT_PAGE_P
+	skb_shinfo(skb)->frags[0].page.p = NULL;
+#else
 	skb_shinfo(skb)->frags[0].page = NULL;
+#endif
 	skb->destructor = NULL;
 #endif
 	tp_put(tp);
@@ -3843,7 +3847,11 @@ tp_skb_destructor(struct sk_buff *skb)
 	struct tp *tp;
 	unsigned long flags;
 
+#ifdef HAVE_KMEMB_STRUCT_SKB_FRAG_STRUCT_PAGE_P
+	tp = (typeof(tp)) skb_shinfo(skb)->frags[0].page.p;
+#else
 	tp = (typeof(tp)) skb_shinfo(skb)->frags[0].page;
+#endif
 	dassert(tp != NULL);
 	if (likely(tp->sndblk == 0)) {
 		/* technically we could have multiple processors freeing sk_buffs at the same time */
@@ -3852,7 +3860,11 @@ tp_skb_destructor(struct sk_buff *skb)
 		tp->sndmem -= skb->truesize;
 		spin_unlock_irqrestore(&tp->qlock, flags);
 #if 0				/* destructor is nulled by skb_orphan */
+#ifdef HAVE_KMEMB_STRUCT_SKB_FRAG_STRUCT_PAGE_P
+		skb_shinfo(skb)->frags[0].page.p = NULL;
+#else
 		skb_shinfo(skb)->frags[0].page = NULL;
+#endif
 		skb->destructor = NULL;
 #endif
 		tp_put(tp);
@@ -3903,7 +3915,11 @@ tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 		/* we never have any page fragments, so we can steal a pointer from the page
 		   fragement list. */
 		assert(skb_shinfo(skb)->nr_frags == 0);
+#ifdef HAVE_KMEMB_STRUCT_SKB_FRAG_STRUCT_PAGE_P
+		skb_shinfo(skb)->frags[0].page.p = (struct page *) tp_get(tp);
+#else
 		skb_shinfo(skb)->frags[0].page = (struct page *) tp_get(tp);
+#endif
 		skb->destructor = tp_skb_destructor;
 		spin_lock_irqsave(&tp->qlock, flags);
 		tp->sndmem += skb->truesize;
@@ -4068,7 +4084,11 @@ tp_alloc_skb_old(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	/* we never have any page fragments, so we can steal a pointer from the page fragement
 	   list. */
 	assert(skb_shinfo(skb)->nr_frags == 0);
+#ifdef HAVE_KMEMB_STRUCT_SKB_FRAG_STRUCT_PAGE_P
+	skb_shinfo(skb)->frags[0].page.p = (struct page *) tp_get(tp);
+#else
 	skb_shinfo(skb)->frags[0].page = (struct page *) tp_get(tp);
+#endif
 	skb->destructor = tp_skb_destructor;
 	spin_lock_irqsave(&tp->qlock, flags);
 	tp->sndmem += skb->truesize;
@@ -4137,7 +4157,11 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	/* we never have any page fragments, so we can steal a pointer from the page fragement
 	   list. */
 	assert(skb_shinfo(skb)->nr_frags == 0);
+#ifdef HAVE_KMEMB_STRUCT_SKB_FRAG_STRUCT_PAGE_P
+	skb_shinfo(skb)->frags[0].page.p = (struct page *) tp_get(tp);
+#else
 	skb_shinfo(skb)->frags[0].page = (struct page *) tp_get(tp);
+#endif
 	skb->destructor = tp_skb_destructor;
 	spin_lock_irqsave(&tp->qlock, flags);
 	tp->sndmem += skb->truesize;

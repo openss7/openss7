@@ -5533,10 +5533,18 @@ sctp_queue_xmit(struct sk_buff *skb)
  *  transferring data to the hardware or by the firmware of the card itself, SCTP performance would
  *  be increased.
  */
-#if 0
-#define SCTP_NO_CSUM (NETIF_F_NO_CSUM | NETIF_F_HW_CSUM)
+#ifdef NETIF_F_NO_CSUM
+#ifdef NETIF_F_SCTP_CSUM
+#define SCTP_NO_CSUM (NETIF_F_SCTP_CSUM|NETIF_F_NO_CSUM|NETIF_F_LOOPBACK)
 #else
-#define SCTP_NO_CSUM (NETIF_F_NO_CSUM)
+#define SCTP_NO_CSUM (NETIF_F_NO_CSUM|NETIF_F_LOOPBACK)
+#endif
+#else
+#ifdef NETIF_F_SCTP_CSUM
+#define SCTP_NO_CSUM (NETIF_F_SCTP_CSUM|NETIF_F_LOOPBACK)
+#else
+#define SCTP_NO_CSUM (NETIF_F_LOOPBACK)
+#endif
 #endif
 
 /*
@@ -30229,20 +30237,21 @@ sctp_notifier(struct notifier_block *self, unsigned long msg, void *data)
 
 #ifdef CONFIG_PROC_FS
 
-#ifdef HAVE_KINC_LINUX_PERCPU_H
+#if defined HAVE_KINC_LINUX_PERCPU_H && !defined SNMP_ARRAY_SZ
 STATIC void
 sctp_init_stats(void)
 {
 	sctp_statistics[0] = alloc_percpu(struct sctp_mib);
 	sctp_statistics[1] = alloc_percpu(struct sctp_mib);
 }
+
 STATIC void
 sctp_term_stats(void)
 {
 	free_percpu(sctp_statistics[1]);
 	free_percpu(sctp_statistics[0]);
 }
-#endif				/* HAVE_KINC_LINUX_PERCPU_H */
+#endif				/* defined HAVE_KINC_LINUX_PERCPU_H && !defined SNMP_ARRAY_SZ */
 
 #endif				/* CONFIG_PROC_FS */
 
@@ -30379,9 +30388,9 @@ sctp_init(void)
 	sctp_init_protosw();
 	/* TODO: adjust buffer size sysctls, port ranges and other parameters based on dynamic
 	   allocations.  */
-#ifdef HAVE_KINC_LINUX_PERCPU_H
+#if defined HAVE_KINC_LINUX_PERCPU_H && !defined SNMP_ARRAY_SZ
 	sctp_init_stats();
-#endif				/* HAVE_KINC_LINUX_PERCPU_H */
+#endif				/* defined HAVE_KINC_LINUX_PERCPU_H && !defined SNMP_ARRAY_SZ */
 	return (0);
 }
 
@@ -30393,9 +30402,9 @@ sctp_exit(void)
 {
 	int err;
 
-#ifdef HAVE_KINC_LINUX_PERCPU_H
+#if defined HAVE_KINC_LINUX_PERCPU_H && !defined SNMP_ARRAY_SZ
 	sctp_term_stats();
-#endif				/* HAVE_KINC_LINUX_PERCPU_H */
+#endif				/* defined HAVE_KINC_LINUX_PERCPU_H && !defined SNMP_ARRAY_SZ */
 	sctp_term_protosw();
 	sctp_term_proto();
 #ifdef SCTP_CONFIG_ADD_IP

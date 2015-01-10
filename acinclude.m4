@@ -788,6 +788,7 @@ dnl----------------------------------------------------------------------------
 	linux/device.h \
 	linux/notifier.h \
 	linux/crypto.h \
+	asm/system.h \
 	], [:], [:], [
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
@@ -838,6 +839,8 @@ dnl----------------------------------------------------------------------------
 	cpumask_scnprintf \
 	create_proc_info_entry \
 	d_alloc_pseudo \
+	d_alloc_root \
+	d_make_root \
 	dev_init_buffers \
 	device_create \
 	device_destroy \
@@ -901,6 +904,7 @@ dnl----------------------------------------------------------------------------
 	request_dma \
 	session_of_pgrp \
 	set_cpus_allowed \
+	set_nlink \
 	set_user_nice \
 	simple_statfs \
 	skb_dst \
@@ -1152,6 +1156,7 @@ dnl----------------------------------------------------------------------------
 	struct ctl_table.ctl_name,
 	struct ctl_table.de,
 	struct ctl_table.parent,
+	struct ctl_table.poll,
 	struct ctl_table.strategy,
 	struct dentry_operations.d_dname,
 	struct dst_entry.path,
@@ -1200,6 +1205,7 @@ dnl----------------------------------------------------------------------------
 	struct packet_type.next,
 	struct sk_buff.h.sh,
 	struct sk_buff.transport_header,
+	struct skb_frag_struct.page.p,
 	struct sock.protinfo.af_inet.ttl,
 	struct sock.protinfo.af_inet.uc_ttl,
 	struct sock.sk_debug,
@@ -1649,6 +1655,7 @@ dnl----------------------------------------------------------------------------
 	kill_pid,
 	kill_pid_info,
 	kill_pid_info_as_uid,
+	kill_pid_info_as_cred,
 	kill_proc,
 	kill_proc_info,
 	kill_proc_info_as_uid,

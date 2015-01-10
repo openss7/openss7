@@ -116,6 +116,7 @@ typedef struct streams_cred {
 #define cr_gid     cr_cred.egid
 #define cr_ngroups cr_cred.group_info->ngroups
 #define cr_groups  cr_cred.group_info->small_block
+#define cr_user_ns cr_cred.user_ns
 #define NGROUPS    NGROUPS_SMALL
 
 /* doesn't work for LIS BCM. */
