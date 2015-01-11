@@ -789,6 +789,7 @@ dnl----------------------------------------------------------------------------
 	linux/notifier.h \
 	linux/crypto.h \
 	asm/system.h \
+	linux/seq_file.h \
 	], [:], [:], [
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
@@ -838,6 +839,8 @@ dnl----------------------------------------------------------------------------
 	cpu_raise_softirq \
 	cpumask_scnprintf \
 	create_proc_info_entry \
+	create_proc_read_entry \
+	proc_create_data \
 	d_alloc_pseudo \
 	d_alloc_root \
 	d_make_root \
