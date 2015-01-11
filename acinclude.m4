@@ -2228,7 +2228,20 @@ dnl----------------------------------------------------------------------------
 		[linux_cv_dev_mc_add_2_args='yes'],
 		[linux_cv_dev_mc_add_2_args='no'])
 	])
-	if test :$linux_cv_dev_mc_add_2_args = :yes ; then
+	AC_CACHE_CHECK([for kernel dev_mc_add with 2 args const], [linux_cv_dev_mc_add_2_args_const], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
+#include NEED_LINUX_AUTOCONF_H
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/netdevice.h>]],
+		[[int (*my_autoconf_function_point)(struct net_device *, const unsigned char *) = &dev_mc_add;]]) ],
+		[linux_cv_dev_mc_add_2_args_const='yes'],
+		[linux_cv_dev_mc_add_2_args_const='no'])
+	])
+	if test :$linux_cv_dev_mc_add_2_args = :yes -o :$linux_cv_dev_mc_add_2_args_const = :yes ; then
 	    AC_DEFINE([HAVE_KFUNC_DEV_MC_ADD_2_ARGS], [1], [Define if
 		function dev_mc_add takes 2 arguments.])
 	fi
