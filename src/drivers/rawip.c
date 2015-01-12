@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -361,10 +361,12 @@ struct tp_chash_bucket;
 
 struct tp_daddr {
 	uint32_t addr;			/* IP address this destination */
+	uint32_t saddr;			/* current source address */
 	unsigned char ttl;		/* time to live, this destination */
 	unsigned char tos;		/* type of service, this destination */
 	unsigned short mtu;		/* maximum transfer unit this destination */
 	struct dst_entry *dst;		/* route for this destination */
+	int oif;			/* current interface */
 };
 
 struct tp_saddr {
@@ -3762,7 +3764,9 @@ tp_ip_queue_xmit(struct sk_buff *skb)
 	struct iphdr *iph = (typeof(iph)) skb_network_header(skb);
 
 #if defined NETIF_F_TSO
-#if defined HAVE_KFUNC_IP_SELECT_IDENT_MORE_SK_BUFF
+#if defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS_SEGS
+	__ip_select_ident(iph, dst, 0);
+#elif defined HAVE_KFUNC_IP_SELECT_IDENT_MORE_SK_BUFF
 	ip_select_ident_more(skb, dst, NULL, 0);
 #else				/* !defined HAVE_KFUNC_IP_SELECT_IDENT_MORE_SK_BUFF */
 	ip_select_ident_more(iph, dst, NULL, 0);
@@ -4184,16 +4188,40 @@ tp_route_output_slow(struct tp *tp, const struct tp_options *opt, struct rtable 
 
 	if (XCHG(rtp, NULL) != NULL)
 		dst_release(XCHG(&tp->daddrs[0].dst, NULL));
+#if defined HAVE_KMEMB_STRUCT_RTABLE_RT_SRC
 	if (likely((err = ip_route_output(rtp, opt->ip.daddr, opt->ip.addr, 0, 0)) == 0)) {
 		dst_hold(rt_dst(*rtp));
 		tp->daddrs[0].dst = rt_dst(*rtp);
+		tp->daddrs[0].addr = opt->ip.daddr;
+		tp->daddrs[0].saddr = (*rtp)->rt_src;
+		tp->daddrs[0].oif = (*rtp)->rt_oif;
 	}
+#else				/* defined HAVE_KMEMB_STRUCT_RTABLE_RT_SRC */
+	{
+		struct flowi4 fl4;
+		struct rtable *rt;
+
+		flowi4_init_output(&fl4, 0, 0, 0, RT_SCOPE_UNIVERSE, 0, 0, opt->ip.daddr, opt->ip.addr, 0, 0);
+		rt = __ip_route_output_key(&init_net, &fl4);
+		if (IS_ERR(rt))
+			return PTR_ERR(rt);
+		tp->daddrs[0].dst = rt_dst(rt);
+		tp->daddrs[0].addr = fl4.daddr;
+		tp->daddrs[0].saddr = fl4.saddr;
+		tp->daddrs[0].oif = fl4.flowi4_oif;
+		tp->daddrs[0].tos = fl4.flowi4_tos;
+		if (rtp)
+			*rtp = rt;
+		err = 0;
+	}
+#endif				/* defined HAVE_KMEMB_STRUCT_RTABLE_RT_SRC */
 	return (err);
 }
 
 STATIC INLINE fastcall __hot_out int
 tp_route_output(struct tp *tp, const struct tp_options *opt, struct rtable **rtp)
 {
+#ifdef HAVE_KMEMB_STRUCT_RTABLE_RT_DST
 	register struct rtable *rt;
 
 	if (likely((rt = *rtp) != NULL)) {
@@ -4202,6 +4230,7 @@ tp_route_output(struct tp *tp, const struct tp_options *opt, struct rtable **rtp
 			return (0);
 		}
 	}
+#endif
 	return tp_route_output_slow(tp, opt, rtp);
 }
 
@@ -4245,9 +4274,18 @@ tp_senddata(struct tp *tp, mblk_t *db, const struct tp_options *opt,
 
 		if (likely((skb = tp_alloc_skb(tp, mp, hlen, GFP_ATOMIC)) != NULL)) {
 			struct iphdr *iph;
-			uint32_t saddr = opt->ip.saddr ? opt->ip.saddr : rt->rt_src;
-			uint32_t daddr = rt->rt_dst;
+			uint32_t saddr, daddr;
 
+#ifdef HAVE_KMEMB_STRUCT_RTABLE_RT_SRC
+			saddr = opt->ip.saddr ? : rt->rt_src;
+#else
+			saddr = opt->ip.saddr ? : tp->daddrs[0].saddr;
+#endif
+#ifdef HAVE_KMEMB_STRUCT_RTABLE_RT_DST
+			daddr = opt->ip.daddr ? : rt->rt_dst;
+#else
+			daddr = opt->ip.daddr ? : tp->daddrs[0].addr;
+#endif
 			/* find headers */
 
 			__skb_push(skb, sizeof(struct iphdr));
@@ -4259,10 +4297,10 @@ tp_senddata(struct tp *tp, mblk_t *db, const struct tp_options *opt,
 			iph = (typeof(iph)) skb_network_header(skb);
 			iph->version = 4;
 			iph->ihl = 5;
-			iph->tos = opt->ip.tos;
+			iph->tos = opt->ip.tos ? : tp->daddrs[0].tos;
 			iph->frag_off = htons(IP_DF);	/* never frag */
 			// iph->frag_off = 0; /* need qos bit */
-			iph->ttl = opt->ip.ttl;
+			iph->ttl = opt->ip.ttl ? : tp->daddrs[0].ttl;
 			iph->daddr = daddr;
 			iph->saddr = saddr;
 			iph->protocol = opt->ip.protocol;

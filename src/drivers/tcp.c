@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -401,8 +401,10 @@ typedef struct tpi_options {
 		t_uscalar_t rcvlowat;	/* XTI_RCVLOWAT */
 		t_uscalar_t sndbuf;	/* XTI_SNDBUF */
 		t_uscalar_t sndlowat;	/* XTI_SNDLOWAT */
+//		t_uscalar_t priority;	/* XTI_PRIORITY */
 	} xti;
 	struct {
+//		unsigned char protocol;	/* T_IP_PROTOCOL */
 		unsigned char options[40];	/* T_IP_OPTIONS */
 		unsigned char tos;	/* T_IP_TOS */
 		unsigned char ttl;	/* T_IP_TTL */
@@ -410,6 +412,9 @@ typedef struct tpi_options {
 		unsigned int dontroute;	/* T_IP_DONTROUTE */
 		unsigned int broadcast;	/* T_IP_BROADCAST */
 		uint32_t addr;		/* T_IP_ADDR */
+//		uint32_t saddr;		/* T_IP_SADDR */
+//		uint32_t daddr;		/* T_IP_DADDR */
+//		uint32_t mtu;		/* T_IP_MTU */
 	} ip;
 	struct {
 		t_uscalar_t nodelay;	/* T_TCP_NODELAY */
@@ -4466,7 +4471,9 @@ t_tpi_queue_xmit(struct sk_buff *skb)
 	struct iphdr *iph = (typeof(iph)) skb_network_header(skb);
 
 #if defined NETIF_F_TSO
-#if defined HAVE_KFUNC_IP_SELECT_IDENT_MORE_SK_BUFF
+#if defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS_SEGS
+	__ip_select_ident(iph, rt_dst(rt), 0);
+#elif defined HAVE_KFUNC_IP_SELECT_IDENT_MORE_SK_BUFF
 	ip_select_ident_more(skb, rt_dst(rt), NULL, 0);
 #else				/* !defined HAVE_KFUNC_IP_SELECT_IDENT_MORE_SK_BUFF */
 	ip_select_ident_more(iph, rt_dst(rt), NULL, 0);
@@ -4571,13 +4578,21 @@ t_tpi_xmitmsg(queue_t *q, mblk_t *dp, struct sockaddr_in *sin, struct tpi_option
 			iph->frag_off = 0;
 			/* Can be set using the T_IP_TTL option at the T_INET_IP level. */
 			iph->ttl = opts->ip.ttl;
+#ifdef HAVE_KMEMB_STRUCT_RTABLE_RT_DST
 			iph->daddr = rt->rt_dst;
+#else
+			iph->daddr = sin->sin_addr.s_addr;
+#endif
 			/* Yes the TS user can override the source address using the T_IP_ADDR
 			   option at the T_INET_IP level. */
 			if (t_tst_bit(_T_BIT_IP_ADDR, opts->flags))
 				iph->saddr = opts->ip.addr;
 			else
+#ifdef HAVE_KMEMB_STRUCT_RTABLE_RT_SRC
 				iph->saddr = rt->rt_src;
+#else
+				iph->saddr = 0;
+#endif
 			iph->protocol = IPPROTO_TCP;
 			iph->tot_len = htons(tlen);
 #if defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER

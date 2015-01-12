@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -5274,36 +5274,70 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 			continue;
 		}
 #endif				/* SCTP_CONFIG_ADD_IP */
-		LOGDA(sp, "checking route %d.%d.%d.%d",
-			  (sd->daddr >> 0) & 0xff, (sd->daddr >> 8) & 0xff,
-			  (sd->daddr >> 16) & 0xff, (sd->daddr >> 24) & 0xff);
+		LOGDA(sp, "checking route %d.%d.%d.%d", (sd->daddr >> 0) & 0xff, (sd->daddr >> 8) & 0xff,
+		      (sd->daddr >> 16) & 0xff, (sd->daddr >> 24) & 0xff);
 		if (!sd->dst_cache || (sd->dst_cache->obsolete > 0 && !my_dst_check(&sd->dst_cache))) {
 			rt = NULL;
 			sd->saddr = 0;
 			route_changed = 1;
 			/* try wildcard saddr and dif routing */
 #if defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
-			err = ip_route_connect(&rt, sd->daddr, 0, RT_CONN_FLAGS(sp), 0);
+			err = ip_route_connect(&rt, sd->daddr, sd->saddr, RT_CONN_FLAGS(sp), 0);
 #elif defined HAVE_KFUNC_IP_ROUTE_CONNECT_9_ARGS
-			err = ip_route_connect(&rt, sd->daddr, 0, RT_CONN_FLAGS(sp), 0,
-					       IPPROTO_SCTP, sp->sport, sp->dport, NULL);
+			err =
+			    ip_route_connect(&rt, sd->daddr, sd->saddr, RT_CONN_FLAGS(sp), 0, IPPROTO_SCTP,
+					     sp->sport, sp->dport, NULL);
 #elif defined HAVE_KFUNC_IP_ROUTE_CONNECT_10_ARGS
 #if !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
-			err = ip_route_connect(&rt, sd->daddr, 0, RT_CONN_FLAGS(sp), 0,
-					       IPPROTO_SCTP, sp->sport, sp->dport, NULL, 0);
+			err =
+			    ip_route_connect(&rt, sd->daddr, sd->saddr, RT_CONN_FLAGS(sp), 0, IPPROTO_SCTP,
+					     sp->sport, sp->dport, NULL, 0);
 #else
-			err = ip_route_output(&rt, sd->daddr, 0, RT_CONN_FLAGS(sp), 0);
+			err = ip_route_output(&rt, sd->daddr, sd->saddr, RT_CONN_FLAGS(sp), 0);
 #endif
 #elif defined HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN
-			err = ip_route_connect(&rt, sd->daddr, 0, RT_CONN_FLAGS(sp), 0,
-					       IPPROTO_SCTP, sp->sport, sp->dport, NULL, 0);
+#if 0
+			err =
+			    ip_route_connect(&rt, sd->daddr, sd->saddr, RT_CONN_FLAGS(sp), 0, IPPROTO_SCTP,
+					     sp->sport, sp->dport, NULL, 0);
+#else
+			{
+				struct flowi4 fl4;
+				struct rtable *rt2;
+
+				flowi4_init_output(&fl4, 0, 0, RT_CONN_FLAGS(sp), RT_SCOPE_UNIVERSE,
+						   IPPROTO_SCTP, 0, sd->daddr, sd->saddr, sp->dport,
+						   sp->sport);
+				if (!sd->daddr || !sd->saddr) {
+					rt2 = __ip_route_output_key(&init_net, &fl4);
+					if (IS_ERR(rt2)) {
+						err = PTR_ERR(rt2);
+						goto done;
+					}
+					ip_rt_put(rt2);
+					flowi4_update_output(&fl4, 0, RT_CONN_FLAGS(sp), fl4.daddr,
+							     fl4.saddr);
+				}
+				rt2 = __ip_route_output_key(&init_net, &fl4);
+				if (IS_ERR(rt2)) {
+					err = PTR_ERR(rt2);
+					goto done;
+				}
+				rt = rt2;
+				sd->daddr = fl4.daddr;
+				sd->saddr = fl4.saddr;
+				sd->dif = fl4.flowi4_oif;
+			}
+		      done:
+#endif
 #else
 #error Need a usable ip_route_connect() prototype.
 #endif
 			if (err < 0 || !rt || rt_dst(rt)->obsolete > 0) {
 				rare();
 				if (rt) {
-					LOGERR(sp, "%s() no route, err=%d, obsolete=%d", __FUNCTION__, -err, rt_dst(rt)->obsolete);
+					LOGERR(sp, "%s() no route, err=%d, obsolete=%d", __FUNCTION__, -err,
+					       rt_dst(rt)->obsolete);
 					ip_rt_put(rt);
 				} else {
 					LOGERR(sp, "%s() no route, err=%d", __FUNCTION__, -err);
@@ -5320,18 +5354,19 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 				err = -ENETUNREACH;
 				continue;
 			}
+#ifdef HAVE_KMEMB_STRUCT_RTABLE_RT_SRC
 			sd->saddr = rt->rt_src;
+#endif
 			if (!sctp_find_saddr(sp, sd->saddr)) {
 				rare();
 				LOGERR(sp, "%s() no route from source", __FUNCTION__);
 #ifdef SCTP_CONFIG_ADD_IP
 				/* Candidate for ADD-IP but we can't use it yet */
-				if (sp->p_caps & SCTP_CAPS_ADD_IP
-				    && !(sp->userlocks & SCTP_BINDADDR_LOCK)) {
+				if (sp->p_caps & SCTP_CAPS_ADD_IP && !(sp->userlocks & SCTP_BINDADDR_LOCK)) {
 					int err = 0;
 					struct sctp_saddr *ss;
 
-					if ((ss = __sctp_saddr_alloc(sp, rt->rt_src, &err))) {
+					if ((ss = __sctp_saddr_alloc(sp, sd->saddr, &err))) {
 						ss->flags |= SCTP_SRCEF_ADD_REQUEST;
 						sp->sackf |= SCTP_SACKF_ASC;
 					}
@@ -5354,8 +5389,7 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 			sd->srtt = 0;
 			sd->mtu = dst_pmtu(rt_dst(rt));
 			sd->dmps =
-			    sd->mtu - sp->ext_header_len - sizeof(struct iphdr) -
-			    sizeof(struct sctphdr);
+			    sd->mtu - sp->ext_header_len - sizeof(struct iphdr) - sizeof(struct sctphdr);
 			sd->ssthresh = 2 * dst_pmtu(rt_dst(rt));
 			sd->cwnd = dst_pmtu(rt_dst(rt));
 			/* SCTP IG Section 2.9 */
@@ -5370,24 +5404,28 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 			struct rtable *rt2 = NULL;
 
 #if defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
-			if (!ip_route_connect(&rt2, rt->rt_dst, 0, RT_CONN_FLAGS(sp), sd->dif))
+			if (!ip_route_connect(&rt2, sd->daddr, 0, RT_CONN_FLAGS(sp), sd->dif))
 #elif defined HAVE_KFUNC_IP_ROUTE_CONNECT_9_ARGS
-			if (!ip_route_connect(&rt2, rt->rt_dst, 0, RT_CONN_FLAGS(sp), sd->dif,
-					      IPPROTO_SCTP, sp->sport, sp->dport, NULL))
+			if (!ip_route_connect
+			    (&rt2, sd->daddr, 0, RT_CONN_FLAGS(sp), sd->dif, IPPROTO_SCTP, sp->sport,
+			     sp->dport, NULL))
 #elif defined HAVE_KFUNC_IP_ROUTE_CONNECT_10_ARGS
 #if !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
-			if (!ip_route_connect(&rt2, rt->rt_dst, 0, RT_CONN_FLAGS(sp), sd->dif,
-					      IPPROTO_SCTP, sp->sport, sp->dport, NULL, 0))
+			if (!ip_route_connect
+			    (&rt2, sd->daddr, 0, RT_CONN_FLAGS(sp), sd->dif, IPPROTO_SCTP, sp->sport,
+			     sp->dport, NULL, 0))
 #else
-			if (!ip_route_output(&rt2, rt->rt_dst, 0, RT_CONN_FLAGS(sp), sd->dif))
+			if (!ip_route_output(&rt2, sd->daddr, 0, RT_CONN_FLAGS(sp), sd->dif))
 #endif
 #elif defined HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN
-			if (!ip_route_connect(&rt2, rt->rt_dst, 0, RT_CONN_FLAGS(sp), sd->dif,
-					      IPPROTO_SCTP, sp->sport, sp->dport, NULL, 0))
+			if (!ip_route_connect
+			    (&rt2, sd->daddr, 0, RT_CONN_FLAGS(sp), sd->dif, IPPROTO_SCTP, sp->sport,
+			     sp->dport, NULL, 0))
 #else
 #error Need a usable ip_route_connect() prototype.
 #endif
 			{
+#ifdef HAVE_KMEMB_STRUCT_RTABLE_RT_SRC
 				if (rt2->rt_src != rt->rt_src) {
 					rare();
 					LOGERR(sp, "%s() wrong source for route", __FUNCTION__);
@@ -5407,6 +5445,7 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 					sd->route_caps = rt_dst(rt)->dev->features;
 					route_changed = 1;
 				}
+#endif
 				ip_rt_put(rt2);
 			}
 		}
@@ -5416,8 +5455,7 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 		if (sd->mtu != dst_pmtu(rt_dst(rt))) {
 			sd->mtu = dst_pmtu(rt_dst(rt));
 			sd->dmps =
-			    sd->mtu - sp->ext_header_len - sizeof(struct iphdr) -
-			    sizeof(struct sctphdr);
+			    sd->mtu - sp->ext_header_len - sizeof(struct iphdr) - sizeof(struct sctphdr);
 			mtu_changed = 1;
 			rare();
 			LOGERR(sp, "%s() mtu changed", __FUNCTION__);
@@ -5433,8 +5471,7 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 		/* set defaults */
 		sp->taddr = sp->daddr;
 		sp->pmtu = ip_rt_min_pmtu;
-		sp->amps =
-		    sp->pmtu - sp->ext_header_len - sizeof(struct iphdr) - sizeof(struct sctphdr);
+		sp->amps = sp->pmtu - sp->ext_header_len - sizeof(struct iphdr) - sizeof(struct sctphdr);
 		LOGERR(sp, "no viable route");
 		return (err);
 	}
@@ -5442,8 +5479,7 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 	if (force_reselect || route_changed || mtu_changed || sp->pmtu != old_pmtu || !sp->taddr) {
 #if (defined(SCTP_CONFIG_DEBUG) || defined(SCTP_CONFIG_TEST)) && defined(SCTP_CONFIG_ERROR_GENERATOR)
 		int bad_choice = 0;
-#endif				/* defined(SCTP_CONFIG_DEBUG) &&
-				   defined(SCTP_CONFIG_ERROR_GENERATOR) */
+#endif				/* defined(SCTP_CONFIG_DEBUG) && defORed(SCTP_CONFIG_ERROR_GENERATOR) */
 		sp->taddr = sctp_choose_best(sp);
 		usual(sp->taddr);
 #if (defined SCTP_CONFIG_DEBUG || defined SCTP_CONFIG_TEST) && defined SCTP_CONFIG_ERROR_GENERATOR
@@ -5452,19 +5488,17 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 		    && sp->taddr->packets > SCTP_CONFIG_BREAK_GENERATOR_LEVEL) {
 			ptrace(("Primary sp->taddr %03d.%03d.%03d.%03d chosen poorly on %p\n",
 				(sp->taddr->daddr >> 0) & 0xff, (sp->taddr->daddr >> 8) & 0xff,
-				(sp->taddr->daddr >> 16) & 0xff, (sp->taddr->daddr >> 24) & 0xff,
-				sp));
+				(sp->taddr->daddr >> 16) & 0xff, (sp->taddr->daddr >> 24) & 0xff, sp));
 			bad_choice = 1;
 		}
-#endif				/* (defined SCTP_CONFIG_DEBUG || defined SCTP_CONFIG_TEST) &&
-				   defined SCTP_CONFIG_ERROR_GENERATOR */
+#endif				/* (defined SCTP_CONFIG_DEBUG || defined SCTP_CONFIG_TEST) && defined
+				   SCTP_CONFIG_ERROR_GENERATOR */
 		if (sp->taddr)
-			ptrace(("sp = %p, taddr = %p, Primary route: %d.%d.%d.%d -> %d.%d.%d.%d\n",
-				sp, sp->taddr, (sp->taddr->saddr >> 0) & 0xff,
-				(sp->taddr->saddr >> 8) & 0xff, (sp->taddr->saddr >> 16) & 0xff,
-				(sp->taddr->saddr >> 24) & 0xff, (sp->taddr->daddr >> 0) & 0xff,
-				(sp->taddr->daddr >> 8) & 0xff, (sp->taddr->daddr >> 16) & 0xff,
-				(sp->taddr->daddr >> 24) & 0xff));
+			ptrace(("sp = %p, taddr = %p, Primary route: %d.%d.%d.%d -> %d.%d.%d.%d\n", sp,
+				sp->taddr, (sp->taddr->saddr >> 0) & 0xff, (sp->taddr->saddr >> 8) & 0xff,
+				(sp->taddr->saddr >> 16) & 0xff, (sp->taddr->saddr >> 24) & 0xff,
+				(sp->taddr->daddr >> 0) & 0xff, (sp->taddr->daddr >> 8) & 0xff,
+				(sp->taddr->daddr >> 16) & 0xff, (sp->taddr->daddr >> 24) & 0xff));
 	}
 	return (0);
 }
@@ -5489,7 +5523,9 @@ sctp_queue_xmit(struct sk_buff *skb)
 	struct iphdr *iph = (typeof(iph)) skb_network_header(skb);
 
 #ifdef NETIF_F_TSO
-#if defined HAVE_KFUNC_IP_SELECT_IDENT_MORE_SK_BUFF
+#if defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS_SEGS
+	__ip_select_ident(iph, rt_dst(rt), 0);
+#elif defined HAVE_KFUNC_IP_SELECT_IDENT_MORE_SK_BUFF
 	ip_select_ident_more(skb, rt_dst(rt), NULL, 0);
 #else				/* !defined HAVE_KFUNC_IP_SELECT_IDENT_MORE_SK_BUFF */
 	ip_select_ident_more(iph, rt_dst(rt), NULL, 0);
@@ -5594,7 +5630,7 @@ sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, mblk_t *mp)
 			iph->ttl = sysctl_ip_default_ttl;
 			if (iph->ttl < 64)
 				iph->ttl = 64;
-			iph->daddr = rt->rt_dst;
+			iph->daddr = daddr;
 			iph->saddr = saddr;
 			iph->protocol = 132;
 			iph->tot_len = htons(tlen);
@@ -5718,7 +5754,7 @@ sctp_xmit_msg(uint32_t saddr, uint32_t daddr, mblk_t *mp, struct sctp *sp)
 #endif
 			if (iph->ttl < 64)
 				iph->ttl = 64;
-			iph->daddr = rt->rt_dst;
+			iph->daddr = daddr;
 			iph->saddr = saddr;
 			iph->protocol = sp->protocol;
 			iph->tot_len = htons(tlen);
@@ -5897,14 +5933,14 @@ sctp_send_msg(struct sctp *sp, struct sctp_daddr *sd, mblk_t *mp)
 		skb->nh.iph = iph;
 #endif				/* defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 #ifndef HAVE_KFUNC_DST_OUTPUT
-#ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
+#if defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 		__ip_select_ident(iph, sd->dst_cache);
-#else
-#ifdef HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+#elif defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
 		__ip_select_ident(iph, sd->dst_cache, 0);
+#elif defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS_SEGS
+		__ip_select_ident(iph, 1);
 #else
-#error HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS or HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS must be defined.
-#endif
+#error HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS(_SEGS) or HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS must be defined.
 #endif
 #endif
 		/* For sockets, socket buffers representing chunks are chained together by control
@@ -13193,8 +13229,8 @@ noinline fastcall int
 sctp_recv_err(struct sctp *sp, mblk_t *mp)
 {
 	struct sctp_daddr *sd;
-	uint32_t daddr = *((uint32_t *) mp->b_rptr);
-	struct icmphdr *icmph = (struct icmphdr *) (mp->b_rptr + sizeof(uint32_t));
+	struct icmphdr *icmph = (typeof(icmph)) (mp->b_rptr);
+	struct iphdr *iph = (typeof(iph)) (mp->b_rptr + sizeof(*icmph));
 	int type = icmph->type;
 	int code = icmph->code;
 	int err = 0, abt = 0;
@@ -13202,7 +13238,7 @@ sctp_recv_err(struct sctp *sp, mblk_t *mp)
 	(void) err;
 	if (sp->state == SCTP_CLOSED)
 		goto closed;
-	sd = sctp_find_daddr(sp, daddr);
+	sd = sctp_find_daddr(sp, iph->daddr);
 	switch (type) {
 	case ICMP_SOURCE_QUENCH:
 		if (!sd)
@@ -13227,9 +13263,17 @@ sctp_recv_err(struct sctp *sp, mblk_t *mp)
 			if (sd && sd->dst_cache) {
 				size_t mtu = ntohs(icmph->un.frag.mtu);
 
+#if defined HAVE_KFUNC_IP_RT_UPDATE_PMTU_4_ARGS
+				struct flowi4 fl4;
+
+				flowi4_init_output(&fl4, 0, 0, RT_TOS(iph->tos), RT_SCOPE_UNIVERSE,
+						   IPPROTO_SCTP, 0, iph->daddr, iph->saddr, 0, 0);
+
+				__ip_rt_update_pmtu((struct rtable *)sd->dst_cache, &fl4, mtu);
+#else				/* defined HAVE_KFUNC_IP_RT_UPDATE_PMTU_4_ARGS */
 #ifdef HAVE_IP_RT_UPDATE_PMTU_SYMBOL
 				ip_rt_update_pmtu(sd->dst_cache, mtu);
-#endif                          /* HAVE_IP_RT_UPDATE_PMTU_SYMBOL */
+#endif				/* HAVE_IP_RT_UPDATE_PMTU_SYMBOL */
 				if (dst_pmtu(sd->dst_cache) > mtu && mtu && mtu >= 68
 #ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
 				    && !(sd->dst_cache->mxlock & (1 << RTAX_MTU))
@@ -13238,8 +13282,9 @@ sctp_recv_err(struct sctp *sp, mblk_t *mp)
 					dst_update_pmtu(sd->dst_cache, mtu);
 #ifdef HAVE_IP_RT_MTU_EXPIRES_SYMBOL
 					dst_set_expires(sd->dst_cache, ip_rt_mtu_expires);
-#endif                          /* HAVE_IP_RT_MTU_EXPIRES_SYMBOL */
+#endif				/* HAVE_IP_RT_MTU_EXPIRES_SYMBOL */
 				}
+#endif				/* defined HAVE_KFUNC_IP_RT_UPDATE_PMTU_4_ARGS */
 			}
 		}
 		LOGRX(sp, "ICMP: error code %d", (int) code);
@@ -13265,14 +13310,13 @@ sctp_recv_err(struct sctp *sp, mblk_t *mp)
 		goto done;
 	}
 	if (sp->state == SCTP_LISTEN)
-		/* NOTE: Unlike TCP, we do not have partially formed sockets in the accept queue,
-		   so this ICMP error should have gone to the established socket in the accept
-		   queue that sent the COOKIE-ACK that generated the error.  Otherwise, it is for
-		   an INIT-ACK that can't get to its destination, so we don't care, just ignore it. 
-		 */
+		/* NOTE: Unlike TCP, we do not have partially formed sockets in the accept queue, so this
+		   ICMP error should have gone to the established socket in the accept queue that sent the
+		   COOKIE-ACK that generated the error.  Otherwise, it is for an INIT-ACK that can't get to
+		   its destination, so we don't care, just ignore it. */
 		goto listening;
-	/* Try to be a little bit smarter about ICMP errors received while trying to form a
-	   connection.  This can speed things up or make them more reliable. */
+	/* Try to be a little bit smarter about ICMP errors received while trying to form a connection.  This 
+	   can speed things up or make them more reliable. */
 	if (abt && ((1 << sp->state) & (SCTPF_OPENING))) {
 		switch (sp->state) {
 		case SCTP_COOKIE_WAIT:
@@ -29852,11 +29896,12 @@ sctp_v4_err(struct sk_buff *skb, uint32_t info)
 		goto no_stream;
 	if (sp->state == SCTP_CLOSED)
 		goto closed;
-	/* No need to take locks here, the reference held from sctp_lookup_xxx() is sufficient for
-	   our purposes here. */
+	/* No need to take locks here, the reference held from sctp_lookup_xxx() is sufficient for our
+	   purposes here. */
 	{
 		mblk_t *mp;
-		size_t mlen = sizeof(uint32_t) + sizeof(struct icmphdr *);
+		struct icmphdr *icmph = (typeof(icmph)) skb_transport_header(skb);
+		size_t mlen = sizeof(*icmph) + sizeof(*iph);
 
 		if (!(mp = allocb(mlen, BPRI_MED)))
 			goto no_buffers;
@@ -29864,10 +29909,10 @@ sctp_v4_err(struct sk_buff *skb, uint32_t info)
 			goto flow_controlled;
 		mp->b_datap->db_type = M_CTL;
 		mp->b_band = 1;
-		*((uint32_t *) mp->b_wptr) = iph->daddr;
-		mp->b_wptr += sizeof(uint32_t);
-		*((struct icmphdr *) mp->b_wptr) = *((struct icmphdr *)skb_transport_header(skb));
-		mp->b_wptr += sizeof(struct icmphdr);
+		*((typeof(icmph)) mp->b_wptr) = *icmph;
+		mp->b_wptr += sizeof(*icmph);
+		*((typeof(iph)) mp->b_wptr) = *iph;
+		mp->b_wptr += sizeof(*iph);
 		putq(sp->rq, mp);	/* must succeed, band 1 already allocated */
 		goto discard_and_put;
 	      no_buffers:

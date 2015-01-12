@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -956,6 +956,22 @@ enum xp_board {
 };
 
 /* indexed by xp_board above */
+
+#ifndef __devinitdata
+#define __devinitdata __initdata
+#endif
+
+#ifndef __devinit
+#define __devinit __init
+#endif
+
+#ifndef __devexit
+#define __devexit __exit
+#endif
+
+#ifndef __devexit_p
+#define __devexit_p __exit_p
+#endif
 
 /* *INDENT-OFF* */
 static struct {
