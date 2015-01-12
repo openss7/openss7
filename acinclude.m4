@@ -7,7 +7,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2009-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2009-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2009  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -864,6 +864,7 @@ dnl----------------------------------------------------------------------------
 	ip_dst_output \
 	ip_route_output_flow \
 	ip_route_output_key \
+	ip_select_ident_segs \
 	i_readcount_inc \
 	i_readcount_dec \
 	kern_umount \
@@ -1185,6 +1186,8 @@ dnl----------------------------------------------------------------------------
 	struct fown_struct.pid_type,
 	struct rtable.u.dst,
 	struct rtable.dst,
+	struct rtable.rt_dst,
+	struct rtable.rt_src,
 	struct inet_protocol.copy,
 	struct inet_protocol.next,
 	struct inet_protocol.no_policy,
@@ -1340,6 +1343,7 @@ AS_LINENO_POP])dnl
 	__get_free_pages,
 	__get_user_4,
 	__ip_route_output_key,
+	__ip_rt_update_pmtu,
 	__ip_select_ident,
 	__kfree_skb,
 	__wake_up,
@@ -1488,6 +1492,7 @@ dnl----------------------------------------------------------------------------
 dnl----------------------------------------------------------------------------
     _LINUX_KERNEL_SYMBOLS([
 	__ip_route_output_key,
+	__ip_rt_update_pmtu,
 	__ip_select_ident,
 	__module_address,
 	__module_text_address,
@@ -1609,6 +1614,7 @@ dnl----------------------------------------------------------------------------
 dnl----------------------------------------------------------------------------
     _LINUX_KERNEL_ABI_SYMBOLS([
 	__ip_route_output_key,
+	__ip_rt_update_pmtu,
 	__ip_select_ident,
 	__module_address,
 	__module_text_address,
@@ -2298,6 +2304,32 @@ dnl 	])
     fi
 dnl----------------------------------------------------------------------------
     _LINUX_KERNEL_ENV([dnl
+	AC_CACHE_CHECK([for ip_rt_update_pmtu takes 4 arguments], [linux_cv_ip_rt_update_pmtu_4_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
+#include NEED_LINUX_AUTOCONF_H
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#ifdef HAVE_KINC_NET_DST_H
+#include <net/dst.h>
+#endif]],
+		    [[void (*my_autoconf_function_pointer)(struct dst_entry *, struct sock *, struct sk_buff *, u32) = NULL;
+		      struct dst_ops my_autoconf_ops = { .update_pmtu = my_autoconf_function_pointer, };]]) ],
+		    [linux_cv_ip_rt_update_pmtu_4_args=yes],
+		    [linux_cv_ip_rt_update_pmtu_4_args=no])
+	])
+	if test :$linux_cv_ip_rt_update_pmtu_4_args = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_IP_RT_UPDATE_PMTU_4_ARGS], [1], [Define if
+		function ip_rt_update_pmtu takes 4 arguments.])
+	fi
+    ])
+dnl----------------------------------------------------------------------------
+    _LINUX_KERNEL_ENV([dnl
 	AC_CACHE_CHECK([for kernel ICMP_INC_STATS_BH with 2 args], [linux_cv_icmp_inc_stats_bh_2_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
@@ -2441,6 +2473,32 @@ dnl----------------------------------------------------------------------------
 	if test :$linux_cv_have___ip_select_ident_3_args = :yes ; then
 	    AC_DEFINE([HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS], [1], [Define if
 		function __ip_select_ident takes 3 arguments.])
+	fi
+	AC_CACHE_CHECK([for kernel __ip_select_ident with 2 arguments (segs).], [linux_cv_have___ip_select_ident_2_args_segs], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
+#include NEED_LINUX_AUTOCONF_H
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/inet.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <linux/skbuff.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter_ipv4.h>]],
+		[[void (*my_autoconf_function_pointer)(struct iphdr *, int) = &__ip_select_ident;]]) ],
+		[linux_cv_have___ip_select_ident_2_args_segs='yes'],
+		[linux_cv_have___ip_select_ident_2_args_segs='no'])
+	])
+	if test :$linux_cv_have___ip_select_ident_2_args_segs = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS_SEGS], [1], [Define if
+		function __ip_select_ident takes 2 arguments (with segs).])
 	fi
 dnl 	if test :"${linux_cv_have___ip_select_ident_2_args:-no}" = :no \
 dnl 	     -a :"${linux_cv_have___ip_select_ident_3_args:-no}" = :no
