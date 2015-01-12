@@ -1,6 +1,6 @@
 This file provides the Installation and Reference Manual for OpenSS7.
 
-This is Edition 7.20131209, last updated 2015-01-10, of the 'OpenSS7
+This is Edition 7.20131209, last updated 2015-01-11, of the 'OpenSS7
 Installation and Reference Manual', for Version 1.1 Release 7.20131209.
 
 Copyright (C) 2008-2014 Monavacon Limited (http://www.monavacon.com/)
@@ -45,7 +45,7 @@ OpenSS7 Installation and Reference Manual
 About This Manual
 =================
 
-This is Edition 7.20131209, last updated 2015-01-10, of 'The OpenSS7
+This is Edition 7.20131209, last updated 2015-01-11, of 'The OpenSS7
 Installation and Reference Manual', for Version 1.1 release 7.20131209
 of the OpenSS7 package.
 
@@ -606,7 +606,7 @@ Quick Start Guide
 OpenSS7
 =======
 
-Package openss7-1.1.7.20131209 was released under AGPLv3 2015-01-10.
+Package openss7-1.1.7.20131209 was released under AGPLv3 2015-01-11.
 
 This is the 'OpenSS7' package.  It contains all of the OpenSS7 Project
 release code.  This is the only package released by the OpenSS7 Project.
@@ -648,7 +648,7 @@ should build and install for other architectures as well.
 Release
 -------
 
-This is the 'openss7-1.1.7.20131209' package, released 2015-01-10.  This
+This is the 'openss7-1.1.7.20131209' package, released 2015-01-11.  This
 '1.1.7.20131209' release, and the latest version, can be obtained from
 the download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
@@ -3241,13 +3241,13 @@ important intricacies should be considered:
 
    * The 'gcc' command line must include several important files
      directly on the command line, such as, '--include
-     /lib/modules/3.4.92-1-lts34/build/include/linux/autoconf.h' and
+     /lib/modules/3.10.64-1-lts310/build/include/linux/autoconf.h' and
      '--include
-     /lib/modules/3.4.92-1-lts34/build/include/linux/modversions.h'.(1)
+     /lib/modules/3.10.64-1-lts310/build/include/linux/modversions.h'.(1)
 
    ---------- Footnotes ----------
 
-   (1) The kernel version, '3.4.92-1-lts34', is just an example.  For
+   (1) The kernel version, '3.10.64-1-lts310', is just an example.  For
 the running kernel, use the output of 'uname -r'.
 
 4.3.1 Kernel Module Building
@@ -8145,7 +8145,7 @@ architecture and kernel version.  If your architecture or kernel version
 is not available, you can build binary RPM from the source RPM (see
 *note Building from the Source RPM::).(1)
 
-'openss7-3.4.92-1-lts34-1.1.7.20131209-1.x86_64.rpm'
+'openss7-3.10.64-1-lts310-1.1.7.20131209-1.x86_64.rpm'
 
      The 'openss7-kernel' binary package contains the kernel modules
      that provide the Linux kernel Linux Fast-STREAMS drivers and
@@ -8154,7 +8154,7 @@ is not available, you can build binary RPM from the source RPM (see
      This binary package also includes modprobe configuration files for
      the associated kernel modules.  This package is heavily tied to the
      kernel for which it and dependent components were compiled.  This
-     package applies to kernel version 3.4.92-1-lts34 and requires
+     package applies to kernel version 3.10.64-1-lts310 and requires
      components compiled for the same kernel.  If you cannot find a
      binary package that matches your kernel, rebuild for your kernel
      from the OpenSS7 package source rpm.
@@ -8164,23 +8164,23 @@ is not available, you can build binary RPM from the source RPM (see
      will also be installed if necessary.  When removing the last kernel
      module package, the 'openss7' package will also be removed.
 
-     Note that the version '3.4.92-1-lts34' is just an example.  Use the
-     version returned by '$(uname -r)' for the kernel for which you wish
-     to install or remove the packages.
+     Note that the version '3.10.64-1-lts310' is just an example.  Use
+     the version returned by '$(uname -r)' for the kernel for which you
+     wish to install or remove the packages.
 
-'openss7-devel-3.4.92-1-lts34-1.1.7.20131209-1.x86_64.rpm'
+'openss7-devel-3.10.64-1-lts310-1.1.7.20131209-1.x86_64.rpm'
 
-     The 'openss7-devel-3.4.92-1-lts34' binary package contains the
+     The 'openss7-devel-3.10.64-1-lts310' binary package contains the
      kernel modules symbol information for development of additional
      Linux Fast-STREAMS kernel modules against the core kernel modules
-     included in the 'openss7-3.4.92-1-lts34' binary package.  This
+     included in the 'openss7-3.10.64-1-lts310' binary package.  This
      package is heavily tied to the core kernel modules and kernel for
      which it was compiled.  This package applies to core kernel modules
-     '3.4.92-1-lts34' for kernel version '3.4.92-1-lts34'.  This package
-     provides kernel debug information for the OpenSS7 package.  Kernel
-     debug information is useful when developing kernel modules that use
-     this package or when debugging kernel modules contained in the
-     package.
+     '3.10.64-1-lts310' for kernel version '3.10.64-1-lts310'.  This
+     package provides kernel debug information for the OpenSS7 package.
+     Kernel debug information is useful when developing kernel modules
+     that use this package or when debugging kernel modules contained in
+     the package.
 
      This package can be used to install or remove the development and
      debug packages for a specific kernel version.  When installing, the
@@ -8189,41 +8189,41 @@ is not available, you can build binary RPM from the source RPM (see
      modules for the last kernel, the 'openss7-devel' package will also
      be removed.
 
-     Note that the version '3.4.92-1-lts34' is just an example.  Use the
-     version returned by '$(uname -r)' for the kernel for which you wish
-     to install or remove the packages.
+     Note that the version '3.10.64-1-lts310' is just an example.  Use
+     the version returned by '$(uname -r)' for the kernel for which you
+     wish to install or remove the packages.
 
-     The 'openss7-devel-3.4.92-1-lts34' package contains the module
+     The 'openss7-devel-3.10.64-1-lts310' package contains the module
      symbol version information for the 'kernel' package, above.  It is
      possible to load this package and compile modules that use the
      exported symbols without loading the actual kernel modules (from
      the 'kernel' package above).  This package is heavily tied to the
      kernel for which it was compiled.  This particular package applies
-     to kernel version '3.4.92-1-lts34'.(2)
+     to kernel version '3.10.64-1-lts310'.(2)
 
-'openss7-debuginfo-3.4.92-1-lts34-1.1.7.20131209-1.x86_64.rpm'
+'openss7-debuginfo-3.10.64-1-lts310-1.1.7.20131209-1.x86_64.rpm'
 
-'openss7-debugsource-3.4.92-1-lts34-1.1.7.20131209-1.x86_64.rpm'
+'openss7-debugsource-3.10.64-1-lts310-1.1.7.20131209-1.x86_64.rpm'
 
-'openss7-source-3.4.92-1-lts34-1.1.7.20131209-1.x86_64.rpm'
+'openss7-source-3.10.64-1-lts310-1.1.7.20131209-1.x86_64.rpm'
 
-     The 'openss7-source-3.4.92-1-lts34' package contains the configured
-     source for a specific kernel.  This package contains source that is
-     configured to the kernel for which it was configured.  This
-     particular package contains configured source for kernel version
-     '3.4.92-1-lts34'(3) The 'openss7-source' package contains the
-     source code necessary for building the OpenSS7 release.  It
-     includes the 'autoconf(1)' configuration utilities necessary to
-     create and distribute tarballs, 'rpm' and 'deb'/'dsc'.
+     The 'openss7-source-3.10.64-1-lts310' package contains the
+     configured source for a specific kernel.  This package contains
+     source that is configured to the kernel for which it was
+     configured.  This particular package contains configured source for
+     kernel version '3.10.64-1-lts310'(3) The 'openss7-source' package
+     contains the source code necessary for building the OpenSS7
+     release.  It includes the 'autoconf(1)' configuration utilities
+     necessary to create and distribute tarballs, 'rpm' and 'deb'/'dsc'.
 
-     The 'openss7-source-3.4.92-1-lts34' binary package contains the
+     The 'openss7-source-3.10.64-1-lts310' binary package contains the
      source code necessary for building the OpenSS7 release for the
-     kernel version '3.4.92-1-lts34'.  It also includes the
+     kernel version '3.10.64-1-lts310'.  It also includes the
      'autoconf(1)' configuration utilities necessary to create and
      distribute this rpm.  However, to develop on the package, it would
      be better to use the tarball release.  Load this package if you
      need some files from the build that are not present in the
-     'openss7-devel-3.4.92-1-lts34' package.
+     'openss7-devel-3.10.64-1-lts310' package.
 
 Configuration and Installation
 ..............................
@@ -8239,9 +8239,11 @@ placed in i586 architecture packages regardless of the true processor
 architecture of the kernel package.  'configure' detects this and builds
 the appropriate packages.
 
-   (2) Note that the '_kversion' of '3.4.92-1-lts34' is only an example.
+   (2) Note that the '_kversion' of '3.10.64-1-lts310' is only an
+example.
 
-   (3) Note that the '_kversion' of '3.4.92-1-lts34' is only an example.
+   (3) Note that the '_kversion' of '3.10.64-1-lts310' is only an
+example.
 
 7.2.6 Downloading the Debian DEB
 --------------------------------
@@ -8327,20 +8329,20 @@ architecture and kernel version.  If your architecture or kernel version
 is not on the list, you can build binary DEB from the source DEB (see
 *note Building from the Debian DSC::).(2)
 
-openss7-core-3.4.92-1-lts34_1.1.7.20131209-0_i386.deb
+openss7-core-3.10.64-1-lts310_1.1.7.20131209-0_i386.deb
      The 'openss7-core' package contains the loadable kernel modules
      that depend only on the kernel.  This package is heavily tied to
      the kernel for which it was compiled.  This particular package
-     applies to kernel version '3.4.92-1-lts34'.(3)
+     applies to kernel version '3.10.64-1-lts310'.(3)
 
-openss7-info-3.4.92-1-lts34_1.1.7.20131209-0_i386.deb
+openss7-info-3.10.64-1-lts310_1.1.7.20131209-0_i386.deb
      The 'openss7-info' package(4) contains the module symbol version
      information for the 'core' subpackage, above.  It is possible to
      load this subpackage and compile modules that use the exported
      symbols without loading the actual kernel modules (from the 'core'
      subpackage above).  This package is heavily tied to the kernel for
      which it was compiled.  This particular package applies to kernel
-     version '3.4.92-1-lts34'.(5)
+     version '3.10.64-1-lts310'.(5)
 
 Configuration and Installation
 ..............................
@@ -8360,16 +8362,17 @@ placed in i586 architecture packages regardless of the true processor
 architecture of the kernel package.  'configure' detects this and builds
 the appropriate packages.
 
-   (3) Note that the '_kversion' of '3.4.92-1-lts34' is only an example.
-Note also that only release packages that contain kernel modules will
-contain a 'core' subpackage.
+   (3) Note that the '_kversion' of '3.10.64-1-lts310' is only an
+example.  Note also that only release packages that contain kernel
+modules will contain a 'core' subpackage.
 
    (4) Note that only release packages that contain kernel modules and
 that export versioned symbols will contain a 'info' subpackage.  Also,
 this subpackage is only applicable to 2.4 series kernels and is not
 necessary and not built for 2.6 or 3.x series kernels.
 
-   (5) Note that the '_kversion' of '3.4.92-1-lts34' is only an example.
+   (5) Note that the '_kversion' of '3.10.64-1-lts310' is only an
+example.
 
 7.2.7 Downloading the Source RPM
 --------------------------------
@@ -8637,13 +8640,13 @@ during installation it is possible to relocate some of the installation
 directories.  This allows some degree of customization.  Relocations
 that are available on the binary RPM are as follows:
 
-'openss7-core-3.4.92-1-lts34-1.1.7.20131209-1.i686.rpm'
-     '/lib/modules/3.4.92-1-lts34'
+'openss7-core-3.10.64-1-lts310-1.1.7.20131209-1.i686.rpm'
+     '/lib/modules/3.10.64-1-lts310'
           This relocatable directory contains the kernel modules that
           provide the OpenSS7 core, drivers and modules.(1)
 
-'openss7-info-3.4.92-1-lts34-1.1.7.20131209-1.i686.rpm'
-     '/usr/include/openss7/3.4.92-1-lts34'
+'openss7-info-3.10.64-1-lts310-1.1.7.20131209-1.i686.rpm'
+     '/usr/include/openss7/3.10.64-1-lts310'
           This relocatable directory contains the kernel module exported
           symbol information that allows other kernel modules to be
           compiled against the correct version of the openss7
@@ -8702,11 +8705,12 @@ To install the binary RPM, *note Installing the Binary RPM::.
 
    ---------- Footnotes ----------
 
-   (1) Note that the '_kversion' of '3.4.92-1-lts34' is only an example.
+   (1) Note that the '_kversion' of '3.10.64-1-lts310' is only an
+example.
 
-   (2) Note that the '_kversion' of '3.4.92-1-lts34' is only an example.
-Also, note that the 'info' subpackage is only applicable to the 2.4
-kernel series.
+   (2) Note that the '_kversion' of '3.10.64-1-lts310' is only an
+example.  Also, note that the 'info' subpackage is only applicable to
+the 2.4 kernel series.
 
 7.3.2 Configuring the Debian DEB
 --------------------------------
@@ -11235,11 +11239,11 @@ RPM::.  These options are provided on the 'rpm(8)' command line.  For
 example:
 
      % rpmbuild --rebuild -vv --target athlon-redhat-linux \
-       --define "_kversion 3.4.92-1-lts34" \
+       --define "_kversion 3.10.64-1-lts310" \
        -- openss7-1.1.7.20131209-1.src.rpm
 
-will rebuild binary RPM for the '3.4.92-1-lts34' kernel for the 'athlon'
-architecture.  (1)
+will rebuild binary RPM for the '3.10.64-1-lts310' kernel for the
+'athlon' architecture.  (1)
 
 Installation
 ............
@@ -11248,7 +11252,8 @@ To install the resulting binary RPM, *note Installing the Binary RPM::.
 
    ---------- Footnotes ----------
 
-   (1) Note that the '_kversion' of '3.4.92-1-lts34' is only an example.
+   (1) Note that the '_kversion' of '3.10.64-1-lts310' is only an
+example.
 
 7.4.2 Building from the Debian DSC
 ----------------------------------
@@ -11271,13 +11276,13 @@ BUILD_DPKGOPTIONS and have the same form as the options to 'configure',
 *note Configuring the Tar Ball::.  For example:
 
      % BUILD_DEBOPTIONS='
-             --with-k-release=3.4.92-1-lts34
+             --with-k-release=3.10.64-1-lts310
              --host=athlon-debian-linux-gnu'
        dpkg-buildpackage -v \
        openss7_1.1.7.20131209-0.dsc
 
-will rebuild binary DEB for the '3.4.92-1-lts34' kernel for the 'athlon'
-architecture.  (1)
+will rebuild binary DEB for the '3.10.64-1-lts310' kernel for the
+'athlon' architecture.  (1)
 
 Installation
 ............
@@ -11286,7 +11291,8 @@ To install the resulting binary DEB, *note Installing the Debian DEB::.
 
    ---------- Footnotes ----------
 
-   (1) Note that the '_kversion' of '3.4.92-1-lts34' is only an example.
+   (1) Note that the '_kversion' of '3.10.64-1-lts310' is only an
+example.
 
 7.4.3 Building from the Tar Ball
 --------------------------------
@@ -11362,11 +11368,11 @@ To add an additional 'OpenSS7' kernel run-time component to the
 installation, use (one of):
 
      % sudo yum install openss7-$(uname -r)
-     % sudo yum install openss7-3.4.92-1-lts34
+     % sudo yum install openss7-3.10.64-1-lts310
 
 Here, '$(uname -r)' is simply a way of specifying the running kernel.
-The value '3.4.92-1-lts34' is just an example.  Use the specific kernel
-version that you want to add to the installation.
+The value '3.10.64-1-lts310' is just an example.  Use the specific
+kernel version that you want to add to the installation.
 
 To install the 'OpenSS7' development components for a single-kernel
 distribution, use (one of):
@@ -11379,11 +11385,11 @@ To add an additional 'OpenSS7' kernel development component to the
 installation, use (one of):
 
      % sudo yum install openss7-devel-$(uname -r)
-     % sudo yum install openss7-devel-3.4.92-1-lts34
+     % sudo yum install openss7-devel-3.10.64-1-lts310
 
 Here, '$(uname -r)' is simply a way of specifying the running kernel.
-The value '3.4.92-1-lts34' is just an example.  Use the specific kernel
-version that you want to add to the installation.
+The value '3.10.64-1-lts310' is just an example.  Use the specific
+kernel version that you want to add to the installation.
 
 To add 'OpenSS7' development documentation, use (one of):
 
@@ -11420,11 +11426,11 @@ To add an additional 'OpenSS7' kernel run-time component to the
 installation, use (one of):
 
      % sudo zypper install openss7-$(uname -r)
-     % sudo zypper install openss7-3.4.92-1-lts34
+     % sudo zypper install openss7-3.10.64-1-lts310
 
 Here, '$(uname -r)' is simply a way of specifying the running kernel.
-The value '3.4.92-1-lts34' is just an example.  Use the specific kernel
-version that you want to add to the installation.
+The value '3.10.64-1-lts310' is just an example.  Use the specific
+kernel version that you want to add to the installation.
 
 To install the 'OpenSS7' development components for a single-kernel
 distribution, use (one of):
@@ -11436,11 +11442,11 @@ To add an additional 'OpenSS7' kernel development component to the
 installation, use (one of):
 
      % sudo zypper install openss7-devel-$(uname -r)
-     % sudo zypper install openss7-devel-3.4.92-1-lts34
+     % sudo zypper install openss7-devel-3.10.64-1-lts310
 
 Here, '$(uname -r)' is simply a way of specifying the running kernel.
-The value '3.4.92-1-lts34' is just an example.  Use the specific kernel
-version that you want to add to the installation.
+The value '3.10.64-1-lts310' is just an example.  Use the specific
+kernel version that you want to add to the installation.
 
 To add 'OpenSS7' development documentation, use (one of):
 
@@ -11474,11 +11480,11 @@ To add an additional 'OpenSS7' kernel run-time component to the
 installation, use (one of):
 
      % sudo urpmi openss7-$(uname -r)
-     % sudo urpmi openss7-3.4.92-1-lts34
+     % sudo urpmi openss7-3.10.64-1-lts310
 
 Here, '$(uname -r)' is simply a way of specifying the running kernel.
-The value '3.4.92-1-lts34' is just an example.  Use the specific kernel
-version that you want to add to the installation.
+The value '3.10.64-1-lts310' is just an example.  Use the specific
+kernel version that you want to add to the installation.
 
 To install the 'OpenSS7' development components for a single-kernel
 distribution, use (one of):
@@ -11491,8 +11497,8 @@ installation, use (one of):
      % sudo urpmi openss7-devel-$(uname -r)
 
 Here, '$(uname -r)' is simply a way of specifying the running kernel.
-The value '3.4.92-1-lts34' is just an example.  Use the specific kernel
-version that you want to add to the installation.
+The value '3.10.64-1-lts310' is just an example.  Use the specific
+kernel version that you want to add to the installation.
 
 To add 'OpenSS7' development documentation, use (one of):
 
@@ -11527,13 +11533,13 @@ To add an additional 'OpenSS7' kernel run-time component to the
 installation, use (one of):
 
      % sudo apt-get install openss7-$(uname -r)
-     % sudo apt-get install openss7-3.4.92-1-lts34
+     % sudo apt-get install openss7-3.10.64-1-lts310
      % sudo aptitude install openss7-$(uname -r)
-     % sudo aptitude install openss7-3.4.92-1-lts34
+     % sudo aptitude install openss7-3.10.64-1-lts310
 
 Here, '$(uname -r)' is simply a way of specifying the running kernel.
-The value '3.4.92-1-lts34' is just an example.  Use the specific kernel
-version that you want to add to the installation.
+The value '3.10.64-1-lts310' is just an example.  Use the specific
+kernel version that you want to add to the installation.
 
 To install the 'OpenSS7' development components for a single-kernel
 distribution, use (one of):
@@ -11548,8 +11554,8 @@ installation, use (one of):
      % sudo aptitude install openss7-devel-$(uname -r)
 
 Here, '$(uname -r)' is simply a way of specifying the running kernel.
-The value '3.4.92-1-lts34' is just an example.  Use the specific kernel
-version that you want to add to the installation.
+The value '3.10.64-1-lts310' is just an example.  Use the specific
+kernel version that you want to add to the installation.
 
 To add 'OpenSS7' development documentation, use (one of):
 
@@ -11660,14 +11666,14 @@ To remove the 'OpenSS7' run-time components for a specific kernel, use
 (one of):
 
      $> sudo yum remove openss7-$(uname -r)
-     $> sudo yum remove openss7-3.4.92-1-lts34
+     $> sudo yum remove openss7-3.10.64-1-lts310
 
 Where, '$(uname -r)' will remove for the running kernel.
-'3.4.92-1-lts34' is just an example.  Note also that 'OpenSS7' does not
-install a kernel package for each and every kernel version, nor is it
-normally necessary.  When the kernel run-time being removed is the last
-kernel run-time, the remainder of the 'OpenSS7' components will also be
-removed.
+'3.10.64-1-lts310' is just an example.  Note also that 'OpenSS7' does
+not install a kernel package for each and every kernel version, nor is
+it normally necessary.  When the kernel run-time being removed is the
+last kernel run-time, the remainder of the 'OpenSS7' components will
+also be removed.
 
 To remove all 'OpenSS7' development components, use (one of):
 
@@ -11679,10 +11685,10 @@ To remove the 'OpenSS7' development components for a specific kernel,
 use (one of):
 
      $> sudo yum remove openss7-develop-$(uname -r)
-     $> sudo yum remove openss7-develop-3.4.92-1-lts34
+     $> sudo yum remove openss7-develop-3.10.64-1-lts310
 
 Where, '$(uname -r)' will remove for the running kernel.
-'3.4.92-1-lts34' is just an example.  When the kernel development
+'3.10.64-1-lts310' is just an example.  When the kernel development
 component being removed is the last kernel development component, the
 remainder of the 'OpenSS7' development components will also be removed.
 
@@ -11712,14 +11718,14 @@ To remove the 'OpenSS7' run-time components for a specific kernel, use
 (one of):
 
      $> sudo zypper remove openss7-$(uname -r)
-     $> sudo zypper remove openss7-3.4.92-1-lts34
+     $> sudo zypper remove openss7-3.10.64-1-lts310
 
 Where, '$(uname -r)' will remove for the running kernel.
-'3.4.92-1-lts34' is just an example.  Note also that 'OpenSS7' does not
-install a kernel package for each and every kernel version, nor is it
-normally necessary.  When the kernel run-time being removed is the last
-kernel run-time, the remainder of the 'OpenSS7' components will also be
-removed.
+'3.10.64-1-lts310' is just an example.  Note also that 'OpenSS7' does
+not install a kernel package for each and every kernel version, nor is
+it normally necessary.  When the kernel run-time being removed is the
+last kernel run-time, the remainder of the 'OpenSS7' components will
+also be removed.
 
 To remove all 'OpenSS7' development components, use (one of):
 
@@ -11729,10 +11735,10 @@ To remove the 'OpenSS7' development components for a specific kernel,
 use (one of):
 
      $> sudo zypper remove openss7-develop-$(uname -r)
-     $> sudo zypper remove openss7-develop-3.4.92-1-lts34
+     $> sudo zypper remove openss7-develop-3.10.64-1-lts310
 
 Where, '$(uname -r)' will remove for the running kernel.
-'3.4.92-1-lts34' is just an example.  When the kernel development
+'3.10.64-1-lts310' is just an example.  When the kernel development
 component being removed is the last kernel development component, the
 remainder of the 'OpenSS7' development components will also be removed.
 
@@ -11759,14 +11765,14 @@ To remove the 'OpenSS7' run-time components for a specific kernel, use
 (one of):
 
      $> sudo urpme openss7-$(uname -r)
-     $> sudo urpme openss7-3.4.92-1-lts34
+     $> sudo urpme openss7-3.10.64-1-lts310
 
 Where, '$(uname -r)' will remove for the running kernel.
-'3.4.92-1-lts34' is just an example.  Note also that 'OpenSS7' does not
-install a kernel package for each and every kernel version, nor is it
-normally necessary.  When the kernel run-time being removed is the last
-kernel run-time, the remainder of the 'OpenSS7' components will also be
-removed.
+'3.10.64-1-lts310' is just an example.  Note also that 'OpenSS7' does
+not install a kernel package for each and every kernel version, nor is
+it normally necessary.  When the kernel run-time being removed is the
+last kernel run-time, the remainder of the 'OpenSS7' components will
+also be removed.
 
 To remove all 'OpenSS7' development components, use (one of):
 
@@ -11776,10 +11782,10 @@ To remove the 'OpenSS7' development components for a specific kernel,
 use (one of):
 
      $> sudo urpme openss7-develop-$(uname -r)
-     $> sudo urpme openss7-develop-3.4.92-1-lts34
+     $> sudo urpme openss7-develop-3.10.64-1-lts310
 
 Where, '$(uname -r)' will remove for the running kernel.
-'3.4.92-1-lts34' is just an example.  When the kernel development
+'3.10.64-1-lts310' is just an example.  When the kernel development
 component being removed is the last kernel development component, the
 remainder of the 'OpenSS7' development components will also be removed.
 
@@ -11909,9 +11915,9 @@ When OpenSS7 installs, modules and drivers belonging to release packages
 are normally configured for demand loading.  The 'install' and
 'install-strip' 'automake(1)' targets will make the necessary changes to
 the '/etc/modules.conf' file and place the modules in an appropriate
-place in '/lib/modules/3.4.92-1-lts34/openss7'.  The 'make install'
+place in '/lib/modules/3.10.64-1-lts310/openss7'.  The 'make install'
 process should have copied the kernel module files 'streams-*.o' to the
-directory '/lib/modules/3.4.92-1-lts34/openss7'.  This means that to
+directory '/lib/modules/3.10.64-1-lts310/openss7'.  This means that to
 load any of these modules, you can simply execute, for example,
 'modprobe stream-SOMEDRIVER'.(1)
 
@@ -11923,8 +11929,8 @@ new 'kmod' mechanisms for demand loading kernel modules.
 
 The convention for 'openss7' kernel loadable object files is:
    * Their name start with "streams-".
-   * They are placed in '/lib/modules/3.4.92-1-lts34/streams/', where
-     '3.4.92-1-lts34' is an example kernel version.
+   * They are placed in '/lib/modules/3.10.64-1-lts310/streams/', where
+     '3.10.64-1-lts310' is an example kernel version.
 
 If your kernel has been built using the 'kerneld' daemon, then 'OpenSS7'
 kernel modules will automatically load as soon as the STREAMS module is
@@ -11955,7 +11961,8 @@ module loading under 'Linux Fast-STREAMS', *Note About This Manual:
 
    ---------- Footnotes ----------
 
-   (1) Note that the '_kversion' of '3.4.92-1-lts34' is only an example.
+   (1) Note that the '_kversion' of '3.10.64-1-lts310' is only an
+example.
 
 7.8 Maintenance
 ===============
@@ -14577,8 +14584,8 @@ Index of Concepts
 * apt <4>:                               Downloading with APT.
                                                             (line  7964)
 * apt <5>:                               Installing with APT.
-                                                            (line 11508)
-* apt <6>:                               Removing with APT. (line 11794)
+                                                            (line 11514)
+* apt <6>:                               Removing with APT. (line 11800)
 * apt-rpm:                               Setting up APT-RPM.
                                                             (line  7790)
 * apt-rpm <1>:                           Using the APT-RPM Repository.
@@ -14590,63 +14597,63 @@ Index of Concepts
 * authors:                               Authors.           (line   454)
 * background:                            Background.        (line  1123)
 * binary debs:                           Downloading the Debian DEB.
-                                                            (line  8248)
+                                                            (line  8250)
 * binary debs <1>:                       Configuring the Debian DEB.
-                                                            (line  8713)
+                                                            (line  8717)
 * binary debs <2>:                       Installing the Debian DEB.
-                                                            (line 11599)
+                                                            (line 11605)
 * binary debs <3>:                       Removing the Debian DEB.
-                                                            (line 11823)
+                                                            (line 11829)
 * binary rpms:                           Downloading the Binary RPM.
                                                             (line  7977)
 * binary rpms <1>:                       Configuring the Binary RPM.
-                                                            (line  8634)
+                                                            (line  8637)
 * binary rpms <2>:                       Installing the Binary RPM.
-                                                            (line 11569)
+                                                            (line 11575)
 * binary rpms <3>:                       Removing the Binary RPM.
-                                                            (line 11798)
+                                                            (line 11804)
 * bug reports, automatic generation:     Automatic Problem Reports.
-                                                            (line 13010)
+                                                            (line 13017)
 * bug reports, generating:               Generating Problem Reports.
-                                                            (line 12956)
+                                                            (line 12963)
 * bug reports, stand along generation:   Stand Alone Problem Reports.
-                                                            (line 13055)
+                                                            (line 13062)
 * bugs:                                  Bugs.              (line  4982)
 * bugs, history:                         Historical Defects.
                                                             (line  5020)
 * bugs, known:                           Known Defects.     (line  5012)
-* bugs, reporting:                       Problem Reports.   (line 12896)
-* building:                              Building.          (line 11210)
+* bugs, reporting:                       Problem Reports.   (line 12903)
+* building:                              Building.          (line 11214)
 * building, source dscs:                 Building from the Debian DSC.
-                                                            (line 11255)
+                                                            (line 11260)
 * building, source srpm:                 Building from the Source RPM.
-                                                            (line 11221)
+                                                            (line 11225)
 * building, tar ball:                    Building from the Tar Ball.
-                                                            (line 11293)
+                                                            (line 11299)
 * checkout, cvs:                         Downloading from CVS.
-                                                            (line  8458)
+                                                            (line  8461)
 * compatibility:                         Compatibility.     (line  3721)
 * components:                            Components.        (line  1382)
-* configuration:                         Configuration.     (line  8631)
+* configuration:                         Configuration.     (line  8634)
 * configure environment variables:       Environment Variables.
-                                                            (line 10747)
-* configure options:                     Configure Options. (line  9484)
+                                                            (line 10751)
+* configure options:                     Configure Options. (line  9488)
 * configuring, binary debs:              Configuring the Debian DEB.
-                                                            (line  8713)
+                                                            (line  8717)
 * configuring, binary rpms:              Configuring the Binary RPM.
-                                                            (line  8634)
+                                                            (line  8637)
 * configuring, source dscs:              Configuring the Debian DSC.
-                                                            (line  9463)
+                                                            (line  9467)
 * configuring, source srpm:              Configuring the Source RPM.
-                                                            (line  8723)
+                                                            (line  8727)
 * configuring, tar ball:                 Configuring the Tar Ball.
-                                                            (line  9476)
+                                                            (line  9480)
 * conformance:                           Conformance.       (line  3572)
 * contributors:                          Contributors.      (line   256)
 * conventions:                           Conventions.       (line  1115)
 * credits:                               Acknowledgements.  (line   217)
 * cvs:                                   Downloading from CVS.
-                                                            (line  8458)
+                                                            (line  8461)
 * definitions:                           Conventions.       (line  1115)
 * developing:                            Development.       (line  2753)
 * downloading:                           Downloading.       (line  7893)
@@ -14655,13 +14662,13 @@ Index of Concepts
 * downloading, binary rpms:              Downloading the Binary RPM.
                                                             (line  7977)
 * downloading, debian debs:              Downloading the Debian DEB.
-                                                            (line  8248)
+                                                            (line  8250)
 * downloading, debian dscs:              Downloading the Debian DSC.
-                                                            (line  8392)
+                                                            (line  8395)
 * downloading, source srpm:              Downloading the Source RPM.
-                                                            (line  8376)
+                                                            (line  8379)
 * downloading, tar ball:                 Downloading the Tar Ball.
-                                                            (line  8409)
+                                                            (line  8412)
 * downloading, urpmi:                    Downloading with URPMI.
                                                             (line  7953)
 * downloading, yum:                      Downloading with YUM.
@@ -14671,40 +14678,40 @@ Index of Concepts
 * drivers:                               Drivers.           (line  2266)
 * files:                                 Files.             (line  1454)
 * generating bug reports:                Generating Problem Reports.
-                                                            (line 12956)
+                                                            (line 12963)
 * generating bug reports <1>:            Stand Alone Problem Reports.
-                                                            (line 13055)
+                                                            (line 13062)
 * generating bug reports automatically:  Automatic Problem Reports.
-                                                            (line 13010)
+                                                            (line 13017)
 * generating problem reports:            Generating Problem Reports.
-                                                            (line 12956)
+                                                            (line 12963)
 * generating problem reports automatically: Automatic Problem Reports.
-                                                            (line 13010)
+                                                            (line 13017)
 * generating problem reports stand alone: Stand Alone Problem Reports.
-                                                            (line 13055)
+                                                            (line 13062)
 * GNU/Linux Distributions:               GNU/Linux Distributions.
                                                             (line  3726)
 * history:                               History.           (line  7126)
 * history bugs:                          Historical Defects.
                                                             (line  5020)
 * IETF conformance:                      IETF Conformance.  (line  3618)
-* indices:                               Indices.           (line 14562)
+* indices:                               Indices.           (line 14569)
 * installation:                          Installation.      (line  7132)
-* installing:                            Installing.        (line 11338)
+* installing:                            Installing.        (line 11344)
 * installing, apt:                       Installing with APT.
-                                                            (line 11508)
+                                                            (line 11514)
 * installing, binary debs:               Installing the Debian DEB.
-                                                            (line 11599)
+                                                            (line 11605)
 * installing, binary rpms:               Installing the Binary RPM.
-                                                            (line 11569)
+                                                            (line 11575)
 * installing, tar ball:                  Installing the Tar Ball.
-                                                            (line 11621)
+                                                            (line 11627)
 * installing, urpmi:                     Installing with URPMI.
-                                                            (line 11457)
+                                                            (line 11463)
 * installing, yum:                       Installing with YUM.
-                                                            (line 11341)
+                                                            (line 11347)
 * installing, zypper:                    Installing with ZYPPER.
-                                                            (line 11401)
+                                                            (line 11407)
 * introduction:                          Introduction.      (line  1081)
 * Kernel:                                Linux Kernel.      (line  3884)
 * kernel module packages:                Kernel Module Packages.
@@ -14724,37 +14731,37 @@ Index of Concepts
 * KMP:                                   Kernel Module Packages.
                                                             (line  3476)
 * known bugs:                            Known Defects.     (line  5012)
-* known problems:                        Known Problems.    (line 13098)
+* known problems:                        Known Problems.    (line 13105)
 * libraries:                             Libraries.         (line  2302)
 * libraries, shared object:              Libraries.         (line  2306)
 * license, AGPL:                         GNU Affero General Public License.
-                                                            (line 13598)
+                                                            (line 13605)
 * license, BSD:                          BSD/USL Combined License.
-                                                            (line 14510)
+                                                            (line 14517)
 * license, BSD/USL combined:             BSD/USL Combined License.
-                                                            (line 14510)
+                                                            (line 14517)
 * license, FDL:                          GNU Free Documentation License.
-                                                            (line 13116)
+                                                            (line 13123)
 * license, GNU Affero General Public License: GNU Affero General Public License.
-                                                            (line 13598)
+                                                            (line 13605)
 * license, GNU Free Documentation License: GNU Free Documentation License.
-                                                            (line 13116)
-* license, Sun RPC:                      Sun RPC License.   (line 14470)
+                                                            (line 13123)
+* license, Sun RPC:                      Sun RPC License.   (line 14477)
 * license, UI DLPI:                      UNIX International DLPI License.
-                                                            (line 14299)
+                                                            (line 14306)
 * license, UI NPI:                       UNIX International NPI License.
-                                                            (line 14357)
+                                                            (line 14364)
 * license, UI TPI:                       UNIX International TPI License.
-                                                            (line 14413)
+                                                            (line 14420)
 * license, UNIX International Inc.:      UNIX International DLPI License.
-                                                            (line 14299)
+                                                            (line 14306)
 * license, UNIX International Inc. <1>:  UNIX International NPI License.
-                                                            (line 14357)
+                                                            (line 14364)
 * license, UNIX International Inc. <2>:  UNIX International TPI License.
-                                                            (line 14413)
-* licenses:                              Licenses.          (line 13113)
+                                                            (line 14420)
+* licenses:                              Licenses.          (line 13120)
 * licensing:                             Notice.            (line    57)
-* loading:                               Loading.           (line 11903)
+* loading:                               Loading.           (line 11909)
 * maintainer:                            Maintainer.        (line   464)
 * manual abstract:                       Abstract.          (line    77)
 * manual audience:                       Abstract.          (line   107)
@@ -14768,22 +14775,22 @@ Index of Concepts
 * NPI interface conformance:             NPI Interface Conformance.
                                                             (line  3582)
 * objective:                             Objective.         (line  1087)
-* openss7-core-3.4.92-1-lts34-1.1.7.20131209-1.i686.rpm: Configuring the Binary RPM.
-                                                            (line  8640)
+* openss7-core-3.10.64-1-lts310-1.1.7.20131209-1.i686.rpm: Configuring the Binary RPM.
+                                                            (line  8643)
 * openss7-dev-1.1.7.20131209-1.i686.rpm: Configuring the Binary RPM.
-                                                            (line  8652)
-* openss7-devel-1.1.7.20131209-1.i686.rpm: Configuring the Binary RPM.
                                                             (line  8655)
+* openss7-devel-1.1.7.20131209-1.i686.rpm: Configuring the Binary RPM.
+                                                            (line  8658)
 * openss7-doc-1.1.7.20131209-1.i686.rpm: Configuring the Binary RPM.
-                                                            (line  8661)
-* openss7-info-3.4.92-1-lts34-1.1.7.20131209-1.i686.rpm: Configuring the Binary RPM.
-                                                            (line  8645)
+                                                            (line  8664)
+* openss7-info-3.10.64-1-lts310-1.1.7.20131209-1.i686.rpm: Configuring the Binary RPM.
+                                                            (line  8648)
 * openss7-lib-1.1.7.20131209-1.i686.rpm: Configuring the Binary RPM.
-                                                            (line  8672)
+                                                            (line  8675)
 * openss7-source-1.1.7.20131209-1.i686.rpm: Configuring the Binary RPM.
-                                                            (line  8681)
+                                                            (line  8684)
 * openss7-util-1.1.7.20131209-1.i686.rpm: Configuring the Binary RPM.
-                                                            (line  8685)
+                                                            (line  8688)
 * organization:                          Organization.      (line  1101)
 * overview:                              Overview.          (line  1120)
 * package contents:                      Package Contents.  (line  1159)
@@ -14794,12 +14801,12 @@ Index of Concepts
 * pacman <2>:                            ALPM Kernel Updates.
                                                             (line  7890)
 * post-installation checks:              Post-installation Checks.
-                                                            (line 12825)
+                                                            (line 12832)
 * pre-installation checks:               Pre-installation Checks.
-                                                            (line 12597)
+                                                            (line 12604)
 * prerequisites:                         Prerequisites.     (line  3634)
-* problem reports:                       Problem Reports.   (line 12896)
-* problems, known:                       Known Problems.    (line 13098)
+* problem reports:                       Problem Reports.   (line 12903)
+* problems, known:                       Known Problems.    (line 13105)
 * quick start guide:                     Quick Start Guide. (line   604)
 * reference:                             Reference.         (line  1370)
 * release notes:                         Release Notes.     (line  3968)
@@ -14867,24 +14874,24 @@ Index of Concepts
                                                             (line  3974)
 * release openss7-1.1.7.20131209 <1>:    .                  (line  3985)
 * releases:                              Releases.          (line  3622)
-* removing:                              Removing.          (line 11639)
-* removing, apt:                         Removing with APT. (line 11795)
+* removing:                              Removing.          (line 11645)
+* removing, apt:                         Removing with APT. (line 11801)
 * removing, binary debs:                 Removing the Debian DEB.
-                                                            (line 11823)
+                                                            (line 11829)
 * removing, binary rpms:                 Removing the Binary RPM.
-                                                            (line 11798)
+                                                            (line 11804)
 * removing, source dscs:                 Removing the Debian DSC.
-                                                            (line 11864)
+                                                            (line 11870)
 * removing, source srpm:                 Removing the Source RPM.
-                                                            (line 11848)
+                                                            (line 11854)
 * removing, tar ball:                    Removing the Tar Ball.
-                                                            (line 11884)
+                                                            (line 11890)
 * removing, urpmi:                       Removing with URPMI.
-                                                            (line 11745)
-* removing, yum:                         Removing with YUM. (line 11642)
+                                                            (line 11751)
+* removing, yum:                         Removing with YUM. (line 11648)
 * removing, zypper:                      Removing with ZYPPER.
-                                                            (line 11697)
-* reporting bugs:                        Problem Reports.   (line 12896)
+                                                            (line 11703)
+* reporting bugs:                        Problem Reports.   (line 12903)
 * repositories:                          Repositories.      (line  7144)
 * repositories, ALPM:                    Repositories for ALPM.
                                                             (line  7881)
@@ -14904,39 +14911,39 @@ Index of Concepts
 * setup, yast:                           Setting up YAST.   (line  7601)
 * shared object libraries:               Libraries.         (line  2306)
 * source dscs:                           Downloading the Debian DSC.
-                                                            (line  8392)
+                                                            (line  8395)
 * source dscs <1>:                       Configuring the Debian DSC.
-                                                            (line  9463)
+                                                            (line  9467)
 * source dscs <2>:                       Building from the Debian DSC.
-                                                            (line 11255)
+                                                            (line 11260)
 * source dscs <3>:                       Removing the Debian DSC.
-                                                            (line 11864)
+                                                            (line 11870)
 * source rpms:                           Downloading the Source RPM.
-                                                            (line  8376)
+                                                            (line  8379)
 * source rpms <1>:                       Configuring the Source RPM.
-                                                            (line  8723)
+                                                            (line  8727)
 * source rpms <2>:                       Building from the Source RPM.
-                                                            (line 11221)
+                                                            (line 11225)
 * source rpms <3>:                       Removing the Source RPM.
-                                                            (line 11848)
+                                                            (line 11854)
 * sponsors:                              Sponsors.          (line   233)
 * supporters:                            Supporters.        (line   274)
 * tar ball:                              Downloading the Tar Ball.
-                                                            (line  8409)
+                                                            (line  8412)
 * tar ball <1>:                          Configuring the Tar Ball.
-                                                            (line  9476)
+                                                            (line  9480)
 * tar ball <2>:                          Building from the Tar Ball.
-                                                            (line 11293)
+                                                            (line 11299)
 * tar ball <3>:                          Installing the Tar Ball.
-                                                            (line 11621)
+                                                            (line 11627)
 * tar ball <4>:                          Removing the Tar Ball.
-                                                            (line 11884)
-* test suites:                           Test Suites.       (line 12594)
+                                                            (line 11890)
+* test suites:                           Test Suites.       (line 12601)
 * test suites, running:                  Running Test Suites.
-                                                            (line 12840)
+                                                            (line 12847)
 * TPI interface conformance:             TPI Interface Conformance.
                                                             (line  3594)
-* troubleshooting:                       Troubleshooting.   (line 12591)
+* troubleshooting:                       Troubleshooting.   (line 12598)
 * urpmi:                                 Repositories for URPMI.
                                                             (line  7607)
 * urpmi <1>:                             Setting up URPMI.  (line  7616)
@@ -14947,9 +14954,9 @@ Index of Concepts
 * urpmi <4>:                             Downloading with URPMI.
                                                             (line  7953)
 * urpmi <5>:                             Installing with URPMI.
-                                                            (line 11457)
+                                                            (line 11463)
 * urpmi <6>:                             Removing with URPMI.
-                                                            (line 11745)
+                                                            (line 11751)
 * utilities:                             Utilities.         (line  2371)
 * web resources:                         Web Resources.     (line   475)
 * XTI interface conformance:             XTI Interface Conformance.
@@ -14967,8 +14974,8 @@ Index of Concepts
 * yum <4>:                               Downloading with YUM.
                                                             (line  7930)
 * yum <5>:                               Installing with YUM.
-                                                            (line 11341)
-* yum <6>:                               Removing with YUM. (line 11642)
+                                                            (line 11347)
+* yum <6>:                               Removing with YUM. (line 11648)
 * zypper:                                Setting up ZYPPER. (line  7437)
 * zypper <1>:                            Using the ZYPPER Repository.
                                                             (line  7479)
@@ -14977,9 +14984,9 @@ Index of Concepts
 * zypper <3>:                            Downloading with ZYPPER.
                                                             (line  7941)
 * zypper <4>:                            Installing with ZYPPER.
-                                                            (line 11401)
+                                                            (line 11407)
 * zypper <5>:                            Removing with ZYPPER.
-                                                            (line 11697)
+                                                            (line 11703)
 
 Index of Data Types
 ===================
@@ -14993,207 +15000,207 @@ Index of Variables and Constants
 * Menu:
 
 * APT_FTPARCHIVE:                        Environment Variables.
-                                                            (line 10982)
+                                                            (line 10986)
 * AUTOM4TE:                              Environment Variables.
-                                                            (line 11071)
+                                                            (line 11075)
 * AUTOTEST:                              Environment Variables.
-                                                            (line 11077)
+                                                            (line 11081)
 * BIBTEX:                                Environment Variables.
-                                                            (line 11095)
-* BZIP2:                                 Environment Variables.
-                                                            (line 10895)
-* BZIP2_CMD:                             Environment Variables.
-                                                            (line 10898)
-* CC:                                    Environment Variables.
-                                                            (line 10750)
-* CCAS:                                  Environment Variables.
-                                                            (line 10768)
-* CCASFLAGS:                             Environment Variables.
-                                                            (line 10771)
-* CFLAGS:                                Environment Variables.
-                                                            (line 10753)
-* CHKCONFIG:                             Environment Variables.
-                                                            (line 10929)
-* CLASSPATH:                             Environment Variables.
-                                                            (line 10831)
-* CONVERT:                               Environment Variables.
-                                                            (line 11139)
-* CPP:                                   Environment Variables.
-                                                            (line 10765)
-* CPPFLAGS:                              Environment Variables.
-                                                            (line 10761)
-* CREATEREPO:                            Environment Variables.
-                                                            (line 10950)
-* CREATE_PACKGE_DESCR:                   Environment Variables.
-                                                            (line 10960)
-* CXX:                                   Environment Variables.
-                                                            (line 10775)
-* CXXCPP:                                Environment Variables.
-                                                            (line 10782)
-* CXXFLAGS:                              Environment Variables.
-                                                            (line 10778)
-* DEB_BUILD_ARCH:                        Environment Variables.
-                                                            (line 11170)
-* DEB_BUILD_GNU_CPU:                     Environment Variables.
-                                                            (line 11174)
-* DEB_BUILD_GNU_SYSTEM:                  Environment Variables.
-                                                            (line 11178)
-* DEB_BUILD_GNU_TYPE:                    Environment Variables.
-                                                            (line 11182)
-* DEB_HOST_ARCH:                         Environment Variables.
-                                                            (line 11186)
-* DEB_HOST_GNU_CPU:                      Environment Variables.
-                                                            (line 11190)
-* DEB_HOST_GNU_SYSTEM:                   Environment Variables.
-                                                            (line 11194)
-* DEB_HOST_GNU_TYPE:                     Environment Variables.
-                                                            (line 11198)
-* DEPMOD:                                Environment Variables.
-                                                            (line 11015)
-* DESTDIR:                               Environment Variables.
-                                                            (line 11011)
-* DOXYGEN:                               Environment Variables.
-                                                            (line 11082)
-* DPKG:                                  Environment Variables.
-                                                            (line 10965)
-* DPKG_BUILDPACKAGE:                     Environment Variables.
-                                                            (line 10976)
-* DPKG_DEB:                              Environment Variables.
-                                                            (line 11000)
-* DPKG_SCANPAKCAGES:                     Environment Variables.
-                                                            (line 10994)
-* DPKG_SCANSOURCES:                      Environment Variables.
-                                                            (line 10988)
-* DPKG_SOURCE:                           Environment Variables.
-                                                            (line 10970)
-* DVI2PS:                                Environment Variables.
-                                                            (line 11115)
-* DVIPDF:                                Environment Variables.
-                                                            (line 11119)
-* EPSTOPDF:                              Environment Variables.
-                                                            (line 11147)
-* FIG2DEV:                               Environment Variables.
-                                                            (line 11135)
-* GCJ:                                   Environment Variables.
-                                                            (line 10800)
-* GCJDBTOOL:                             Environment Variables.
-                                                            (line 10807)
-* GCJFLAGS:                              Environment Variables.
-                                                            (line 10803)
-* GCJH:                                  Environment Variables.
-                                                            (line 10810)
-* GCJHFLAGS:                             Environment Variables.
-                                                            (line 10813)
-* GENKSYMS:                              Environment Variables.
-                                                            (line 11042)
-* GNUPGHOME:                             Environment Variables.
-                                                            (line 10849)
-* GNUPGUSER:                             Environment Variables.
-                                                            (line 10845)
-* GNUPLOT:                               Environment Variables.
-                                                            (line 11127)
-* GPG:                                   Environment Variables.
-                                                            (line 10841)
-* GPGPASSWD:                             Environment Variables.
-                                                            (line 10853)
-* GROFF:                                 Environment Variables.
-                                                            (line 11131)
-* GZIP:                                  Environment Variables.
-                                                            (line 10884)
-* GZIP_CMD:                              Environment Variables.
-                                                            (line 10888)
-* INSSERV:                               Environment Variables.
-                                                            (line 10936)
-* JAR:                                   Environment Variables.
-                                                            (line 10922)
-* JAVAC:                                 Environment Variables.
-                                                            (line 10824)
-* JAVACFLAGS:                            Environment Variables.
-                                                            (line 10827)
-* JAVADOC:                               Environment Variables.
-                                                            (line 10834)
-* JAVADOCFLAGS:                          Environment Variables.
-                                                            (line 10837)
-* JAVAH:                                 Environment Variables.
-                                                            (line 10817)
-* JAVAHFLAGS:                            Environment Variables.
-                                                            (line 10820)
-* KGENKSYMS:                             Environment Variables.
-                                                            (line 11048)
-* LATEX:                                 Environment Variables.
                                                             (line 11099)
-* LATEX2HTML:                            Environment Variables.
-                                                            (line 11111)
-* LD:                                    Environment Variables.
-                                                            (line 10785)
-* LDCONFIG:                              Environment Variables.
-                                                            (line 11005)
-* LDFLAGS:                               Environment Variables.
+* BZIP2:                                 Environment Variables.
+                                                            (line 10899)
+* BZIP2_CMD:                             Environment Variables.
+                                                            (line 10902)
+* CC:                                    Environment Variables.
+                                                            (line 10754)
+* CCAS:                                  Environment Variables.
+                                                            (line 10772)
+* CCASFLAGS:                             Environment Variables.
+                                                            (line 10775)
+* CFLAGS:                                Environment Variables.
                                                             (line 10757)
-* LSMOD:                                 Environment Variables.
-                                                            (line 11028)
-* LSOF:                                  Environment Variables.
-                                                            (line 11034)
-* LZMA:                                  Environment Variables.
-                                                            (line 10905)
-* LZMA_CMD:                              Environment Variables.
-                                                            (line 10908)
-* MAKEWHATIS:                            Environment Variables.
-                                                            (line 10917)
-* MD5SUM:                                Environment Variables.
-                                                            (line 11151)
-* MODIFYREPO:                            Environment Variables.
-                                                            (line 10955)
-* MODPOST_CACHE:                         Environment Variables.
-                                                            (line 11065)
-* MODPROBE:                              Environment Variables.
-                                                            (line 11022)
-* NM:                                    Environment Variables.
-                                                            (line 11060)
-* OBJDUMP:                               Environment Variables.
-                                                            (line 11054)
-* PACKAGE_KVERSION:                      Configuring the Source RPM.
-                                                            (line  8774)
-* PDFLATEX:                              Environment Variables.
-                                                            (line 11107)
-* PDFTEX:                                Environment Variables.
-                                                            (line 11091)
-* PIC:                                   Environment Variables.
-                                                            (line 10878)
-* PS2EPSI:                               Environment Variables.
+* CHKCONFIG:                             Environment Variables.
+                                                            (line 10933)
+* CLASSPATH:                             Environment Variables.
+                                                            (line 10835)
+* CONVERT:                               Environment Variables.
                                                             (line 11143)
-* PS2PDF:                                Environment Variables.
+* CPP:                                   Environment Variables.
+                                                            (line 10769)
+* CPPFLAGS:                              Environment Variables.
+                                                            (line 10765)
+* CREATEREPO:                            Environment Variables.
+                                                            (line 10954)
+* CREATE_PACKGE_DESCR:                   Environment Variables.
+                                                            (line 10964)
+* CXX:                                   Environment Variables.
+                                                            (line 10779)
+* CXXCPP:                                Environment Variables.
+                                                            (line 10786)
+* CXXFLAGS:                              Environment Variables.
+                                                            (line 10782)
+* DEB_BUILD_ARCH:                        Environment Variables.
+                                                            (line 11174)
+* DEB_BUILD_GNU_CPU:                     Environment Variables.
+                                                            (line 11178)
+* DEB_BUILD_GNU_SYSTEM:                  Environment Variables.
+                                                            (line 11182)
+* DEB_BUILD_GNU_TYPE:                    Environment Variables.
+                                                            (line 11186)
+* DEB_HOST_ARCH:                         Environment Variables.
+                                                            (line 11190)
+* DEB_HOST_GNU_CPU:                      Environment Variables.
+                                                            (line 11194)
+* DEB_HOST_GNU_SYSTEM:                   Environment Variables.
+                                                            (line 11198)
+* DEB_HOST_GNU_TYPE:                     Environment Variables.
+                                                            (line 11202)
+* DEPMOD:                                Environment Variables.
+                                                            (line 11019)
+* DESTDIR:                               Environment Variables.
+                                                            (line 11015)
+* DOXYGEN:                               Environment Variables.
+                                                            (line 11086)
+* DPKG:                                  Environment Variables.
+                                                            (line 10969)
+* DPKG_BUILDPACKAGE:                     Environment Variables.
+                                                            (line 10980)
+* DPKG_DEB:                              Environment Variables.
+                                                            (line 11004)
+* DPKG_SCANPAKCAGES:                     Environment Variables.
+                                                            (line 10998)
+* DPKG_SCANSOURCES:                      Environment Variables.
+                                                            (line 10992)
+* DPKG_SOURCE:                           Environment Variables.
+                                                            (line 10974)
+* DVI2PS:                                Environment Variables.
+                                                            (line 11119)
+* DVIPDF:                                Environment Variables.
                                                             (line 11123)
-* PSLATEX:                               Environment Variables.
-                                                            (line 11103)
-* REFER:                                 Environment Variables.
-                                                            (line 10866)
-* RPM:                                   Environment Variables.
-                                                            (line 10939)
-* RPMBUILD:                              Environment Variables.
-                                                            (line 10944)
-* SHA1SUM:                               Environment Variables.
-                                                            (line 11157)
-* SHA256SUM:                             Environment Variables.
-                                                            (line 11163)
-* SOELIM:                                Environment Variables.
-                                                            (line 10859)
-* SWIG:                                  Environment Variables.
-                                                            (line 10797)
-* TBL:                                   Environment Variables.
-                                                            (line 10872)
-* TEX:                                   Environment Variables.
-                                                            (line 11087)
-* XZ:                                    Environment Variables.
-                                                            (line 10911)
-* XZ_CMD:                                Environment Variables.
-                                                            (line 10914)
-* YACC:                                  Environment Variables.
-                                                            (line 10788)
-* YFLAGS:                                Environment Variables.
-                                                            (line 10792)
-* ZIP:                                   Environment Variables.
+* EPSTOPDF:                              Environment Variables.
+                                                            (line 11151)
+* FIG2DEV:                               Environment Variables.
+                                                            (line 11139)
+* GCJ:                                   Environment Variables.
+                                                            (line 10804)
+* GCJDBTOOL:                             Environment Variables.
+                                                            (line 10811)
+* GCJFLAGS:                              Environment Variables.
+                                                            (line 10807)
+* GCJH:                                  Environment Variables.
+                                                            (line 10814)
+* GCJHFLAGS:                             Environment Variables.
+                                                            (line 10817)
+* GENKSYMS:                              Environment Variables.
+                                                            (line 11046)
+* GNUPGHOME:                             Environment Variables.
+                                                            (line 10853)
+* GNUPGUSER:                             Environment Variables.
+                                                            (line 10849)
+* GNUPLOT:                               Environment Variables.
+                                                            (line 11131)
+* GPG:                                   Environment Variables.
+                                                            (line 10845)
+* GPGPASSWD:                             Environment Variables.
+                                                            (line 10857)
+* GROFF:                                 Environment Variables.
+                                                            (line 11135)
+* GZIP:                                  Environment Variables.
+                                                            (line 10888)
+* GZIP_CMD:                              Environment Variables.
+                                                            (line 10892)
+* INSSERV:                               Environment Variables.
+                                                            (line 10940)
+* JAR:                                   Environment Variables.
                                                             (line 10926)
+* JAVAC:                                 Environment Variables.
+                                                            (line 10828)
+* JAVACFLAGS:                            Environment Variables.
+                                                            (line 10831)
+* JAVADOC:                               Environment Variables.
+                                                            (line 10838)
+* JAVADOCFLAGS:                          Environment Variables.
+                                                            (line 10841)
+* JAVAH:                                 Environment Variables.
+                                                            (line 10821)
+* JAVAHFLAGS:                            Environment Variables.
+                                                            (line 10824)
+* KGENKSYMS:                             Environment Variables.
+                                                            (line 11052)
+* LATEX:                                 Environment Variables.
+                                                            (line 11103)
+* LATEX2HTML:                            Environment Variables.
+                                                            (line 11115)
+* LD:                                    Environment Variables.
+                                                            (line 10789)
+* LDCONFIG:                              Environment Variables.
+                                                            (line 11009)
+* LDFLAGS:                               Environment Variables.
+                                                            (line 10761)
+* LSMOD:                                 Environment Variables.
+                                                            (line 11032)
+* LSOF:                                  Environment Variables.
+                                                            (line 11038)
+* LZMA:                                  Environment Variables.
+                                                            (line 10909)
+* LZMA_CMD:                              Environment Variables.
+                                                            (line 10912)
+* MAKEWHATIS:                            Environment Variables.
+                                                            (line 10921)
+* MD5SUM:                                Environment Variables.
+                                                            (line 11155)
+* MODIFYREPO:                            Environment Variables.
+                                                            (line 10959)
+* MODPOST_CACHE:                         Environment Variables.
+                                                            (line 11069)
+* MODPROBE:                              Environment Variables.
+                                                            (line 11026)
+* NM:                                    Environment Variables.
+                                                            (line 11064)
+* OBJDUMP:                               Environment Variables.
+                                                            (line 11058)
+* PACKAGE_KVERSION:                      Configuring the Source RPM.
+                                                            (line  8778)
+* PDFLATEX:                              Environment Variables.
+                                                            (line 11111)
+* PDFTEX:                                Environment Variables.
+                                                            (line 11095)
+* PIC:                                   Environment Variables.
+                                                            (line 10882)
+* PS2EPSI:                               Environment Variables.
+                                                            (line 11147)
+* PS2PDF:                                Environment Variables.
+                                                            (line 11127)
+* PSLATEX:                               Environment Variables.
+                                                            (line 11107)
+* REFER:                                 Environment Variables.
+                                                            (line 10870)
+* RPM:                                   Environment Variables.
+                                                            (line 10943)
+* RPMBUILD:                              Environment Variables.
+                                                            (line 10948)
+* SHA1SUM:                               Environment Variables.
+                                                            (line 11161)
+* SHA256SUM:                             Environment Variables.
+                                                            (line 11167)
+* SOELIM:                                Environment Variables.
+                                                            (line 10863)
+* SWIG:                                  Environment Variables.
+                                                            (line 10801)
+* TBL:                                   Environment Variables.
+                                                            (line 10876)
+* TEX:                                   Environment Variables.
+                                                            (line 11091)
+* XZ:                                    Environment Variables.
+                                                            (line 10915)
+* XZ_CMD:                                Environment Variables.
+                                                            (line 10918)
+* YACC:                                  Environment Variables.
+                                                            (line 10792)
+* YFLAGS:                                Environment Variables.
+                                                            (line 10796)
+* ZIP:                                   Environment Variables.
+                                                            (line 10930)
 
 Index of Files and Programs
 ===========================
@@ -15210,7 +15217,7 @@ Index of Files and Programs
 * /etc/init.d/streams.sh:                Utilities.         (line  2396)
 * /etc/init.d/strerr:                    Utilities.         (line  2425)
 * /etc/init.d/strerr.sh:                 Utilities.         (line  2426)
-* /lib/modules/3.4.92-1-lts34/streams/:  Loading.           (line 11926)
+* /lib/modules/3.10.64-1-lts310/streams/: Loading.          (line 11932)
 * openss7:                               Utilities.         (line  2413)
 * openss7.sh:                            Utilities.         (line  2414)
 * specfs:                                Utilities.         (line  2380)
@@ -15227,394 +15234,394 @@ Index of Configuration Options
 
 * Menu:
 
-* 32bit-libs:                            Configure Options. (line  9545)
-* arch:                                  Configure Options. (line  9597)
-* autotest:                              Configure Options. (line  9505)
-* base-major:                            Configure Options. (line  9972)
-* base-modid:                            Configure Options. (line  9977)
-* bestzip:                               Configure Options. (line 10052)
+* 32bit-libs:                            Configure Options. (line  9549)
+* arch:                                  Configure Options. (line  9601)
+* autotest:                              Configure Options. (line  9509)
+* base-major:                            Configure Options. (line  9976)
+* base-modid:                            Configure Options. (line  9981)
+* bestzip:                               Configure Options. (line 10056)
 * big-compile:                           Configuring the Source RPM.
-                                                            (line  8936)
-* big-compile <1>:                       Configure Options. (line 10225)
-* checks:                                Configuring the Source RPM.
-                                                            (line  8784)
-* checks <1>:                            Configure Options. (line  9492)
-* compat-aix:                            Configuring the Source RPM.
-                                                            (line  9236)
-* compat-aix <1>:                        Configure Options. (line 10525)
-* compat-hpux:                           Configuring the Source RPM.
-                                                            (line  9244)
-* compat-hpux <1>:                       Configure Options. (line 10533)
-* compat-irix:                           Configuring the Source RPM.
-                                                            (line  9252)
-* compat-irix <1>:                       Configure Options. (line 10541)
-* compat-mac:                            Configuring the Source RPM.
-                                                            (line  9260)
-* compat-mac <1>:                        Configure Options. (line 10549)
-* compat-mps:                            Configuring the Source RPM.
-                                                            (line  9204)
-* compat-mps <1>:                        Configure Options. (line 10493)
-* compat-os7:                            Configuring the Source RPM.
-                                                            (line  9180)
-* compat-os7 <1>:                        Configure Options. (line 10469)
-* compat-osf:                            Configuring the Source RPM.
-                                                            (line  9228)
-* compat-osf <1>:                        Configure Options. (line 10517)
-* compat-sol8:                           Configuring the Source RPM.
-                                                            (line  9212)
-* compat-sol8 <1>:                       Configure Options. (line 10501)
-* compat-svr3:                           Configuring the Source RPM.
-                                                            (line  9188)
-* compat-svr3 <1>:                       Configure Options. (line 10477)
-* compat-svr4:                           Configuring the Source RPM.
-                                                            (line  9196)
-* compat-svr4 <1>:                       Configure Options. (line 10485)
-* compat-uw7:                            Configuring the Source RPM.
-                                                            (line  9220)
-* compat-uw7 <1>:                        Configure Options. (line 10509)
-* compress-manpages:                     Configure Options. (line  9514)
-* cooked-manpages:                       Configuring the Source RPM.
-                                                            (line  8804)
-* cooked-manpages <1>:                   Configure Options. (line  9723)
-* deb-epoch:                             Configure Options. (line  9755)
-* deb-release:                           Configure Options. (line  9760)
-* deb-topdir:                            Configure Options. (line  9765)
-* debs:                                  Configure Options. (line 10157)
-* devel:                                 Configuring the Source RPM.
-                                                            (line  8864)
-* devel <1>:                             Configure Options. (line  9553)
-* devfs:                                 Configure Options. (line  9665)
-* distribute-docs:                       Configure Options. (line  9569)
-* docs:                                  Configuring the Source RPM.
-                                                            (line  8872)
-* docs <1>:                              Configure Options. (line  9561)
-* drafts:                                Configure Options. (line  9939)
-* drafts-html:                           Configure Options. (line  9949)
-* drafts-print:                          Configure Options. (line  9958)
-* driver-clone:                          Configuring the Source RPM.
-                                                            (line  9072)
-* driver-clone <1>:                      Configure Options. (line 10361)
-* driver-echo:                           Configuring the Source RPM.
-                                                            (line  9081)
-* driver-echo <1>:                       Configure Options. (line 10370)
-* driver-fifo:                           Configuring the Source RPM.
-                                                            (line  9090)
-* driver-fifo <1>:                       Configure Options. (line 10379)
-* driver-log:                            Configuring the Source RPM.
-                                                            (line  9099)
-* driver-log <1>:                        Configure Options. (line 10388)
-* driver-loop:                           Configuring the Source RPM.
-                                                            (line  9108)
-* driver-loop <1>:                       Configure Options. (line 10397)
-* driver-mux:                            Configuring the Source RPM.
-                                                            (line  9126)
-* driver-mux <1>:                        Configure Options. (line 10415)
-* driver-nsdev:                          Configuring the Source RPM.
-                                                            (line  9117)
-* driver-nsdev <1>:                      Configure Options. (line 10406)
-* driver-nuls:                           Configuring the Source RPM.
-                                                            (line  9135)
-* driver-nuls <1>:                       Configure Options. (line 10424)
-* driver-pipe:                           Configuring the Source RPM.
-                                                            (line  9144)
-* driver-pipe <1>:                       Configure Options. (line 10433)
-* driver-sad:                            Configuring the Source RPM.
-                                                            (line  9153)
-* driver-sad <1>:                        Configure Options. (line 10442)
-* driver-sfx:                            Configuring the Source RPM.
-                                                            (line  9162)
-* driver-sfx <1>:                        Configure Options. (line 10451)
-* driver-spx:                            Configuring the Source RPM.
-                                                            (line  9171)
-* driver-spx <1>:                        Configure Options. (line 10460)
-* dscs:                                  Configure Options. (line 10165)
-* gpg-home:                              Configure Options. (line  9682)
-* gpg-user:                              Configure Options. (line  9674)
-* indep:                                 Configure Options. (line  9604)
-* initscripts:                           Configure Options. (line  9532)
-* install-source-apt:                    Configure Options. (line 10180)
-* install-source-yum:                    Configure Options. (line 10136)
-* install-source-zypp:                   Configure Options. (line 10150)
-* ip:                                    Configuring the Source RPM.
-                                                            (line  9418)
-* ip <1>:                                Configure Options. (line 10710)
-* java:                                  Configure Options. (line 10022)
-* k-archdir:                             Configure Options. (line  9835)
-* k-asm:                                 Configure Options. (line  9842)
-* k-build:                               Configure Options. (line  9797)
-* k-build <1>:                           Configure Options. (line  9805)
-* k-config:                              Configure Options. (line  9856)
-* k-debug:                               Configuring the Source RPM.
-                                                            (line  8817)
-* k-debug <1>:                           Configure Options. (line  9634)
-* k-hdrdir:                              Configure Options. (line  9827)
-* k-inline:                              Configuring the Source RPM.
-                                                            (line  8840)
-* k-inline <1>:                          Configure Options. (line  9611)
-* k-linkage:                             Configure Options. (line  9780)
-* k-machdir:                             Configure Options. (line  9849)
-* k-modules:                             Configure Options. (line  9787)
-* k-modversions:                         Configuring the Source RPM.
-                                                            (line  8850)
-* k-modversions <1>:                     Configure Options. (line  9651)
-* k-none:                                Configure Options. (line  9643)
-* k-optimize:                            Configuring the Source RPM.
-                                                            (line  8797)
-* k-optimize <1>:                        Configure Options. (line  9864)
-* k-package:                             Configure Options. (line  9657)
-* k-release:                             Configuring the Source RPM.
-                                                            (line  8774)
-* k-release <1>:                         Configure Options. (line  9772)
-* k-safe:                                Configuring the Source RPM.
-                                                            (line  8833)
-* k-safe <1>:                            Configure Options. (line  9617)
-* k-sysmap:                              Configure Options. (line  9813)
-* k-sysmap <1>:                          Configure Options. (line  9820)
-* k-test:                                Configuring the Source RPM.
-                                                            (line  8825)
-* k-test <1>:                            Configure Options. (line  9625)
-* lzma:                                  Configure Options. (line 10062)
-* module-bufmod:                         Configuring the Source RPM.
-                                                            (line  9037)
-* module-bufmod <1>:                     Configure Options. (line 10326)
-* module-connld:                         Configuring the Source RPM.
-                                                            (line  8993)
-* module-connld <1>:                     Configure Options. (line 10282)
-* module-nbuf:                           Configuring the Source RPM.
-                                                            (line  9055)
-* module-nbuf <1>:                       Configure Options. (line 10344)
-* module-nullmod:                        Configuring the Source RPM.
-                                                            (line  8975)
-* module-nullmod <1>:                    Configure Options. (line 10264)
-* module-pf:                             Configuring the Source RPM.
-                                                            (line  9064)
-* module-pf <1>:                         Configure Options. (line 10353)
-* module-pfmod:                          Configuring the Source RPM.
-                                                            (line  9046)
-* module-pfmod <1>:                      Configure Options. (line 10335)
-* module-pipemod:                        Configuring the Source RPM.
-                                                            (line  8984)
-* module-pipemod <1>:                    Configure Options. (line 10273)
-* module-sc:                             Configuring the Source RPM.
-                                                            (line  9002)
-* module-sc <1>:                         Configure Options. (line 10291)
-* module-srvmod:                         Configuring the Source RPM.
-                                                            (line  8966)
-* module-srvmod <1>:                     Configure Options. (line 10255)
-* module-sth:                            Configuring the Source RPM.
-                                                            (line  8957)
-* module-sth <1>:                        Configure Options. (line 10246)
-* module-testmod:                        Configuring the Source RPM.
-                                                            (line  9010)
-* module-testmod <1>:                    Configure Options. (line 10299)
-* module-timod:                          Configuring the Source RPM.
-                                                            (line  9019)
-* module-timod <1>:                      Configure Options. (line 10308)
-* module-tirdwr:                         Configuring the Source RPM.
-                                                            (line  9028)
-* module-tirdwr <1>:                     Configure Options. (line 10317)
-* modules:                               Configuring the Source RPM.
-                                                            (line  8890)
-* modules <1>:                           Configure Options. (line  9589)
-* optimize:                              Configure Options. (line  9874)
-* papers:                                Configure Options. (line  9911)
-* papers-html:                           Configure Options. (line  9920)
-* papers-print:                          Configure Options. (line  9929)
-* perl:                                  Configure Options. (line 10042)
-* perl-headers:                          Configure Options. (line 10006)
-* pkg-distdir:                           Configure Options. (line  9711)
-* pkg-epoch:                             Configure Options. (line  9687)
-* pkg-patchlevel:                        Configure Options. (line  9702)
-* pkg-release:                           Configure Options. (line  9694)
-* pkg-tardir:                            Configure Options. (line  9717)
-* public:                                Configuring the Source RPM.
-                                                            (line  8812)
-* public <1>:                            Configure Options. (line  9521)
-* raw:                                   Configuring the Source RPM.
-                                                            (line  9427)
-* raw <1>:                               Configure Options. (line 10719)
-* repo-apt:                              Configure Options. (line 10173)
-* repo-tar:                              Configure Options. (line 10094)
-* repo-yast:                             Configure Options. (line 10143)
-* repo-yum:                              Configure Options. (line 10129)
-* rpm-epoch:                             Configure Options. (line  9731)
-* rpm-extra:                             Configure Options. (line  9741)
-* rpm-release:                           Configure Options. (line  9736)
-* rpm-topdir:                            Configure Options. (line  9748)
-* rpms:                                  Configure Options. (line 10103)
-* sctp:                                  Configuring the Source RPM.
-                                                            (line  9437)
-* sctp <1>:                              Configure Options. (line 10729)
-* sctp-adaptation-layer-info:            Configuring the Source RPM.
-                                                            (line  9397)
-* sctp-adaptation-layer-info <1>:        Configure Options. (line 10689)
-* sctp-add-ip:                           Configuring the Source RPM.
-                                                            (line  9391)
-* sctp-add-ip <1>:                       Configure Options. (line 10683)
-* sctp-adler32:                          Configuring the Source RPM.
-                                                            (line  9352)
-* sctp-adler32 <1>:                      Configure Options. (line 10643)
-* sctp-crc32c:                           Configuring the Source RPM.
-                                                            (line  9358)
-* sctp-crc32c <1>:                       Configure Options. (line 10649)
-* sctp-discard-ootb:                     Configuring the Source RPM.
-                                                            (line  9308)
-* sctp-discard-ootb <1>:                 Configure Options. (line 10598)
-* sctp-ecn:                              Configuring the Source RPM.
-                                                            (line  9377)
-* sctp-ecn <1>:                          Configure Options. (line 10669)
-* sctp-error-generator:                  Configuring the Source RPM.
-                                                            (line  9411)
-* sctp-error-generator <1>:              Configure Options. (line 10703)
-* sctp-exteded-ip-support:               Configuring the Source RPM.
-                                                            (line  9325)
-* sctp-extended-ip-support:              Configure Options. (line 10616)
-* sctp-hmac-md5:                         Configuring the Source RPM.
-                                                            (line  9342)
-* sctp-hmac-md5 <1>:                     Configure Options. (line 10633)
-* sctp-hmac-sha1:                        Configuring the Source RPM.
-                                                            (line  9332)
-* sctp-hmac-sha1 <1>:                    Configure Options. (line 10623)
-* sctp-lifetimes:                        Configuring the Source RPM.
-                                                            (line  9384)
-* sctp-lifetimes <1>:                    Configure Options. (line 10676)
-* sctp-partial-reliability:              Configuring the Source RPM.
-                                                            (line  9404)
-* sctp-partial-reliability <1>:          Configure Options. (line 10696)
-* sctp-slow-verification:                Configuring the Source RPM.
-                                                            (line  9286)
-* sctp-slow-verification <1>:            Configure Options. (line 10575)
-* sctp-throttle-heartbeats:              Configuring the Source RPM.
-                                                            (line  9298)
-* sctp-throttle-heartbeats <1>:          Configure Options. (line 10587)
-* sctp-throttle-passiveopens:            Configuring the Source RPM.
-                                                            (line  9365)
-* sctp-throttle-passiveopens <1>:        Configure Options. (line 10656)
-* sctp2:                                 Configuring the Source RPM.
-                                                            (line  9441)
-* sctp2 <1>:                             Configure Options. (line 10733)
-* snmp:                                  Configure Options. (line 10013)
-* snmp-agent:                            Configure Options. (line  9993)
-* srpms:                                 Configure Options. (line 10116)
-* strconf-master:                        Configure Options. (line  9968)
-* strconf-pkgdir:                        Configure Options. (line  9981)
-* strconf-pkgrules:                      Configure Options. (line  9987)
-* streams-fifos:                         Configuring the Source RPM.
                                                             (line  8940)
-* streams-fifos <1>:                     Configure Options. (line 10229)
-* streams-irq:                           Configuring the Source RPM.
-                                                            (line  8900)
-* streams-irq <1>:                       Configure Options. (line 10189)
-* streams-kthreads:                      Configuring the Source RPM.
-                                                            (line  8944)
-* streams-kthreads <1>:                  Configure Options. (line 10233)
-* streams-stats:                         Configuring the Source RPM.
-                                                            (line  8909)
-* streams-stats <1>:                     Configure Options. (line 10198)
-* streams-syncqs:                        Configuring the Source RPM.
-                                                            (line  8919)
-* streams-syncqs <1>:                    Configure Options. (line 10208)
-* streams-utils:                         Configuring the Source RPM.
-                                                            (line  8929)
-* streams-utils <1>:                     Configure Options. (line 10218)
-* tcl:                                   Configure Options. (line 10032)
-* tcp:                                   Configuring the Source RPM.
-                                                            (line  9432)
-* tcp <1>:                               Configure Options. (line 10724)
-* texinfo:                               Configure Options. (line  9883)
-* texinfo-html:                          Configure Options. (line  9892)
-* texinfo-print:                         Configure Options. (line  9901)
-* tools:                                 Configuring the Source RPM.
-                                                            (line  8881)
-* tools <1>:                             Configure Options. (line  9579)
-* udp:                                   Configuring the Source RPM.
+* big-compile <1>:                       Configure Options. (line 10229)
+* checks:                                Configuring the Source RPM.
+                                                            (line  8788)
+* checks <1>:                            Configure Options. (line  9496)
+* compat-aix:                            Configuring the Source RPM.
+                                                            (line  9240)
+* compat-aix <1>:                        Configure Options. (line 10529)
+* compat-hpux:                           Configuring the Source RPM.
+                                                            (line  9248)
+* compat-hpux <1>:                       Configure Options. (line 10537)
+* compat-irix:                           Configuring the Source RPM.
+                                                            (line  9256)
+* compat-irix <1>:                       Configure Options. (line 10545)
+* compat-mac:                            Configuring the Source RPM.
+                                                            (line  9264)
+* compat-mac <1>:                        Configure Options. (line 10553)
+* compat-mps:                            Configuring the Source RPM.
+                                                            (line  9208)
+* compat-mps <1>:                        Configure Options. (line 10497)
+* compat-os7:                            Configuring the Source RPM.
+                                                            (line  9184)
+* compat-os7 <1>:                        Configure Options. (line 10473)
+* compat-osf:                            Configuring the Source RPM.
+                                                            (line  9232)
+* compat-osf <1>:                        Configure Options. (line 10521)
+* compat-sol8:                           Configuring the Source RPM.
+                                                            (line  9216)
+* compat-sol8 <1>:                       Configure Options. (line 10505)
+* compat-svr3:                           Configuring the Source RPM.
+                                                            (line  9192)
+* compat-svr3 <1>:                       Configure Options. (line 10481)
+* compat-svr4:                           Configuring the Source RPM.
+                                                            (line  9200)
+* compat-svr4 <1>:                       Configure Options. (line 10489)
+* compat-uw7:                            Configuring the Source RPM.
+                                                            (line  9224)
+* compat-uw7 <1>:                        Configure Options. (line 10513)
+* compress-manpages:                     Configure Options. (line  9518)
+* cooked-manpages:                       Configuring the Source RPM.
+                                                            (line  8808)
+* cooked-manpages <1>:                   Configure Options. (line  9727)
+* deb-epoch:                             Configure Options. (line  9759)
+* deb-release:                           Configure Options. (line  9764)
+* deb-topdir:                            Configure Options. (line  9769)
+* debs:                                  Configure Options. (line 10161)
+* devel:                                 Configuring the Source RPM.
+                                                            (line  8868)
+* devel <1>:                             Configure Options. (line  9557)
+* devfs:                                 Configure Options. (line  9669)
+* distribute-docs:                       Configure Options. (line  9573)
+* docs:                                  Configuring the Source RPM.
+                                                            (line  8876)
+* docs <1>:                              Configure Options. (line  9565)
+* drafts:                                Configure Options. (line  9943)
+* drafts-html:                           Configure Options. (line  9953)
+* drafts-print:                          Configure Options. (line  9962)
+* driver-clone:                          Configuring the Source RPM.
+                                                            (line  9076)
+* driver-clone <1>:                      Configure Options. (line 10365)
+* driver-echo:                           Configuring the Source RPM.
+                                                            (line  9085)
+* driver-echo <1>:                       Configure Options. (line 10374)
+* driver-fifo:                           Configuring the Source RPM.
+                                                            (line  9094)
+* driver-fifo <1>:                       Configure Options. (line 10383)
+* driver-log:                            Configuring the Source RPM.
+                                                            (line  9103)
+* driver-log <1>:                        Configure Options. (line 10392)
+* driver-loop:                           Configuring the Source RPM.
+                                                            (line  9112)
+* driver-loop <1>:                       Configure Options. (line 10401)
+* driver-mux:                            Configuring the Source RPM.
+                                                            (line  9130)
+* driver-mux <1>:                        Configure Options. (line 10419)
+* driver-nsdev:                          Configuring the Source RPM.
+                                                            (line  9121)
+* driver-nsdev <1>:                      Configure Options. (line 10410)
+* driver-nuls:                           Configuring the Source RPM.
+                                                            (line  9139)
+* driver-nuls <1>:                       Configure Options. (line 10428)
+* driver-pipe:                           Configuring the Source RPM.
+                                                            (line  9148)
+* driver-pipe <1>:                       Configure Options. (line 10437)
+* driver-sad:                            Configuring the Source RPM.
+                                                            (line  9157)
+* driver-sad <1>:                        Configure Options. (line 10446)
+* driver-sfx:                            Configuring the Source RPM.
+                                                            (line  9166)
+* driver-sfx <1>:                        Configure Options. (line 10455)
+* driver-spx:                            Configuring the Source RPM.
+                                                            (line  9175)
+* driver-spx <1>:                        Configure Options. (line 10464)
+* dscs:                                  Configure Options. (line 10169)
+* gpg-home:                              Configure Options. (line  9686)
+* gpg-user:                              Configure Options. (line  9678)
+* indep:                                 Configure Options. (line  9608)
+* initscripts:                           Configure Options. (line  9536)
+* install-source-apt:                    Configure Options. (line 10184)
+* install-source-yum:                    Configure Options. (line 10140)
+* install-source-zypp:                   Configure Options. (line 10154)
+* ip:                                    Configuring the Source RPM.
                                                             (line  9422)
-* udp <1>:                               Configure Options. (line 10714)
+* ip <1>:                                Configure Options. (line 10714)
+* java:                                  Configure Options. (line 10026)
+* k-archdir:                             Configure Options. (line  9839)
+* k-asm:                                 Configure Options. (line  9846)
+* k-build:                               Configure Options. (line  9801)
+* k-build <1>:                           Configure Options. (line  9809)
+* k-config:                              Configure Options. (line  9860)
+* k-debug:                               Configuring the Source RPM.
+                                                            (line  8821)
+* k-debug <1>:                           Configure Options. (line  9638)
+* k-hdrdir:                              Configure Options. (line  9831)
+* k-inline:                              Configuring the Source RPM.
+                                                            (line  8844)
+* k-inline <1>:                          Configure Options. (line  9615)
+* k-linkage:                             Configure Options. (line  9784)
+* k-machdir:                             Configure Options. (line  9853)
+* k-modules:                             Configure Options. (line  9791)
+* k-modversions:                         Configuring the Source RPM.
+                                                            (line  8854)
+* k-modversions <1>:                     Configure Options. (line  9655)
+* k-none:                                Configure Options. (line  9647)
+* k-optimize:                            Configuring the Source RPM.
+                                                            (line  8801)
+* k-optimize <1>:                        Configure Options. (line  9868)
+* k-package:                             Configure Options. (line  9661)
+* k-release:                             Configuring the Source RPM.
+                                                            (line  8778)
+* k-release <1>:                         Configure Options. (line  9776)
+* k-safe:                                Configuring the Source RPM.
+                                                            (line  8837)
+* k-safe <1>:                            Configure Options. (line  9621)
+* k-sysmap:                              Configure Options. (line  9817)
+* k-sysmap <1>:                          Configure Options. (line  9824)
+* k-test:                                Configuring the Source RPM.
+                                                            (line  8829)
+* k-test <1>:                            Configure Options. (line  9629)
+* lzma:                                  Configure Options. (line 10066)
+* module-bufmod:                         Configuring the Source RPM.
+                                                            (line  9041)
+* module-bufmod <1>:                     Configure Options. (line 10330)
+* module-connld:                         Configuring the Source RPM.
+                                                            (line  8997)
+* module-connld <1>:                     Configure Options. (line 10286)
+* module-nbuf:                           Configuring the Source RPM.
+                                                            (line  9059)
+* module-nbuf <1>:                       Configure Options. (line 10348)
+* module-nullmod:                        Configuring the Source RPM.
+                                                            (line  8979)
+* module-nullmod <1>:                    Configure Options. (line 10268)
+* module-pf:                             Configuring the Source RPM.
+                                                            (line  9068)
+* module-pf <1>:                         Configure Options. (line 10357)
+* module-pfmod:                          Configuring the Source RPM.
+                                                            (line  9050)
+* module-pfmod <1>:                      Configure Options. (line 10339)
+* module-pipemod:                        Configuring the Source RPM.
+                                                            (line  8988)
+* module-pipemod <1>:                    Configure Options. (line 10277)
+* module-sc:                             Configuring the Source RPM.
+                                                            (line  9006)
+* module-sc <1>:                         Configure Options. (line 10295)
+* module-srvmod:                         Configuring the Source RPM.
+                                                            (line  8970)
+* module-srvmod <1>:                     Configure Options. (line 10259)
+* module-sth:                            Configuring the Source RPM.
+                                                            (line  8961)
+* module-sth <1>:                        Configure Options. (line 10250)
+* module-testmod:                        Configuring the Source RPM.
+                                                            (line  9014)
+* module-testmod <1>:                    Configure Options. (line 10303)
+* module-timod:                          Configuring the Source RPM.
+                                                            (line  9023)
+* module-timod <1>:                      Configure Options. (line 10312)
+* module-tirdwr:                         Configuring the Source RPM.
+                                                            (line  9032)
+* module-tirdwr <1>:                     Configure Options. (line 10321)
+* modules:                               Configuring the Source RPM.
+                                                            (line  8894)
+* modules <1>:                           Configure Options. (line  9593)
+* optimize:                              Configure Options. (line  9878)
+* papers:                                Configure Options. (line  9915)
+* papers-html:                           Configure Options. (line  9924)
+* papers-print:                          Configure Options. (line  9933)
+* perl:                                  Configure Options. (line 10046)
+* perl-headers:                          Configure Options. (line 10010)
+* pkg-distdir:                           Configure Options. (line  9715)
+* pkg-epoch:                             Configure Options. (line  9691)
+* pkg-patchlevel:                        Configure Options. (line  9706)
+* pkg-release:                           Configure Options. (line  9698)
+* pkg-tardir:                            Configure Options. (line  9721)
+* public:                                Configuring the Source RPM.
+                                                            (line  8816)
+* public <1>:                            Configure Options. (line  9525)
+* raw:                                   Configuring the Source RPM.
+                                                            (line  9431)
+* raw <1>:                               Configure Options. (line 10723)
+* repo-apt:                              Configure Options. (line 10177)
+* repo-tar:                              Configure Options. (line 10098)
+* repo-yast:                             Configure Options. (line 10147)
+* repo-yum:                              Configure Options. (line 10133)
+* rpm-epoch:                             Configure Options. (line  9735)
+* rpm-extra:                             Configure Options. (line  9745)
+* rpm-release:                           Configure Options. (line  9740)
+* rpm-topdir:                            Configure Options. (line  9752)
+* rpms:                                  Configure Options. (line 10107)
+* sctp:                                  Configuring the Source RPM.
+                                                            (line  9441)
+* sctp <1>:                              Configure Options. (line 10733)
+* sctp-adaptation-layer-info:            Configuring the Source RPM.
+                                                            (line  9401)
+* sctp-adaptation-layer-info <1>:        Configure Options. (line 10693)
+* sctp-add-ip:                           Configuring the Source RPM.
+                                                            (line  9395)
+* sctp-add-ip <1>:                       Configure Options. (line 10687)
+* sctp-adler32:                          Configuring the Source RPM.
+                                                            (line  9356)
+* sctp-adler32 <1>:                      Configure Options. (line 10647)
+* sctp-crc32c:                           Configuring the Source RPM.
+                                                            (line  9362)
+* sctp-crc32c <1>:                       Configure Options. (line 10653)
+* sctp-discard-ootb:                     Configuring the Source RPM.
+                                                            (line  9312)
+* sctp-discard-ootb <1>:                 Configure Options. (line 10602)
+* sctp-ecn:                              Configuring the Source RPM.
+                                                            (line  9381)
+* sctp-ecn <1>:                          Configure Options. (line 10673)
+* sctp-error-generator:                  Configuring the Source RPM.
+                                                            (line  9415)
+* sctp-error-generator <1>:              Configure Options. (line 10707)
+* sctp-exteded-ip-support:               Configuring the Source RPM.
+                                                            (line  9329)
+* sctp-extended-ip-support:              Configure Options. (line 10620)
+* sctp-hmac-md5:                         Configuring the Source RPM.
+                                                            (line  9346)
+* sctp-hmac-md5 <1>:                     Configure Options. (line 10637)
+* sctp-hmac-sha1:                        Configuring the Source RPM.
+                                                            (line  9336)
+* sctp-hmac-sha1 <1>:                    Configure Options. (line 10627)
+* sctp-lifetimes:                        Configuring the Source RPM.
+                                                            (line  9388)
+* sctp-lifetimes <1>:                    Configure Options. (line 10680)
+* sctp-partial-reliability:              Configuring the Source RPM.
+                                                            (line  9408)
+* sctp-partial-reliability <1>:          Configure Options. (line 10700)
+* sctp-slow-verification:                Configuring the Source RPM.
+                                                            (line  9290)
+* sctp-slow-verification <1>:            Configure Options. (line 10579)
+* sctp-throttle-heartbeats:              Configuring the Source RPM.
+                                                            (line  9302)
+* sctp-throttle-heartbeats <1>:          Configure Options. (line 10591)
+* sctp-throttle-passiveopens:            Configuring the Source RPM.
+                                                            (line  9369)
+* sctp-throttle-passiveopens <1>:        Configure Options. (line 10660)
+* sctp2:                                 Configuring the Source RPM.
+                                                            (line  9445)
+* sctp2 <1>:                             Configure Options. (line 10737)
+* snmp:                                  Configure Options. (line 10017)
+* snmp-agent:                            Configure Options. (line  9997)
+* srpms:                                 Configure Options. (line 10120)
+* strconf-master:                        Configure Options. (line  9972)
+* strconf-pkgdir:                        Configure Options. (line  9985)
+* strconf-pkgrules:                      Configure Options. (line  9991)
+* streams-fifos:                         Configuring the Source RPM.
+                                                            (line  8944)
+* streams-fifos <1>:                     Configure Options. (line 10233)
+* streams-irq:                           Configuring the Source RPM.
+                                                            (line  8904)
+* streams-irq <1>:                       Configure Options. (line 10193)
+* streams-kthreads:                      Configuring the Source RPM.
+                                                            (line  8948)
+* streams-kthreads <1>:                  Configure Options. (line 10237)
+* streams-stats:                         Configuring the Source RPM.
+                                                            (line  8913)
+* streams-stats <1>:                     Configure Options. (line 10202)
+* streams-syncqs:                        Configuring the Source RPM.
+                                                            (line  8923)
+* streams-syncqs <1>:                    Configure Options. (line 10212)
+* streams-utils:                         Configuring the Source RPM.
+                                                            (line  8933)
+* streams-utils <1>:                     Configure Options. (line 10222)
+* tcl:                                   Configure Options. (line 10036)
+* tcp:                                   Configuring the Source RPM.
+                                                            (line  9436)
+* tcp <1>:                               Configure Options. (line 10728)
+* texinfo:                               Configure Options. (line  9887)
+* texinfo-html:                          Configure Options. (line  9896)
+* texinfo-print:                         Configure Options. (line  9905)
+* tools:                                 Configuring the Source RPM.
+                                                            (line  8885)
+* tools <1>:                             Configure Options. (line  9583)
+* udp:                                   Configuring the Source RPM.
+                                                            (line  9426)
+* udp <1>:                               Configure Options. (line 10718)
 * xti-servtype:                          Configuring the Source RPM.
-                                                            (line  9267)
-* xti-servtype <1>:                      Configure Options. (line 10556)
+                                                            (line  9271)
+* xti-servtype <1>:                      Configure Options. (line 10560)
 * xti-states:                            Configuring the Source RPM.
-                                                            (line  9277)
-* xti-states <1>:                        Configure Options. (line 10566)
-* xz:                                    Configure Options. (line 10078)
+                                                            (line  9281)
+* xti-states <1>:                        Configure Options. (line 10570)
+* xz:                                    Configure Options. (line 10082)
 
 Index of Makefile Targets
 =========================
 
 * Menu:
 
-* all:                                   Loading.           (line 11909)
-* all <1>:                               User Targets.      (line 11980)
-* check:                                 User Targets.      (line 12002)
-* check-clean:                           Clean Targets.     (line 12185)
-* check.log:                             Logging Targets.   (line 12300)
-* clean:                                 Clean Targets.     (line 12147)
-* compile.log:                           Logging Targets.   (line 12296)
+* all:                                   Loading.           (line 11915)
+* all <1>:                               User Targets.      (line 11987)
+* check:                                 User Targets.      (line 12009)
+* check-clean:                           Clean Targets.     (line 12192)
+* check.log:                             Logging Targets.   (line 12307)
+* clean:                                 Clean Targets.     (line 12154)
+* compile.log:                           Logging Targets.   (line 12303)
 * csig:                                  Debian Build Targets.
-                                                            (line 12567)
+                                                            (line 12574)
 * debs:                                  Debian Build Targets.
-                                                            (line 12557)
+                                                            (line 12564)
 * dist:                                  Maintainer Targets.
-                                                            (line 12112)
-* dist.log:                              Logging Targets.   (line 12328)
+                                                            (line 12119)
+* dist.log:                              Logging Targets.   (line 12335)
 * distcheck:                             Maintainer Targets.
-                                                            (line 12122)
-* distcheck.log:                         Logging Targets.   (line 12332)
-* distclean:                             Clean Targets.     (line 12158)
+                                                            (line 12129)
+* distcheck.log:                         Logging Targets.   (line 12339)
+* distclean:                             Clean Targets.     (line 12165)
 * doxy:                                  Documentation Targets.
-                                                            (line 12581)
+                                                            (line 12588)
 * dsc:                                   Debian Build Targets.
-                                                            (line 12539)
-* forced-release:                        Release Targets.   (line 12245)
-* forced-release-sign:                   Release Targets.   (line 12262)
-* install:                               Loading.           (line 11909)
-* install <1>:                           User Targets.      (line 12023)
+                                                            (line 12546)
+* forced-release:                        Release Targets.   (line 12252)
+* forced-release-sign:                   Release Targets.   (line 12269)
+* install:                               Loading.           (line 11915)
+* install <1>:                           User Targets.      (line 12030)
 * install-mans:                          Manual Page Targets.
-                                                            (line 12214)
-* install-strip:                         Loading.           (line 11909)
-* install-strip <1>:                     User Targets.      (line 12023)
-* install.log:                           Logging Targets.   (line 12304)
-* installcheck:                          User Targets.      (line 12034)
-* installcheck.log:                      Logging Targets.   (line 12308)
-* maintainer-clean:                      Clean Targets.     (line 12170)
+                                                            (line 12221)
+* install-strip:                         Loading.           (line 11915)
+* install-strip <1>:                     User Targets.      (line 12030)
+* install.log:                           Logging Targets.   (line 12311)
+* installcheck:                          User Targets.      (line 12041)
+* installcheck.log:                      Logging Targets.   (line 12315)
+* maintainer-clean:                      Clean Targets.     (line 12177)
 * mans:                                  Manual Page Targets.
-                                                            (line 12208)
-* mostlyclean:                           Clean Targets.     (line 12139)
+                                                            (line 12215)
+* mostlyclean:                           Clean Targets.     (line 12146)
 * pr:                                    Problem Report Targets.
-                                                            (line 12379)
+                                                            (line 12386)
 * pr <1>:                                Generating Problem Reports.
-                                                            (line 12975)
-* rebuild:                               RPM Build Targets. (line 12509)
-* rebuild.log:                           Logging Targets.   (line 12341)
-* release:                               Release Targets.   (line 12234)
+                                                            (line 12982)
+* rebuild:                               RPM Build Targets. (line 12516)
+* rebuild.log:                           Logging Targets.   (line 12348)
+* release:                               Release Targets.   (line 12241)
 * release-archives:                      Release Archive Targets.
-                                                            (line 12416)
-* release-clean:                         Release Targets.   (line 12270)
+                                                            (line 12423)
+* release-clean:                         Release Targets.   (line 12277)
 * release-clean-archives:                Release Archive Targets.
-                                                            (line 12454)
-* release-sign:                          Release Targets.   (line 12253)
+                                                            (line 12461)
+* release-sign:                          Release Targets.   (line 12260)
 * release-sign-archives:                 Release Archive Targets.
-                                                            (line 12434)
-* release-sign.log:                      Logging Targets.   (line 12353)
-* release.log:                           Logging Targets.   (line 12349)
-* remove:                                User Targets.      (line 12082)
-* remove.log:                            Logging Targets.   (line 12318)
-* resign:                                RPM Build Targets. (line 12519)
-* resign.log:                            Logging Targets.   (line 12345)
-* retest:                                User Targets.      (line 12051)
-* rpms:                                  RPM Build Targets. (line 12481)
+                                                            (line 12441)
+* release-sign.log:                      Logging Targets.   (line 12360)
+* release.log:                           Logging Targets.   (line 12356)
+* remove:                                User Targets.      (line 12089)
+* remove.log:                            Logging Targets.   (line 12325)
+* resign:                                RPM Build Targets. (line 12526)
+* resign.log:                            Logging Targets.   (line 12352)
+* retest:                                User Targets.      (line 12058)
+* rpms:                                  RPM Build Targets. (line 12488)
 * send-pr:                               Problem Report Targets.
-                                                            (line 12391)
-* sign:                                  RPM Build Targets. (line 12498)
+                                                            (line 12398)
+* sign:                                  RPM Build Targets. (line 12505)
 * sigs:                                  Debian Build Targets.
-                                                            (line 12550)
-* srpm:                                  RPM Build Targets. (line 12473)
-* srpm-sign:                             RPM Build Targets. (line 12498)
-* srpm.log:                              Logging Targets.   (line 12337)
-* uninstall:                             User Targets.      (line 12066)
+                                                            (line 12557)
+* srpm:                                  RPM Build Targets. (line 12480)
+* srpm-sign:                             RPM Build Targets. (line 12505)
+* srpm.log:                              Logging Targets.   (line 12344)
+* uninstall:                             User Targets.      (line 12073)
 * uninstall-mans:                        Manual Page Targets.
-                                                            (line 12220)
-* uninstall.log:                         Logging Targets.   (line 12313)
+                                                            (line 12227)
+* uninstall.log:                         Logging Targets.   (line 12320)
 
 Index of Manual Pages Referenced
 ================================
