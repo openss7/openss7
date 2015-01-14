@@ -436,8 +436,13 @@ log_wput(queue_t *q, mblk_t *mp)
 		switch (ioc->iocblk.ioc_cmd) {
 		case I_CONSLOG:
 			err = -EPERM;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+			if (ioc->iocblk.ioc_uid.val != 0)
+				goto nak;
+#else
 			if (ioc->iocblk.ioc_uid != 0)
 				goto nak;
+#endif
 			err = -EINVAL;
 			if (ioc->iocblk.ioc_count == TRANSPARENT)
 				goto nak;
@@ -449,8 +454,13 @@ log_wput(queue_t *q, mblk_t *mp)
 			goto ack;
 		case I_ERRLOG:
 			err = -EPERM;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+			if (ioc->iocblk.ioc_uid.val != 0)
+				goto nak;
+#else
 			if (ioc->iocblk.ioc_uid != 0)
 				goto nak;
+#endif
 			err = -EINVAL;
 			if (ioc->iocblk.ioc_count == TRANSPARENT)
 				goto nak;
@@ -462,8 +472,13 @@ log_wput(queue_t *q, mblk_t *mp)
 			goto ack;
 		case I_TRCLOG:
 			err = -EPERM;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+			if (ioc->iocblk.ioc_uid.val != 0)
+				goto nak;
+#else
 			if (ioc->iocblk.ioc_uid != 0)
 				goto nak;
+#endif
 			err = -EINVAL;
 			if (ioc->iocblk.ioc_count == TRANSPARENT)
 				goto nak;

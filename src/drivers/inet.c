@@ -15238,8 +15238,13 @@ t_conn_req(ss_t *ss, queue_t *q, mblk_t *mp)
 
 		if (dst_in->sin_port == 0)
 			goto badaddr;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+		if (ss->cred.cr_uid.val != 0 && ntohs(dst_in->sin_port) == IPPROTO_RAW)
+			goto acces;
+#else
 		if (ss->cred.cr_uid != 0 && ntohs(dst_in->sin_port) == IPPROTO_RAW)
 			goto acces;
+#endif
 		break;
 	}
 	case AF_UNIX:
@@ -15388,8 +15393,13 @@ t_conn_res(ss_t *ss, queue_t *q, mblk_t *mp)
 		goto provmismatch;
 	if (unlikely(ss_get_state(as) == TS_IDLE && as->conind))
 		goto resqlen;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (unlikely(ss->cred.cr_uid.val != 0 && as->cred.cr_uid.val == 0))
+		goto acces;
+#else
 	if (unlikely(ss->cred.cr_uid != 0 && as->cred.cr_uid == 0))
 		goto acces;
+#endif
 	opt = mp->b_rptr + p->OPT_offset;
 	if (unlikely(p->OPT_length && mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length))
 		goto badopt;
@@ -15785,8 +15795,13 @@ t_bind_req(ss_t *ss, queue_t *q, mblk_t *mp)
 			add = (typeof(add)) (mp->b_rptr + p->ADDR_offset);
 		}
 		add_in = (typeof(add_in)) add;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+		if (ss->p.prot.type == SOCK_RAW && ss->cred.cr_uid.val != 0)
+			goto acces;
+#else
 		if (ss->p.prot.type == SOCK_RAW && ss->cred.cr_uid != 0)
 			goto acces;
+#endif
 		ss->port = ntohs(add_in->sin_port);
 		/* raw sockets really do not like being fed zero protocol numbers */
 		if (ss->p.prot.type == SOCK_RAW && ss->port == 0)
@@ -15910,8 +15925,13 @@ t_unitdata_req(ss_t *ss, queue_t *q, mblk_t *mp)
 	    || (p->DEST_length < sizeof(ss->dst.sa_family))
 	    || (p->DEST_length < ss_addr_size((struct sockaddr *) (mp->b_rptr + p->DEST_length))))
 		goto badadd;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (unlikely(ss->p.prot.type == SOCK_RAW && ss->cred.cr_uid.val != 0))
+		goto acces;
+#else
 	if (unlikely(ss->p.prot.type == SOCK_RAW && ss->cred.cr_uid != 0))
 		goto acces;
+#endif
 	else {
 		int cmsg_len;
 		size_t opt_len = p->OPT_length;

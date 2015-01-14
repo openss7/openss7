@@ -14036,8 +14036,13 @@ n_conn_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	if ((mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length)
 	    || (p->DEST_length < sizeof(struct sccp_addr) + a->alen) || !a->ssn)
 		goto nbadaddr;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (sc->cred.cr_uid.val != 0 && !a->ssn)
+		goto naccess;
+#else
 	if (sc->cred.cr_uid != 0 && !a->ssn)
 		goto naccess;
+#endif
 	fixme(("select a source local reference number\n"));
 	if (p->QOS_length) {
 		sls = &qos->sequence_selection;
@@ -14163,8 +14168,13 @@ n_conn_res(struct sc *sc, queue_t *q, mblk_t *mp)
 	if (ap->i_state == NS_IDLE && ap->conind)
 		goto nbadtoken;
 	/* protect at least r00t streams from users */
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (sc->cred.cr_uid.val != 0 && ap->cred.cr_uid.val == 0)
+		goto naccess;
+#else
 	if (sc->cred.cr_uid != 0 && ap->cred.cr_uid == 0)
 		goto naccess;
+#endif
 	{
 		np_ulong ap_oldstate = ap->i_state;
 		np_ulong ap_oldflags = ap->flags;
@@ -14462,8 +14472,13 @@ n_bind_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	fixme(("Deal with slr assignment\n"));
 	if (0)
 		goto nnoaddr;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (sc->cred.cr_uid.val != 0 && !a->ssn)
+		goto naccess;
+#else
 	if (sc->cred.cr_uid != 0 && !a->ssn)
 		goto naccess;
+#endif
 	if ((err = sccp_bind_req(sc, q, a, p->CONIND_number)))
 		goto error;
 	return n_bind_ack(sc, q, NULL);
@@ -14570,8 +14585,13 @@ n_unitdata_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	    || (!p->DEST_offset) || (p->DEST_offset < sizeof(*p))
 	    || (p->DEST_length < sizeof(*dst)) || (p->DEST_length < sizeof(*dst) + dst->alen))
 		goto eproto2;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (sc->cred.cr_uid.val != 0 && !dst->ssn)
+		goto eproto;
+#else
 	if (sc->cred.cr_uid != 0 && !dst->ssn)
 		goto eproto;
+#endif
 	if (mp->b_wptr >=
 	    mp->b_rptr + p->DEST_offset + p->DEST_length + PAD4(dst->alen) + sizeof(*qos)) {
 		qos = (typeof(qos)) (mp->b_rptr + p->DEST_offset + p->DEST_length);
@@ -14961,8 +14981,13 @@ t_conn_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	if ((mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length)
 	    || (p->DEST_length < sizeof(struct sccp_addr) + a->alen) || !a->ssn)
 		goto badaddr;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (sc->cred.cr_uid.val != 0 && !a->ssn)
+		goto access;
+#else
 	if (sc->cred.cr_uid != 0 && !a->ssn)
 		goto access;
+#endif
 	fixme(("select a source local reference number\n"));
 	if (p->OPT_length) {
 		for (op = mp->b_rptr + p->OPT_offset, oe = op + p->OPT_length, oh = (typeof(oh)) op;
@@ -15119,8 +15144,13 @@ t_conn_res(struct sc *sc, queue_t *q, mblk_t *mp)
 	if ((ap_oldstate = sccp_get_t_state(ap)) == TS_IDLE && ap->conind)
 		goto resqlen;
 	/* protect at least r00t streams from users */
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (sc->cred.cr_uid.val != 0 && ap->cred.cr_uid.val == 0)
+		goto access;
+#else
 	if (sc->cred.cr_uid != 0 && ap->cred.cr_uid == 0)
 		goto access;
+#endif
 	if (p->OPT_length) {
 		for (op = mp->b_rptr + p->OPT_offset, oe = op + p->OPT_length, oh = (typeof(oh)) op;
 		     op + sizeof(*oh) <= oe && oh->len >= sizeof(*oh)
@@ -15418,8 +15448,13 @@ t_bind_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	/* we don't allow wildcards just yet */
 	if (!add->ssn)
 		goto tnoaddr;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (sc->cred.cr_uid.val != 0 && !add->ssn)
+		goto tacces;
+#else
 	if (sc->cred.cr_uid != 0 && !add->ssn)
 		goto tacces;
+#endif
 	if ((err = sccp_bind_req(sc, q, add, p->CONIND_number)))
 		goto error;
 	return t_bind_ack(sc, q, NULL, &sc->src);
@@ -15536,8 +15571,13 @@ t_unitdata_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	if ((mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length)
 	    || (p->DEST_length != dst_len))
 		goto tbadaddr;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (sc->cred.cr_uid.val != 0 && dst->ssn != sc->src.ssn)
+		goto eperm;
+#else
 	if (sc->cred.cr_uid != 0 && dst->ssn != sc->src.ssn)
 		goto eperm;
+#endif
 	seq = sc->sls;
 	pri = sc->mp;
 	pcl = sc->pcl;
@@ -18915,7 +18955,12 @@ sccp_w_ioctl(queue_t *q, mblk_t *mp)
 		}
 		switch (nr) {
 		case _IOC_NR(I_PLINK):
-			if (iocp->ioc_cr->cr_uid != 0) {
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+			if (iocp->ioc_cr->cr_uid.val != 0)
+#else
+			if (iocp->ioc_cr->cr_uid != 0)
+#endif
+			{
 				ptrace(("%s: %p: ERROR: Non-root attempt to I_PLINK\n", DRV_NAME,
 					sc));
 				ret = -EPERM;
@@ -18929,7 +18974,12 @@ sccp_w_ioctl(queue_t *q, mblk_t *mp)
 			ret = -ENOMEM;
 			break;
 		case _IOC_NR(I_PUNLINK):
-			if (iocp->ioc_cr->cr_uid != 0) {
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+			if (iocp->ioc_cr->cr_uid.val != 0)
+#else
+			if (iocp->ioc_cr->cr_uid != 0)
+#endif
+			{
 				ptrace(("%s: %p: ERROR: Non-root attempt to I_PUNLINK\n", DRV_NAME,
 					sc));
 				ret = -EPERM;

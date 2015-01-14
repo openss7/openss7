@@ -2409,15 +2409,25 @@ sc_conn_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	bcopy(mp->b_rptr + p->DEST_offset, &sc->dst, p->DEST_length);
 	if (p->DEST_length != sizeof(sc->dst) + sc->dst.alen)
 		goto nbadaddr;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (sc->dst.ssn == 0 && sc->cred.cr_uid.val != 0)
+		goto naccess;
+#else
 	if (sc->dst.ssn == 0 && sc->cred.cr_uid != 0)
 		goto naccess;
+#endif
 	sc->flags &= ~(SCCPF_REC_CONF_OPT | SCCPF_EX_DATA_OPT);
 	if (p->CONN_flags & REC_CONF_OPT)
 		sc->flags |= SCCPF_REC_CONF_OPT;
 	if (p->CONN_flags & EX_DATA_OPT)
 		sc->flags |= SCCPF_EX_DATA_OPT;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (sc->cqos.message_priority > 1 && sc->cred.cr_uid.val != 0)
+		goto naccess;
+#else
 	if (sc->cqos.message_priority > 1 && sc->cred.cr_uid != 0)
 		goto naccess;
+#endif
 	sc->slr = (sc->sp.sccp_next_slr++) & 0xffff;
 #if 0
 	if ((err = sccp_send_cr(sc, q, mp, mp->b_cont)))

@@ -393,4 +393,16 @@
    included. */
 #undef NEED_LINUX_AUTOCONF_H
 
+/* Define to 1 if 'uid.val' is a member of 'struct cred'. */
+#undef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+
+/* Define to 1 if 'gid.val' is a member of 'struct cred'. */
+#undef HAVE_KMEMB_STRUCT_CRED_GID_VAL
+
+/* Define to 1 if 'euid.val' is a member of 'struct cred'. */
+#undef HAVE_KMEMB_STRUCT_CRED_EUID_VAL
+
+/* Define to 1 if 'egid.val' is a member of 'struct cred'. */
+#undef HAVE_KMEMB_STRUCT_CRED_EGID_VAL
+
 #endif				/* __SYS_OPENSS7_CONFIG_H__ */

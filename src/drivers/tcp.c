@@ -6936,7 +6936,11 @@ tpi_init_hashes(void)
 	unsigned long goal;
 
 	/* size and allocate bind hash table */
+#ifdef HAVE_NUM_PHYSPAGES_EXPORT
 	goal = num_physpages >> (20 - PAGE_SHIFT);
+#else
+	goal = totalram_pages >> (20 - PAGE_SHIFT);
+#endif
 	for (order = 0; (1 << order) < goal; order++) ;
 	do {
 		tpi_bhash_order = order;

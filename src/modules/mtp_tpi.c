@@ -1658,8 +1658,13 @@ t_conn_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 		goto noaddr;
 	if (dst->si < 3 && mtp->src.si != 0)
 		goto badaddr;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (dst->si < 3 && mtp->cred.cr_uid.val != 0)
+		goto acces;
+#else
 	if (dst->si < 3 && mtp->cred.cr_uid != 0)
 		goto acces;
+#endif
 	if (dst->si != mtp->src.si && mtp->src.si != 0)
 		goto badaddr;
 	if (t_parse_opts(&opts, mp->b_rptr + p->OPT_offset, p->OPT_length))
@@ -1898,8 +1903,13 @@ t_bind_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 		goto badaddr;
 	if (!src.si || !src.pc)
 		goto noaddr;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (src.si < 3 && mtp->cred.cr_uid.val != 0)
+		goto acces;
+#else
 	if (src.si < 3 && mtp->cred.cr_uid != 0)
 		goto acces;
+#endif
 	mtp_set_state(mtp, TS_WACK_BREQ);
 	return mtp_bind_req(mtp, q, mp, &src, 0);
       acces:
@@ -1999,8 +2009,13 @@ t_unitdata_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 		goto badaddr;
 	if (!dst.si || !dst.pc)
 		goto badaddr;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (dst.si < 3 && mtp->cred.cr_uid.val != 0)
+		goto acces;
+#else
 	if (dst.si < 3 && mtp->cred.cr_uid != 0)
 		goto acces;
+#endif
 	if (dst.si != mtp->src.si)
 		goto badaddr;
 	if (t_parse_opts(&opts, mp->b_rptr + p->OPT_offset, p->OPT_length))

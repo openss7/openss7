@@ -747,7 +747,12 @@ sl_w_ioctl(queue_t *q, mblk_t *mp)
 		switch (nr) {
 		case _IOC_NR(I_PLINK):
 			ptrace(("%s: %p: I_PLINK\n", DRV_NAME, sl));
-			if (iocp->ioc_cr->cr_uid != 0) {
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+			if (iocp->ioc_cr->cr_uid.val != 0)
+#else
+			if (iocp->ioc_cr->cr_uid != 0)
+#endif
+			{
 				ptrace(("%s: %p: ERROR: Non-root attempt to I_PLINK\n", DRV_NAME,
 					sl));
 				ret = -EPERM;
@@ -773,7 +778,12 @@ sl_w_ioctl(queue_t *q, mblk_t *mp)
 			break;
 		case _IOC_NR(I_PUNLINK):
 			ptrace(("%s: %p: I_PUNLINK\n", DRV_NAME, sl));
-			if (iocp->ioc_cr->cr_uid != 0) {
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+			if (iocp->ioc_cr->cr_uid.val != 0)
+#else
+			if (iocp->ioc_cr->cr_uid != 0)
+#endif
+			{
 				ptrace(("%s: %p: ERROR: Non-root attempt to I_PUNLINK\n", DRV_NAME,
 					sl));
 				ret = -EPERM;

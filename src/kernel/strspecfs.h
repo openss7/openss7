@@ -77,8 +77,16 @@ struct spec_sb_info {
 	int sbi_setuid;
 	int sbi_setgid;
 	int sbi_setmod;
+#ifdef HAVE_KMEMB_STRUCT_INODE_I_UID_VAL
+	kuid_t sbi_uid;
+#else
 	uid_t sbi_uid;
+#endif
+#ifdef HAVE_KMEMB_STRUCT_INODE_I_GID_VAL
+	kgid_t sbi_gid;
+#else
 	gid_t sbi_gid;
+#endif
 	umode_t sbi_mode;
 };
 

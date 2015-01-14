@@ -136,8 +136,16 @@ struct strevent {
 			long events;
 			int fd;
 #if defined HAVE_KILL_PROC_INFO_AS_UID_SYMBOL || defined HAVE_KILL_PID_INFO_AS_UID_SYMBOL || defined HAVE_KILL_PID_INFO_AS_CRED_SYMBOL
+#if defined HAVE_KMEMB_STRUCT_CRED_UID_VAL
+			kuid_t uid;
+#else
 			uid_t uid;
+#endif
+#if defined HAVE_KMEMB_STRUCT_CRED_EUID_VAL
+			kuid_t euid;
+#else
 			uid_t euid;
+#endif
 			uint32_t secid;
 #if defined HAVE_KILL_PID_INFO_AS_CRED_SYMBOL
 			struct user_namespace *user_ns;

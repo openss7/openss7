@@ -3304,8 +3304,14 @@ sl_i_unlink(struct sl *lm, queue_t *q, mblk_t *mp)
 		return (-EDEADLK);
 	}
 	/* if issued by user, check credentials */
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
 	if (unlikely((ioc->ioc_flag & IOC_MASK) == IOC_NONE
-		     && drv_priv(ioc->ioc_cr) != 0 && ioc->ioc_cr->cr_uid != sl->cred.cr_uid)) {
+		     && drv_priv(ioc->ioc_cr) != 0 && ioc->ioc_cr->cr_uid.val != sl->cred.cr_uid.val))
+#else
+	if (unlikely((ioc->ioc_flag & IOC_MASK) == IOC_NONE
+		     && drv_priv(ioc->ioc_cr) != 0 && ioc->ioc_cr->cr_uid != sl->cred.cr_uid))
+#endif
+	{
 		sl_release(sl);
 		write_unlock_irqrestore(&sl_mux_lock, flags);
 		mi_copy_done(q, mp, EPERM);
@@ -3347,7 +3353,12 @@ sl_i_punlink(struct sl *lm, queue_t *q, mblk_t *mp)
 	/* Always issued by user, check credentials.  Only the master control stream is allows to
 	   create permanent links, however, to avoid difficulties with hanging permanent links,
 	   permit the owner of the link or the super user to always undo permanent links. */
-	if (lm != sl_ctrl && drv_priv(ioc->ioc_cr) != 0 && ioc->ioc_cr->cr_uid != sl->cred.cr_uid) {
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (lm != sl_ctrl && drv_priv(ioc->ioc_cr) != 0 && ioc->ioc_cr->cr_uid.val != sl->cred.cr_uid.val)
+#else
+	if (lm != sl_ctrl && drv_priv(ioc->ioc_cr) != 0 && ioc->ioc_cr->cr_uid != sl->cred.cr_uid)
+#endif
+	{
 		sl_release(sl);
 		write_unlock_irqrestore(&sl_mux_lock, flags);
 		mi_copy_done(q, mp, EPERM);

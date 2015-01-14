@@ -301,8 +301,13 @@ sad_put(queue_t *q, mblk_t *mp)
 		switch (ioc->iocblk.ioc_cmd) {
 		case SAD_SAP:
 			err = -EPERM;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+			if (ioc->iocblk.ioc_uid.val != 0)
+				goto nak;
+#else
 			if (ioc->iocblk.ioc_uid != 0)
 				goto nak;
+#endif
 			if (ioc->iocblk.ioc_count == TRANSPARENT) {
 				mp->b_datap->db_type = M_COPYIN;
 				ioc->copyreq.cq_addr = sa_addr;
@@ -605,8 +610,13 @@ sad_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	case DRVOPEN:
 		if (minor != 0 && minor != 1)
 			break;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+		if (minor == 0 && crp->cr_uid.val != 0 && crp->cr_ruid.val != 0)
+			return (-EACCES);
+#else
 		if (minor == 0 && crp->cr_uid != 0 && crp->cr_ruid != 0)
 			return (-EACCES);
+#endif
 		*devp = makedevice(major, minor);
 		sads[minor].assigned |= 1;
 		q->q_ptr = WR(q)->q_ptr = &sads[minor];

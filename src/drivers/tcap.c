@@ -10384,8 +10384,13 @@ tcap_i_unlink(struct tc *lm, queue_t *q, mblk_t *mp)
 		goto einval;
 	if ((ioc->ioc_flag & IOC_MASK) == IOC_NONE) {
 		/* if issued by user, check credentials */
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+		if (drv_priv(ioc->ioc_cr) != 0 && ioc->ioc_cr->cr_uid.val != sc->cred.cr_uid.val)
+			goto eperm;
+#else
 		if (drv_priv(ioc->ioc_cr) != 0 && ioc->ioc_cr->cr_uid != sc->cred.cr_uid)
 			goto eperm;
+#endif
 	}
 	if ((te = sc->te.te)) {
 		if (!te_trylock(te, q))
@@ -10562,8 +10567,13 @@ tcap_i_punlink(struct tc *lm, queue_t *q, mblk_t *mp)
 	/* Always issued by user, check credentials.  Only the master control Stream is allowed to
 	   create permanent links, however, to avoid difficulties with hanging permanent links,
 	   however, permit the owner of the link or the super user to undo permanent links. */
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (lm != lm_ctrl && drv_priv(ioc->ioc_cr) != 0 && ioc->ioc_cr->cr_uid.val != sc->cred.cr_uid.val)
+		goto eperm;
+#else
 	if (lm != lm_ctrl && drv_priv(ioc->ioc_cr) != 0 && ioc->ioc_cr->cr_uid != sc->cred.cr_uid)
 		goto eperm;
+#endif
 	if ((te = sc->te.te)) {
 		if (!te_trylock(te, q))
 			goto edeadlk;

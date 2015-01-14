@@ -15024,8 +15024,13 @@ m_bind_req(queue_t *q, mblk_t *mp)
 			goto badaddr;
 		if (!src->si || !src->pc)
 			goto noaddr;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+		if (src->si < 3 && mtp->cred.cr_uid.val != 0)
+			goto access;
+#else
 		if (src->si < 3 && mtp->cred.cr_uid != 0)
 			goto access;
+#endif
 		if (!(loc = mtp_check_src(q, mtp, src, &err)))
 			goto error;
 		if (!mtp->sp.loc)
@@ -15124,8 +15129,13 @@ m_conn_req(queue_t *q, mblk_t *mp)
 				goto badaddr;
 			if (dst->si == 0 && mtp->src.si == 0)
 				goto noaddr;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+			if (dst->si < 3 && mtp->cred.cr_uid.val != 0)
+				goto access;
+#else
 			if (dst->si < 3 && mtp->cred.cr_uid != 0)
 				goto access;
+#endif
 			if (dst->si != mtp->src.si)
 				goto badaddr;
 			if (!mtp_check_dst(q, mtp, dst))
@@ -15490,8 +15500,13 @@ t_conn_req(queue_t *q, mblk_t *mp)
 			goto badaddr;
 		if (dst->si == 0 && mtp->src.si == 0)
 			goto noaddr;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+		if (dst->si < 3 && mtp->cred.cr_uid.val != 0)
+			goto acces;
+#else
 		if (dst->si < 3 && mtp->cred.cr_uid != 0)
 			goto acces;
+#endif
 		if (dst->si != mtp->src.si)
 			goto badaddr;
 		if (!mtp_check_dst(q, mtp, dst))
@@ -15706,8 +15721,13 @@ t_bind_req(queue_t *q, mblk_t *mp)
 			goto badaddr;
 		if (!src->si || !src->pc)
 			goto noaddr;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+		if (src->si < 3 && mtp->cred.cr_uid.val != 0)
+			goto acces;
+#else
 		if (src->si < 3 && mtp->cred.cr_uid != 0)
 			goto acces;
+#endif
 		if ((loc = mtp_check_src(q, mtp, src, &err)))
 			goto error;
 		if (!mtp->sp.loc)
@@ -15794,8 +15814,13 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
 
 		if (p->DEST_length < sizeof(*dst))
 			goto badaddr;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+		if (dst->si < 3 && mtp->cred.cr_uid.val != 0)
+			goto acces;
+#else
 		if (dst->si < 3 && mtp->cred.cr_uid != 0)
 			goto acces;
+#endif
 		if (!mtp_check_dst(q, mtp, dst))
 			goto badaddr;
 		else {
@@ -16379,8 +16404,13 @@ n_bind_req(queue_t *q, mblk_t *mp)
 		goto badaddr;
 	if (!src.si || !src.pc)
 		goto noaddr;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (src.si < 3 || mtp->cred.cr_uid.val != 0)
+		goto access;
+#else
 	if (src.si < 3 || mtp->cred.cr_uid != 0)
 		goto access;
+#endif
 	if ((loc = mtp_check_src(q, mtp, &src, &err)))
 		goto error;
 	if (!mtp->sp.loc)
@@ -16474,8 +16504,13 @@ n_unitdata_req(queue_t *q, mblk_t *mp)
 		goto badaddr;
 	if (!dst.si || !dst.pc)
 		goto badaddr;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (dst.si < 3 && mtp->cred.cr_uid.val != 0)
+		goto access;
+#else
 	if (dst.si < 3 && mtp->cred.cr_uid != 0)
 		goto access;
+#endif
 	if (dst.si != mtp->src.si)
 		goto badaddr;
 	if (!mtp_check_dst(q, mtp, &dst))
@@ -19539,7 +19574,12 @@ mtp_i_plink(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	struct sl *sl;
 	int err = EPERM;
 
-	if (ioc->ioc_cr->cr_uid == 0) {
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (ioc->ioc_cr->cr_uid.val == 0)
+#else
+	if (ioc->ioc_cr->cr_uid == 0)
+#endif
+	{
 		err = ENOMEM;
 		if ((sl = mtp_alloc_link(l->l_qbot, l->l_index, ioc->ioc_cr, 0)))
 			err = 0;
@@ -19567,7 +19607,12 @@ mtp_i_punlink(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	struct sl *sl;
 	int err = EPERM;
 
-	if (ioc->ioc_cr->cr_uid == 0) {
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (ioc->ioc_cr->cr_uid.val == 0)
+#else
+	if (ioc->ioc_cr->cr_uid == 0)
+#endif
+	{
 		sl = SL_PRIV(l->l_qtop);
 		mtp_free_link(sl);
 		err = 0;

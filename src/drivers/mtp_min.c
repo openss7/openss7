@@ -5601,8 +5601,13 @@ t_conn_req(queue_t *q, mblk_t *mp)
 			goto badaddr;
 		if (dst->si == 0 && mtp->src.si == 0)
 			goto noaddr;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+		if (dst->si < 3 && mtp->cred.cr_uid.val != 0)
+			goto acces;
+#else
 		if (dst->si < 3 && mtp->cred.cr_uid != 0)
 			goto acces;
+#endif
 		if (dst->si != mtp->src.si)
 			goto badaddr;
 		if (!mtp_check_dst(mtp, dst))
@@ -5779,8 +5784,13 @@ t_bind_req(queue_t *q, mblk_t *mp)
 			goto badaddr;
 		if (!src->si || !src->pc)
 			goto noaddr;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+		if (src->si < 3 && mt->cred.cr_uid.val != 0)
+			goto acces;
+#else
 		if (src->si < 3 && mt->cred.cr_uid != 0)
 			goto acces;
+#endif
 		if ((err = mtp_check_src(mt, src)))
 			goto error;
 		return t_bind_ack(q, src);
@@ -5862,8 +5872,13 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
 
 		if (p->DEST_length < sizeof(*dst))
 			goto badaddr;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+		if (dst->si < 3 && mt->cred.cr_uid.val != 0)
+			goto acces;
+#else
 		if (dst->si < 3 && mt->cred.cr_uid != 0)
 			goto acces;
+#endif
 		if (!mtp_check_dst(mt, dst))
 			goto badaddr;
 		else {
@@ -6372,7 +6387,12 @@ mt_w_ioctl(queue_t *q, mblk_t *mp)
 		}
 		switch (nr) {
 		case _IOC_NR(I_PLINK):
-			if (iocp->ioc_cr->cr_uid != 0) {
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+			if (iocp->ioc_cr->cr_uid.val != 0)
+#else
+			if (iocp->ioc_cr->cr_uid != 0)
+#endif
+			{
 				ptrace(("%s: %p: ERROR: Non-root attempt to I_PLINK\n",
 					DRV_NAME, MT_PRIV(q)));
 				ret = -EPERM;
@@ -6384,7 +6404,12 @@ mt_w_ioctl(queue_t *q, mblk_t *mp)
 			ret = -ENOMEM;
 			break;
 		case _IOC_NR(I_PUNLINK):
-			if (iocp->ioc_cr->cr_uid != 0) {
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+			if (iocp->ioc_cr->cr_uid.val != 0)
+#else
+			if (iocp->ioc_cr->cr_uid != 0)
+#endif
+			{
 				ptrace(("%s: %p: ERROR: Non-root attempt to I_PUNLINK\n",
 					DRV_NAME, MT_PRIV(q)));
 				ret = -EPERM;

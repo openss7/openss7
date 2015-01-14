@@ -968,12 +968,21 @@ pts_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 
 	if ((c = q->q_ptr) != NULL) {
 		/* already open, check permissions */
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+		if (crp->cr_uid.val == 0)
+			goto access_ok;
+		if (crp->cr_uid.val == 5 && !(oflag & FREAD))
+			goto access_ok;
+		if (crp->cr_uid.val == c->pts.creds.cr_uid.val)
+			goto access_ok;
+#else
 		if (crp->cr_uid == 0)
 			goto access_ok;
 		if (crp->cr_uid == 5 && !(oflag & FREAD))
 			goto access_ok;
 		if (crp->cr_uid == c->pts.creds.cr_uid)
 			goto access_ok;
+#endif
 		return (EPERM);
 	}
 
@@ -1016,12 +1025,21 @@ pts_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 			}
 
 			/* its unlocked, but check your permissions */
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+			if (crp->cr_uid.val == 0)
+				goto good_open;
+			if (crp->cr_uid.val == 5 && !(oflag & FREAD))
+				goto good_open;
+			if (crp->cr_uid.val == c->pts.creds.cr_uid.val)
+				goto good_open;
+#else
 			if (crp->cr_uid == 0)
 				goto good_open;
 			if (crp->cr_uid == 5 && !(oflag & FREAD))
 				goto good_open;
 			if (crp->cr_uid == c->pts.creds.cr_uid)
 				goto good_open;
+#endif
 		}
 		write_unlock_str(&c->lock, flags);
 	}
