@@ -1,5 +1,5 @@
-OpenSS7 -- matches release introduction.  2015-01-11
-Binary file /u7/next/README-alpha matches
+OpenSS7 -- beta release introduction.  2015-01-13
+$Id: README-alpha,v 1.1.2.25 2011-05-10 13:45:30 brian Exp $
 Copyright (c) 2008-2015  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
@@ -8,9 +8,9 @@ See the end for copying conditions (for this file).
 OpenSS7
 =======
 
-Package openss7-1.1.7.20131209 Released 2015-01-11.
+Package openss7-1.1.7.20150114 Released 2015-01-13.
 
-This is matches release software.
+This is beta release software.
 
 The following is an extract from the Installation and Reference Manual:
 
@@ -886,45 +886,6 @@ the most part bugs are currently available.
      destination addresses is somehow making the receiver think that it
      is a connection-oriented stream!
 
-6.4 Maturity
-============
-
-The 'OpenSS7 Project' adheres to the following release philosophy:
-
-   * pre-alpha release
-   * alpha release
-   * beta release
-   * gamma release
-   * production release
-   * unstable release
-
-6.4.1 Pre-Alpha Releases
-------------------------
-
-"Pre-alpha" releases are releases that have received no testing
-whatsoever.  Code in the release is not even known to configure or
-compile.  The purpose of a pre-alpha release is to make code and
-documentation available for inspection only, and to solicit comments on
-the design approach or other characteristics of the software package.
-
-"Pre-alpha" release packages ship containing warnings recommending that
-the user not even execute the contained code.
-
-6.4.2 Alpha Releases
---------------------
-
-"Alpha" releases are releases that have received little to no testing,
-or that have been tested and contains known bugs or defects that make
-the package unsuitable even for testing.  The purpose for an "alpha"
-release are the same as for the pre-alpha release, with the additional
-purpose that it is an early release of partially functional code that
-has problems that an external developer might be willing to fix
-themselves and contribute back to the project.
-
-"Alpha" release packages ship containing warnings that executing the
-code can crash machines and might possibly do damage to systems upon
-which it is executed.
-
 6.4.3 Beta Releases
 -------------------
 
@@ -941,56 +902,6 @@ not been exhaustively tested and that the package may cause systems to
 crash.  Suitability of software in this category for production use is
 not advised by the project; however, as always, is at the discretion of
 the user of the software.
-
-6.4.4 Gamma Releases
---------------------
-
-"Gamma" releases are releases that have received exhaustive testing
-within the project, but external testing has been minimal.  "Gamma"
-release packages do not ship with known defects.  As exhaustive internal
-testing has been performed, unknown defects should be few.  Please
-remember that there is NO WARRANTY on public release packages.
-
-"Gamma" release packages typically resolve problems in previous "beta"
-releases, and might not have had full regression testing performed.
-Suitability of software in this category for production use is at the
-discretion of the user of the software.  "The OpenSS7 Project"
-recommends that the complete validation test suites provided with the
-package be performed and pass on target systems before considering
-production use.
-
-6.4.5 Production Releases
--------------------------
-
-"Production" releases are releases that have received exhaustive testing
-within the project and validated on specific distributions and
-architectures.  "Production" release packages do not ship with known
-defects.  Please remember that there is NO WARRANTY on public release
-packages.
-
-"Production" packages ship containing a list of validated distributions
-and architectures.  Full regression testing of any maintenance changes
-is performed.  Suitability of software in this category for production
-use on the specified target distributions and architectures is at the
-discretion of the user.  It should not be necessary to preform
-validation tests on the set of supported target systems before
-considering production use.
-
-6.4.6 Unstable Releases
------------------------
-
-"Unstable" releases are releases that have received extensive testing
-within the project and validated on a a wide range of distributions and
-architectures; however, is has tested unstable and found to be suffering
-from critical problems and issues that cannot be resolved.  Maintenance
-of the package has proved impossible.  "Unstable" release packages ship
-with known defects (and loud warnings).  Suitability of software in this
-category for production use is at the discretion of the user of the
-software.  "The OpenSS7 Project" recommends that the problems and issues
-be closely examined before this software is used even in a
-non-production environment.  Each failing test scenario should be
-completely avoided by the application.  'OpenSS7' beta software is more
-stable that software in this category.
 
 -----
 
