@@ -323,7 +323,7 @@ extern void file_move(struct file *file, struct list_head *list);
 extern void file_sb_list_add(struct file *file, struct super_block *sb);
 extern void file_sb_list_del(struct file *file);
 #else
-#error Need a way to move a file pointer.
+// #error Need a way to move a file pointer.
 #endif
 
 STATIC struct vfsmount *specfs_mnt = NULL;
@@ -502,7 +502,7 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 	file_sb_list_del(file);
 	file_sb_list_add(file, mnt->mnt_sb);
 #else
-#error Need a way to move a file pointer.
+// #error Need a way to move a file pointer.
 #endif
 	return (0);
 
@@ -677,6 +677,7 @@ STATIC struct inode_operations spec_dir_i_ops = {
  *  -------------------------------------------------------------------------
  */
 
+#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_READDIR
 /**
  *  spec_dir_readdir:	- read a driver/module subdirectory
  *  @file:		user file pointer
@@ -774,10 +775,88 @@ spec_dir_readdir(struct file *file, void *dirent, filldir_t filldir)
 	return (0);
 }
 
+#elif defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_ITERATE
+/**
+ *  spec_dir_iterate:	- read a driver/module subdirectory
+ *  @file:		user file pointer
+ *  @ctx:		directory context
+ *
+ *  Lists a driver subdirectory.  The driver subdirectory contains registered minor device nodes and
+ *  active (open) devices.  spec_dir_iterate() walks the allocated device node list and then the
+ *  active stream head list associated with the driver.
+ */
+STATIC int
+spec_dir_iterate(struct file *file, struct dir_context *ctx)
+{
+	struct dentry *dentry = file->f_path.dentry;
+	struct cdevsw *cdev;
+
+	if (!dir_emit_dots(file, ctx))
+		return (0);
+	if ((cdev = cdrv_get(getminor(dentry->d_inode->i_ino)))) {
+		int i = ctx->pos - 2;
+
+		read_lock(&cdevsw_lock);
+		if (cdev->d_minors.next && !list_empty(&cdev->d_minors)) {
+			struct list_head *pos;
+
+			/* skip to position */
+			for (pos = cdev->d_minors.next; pos != &cdev->d_minors && i; pos = pos->next, i--) ;
+			/* start writing */
+			for (; pos != &cdev->d_minors; pos = pos->next, ctx->pos++) {
+				struct devnode *cmin = list_entry(pos, struct devnode, n_list);
+				int len = strnlen(cmin->n_name, FMNAMESZ);
+
+				if (cmin->n_inode == NULL)
+					continue;
+				read_unlock(&cdevsw_lock);	/* Not safe */
+				if (!dir_emit(ctx, cmin->n_name, len, cmin->n_inode->i_ino,
+					      cmin->n_inode->i_mode >> 12))
+					return (0);
+				read_lock(&cdevsw_lock);
+			}
+		}
+		/* walk the active stream head list */
+		if (cdev->d_stlist.next && !list_empty(&cdev->d_stlist)) {
+			struct list_head *pos;
+
+			/* skip to position */
+			for (pos = cdev->d_stlist.next; pos != &cdev->d_stlist && i; pos = pos->next, i--) ;
+			for (; pos != &cdev->d_stlist; pos = pos->next, ctx->pos++) {
+				struct stdata *sd = list_entry(pos, struct stdata, sd_list);
+				char numstr[24];
+				int len;
+
+				if (sd->sd_inode == NULL)
+					continue;
+				len = snprintf(numstr, sizeof(numstr), "%lu", getminor(sd->sd_inode->i_ino));
+				read_unlock(&cdevsw_lock);	/* Not safe */
+				if (!dir_emit(ctx, numstr, len, sd->sd_inode->i_ino,
+					      sd->sd_inode->i_mode >> 12))
+					return (0);
+				read_lock(&cdevsw_lock);
+			}
+		}
+		read_unlock(&cdevsw_lock);
+		_ctrace(cdrv_put(cdev));
+	}
+	return (0);
+}
+
+#else
+#error Need a way to read a directory.
+#endif
+
 STATIC struct file_operations spec_dir_f_ops = {
 	.owner = THIS_MODULE,
 	.read = generic_read_dir,
+#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_READDIR
 	.readdir = spec_dir_readdir,
+#elif defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_ITERATE
+	.iterate = spec_dir_iterate,
+#else
+#error Need a way to read a directory.
+#endif
 };
 
 /* 
@@ -859,6 +938,7 @@ STATIC struct inode_operations spec_root_i_ops = {
  *  -------------------------------------------------------------------------
  */
 
+#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_READDIR
 /**
  *  spec_root_readdir:	- read the root directory
  *  @file:		user file pointer
@@ -917,11 +997,59 @@ spec_root_readdir(struct file *file, void *dirent, filldir_t filldir)
 	}
 	return 0;
 }
+#elif defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_ITERATE
+/**
+ *  spec_root_iterate:	- read the root directory
+ *  @file:		user file pointer
+ *  @ctx:		directory context
+ *
+ *  Lists the root directory.  The root directory contains subdirectories for each device in the
+ *  cdevsw hash.  It walks the cdevsw_list and fills a dirent structure for each item on the list.
+ *  Each cdevsw entry that has an associated directory inode is listed.
+ */
+STATIC int
+spec_root_iterate(struct file *file, struct dir_context *ctx)
+{
+	if (!dir_emit_dots(file, ctx))
+		return (0);
+	read_lock(&cdevsw_lock);
+	if (cdevsw_list.next) {
+		struct list_head *pos;
+		int i = ctx->pos - 2;
+
+		/* skip to position */
+		for (pos = cdevsw_list.next; pos != &cdevsw_list && i; pos = pos->next, i--) ;
+		/* start writing */
+		for (; pos != &cdevsw_list; pos = pos->next, ctx->pos++) {
+			struct cdevsw *cdev = list_entry(pos, struct cdevsw, d_list);
+			int len = strnlen(cdev->d_name, FMNAMESZ);
+
+			if (cdev->d_inode == NULL)
+				continue;
+			read_unlock(&cdevsw_lock);
+			if (!dir_emit(ctx, cdev->d_name, len, cdev->d_inode->i_ino,
+				      (cdev->d_inode->i_mode >> 12) & 15))
+				return (0);
+			read_lock(&cdevsw_lock);
+		}
+	}
+	read_unlock(&cdevsw_lock);
+	return (0);
+}
+#else
+#error Need a way to read a directory.
+#endif
 
 STATIC struct file_operations spec_root_f_ops = {
 	.owner = THIS_MODULE,
 	.read = generic_read_dir,
+#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_READDIR
 	.readdir = spec_root_readdir,
+#elif defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_ITERATE
+	.iterate = spec_root_iterate,
+#else
+#error Need a way to read a directory.
+#endif
 };
 
 /*
@@ -1068,8 +1196,26 @@ spec_parse_options(char *options, struct spec_sb_info *sbi)
 	sbi->sbi_setuid = setuid;
 	sbi->sbi_setgid = setgid;
 	sbi->sbi_setmod = setmod;
+#ifdef HAVE_KMEMB_STRUCT_INODE_I_UID_VAL
+	sbi->sbi_uid = current_uid();
+	if (setuid) {
+		sbi->sbi_uid = make_kuid(current_user_ns(), uid);
+		if (!uid_valid(sbi->sbi_uid))
+			err = -EINVAL;
+	}
+#else
 	sbi->sbi_uid = uid;
+#endif
+#ifdef HAVE_KMEMB_STRUCT_INODE_I_GID_VAL
+	sbi->sbi_gid = current_gid();
+	if (setgid) {
+		sbi->sbi_gid = make_kgid(current_user_ns(), gid);
+		if (!gid_valid(sbi->sbi_gid))
+			err = -EINVAL;
+	}
+#else
 	sbi->sbi_gid = gid;
+#endif
 	sbi->sbi_mode = mode & ~S_IFMT;
 	return (err);
       einval:
@@ -1419,7 +1565,12 @@ specfs_fill_super(struct super_block *sb, void *data, int silent)
 #ifdef HAVE_KMEMB_STRUCT_INODE_I_BLKSIZE
 	inode->i_blksize = 1024;
 #endif
-	inode->i_uid = inode->i_gid = 0;
+#ifndef HAVE_KMEMB_STRUCT_INODE_I_UID_VAL
+	inode->i_uid = 0;
+#endif
+#ifndef HAVE_KMEMB_STRUCT_INODE_I_GID_VAL
+	inode->i_gid = 0;
+#endif
 	inode->i_mode = S_IFDIR | S_IRUGO | S_IXUGO | S_IWUSR;
 	inode->i_op = &spec_root_i_ops;
 	inode->i_fop = &spec_root_f_ops;
