@@ -790,6 +790,7 @@ dnl----------------------------------------------------------------------------
 	linux/crypto.h \
 	asm/system.h \
 	linux/seq_file.h \
+	linux/smpboot.h \
 	], [:], [:], [
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
@@ -888,6 +889,7 @@ dnl----------------------------------------------------------------------------
 	pci_dma_sync_sg \
 	pci_dma_sync_single \
 	pci_find_class \
+	pci_is_pcie \
 	pci_module_init \
 	pcibios_find_class \
 	pcibios_find_device \
@@ -921,6 +923,7 @@ dnl----------------------------------------------------------------------------
 	skb_transport_header \
 	sleep_on \
 	sleep_on_timeout \
+	smpboot_register_percpu_thread \
 	sti \
 	synchronize_net \
 	task_pgrp \
@@ -1033,6 +1036,9 @@ dnl----------------------------------------------------------------------------
 #include <net/tcp.h>
 #ifdef HAVE_KINC_LINUX_DEVICE_H
 #include <linux/device.h>
+#endif
+#ifdef HAVE_KINC_LINUX_SMPBOOT_H
+#include <linux/smpboot.h>
 #endif
     ]) # _LINUX_CHECK_FUNCS
 dnl----------------------------------------------------------------------------
@@ -1161,6 +1167,10 @@ dnl----------------------------------------------------------------------------
 dnl----------------------------------------------------------------------------
 dnl----------------------------------------------------------------------------
     _LINUX_CHECK_MEMBERS([
+	struct cred.uid.val,
+	struct cred.gid.val,
+	struct cred.euid.val,
+	struct cred.egid.val,
 	struct ctl_table.ctl_name,
 	struct ctl_table.de,
 	struct ctl_table.parent,
@@ -1178,6 +1188,8 @@ dnl----------------------------------------------------------------------------
 	struct file_operations.flush,
 	struct file_operations.iotcl,
 	struct file_operations.unlocked_ioctl,
+	struct file_operations.readdir,
+	struct file_operations.iterate,
 	struct files_struct.fdtab,
 	struct files_struct.max_fdset,
 	struct file_system_type.get_sb,
@@ -1203,6 +1215,8 @@ dnl----------------------------------------------------------------------------
 	struct inode.i_lock,
 	struct inode.i_mutex,
 	struct inode.i_private,
+	struct inode.i_uid.val,
+	struct inode.i_gid.val,
 	struct kobject.kref,
 	struct kstatfs.f_type,
 	struct module.next,
@@ -1549,6 +1563,7 @@ dnl----------------------------------------------------------------------------
 	kill_pid,
 	kill_pid_info,
 	kill_pid_info_as_uid,
+	kill_pid_info_as_cred,
 	kill_proc,
 	kill_proc_info,
 	kill_proc_info_as_uid,
@@ -3096,6 +3111,34 @@ dnl----------------------------------------------------------------------------
     fi
 dnl----------------------------------------------------------------------------
     _LINUX_KERNEL_ENV([dnl
+	AC_CACHE_CHECK([for kernel inet_get_local_port_range with 3 arguments], [linux_cv_have_inet_get_local_port_range_3_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
+#include NEED_LINUX_AUTOCONF_H
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/inet.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <linux/skbuff.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter_ipv4.h>
+#include <linux/ip.h>]],
+		[[void (*my_autoconf_function_pointer)(struct net *, int *, int *) = &inet_get_local_port_range;]]) ],
+		[linux_cv_have_inet_get_local_port_range_3_args='yes'],
+		[linux_cv_have_inet_get_local_port_range_3_args='no'])
+	])
+	if test :$linux_cv_have_inet_get_local_port_range_3_args = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_INET_GET_LOCAL_PORT_RANGE_3_ARGS], [1], [Define if
+		function inet_get_local_port_range takes 3 arguments which is the
+		the case as of 3.14.x.])
+	fi
 	AC_CACHE_CHECK([for kernel ip_route_connect with 9 arguments], [linux_cv_have_ip_route_connect_9_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
@@ -3178,7 +3221,35 @@ dnl----------------------------------------------------------------------------
 	if test :$linux_cv_have_ip_route_connect_rtable_return = :yes ; then
 	    AC_DEFINE([HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN], [1], [Define if function
 		ip_route_connect() returns a pointer to an rtable structure, which is the case from
-		3.0.0.])
+		3.0.x.])
+	fi
+	AC_CACHE_CHECK([for kernel ip_route_connect rtable return no sleep], [linux_cv_have_ip_route_connect_rtable_return_ns], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
+#include NEED_LINUX_AUTOCONF_H
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/inet.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <linux/skbuff.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter_ipv4.h>
+#include <linux/ip.h>]],
+		[[struct rtable *(*my_autoconf_function_pointer)(struct flowi4 *, __be32, __be32, u32, int, u8, __be16, __be16, struct sock *) = &ip_route_connect;]]) ],
+		[linux_cv_have_ip_route_connect_rtable_return_ns='yes'],
+		[linux_cv_have_ip_route_connect_rtable_return_ns='no'])
+	])
+	if test :$linux_cv_have_ip_route_connect_rtable_return_ns = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN_NS], [1], [Define if function
+		ip_route_connect() returns a pointer to an rtable structure, and cannot sleep,
+		which is the case from 3.14.x.])
 	fi
     ])
 dnl----------------------------------------------------------------------------
