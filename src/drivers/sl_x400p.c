@@ -32258,6 +32258,10 @@ xp_download_fw(struct cd *cd, enum xp_board board)
 #define SA_SHIRQ IRQF_SHARED
 #endif
 
+#ifndef HAVE_KFUNC_PCI_IS_PCIE
+#define pci_is_pcie(dev) (dev->is_pcie)
+#endif
+
 /** xp_probe: - X400P-SS7 Probe
   * @dev: PCI device
   * @id: PCI device id
@@ -32445,13 +32449,13 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 			cd->board = A400PT;
 			break;
 		case CP100:
-			cd->board = dev->is_pcie ? CP100E : CP100P;
+			cd->board = pci_is_pcie(dev) ? CP100E : CP100P;
 			break;
 		case CP200:
-			cd->board = dev->is_pcie ? CP200E : CP200P;
+			cd->board = pci_is_pcie(dev) ? CP200E : CP200P;
 			break;
 		case CP400:
-			cd->board = dev->is_pcie ? CP400E : CP400P;
+			cd->board = pci_is_pcie(dev) ? CP400E : CP400P;
 			break;
 		default:
 			cd->board = -1;
