@@ -378,9 +378,12 @@ dst_update_pmtu(struct dst_entry *dst, uint32_t mtu)
 #undef HAVE_KMEMB_STRUCT_NET_DEV_BASE_HEAD
 
 /* Define if function ip_route_connect() returns a pointer to an rtable
-   structure, which is the case from 3.0.0. */
+   structure, and cannot sleep, which is the case from 3.14.x. */
 #undef HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN
-#ifdef HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN
+/* Define if function ip_route_connect() returns a pointer to an rtable
+   structure, and cannot sleep, which is the case from 3.14.x. */
+#undef HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN_NS
+#if defined HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN || defined HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN_NS
 #undef ip_route_connect
 #if 0
 static __inline__ int

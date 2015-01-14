@@ -3761,7 +3761,11 @@ sctp_init_hashes(void)
 	unsigned long goal;
 
 	/* size and allocate vtag hash table */
+#ifdef HAVE_NUM_PHYSPAGES_EXPORT
 	goal = num_physpages >> (20 - PAGE_SHIFT);
+#else
+	goal = totalram_pages >> (20 - PAGE_SHIFT);
+#endif
 	for (order = 0; (1 << order) < goal; order++) ;
 	do {
 		sctp_vhash_order = order;
@@ -5295,7 +5299,7 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 #else
 			err = ip_route_output(&rt, sd->daddr, sd->saddr, RT_CONN_FLAGS(sp), 0);
 #endif
-#elif defined HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN
+#elif defined HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN || defined HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN_NS
 #if 0
 			err =
 			    ip_route_connect(&rt, sd->daddr, sd->saddr, RT_CONN_FLAGS(sp), 0, IPPROTO_SCTP,
@@ -5418,6 +5422,10 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 			if (!ip_route_output(&rt2, sd->daddr, 0, RT_CONN_FLAGS(sp), sd->dif))
 #endif
 #elif defined HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN
+			if (!ip_route_connect
+			    (&rt2, sd->daddr, 0, RT_CONN_FLAGS(sp), sd->dif, IPPROTO_SCTP, sp->sport,
+			     sp->dport, NULL, 0))
+#elif defined HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN_NS
 			if (!ip_route_connect
 			    (&rt2, sd->daddr, 0, RT_CONN_FLAGS(sp), sd->dif, IPPROTO_SCTP, sp->sport,
 			     sp->dport, NULL, 0))
@@ -13655,8 +13663,13 @@ sctp_conn_req(struct sctp *sp, uint16_t dport, struct sockaddr_in *dsin, size_t 
 		goto eisconn;
 	if (!num)
 		goto eaddrnotavail;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (num < PROT_SOCK && sp->cred.cr_uid.val != 0)
+		goto eacces;
+#else
 	if (num < PROT_SOCK && sp->cred.cr_uid != 0)
 		goto eacces;
+#endif
 	if ((err = sctp_alloc_sock_daddrs(sp, dport, dsin, dnum)) < 0)
 		goto error;
 	if (err == 0)
@@ -14138,7 +14151,13 @@ sctp_bind_conflict(struct sctp *sp, struct sctp_bind_bucket *sb)
 	return (sp2 != NULL);
 }
 
-#if   defined HAVE_INET_GET_LOCAL_PORT_RANGE_SYMBOL
+#if   defined HAVE_KFUNC_INET_GET_LOCAL_PORT_RANGE_3_ARGS
+#undef inet_get_local_port_range
+#define inet_get_local_port_range(l,h) inet_get_local_port_range(&init_net,l,h)
+#elif defined HAVE_KFUNC_INET_GET_LOCAL_PORT_RANGE
+#undef inet_get_local_port_range
+#define inet_get_local_port_range(l,h) inet_get_local_port_range(l,h)
+#elif defined HAVE_INET_GET_LOCAL_PORT_RANGE_SYMBOL
 #if   defined HAVE_INET_GET_LOCAL_PORT_RANGE_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern void inet_get_local_port_range(int *low, int *high);
 #else
@@ -14259,8 +14278,13 @@ sctp_bind_req(struct sctp *sp, uint16_t sport, struct sockaddr_in *ssin, size_t 
 		goto einval;
 	num = ntohs(sport);
 	usual(num);
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (num && num < PROT_SOCK && sp->cred.cr_uid.val != 0)
+		goto eacces;
+#else
 	if (num && num < PROT_SOCK && sp->cred.cr_uid != 0)
 		goto eacces;
+#endif
 	if (sp->state != SCTP_CLOSED || sp->num != 0)
 		goto einval;
 	if ((err = sctp_alloc_sock_saddrs(sp, sport, ssin, snum)) < 0)
@@ -16549,8 +16573,13 @@ n_conn_res(struct sctp *sp, mblk_t *mp)
 	if (ap->i_state == NS_IDLE && ap->conind)
 		goto badtoken2;
 	/* protect at least r00t streams from users */
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (sp->cred.cr_uid.val != 0 && (ap->cred.cr_uid.val != sp->cred.cr_uid.val))
+		goto access;
+#else
 	if (sp->cred.cr_uid != 0 && (ap->cred.cr_uid != sp->cred.cr_uid))
 		goto access;
+#endif
 	{
 		uint ap_oldstate = ap->i_state;
 		uint ap_oldflags = ap->flags;
@@ -27897,8 +27926,13 @@ t_conn_res(struct sctp *sp, mblk_t *mp)
 	if (unlikely(ap->i_state == TS_IDLE && ap->conind))
 		goto resqlen;
 	/* protect at least r00t streams from users */
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (unlikely(sp->cred.cr_uid.val != 0 && ap->cred.cr_uid.val != sp->cred.cr_uid.val))
+		goto acces;
+#else
 	if (unlikely(sp->cred.cr_uid != 0 && ap->cred.cr_uid != sp->cred.cr_uid))
 		goto acces;
+#endif
 	if (unlikely(p->OPT_length && mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length))
 		goto badopt;
 	if (unlikely(mp->b_cont != NULL)) {
