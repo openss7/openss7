@@ -87,7 +87,8 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-09-20 09:51:39 $";
+static char const ident[] =
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-09-20 09:51:39 $";
 
 #ifdef NEED_LINUX_AUTOCONF_H
 #include NEED_LINUX_AUTOCONF_H
@@ -130,6 +131,9 @@ static char const ident[] = "$RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2
 #include <linux/security.h>	/* avoid ptrace conflict */
 #endif
 #include <asm/io.h>		/* virt_to_phys */
+#if defined HAVE_KINC_LINUX_SMPBOOT_H
+#include <linux/smpboot.h>
+#endif
 
 #ifndef __STRSCHD_EXTERN_INLINE
 #define __STRSCHD_EXTERN_INLINE inline streams_fastcall __unlikely
@@ -144,12 +148,12 @@ static char const ident[] = "$RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2
 #include <sys/ddi.h>
 
 #include "sys/config.h"
-#include "src/modules/sth.h"		/* for str_minfo */
+#include "src/modules/sth.h"	/* for str_minfo */
 #include "src/kernel/strsysctl.h"	/* for sysctl_str_ defs */
 #include "src/kernel/strsched.h"	/* for in_stream */
-#include "src/kernel/strutil.h"		/* for q locking and puts and gets */
+#include "src/kernel/strutil.h"	/* for q locking and puts and gets */
 #include "src/kernel/strsched.h"	/* verification of externs */
-#include "src/kernel/strlock.h"		/* for filesystem signage */
+#include "src/kernel/strlock.h"	/* for filesystem signage */
 
 #if defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic
 #define can_sleep() (!in_interrupt()&&!in_atomic())
@@ -270,14 +274,15 @@ qbinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 #endif
 	}
 }
+
 BIG_STATIC __unlikely streams_fastcall struct qband *
 allocqb(void)
 {
 	struct qband *qb;
 	struct strinfo *si = &Strinfo[DYN_QBAND];
 
-	/* Queue bands are allocated as part of the normal STREAMS module or driver procedures and
-	   must be allocated GFP_ATOMIC. */
+	/* Queue bands are allocated as part of the normal STREAMS module or driver procedures and must be
+	   allocated GFP_ATOMIC. */
 	if (likely((qb = kmem_cache_alloc(si->si_cache, GFP_ATOMIC)) != NULL)) {
 		struct qbinfo *qbi = (struct qbinfo *) qb;
 
@@ -311,6 +316,7 @@ freeqb(struct qband *qb)
 	bzero(qb, sizeof(*qb));
 	kmem_cache_free(si->si_cache, qb);
 }
+
 STATIC streams_fastcall __unlikely void
 __freebands(queue_t *rq)
 {
@@ -348,6 +354,7 @@ bget(qband_t *qb)
 	}
 	return (qb);
 }
+
 BIG_STATIC __unlikely streams_fastcall void
 bput(qband_t **bp)
 {
@@ -399,14 +406,15 @@ apinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 #endif
 	}
 }
+
 BIG_STATIC __unlikely streams_fastcall struct apinfo *
 ap_alloc(struct strapush *sap)
 {
 	struct apinfo *api;
 	struct strinfo *si = &Strinfo[DYN_STRAPUSH];
 
-	/* Note: this function is called (indirectly) by the SAD driver put procedure and,
-	   therefore, needs atomic allocations. */
+	/* Note: this function is called (indirectly) by the SAD driver put procedure and, therefore, needs
+	   atomic allocations. */
 	if (likely((api = kmem_cache_alloc(si->si_cache, GFP_ATOMIC)) != NULL)) {
 #if defined CONFIG_STREAMS_DEBUG
 		write_lock(&si->si_rwlock);
@@ -421,6 +429,7 @@ ap_alloc(struct strapush *sap)
 	}
 	return (api);
 }
+
 STATIC __unlikely void
 ap_free(struct apinfo *api)
 {
@@ -441,6 +450,7 @@ ap_free(struct apinfo *api)
 #endif
 	kmem_cache_free(si->si_cache, api);
 }
+
 BIG_STATIC __unlikely streams_fastcall struct apinfo *
 ap_get(struct apinfo *api)
 {
@@ -499,9 +509,9 @@ di_alloc(struct cdevsw *cdev)
 	struct devinfo *di;
 	struct strinfo *si = &Strinfo[DYN_DEVINFO];
 
-	/* Note: devinfo is only used by Solaris compatiblity modules that have been extracted from 
-	   fast streams. Chances are it will only be called at registration time, but I will leave
-	   this at GFP_ATOMIC until the compatibility module can be checked. */
+	/* Note: devinfo is only used by Solaris compatiblity modules that have been extracted from fast
+	   streams. Chances are it will only be called at registration time, but I will leave this at
+	   GFP_ATOMIC until the compatibility module can be checked. */
 	if (likely((di = kmem_cache_alloc(si->si_cache, GFP_ATOMIC)) != NULL)) {
 #if defined CONFIG_STREAMS_DEBUG
 		write_lock(&si->si_rwlock);
@@ -608,9 +618,9 @@ modi_alloc(struct fmodsw *fmod)
 	struct mdlinfo *mi;
 	struct strinfo *si = &Strinfo[DYN_MODINFO];
 
-	/* Note: mdlinfo is only used by Solaris compatiblity modules that have been extracted from 
-	   fast streams. Chances are it will only be called at registration time, but I will leave
-	   this at GFP_ATOMIC until the compatibility module can be checked. */
+	/* Note: mdlinfo is only used by Solaris compatiblity modules that have been extracted from fast
+	   streams. Chances are it will only be called at registration time, but I will leave this at
+	   GFP_ATOMIC until the compatibility module can be checked. */
 	if (likely((mi = kmem_cache_alloc(si->si_cache, GFP_ATOMIC)) != NULL)) {
 #if defined CONFIG_STREAMS_DEBUG
 		write_lock(&si->si_rwlock);
@@ -627,6 +637,7 @@ modi_alloc(struct fmodsw *fmod)
 	}
 	return (mi);
 }
+
 STATIC __unlikely void
 modi_free(struct mdlinfo *mi)
 {
@@ -649,6 +660,7 @@ modi_free(struct mdlinfo *mi)
 #endif
 	kmem_cache_free(si->si_cache, mi);
 }
+
 BIG_STATIC __unlikely streams_fastcall struct mdlinfo *
 modi_get(struct mdlinfo *mi)
 {
@@ -690,6 +702,7 @@ queinfo_init(struct queinfo *qu)
 	INIT_LIST_HEAD(&qu->qu_list);
 #endif
 }
+
 STATIC __unlikely void
 #if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
 queinfo_ctor(kmem_cachep_t cachep, void *obj)
@@ -717,9 +730,9 @@ allocq(void)
 	struct strinfo *si = &Strinfo[DYN_QUEUE];
 
 	// strblocking(); /* before we sleep */
-	/* Note: we only allocate queue pairs in the stream head which is called at user context
-	   without any locks held.  This allocation can sleep.  We now use GFP_KERNEL instead of
-	   GFP_ATOMIC.  Allocate your private queue pairs in qopen/qclose or module init. */
+	/* Note: we only allocate queue pairs in the stream head which is called at user context without any
+	   locks held.  This allocation can sleep.  We now use GFP_KERNEL instead of GFP_ATOMIC.  Allocate
+	   your private queue pairs in qopen/qclose or module init. */
 	if (likely((rq = kmem_cache_alloc(si->si_cache, GFP_KERNEL)) != NULL)) {
 		queue_t *wq = rq + 1;
 		struct queinfo *qu = (struct queinfo *) rq;
@@ -739,7 +752,7 @@ allocq(void)
 	return (rq);
 }
 
-EXPORT_SYMBOL_GPL(allocq);		/* include/sys/openss7/stream.h */
+EXPORT_SYMBOL_GPL(allocq);	/* include/sys/openss7/stream.h */
 
 streams_noinline streams_fastcall void sd_release(struct stdata **sdp);
 STATIC void __freestr(struct stdata *sd);
@@ -811,7 +824,7 @@ freeq(queue_t *rq)
 	freeq_fast(rq);
 }
 
-EXPORT_SYMBOL_GPL(freeq);		/* include/sys/openss7/stream.h */
+EXPORT_SYMBOL_GPL(freeq);	/* include/sys/openss7/stream.h */
 
 /* queue gets and puts */
 BIG_STATIC streams_fastcall __hot_out queue_t *
@@ -831,6 +844,7 @@ qget(queue_t *q)
 	assure(q != NULL);
 	return (NULL);
 }
+
 BIG_STATIC streams_fastcall __hot_in void
 qput(queue_t **qp)
 {
@@ -965,9 +979,8 @@ mdbblock_alloc_slow(uint priority, void *func)
 		int slab_flags;
 
 #if !defined _OPTIMIZE_SPEED
-		/* might be able to do this first for other than BRPI_HI and BPRI_FT.  Another
-		   thing to do is the percentage of thewall trick: BPRI_LO => 80%, BPRI_MED => 90%, 
-		   BPRI_HI => 100% */
+		/* might be able to do this first for other than BRPI_HI and BPRI_FT.  Another thing to do is 
+		   the percentage of thewall trick: BPRI_LO => 80%, BPRI_MED => 90%, BPRI_HI => 100% */
 		if (unlikely(atomic_read(&sdi->si_cnt) > sysctl_str_nstrmsgs))	/* PROFILED */
 			goto fail;
 #endif				/* !defined _OPTIMIZE_SPEED */
@@ -1023,38 +1036,32 @@ mdbblock_alloc_slow(uint priority, void *func)
 #endif
 
 #ifdef DOUBLE_CHECK_MBLKS
-			__ensure(md->msgblk.m_mblock.b_next == NULL, md->msgblk.m_mblock.b_next =
-				 NULL);
-			__ensure(md->msgblk.m_mblock.b_prev == NULL, md->msgblk.m_mblock.b_prev =
-				 NULL);
-			__ensure(md->msgblk.m_mblock.b_cont == NULL, md->msgblk.m_mblock.b_cont =
-				 NULL);
-			_ensure(md->msgblk.m_mblock.b_rptr == md->databuf,
-				md->msgblk.m_mblock.b_rptr = md->databuf);
-			_ensure(md->msgblk.m_mblock.b_wptr == md->databuf,
-				md->msgblk.m_mblock.b_wptr = md->databuf);
-			__ensure(md->msgblk.m_mblock.b_datap == NULL, md->msgblk.m_mblock.b_datap =
-				 NULL);
+			__ensure(md->msgblk.m_mblock.b_next == NULL, md->msgblk.m_mblock.b_next = NULL);
+			__ensure(md->msgblk.m_mblock.b_prev == NULL, md->msgblk.m_mblock.b_prev = NULL);
+			__ensure(md->msgblk.m_mblock.b_cont == NULL, md->msgblk.m_mblock.b_cont = NULL);
+			_ensure(md->msgblk.m_mblock.b_rptr == md->databuf, md->msgblk.m_mblock.b_rptr =
+				md->databuf);
+			_ensure(md->msgblk.m_mblock.b_wptr == md->databuf, md->msgblk.m_mblock.b_wptr =
+				md->databuf);
+			__ensure(md->msgblk.m_mblock.b_datap == NULL, md->msgblk.m_mblock.b_datap = NULL);
 			md->msgblk.m_mblock.b_datap = &md->datablk.d_dblock;
 			__ensure(md->msgblk.m_mblock.b_band == 0, md->msgblk.m_mblock.b_band = 0);
 			__ensure(md->msgblk.m_mblock.b_pad1 == 0, md->msgblk.m_mblock.b_pad1 = 0);
 			__ensure(md->msgblk.m_mblock.b_flag == 0, md->msgblk.m_mblock.b_flag = 0);
 			__ensure(md->msgblk.m_mblock.b_csum == 0, md->msgblk.m_mblock.b_csum = 0);
 
-			__ensure(md->datablk.d_dblock.db_frtnp == NULL,
-				 md->datablk.d_dblock.db_frtnp = NULL);
-			_ensure(md->datablk.d_dblock.db_base == md->databuf,
-				md->datablk.d_dblock.db_base = md->databuf);
+			__ensure(md->datablk.d_dblock.db_frtnp == NULL, md->datablk.d_dblock.db_frtnp = NULL);
+			_ensure(md->datablk.d_dblock.db_base == md->databuf, md->datablk.d_dblock.db_base =
+				md->databuf);
 			_ensure(md->datablk.d_dblock.db_lim == md->databuf + FASTBUF,
 				md->datablk.d_dblock.db_lim = md->databuf + FASTBUF);
 			__ensure(md->datablk.d_dblock.db_ref == 0, md->datablk.d_dblock.db_ref = 0);
 			md->datablk.d_dblock.db_ref = 1;
-			__ensure(md->datablk.d_dblock.db_type == M_DATA,
-				 md->datablk.d_dblock.db_type = M_DATA);
-			__ensure(md->datablk.d_dblock.db_flag == 0, md->datablk.d_dblock.db_flag =
-				 0);
-			_ensure(md->datablk.d_dblock.db_size == FASTBUF,
-				md->datablk.d_dblock.db_size = FASTBUF);
+			__ensure(md->datablk.d_dblock.db_type == M_DATA, md->datablk.d_dblock.db_type =
+				 M_DATA);
+			__ensure(md->datablk.d_dblock.db_flag == 0, md->datablk.d_dblock.db_flag = 0);
+			_ensure(md->datablk.d_dblock.db_size == FASTBUF, md->datablk.d_dblock.db_size =
+				FASTBUF);
 #endif
 
 			_ptrace(("%s: allocated mblk %p\n", __FUNCTION__, mp));
@@ -1074,9 +1081,9 @@ mdbblock_alloc(uint priority, void *func)
 	mblk_t *mp;
 
 	_trace();
-	/* Very first order of business: check free list.  Every priority is allowed to get a block 
-	   from the free list now.  It is just a matter of speed.  If blocks are cached on the
-	   per-cpu free list we want to use them, not free them later. */
+	/* Very first order of business: check free list.  Every priority is allowed to get a block from the
+	   free list now.  It is just a matter of speed.  If blocks are cached on the per-cpu free list we
+	   want to use them, not free them later. */
 
 	prefetchw(t);
 
@@ -1118,38 +1125,32 @@ mdbblock_alloc(uint priority, void *func)
 			}
 
 #ifdef DOUBLE_CHECK_MBLKS
-			__ensure(md->msgblk.m_mblock.b_next == NULL, md->msgblk.m_mblock.b_next =
-				 NULL);
-			__ensure(md->msgblk.m_mblock.b_prev == NULL, md->msgblk.m_mblock.b_prev =
-				 NULL);
-			__ensure(md->msgblk.m_mblock.b_cont == NULL, md->msgblk.m_mblock.b_cont =
-				 NULL);
-			_ensure(md->msgblk.m_mblock.b_rptr == md->databuf,
-				md->msgblk.m_mblock.b_rptr = md->databuf);
-			_ensure(md->msgblk.m_mblock.b_wptr == md->databuf,
-				md->msgblk.m_mblock.b_wptr = md->databuf);
-			__ensure(md->msgblk.m_mblock.b_datap == NULL, md->msgblk.m_mblock.b_datap =
-				 NULL);
+			__ensure(md->msgblk.m_mblock.b_next == NULL, md->msgblk.m_mblock.b_next = NULL);
+			__ensure(md->msgblk.m_mblock.b_prev == NULL, md->msgblk.m_mblock.b_prev = NULL);
+			__ensure(md->msgblk.m_mblock.b_cont == NULL, md->msgblk.m_mblock.b_cont = NULL);
+			_ensure(md->msgblk.m_mblock.b_rptr == md->databuf, md->msgblk.m_mblock.b_rptr =
+				md->databuf);
+			_ensure(md->msgblk.m_mblock.b_wptr == md->databuf, md->msgblk.m_mblock.b_wptr =
+				md->databuf);
+			__ensure(md->msgblk.m_mblock.b_datap == NULL, md->msgblk.m_mblock.b_datap = NULL);
 			md->msgblk.m_mblock.b_datap = &md->datablk.d_dblock;
 			__ensure(md->msgblk.m_mblock.b_band == 0, md->msgblk.m_mblock.b_band = 0);
 			__ensure(md->msgblk.m_mblock.b_pad1 == 0, md->msgblk.m_mblock.b_pad1 = 0);
 			__ensure(md->msgblk.m_mblock.b_flag == 0, md->msgblk.m_mblock.b_flag = 0);
 			__ensure(md->msgblk.m_mblock.b_csum == 0, md->msgblk.m_mblock.b_csum = 0);
 
-			__ensure(md->datablk.d_dblock.db_frtnp == NULL,
-				 md->datablk.d_dblock.db_frtnp = NULL);
-			_ensure(md->datablk.d_dblock.db_base == md->databuf,
-				md->datablk.d_dblock.db_base = md->databuf);
+			__ensure(md->datablk.d_dblock.db_frtnp == NULL, md->datablk.d_dblock.db_frtnp = NULL);
+			_ensure(md->datablk.d_dblock.db_base == md->databuf, md->datablk.d_dblock.db_base =
+				md->databuf);
 			_ensure(md->datablk.d_dblock.db_lim == md->databuf + FASTBUF,
 				md->datablk.d_dblock.db_lim = md->databuf + FASTBUF);
 			__ensure(md->datablk.d_dblock.db_ref == 0, md->datablk.d_dblock.db_ref = 0);
 			md->datablk.d_dblock.db_ref = 1;
-			__ensure(md->datablk.d_dblock.db_type == M_DATA,
-				 md->datablk.d_dblock.db_type = M_DATA);
-			__ensure(md->datablk.d_dblock.db_flag == 0, md->datablk.d_dblock.db_flag =
-				 0);
-			_ensure(md->datablk.d_dblock.db_size == FASTBUF,
-				md->datablk.d_dblock.db_size = FASTBUF);
+			__ensure(md->datablk.d_dblock.db_type == M_DATA, md->datablk.d_dblock.db_type =
+				 M_DATA);
+			__ensure(md->datablk.d_dblock.db_flag == 0, md->datablk.d_dblock.db_flag = 0);
+			_ensure(md->datablk.d_dblock.db_size == FASTBUF, md->datablk.d_dblock.db_size =
+				FASTBUF);
 #endif
 
 			_ptrace(("%s: allocated mblk %p\n", __FUNCTION__, mp));
@@ -1257,8 +1258,8 @@ mdbblock_free(mblk_t *mp)
 
 		// unsigned char *base = md->databuf;
 
-		/* clean the state before putting it back, save mutlitple initializations elsewhere 
-		   and reduces code paths.  Optimized for FASTBUFS (all fields completed). */
+		/* clean the state before putting it back, save mutlitple initializations elsewhere and
+		   reduces code paths.  Optimized for FASTBUFS (all fields completed). */
 		/* these are strung on the free list using the b_next pointer */
 		mp->b_next = NULL;
 		mp->b_prev = NULL;
@@ -1291,8 +1292,8 @@ mdbblock_free(mblk_t *mp)
 	{
 		unsigned long flags;
 
-		/* Originally freed blocks were added to the end of the list but this does not keep 
-		   mblks hot, so now a push-down pop-up stack is used instead. */
+		/* Originally freed blocks were added to the end of the list but this does not keep mblks
+		   hot, so now a push-down pop-up stack is used instead. */
 		streams_local_save(flags);
 		if (unlikely((mp->b_next = t->freemblk_head) == NULL))
 			t->freemblk_tail = &mp->b_next;
@@ -1319,10 +1320,9 @@ mdbblock_free(mblk_t *mp)
 #endif
 	}
 #if !defined CONFIG_STREAMS_NORECYCLE
-	/* Decide when to invoke freeblocks.  Current policy is to free blocks when then number of
-	   blocks on the free list exceeds some (per-cpu) threshold.  Currently I set this to just
-	   1/16th of the maximum.  That should be ok for now.  I will create a sysctl for it
-	   later... */
+	/* Decide when to invoke freeblocks.  Current policy is to free blocks when then number of blocks on
+	   the free list exceeds some (per-cpu) threshold.  Currently I set this to just 1/16th of the
+	   maximum.  That should be ok for now.  I will create a sysctl for it later... */
 	if (unlikely((t->freemblks > (sysctl_str_nstrmsgs >> 4))
 		     && test_and_set_bit(freeblks, &t->flags) == 0))
 		__raise_streams();
@@ -1457,6 +1457,7 @@ linkinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 		spin_unlock(&link_index_lock);
 	}
 }
+
 streams_fastcall __unlikely struct linkblk *
 alloclk(void)
 {
@@ -1464,9 +1465,9 @@ alloclk(void)
 	struct strinfo *si = &Strinfo[DYN_LINKBLK];
 
 	// strblocking(); /* before we sleep */
-	/* linkblk's are only allocated by the STREAM head when performing an I_LINK or I_PLINK
-	   operation, and this function is only called in user context with no locks held.
-	   Therefore, we can sleep and GFP_KERNEL is used instead of GFP_ATOMIC. */
+	/* linkblk's are only allocated by the STREAM head when performing an I_LINK or I_PLINK operation,
+	   and this function is only called in user context with no locks held. Therefore, we can sleep and
+	   GFP_KERNEL is used instead of GFP_ATOMIC. */
 	if (likely((l = kmem_cache_alloc(si->si_cache, GFP_KERNEL)) != NULL)) {
 #if defined CONFIG_STREAMS_DEBUG
 		struct linkinfo *li = (struct linkinfo *) l;
@@ -1543,6 +1544,7 @@ syncq_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 #endif
 	}
 }
+
 BIG_STATIC streams_fastcall __unlikely struct syncq *
 sq_alloc(void)
 {
@@ -1550,8 +1552,8 @@ sq_alloc(void)
 	struct strinfo *si = &Strinfo[DYN_SYNCQ];
 
 	// strblocking(); /* before we sleep */
-	/* Note: sq_alloc() is only called by qattach() that is only called by the STREAM head at
-	   user context with no locks held, therefore we use GFP_KERNEL instead of GFP_ATOMIC. */
+	/* Note: sq_alloc() is only called by qattach() that is only called by the STREAM head at user
+	   context with no locks held, therefore we use GFP_KERNEL instead of GFP_ATOMIC. */
 	if (likely((sq = kmem_cache_alloc(si->si_cache, GFP_KERNEL)) != NULL)) {
 		_ptrace(("syncq %p is allocated\n", sq));
 		atomic_set(&sq->sq_refs, 1);
@@ -1568,6 +1570,7 @@ sq_alloc(void)
 }
 
 static struct syncq *elsewhere_list = NULL;
+
 #if	defined DEFINE_SPINLOCK
 static DEFINE_SPINLOCK(elsewhere_lock);
 #elif	defined __SPIN_LOCK_UNLOCKED
@@ -1585,8 +1588,8 @@ sq_locate(const char *sq_info)
 	struct strinfo *si = &Strinfo[DYN_SYNCQ];
 
 	// strblocking(); /* before we sleep */
-	/* Note: sq_locate() is only called by qattach() that is only called by the STREAM head at
-	   user context with no locks held, therefore we use GFP_KERNEL instead of GFP_ATOMIC. */
+	/* Note: sq_locate() is only called by qattach() that is only called by the STREAM head at user
+	   context with no locks held, therefore we use GFP_KERNEL instead of GFP_ATOMIC. */
 	if (likely((sq = kmem_cache_alloc(si->si_cache, GFP_KERNEL)) != NULL)) {
 		_ptrace(("syncq %p is allocated\n", sq));
 
@@ -1623,6 +1626,7 @@ sq_locate(const char *sq_info)
 	}
 	return (sq);
 }
+
 STATIC __unlikely void
 sq_free(struct syncq *sq)
 {
@@ -1667,6 +1671,7 @@ sq_free(struct syncq *sq)
 	init_waitqueue_head(&sq->sq_waitq);
 	kmem_cache_free(si->si_cache, sq);
 }
+
 BIG_STATIC streams_fastcall __unlikely struct syncq *
 sq_get(struct syncq *sq)
 {
@@ -1678,6 +1683,7 @@ sq_get(struct syncq *sq)
 	}
 	return (sq);
 }
+
 BIG_STATIC streams_fastcall __unlikely void
 sq_put(struct syncq **sqp)
 {
@@ -1694,6 +1700,7 @@ sq_put(struct syncq **sqp)
 			_ptrace(("syncq %p count is now %d\n", sq, atomic_read(&sq->sq_refs)));
 	}
 }
+
 BIG_STATIC streams_fastcall __unlikely void
 sq_release(struct syncq **sqp)
 {
@@ -1748,6 +1755,7 @@ event_insert(struct strevent **sep, struct strevent *se)
 		se->se_next->se_prev = &se->se_next;
 	se->se_prev = sep;
 }
+
 STATIC inline fastcall void
 event_delete(struct strevent *se)
 {
@@ -1756,6 +1764,7 @@ event_delete(struct strevent *se)
 	se->se_next = NULL;
 	se->se_prev = &se->se_next;
 }
+
 STATIC inline fastcall long
 event_export(struct strevent *se)
 {
@@ -1773,6 +1782,7 @@ event_export(struct strevent *se)
 	spin_unlock_irqrestore(&event_hash_lock, flags);
 	return (id);
 }
+
 STATIC void
 #if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
 seinfo_ctor(kmem_cachep_t cachep, void *obj)
@@ -1796,6 +1806,7 @@ seinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 		se->se_prev = &se->se_next;
 	}
 }
+
 STATIC struct strevent *
 event_alloc(int type, queue_t *q)
 {
@@ -1803,8 +1814,8 @@ event_alloc(int type, queue_t *q)
 	struct strevent *se = NULL;
 
 	if (atomic_read(&si->si_cnt) < EVENT_LIMIT) {
-		/* Note: Events are allocated in the normal course of STREAMS driver and module
-		   procedures and must be called with GFP_ATOMIC. */
+		/* Note: Events are allocated in the normal course of STREAMS driver and module procedures
+		   and must be called with GFP_ATOMIC. */
 		if (likely((se = kmem_cache_alloc(si->si_cache, GFP_ATOMIC)) != NULL)) {
 			struct seinfo *s = (struct seinfo *) se;
 
@@ -1826,6 +1837,7 @@ event_alloc(int type, queue_t *q)
 	}
 	return (se);
 }
+
 STATIC void
 event_free(struct strevent *se)
 {
@@ -2026,7 +2038,7 @@ strsched_bufcall(struct strevent *se)
 #if	defined DEFINE_SPINLOCK
 static DEFINE_SPINLOCK(timeout_list_lock);
 #elif	defined __SPIN_LOCK_UNLOCKED
-static spinlock_t timeout_list_lock = __SPIN_LOCK_UNLOCKED(timeout_list_lock );
+static spinlock_t timeout_list_lock = __SPIN_LOCK_UNLOCKED(timeout_list_lock);
 #elif	defined SPIN_LOCK_UNLOCKED
 static spinlock_t timeout_list_lock = SPIN_LOCK_UNLOCKED;
 #else
@@ -2063,8 +2075,8 @@ timeout_function(unsigned long arg)
 	{
 		unsigned long flags;
 
-		/* Spin lock here to keep multiple processors from appending to the list at the
-		   same time.  Stealing the list for processing is MP safe. */
+		/* Spin lock here to keep multiple processors from appending to the list at the same time.
+		   Stealing the list for processing is MP safe. */
 		streams_spin_lock(&timeout_list_lock, flags);
 		*XCHG(&t->strtimout_tail, &se->se_link) = se;
 		streams_spin_unlock(&timeout_list_lock, flags);
@@ -2111,8 +2123,7 @@ defer_stream_event(queue_t *q, struct task_struct *procp, long events)
 #endif
 
 STATIC streams_fastcall long
-defer_bufcall_event(queue_t *q, unsigned size, int priority, void streamscall (*func) (long),
-		    long arg)
+defer_bufcall_event(queue_t *q, unsigned size, int priority, void streamscall (*func) (long), long arg)
 {
 	long id = 0;
 	struct strevent *se;
@@ -2127,9 +2138,9 @@ defer_bufcall_event(queue_t *q, unsigned size, int priority, void streamscall (*
 	}
 	return (id);
 }
+
 STATIC streams_fastcall long
-defer_timeout_event(queue_t *q, timo_fcn_t *func, caddr_t arg, long ticks, unsigned long pl,
-		    int cpu)
+defer_timeout_event(queue_t *q, timo_fcn_t *func, caddr_t arg, long ticks, unsigned long pl, int cpu)
 {
 	long id = 0;
 	struct strevent *se;
@@ -2146,9 +2157,10 @@ defer_timeout_event(queue_t *q, timo_fcn_t *func, caddr_t arg, long ticks, unsig
 	}
 	return (id);
 }
+
 STATIC streams_fastcall long
-defer_weldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
-		  weld_arg_t arg, queue_t *q)
+defer_weldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, weld_arg_t arg,
+		  queue_t *q)
 {
 	long id = 0;
 	struct strevent *se;
@@ -2165,9 +2177,10 @@ defer_weldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t
 	}
 	return (id);
 }
+
 STATIC streams_fastcall long
-defer_unweldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
-		    weld_arg_t arg, queue_t *q)
+defer_unweldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, weld_arg_t arg,
+		    queue_t *q)
 {
 	long id = 0;
 	struct strevent *se;
@@ -2226,8 +2239,7 @@ EXPORT_SYMBOL(bufcall);		/* include/sys/openss7/stream.h */
  *  @function:	the callback function when bytes and headers are available
  *  @arg:	a client argument to pass to the callback function
  */
-__STRSCHD_EXTERN_INLINE bcid_t esbbcall(int priority, void streamscall (*function) (long),
-					long arg);
+__STRSCHD_EXTERN_INLINE bcid_t esbbcall(int priority, void streamscall (*function) (long), long arg);
 
 EXPORT_SYMBOL(esbbcall);	/* include/sys/openss7/stream.h */
 
@@ -2251,7 +2263,7 @@ unbufcall(register bcid_t bcid)
 	if (unlikely(bcid == 0))
 		return;
 	spin_lock_irqsave(&event_hash_lock, flags);
-	if (likely(!!(se = find_event(bcid)))) {
+	if (likely(! !(se = find_event(bcid)))) {
 		switch (__builtin_expect((state = se->se_state), SE_ARMED)) {
 		case SE_ARMED:
 		case SE_TRIGGERED:
@@ -2262,13 +2274,13 @@ unbufcall(register bcid_t bcid)
 			kmod = XCHG(&se->x.b.kmod, NULL);
 #endif
 			spin_unlock_irqrestore(&event_hash_lock, flags);
-			/* we can release the module and queue at this point, it is not necessary
-			   to wait until the STREAMS scheduler frees the event. */
+			/* we can release the module and queue at this point, it is not necessary to wait
+			   until the STREAMS scheduler frees the event. */
 #if 0
 			if (likely(kmod != NULL))
 				module_put(kmod);
 #endif
-			if (unlikely(!!q))
+			if (unlikely(! !q))
 				qput(&q);
 			return;
 		case SE_ACTIVE:
@@ -2282,8 +2294,8 @@ unbufcall(register bcid_t bcid)
 				event_free(se);
 				return;
 			}
-			/* cancellation from interrupt on same processor, or from callback itself,
-			   must return or callback will not complete */
+			/* cancellation from interrupt on same processor, or from callback itself, must
+			   return or callback will not complete */
 			se->se_state = SE_CANCELLED;
 			spin_unlock_irqrestore(&event_hash_lock, flags);
 			return;
@@ -2356,6 +2368,7 @@ untimeout(toid_t toid)
 	int state;
 	queue_t *q;
 	clock_t rem;
+
 #if 0
 	struct module *kmod;
 #endif
@@ -2363,7 +2376,7 @@ untimeout(toid_t toid)
 	if (unlikely(toid == 0))
 		return (-1);
 	spin_lock_irqsave(&event_hash_lock, flags);
-	if (likely(!!(se = find_event(toid)))) {
+	if (likely(! !(se = find_event(toid)))) {
 		if ((rem = se->x.t.timer.expires - jiffies) < 0)
 			rem = 0;
 		switch (__builtin_expect((state = se->se_state), SE_ARMED)) {
@@ -2376,18 +2389,18 @@ untimeout(toid_t toid)
 			kmod = XCHG(&se->x.t.kmod, NULL);
 #endif
 			spin_unlock_irqrestore(&event_hash_lock, flags);
-			/* We can release the module and queue at this point, it is not necessary
-			   to wait until the STREAMS scheduler frees the event. */
+			/* We can release the module and queue at this point, it is not necessary to wait
+			   until the STREAMS scheduler frees the event. */
 #if 0
 			if (likely(kmod != NULL))
 				module_put(kmod);
 #endif
-			if (unlikely(!!q))
+			if (unlikely(! !q))
 				qput(&q);
 			if (likely(del_timer(&se->x.t.timer))) {
-				/* Cancellation before timeout function could schedule event
-				   against processor, the streams scheduler will never see the
-				   cancellation so we will have to terminate it. */
+				/* Cancellation before timeout function could schedule event against
+				   processor, the streams scheduler will never see the cancellation so we
+				   will have to terminate it. */
 				se->se_state = SE_IDLE;
 				event_free(se);
 			}
@@ -2403,8 +2416,8 @@ untimeout(toid_t toid)
 				event_free(se);
 				return (-1);
 			}
-			/* cancellation from interrupt on same processor, or from callback itself,
-			   must return or callback will not complete */
+			/* cancellation from interrupt on same processor, or from callback itself, must
+			   return or callback will not complete */
 			se->se_state = SE_CANCELLED;
 			spin_unlock_irqrestore(&event_hash_lock, flags);
 			return (-1);
@@ -2434,8 +2447,7 @@ EXPORT_SYMBOL(untimeout);	/* include/sys/openss7/stream.h */
  *  Issues the STREAMS event necessary to weld two queue pairs together with synchronization.
  */
 STATIC streams_fastcall int
-__weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, weld_arg_t arg,
-	queue_t *protq)
+__weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, weld_arg_t arg, queue_t *protq)
 {
 	return ((defer_weldq_event(q1, q2, q3, q4, func, arg, protq) != 0) ? 0 : EAGAIN);
 }
@@ -2453,8 +2465,7 @@ __weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, wel
  *  Issues the STREAMS event necessary to unweld two queue pairs apart with synchronization.
  */
 STATIC streams_fastcall int
-__unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, weld_arg_t arg,
-	  queue_t *protq)
+__unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, weld_arg_t arg, queue_t *protq)
 {
 	return ((defer_unweldq_event(q1, q2, q3, q4, func, arg, protq) != 0) ? 0 : EAGAIN);
 }
@@ -2476,8 +2487,7 @@ __unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, w
  *  Notices: The @func callback function will be called by the same CPU upon which weldq() was issued.
  */
 streams_fastcall int
-weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, weld_arg_t arg,
-      queue_t *protq)
+weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, weld_arg_t arg, queue_t *protq)
 {
 	if (!q1)
 		return (EINVAL);
@@ -2515,8 +2525,7 @@ EXPORT_SYMBOL(weldq);		/* include/sys/openss7/stream.h */
  *
  */
 streams_fastcall int
-unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, weld_arg_t arg,
-	queue_t *protq)
+unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, weld_arg_t arg, queue_t *protq)
 {
 	if (!q1)
 		return (EINVAL);
@@ -2554,7 +2563,7 @@ qwakeup(queue_t *q)
 		wake_up_all(&qu->qu_qwait);
 }
 
-EXPORT_SYMBOL(qwakeup);         /* include/sys/openss7/stream.h */
+EXPORT_SYMBOL(qwakeup);		/* include/sys/openss7/stream.h */
 
 /*
  *  Immediate event processing.
@@ -2679,9 +2688,9 @@ putp_fast(queue_t *q, mblk_t *mp)
 	/* spin here if Stream frozen by other than caller */
 	stream_barrier(sd);
 
-	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
-	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
-	   matter) on the stack.  Note that these are a no-op on UP. */
+	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a Stream end
+	   (upper mux rq, lower mux wq), but we don't want sd (or anything for that matter) on the stack.
+	   Note that these are a no-op on UP. */
 	prlock(sd);
 
 	/* procs can't be turned off */
@@ -2709,9 +2718,9 @@ putp_fast(queue_t *q, mblk_t *mp)
 		freemsg(mp);
 		swerr();
 	}
-	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
-	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
-	   matter) on the stack.  Note that these are a no-op on UP. */
+	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a Stream end
+	   (upper mux rq, lower mux wq), but we don't want sd (or anything for that matter) on the stack.
+	   Note that these are a no-op on UP. */
 	prunlock(sd);
 }
 
@@ -2761,8 +2770,8 @@ srvp_fast(queue_t *q)
 {
 	dassert(q);
 
-	/* Check if enable bit cleared first (done in qprocsoff for Stream head that might later
-	   have the stream head removed before the service procedure is fully invoked. */
+	/* Check if enable bit cleared first (done in qprocsoff for Stream head that might later have the
+	   stream head removed before the service procedure is fully invoked. */
 	if (likely(test_and_clear_bit(QENAB_BIT, &q->q_flag) != 0)) {
 		struct stdata *sd;
 
@@ -2870,6 +2879,7 @@ defer_syncq(struct syncq_cookie *sc)
 	}
 	return (0);
 }
+
 STATIC int
 find_syncq(struct syncq_cookie *sc)
 {
@@ -2883,6 +2893,7 @@ find_syncq(struct syncq_cookie *sc)
 	}
 	return (sc->sc_osq != NULL);
 }
+
 STATIC streams_fastcall __hot int
 find_syncqs(struct syncq_cookie *sc)
 {
@@ -3013,8 +3024,7 @@ enter_syncq_exclus(struct syncq_cookie *sc)
 	unsigned long flags;
 
 	spin_lock_irqsave(&sq->sq_lock, flags);
-	/* Note that syncrhonization queues are always left exclusively locked when there is a
-	   backlog. */
+	/* Note that syncrhonization queues are always left exclusively locked when there is a backlog. */
 	if (likely(sq->sq_count == 0)) {
 		sq->sq_count = -1;
 		sq->sq_owner = current;
@@ -3041,8 +3051,7 @@ enter_syncq_shared(struct syncq_cookie *sc)
 	unsigned long flags;
 
 	spin_lock_irqsave(&sq->sq_lock, flags);
-	/* Note that syncrhonization queues are always left exclusively locked when there is a
-	   backlog. */
+	/* Note that syncrhonization queues are always left exclusively locked when there is a backlog. */
 	if (likely(sq->sq_count >= 0)) {
 		sq->sq_count++;
 	} else {
@@ -3224,8 +3233,8 @@ enter_syncq_shared_blocking_slow(struct syncq_cookie *sc)
 			spin_unlock(&isq->sq_lock);
 		}
 		if (likely(osq->sq_count == -1 && osq->sq_owner == NULL)) {
-			/* Note that an exclusive lock on the outer is better than a shared lock on 
-			   the outer and an exclusive lock on the inner. */
+			/* Note that an exclusive lock on the outer is better than a shared lock on the outer 
+			   and an exclusive lock on the inner. */
 			osq->sq_count = -1;
 			osq->sq_owner = current;
 			break;
@@ -3561,9 +3570,9 @@ put_filter(queue_t **qp, mblk_t *mp)
 {
 	queue_t *q = *qp;
 
-	/* This AIX message filtering thing is really bad for performance when done the old way
-	   (from qputp()). Consider that if there are 100 modules on the Stream, the old way will
-	   check 5000 times.  This can be done by put(), but NOT by putnext()! */
+	/* This AIX message filtering thing is really bad for performance when done the old way (from
+	   qputp()). Consider that if there are 100 modules on the Stream, the old way will check 5000 times. 
+	   This can be done by put(), but NOT by putnext()! */
 	while (q && q->q_ftmsg && !q->q_ftmsg(mp))
 		q = q->q_next;
 	if (unlikely(q == NULL)) {
@@ -3627,9 +3636,9 @@ put(queue_t *q, mblk_t *mp)
 	dassert(mp);
 	dassert(q);
 
-	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
-	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
-	   matter) on the stack.  Note that these are a no-op on UP. */
+	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a Stream end
+	   (upper mux rq, lower mux wq), but we don't want sd (or anything for that matter) on the stack.
+	   Note that these are a no-op on UP. */
 	sd = qstream(q);
 
 	dassert(sd);
@@ -3641,9 +3650,9 @@ put(queue_t *q, mblk_t *mp)
 		putp_fast(q, mp);
 #endif
 	}
-	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
-	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
-	   matter) on the stack.  Note that these are a no-op on UP. */
+	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a Stream end
+	   (upper mux rq, lower mux wq), but we don't want sd (or anything for that matter) on the stack.
+	   Note that these are a no-op on UP. */
 	prunlock(sd);
 	return;
 }
@@ -3701,9 +3710,9 @@ putnext(queue_t *q, mblk_t *mp)
 	dassert(q);
 	dassert(q->q_next);
 
-	/* prlock/unlock doesn't cost much anymore, so it is here so putnext() can be called on a
-	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
-	   matter) on the stack.  Note that these are a no-op on UP. */
+	/* prlock/unlock doesn't cost much anymore, so it is here so putnext() can be called on a Stream end
+	   (upper mux rq, lower mux wq), but we don't want sd (or anything for that matter) on the stack.
+	   Note that these are a no-op on UP. */
 	sd = qstream(q);
 	dassert(sd);
 	prlock(sd);
@@ -3715,9 +3724,9 @@ putnext(queue_t *q, mblk_t *mp)
 		putp_fast(q->q_next, mp);
 #endif
 	}
-	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
-	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
-	   matter) on the stack.  Note that these are a no-op on UP. */
+	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a Stream end
+	   (upper mux rq, lower mux wq), but we don't want sd (or anything for that matter) on the stack.
+	   Note that these are a no-op on UP. */
 	prunlock(sd);
 	_trace();
 }
@@ -3748,6 +3757,7 @@ qsrvp_sync(queue_t *q)
 	srvp(q);
 	leave_syncq(sc->sc_sq);
 }
+
 STATIC streams_inline streams_fastcall __hot_in void
 qsrvp(queue_t *q)
 {
@@ -4410,8 +4420,7 @@ do_weldq_synced(struct strevent *se)
 			default:
 				/* invalid state, better to leak memory here */
 				spin_unlock_irqrestore(&event_hash_lock, flags);
-				pswerr(("%s(%d): invalid timer state %d\n", __FUNCTION__, __LINE__,
-					state));
+				pswerr(("%s(%d): invalid timer state %d\n", __FUNCTION__, __LINE__, state));
 				break;
 			}
 			break;
@@ -4484,8 +4493,8 @@ do_mblk_func(mblk_t *b)
 		qputp_sync(m_queue, b);
 	else if (m_func == (void *) &strwrit)
 		/* deferred function is a qstrwrit function */
-		/* only unfortunate thing is that we have lost the original perimeter request, so
-		   we upgrade it to outer */
+		/* only unfortunate thing is that we have lost the original perimeter request, so we upgrade
+		   it to outer */
 		qstrwrit_sync(m_queue, b, m_private, PERIM_OUTER);
 	else
 		/* deferred function is a qstrfunc function */
@@ -4600,8 +4609,8 @@ kmem_alloc_slow(size_t size, int flags)
 	if (size == 0 || size > 131072)
 		return NULL;
 #if ((L1_CACHE_BYTES > 32) && (PAGE_SIZE == 4096)) || ((L1_CACHE_BYTES > 64) && (PAGE_SIZE != 4096))
-	/* all we have to do is pad to a cacheline to get cacheline aligment, as long as a
-	   cacheline is a power of 2 */
+	/* all we have to do is pad to a cacheline to get cacheline aligment, as long as a cacheline is a
+	   power of 2 */
 	if (unlikely(flags & KM_CACHEALIGN) && unlikely(size <= (L1_CACHE_BYTES >> 1)))
 		size = L1_CACHE_BYTES;
 #endif
@@ -4673,6 +4682,7 @@ nextpower(unsigned int s)
 	}
 	return (1 << r);
 }
+
 #define nextpower(s) nextpower(s)
 #endif
 #endif
@@ -4699,13 +4709,13 @@ ktruesize(const void *obj, unsigned int size)
 		return ksize(obj);
 	return nextpower(size);
 }
+
 #define ktruesize(obj,size) ktruesize(obj,size)
 #endif
 #else
 #define ktruesize(obj,size) nextpower(size)
 #endif
 #endif
-
 
 #ifdef HAVE_KMEM_ZALLOC_EXPORT
 #undef kmem_zalloc
@@ -4722,7 +4732,7 @@ kmem_zalloc(size_t size, int flags)
 	void *mem;
 
 	if ((mem = kmem_alloc(size, flags)))
-		memset(mem, 0, ktruesize(mem,size));
+		memset(mem, 0, ktruesize(mem, size));
 	return (mem);
 }
 
@@ -5040,17 +5050,16 @@ runsyncq(struct syncq *sq)
 
 	spin_lock_irqsave(&sq->sq_lock, flags);
 	assure(!sq->sq_link);
-	/* If we are already scheduled we just want to complain a bit about it: we can still clear
-	   the backlog now, later when the syncrhonization queue is serviced, it could be found
-	   empty and not requiring any service. */
+	/* If we are already scheduled we just want to complain a bit about it: we can still clear the
+	   backlog now, later when the syncrhonization queue is serviced, it could be found empty and not
+	   requiring any service. */
 
 	sq->sq_owner = current;
 	sq->sq_count = -1;
-	/* We are now in the barrier exclusive.  Just run them all exclusive.  Anything that wanted 
-	   to enter the outer perimeter shared and the inner perimeter exclusive will run nicely
-	   with just the outer perimeter exclusive; this is because the outer perimeter is always
-	   more restrictive than the inner perimeter.  If there is only one perimeter, then it is
-	   exclusive anyway. */
+	/* We are now in the barrier exclusive.  Just run them all exclusive.  Anything that wanted to enter
+	   the outer perimeter shared and the inner perimeter exclusive will run nicely with just the outer
+	   perimeter exclusive; this is because the outer perimeter is always more restrictive than the inner
+	   perimeter.  If there is only one perimeter, then it is exclusive anyway. */
 
 	do {
 		{
@@ -5117,8 +5126,8 @@ runsyncq(struct syncq *sq)
 
 	/* finally unlock the queue */
 	sq->sq_owner = NULL;
-	/* if we have waiters, we leave the queue locked but with a NULL owner, and one of the
-	   waiters will pick it up, the others will wait some more */
+	/* if we have waiters, we leave the queue locked but with a NULL owner, and one of the waiters will
+	   pick it up, the others will wait some more */
 	if (unlikely(waitqueue_active(&sq->sq_waitq)))
 		wake_up_all(&sq->sq_waitq);
 	else
@@ -5369,9 +5378,9 @@ __runqueues(struct softirq_action *unused)
 		if (likely(test_bit(qrunflag, &t->flags) != 0))	/* PROFILED */
 			queuerun(t);
 		if (unlikely
-		    (((volatile unsigned long) t->
-		      flags & (FLUSHWORK | FREEBLKS | STRMFUNCS | QSYNCFLAG | STRTIMOUT | SCANQFLAG
-			       | STREVENTS | STRBCFLAG | STRBCWAIT)) != 0))
+		    (((volatile unsigned long) t->flags &
+		      (FLUSHWORK | FREEBLKS | STRMFUNCS | QSYNCFLAG | STRTIMOUT | SCANQFLAG | STREVENTS |
+		       STRBCFLAG | STRBCWAIT)) != 0))
 			__runqueues_slow(t);
 		clear_bit(qwantrun, &t->flags);
 	} while (unlikely(((volatile unsigned long) t->flags & (QRUNFLAGS)) != 0 && runs < 10));
@@ -5441,8 +5450,7 @@ clear_shinfo(struct shinfo *sh)
 	sd->sd_wropt = 0;
 	sd->sd_eropt = RERRNORM | WERRNORM;
 	sd->sd_closetime = sysctl_str_cltime;	/* typically 15 seconds (saved in ticks) */
-	sd->sd_ioctime = sysctl_str_ioctime;	/* default for ioctls, typically 15 seconds (saved
-						   in ticks) */
+	sd->sd_ioctime = sysctl_str_ioctime;	/* default for ioctls, typically 15 seconds (saved in ticks) */
 //      sd->sd_rtime = sysctl_str_rtime;        /* typically 10 milliseconds (saved in ticks) */
 	sd->sd_strmsgsz = sysctl_str_strmsgsz;	/* maximum message size */
 	sd->sd_strctlsz = sysctl_str_strctlsz;	/* maximum control message size */
@@ -5465,6 +5473,7 @@ clear_shinfo(struct shinfo *sh)
 	sd->sd_wq = &qu->wq;
 	qu->qu_str = sd;
 }
+
 STATIC __unlikely void
 #if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
 shinfo_ctor(kmem_cachep_t cachep, void *obj)
@@ -5583,6 +5592,7 @@ sd_free(struct stdata *sd)
 	if (mp)
 		freechain(mp, mpp);
 }
+
 streams_fastcall __hot struct stdata *
 sd_get(struct stdata *sd)
 {
@@ -5636,7 +5646,7 @@ freestr(struct stdata *sd)
 	sd_put(&sd);
 }
 
-EXPORT_SYMBOL_GPL(freestr);		/* include/sys/openss7/strsubr.h */
+EXPORT_SYMBOL_GPL(freestr);	/* include/sys/openss7/strsubr.h */
 
 /* 
  *  -------------------------------------------------------------------------
@@ -5681,8 +5691,8 @@ STATIC struct cacheinfo {
 	void (*ctor) (kmem_cachep_t, void *);
 	void (*dtor) (kmem_cachep_t, void *);
 #elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
-        void (*ctor) (void *);
-        void (*dtor) (void *);
+	void (*ctor) (void *);
+	void (*dtor) (void *);
 #else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 	void (*ctor) (void *, kmem_cachep_t, unsigned long);
 	void (*dtor) (void *, kmem_cachep_t, unsigned long);
@@ -5692,8 +5702,7 @@ STATIC struct cacheinfo {
 	"DYN_STREAM", sizeof(struct shinfo), 0, STREAMS_CACHE_FLAGS, &shinfo_ctor, NULL}, {
 	"DYN_QUEUE", sizeof(struct queinfo), 0, STREAMS_CACHE_FLAGS, &queinfo_ctor, NULL}, {
 	"DYN_MSGBLOCK", 0, 0, STREAMS_CACHE_FLAGS, NULL, NULL}, {
-	"DYN_MDBBLOCK", sizeof(struct mdbblock), 0, STREAMS_CACHE_FLAGS, &mdbblock_ctor, NULL},
-	{
+	"DYN_MDBBLOCK", sizeof(struct mdbblock), 0, STREAMS_CACHE_FLAGS, &mdbblock_ctor, NULL}, {
 	"DYN_LINKBLK", sizeof(struct linkinfo), 0, STREAMS_CACHE_FLAGS, &linkinfo_ctor, NULL}, {
 	"DYN_STREVENT", sizeof(struct seinfo), 0, STREAMS_CACHE_FLAGS, &seinfo_ctor, NULL}, {
 	"DYN_QBAND", sizeof(struct qbinfo), 0, STREAMS_CACHE_FLAGS, &qbinfo_ctor, NULL}, {
@@ -5725,8 +5734,8 @@ str_term_caches(void)
 		if (unlikely((cache = si->si_cache) == NULL))
 			continue;
 #if defined CONFIG_STREAMS_DEBUG
-		/* if we are tracking the allocations we can kill things whether they refer to each 
-		   other or not. I hope we don't have any inodes kicking around... */
+		/* if we are tracking the allocations we can kill things whether they refer to each other or
+		   not. I hope we don't have any inodes kicking around... */
 #endif
 		si->si_cache = NULL;
 #ifdef HAVE_KTYPE_KMEM_CACHE_T_P
@@ -5771,8 +5780,7 @@ str_init_caches(void)
 		if (ci->size == 0)
 			continue;
 		si->si_cache =
-		    kmem_create_cache(ci->name, ci->size, ci->offset, ci->flags, ci->ctor,
-				      ci->dtor);
+		    kmem_create_cache(ci->name, ci->size, ci->offset, ci->flags, ci->ctor, ci->dtor);
 		if (si->si_cache != NULL)
 			continue;
 		printk(KERN_ERR "%s: could not allocate %s cache\n", __FUNCTION__, ci->name);
@@ -5783,6 +5791,238 @@ str_init_caches(void)
 }
 
 #if defined CONFIG_STREAMS_KTHREADS
+
+#if defined HAVE_KFUNC_SMPBOOT_REGISTER_PERCPU_THREAD
+
+#ifdef CONFIG_HOTPLUG_CPU
+STATIC __unlikely void
+takeover_strsched(unsigned int cpu)
+{
+	struct strthread *t = this_thread;
+	struct strthread *o = &strthreads[cpu];
+	unsigned long flags;
+
+	streams_local_save(flags);
+	if (o->qhead) {
+		*XCHG(&t->qtail, o->qtail) = o->qhead;
+		o->qhead = NULL;
+		o->qtail = &o->qhead;
+	}
+#ifdef CONFIG_STREAMS_SYNCQS
+	if (o->sqhead) {
+		*XCHG(&t->sqtail, o->sqtail) = o->sqhead;
+		o->sqhead = NULL;
+		o->sqtail = &o->sqhead;
+	}
+	if (o->strmfuncs_head) {
+		*XCHG(&t->strmfuncs_tail, o->strmfuncs_tail) = o->strmfuncs_head;
+		o->strmfuncs_head = NULL;
+		o->strmfuncs_tail = &o->strmfuncs_head;
+	}
+#endif				/* CONFIG_STREAMS_SYNCQS */
+	if (o->strbcalls_head) {
+		*XCHG(&t->strbcalls_tail, o->strbcalls_tail) = o->strbcalls_head;
+		o->strbcalls_head = NULL;
+		o->strbcalls_tail = &o->strbcalls_head;
+	}
+	if (o->strtimout_head) {
+		*xchg(&t->strtimout_tail, o->strtimout_tail) = o->strtimout_head;
+		o->strtimout_head = NULL;
+		o->strtimout_tail = &o->strtimout_head;
+	}
+	if (o->strevents_head) {
+		*XCHG(&t->strevents_tail, o->strevents_tail) = o->strevents_head;
+		o->strevents_head = NULL;
+		o->strevents_tail = &o->strevents_head;
+	}
+	if (o->scanqhead) {
+		*XCHG(&t->scanqtail, o->scanqtail) = o->scanqhead;
+		o->scanqhead = NULL;
+		o->scanqtail = &o->scanqhead;
+	}
+	if (o->freemsg_head) {
+		*XCHG(&t->freemsg_tail, o->freemsg_tail) = o->freemsg_head;
+		o->freemsg_head = NULL;
+		o->freemsg_tail = &o->freemsg_head;
+	}
+#if !defined CONFIG_STREAMS_NORECYCLE
+	if (o->freemblk_head) {
+		*XCHG(&t->freemblk_tail, o->freemblk_tail) = o->freemblk_head;
+		o->freemblk_head = NULL;
+		o->freemblk_tail = &o->freemblk_head;
+		t->freemblks += o->freemblks;
+		o->freemblks = 0;
+	}
+#endif				/* !defined CONFIG_STREAMS_NORECYCLE */
+	if (o->freeevnt_head) {
+		*XCHG(&t->freeevnt_tail, o->freeevnt_tail) = o->freeevnt_head;
+		o->freeevnt_head = NULL;
+		o->freeevnt_tail = &o->freeevnt_head;
+	}
+	streams_local_restore(flags);
+}
+#endif				/* CONFIG_HOTPLUG_CPU */
+
+STATIC int
+str_cpu_callback(struct notifier_block *nfb, unsigned long action, void *hcpu)
+{
+	int cpu = (long) hcpu;
+
+	switch (action) {
+#ifdef CONFIG_HOTPLUG_CPU
+	case CPU_DEAD:
+	case CPU_DEAD_FROZEN:
+		takeover_strsched(cpu);
+		break;
+#endif				/* CONFIG_HOTPLUG_CPU */
+	}
+	return NOTIFY_OK;
+}
+
+STATIC struct notifier_block str_cpu_nfb = {
+	.notifier_call = str_cpu_callback,
+};
+
+DEFINE_PER_CPU(struct task_struct *, kstreamd_proc);
+
+STATIC int
+local_strevent_pending(void)
+{
+	struct strthread *t = this_thread;
+
+	return ((t->flags & (QRUNFLAGS)) != 0);
+}
+
+STATIC int
+kstreamd_should_run(unsigned int cpu)
+{
+	return local_strevent_pending();
+}
+
+STATIC void
+kstreamd_fn(unsigned int cpu)
+{
+	preempt_disable();
+	if (local_strevent_pending()) {
+		preempt_enable();
+		__runqueues();
+		rcu_note_context_switch(cpu);
+		cond_resched();
+		return;
+	}
+	preempt_enable();
+}
+
+/* calld from outside the kthread when it is first created and parked */
+STATIC void
+kstreamd_create(unsigned int cpu)
+{
+}
+
+/* called from inside the kthread when it is first run */
+STATIC void
+kstreamd_setup(unsigned int cpu)
+{
+	struct strthread *t = this_thread;
+
+	t->proc = current;
+#ifdef PF_NOFREEZE
+	current->flags |= PF_NOFREEZE;
+#endif
+
+#ifndef SCHED_NORMAL
+#define SCHED_NORMAL SCHED_OTHER
+#endif
+#if !defined CONFIG_STREAMS_RT_KTHREADS
+#if defined HAVE_SCHED_SETSCHEDULER_EXPORT
+	{
+		struct sched_param sp = { 0 };
+
+#if 1
+#ifdef SCHED_BATCH
+		sched_setscheduler(current, SCHED_BATCH, &sp);
+#else
+		sched_setscheduler(current, SCHED_NORMAL, &sp);
+#endif
+#else
+		sched_setscheduler(current, SCHED_NORMAL, &sp);
+#endif
+	}
+#else
+	current->policy = SCHED_NORMAL;
+#endif
+#if !defined CONFIG_STREAMS_NN_KTHREADS
+	set_user_nice(current, 19);
+#else
+	set_user_nice(current, 0);
+#endif
+#else				/* !defined CONFIG_STREAMS_RT_KTHREADS */
+#if !(defined HAVE___SETSCHEDULER_ADDR && defined HAVE_TASK_RQ_LOCK_ADDR) && !defined HAVE_SCHED_SETSCHEDULER_EXPORT
+	current->policy = SCHED_FIFO;
+	current->rt_priority = 99;
+	current->need_resched = 1;
+#endif				/* !defined HAVE___SETSCHEDULER_ADDR */
+#endif				/* !defined CONFIG_STREAMS_RT_KTHREADS */
+}
+
+/* called from inside the kthread when it is stopped */
+STATIC void
+kstreamd_cleanup(unsigned int cpu, bool online)
+{
+}
+
+/* called from inside the kthread when it is parked */
+STATIC void
+kstreamd_park(unsigned int cpu)
+{
+}
+
+/* called from inside the kthread when it is unparked */
+STATIC void
+kstreamd_unpark(unsigned int cpu)
+{
+}
+
+/* called from outside the kthread before it is unparked */
+STATIC void
+kstreamd_pre_unpark(unsigned int cpu)
+{
+}
+
+STATIC struct smp_hotplug_thread streams_threads = {
+	.store = &kstreamd_proc,
+	.thread_should_run = kstreamd_should_run,
+	.thread_fn = kstreamd_fn,
+	.create = kstreamd_create,
+	.setup = kstreamd_setup,
+	.cleanup = kstreamd_cleanup,
+	.park = kstreamd_park,
+	.unpark = kstreamd_unpark,
+	.pre_unpark = kstreamd_pre_unpark,
+	.selfparking = 0,
+	.thread_comm = "kstreamd/%u",
+};
+
+STATIC __unlikely int
+spawn_kstreamd(void)
+{
+	register_cpu_notifier(&str_cpu_nfb);
+
+	BUG_ON(smpboot_register_percpu_thread(&streams_threads));
+
+	return (0);
+}
+
+STATIC __unlikely void
+kill_kstreamd(void)
+{
+	smpboot_unregister_percpu_thread(&streams_threads);
+
+	unregister_cpu_notifier(&str_cpu_nfb);
+}
+
+#else				/* defined HAVE_KFUNC_SMPBOOT_REGISTER_PERCPU_THREAD */
+
 #if defined HAVE_KINC_LINUX_KTHREAD_H
 STATIC int
 kstreamd(void *__bind_cpu)
@@ -5828,8 +6068,8 @@ kstreamd(void *__bind_cpu)
 	set_current_state(TASK_INTERRUPTIBLE);
 	while (!kthread_should_stop()) {
 		preempt_disable();
-		/* Yes, sometimes kstreamd gets woken up for nothing (or, gets woken up and then
-		   the process runs queues in process context. */
+		/* Yes, sometimes kstreamd gets woken up for nothing (or, gets woken up and then the process
+		   runs queues in process context. */
 		if (likely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0)) {
 		      reschedule:
 			preempt_enable_no_resched();
@@ -5969,13 +6209,11 @@ str_cpu_callback(struct notifier_block *nfb, unsigned long action, void *hcpu)
 		{
 			unsigned long flags;
 			spinlock_t *rq;
-			static void (*__setscheduler) (struct task_struct * p, int policy,
-						       int prio) =
+			static void (*__setscheduler) (struct task_struct * p, int policy, int prio) =
 			    (void *) HAVE___SETSCHEDULER_ADDR;
 
 			/* the lock happens to be first */
-			static spinlock_t *(*task_rq_lock) (struct task_struct * p,
-							    unsigned long *flags) =
+			static spinlock_t *(*task_rq_lock) (struct task_struct * p, unsigned long *flags) =
 			    (void *) HAVE_TASK_RQ_LOCK_ADDR;
 
 			rq = task_rq_lock(p, &flags);
@@ -6008,6 +6246,7 @@ str_cpu_callback(struct notifier_block *nfb, unsigned long action, void *hcpu)
 	}
 	return (NOTIFY_OK);
 }
+
 #ifndef __cpuinitdata
 #ifdef __devinitdata
 #define __cpuinitdata __devinitdata
@@ -6045,6 +6284,7 @@ spawn_kstreamd(void)
 	register_cpu_notifier(&str_cpu_nfb);
 	return (0);
 }
+
 STATIC __unlikely void
 kill_kstreamd(void)
 {
@@ -6144,8 +6384,8 @@ kstreamd(void *__bind_cpu)
 	while (likely(!(signal_pending(current) && sigismember(&current->pending.signal, SIGKILL)))) {
 		if (signal_pending(current))
 			do_exit(0);
-		/* Yes, sometimes kstreamd gets woken up for nothing (or, gets woken up and then
-		   the process runs queues in process context. */
+		/* Yes, sometimes kstreamd gets woken up for nothing (or, gets woken up and then the process
+		   runs queues in process context. */
 		if (likely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0)) {
 		      reschedule:
 			schedule();
@@ -6154,8 +6394,7 @@ kstreamd(void *__bind_cpu)
 				     && sigismember(&current->pending.signal, SIGKILL)))
 				break;
 			if (unlikely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0)) {
-				printd(("CPU#%d: kstreamd: false wakeup\n",
-					(int) (long) __bind_cpu));
+				printd(("CPU#%d: kstreamd: false wakeup\n", (int) (long) __bind_cpu));
 				set_current_state(TASK_INTERRUPTIBLE);
 				goto reschedule;
 			}
@@ -6197,6 +6436,7 @@ spawn_kstreamd(void)
 	}
 	return (0);
 }
+
 STATIC __unlikely void
 kill_kstreamd(void)
 {
@@ -6216,6 +6456,8 @@ kill_kstreamd(void)
 	return;
 }
 #endif				/* HAVE_KINC_LINUX_KTHREAD_H */
+
+#endif				/* defined HAVE_KFUNC_SMPBOOT_REGISTER_PERCPU_THREAD */
 
 STATIC __unlikely void
 init_strsched(void)
