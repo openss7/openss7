@@ -823,6 +823,19 @@ function read_modobject(command, dir, own, src,
 		    }
 		    continue
 		}
+		if (substr(flags,1,1) == "g") {
+		    if (substr(flags,7,1) == "O") {
+			if (sub(/^_?_?__ksymtab/,"",sec)) {
+			    sub(/\+.*/,"",sec)
+			    if (sub(/^_?__ksymtab_/,"",sym)) {
+				print_debug(3,pfx "symbol: " sym)
+				set_symbol(sym, mod, "", "EXPORT_SYMBOL" toupper(sec), "", 0, own, "", 0, "ko object")
+				count_syms++
+			    }
+			    continue
+			}
+		    }
+		}
 		if (sec == "*ABS*") {
 		    if (substr(flags,1,1) == "g") {
 			if (sub(/^_?__crc_/,"",sym)) {
