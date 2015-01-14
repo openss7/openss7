@@ -1512,8 +1512,13 @@ n_conn_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 		goto noaddr;
 	if (dst->si < 3 && mtp->src.si != 0)
 		goto badaddr;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (dst->si < 3 && mtp->cred.cr_uid.val != 0)
+		goto access;
+#else
 	if (dst->si < 3 && mtp->cred.cr_uid != 0)
 		goto access;
+#endif
 	if (dst->si != mtp->src.si && mtp->src.si != 0)
 		goto badaddr;
 	if (n_parse_opts(mtp, &opts, mp->b_rptr + p->QOS_offset, p->QOS_length))
@@ -1769,8 +1774,13 @@ n_bind_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 		goto badaddr;
 	if (!src.si || !src.pc)
 		goto noaddr;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (src.si < 3 && mtp->cred.cr_uid.val != 0)
+		goto acces;
+#else
 	if (src.si < 3 && mtp->cred.cr_uid != 0)
 		goto acces;
+#endif
 	mtp_set_state(mtp, NS_WACK_BREQ);
 	return mtp_bind_req(mtp, q, mp, &src, 0);
       acces:
@@ -1872,8 +1882,13 @@ n_unitdata_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 		goto badaddr;
 	if (!dst.si || !dst.pc)
 		goto badaddr;
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+	if (dst.si < 3 && mtp->cred.cr_uid.val != 0)
+		goto acces;
+#else
 	if (dst.si < 3 && mtp->cred.cr_uid != 0)
 		goto acces;
+#endif
 	if (dst.si != mtp->src.si)
 		goto badaddr;
 #if 0

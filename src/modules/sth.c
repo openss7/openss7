@@ -1248,9 +1248,13 @@ kill_proc_(pid_t sess, int sig, int priv)
 /* How to send a signal with information to a process: just use kill_proc_info(7) in the code */
 #if   defined HAVE_KILL_PID_INFO_AS_CRED_SYMBOL
 /* 3.4 kernel approach: */
+#if defined HAVE_KMEMB_STRUCT_CRED_UID_VAL && defined HAVE_KMEMB_STRUCT_CRED_EUID_VAL
 #if   defined HAVE_KILL_PID_INFO_AS_CRED_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
-extern int kill_pid_info_as_cred(int sig, struct siginfo *info, struct pid *pid, const struct cred *cred, u32 secid);
-int kill_pid_info_(int sig, struct siginfo *info, struct pid *pid, uid_t uid, uid_t euid, u32 secid, struct user_namespace *user_ns)
+extern int kill_pid_info_as_cred(int sig, struct siginfo *info, struct pid *pid,
+				 const struct cred *cred, u32 secid);
+int
+kill_pid_info_(int sig, struct siginfo *info, struct pid *pid, kuid_t uid, kuid_t euid, u32 secid,
+	       struct user_namespace *user_ns)
 {
 	struct cred cr = {
 		.uid = uid,
@@ -1259,11 +1263,15 @@ int kill_pid_info_(int sig, struct siginfo *info, struct pid *pid, uid_t uid, ui
 	};
 	return kill_pid_info_as_cred(sig, info, pid, &cr, secid);
 }
+
 #define kill_proc_info(a,b,c,d,e,f,g) kill_pid_info_(a,b,c,d,e,f,g)
 #else
-extern int kill_pid_info_as_cred(int sig, struct siginfo *info, struct pid *pid, const struct cred *cred, u32 secid)
-	__attribute__((__weak__));
-int kill_pid_info_(int sig, struct siginfo *info, struct pid *pid, uid_t uid, uid_t euid, u32 secid, struct user_namespace *user_ns)
+extern int kill_pid_info_as_cred(int sig, struct siginfo *info, struct pid *pid,
+				 const struct cred *cred, u32 secid)
+    __attribute__ ((__weak__));
+int
+kill_pid_info_(int sig, struct siginfo *info, struct pid *pid, uid_t uid, uid_t euid, u32 secid,
+	       struct user_namespace *user_ns)
 {
 	if (kill_pid_info_as_cred) {
 		struct cred cr = {
@@ -1275,8 +1283,58 @@ int kill_pid_info_(int sig, struct siginfo *info, struct pid *pid, uid_t uid, ui
 	}
 	return kill_pid(pid, sig, 1);
 }
+
 #define kill_proc_info(a,b,c,d,e,f,g) kill_pid_info_(a,b,c,d,e,f,g)
 #endif
+#else				/* defined HAVE_KMEMB_STRUCT_CRED_UID_VAL && defined
+				   HAVE_KMEMB_STRUCT_CRED_EUID_VAL */
+#if   defined HAVE_KILL_PID_INFO_AS_CRED_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern int kill_pid_info_as_cred(int sig, struct siginfo *info, struct pid *pid,
+				 const struct cred *cred, u32 secid);
+int
+kill_pid_info_(int sig, struct siginfo *info, struct pid *pid, uid_t uid, uid_t euid, u32 secid,
+	       struct user_namespace *user_ns)
+{
+	struct cred cr = {
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+		.uid = {uid},
+#else
+		.uid = uid,
+#endif
+#ifdef HAVE_KMEMB_STRUCT_CRED_EUID_VAL
+		.euid = {euid},
+#else
+		.euid = euid,
+#endif
+		.user_ns = user_ns,
+	};
+	return kill_pid_info_as_cred(sig, info, pid, &cr, secid);
+}
+
+#define kill_proc_info(a,b,c,d,e,f,g) kill_pid_info_(a,b,c,d,e,f,g)
+#else
+extern int kill_pid_info_as_cred(int sig, struct siginfo *info, struct pid *pid,
+				 const struct cred *cred, u32 secid)
+    __attribute__ ((__weak__));
+int
+kill_pid_info_(int sig, struct siginfo *info, struct pid *pid, uid_t uid, uid_t euid, u32 secid,
+	       struct user_namespace *user_ns)
+{
+	if (kill_pid_info_as_cred) {
+		struct cred cr = {
+			.uid = uid,
+			.euid = {euid},
+			.user_ns = user_ns,
+		};
+		return kill_pid_info_as_cred(sig, info, pid, &cr, secid);
+	}
+	return kill_pid(pid, sig, 1);
+}
+
+#define kill_proc_info(a,b,c,d,e,f,g) kill_pid_info_(a,b,c,d,e,f,g)
+#endif
+#endif				/* defined HAVE_KMEMB_STRUCT_CRED_UID_VAL && defined
+				   HAVE_KMEMB_STRUCT_CRED_EUID_VAL */
 #elif   defined HAVE_KILL_PID_INFO_AS_UID_SYMBOL
 /* 2.6.32 kernel approach: */
 #if   defined HAVE_KILL_PID_INFO_AS_UID_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
@@ -8471,7 +8529,13 @@ str_i_pop(const struct file *file, struct stdata *sd, unsigned long arg)
 			cred_t *crp = current_creds;
 
 			/* TODO: should use capabilities instead of UID */
-			if (sd->sd_pushcnt >= sd->sd_nanchor || crp->cr_uid == 0) {
+			if (sd->sd_pushcnt >= sd->sd_nanchor ||
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+					crp->cr_uid.val == 0
+#else
+					crp->cr_uid == 0
+#endif
+					) {
 				int oflag = make_oflag(file);
 
 				sd->sd_pushcnt--;
@@ -8634,14 +8698,22 @@ __str_i_recvfd(const struct file *file, struct stdata *sd, struct strrecvfd *sr)
 #if defined HAVE_KMEMB_STRUCT_FILE_F_UID
 			sr->uid = f2->f_uid;
 #elif defined HAVE_KMEMB_STRUCT_FILE_F_CRED
+#if defined HAVE_KMEMB_STRUCT_CRED_UID_VAL
+			sr->uid = f2->f_cred->uid.val;
+#else
 			sr->uid = f2->f_cred->uid;
+#endif
 #else
 #error Do not know how to get file uid.
 #endif
 #if defined HAVE_KMEMB_STRUCT_FILE_F_GID
 			sr->gid = f2->f_gid;
 #elif defined HAVE_KMEMB_STRUCT_FILE_F_CRED
+#if defined HAVE_KMEMB_STRUCT_CRED_GID_VAL
+			sr->gid = f2->f_cred->gid.val;
+#else
 			sr->gid = f2->f_cred->gid;
+#endif
 #else
 #error Do not know how to get file gid.
 #endif
