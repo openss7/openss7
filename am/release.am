@@ -85,7 +85,7 @@ $(top_srcdir)/AUTHORS: MANUAL
 	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
 	 $(ECHO_Q) "  GEN   " `basename $@` ; \
 	 $(ECHO_V) "Creating $@ from the MANUAL..." ; \
-	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
+	 idline="\$$Id\$$" ; if test -e $@ ; then if grep -a '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep -a '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- authors.  $(PACKAGE_DATE)" > $@ ; \
 	 $(ECHO) "$$idline" >> $@ ; \
 	 $(ECHO) "Copyright (c) 2008-`date +%Y`  Monavacon Limited. <http://www.monavacon.com/>" >> $@ ; \
@@ -100,7 +100,7 @@ $(top_srcdir)/BUGS: MANUAL $(top_srcdir)/AUTHORS
 	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
 	 $(ECHO_Q) "  GEN   " `basename $@` ; \
 	 $(ECHO_V) "Creating $@ from the MANUAL..." ; \
-	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
+	 idline="\$$Id\$$" ; if test -e $@ ; then if grep -a '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep -a '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- defects.  $(PACKAGE_DATE)" > $@ ; \
 	 $(ECHO) "$$idline" >> $@ ; \
 	 $(ECHO) "Copyright (c) 2008-`date +%Y`  Monavacon Limited. <http://www.monavacon.com/>" >> $@ ; \
@@ -115,7 +115,7 @@ $(top_srcdir)/LICENSES: MANUAL $(top_srcdir)/AUTHORS
 	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
 	 $(ECHO_Q) "  GEN   " `basename $@` ; \
 	 $(ECHO_V) "Creating $@ from the MANUAL..." ; \
-	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
+	 idline="\$$Id\$$" ; if test -e $@ ; then if grep -a '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep -a '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- licenses.  $(PACKAGE_DATE)" > $@ ; \
 	 $(ECHO) "$$idline" >> $@ ; \
 	 $(ECHO) "Copyright (c) 2008-`date +%Y`  Monavacon Limited. <http://www.monavacon.com/>" >> $@ ; \
@@ -130,7 +130,7 @@ $(top_srcdir)/PROBLEMS: MANUAL $(top_srcdir)/AUTHORS
 	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
 	 $(ECHO_Q) "  GEN   " `basename $@` ; \
 	 $(ECHO_V) "Creating $@ from the MANUAL..." ; \
-	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
+	 idline="\$$Id\$$" ; if test -e $@ ; then if grep -a '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep -a '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- problem reports.  $(PACKAGE_DATE)" > $@ ; \
 	 $(ECHO) "$$idline" >> $@ ; \
 	 $(ECHO) "Copyright (c) 2008-`date +%Y`  Monavacon Limited. <http://www.monavacon.com/>" >> $@ ; \
@@ -145,7 +145,7 @@ $(top_srcdir)/NEWS: MANUAL $(top_srcdir)/AUTHORS
 	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
 	 $(ECHO_Q) "  GEN   " `basename $@` ; \
 	 $(ECHO_V) "Creating $@ from the MANUAL..." ; \
-	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
+	 idline="\$$Id\$$" ; if test -e $@ ; then if grep -a '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep -a '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- history of user visible changes.  $(PACKAGE_DATE)" > $@ ; \
 	 $(ECHO) "$$idline" >> $@ ; \
 	 $(ECHO) "Copyright (c) 2008-`date +%Y`  Monavacon Limited. <http://www.monavacon.com/>" >> $@ ; \
@@ -160,7 +160,7 @@ $(top_srcdir)/THANKS: MANUAL $(top_srcdir)/AUTHORS
 	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
 	 $(ECHO_Q) "  GEN   " `basename $@` ; \
 	 $(ECHO_V) "Creating $@ from the MANUAL..." ; \
-	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
+	 idline="\$$Id\$$" ; if test -e $@ ; then if grep -a '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep -a '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- acknowledgements.  $(PACKAGE_DATE)" > $@ ; \
 	 $(ECHO) "$$idline" >> $@ ; \
 	 $(ECHO) "Copyright (c) 2008-`date +%Y`  Monavacon Limited. <http://www.monavacon.com/>" >> $@ ; \
@@ -175,7 +175,7 @@ $(top_srcdir)/TODO: MANUAL $(top_srcdir)/AUTHORS
 	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
 	 $(ECHO_Q) "  GEN   " `basename $@` ; \
 	 $(ECHO_V) "Creating $@ from the MANUAL..." ; \
-	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
+	 idline="\$$Id\$$" ; if test -e $@ ; then if grep -a '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep -a '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- things to do.  $(PACKAGE_DATE)" > $@ ; \
 	 $(ECHO) "$$idline" >> $@ ; \
 	 $(ECHO) "Copyright (c) 2008-`date +%Y`  Monavacon Limited. <http://www.monavacon.com/>" >> $@ ; \
@@ -190,7 +190,7 @@ $(top_srcdir)/README: MANUAL $(top_srcdir)/AUTHORS
 	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
 	 $(ECHO_Q) "  GEN   " `basename $@` ; \
 	 $(ECHO_V) "Creating $@ from the MANUAL..." ; \
-	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
+	 idline="\$$Id\$$" ; if test -e $@ ; then if grep -a '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep -a '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- read me first file.  $(PACKAGE_DATE)" > $@ ; \
 	 $(ECHO) "$$idline" >> $@ ; \
 	 $(ECHO) "Copyright (c) 2008-`date +%Y`  Monavacon Limited. <http://www.monavacon.com/>" >> $@ ; \
@@ -205,7 +205,7 @@ $(top_srcdir)/README-cvs: MANUAL $(top_srcdir)/AUTHORS
 	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
 	 $(ECHO_Q) "  GEN   " `basename $@` ; \
 	 $(ECHO_V) "Creating $@ from the MANUAL..." ;\
-	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
+	 idline="\$$Id\$$" ; if test -e $@ ; then if grep -a '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep -a '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- read me CVS file.  $(PACKAGE_DATE)" > $@ ;\
 	 $(ECHO) "$$idline" >> $@ ; \
 	 $(ECHO) "Copyright (c) 2008-`date +%Y`  Monavacon Limited. <http://www.monavacon.com/>" >> $@ ; \
@@ -222,8 +222,8 @@ $(top_srcdir)/README-alpha: MANUAL $(top_srcdir)/AUTHORS
 	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
 	 $(ECHO_Q) "  GEN   " `basename $@` ; \
 	 $(ECHO_V) "Creating $@ from the MANUAL..." ;\
-	 reltype=`grep '^This software is' $${d}MANUAL | cut -f4 '-d '` ; \
-	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
+	 reltype=`grep -a '^This software is' $${d}MANUAL | cut -f4 '-d '` ; \
+	 idline="\$$Id\$$" ; if test -e $@ ; then if grep -a '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep -a '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- $$reltype release introduction.  $(PACKAGE_DATE)" > $@ ;\
 	 $(ECHO) "$$idline" >> $@ ; \
 	 $(ECHO) "Copyright (c) 2008-`date +%Y`  Monavacon Limited. <http://www.monavacon.com/>" >> $@ ; \
