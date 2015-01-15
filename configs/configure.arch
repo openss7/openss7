@@ -5,10 +5,17 @@ srcdir=`(cd $where/..; pwd)`
 # use native tools for arch
 $srcdir/configure \
 	WFLAGS='-Wno-unused-but-set-variable -Wno-system-headers -Wno-endif-labels' \
-	--libexecdir='${exec_prefix}/lib' \
+	syslibdir=/usr/lib \
+	sysbindir=/usr/bin \
+	syssbindir=/usr/sbin \
+	--libdir=/usr/lib \
+	--sbindir=/usr/bin \
+	--libexecdir=/usr/lib \
+	--docdir=/usr/share/doc/openss7 \
 	--with-pkg-distdir=/u6/repo \
 	--with-pkg-repodir=/u5/repo \
 	--enable-maintainer-mode \
 	--disable-sysvinit \
+        --with-gnu-ld \
 	$* \
 	2>&1 | tee configure.log

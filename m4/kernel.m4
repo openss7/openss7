@@ -533,7 +533,9 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [dnl
 	[AS_HELP_STRING([--with-k-modules=DIR],
 	    [kernel module install directory @<:@default=/lib/modules/K-RELEASE/misc@:>@])])
     _BLD_FIND_DIR([for kernel modules install directory], [linux_cv_k_modules], [
-	    ${rootdir}/lib/modules/${kversion}], [], [${rootdir}/lib/modules/${kversion}], [dnl
+	    ${rootdir}/usr/lib/modules/${kversion}
+	    ${rootdir}/lib/modules/${kversion}
+    ], [], [${rootdir}/lib/modules/${kversion}], [dnl
 		AC_MSG_ERROR([
 *** 
 *** Configure could not find the kernel modules directory for the
@@ -550,7 +552,9 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [dnl
     kmoduledir="$linux_cv_k_modules"
     AC_SUBST([kmoduledir])dnl
     _BLD_FIND_DIR([for kernel modules directory], [linux_cv_k_moddir], [
-	    ${rootdir}/lib/modules/${kversion}], [modules.dep], [], [dnl
+	    ${rootdir}/usr/lib/modules/${kversion}
+	    ${rootdir}/lib/modules/${kversion}
+    ], [modules.dep], [], [dnl
 		AC_MSG_WARN([
 ***
 *** Strange, the modules directory is $kmoduledir
@@ -867,6 +871,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILDDIR], [dnl
 	    [kernel build directory @<:@default=K-MODULES-DIR/build@:>@])])
     _BLD_FIND_DIR([for kernel build directory], [linux_cv_k_build], [
 	    ${kmoduledir:+${kmoduledir}/build}
+	    ${rootdir}/usr/lib/modules/${kversion}/build
 	    ${rootdir}/lib/modules/${kversion}/build
 	    ${rootdir}/usr/src/kernels/${kversion}-${kmarch}
 	    ${rootdir}/usr/src/kernels/${kversion}
@@ -934,6 +939,7 @@ dnl directory, we need to go searching for them.
 dnl 
     _BLD_FIND_DIR([for kernel header directory], [linux_cv_k_hdrdir], [
 	    ${kbuildir}/include/asm-generic
+	    ${rootdir}/usr/lib/modules/${kversion}/source
 	    ${rootdir}/lib/modules/${kversion}/source
 	    ${rootdir}/usr/src/linux-headers-${kversion}
 	    ${rootdir}/usr/src/linux-headers-${knumber}
@@ -1581,7 +1587,9 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_KABI], [dnl
 			[kABI whitelist file @<:@default=/lib/modules/kabi/kabi_whitelist_ARCH@:>@])],
 	[], [with_kabi_whitelist=search])
     _BLD_FIND_FILE([kernel kABI whitelist], [linux_cv_kabi_whitelist], [
-	    ${rootdir}/lib/modules/kabi/kabi_whitelist_${karch}], [], [dnl
+	    ${rootdir}/usr/lib/modules/kabi/kabi_whitelist_${karch}
+	    ${rootdir}/lib/modules/kabi/kabi_whitelist_${karch}
+    ], [], [dnl
 	if test ${with_kabi_whitelist:-search} != no ; then
 	    case "$target_vendor:$target_edition" in
 		(redhat:[[67]]*|oracle:[[67]]*|springdale:[[67]]*|puias:[[67]]*|centos:[[67]]*|scientific:[[67]]*)
@@ -1592,6 +1600,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_KABI], [dnl
 *** 
 *** Configure cannot find the kABI whitelist:
 ***
+***	/usr/lib/modules/kabi/kabi_whitelist_${karch}
 ***	/lib/modules/kabi/kabi_whitelist_${karch}
 ***
 *** Perhaps you need to load the kABI whitelist package (e.g.,

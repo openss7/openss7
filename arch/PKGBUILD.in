@@ -34,7 +34,7 @@ epoch=0
 pkgdesc='OpenSS7 Fast-STREAMS and Protocol Suites'
 arch=('i686' 'x86_64')
 url='http://www.openss7.org/'
-license=('AGPL3' 'GPL3' 'BSD')
+license=('AGPL3')
 groups=('@PACKAGE@')
 depends=()
 makedepends=(
@@ -46,10 +46,10 @@ makedepends=(
 checkdepends=()
 optdepends=()
 provides=()
-conflicts=()
+conflicts=('strigi')
 replaces=()
 backup=()
-options=('!strip' 'docs' 'libtool' 'emptydirs' 'ccache' '!distcc' 'buildflags' '!makeflags')
+options=('staticlibs' '!strip' 'docs' '!libtool' 'emptydirs' 'ccache' '!distcc' 'buildflags' '!makeflags')
 install=
 #changelog=@PACKAGE@.changelog
 source=('http://www.openss7.org/repo/tarballs/@PACKAGE@-@VERSION@.tar.xz')
@@ -60,9 +60,9 @@ build() {
 	[ -d $srcdir/_build ] && return 0
 	mkdir $srcdir/_build
 	cd $srcdir/_build
-	cache_file=../../@target@-@kversion@-config.cache
-	csite_file=../../@target@-config.site
-	mpost_file=../../@target@-@kversion@-modpost.cache
+	cache_file=../../$CARCH-@kversion@-config.cache
+	csite_file=../../$CARCH-config.site
+	mpost_file=../../$CARCH-@kversion@-modpost.cache
 	$srcdir/@PACKAGE@-@VERSION@/configure \
 		${CC:+CC="${CC}"} \
 		${CFLAGS+CFLAGS="${CFLAGS}"} \
@@ -77,8 +77,14 @@ build() {
 		CONFIG_SITE=${csite_file} \
 		MODPOST_CACHE=${mpost_file} \
 		${PACKAGE_PACOPTIONS} \
+		syslibdir=/usr/lib \
+		sysbindir=/usr/bin \
+		syssbindir=/usr/bin \
 		--cache-file=${cache_file} \
-		--libexecdir='${exec_prefix}/lib' \
+		--libdir=/usr/lib \
+		--bindir=/usr/bin \
+		--sbindir=/usr/bin \
+		--libexecdir=/usr/lib \
 		--disable-maintainer-mode \
 		--disable-sysvinit \
 		--with-k-release=@kversion@ \
@@ -119,9 +125,9 @@ package() {
 	'INSTALL-@PACKAGE@' 'LICENSES' 'LSM' 'MANUAL' 'NEWS' 'NOTES' 'NOTES.cos53' 'NOTES.kmod' \
 	'NOTES.ksyms' 'NOTES.repo' 'NOTES.rpm' 'NOTES.sles' 'PROBLEMS' 'README' 'README-alpha' \
 	'README-cvs' 'README-make' 'RELEASE-NOTES' 'THANKS' 'TODO' '@PACKAGE@-@VERSION@.lsm'
-	cache_file=../../@target@-@kversion@-config.cache
-	csite_file=../../@target@-config.site
-	mpost_file=../../@target@-@kversion@-modpost.cache
+	cache_file=../../$CARCH-@kversion@-config.cache
+	csite_file=../../$CARCH-config.site
+	mpost_file=../../$CARCH-@kversion@-modpost.cache
 	d=$srcdir/_install/usr/src/@PACKAGE@-@VERSION@-@PACKAGE_PACRELEASE@/@kversion@
 	mkdir -p $d
 	b=$srcdir/_install/boot
@@ -139,14 +145,15 @@ package() {
 	cp -pv $d/abi-@kversion@ $b
 	cp -pv symsets-@kversion@.tar.gz $d
 	cp -pv symsets-@kversion@.tar.gz $b
-	cd $startdir
+	cd $srcdir; cd ..
 	( cd $srcdir/_install; find . | sort ) |tee installed.list >unused.list
 }
 
 package_@PACKAGE@-repo() {
 	pkgdesc='OpenSS7 Fast-STREAMS and Protocol Suites (Repository)'
 	groups=('@PACKAGE@-repo')
-	backup=('etc/pacman.conf')
+#	backup=('etc/pacman.conf')
+	depends=('bash')
 	install=@PACKAGE@-repo.install
 	package
 	keydir=$pkgdir/usr/share/pacman/keyrings
@@ -157,7 +164,7 @@ package_@PACKAGE@-repo() {
 	repodir=$pkgdir/etc/pacman.d
 	mkdir -p $repodir
 	touch $repodir/openss7list
-	cd $startdir
+	cd $srcdir; cd ..
 	( cd $pkgdir; find . | sort ) >@PACKAGE@-repo.list
 	join -v 1 unused.list @PACKAGE@-repo.list >unused.tmp
 	mv -f -- unused.tmp unused.list
@@ -168,13 +175,11 @@ package_@PACKAGE@() {
 	groups=('@PACKAGE@-run')
 	depends=(
 		'@PACKAGE@-repo=@VERSION@-@PACKAGE_PACRELEASE@'
-		'binutils')
+		'net-snmp' 'gawk' 'lm_sensors' 'popt' 'bash' 'gcc-libs')
 	optdepends=(
-		'net-snmp: for SNMP agent support'
 		'perl-tk: for graphical utilities'
 		'gtkdialog: for graphical utilities')
-	backup=('etc/conf.d/openss7' 'etc/conf.d/specfs' 'etc/conf.d/strace'
-		'etc/conf.d/streams' 'etc/conf.d/strerr' 'etc/nslconfig.d/openss7'
+	backup=(
 		'etc/snmp/snmp.d/01openss7'
 		'etc/sock2path.d/openss7')
 	install=@PACKAGE@.install
@@ -193,7 +198,7 @@ package_@PACKAGE@() {
 	rm -fr $pkgdir/usr/lib/java
 	rm -fr $pkgdir/usr/share/java
 	rm -fr $pkgdir/usr/lib/gcj
-	cd $startdir
+	cd $srcdir; cd ..
 	( cd $pkgdir; find . | sort ) >@PACKAGE@.list
 	join -v 1 unused.list @PACKAGE@.list >unused.tmp
 	mv -f -- unused.tmp unused.list
@@ -260,7 +265,7 @@ EOF
 	cp -av usr/share/info $pkgdir/usr/share
 	mkdir -p $pkgdir/usr/share/man
 	cp -av usr/share/man/man{2,3,7} $pkgdir/usr/share/man
-	cd $startdir
+	cd $srcdir; cd ..
 	( cd $pkgdir; find . | sort ) >@PACKAGE@-devel.list
 	join -v 1 unused.list @PACKAGE@-devel.list >unused.tmp
 	mv -f -- unused.tmp unused.list
@@ -287,7 +292,7 @@ package_@PACKAGE@-@kversion@() {
 	cp -av boot $pkgdir
 	mkdir -p $pkgdir/lib
 	cp -av lib/modules $pkgdir/lib
-	cd $startdir
+	cd $srcdir; cd ..
 	( cd $pkgdir; find . | sort ) >@PACKAGE@-@kversion@.list
 	join -v 1 unused.list @PACKAGE@-@kversion@.list >unused.tmp
 	mv -f -- unused.tmp unused.list
@@ -354,7 +359,7 @@ EOF
 	cp -av usr/include/openss7/sys/svr3 $pkgdir/usr/include/openss7/sys
 	cp -av usr/include/openss7/sys/svr4 $pkgdir/usr/include/openss7/sys
 	cp -av usr/include/openss7/sys/uw7  $pkgdir/usr/include/openss7/sys
-	cd $startdir
+	cd $srcdir; cd ..
 	( cd $pkgdir; find . | sort ) >@PACKAGE@-@kversion@-devel.list
 	join -v 1 unused.list @PACKAGE@-@kversion@-devel.list >unused.tmp
 	mv -f -- unused.tmp unused.list
@@ -390,9 +395,9 @@ package_@PACKAGE@-@kernel_image@() {
 	cd $srcdir/_install
 	mkdir -p $pkgdir
 	cp -av boot $pkgdir
-	mkdir -p $pkgdir/lib
-	cp -av lib/modules $pkgdir/lib
-	cd $startdir
+	mkdir -p $pkgdir/usr/lib
+	cp -av lib/modules $pkgdir/usr/lib
+	cd $srcdir; cd ..
 	( cd $pkgdir; find . | sort ) >@PACKAGE@-@kernel_image@.list
 	join -v 1 unused.list @PACKAGE@-@kernel_image@.list >unused.tmp
 	mv -f -- unused.tmp unused.list
@@ -470,7 +475,7 @@ EOF
 	cp -av usr/include/openss7/sys/svr3 $pkgdir/usr/include/openss7/sys
 	cp -av usr/include/openss7/sys/svr4 $pkgdir/usr/include/openss7/sys
 	cp -av usr/include/openss7/sys/uw7  $pkgdir/usr/include/openss7/sys
-	cd $startdir
+	cd $srcdir; cd ..
 	( cd $pkgdir; find . | sort ) >@PACKAGE@-@kernel_image@-devel.list
 	join -v 1 unused.list @PACKAGE@-@kernel_image@-devel.list >unused.tmp
 	mv -f -- unused.tmp unused.list
@@ -479,7 +484,8 @@ EOF
 package_@PACKAGE@-java() {
 	pkgdesc='OpenSS7 Fast-STREAMS and Protocol Suites (Java)'
 	groups=('@PACKAGE@-java')
-	depends=('@PACKAGE@=@VERSION@-@PACKAGE_PACRELEASE@')
+	depends=('@PACKAGE@=@VERSION@-@PACKAGE_PACRELEASE@'
+		 'gcc-gcj' 'java-environment')
 	install=@PACKAGE@-libs.install
 	package
 	cd $srcdir/_install
@@ -489,7 +495,7 @@ package_@PACKAGE@-java() {
 	cp -av usr/lib/gcj $pkgdir/usr/lib
 	cp -av usr/share/java $pkgdir/usr/share
 	cp -av usr/share/javadoc $pkgdir/usr/share
-	cd $startdir
+	cd $srcdir; cd ..
 	( cd $pkgdir; find . | sort ) >@PACKAGE@-java.list
 	join -v 1 unused.list @PACKAGE@-java.list >unused.tmp
 	mv -f -- unused.tmp unused.list
