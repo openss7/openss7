@@ -5,7 +5,7 @@
 
 PACKAGER="${PACKAGER:-Brian Bidulock <bidulock@openss7.org>}"
 
-_kvr="$(pacman -Qi @kernel_image@|grep -i '^version'|awk '{print$3}')"
+_kvr="$(pacman -Qi @kernel_image@|awk '/^Version/{print$3}')"
 _kv=$(echo "$_kvr" | sed -e 's,-.*$,,')
 _kr=$(echo "$_kvr" | sed -e 's,^.*-,,')
 

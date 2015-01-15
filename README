@@ -1,4 +1,4 @@
-OpenSS7 -- read me first file.  2015-01-13
+OpenSS7 -- read me first file.  2015-01-14
 $Id: README,v 1.1.2.25 2011-05-10 13:45:30 brian Exp $
 Copyright (c) 2008-2015  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
@@ -8,7 +8,7 @@ See the end for copying conditions (for this file).
 OpenSS7
 =======
 
-Package openss7-1.1.7.20150114 was released under AGPLv3 2015-01-13.
+Package openss7-1.1.7.20150114 was released under AGPLv3 2015-01-14.
 
 This is the 'OpenSS7' package.  It contains all of the OpenSS7 Project
 release code.  This is the only package released by the OpenSS7 Project.
@@ -50,7 +50,7 @@ should build and install for other architectures as well.
 Release
 -------
 
-This is the 'openss7-1.1.7.20150114' package, released 2015-01-13.  This
+This is the 'openss7-1.1.7.20150114' package, released 2015-01-14.  This
 '1.1.7.20150114' release, and the latest version, can be obtained from
 the download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
