@@ -2131,12 +2131,12 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_FILES], [dnl
 	    kernel_source="linux-source-${kmajor}.${kminor}"
 	    kernel_headers="linux-headers-${kmajor}.${kminor}"
 	    ;;
-	(debian-3.?|ubuntu-3.?|mint-3.?)
+	(debian-3.*|ubuntu-3.*|mint-3.*)
 	    kernel_image="linux-image-${kversion}"
 	    kernel_source="linux-source-${kmajor}.${kminor}"
 	    kernel_headers="linux-headers-${kmajor}.${kminor}"
 	    ;;
-	(slackware-3.?|salix-3.?)
+	(slackware-3.*|salix-3.*)
 	    kernel_image="kernel-generic-${kversion}"
 	    kernel_source="kernel-source-${kversion}"
 	    kernel_headers="kernel-headers-${kversion}"
@@ -2151,7 +2151,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_FILES], [dnl
 	    fi
 	    kernel_source=
 	    ;;
-	(arch-3.?)
+	(arch-3.*)
 	    if test "$kflavor" != "ARCH"; then
 		kernel_image="linux${kflavor:+-$kflavor}"
 		kernel_headers="linux${kflavor:+-$kflavor}-headers"
