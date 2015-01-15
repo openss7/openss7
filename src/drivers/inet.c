@@ -1096,7 +1096,11 @@ typedef struct inet {
 	cred_t cred;			/* credientials */
 	struct {
 		void (*sk_state_change) (struct sock *);
+#ifdef HAVE_KFUNC_SK_DATA_READY_1_ARG
+		void (*sk_data_ready) (struct sock *);
+#else
 		void (*sk_data_ready) (struct sock *, int);
+#endif
 		void (*sk_write_space) (struct sock *);
 		void (*sk_error_report) (struct sock *);
 	} cb_save;			/* call back holder */
@@ -1406,7 +1410,11 @@ ss_unlock(ss_t *ss)
 static void ss_state_change(struct sock *sk);
 static void ss_write_space(struct sock *sk);
 static void ss_error_report(struct sock *sk);
+#ifdef HAVE_KFUNC_SK_DATA_READY_1_ARG
+static void ss_data_ready(struct sock *sk);
+#else
 static void ss_data_ready(struct sock *sk, int len);
+#endif
 
 /**
  * ss_socket_put: - restore socket from strinet use.
@@ -2885,8 +2893,13 @@ t_set_options(ss_t *ss)
 			if (t_tst_bit(_T_BIT_UDP_CHECKSUM, ss->options.flags)) {
 				t_uscalar_t *valp = &ss->options.udp.checksum;
 
+#if defined HAVE_KMEMB_STRUCT_SOCK_SK_NO_CHECK_TX && defined HAVE_KMEMB_STRUCT_SOCK_SK_NO_CHECK_RX
+				sk->sk_no_check_tx =
+				    (*valp == T_YES) ? 0 : 1;
+#else
 				sk->sk_no_check =
 				    (*valp == T_YES) ? UDP_CSUM_DEFAULT : UDP_CSUM_NOXMIT;
+#endif
 			}
 			break;
 		case T_INET_TCP:
@@ -3596,8 +3609,13 @@ t_parse_conn_opts(ss_t *ss, const unsigned char *ip, size_t ilen, int request)
 					t_set_bit(_T_BIT_UDP_CHECKSUM, ss->options.flags);
 					if (!request)
 						continue;
+#if defined HAVE_KMEMB_STRUCT_SOCK_SK_NO_CHECK_TX && defined HAVE_KMEMB_STRUCT_SOCK_SK_NO_CHECK_RX
+					sk->sk_no_check_tx =
+					    (*valp == T_YES) ? 0 : 1;
+#else
 					sk->sk_no_check =
 					    (*valp == T_YES) ? UDP_CSUM_DEFAULT : UDP_CSUM_NOXMIT;
+#endif
 					continue;
 				}
 				}
@@ -4680,9 +4698,15 @@ ss_cmsg_build(const ss_t *ss, const unsigned char *ip, size_t ilen, struct msghd
 				switch (ih->name) {
 				case T_UDP_CHECKSUM:
 					if (ih->len == sizeof(*ih) + sizeof(t_uscalar_t)) {
+#if defined HAVE_KMEMB_STRUCT_SOCK_SK_NO_CHECK_TX && defined HAVE_KMEMB_STRUCT_SOCK_SK_NO_CHECK_RX
+						sk->sk_no_check_tx =
+						    *((t_uscalar_t *) T_OPT_DATA(ih)) ==
+						    T_NO ? 1 : 0;
+#else
 						sk->sk_no_check =
 						    *((t_uscalar_t *) T_OPT_DATA(ih)) ==
 						    T_NO ? UDP_CSUM_NOXMIT : UDP_CSUM_DEFAULT;
+#endif
 					}
 					continue;
 				}
@@ -10875,9 +10899,15 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 								goto einval;
 						}
 						t->options.udp.checksum = *valp;
+#if defined HAVE_KMEMB_STRUCT_SOCK_SK_NO_CHECK_TX && defined HAVE_KMEMB_STRUCT_SOCK_SK_NO_CHECK_RX
+						sk->sk_no_check_tx =
+						    (*valp ==
+						     T_YES) ? 0 : 1;
+#else
 						sk->sk_no_check =
 						    (*valp ==
 						     T_YES) ? UDP_CSUM_DEFAULT : UDP_CSUM_NOXMIT;
+#endif
 					}
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -15160,8 +15190,13 @@ ss_error_report(struct sock *sk)
  * Simply enable the read queue and chain the callback.  Note that if data ready is reported on an
  * open request child, then the read queue of the parent (listening stream) will be enabled.
  */
+#ifdef HAVE_KFUNC_SK_DATA_READY_1_ARG
+static __hot_in void
+ss_data_ready(struct sock *sk)
+#else
 static __hot_in void
 ss_data_ready(struct sock *sk, int len)
+#endif
 {
 	ss_conind_t *ci;
 
@@ -15186,7 +15221,11 @@ ss_data_ready(struct sock *sk, int len)
 			read_unlock(&ss_lock);
 			if (ss->cb_save.sk_data_ready) {
 				assert(ss->cb_save.sk_data_ready != ss_data_ready);
+#ifdef HAVE_KFUNC_SK_DATA_READY_1_ARG
+				ss->cb_save.sk_data_ready(sk);
+#else
 				ss->cb_save.sk_data_ready(sk, len);
+#endif
 			}
 		} else
 			assure(ss);

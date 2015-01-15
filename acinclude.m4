@@ -1238,6 +1238,8 @@ dnl----------------------------------------------------------------------------
 	struct sock.sk_debug,
 	struct sock.sk_localroute,
 	struct sock.tp_pinfo.af_sctp,
+	struct sock.sk_no_check_tx,
+	struct sock.sk_no_check_rx,
 	struct super_block.s_d_op,
 	struct super_block.s_fs_info,
 	struct super_block.s_time_gran,
@@ -2363,11 +2365,35 @@ ICMP_INC_STATS_BH(&my_autoconf_net, ICMP_MIB_INERRORS);]]) ],
 		    [linux_cv_icmp_inc_stats_bh_2_args='yes'],
 		    [linux_cv_icmp_inc_stats_bh_2_args='no'])
 	    ])
+	if test :"${linux_cv_icmp_inc_stats_bh_2_args:-no}" = :yes ; then
+	    AC_DEFINE([HAVE_ICMP_INC_STATS_BH_2_ARGS], [1], [Define if macro ICMP_INC_STATS_BH
+		       takes two arguments.])
+	fi
+	AC_CACHE_CHECK([for kernel DEFINE_SNMP_STAT defines array.], [linux_cv_define_snmp_stat_array], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
+#include NEED_LINUX_AUTOCONF_H
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <linux/snmp.h>]],
+		[[
+struct my_autoconf_mib_type { int dummy; } my_autoconf_mib;
+DEFINE_SNMP_STAT(struct my_autoconf_mib_type, my_autoconf_array);
+my_autoconf_array[0] = &my_autoconf_mib;]]) ],
+		    [linux_cv_define_snmp_stat_array=yes],
+		    [linux_cv_define_snmp_stat_array=no])
+	])
+	if test :$linux_cv_define_snmp_stat_array = :yes ; then
+	    AC_DEFINE([HAVE_DEFINE_SNMP_STAT_DEFINES_ARRAY], [1], [Define if macro
+		DEFINE_SNMP_STAT defines an array of pointers (it does not as
+		of 3.17.x or so).])
+	fi
     ])
-    if test :"${linux_cv_icmp_inc_stats_bh_2_args:-no}" = :yes ; then
-	AC_DEFINE([HAVE_ICMP_INC_STATS_BH_2_ARGS], [1], [Define if macro ICMP_INC_STATS_BH
-		   takes two arguments.])
-    fi
 dnl----------------------------------------------------------------------------
     _LINUX_KERNEL_ENV([dnl
 	if test :$linux_cv_inet_protos_symbol = :yes ; then
@@ -2433,6 +2459,37 @@ dnl----------------------------------------------------------------------------
 		AC_DEFINE([HAVE_XFRM_POLICY_DELETE_RETURNS_INT], [1], [Define if
 		    function xfrm_policy_delete returns int.])
 	    fi
+	fi
+	AC_CACHE_CHECK([for kernel sock.sk_data_ready takes 1 argument], [linux_cv_have_sk_data_ready_1_arg], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
+#include NEED_LINUX_AUTOCONF_H
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#ifdef HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/socket.h>
+#include <net/sock.h>
+#include <net/protocol.h>
+#include <net/inet_common.h>
+#ifdef HAVE_KINC_NET_XFRM_H
+#include <net/xfrm.h>
+#endif]],
+		    [[void (*my_autoconf_function_pointer)(struct sock *) = NULL;
+		      struct sock my_autoconf_sock = { .sk_data_ready = my_autoconf_function_pointer, };]]) ],
+		    [linux_cv_have_sk_data_ready_1_arg=yes],
+		    [linux_cv_have_sk_data_ready_1_arg=no])
+	])
+	if test :$linux_cv_have_sk_data_ready_1_arg = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_SK_DATA_READY_1_ARG], [1], [Define if function
+		sock.sk_data_ready takes 1 argument.])
 	fi
 	if test :${linux_cv_func___ip_select_ident} = :yes
 	then

@@ -30316,21 +30316,33 @@ sctp_notifier(struct notifier_block *self, unsigned long msg, void *data)
 
 #ifdef CONFIG_PROC_FS
 
-#if defined HAVE_KINC_LINUX_PERCPU_H && !defined SNMP_ARRAY_SZ
+#if defined HAVE_KINC_LINUX_PERCPU_H
 STATIC void
 sctp_init_stats(void)
 {
+#ifdef HAVE_DEFINE_SNMP_STAT_DEFINES_ARRAY
 	sctp_statistics[0] = alloc_percpu(struct sctp_mib);
+#if !defined SNMP_ARRAY_SZ || SNMP_ARRAY_SZ > 1
 	sctp_statistics[1] = alloc_percpu(struct sctp_mib);
+#endif
+#else
+	sctp_statistics = alloc_percpu(struct sctp_mib);
+#endif
 }
 
 STATIC void
 sctp_term_stats(void)
 {
+#ifdef HAVE_DEFINE_SNMP_STAT_DEFINES_ARRAY
+#if !defined SNMP_ARRAY_SZ || SNMP_ARRAY_SZ > 1
 	free_percpu(sctp_statistics[1]);
+#endif
 	free_percpu(sctp_statistics[0]);
+#else
+	free_percpu(sctp_statistics);
+#endif
 }
-#endif				/* defined HAVE_KINC_LINUX_PERCPU_H && !defined SNMP_ARRAY_SZ */
+#endif				/* defined HAVE_KINC_LINUX_PERCPU_H */
 
 #endif				/* CONFIG_PROC_FS */
 
@@ -30467,9 +30479,9 @@ sctp_init(void)
 	sctp_init_protosw();
 	/* TODO: adjust buffer size sysctls, port ranges and other parameters based on dynamic
 	   allocations.  */
-#if defined HAVE_KINC_LINUX_PERCPU_H && !defined SNMP_ARRAY_SZ
+#if defined HAVE_KINC_LINUX_PERCPU_H
 	sctp_init_stats();
-#endif				/* defined HAVE_KINC_LINUX_PERCPU_H && !defined SNMP_ARRAY_SZ */
+#endif				/* defined HAVE_KINC_LINUX_PERCPU_H */
 	return (0);
 }
 
@@ -30481,9 +30493,9 @@ sctp_exit(void)
 {
 	int err;
 
-#if defined HAVE_KINC_LINUX_PERCPU_H && !defined SNMP_ARRAY_SZ
+#if defined HAVE_KINC_LINUX_PERCPU_H
 	sctp_term_stats();
-#endif				/* defined HAVE_KINC_LINUX_PERCPU_H && !defined SNMP_ARRAY_SZ */
+#endif				/* defined HAVE_KINC_LINUX_PERCPU_H */
 	sctp_term_protosw();
 	sctp_term_proto();
 #ifdef SCTP_CONFIG_ADD_IP

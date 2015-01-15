@@ -124,7 +124,7 @@ EXPORT_SYMBOL_GPL(sysctl_str_lowat);
 
 STATIC struct ctl_table_header *streams_sysctl_handle;
 
-STATIC ctl_table streams_table[] = {
+STATIC struct ctl_table streams_table[] = {
 	/* stream head default maximum packet size */
 	{
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
@@ -560,7 +560,7 @@ STATIC ctl_table streams_table[] = {
 	{0}
 };
 
-STATIC ctl_table streams_root_table[] = {
+STATIC struct ctl_table streams_root_table[] = {
 	{
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
 	 CTL_STREAMS,
