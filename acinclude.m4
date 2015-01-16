@@ -2491,6 +2491,30 @@ dnl----------------------------------------------------------------------------
 	    AC_DEFINE([HAVE_KFUNC_SK_DATA_READY_1_ARG], [1], [Define if function
 		sock.sk_data_ready takes 1 argument.])
 	fi
+	AC_CACHE_CHECK([for kernel sk_buff.network_header is an offset], [linux_cv_have_sk_buff_network_header_offset], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
+#include NEED_LINUX_AUTOCONF_H
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/inet.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <linux/skbuff.h>]],
+		[[struct sk_buff my_autoconf_sk_buff = { .network_header = 1, };]]) ],
+		[linux_cv_have_sk_buff_network_header_offset=yes],
+		[linux_cv_have_sk_buff_network_header_offset=no])
+	])
+	if test :$linux_cv_have_sk_buff_network_header_offset = :yes ; then
+	    AC_DEFINE([HAVE_SK_BUFF_NETWORK_HEADER_OFFSET], [1], [Define if member
+		network_header of struct sk_buff is an offset instead of a pointer.])
+	fi
 	if test :${linux_cv_func___ip_select_ident} = :yes
 	then
 	AC_CACHE_CHECK([for kernel __ip_select_ident with 2 arguments], [linux_cv_have___ip_select_ident_2_args], [dnl

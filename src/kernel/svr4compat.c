@@ -208,7 +208,11 @@ EXPORT_SYMBOL(MPSTR_STPRELE);	/* svr4/ddi.h */
 __SVR4_EXTERN_INLINE toid_t dtimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl,
 				     processorid_t processor);
 EXPORT_SYMBOL(dtimeout);	/* svr4/ddi.h */
-__SVR4_EXTERN_INLINE toid_t itimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl);
+__SVR4_EXTERN toid_t
+itimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl)
+{
+	return __timeout(NULL, timo_fcn, arg, ticks, pl, smp_processor_id());
+}
 
 EXPORT_SYMBOL(itimeout);	/* svr4/ddi.h */
 

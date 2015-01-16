@@ -5643,7 +5643,7 @@ sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, mblk_t *mp)
 			iph->protocol = 132;
 			iph->tot_len = htons(tlen);
 #if defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
-#if defined NET_SKBUFF_DATA_USES_OFFSET
+#if defined NET_SKBUFF_DATA_USES_OFFSET || defined HAVE_SK_BUFF_NETWORK_HEADER_OFFSET
 			skb->network_header = (unsigned char *) iph - skb->head;
 #else				/* defined NET_SKBUFF_DATA_USES_OFFSET */
 			skb->network_header = (void *) iph;
@@ -5767,7 +5767,7 @@ sctp_xmit_msg(uint32_t saddr, uint32_t daddr, mblk_t *mp, struct sctp *sp)
 			iph->protocol = sp->protocol;
 			iph->tot_len = htons(tlen);
 #if defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
-#if defined NET_SKBUFF_DATA_USES_OFFSET
+#if defined NET_SKBUFF_DATA_USES_OFFSET || defined HAVE_SK_BUFF_NETWORK_HEADER_OFFSET
 			skb->network_header = (unsigned char *) iph - skb->head;
 #else				/* defined NET_SKBUFF_DATA_USES_OFFSET */
 			skb->network_header = (void *) iph;
@@ -5932,7 +5932,7 @@ sctp_send_msg(struct sctp *sp, struct sctp_daddr *sd, mblk_t *mp)
 		iph->protocol = sp->protocol;
 		iph->tot_len = htons(tlen);
 #if defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
-#if defined NET_SKBUFF_DATA_USES_OFFSET
+#if defined NET_SKBUFF_DATA_USES_OFFSET || defined HAVE_SK_BUFF_NETWORK_HEADER_OFFSET
 		skb->network_header = (unsigned char *) iph - skb->head;
 #else				/* defined NET_SKBUFF_DATA_USES_OFFSET */
 		skb->network_header = (void *) iph;

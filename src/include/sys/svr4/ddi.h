@@ -147,11 +147,7 @@ dtimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl, processorid_t p
 {
 	return __timeout(NULL, timo_fcn, arg, ticks, pl, processor);
 }
-__SVR4_EXTERN_INLINE toid_t
-itimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl)
-{
-	return __timeout(NULL, timo_fcn, arg, ticks, pl, smp_processor_id());
-}
+__SVR4_EXTERN toid_t itimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl);
 
 __SVR4_EXTERN_INLINE major_t
 getemajor(dev_t dev)

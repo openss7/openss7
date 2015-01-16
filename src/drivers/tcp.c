@@ -4596,7 +4596,7 @@ t_tpi_xmitmsg(queue_t *q, mblk_t *dp, struct sockaddr_in *sin, struct tpi_option
 			iph->protocol = IPPROTO_TCP;
 			iph->tot_len = htons(tlen);
 #if defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
-#if defined NET_SKBUFF_DATA_USES_OFFSET
+#if defined NET_SKBUFF_DATA_USES_OFFSET || defined HAVE_SK_BUFF_NETWORK_HEADER_OFFSET
 			skb->network_header = (unsigned char *) iph - skb->head;
 #else				/* defined NET_SKBUFF_DATA_USES_OFFSET */
 			skb->network_header = (void *) iph;
