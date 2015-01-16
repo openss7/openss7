@@ -72,6 +72,7 @@
 #endif				/* __KERNEL__ */
 
 #include <linux/compiler.h>
+#include <linux/prefetch.h>
 
 /*
  *  Kernel 2.4, 2.6 module compatibility.
