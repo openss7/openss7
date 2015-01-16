@@ -3241,13 +3241,13 @@ important intricacies should be considered:
 
    * The 'gcc' command line must include several important files
      directly on the command line, such as, '--include
-     /lib/modules/3.17.6-1-ARCH/build/include/linux/autoconf.h' and
+     /lib/modules/3.18.2-2-ARCH/build/include/linux/autoconf.h' and
      '--include
-     /lib/modules/3.17.6-1-ARCH/build/include/linux/modversions.h'.(1)
+     /lib/modules/3.18.2-2-ARCH/build/include/linux/modversions.h'.(1)
 
    ---------- Footnotes ----------
 
-   (1) The kernel version, '3.17.6-1-ARCH', is just an example.  For the
+   (1) The kernel version, '3.18.2-2-ARCH', is just an example.  For the
 running kernel, use the output of 'uname -r'.
 
 4.3.1 Kernel Module Building
@@ -8145,7 +8145,7 @@ architecture and kernel version.  If your architecture or kernel version
 is not available, you can build binary RPM from the source RPM (see
 *note Building from the Source RPM::).(1)
 
-'openss7-3.17.6-1-ARCH-1.1.7.20150115-1.x86_64.rpm'
+'openss7-3.18.2-2-ARCH-1.1.7.20150115-1.x86_64.rpm'
 
      The 'openss7-kernel' binary package contains the kernel modules
      that provide the Linux kernel Linux Fast-STREAMS drivers and
@@ -8154,7 +8154,7 @@ is not available, you can build binary RPM from the source RPM (see
      This binary package also includes modprobe configuration files for
      the associated kernel modules.  This package is heavily tied to the
      kernel for which it and dependent components were compiled.  This
-     package applies to kernel version 3.17.6-1-ARCH and requires
+     package applies to kernel version 3.18.2-2-ARCH and requires
      components compiled for the same kernel.  If you cannot find a
      binary package that matches your kernel, rebuild for your kernel
      from the OpenSS7 package source rpm.
@@ -8164,19 +8164,19 @@ is not available, you can build binary RPM from the source RPM (see
      will also be installed if necessary.  When removing the last kernel
      module package, the 'openss7' package will also be removed.
 
-     Note that the version '3.17.6-1-ARCH' is just an example.  Use the
+     Note that the version '3.18.2-2-ARCH' is just an example.  Use the
      version returned by '$(uname -r)' for the kernel for which you wish
      to install or remove the packages.
 
-'openss7-devel-3.17.6-1-ARCH-1.1.7.20150115-1.x86_64.rpm'
+'openss7-devel-3.18.2-2-ARCH-1.1.7.20150115-1.x86_64.rpm'
 
-     The 'openss7-devel-3.17.6-1-ARCH' binary package contains the
+     The 'openss7-devel-3.18.2-2-ARCH' binary package contains the
      kernel modules symbol information for development of additional
      Linux Fast-STREAMS kernel modules against the core kernel modules
-     included in the 'openss7-3.17.6-1-ARCH' binary package.  This
+     included in the 'openss7-3.18.2-2-ARCH' binary package.  This
      package is heavily tied to the core kernel modules and kernel for
      which it was compiled.  This package applies to core kernel modules
-     '3.17.6-1-ARCH' for kernel version '3.17.6-1-ARCH'.  This package
+     '3.18.2-2-ARCH' for kernel version '3.18.2-2-ARCH'.  This package
      provides kernel debug information for the OpenSS7 package.  Kernel
      debug information is useful when developing kernel modules that use
      this package or when debugging kernel modules contained in the
@@ -8189,40 +8189,40 @@ is not available, you can build binary RPM from the source RPM (see
      modules for the last kernel, the 'openss7-devel' package will also
      be removed.
 
-     Note that the version '3.17.6-1-ARCH' is just an example.  Use the
+     Note that the version '3.18.2-2-ARCH' is just an example.  Use the
      version returned by '$(uname -r)' for the kernel for which you wish
      to install or remove the packages.
 
-     The 'openss7-devel-3.17.6-1-ARCH' package contains the module
+     The 'openss7-devel-3.18.2-2-ARCH' package contains the module
      symbol version information for the 'kernel' package, above.  It is
      possible to load this package and compile modules that use the
      exported symbols without loading the actual kernel modules (from
      the 'kernel' package above).  This package is heavily tied to the
      kernel for which it was compiled.  This particular package applies
-     to kernel version '3.17.6-1-ARCH'.(2)
+     to kernel version '3.18.2-2-ARCH'.(2)
 
-'openss7-debuginfo-3.17.6-1-ARCH-1.1.7.20150115-1.x86_64.rpm'
+'openss7-debuginfo-3.18.2-2-ARCH-1.1.7.20150115-1.x86_64.rpm'
 
-'openss7-debugsource-3.17.6-1-ARCH-1.1.7.20150115-1.x86_64.rpm'
+'openss7-debugsource-3.18.2-2-ARCH-1.1.7.20150115-1.x86_64.rpm'
 
-'openss7-source-3.17.6-1-ARCH-1.1.7.20150115-1.x86_64.rpm'
+'openss7-source-3.18.2-2-ARCH-1.1.7.20150115-1.x86_64.rpm'
 
-     The 'openss7-source-3.17.6-1-ARCH' package contains the configured
+     The 'openss7-source-3.18.2-2-ARCH' package contains the configured
      source for a specific kernel.  This package contains source that is
      configured to the kernel for which it was configured.  This
      particular package contains configured source for kernel version
-     '3.17.6-1-ARCH'(3) The 'openss7-source' package contains the source
+     '3.18.2-2-ARCH'(3) The 'openss7-source' package contains the source
      code necessary for building the OpenSS7 release.  It includes the
      'autoconf(1)' configuration utilities necessary to create and
      distribute tarballs, 'rpm' and 'deb'/'dsc'.
 
-     The 'openss7-source-3.17.6-1-ARCH' binary package contains the
+     The 'openss7-source-3.18.2-2-ARCH' binary package contains the
      source code necessary for building the OpenSS7 release for the
-     kernel version '3.17.6-1-ARCH'.  It also includes the 'autoconf(1)'
+     kernel version '3.18.2-2-ARCH'.  It also includes the 'autoconf(1)'
      configuration utilities necessary to create and distribute this
      rpm.  However, to develop on the package, it would be better to use
      the tarball release.  Load this package if you need some files from
-     the build that are not present in the 'openss7-devel-3.17.6-1-ARCH'
+     the build that are not present in the 'openss7-devel-3.18.2-2-ARCH'
      package.
 
 Configuration and Installation
@@ -8239,9 +8239,9 @@ placed in i586 architecture packages regardless of the true processor
 architecture of the kernel package.  'configure' detects this and builds
 the appropriate packages.
 
-   (2) Note that the '_kversion' of '3.17.6-1-ARCH' is only an example.
+   (2) Note that the '_kversion' of '3.18.2-2-ARCH' is only an example.
 
-   (3) Note that the '_kversion' of '3.17.6-1-ARCH' is only an example.
+   (3) Note that the '_kversion' of '3.18.2-2-ARCH' is only an example.
 
 7.2.6 Downloading the Debian DEB
 --------------------------------
@@ -8327,20 +8327,20 @@ architecture and kernel version.  If your architecture or kernel version
 is not on the list, you can build binary DEB from the source DEB (see
 *note Building from the Debian DSC::).(2)
 
-openss7-core-3.17.6-1-ARCH_1.1.7.20150115-0_i386.deb
+openss7-core-3.18.2-2-ARCH_1.1.7.20150115-0_i386.deb
      The 'openss7-core' package contains the loadable kernel modules
      that depend only on the kernel.  This package is heavily tied to
      the kernel for which it was compiled.  This particular package
-     applies to kernel version '3.17.6-1-ARCH'.(3)
+     applies to kernel version '3.18.2-2-ARCH'.(3)
 
-openss7-info-3.17.6-1-ARCH_1.1.7.20150115-0_i386.deb
+openss7-info-3.18.2-2-ARCH_1.1.7.20150115-0_i386.deb
      The 'openss7-info' package(4) contains the module symbol version
      information for the 'core' subpackage, above.  It is possible to
      load this subpackage and compile modules that use the exported
      symbols without loading the actual kernel modules (from the 'core'
      subpackage above).  This package is heavily tied to the kernel for
      which it was compiled.  This particular package applies to kernel
-     version '3.17.6-1-ARCH'.(5)
+     version '3.18.2-2-ARCH'.(5)
 
 Configuration and Installation
 ..............................
@@ -8360,7 +8360,7 @@ placed in i586 architecture packages regardless of the true processor
 architecture of the kernel package.  'configure' detects this and builds
 the appropriate packages.
 
-   (3) Note that the '_kversion' of '3.17.6-1-ARCH' is only an example.
+   (3) Note that the '_kversion' of '3.18.2-2-ARCH' is only an example.
 Note also that only release packages that contain kernel modules will
 contain a 'core' subpackage.
 
@@ -8369,7 +8369,7 @@ that export versioned symbols will contain a 'info' subpackage.  Also,
 this subpackage is only applicable to 2.4 series kernels and is not
 necessary and not built for 2.6 or 3.x series kernels.
 
-   (5) Note that the '_kversion' of '3.17.6-1-ARCH' is only an example.
+   (5) Note that the '_kversion' of '3.18.2-2-ARCH' is only an example.
 
 7.2.7 Downloading the Source RPM
 --------------------------------
@@ -8637,13 +8637,13 @@ during installation it is possible to relocate some of the installation
 directories.  This allows some degree of customization.  Relocations
 that are available on the binary RPM are as follows:
 
-'openss7-core-3.17.6-1-ARCH-1.1.7.20150115-1.i686.rpm'
-     '/lib/modules/3.17.6-1-ARCH'
+'openss7-core-3.18.2-2-ARCH-1.1.7.20150115-1.i686.rpm'
+     '/lib/modules/3.18.2-2-ARCH'
           This relocatable directory contains the kernel modules that
           provide the OpenSS7 core, drivers and modules.(1)
 
-'openss7-info-3.17.6-1-ARCH-1.1.7.20150115-1.i686.rpm'
-     '/usr/include/openss7/3.17.6-1-ARCH'
+'openss7-info-3.18.2-2-ARCH-1.1.7.20150115-1.i686.rpm'
+     '/usr/include/openss7/3.18.2-2-ARCH'
           This relocatable directory contains the kernel module exported
           symbol information that allows other kernel modules to be
           compiled against the correct version of the openss7
@@ -8702,9 +8702,9 @@ To install the binary RPM, *note Installing the Binary RPM::.
 
    ---------- Footnotes ----------
 
-   (1) Note that the '_kversion' of '3.17.6-1-ARCH' is only an example.
+   (1) Note that the '_kversion' of '3.18.2-2-ARCH' is only an example.
 
-   (2) Note that the '_kversion' of '3.17.6-1-ARCH' is only an example.
+   (2) Note that the '_kversion' of '3.18.2-2-ARCH' is only an example.
 Also, note that the 'info' subpackage is only applicable to the 2.4
 kernel series.
 
@@ -11235,10 +11235,10 @@ RPM::.  These options are provided on the 'rpm(8)' command line.  For
 example:
 
      % rpmbuild --rebuild -vv --target athlon-redhat-linux \
-       --define "_kversion 3.17.6-1-ARCH" \
+       --define "_kversion 3.18.2-2-ARCH" \
        -- openss7-1.1.7.20150115-1.src.rpm
 
-will rebuild binary RPM for the '3.17.6-1-ARCH' kernel for the 'athlon'
+will rebuild binary RPM for the '3.18.2-2-ARCH' kernel for the 'athlon'
 architecture.  (1)
 
 Installation
@@ -11248,7 +11248,7 @@ To install the resulting binary RPM, *note Installing the Binary RPM::.
 
    ---------- Footnotes ----------
 
-   (1) Note that the '_kversion' of '3.17.6-1-ARCH' is only an example.
+   (1) Note that the '_kversion' of '3.18.2-2-ARCH' is only an example.
 
 7.4.2 Building from the Debian DSC
 ----------------------------------
@@ -11271,12 +11271,12 @@ BUILD_DPKGOPTIONS and have the same form as the options to 'configure',
 *note Configuring the Tar Ball::.  For example:
 
      % BUILD_DEBOPTIONS='
-             --with-k-release=3.17.6-1-ARCH
+             --with-k-release=3.18.2-2-ARCH
              --host=athlon-debian-linux-gnu'
        dpkg-buildpackage -v \
        openss7_1.1.7.20150115-0.dsc
 
-will rebuild binary DEB for the '3.17.6-1-ARCH' kernel for the 'athlon'
+will rebuild binary DEB for the '3.18.2-2-ARCH' kernel for the 'athlon'
 architecture.  (1)
 
 Installation
@@ -11286,7 +11286,7 @@ To install the resulting binary DEB, *note Installing the Debian DEB::.
 
    ---------- Footnotes ----------
 
-   (1) Note that the '_kversion' of '3.17.6-1-ARCH' is only an example.
+   (1) Note that the '_kversion' of '3.18.2-2-ARCH' is only an example.
 
 7.4.3 Building from the Tar Ball
 --------------------------------
@@ -11362,10 +11362,10 @@ To add an additional 'OpenSS7' kernel run-time component to the
 installation, use (one of):
 
      % sudo yum install openss7-$(uname -r)
-     % sudo yum install openss7-3.17.6-1-ARCH
+     % sudo yum install openss7-3.18.2-2-ARCH
 
 Here, '$(uname -r)' is simply a way of specifying the running kernel.
-The value '3.17.6-1-ARCH' is just an example.  Use the specific kernel
+The value '3.18.2-2-ARCH' is just an example.  Use the specific kernel
 version that you want to add to the installation.
 
 To install the 'OpenSS7' development components for a single-kernel
@@ -11379,10 +11379,10 @@ To add an additional 'OpenSS7' kernel development component to the
 installation, use (one of):
 
      % sudo yum install openss7-devel-$(uname -r)
-     % sudo yum install openss7-devel-3.17.6-1-ARCH
+     % sudo yum install openss7-devel-3.18.2-2-ARCH
 
 Here, '$(uname -r)' is simply a way of specifying the running kernel.
-The value '3.17.6-1-ARCH' is just an example.  Use the specific kernel
+The value '3.18.2-2-ARCH' is just an example.  Use the specific kernel
 version that you want to add to the installation.
 
 To add 'OpenSS7' development documentation, use (one of):
@@ -11420,10 +11420,10 @@ To add an additional 'OpenSS7' kernel run-time component to the
 installation, use (one of):
 
      % sudo zypper install openss7-$(uname -r)
-     % sudo zypper install openss7-3.17.6-1-ARCH
+     % sudo zypper install openss7-3.18.2-2-ARCH
 
 Here, '$(uname -r)' is simply a way of specifying the running kernel.
-The value '3.17.6-1-ARCH' is just an example.  Use the specific kernel
+The value '3.18.2-2-ARCH' is just an example.  Use the specific kernel
 version that you want to add to the installation.
 
 To install the 'OpenSS7' development components for a single-kernel
@@ -11436,10 +11436,10 @@ To add an additional 'OpenSS7' kernel development component to the
 installation, use (one of):
 
      % sudo zypper install openss7-devel-$(uname -r)
-     % sudo zypper install openss7-devel-3.17.6-1-ARCH
+     % sudo zypper install openss7-devel-3.18.2-2-ARCH
 
 Here, '$(uname -r)' is simply a way of specifying the running kernel.
-The value '3.17.6-1-ARCH' is just an example.  Use the specific kernel
+The value '3.18.2-2-ARCH' is just an example.  Use the specific kernel
 version that you want to add to the installation.
 
 To add 'OpenSS7' development documentation, use (one of):
@@ -11474,10 +11474,10 @@ To add an additional 'OpenSS7' kernel run-time component to the
 installation, use (one of):
 
      % sudo urpmi openss7-$(uname -r)
-     % sudo urpmi openss7-3.17.6-1-ARCH
+     % sudo urpmi openss7-3.18.2-2-ARCH
 
 Here, '$(uname -r)' is simply a way of specifying the running kernel.
-The value '3.17.6-1-ARCH' is just an example.  Use the specific kernel
+The value '3.18.2-2-ARCH' is just an example.  Use the specific kernel
 version that you want to add to the installation.
 
 To install the 'OpenSS7' development components for a single-kernel
@@ -11491,7 +11491,7 @@ installation, use (one of):
      % sudo urpmi openss7-devel-$(uname -r)
 
 Here, '$(uname -r)' is simply a way of specifying the running kernel.
-The value '3.17.6-1-ARCH' is just an example.  Use the specific kernel
+The value '3.18.2-2-ARCH' is just an example.  Use the specific kernel
 version that you want to add to the installation.
 
 To add 'OpenSS7' development documentation, use (one of):
@@ -11527,12 +11527,12 @@ To add an additional 'OpenSS7' kernel run-time component to the
 installation, use (one of):
 
      % sudo apt-get install openss7-$(uname -r)
-     % sudo apt-get install openss7-3.17.6-1-ARCH
+     % sudo apt-get install openss7-3.18.2-2-ARCH
      % sudo aptitude install openss7-$(uname -r)
-     % sudo aptitude install openss7-3.17.6-1-ARCH
+     % sudo aptitude install openss7-3.18.2-2-ARCH
 
 Here, '$(uname -r)' is simply a way of specifying the running kernel.
-The value '3.17.6-1-ARCH' is just an example.  Use the specific kernel
+The value '3.18.2-2-ARCH' is just an example.  Use the specific kernel
 version that you want to add to the installation.
 
 To install the 'OpenSS7' development components for a single-kernel
@@ -11548,7 +11548,7 @@ installation, use (one of):
      % sudo aptitude install openss7-devel-$(uname -r)
 
 Here, '$(uname -r)' is simply a way of specifying the running kernel.
-The value '3.17.6-1-ARCH' is just an example.  Use the specific kernel
+The value '3.18.2-2-ARCH' is just an example.  Use the specific kernel
 version that you want to add to the installation.
 
 To add 'OpenSS7' development documentation, use (one of):
@@ -11660,10 +11660,10 @@ To remove the 'OpenSS7' run-time components for a specific kernel, use
 (one of):
 
      $> sudo yum remove openss7-$(uname -r)
-     $> sudo yum remove openss7-3.17.6-1-ARCH
+     $> sudo yum remove openss7-3.18.2-2-ARCH
 
 Where, '$(uname -r)' will remove for the running kernel.
-'3.17.6-1-ARCH' is just an example.  Note also that 'OpenSS7' does not
+'3.18.2-2-ARCH' is just an example.  Note also that 'OpenSS7' does not
 install a kernel package for each and every kernel version, nor is it
 normally necessary.  When the kernel run-time being removed is the last
 kernel run-time, the remainder of the 'OpenSS7' components will also be
@@ -11679,10 +11679,10 @@ To remove the 'OpenSS7' development components for a specific kernel,
 use (one of):
 
      $> sudo yum remove openss7-develop-$(uname -r)
-     $> sudo yum remove openss7-develop-3.17.6-1-ARCH
+     $> sudo yum remove openss7-develop-3.18.2-2-ARCH
 
 Where, '$(uname -r)' will remove for the running kernel.
-'3.17.6-1-ARCH' is just an example.  When the kernel development
+'3.18.2-2-ARCH' is just an example.  When the kernel development
 component being removed is the last kernel development component, the
 remainder of the 'OpenSS7' development components will also be removed.
 
@@ -11712,10 +11712,10 @@ To remove the 'OpenSS7' run-time components for a specific kernel, use
 (one of):
 
      $> sudo zypper remove openss7-$(uname -r)
-     $> sudo zypper remove openss7-3.17.6-1-ARCH
+     $> sudo zypper remove openss7-3.18.2-2-ARCH
 
 Where, '$(uname -r)' will remove for the running kernel.
-'3.17.6-1-ARCH' is just an example.  Note also that 'OpenSS7' does not
+'3.18.2-2-ARCH' is just an example.  Note also that 'OpenSS7' does not
 install a kernel package for each and every kernel version, nor is it
 normally necessary.  When the kernel run-time being removed is the last
 kernel run-time, the remainder of the 'OpenSS7' components will also be
@@ -11729,10 +11729,10 @@ To remove the 'OpenSS7' development components for a specific kernel,
 use (one of):
 
      $> sudo zypper remove openss7-develop-$(uname -r)
-     $> sudo zypper remove openss7-develop-3.17.6-1-ARCH
+     $> sudo zypper remove openss7-develop-3.18.2-2-ARCH
 
 Where, '$(uname -r)' will remove for the running kernel.
-'3.17.6-1-ARCH' is just an example.  When the kernel development
+'3.18.2-2-ARCH' is just an example.  When the kernel development
 component being removed is the last kernel development component, the
 remainder of the 'OpenSS7' development components will also be removed.
 
@@ -11759,10 +11759,10 @@ To remove the 'OpenSS7' run-time components for a specific kernel, use
 (one of):
 
      $> sudo urpme openss7-$(uname -r)
-     $> sudo urpme openss7-3.17.6-1-ARCH
+     $> sudo urpme openss7-3.18.2-2-ARCH
 
 Where, '$(uname -r)' will remove for the running kernel.
-'3.17.6-1-ARCH' is just an example.  Note also that 'OpenSS7' does not
+'3.18.2-2-ARCH' is just an example.  Note also that 'OpenSS7' does not
 install a kernel package for each and every kernel version, nor is it
 normally necessary.  When the kernel run-time being removed is the last
 kernel run-time, the remainder of the 'OpenSS7' components will also be
@@ -11776,10 +11776,10 @@ To remove the 'OpenSS7' development components for a specific kernel,
 use (one of):
 
      $> sudo urpme openss7-develop-$(uname -r)
-     $> sudo urpme openss7-develop-3.17.6-1-ARCH
+     $> sudo urpme openss7-develop-3.18.2-2-ARCH
 
 Where, '$(uname -r)' will remove for the running kernel.
-'3.17.6-1-ARCH' is just an example.  When the kernel development
+'3.18.2-2-ARCH' is just an example.  When the kernel development
 component being removed is the last kernel development component, the
 remainder of the 'OpenSS7' development components will also be removed.
 
@@ -11909,9 +11909,9 @@ When OpenSS7 installs, modules and drivers belonging to release packages
 are normally configured for demand loading.  The 'install' and
 'install-strip' 'automake(1)' targets will make the necessary changes to
 the '/etc/modules.conf' file and place the modules in an appropriate
-place in '/lib/modules/3.17.6-1-ARCH/openss7'.  The 'make install'
+place in '/lib/modules/3.18.2-2-ARCH/openss7'.  The 'make install'
 process should have copied the kernel module files 'streams-*.o' to the
-directory '/lib/modules/3.17.6-1-ARCH/openss7'.  This means that to load
+directory '/lib/modules/3.18.2-2-ARCH/openss7'.  This means that to load
 any of these modules, you can simply execute, for example, 'modprobe
 stream-SOMEDRIVER'.(1)
 
@@ -11923,8 +11923,8 @@ new 'kmod' mechanisms for demand loading kernel modules.
 
 The convention for 'openss7' kernel loadable object files is:
    * Their name start with "streams-".
-   * They are placed in '/lib/modules/3.17.6-1-ARCH/streams/', where
-     '3.17.6-1-ARCH' is an example kernel version.
+   * They are placed in '/lib/modules/3.18.2-2-ARCH/streams/', where
+     '3.18.2-2-ARCH' is an example kernel version.
 
 If your kernel has been built using the 'kerneld' daemon, then 'OpenSS7'
 kernel modules will automatically load as soon as the STREAMS module is
@@ -11955,7 +11955,7 @@ module loading under 'Linux Fast-STREAMS', *Note About This Manual:
 
    ---------- Footnotes ----------
 
-   (1) Note that the '_kversion' of '3.17.6-1-ARCH' is only an example.
+   (1) Note that the '_kversion' of '3.18.2-2-ARCH' is only an example.
 
 7.8 Maintenance
 ===============
@@ -14768,7 +14768,7 @@ Index of Concepts
 * NPI interface conformance:             NPI Interface Conformance.
                                                             (line  3582)
 * objective:                             Objective.         (line  1087)
-* openss7-core-3.17.6-1-ARCH-1.1.7.20150115-1.i686.rpm: Configuring the Binary RPM.
+* openss7-core-3.18.2-2-ARCH-1.1.7.20150115-1.i686.rpm: Configuring the Binary RPM.
                                                             (line  8640)
 * openss7-dev-1.1.7.20150115-1.i686.rpm: Configuring the Binary RPM.
                                                             (line  8652)
@@ -14776,7 +14776,7 @@ Index of Concepts
                                                             (line  8655)
 * openss7-doc-1.1.7.20150115-1.i686.rpm: Configuring the Binary RPM.
                                                             (line  8661)
-* openss7-info-3.17.6-1-ARCH-1.1.7.20150115-1.i686.rpm: Configuring the Binary RPM.
+* openss7-info-3.18.2-2-ARCH-1.1.7.20150115-1.i686.rpm: Configuring the Binary RPM.
                                                             (line  8645)
 * openss7-lib-1.1.7.20150115-1.i686.rpm: Configuring the Binary RPM.
                                                             (line  8672)
@@ -15211,7 +15211,7 @@ Index of Files and Programs
 * /etc/init.d/streams.sh:                Utilities.         (line  2396)
 * /etc/init.d/strerr:                    Utilities.         (line  2425)
 * /etc/init.d/strerr.sh:                 Utilities.         (line  2426)
-* /lib/modules/3.17.6-1-ARCH/streams/:   Loading.           (line 11926)
+* /lib/modules/3.18.2-2-ARCH/streams/:   Loading.           (line 11926)
 * openss7:                               Utilities.         (line  2413)
 * openss7.sh:                            Utilities.         (line  2414)
 * specfs:                                Utilities.         (line  2380)
