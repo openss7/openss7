@@ -2,10 +2,10 @@
 
 _update_sock2path() {
     local s2pa_fil s2pa_dir s2pa_tmp found files f
-    echo ">>> Updating etc/sock2path..." >&2
-    s2pa_fil=etc/sock2path
-    s2pa_dir=etc/sock2path.d
-    s2pa_tmp=var/tmp/sock2path.tmp.$$
+    echo ">>> Updating /etc/sock2path..." >&2
+    s2pa_fil=/etc/sock2path
+    s2pa_dir=/etc/sock2path.d
+    s2pa_tmp=/var/tmp/sock2path.tmp.$$
     found=no
     files="$s2pa_dir/*"
     (   echo '# Generated from sock2path.d by openss7'

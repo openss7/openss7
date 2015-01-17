@@ -2,20 +2,20 @@
 
 _install_snmpconf() {
     local snmp_fil snmp_dir snmp_lcl snmp_tmp wrote_one changed_local files f
-    echo ">>> Updating ${rootdir}/etc/snmp/snmpd.conf..." >&2
-    snmp_fil=${rootdir}/etc/snmp/snmpd.local.conf
-    snmp_dir=${rootdir}/etc/snmp/snmp.d
-    snmp_lcl=${rootdir}/etc/snmp/snmp.d/00local
-    snmp_tmp=${tmppath:-/var/tmp}/snmpd.local.conf.tmp.$$
+    echo ">>> Updating /etc/snmp/snmpd.conf..." >&2
+    snmp_fil=/etc/snmp/snmpd.local.conf
+    snmp_dir=/etc/snmp/snmp.d
+    snmp_lcl=/etc/snmp/snmp.d/00local
+    snmp_tmp=/var/tmp/snmpd.local.conf.tmp.$$
     wrote_one=no
     changed_local=no
     files="$snmp_dir/*"
-    if [ ! -e ${rootdir}/etc/snmp/snmpd.conf -a -e ${rootdir}/etc/snmpd.conf ]; then
-	ln -L ${rootdir}/etc/snmpd.conf ${rootdir}/etc/snmp/snmpd.conf
-	touch ${rootdir}/etc/snmpd.local.conf
+    if [ ! -e /etc/snmp/snmpd.conf -a -e /etc/snmpd.conf ]; then
+	ln -L /etc/snmpd.conf /etc/snmp/snmpd.conf
+	touch /etc/snmpd.local.conf
     fi
-    if [ ! -e ${rootdir}/etc/snmp/snmpd.local.conf -a -e ${rootdir}/etc/snmpd.local.conf ]; then
-	ln -L ${rootdir}/etc/snmpd.local.conf ${rootdir}/etc/snmp/snmpd.conf
+    if [ ! -e /etc/snmp/snmpd.local.conf -a -e /etc/snmpd.local.conf ]; then
+	ln -L /etc/snmpd.local.conf $etc/snmp/snmpd.conf
     fi
     if [ -s $snmp_fil ]; then
 	if ! grep '^# Generated from snmp.d' $snmp_fil >/dev/null 2>&1; then
@@ -64,6 +64,7 @@ _install_snmpconf() {
     fi
     rmdir $snmp_dir 2>/dev/null || :
     rm -f -- $snmp_tmp || :
+    echo ">>> ...done." >&2
     if [ $changed_local = yes ]; then
 	echo ">>> Consider restarting the SNMP daemon." >&2
     fi
@@ -71,20 +72,20 @@ _install_snmpconf() {
 
 _remove_snmpconf() {
     local snmp_fil snmp_dir snmp_lcl snmp_tmp wrote_one changed_local files f
-    echo ">>> Updating ${rootdir}/etc/snmp/snmpd.conf..." >&2
-    snmp_fil=${rootdir}/etc/snmp/snmpd.local.conf
-    snmp_dir=${rootdir}/etc/snmp/snmp.d
-    snmp_lcl=${rootdir}/etc/snmp/snmp.d/00local
-    snmp_tmp=${tmppath:-/var/tmp}/snmpd.local.conf.tmp.$$
+    echo ">>> Updating /etc/snmp/snmpd.conf..." >&2
+    snmp_fil=/etc/snmp/snmpd.local.conf
+    snmp_dir=/etc/snmp/snmp.d
+    snmp_lcl=/etc/snmp/snmp.d/00local
+    snmp_tmp=/var/tmp/snmpd.local.conf.tmp.$$
     wrote_one=no
     changed_local=no
     files="$snmp_dir/*"
-    if [ ! -e ${rootdir}/etc/snmp/snmpd.conf -a -e ${rootdir}/etc/snmpd.conf ]; then
-	ln -L ${rootdir}/etc/snmpd.conf ${rootdir}/etc/snmp/snmpd.conf
-	touch ${rootdir}/etc/snmpd.local.conf
+    if [ ! -e /etc/snmp/snmpd.conf -a -e /etc/snmpd.conf ]; then
+	ln -L /etc/snmpd.conf /etc/snmp/snmpd.conf
+	touch /etc/snmpd.local.conf
     fi
-    if [ ! -e ${rootdir}/etc/snmp/snmpd.local.conf -a -e ${rootdir}/etc/snmpd.local.conf ]; then
-	ln -L ${rootdir}/etc/snmpd.local.conf ${rootdir}/etc/snmp/snmpd.local.conf
+    if [ ! -e /etc/snmp/snmpd.local.conf -a -e /etc/snmpd.local.conf ]; then
+	ln -L /etc/snmpd.local.conf /etc/snmp/snmpd.local.conf
     fi
     if [ -s $snmp_fil ]; then
 	if grep '^# Generated from snmp.d' $snmp_fil >/dev/null 2>&1; then
@@ -135,21 +136,9 @@ _remove_snmpconf() {
     fi
     rmdir $snmp_dir 2>/dev/null || :
     rm -f -- $snmp_tmp || :
+    echo ">>> ...done." >&2
     if [ $changed_local = yes ]; then
-	if [ -f /etc/rc.d/snmpd ]; then
-	    r="`runlevel | awk '{print$2}'`"
-	    start=no
-	    for l in /etc/rc.d/../rc${r}.d/S[0-9][0-9]snmpd /etc/rc.d/rc${r}.d/S[0-9][0-9]snmpd; do
-		if [ -L $l ]; then start=yes; break; fi
-	    done
-	    if [ $start = yes -o -e /var/lock/subsys/snmpd ]; then
-		[ -x "`which service     2>/dev/null`" ] && { service     snmpd reload || :; }
-		[ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d snmpd reload || :; }
-		[ -x "/etc/rc.d/snmpd"               ] && { /etc/rc.d/snmpd reload || :; }
-	    fi
-	else
-	    killall -HUP snmpd || :
-	fi
+	echo ">>> Consider restarting the SNMP daemon." >&2
     fi
 }
 

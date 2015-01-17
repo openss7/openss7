@@ -2,11 +2,11 @@
 
 _update_netconfig() {
     local netc_fil netc_alt netc_dir netc_tmp found files f
-    echo ">>> Updating etc/netconfig.xnsl..." >&2
-    netc_fil=etc/netconfig
-    netc_alt=etc/netconfig.xnsl
-    netc_dir=etc/nslconfig.d
-    netc_tmp=var/tmp/netconfig.tmp.$$
+    echo ">>> Updating /etc/netconfig.xnsl..." >&2
+    netc_fil=/etc/netconfig
+    netc_alt=/etc/netconfig.xnsl
+    netc_dir=/etc/nslconfig.d
+    netc_tmp=/var/tmp/netconfig.tmp.$$
     found=no
     files="$netc_dir/*"
     if [ -r $netc_fil ]; then
@@ -56,6 +56,7 @@ _update_netconfig() {
     if [ $netc_fil != $netc_alt ]; then
 	rm -f -- $netc_alt || :
     fi
+    echo ">>> ...done." >&2
 }
 
 _update_netconfig || :
