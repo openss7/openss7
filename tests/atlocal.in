@@ -1,10 +1,7 @@
 # vim: ft=sh sw=4 et nosi nocin fo+=or tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: atlocal.in,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:49:03 $
-#
-# -----------------------------------------------------------------------------
-#
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -58,10 +55,6 @@
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
 #
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2009-06-21 11:49:03 $ by $Author: brian $
-#
 # =============================================================================
 
 #
@@ -79,8 +72,6 @@ at_LDCONFIG="@LDCONFIG@"
 at_LSMOD="@LSMOD@"
 at_LSOF="@LSOF@"
 at_MODPROBE="@MODPROBE@"
-at_RPM="@RPM@"
-at_RPMBUILD="@RPMBUILD@"
 
 at_build="@build@"
 at_build_alias="@build_alias@"
@@ -88,47 +79,17 @@ at_build_cpu="@build_cpu@"
 at_build_os="@build_os@"
 at_build_vendor="@build_vendor@"
 
-#echo "at_build         =\"$at_build\""
-#echo "at_build_alias   =\"$at_build_alias\""
-#echo "at_build_cpu     =\"$at_build_cpu\""
-#echo "at_build_os      =\"$at_build_os\""
-#echo "at_build_vendor  =\"$at_build_vendor\""
-
 at_host="@host@"
 at_host_alias="@host_alias@"
 at_host_cpu="@host_cpu@"
 at_host_os="@host_os@"
 at_host_vendor="@host_vendor@"
 
-#echo "at_host          =\"$at_host\""
-#echo "at_host_alias    =\"$at_host_alias\""
-#echo "at_host_cpu      =\"$at_host_cpu\""
-#echo "at_host_os       =\"$at_host_os\""
-#echo "at_host_vendor   =\"$at_host_vendor\""
-
 at_target="@target@"
 at_target_alias="@target_alias@"
 at_target_cpu="@target_cpu@"
 at_target_os="@target_os@"
 at_target_vendor="@target_vendor@"
-
-#echo "at_target        =\"$at_target\""
-#echo "at_target_alias  =\"$at_target_alias\""
-#echo "at_target_cpu    =\"$at_target_cpu\""
-#echo "at_target_os     =\"$at_target_os\""
-#echo "at_target_vendor =\"$at_target_vendor\""
-
-#at_test=`@top_srcdir@/scripts/config.guess`
-#at_test_alias=
-#at_test_cpu=`echo $at_test | sed -e 's|-.*||g'`
-#at_test_vendor=`echo $at_test | sed -e 's|^[^-]*-||;s|-.*||g'`
-#at_test_os=`echo $at_test | sed -e 's|^[^-]*-[^-]*-||'`
-
-#echo "at_test          =\"$at_test\""
-#echo "at_test_alias    =\"$at_test_alias\""
-#echo "at_test_cpu      =\"$at_test_cpu\""
-#echo "at_test_os       =\"$at_test_os\""
-#echo "at_test_vendor   =\"$at_test_vendor\""
 
 prefix="@prefix@"
 exec_prefix="@exec_prefix@"
@@ -198,41 +159,4 @@ at_ioctl_getmsg="@at_ioctl_getmsg@"
 #    at_library_tests='no'
 #fi
 
-# =============================================================================
-#
-# $Log: atlocal.in,v $
-# Revision 1.1.2.1  2009-06-21 11:49:03  brian
-# - added files to new distro
-#
-# Revision 0.9.2.18  2008-04-28 12:54:12  brian
-# - update file headers for release
-#
-# Revision 0.9.2.17  2007/08/13 22:46:42  brian
-# - GPLv3 header updates
-#
-# Revision 0.9.2.16  2007/03/08 04:29:07  brian
-# - substituions changed for program checking macros
-#
-# Revision 0.9.2.15  2007/02/12 10:40:42  brian
-# - added support for autoconf 2.61
-#
-# Revision 0.9.2.14  2006/09/18 00:48:49  brian
-# - updated testsuite headers
-#
-# Revision 0.9.2.13  2006/01/03 21:39:05  brian
-# - rootdir not krootdir
-#
-# Revision 0.9.2.12  2005/11/01 11:21:20  brian
-# - updates for testing and documentation
-#
-# Revision 0.9.2.11  2005/10/03 17:42:12  brian
-# - working up read/write getmsg/putmsg tests
-#
-# Revision 0.9.2.10  2005/05/27 19:48:49  brian
-# - updated headers
-#
-# Revision 0.9.2.8  2005/05/27 19:48:49  brian
-# - updated headers
-#
-# =============================================================================
 # vim: ft=sh sw=4 et nosi nocin fo+=or tw=78
