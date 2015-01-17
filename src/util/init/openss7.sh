@@ -1,7 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: openss7.sh,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:42 $
-# Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -35,6 +34,8 @@
 # Should-Stop: strerr strace
 # Default-Start: S
 # Default-Stop:
+# X-Start-Before: $syslog
+# X-Stop-After: $null
 # X-UnitedLinux-Default-Enabled: yes
 # Short-Description: start and stop STREAMS OpenSS7 Devices
 # License: AGPL
@@ -720,7 +721,7 @@ stop_params () {
 # subsystem.
 #
 start_devices () {
-    if [ ":$OPENSS7_MAKEDEVICES" = ":yes" ] ; then
+    if [ ":$OPENSS7_MAKEDEVICES" = ':yes' ] ; then
 	if [ -n "$OPENSS7_MKDEV" -a -x "$OPENSS7_MKDEV" ] ; then
 	    action "Making $ucname devices: " \
 		$OPENSS7_MKDEV --create \
@@ -760,7 +761,7 @@ status_devices () {
 # susbsystem.
 #
 stop_devices () {
-    if [ ":$OPENSS7_REMOVEDEVICES" = ":yes" ] ; then
+    if [ ":$OPENSS7_REMOVEDEVICES" = ':yes' ] ; then
 	if [ -n "$OPENSS7_MKDEV" -a -x "$OPENSS7_MKDEV" ] ; then
 	    action "Removing $ucname devices: " \
 	    $OPENSS7_MKDEV --remove \
@@ -978,11 +979,7 @@ esac
 
 # =============================================================================
 #
-# @(#) $RCSfile: openss7.sh,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:42 $
-#
-# -----------------------------------------------------------------------------
-#
-# Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -1021,28 +1018,6 @@ esac
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-09-20 09:51:42 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: openss7.sh,v $
-# Revision 1.1.2.6  2011-09-20 09:51:42  brian
-# - updates from git
-#
-# Revision 1.1.2.5  2011-05-15 12:01:21  brian
-# - many build system refinements
-#
-# Revision 1.1.2.4  2011-05-10 13:45:37  brian
-# - weak modules workup
-#
-# Revision 1.1.2.3  2011-01-12 00:19:32  brian
-# - modprobe no longer accepts k option
-#
-# Revision 1.1.2.2  2009-07-24 13:49:46  brian
-# - updates for release build
 #
 # =============================================================================
 

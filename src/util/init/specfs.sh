@@ -1,7 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-09-20 09:51:42 $
-# Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -980,11 +979,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-09-20 09:51:42 $
-#
-# -----------------------------------------------------------------------------
-#
-# Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -1023,46 +1018,6 @@ esac
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-09-20 09:51:42 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: specfs.sh,v $
-# Revision 1.1.2.8  2011-09-20 09:51:42  brian
-# - updates from git
-#
-# Revision 1.1.2.7  2011-05-15 12:01:21  brian
-# - many build system refinements
-#
-# Revision 1.1.2.6  2011-05-10 13:45:37  brian
-# - weak modules workup
-#
-# Revision 1.1.2.5  2011-04-11 06:13:44  brian
-# - working up weak updates
-#
-# Revision 1.1.2.4  2011-02-08 23:39:03  brian
-# - last minute release updates
-#
-# Revision 1.1.2.3  2011-02-07 04:44:28  brian
-# - updated init scripts
-#
-# Revision 1.1.2.2  2011-01-12 00:19:32  brian
-# - modprobe no longer accepts k option
-#
-# Revision 1.1.2.1  2009-06-21 11:47:57  brian
-# - added files to new distro
-#
-# Revision 0.9.2.15  2008-10-21 22:42:15  brian
-# - handle verbose better in debian initscripts
-#
-# Revision 0.9.2.14  2008-04-28 12:54:11  brian
-# - update file headers for release
-#
-# Revision 0.9.2.13  2007/08/13 22:46:39  brian
-# - GPLv3 header updates
 #
 # =============================================================================
 

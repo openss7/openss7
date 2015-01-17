@@ -1,7 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:42 $
-# Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -978,11 +977,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:42 $
-#
-# -----------------------------------------------------------------------------
-#
-# Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -1021,40 +1016,6 @@ esac
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-09-20 09:51:42 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: streams.sh,v $
-# Revision 1.1.2.6  2011-09-20 09:51:42  brian
-# - updates from git
-#
-# Revision 1.1.2.5  2011-05-15 12:01:22  brian
-# - many build system refinements
-#
-# Revision 1.1.2.4  2011-05-10 13:45:37  brian
-# - weak modules workup
-#
-# Revision 1.1.2.3  2011-01-12 00:19:32  brian
-# - modprobe no longer accepts k option
-#
-# Revision 1.1.2.2  2009-07-24 13:49:46  brian
-# - updates for release build
-#
-# Revision 1.1.2.1  2009-06-21 11:47:57  brian
-# - added files to new distro
-#
-# Revision 0.9.2.21  2008-10-21 22:42:16  brian
-# - handle verbose better in debian initscripts
-#
-# Revision 0.9.2.20  2008-04-28 12:54:11  brian
-# - update file headers for release
-#
-# Revision 0.9.2.19  2007/08/13 22:46:39  brian
-# - GPLv3 header updates
 #
 # =============================================================================
 
