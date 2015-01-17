@@ -205,7 +205,7 @@ dnl     [], [enable_k_install=yes])
     fi])
     if test :"${linux_cv_k_weak_modules:-yes}" = :yes ; then :;
 	AC_DEFINE([CONFIG_KERNEL_WEAK_MODULES], [1], [When linking a kernel
-	module, symbols addresses can be ripped from the system map an resolved
+	module, symbols addresses can be ripped from the system map and resolved
 	when packaging the kernel module.  This provides a dependency between
 	the kernel module and a specific kernel that is hidden to the module
 	loader and is unsuitable for kernel weak updating modules.  When

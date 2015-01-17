@@ -275,7 +275,7 @@ dnl--------------------------------------------------------------------------
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([weak-modules],
 	[AS_HELP_STRING([--enable-weak-modules],
-	    [use only exported kernel symbols @<:@default-no@:>@])])
+	    [use only exported kernel symbols @<:@default=no@:>@])])
     AC_MSG_CHECKING([for weak module support])
     if test :"${enable_weak_modules:-no}" = :yes ; then
 	AC_DEFINE_UNQUOTED([CONFIG_STREAMS_WEAK_MODULES], [1], [When defined,]
