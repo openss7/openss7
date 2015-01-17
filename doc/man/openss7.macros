@@ -1,10 +1,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
-.\"
-.\" @(#) $Id: openss7.macros,v 1.1.2.4 2011-02-07 04:42:15 brian Exp $
-.\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -77,25 +74,6 @@
 .\" Commercial licensing and support of this software is available from
 .\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 .\" 
-.\" =========================================================================
-.\"
-.\" Last Modified $Date: 2011-02-07 04:42:15 $ by $Author: brian $
-.\"
-.\" -------------------------------------------------------------------------
-.\"
-.\" $Log: openss7.macros,v $
-.\" Revision 1.1.2.4  2011-02-07 04:42:15  brian
-.\" - updated manual pages
-.\"
-.\" Revision 1.1.2.3  2011-01-18 16:47:33  brian
-.\" - updated manual pages
-.\"
-.\" Revision 1.1.2.2  2010-12-02 22:22:43  brian
-.\" - regression fix and np_udp driver
-.\"
-.\" Revision 1.1.2.1  2009-06-21 10:32:53  brian
-.\" - added files to distro
-.\"
 .\" =========================================================================
 .de ]<
 .SH REFERENCES
@@ -217,7 +195,7 @@
 .de CO
 .SH COPYRIGHT
 .PP
-\f(HR\)Copyright\ \(co\)\ 2008-2012\ Monavacon\ Limited.
+\f(HR\)Copyright\ \(co\)\ 2008-2015\ Monavacon\ Limited.
 \f(HR\)All\ Rights\ Reserved.
 .br
 \f(HR\)Copyright\ \(co\)\ 2001-2008\ OpenSS7\ Corporation.
@@ -416,7 +394,7 @@ Trademarks mentioned are the property of their owners.
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
-\f(HR\)Copyright\ \(co\)\ 2008-2012\ Monavacon\ Ltd.
+\f(HR\)Copyright\ \(co\)\ 2008-2015\ Monavacon\ Ltd.
 All\ Rights\ Reserved.
 .br
 \f(HR\)Copyright\ \(co\)\ 2001-2008\ OpenSS7\ Corp.

@@ -2,11 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: pipe.2s.man,v 1.1.2.2 2011-02-07 02:17:58 brian Exp $
-.\"
-.\" =========================================================================
-.\"
-.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -79,16 +75,6 @@
 .\" Commercial licensing and support of this software is available from
 .\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 .\" 
-.\" =========================================================================
-.\"
-.\" Last Modified $Date: 2011-02-07 02:17:58 $ by $Author: brian $
-.\"
-.\" -------------------------------------------------------------------------
-.\"
-.\" $Log: pipe.2s.man,v $
-.\" Revision 1.1.2.2  2011-02-07 02:17:58  brian
-.\" - updated manual pages
-.\"
 .\" =========================================================================
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
@@ -214,7 +200,7 @@ module pushed onto one end of the pipe.
 .IP \(bu
 .IR STREAMS -based
 pipes can be attached to an object in a filesystem using
-.BR fattach (2).
+.BR fattach (2s).
 .IP \(bu
 .IR STREAMS -based
 pipes have controllable flow control and minimum and maximum packet size
@@ -253,13 +239,13 @@ information, or pass file descriptors, are desired.
 The ability to link a pipe end beneath a multiplexing driver,
 .BR I_LINK (7),
 or attaching one end to a path in the file system,
-.BR fattach (2),
+.BR fattach (2s),
 is desired.
 .IP \(bu
 Servers based on pipes using
 .BR connld (4)
 and
-.BR fattach (2)
+.BR fattach (2s)
 is to be supported.
 .IP \(bu
 Other
@@ -355,7 +341,7 @@ for an example.
 .BR M_FLUSH (9),
 .BR getmsg "(2s), " getpmsg "(2s), " putmsg "(2s), " putpmsg (2s),
 .BR fcntl (2),
-.BR fattach (2),
+.BR fattach (2s),
 .IR errno (3),
 .BR specfs (5),
 .BR I_SENDFD (7),

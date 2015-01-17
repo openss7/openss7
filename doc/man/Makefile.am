@@ -1,11 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.13 $) $Date: 2011-04-11 06:13:41 $
-##
-## -----------------------------------------------------------------------------
-##
-## Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+## Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 ## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 ## Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 ##
@@ -46,10 +42,6 @@
 ## Commercial licensing and support of this software is available from OpenSS7
 ## Corporation at a fee.  See http://www.openss7.com/
 ##
-## -----------------------------------------------------------------------------
-##
-## Last Modified $Date: 2011-04-11 06:13:41 $ by $Author: brian $
-##
 ## =============================================================================
 
 include ../../am/openss7.am
@@ -72,7 +64,7 @@ openss7_man_MANS = \
 	man1/strlog.1 \
 	man1/strreset.1 \
 	man2/close.2s \
-	man2/fattach.2 \
+	man2/fattach.2s \
 	man2/fdetach.2s \
 	man2/getmsg.2s \
 	man2/getpmsg.2s \
@@ -4458,7 +4450,7 @@ openss7_dist_noinst_MANS = \
 	man1/strlog.1.man \
 	man1/strreset.1.man \
 	man2/close.2s.man \
-	man2/fattach.2.man \
+	man2/fattach.2s.man \
 	man2/fdetach.2s.man \
 	man2/getmsg.2s.man \
 	man2/getpmsg.2s.man \
@@ -9939,47 +9931,5 @@ endif
 
 include ../../am/man.am
 
-## =============================================================================
-##
-## $Log: Makefile.am,v $
-## Revision 1.1.2.13  2011-04-11 06:13:41  brian
-## - working up weak updates
-##
-## Revision 1.1.2.12  2011-04-08 12:35:42  brian
-## - documented openss7-modules script
-##
-## Revision 1.1.2.11  2011-02-08 23:39:02  brian
-## - last minute release updates
-##
-## Revision 1.1.2.10  2011-02-07 04:42:15  brian
-## - updated manual pages
-##
-## Revision 1.1.2.9  2011-01-18 16:47:33  brian
-## - updated manual pages
-##
-## Revision 1.1.2.8  2011-01-11 23:43:15  brian
-## - updated manual pages
-##
-## Revision 1.1.2.7  2010-12-02 22:22:42  brian
-## - regression fix and np_udp driver
-##
-## Revision 1.1.2.6  2010-11-28 13:35:23  brian
-## - build updates and manual page corrections
-##
-## Revision 1.1.2.5  2009-07-23 16:37:43  brian
-## - updates for release
-##
-## Revision 1.1.2.4  2009-07-21 11:06:12  brian
-## - changes from release build
-##
-## Revision 1.1.2.3  2009-06-22 05:43:05  brian
-## - needed to pass check target
-##
-## Revision 1.1.2.2  2009-06-22 03:34:24  brian
-## - updates for release
-##
-## Revision 1.1.2.1  2009-06-21 10:32:53  brian
-## - added files to distro
-##
 ## =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
