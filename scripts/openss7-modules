@@ -526,7 +526,7 @@ function rpmlessthan(ver1,ver2,	    seg1,seg2,n,n1,n2,i,num1,num2,m,m1,m2,j,s1,s
 function rpmsort(versions, n,		swapped,i,version) {
     do {
 	swapped = 0
-	for (i=1;i<n;i++) {
+	for (i=1;i<n-1;i++) {
 	    if (rpmlessthan(versions[i+1],versions[i]) == 1) {
 		version = versions[i+1]
 		versions[i+1] = versions[i]
@@ -739,7 +739,7 @@ function getstructure(		pfx,dirs,dir,paths,path,command,h,l,u,k,ph,pl,file,modul
     return n
 }
 function readsymmap(kversion, file, command, pfx, maps,
-		    fmt,n,pn,sym,c,pc,bads,d,pd,errs,v,pv,e,pe)
+		    fmt,n,pn,sym,ver,c,pc,bads,d,pd,errs,v,pv,e,pe)
 {
     # read the symbol map for kernel "kversion"
     fmt = "%05d maps, %04d bads, %04d dups, %04d vers, %04d errs"
@@ -751,14 +751,16 @@ function readsymmap(kversion, file, command, pfx, maps,
 	    if (NF!=3) continue
 	    if (!($3 in maps)) {
 		maps[$3] = $1
+		ver = $1
+		sub(/^00000000/,"",ver)
 		if ($2 == "A" && $3~/^__crc_/) {
 		    sym = $3; sub(/^__crc_/,"",sym)
 		    if (!((kversion,sym) in symvers)) {
-			symvers[kversion,sym] = "0x" $1
+			symvers[kversion,sym] = "0x" ver
 			v++; pv++
 		    } else
-		    if (symvers[kversion,sym] != "0x" $1) {
-			symvers[kversion,sym] = "0x" $1
+		    if (symvers[kversion,sym] != "0x" ver) {
+			symvers[kversion,sym] = "0x" ver
 			errs[sym] = 1
 			e++; pe++
 			if (pe >= 100) {
@@ -929,7 +931,7 @@ function readsymabi(kversion, file,
 		n++
 	    } else
 	    if (symvers[kversion,sym] != crc) {
-		print_error(pfx "conflicting crc for " sym " in " kversion)
+		print_error(pfx "conflicting crc for " sym " in " kversion " (" symvers[kversion,sym] "!=" crc ")")
 		symvers[kversion,sym] = crc
 	    } else {
 		print_vinfo(3,pfx "duplicate crc for " sym " in " kversion)
@@ -965,7 +967,7 @@ function readsymver(kversion, file,
 		}
 	    } else
 	    if (symvers[kversion,sym] != crc) {
-		print_error(pfx "conflicting crc for " sym " in " kversion)
+		print_error(pfx "conflicting crc for " sym " in " kversion " (" symvers[kversion,sym] "!=" crc ")")
 		symvers[kversion,sym] = crc
 	    } else {
 		print_vinfo(3,pfx "duplicate crc for " sym " in " kversion)
@@ -1061,7 +1063,7 @@ function readkernel(kversion,
 		    #}
 		} else
 		if (symvers[kversion,sym] != crc) {
-		    print_error(pfx "conflicting crc for " sym " in " kversion)
+		    print_error(pfx "conflicting crc for " sym " in " kversion " (" symvers[kversion,sym] "!=" crc ")")
 		    symvers[kversion,sym] = crc
 		}
 		# expect duplicates
@@ -2900,17 +2902,17 @@ function dompatch(kversion,
 	if (system("test -r \"" patch "\"") == 0) {
 	    if ((getline string < patch) == 1)
 		close(patch)
+	    if (length(string) != 48) {
+		print_debug(4, pfx "patch length " length(string) " != 48")
+		return
+	    }
+	    if (system("test -d \"" dir "\"") != 0) {
+		print_debug(4, pfx "directory " dir " does not exist")
+		return
+	    }
+	    print "specfs.ko: d5f3c4981e2e41f3bdba506861e8b5eca27e48c9b4eecdda 24 " string > file
+	    close(file)
 	}
-	if (length(string) != 48) {
-	    print_debug(4, pfx "patch length " length(string) " != 48")
-	    return
-	}
-	if (system("test -d \"" dir "\"") != 0) {
-	    print_debug(4, pfx "directory " dir " does not exist")
-	    return
-	}
-	print "specfs.ko: d5f3c4981e2e41f3bdba506861e8b5eca27e48c9b4eecdda 24 " string > file
-	close(file)
     }
     doit(command)
 }
