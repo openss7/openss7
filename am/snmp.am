@@ -64,6 +64,9 @@ if PKG_BUILD_ARCH
 if PKG_BUILD_USER
 ## PKG_BUILD_USER
 
+dist_sbin_SCRIPTS			+= scripts/update-snmpconf
+AM_INSTALLCHECK_STD_OPTIONS_EXEMPT	+= scripts/update-snmpconf
+
 ##
 # These targets are responsible for installing the default net-snmp agent
 # configuration information into the /etc/snmp/AGENT.conf configuration file and

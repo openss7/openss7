@@ -64,6 +64,9 @@ if PKG_BUILD_ARCH
 if PKG_BUILD_USER
 ## PKG_BUILD_USER
 
+dist_sbin_SCRIPTS			+= scripts/update-sock2path
+AM_INSTALLCHECK_STD_OPTIONS_EXEMPT	+= scripts/update-sock2path
+
 ##
 # These targets are responsible for installing the sock2path configuration
 # information into the /etc/sock2path database.  This is performed by looking
