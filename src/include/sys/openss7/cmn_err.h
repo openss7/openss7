@@ -108,7 +108,7 @@ __STREAMS_EXTERN void cmn_err(int err_lvl, const char *fmt, ...)
 __STREAMS_EXTERN void cmn_err_(int err_lvl, const char *fmt, ...)
     __attribute__ ((__format__(__printf__, 2, 3)));
 #undef cmn_err
-#define cmn_err(err_lvl,fmt,...) cmn_err_(err_lvl,fmt,__VA_ARGS__)
+#define cmn_err(err_lvl,...) cmn_err_(err_lvl,__VA_ARGS__)
 #endif
 
 #endif				/* __SYS_OPENSS7_CMN_ERR_H__ */

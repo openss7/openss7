@@ -1135,7 +1135,7 @@ is_current_pgrp_orphaned_(void)
 #endif
 #elif defined HAVE_IS_CURRENT_PGRP_ORPHANED_SYMBOL
 #if   defined HAVE_IS_CURRENT_PGRP_ORPHANED_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
-int is_current_pgrp_orphaned();
+int is_current_pgrp_orphaned(void);
 #define is_current_pgrp_orphaned() is_current_pgrp_orphaned()
 #else
 int is_current_pgrp_orphaned(void)__attribute__((__weak__));
