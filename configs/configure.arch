@@ -18,6 +18,7 @@ $srcdir/configure \
 	--disable-k-abi-support \
 	--disable-k-weak-symbols \
 	--enable-k-weak-modules \
+	--disable-specfs-lock \
 	--with-pkg-distdir=/u6/repo \
 	--with-pkg-repodir=/u5/repo \
         --with-gnu-ld \
