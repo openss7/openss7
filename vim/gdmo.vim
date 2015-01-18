@@ -1,0 +1,43 @@
+
+syn match gdmoCategory "CONSTRAINT\s\+RULE"
+syn match gdmoCategory "SUBORDINATION\s\+RULE"
+syn keyword gdmoCategory ROLE
+syn keyword gdmoCategory GROUPS
+syn match gdmoCategory "ATTRIBUTE\s\+GROUPS"
+syn match gdmoCategory "RELATIONSHIP\s\+CLASS"
+syn match gdmoCategory "RELATIONSHIP\s\+MAPPING"
+syn match gdmoRelationship "NAMES\s\+SUBORDINATES"
+syn match gdmoRelationship "OBJECT\s\+CLASS"
+syn match gdmoRelationship "IS\s\+RELATED\s\+TO"
+syn match gdmoExtension "ACCORDING\s\+TO\s\+RULE"
+syn match gdmoExtension "INITIAL\s\+VALUE"
+syn match gdmoExtension "DERIVATION\s\+RULE"
+syn match gdmoExtension "DERIVED\s\+RULES"
+
+syn match gdmoReference "USING\s\+ATTRIBUTE"
+syn match gdmoReference "DERIVED\s\+FROM"
+syn keyword gdmoReference SUPPORTS
+syn match gdmoReference "QUALIFIED\s\+BY"
+syn match gdmoReference "COMPATIBLE-WITH"
+syn match gdmoReference "COMPATIBLE\s\+WITH"
+syn match gdmoReference "RELATIONSHIP\s\+OBJECT"
+syn match gdmoReference "OPERATIONS\s\+MAPPING"
+syn match gdmoReference "RELATED-CLASSES"
+syn match gdmoReference "RELATED\s\+CLASSES"
+
+syn match gdmoExtension "BIND-SUPPORT"
+syn match gdmoExtension "UNBIND-SUPPORT"
+syn keyword gdmoExtension OF ESTABLISH TERMINATE BIND UNBIND QUERY NOTIFY QUALIFIES NAMING OPERATION SUPERIOR SUBORDINATE
+syn match gdmoExtension "MAPS-TO-OPERATION"
+syn match gdmoExtension "ADD"
+syn match gdmoExtension "REMOVE"
+syn match gdmoExtension "GET"
+syn match gdmoExtension "REPLACE"
+syn match gdmoExtension "USING"
+syn match gdmoExtension "USER\s\+DEFINED"
+syn match gdmoExtension "RELATIONSHIP-OBJECT-USING-POINTER"
+syn match gdmoExtension "PERMITTED-ROLE-CARDINALITY-CONSTRAINT"
+syn match gdmoExtension "REQUIRED-ROLE-CARDINALITY-CONSTRAINT"
+syn match gdmoExtension "PERMITTED-RELATIONSHIP-CARDINALITY-CONSTRAINT"
+syn match gdmoExtension "REPRESENTED-BY"
+syn match gdmoExtension "REPRESENTED\s\+BY"
