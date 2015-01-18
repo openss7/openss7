@@ -311,7 +311,7 @@ PERFORMANCE OF THIS DOCUMENTATION.
 .\}
 .el \{\
 .br
-\f(HR\)Copyright\ \(co\)\ 2008-2012\ Monavacon\ Limited.
+\f(HR\)Copyright\ \(co\)\ 2008-2015\ Monavacon\ Limited.
 \f(HR\)All\ Rights\ Reserved.
 .br
 \f(HR\)Copyright\ \(co\)\ 2001-2008\ OpenSS7\ Corporation.
@@ -372,7 +372,7 @@ The OpenSS7 Project http://www.openss7.org/
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
-\f(HR\)Copyright\ \(co\)\ 2008-2012\ Monavacon\ Ltd.
+\f(HR\)Copyright\ \(co\)\ 2008-2015\ Monavacon\ Ltd.
 All\ Rights\ Reserved.
 .br
 \f(HR\)Copyright\ \(co\)\ 2001-2008\ OpenSS7\ Corp.
