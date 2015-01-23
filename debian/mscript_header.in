@@ -1,7 +1,7 @@
 # =============================================================================
 # @configure_input@
-# @(#) $RCSfile: mscript_header.in,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:28 $
-# Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
+# @(#) File: debian/mscript_header.in  Version: @VERSION@  Date: @PACKAGE_DATE@
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # This software is licensed under the GNU Affero General Public License (AGPL)

@@ -1,11 +1,11 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: args.texi.in,v 1.1.2.5 2011-09-02 08:46:31 brian Exp $
+@c @(#) File: scripts/texi/args.texi.in  Version: @VERSION@  Date: @PACKAGE_DATE@
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 @c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 @c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
@@ -78,10 +78,6 @@
 @c Commercial licensing and support of this software is available from
 @c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 @c 
-@c =========================================================================
-@c
-@c Last Modified $Date: 2011-09-02 08:46:31 $ by $Author: brian $
-@c
 @c =========================================================================
 
 @set PACKAGE @PACKAGE@

@@ -1,7 +1,7 @@
 # =============================================================================
 # @configure_input@
-# @(#) $RCSfile: mscript_preinst.in,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-05-10 13:45:29 $
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# @(#) File: debian/mscript_preinst.in  Version: @VERSION@  Date: @PACKAGE_DATE@
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # This software is licensed under the GNU Affero General Public License (AGPL)

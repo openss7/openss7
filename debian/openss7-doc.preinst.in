@@ -2,11 +2,11 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7-doc.preinst.in,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-15 12:01:18 $
+# @(#) File: debian/openss7-doc.preinst.in  Version: @VERSION@  Date: @PACKAGE_DATE@
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -45,10 +45,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-05-15 12:01:18 $ by $Author: brian $
 #
 # =============================================================================
 subpkg=doc
@@ -111,35 +107,5 @@ abort_upgrade_preinst () { :
 }
 @mscript_preinst@
 @mscript_debhelper@
-# =============================================================================
-#
-# $Log: openss7-doc.preinst.in,v $
-# Revision 1.1.2.3  2011-05-15 12:01:18  brian
-# - many build system refinements
-#
-# Revision 1.1.2.2  2011-05-10 13:45:29  brian
-# - weak modules workup
-#
-# Revision 0.9.2.6  2008-04-28 10:30:21  brian
-# - updated headers for release
-#
-# Revision 0.9.2.5  2007/12/15 20:19:30  brian
-# - updates
-#
-# Revision 0.9.2.4  2007/08/13 22:45:54  brian
-# - GPLv3 header updates
-#
-# Revision 0.9.2.3  2006/12/18 10:25:29  brian
-# - updated headers for release
-#
-# Revision 0.9.2.2  2005/05/14 08:34:11  brian
-# - copyright header correction
-#
-# Revision 0.9.2.1  2005/03/26 03:11:24  brian
-# - Reworking maintainance scripts
-#
-# Revision 0.9.2.1  2005/03/24 01:38:17  brian
-# - better debian build
-#
 # =============================================================================
 # vim: ft=sh sw=4 noet nocin nosi formatoptions+=tcqlorn

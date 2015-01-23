@@ -1,5 +1,6 @@
 #!/bin/bash
 #
+# @(#) File: arch/PKGBUILD.in  Version: @VERSION@  Date: @PACKAGE_DATE@
 
 # Maintainer: Brian Bidulock <bidulock@openss7.org>
 

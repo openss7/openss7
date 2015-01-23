@@ -1,11 +1,11 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 #
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.32 $) $Date: 2011-09-20 09:52:47 $
+# @(#) File: openss7.spec.in  Version: @VERSION@  Date: @PACKAGE_DATE@
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -44,10 +44,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-09-20 09:52:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -6328,10 +6324,6 @@ not normally required on other than a development system.
 # =============================================================================
 %changelog
 # -----------------------------------------------------------------------------
-# $Log: openss7.spec.in,v $
-# Revision 1.1.2.32  2011-09-20 09:52:47  brian
-# - update changelog
-#
 
 * Tue Sep 20 2011 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.31  2011-09-20 09:51:31  brian
