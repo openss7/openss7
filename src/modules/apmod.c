@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: apmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:51 $
+ @(#) File: src/modules/apmod.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,28 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:51 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: apmod.c,v $
- Revision 1.1.2.4  2011-09-02 08:46:51  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.3  2010-11-28 14:22:00  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.2  2009-06-29 07:35:45  brian
- - SVR 4.2 => SVR 4.2 MP
-
- Revision 1.1.2.1  2009-06-21 11:40:30  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: apmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:51 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  * ASCE/Presentation (A/P) Module
@@ -91,8 +72,8 @@ static char const ident[] = "$RCSfile: apmod.c,v $ $Name:  $($Revision: 1.1.2.4 
 
 #define APLI_DESCRIP	"ACSE/Presentation Layer (APLI) Library Module (APMOD) STREAMS Module"
 #define APLI_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define APLI_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define APLI_REVISION	"OpenSS7 $RCSfile: apmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:51 $"
+#define APLI_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define APLI_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define APLI_DEVICE	"SVR 4.2 MP STREAMS APLI Module for APLI"
 #define APLI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define APLI_LICENSE	"GPL"

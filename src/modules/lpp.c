@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lpp.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:53 $
+ @(#) File: src/modules/lpp.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,29 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:53 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: lpp.c,v $
- Revision 1.1.2.4  2011-09-02 08:46:53  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.3  2011-01-18 16:55:53  brian
- - added stub drivers and modules
-
- Revision 1.1.2.2  2010-11-28 14:22:02  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:40:31  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] =
-    "$RCSfile: lpp.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:53 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  *  Lightweight Presentation Protocol (LPP) module
@@ -81,8 +61,8 @@ static char const ident[] =
 
 #define LPP_DESCRIP	"LPP STREAMS Module"
 #define LPP_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
-#define LPP_REVISION	"OpenSS7 $RCSfile: lpp.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:53 $"
-#define LPP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define LPP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define LPP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define LPP_DEVICE	"Provides OpenSS7 Lightweight Presentation Protocol (LPP)"
 #define LPP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LPP_LICENSE	"GPL"

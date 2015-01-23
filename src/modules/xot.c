@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xot.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:57 $
+ @(#) File: src/modules/xot.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,29 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:57 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: xot.c,v $
- Revision 1.1.2.4  2011-09-02 08:46:57  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.3  2011-01-18 16:55:53  brian
- - added stub drivers and modules
-
- Revision 1.1.2.2  2010-11-28 14:22:08  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:40:37  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] =
-    "$RCSfile: xot.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:57 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  *  X.25 over TCP (XOT).
@@ -106,8 +86,8 @@ static char const ident[] =
 
 #define XOT_DESCRIP	"X.25 over TCP Module for Linux Fast-STREAMS"
 #define XOT_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
-#define XOT_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define XOT_REVISION	"OpenSS7 $RCSfile: xot.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:57 $"
+#define XOT_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define XOT_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define XOT_DEVICE	"SVR 4.2MP X.25 over TCP Module (XOT) for X.25 CONS"
 #define XOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define XOT_LICENSE	"GPL"

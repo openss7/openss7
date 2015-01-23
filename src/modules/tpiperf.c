@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:56 $
+ @(#) File: src/modules/tpiperf.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,31 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:56 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: tpiperf.c,v $
- Revision 1.1.2.5  2011-09-02 08:46:56  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.4  2011-05-31 09:46:11  brian
- - new distros
-
- Revision 1.1.2.3  2010-11-28 14:22:08  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.2  2009-06-29 07:35:46  brian
- - SVR 4.2 => SVR 4.2 MP
-
- Revision 1.1.2.1  2009-06-21 11:40:37  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:56 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 
 /*
@@ -90,8 +68,8 @@ static char const ident[] = "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 1.1.2.
 
 #define TPIPERF_DESCRIP		"TPI Performance (TPIPERF) STREAMS Module"
 #define TPIPERF_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define TPIPERF_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define TPIPERF_REVISION	"OpenSS7 $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:56 $"
+#define TPIPERF_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define TPIPERF_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define TPIPERF_DEVICE		"SVR 4.2 MP STREAMS TPI Performance Module (TPIPERF)"
 #define TPIPERF_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TPIPERF_LICENSE		"GPL"

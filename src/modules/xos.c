@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xos.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:57 $
+ @(#) File: src/modules/xos.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,25 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:57 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: xos.c,v $
- Revision 1.1.2.3  2011-09-02 08:46:57  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.2  2010-11-28 14:22:08  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:40:37  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: xos.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:57 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  * This is a XOS [draft-bidulock-tsvwg-xos-00] module.  It pushes over a TCP
@@ -85,8 +69,8 @@ static char const ident[] = "$RCSfile: xos.c,v $ $Name:  $($Revision: 1.1.2.3 $)
 
 #define XOS_DESCRIP	"X.25 over SCTP Module for Linux Fast-STREAMS"
 #define XOS_EXTRA	"Part fo the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
-#define XOS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define XOS_REVISION	"OpenSS7 $RCSfile: xos.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:57 $"
+#define XOS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define XOS_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define XOS_DEVICE	"SVR 4.2MP X.25 over SCTP Module (XOS) for X.25 CONS"
 #define XOS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define XOS_LICENSE	"GPL"

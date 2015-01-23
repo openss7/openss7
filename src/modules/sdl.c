@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:54 $
+ @(#) File: src/modules/sdl.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,28 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:54 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: sdl.c,v $
- Revision 1.1.2.4  2011-09-02 08:46:54  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.3  2011-01-12 04:10:33  brian
- - code updates for 2.6.32 kernel and gcc 4.4
-
- Revision 1.1.2.2  2010-11-28 14:22:05  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:40:34  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sdl.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:54 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 
 //#define _SVR4_SOURCE	1
@@ -86,8 +67,8 @@ static char const ident[] = "$RCSfile: sdl.c,v $ $Name:  $($Revision: 1.1.2.4 $)
 
 #define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS Module"
 #define SDL_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define SDL_REVISION	"OpenSS7 $RCSfile: sdl.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:54 $"
-#define SDL_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define SDL_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SDL_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define SDL_DEVICE	"Supports STREAMS pipes."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDL_LICENSE	"GPL"

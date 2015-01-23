@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) File: src/modules/nit_pf.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,16 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date$ by $Author$
-
- -----------------------------------------------------------------------------
-
- $Log$
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  *  This is NIT_PF, a classical STREAMS packet filter module similar to pfmod(4) that performs the
@@ -87,8 +80,8 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define PF_DESCRIP	"SVR 4.1 SNIT Packet Filter (PF) STREAMS Module"
 #define PF_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define PF_COPYRIGHT	"Copyright (c) 2008-2012  Monavacon Limited.  All Rights Reserved."
-#define PF_REVISION	"Lfs $RCSfile$ $Name$($Revision$) $Date$"
+#define PF_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define PF_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define PF_DEVICE	"SVR 4.1 SNIT Packet Filter (PF) for STREAMS."
 #define PF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PF_LICENSE	"GPL"

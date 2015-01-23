@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) File: src/modules/bpfmod.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,16 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date$ by $Author$
-
- -----------------------------------------------------------------------------
-
- $Log$
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  *  This is BPFMOD a partial implementation of the classical Berkeley Packet Filter.  The missing
@@ -88,8 +81,8 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define BPFMOD_DESCRIP		"Berkeley Packet Filter Module (BPFMOD) STREAMS Module"
 #define BPFMOD_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define BPFMOD_COPYRIGHT	"Copyright (c) 2008-2012  Monavacon Limited.  All Rights Reserved."
-#define BPFMOD_REVISION		"Lfs $RCSfile$ $Name$($Revision$) $Date$"
+#define BPFMOD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define BPFMOD_REVISION		"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define BPFMOD_DEVICE		"SVR 4.2 Berkeley Packet Filter Module (BPFMOD) for STREAMS"
 #define BPFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define BPFMOD_LICENSE		"GPL"

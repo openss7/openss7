@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: s_nli.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:54 $
+ @(#) File: src/modules/s_nli.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,25 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:54 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: s_nli.c,v $
- Revision 1.1.2.3  2011-09-02 08:46:54  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.2  2010-11-28 14:22:04  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:40:33  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: s_nli.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:54 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  * This is s_nli, a pushable STREAMS module that interprets the SpiderX25
@@ -83,8 +67,8 @@ static char const ident[] = "$RCSfile: s_nli.c,v $ $Name:  $($Revision: 1.1.2.3 
 
 #define S_NLI_DESCRIP	"Spider X25 Compatibility Module for Linux Fast-STREAMS"
 #define S_NLI_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
-#define S_NLI_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define S_NLI_REVISION	"OpenSS7 $RCSfile: s_nli.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:54 $"
+#define S_NLI_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define S_NLI_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define S_NLI_DEVICE	"SVR 4.2MP CDI CD_HDLC Devices"
 #define S_NLI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define S_NLI_LICENSE	"GPL"

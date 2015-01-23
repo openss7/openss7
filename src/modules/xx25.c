@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xx25.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:57 $
+ @(#) File: src/modules/xx25.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,28 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:57 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: xx25.c,v $
- Revision 1.1.2.4  2011-09-02 08:46:57  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.3  2010-11-28 14:22:08  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.2  2009-06-29 07:35:46  brian
- - SVR 4.2 => SVR 4.2 MP
-
- Revision 1.1.2.1  2009-06-21 11:40:37  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: xx25.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:57 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  * This is XX25 implemented as a pushable module that pushes over an NPI
@@ -98,8 +79,8 @@ static char const ident[] = "$RCSfile: xx25.c,v $ $Name:  $($Revision: 1.1.2.4 $
 
 #define XX25_DESCRIP	"XX25 Module for X.25-PLP (X25MOD) STREAMS Module"
 #define XX25_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
-#define XX25_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define XX25_REVISION	"OpenSS7 $RCSfile: xx25.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:57 $"
+#define XX25_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define XX25_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define XX25_DEVICE	"SVR 4.2 MP STREAMS XX25 Module for X.25-PLP (X25MOD)"
 #define XX25_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define XX25_LICENSE	"GPL"

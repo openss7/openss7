@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: zaptel-mod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:57 $
+ @(#) File: src/modules/zaptel-mod.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,25 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:57 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: zaptel-mod.c,v $
- Revision 1.1.2.3  2011-09-02 08:46:57  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.2  2010-11-28 14:22:09  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:40:37  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: zaptel-mod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:57 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 
 /*
@@ -98,8 +82,8 @@ static char const ident[] = "$RCSfile: zaptel-mod.c,v $ $Name:  $($Revision: 1.1
 
 #define ZAP_MX_DESCRIP	"ZAPTEL Multiplex (ZAP-MX) STREAMS Module"
 #define ZAP_MX_EXTRA	"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
-#define ZAP_MX_REVISION	"LfS $RCSfile: zaptel-mod.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:57 $"
-#define ZAP_MX_COPYRIGHT    "Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define ZAP_MX_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define ZAP_MX_COPYRIGHT    "Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define ZAP_MX_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define ZAP_MX_CONTACT	"Brian Biduock <bidulock@openss7.org>"
 #define ZAP_MX_LICENSE	"GPL"

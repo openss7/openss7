@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: aal2.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-20 09:51:40 $
+ @(#) File: src/modules/aal2.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,28 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-20 09:51:40 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: aal2.c,v $
- Revision 1.1.2.4  2011-09-20 09:51:40  brian
- - updates from git
-
- Revision 1.1.2.3  2011-09-02 08:46:51  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.2  2010-11-28 14:22:00  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:40:30  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: aal2.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-20 09:51:40 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  * This is an ATM Adaptation Layer (AAL) Type 2 (AAL2) for passing packets of fixed length across
@@ -87,8 +68,8 @@ static char const ident[] = "$RCSfile: aal2.c,v $ $Name:  $($Revision: 1.1.2.4 $
 
 #define AAL2_DESCRIP	"MTP3B-AAL2 STREAMS Module"
 #define AAL2_EXTRA	"Part of the OpenSS7 ATM Stack for Linux Fast-STREAMS"
-#define AAL2_REVISION	"OpenSS7 $RCSfile: aal2.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-20 09:51:40 $"
-#define AAL2_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define AAL2_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define AAL2_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define AAL2_DEVICE	"Provides OpenSS7 MTP3B-I.432.3-AAL2 module."
 #define AAL2_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define AAL2_LICENSE	"GPL"

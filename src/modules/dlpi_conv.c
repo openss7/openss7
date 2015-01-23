@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:52 $
+ @(#) File: src/modules/dlpi_conv.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,28 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:52 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: dlpi_conv.c,v $
- Revision 1.1.2.4  2011-09-02 08:46:52  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.3  2011-02-07 04:54:44  brian
- - code updates for new distro support
-
- Revision 1.1.2.2  2010-11-28 14:22:02  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:40:30  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:52 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  *  DLPI-CONV is a simple endian conversion module for use with the RMUX driver.  It converts
@@ -82,8 +63,8 @@ static char const ident[] = "$RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 1.1.
 
 #define DLPI_CONV_DESCRIP	"DLPI Endian Conversion (DLPI-CONV) for Linux Fast-STREAMS"
 #define DLPI_CONV_EXTRA		"Part of the OpenSS7 Protocol Stacks for Linux Fast-STREAMS"
-#define DLPI_CONV_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define DLPI_CONV_REVISION	"OpenSS7 $RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:52 $"
+#define DLPI_CONV_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define DLPI_CONV_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define DLPI_CONV_DEVICE	"SVR 4.2 DLPI Endian Conversion (DLPI-CONV) for STREAMS"
 #define DLPI_CONV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DLPI_CONV_LICENSE	"GPL"

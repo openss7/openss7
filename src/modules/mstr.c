@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mstr.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-09-02 08:46:53 $
+ @(#) File: src/modules/mstr.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,22 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:53 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: mstr.c,v $
- Revision 1.1.2.2  2011-09-02 08:46:53  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.1  2010-12-19 00:26:46  brian
- - added multi-stream conversion module
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: mstr.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-09-02 08:46:53 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  *  This is a single-stream to multi-stream conversion module.  What it does is accept a
@@ -77,8 +64,8 @@ static char const ident[] = "$RCSfile: mstr.c,v $ $Name:  $($Revision: 1.1.2.2 $
 
 #define MSTR_DESCRIP	"Multi-Stream (MSTR) STREAMS Module"
 #define MSTR_EXTRA	"Part of Linux Fast-STREAMS"
-#define MSTR_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define MSTR_REVISION	"OpenSS7 $RCSfile: mstr.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-09-02 08:46:53 $"
+#define MSTR_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define MSTR_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define MSTR_DEVICE	"SVR 4.2 MP STREAMS Multi-Stream Module"
 #define MSTR_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MSTR_LICENSE	"GPL"
