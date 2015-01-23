@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: archive.m4,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-08-07 11:14:37 $
+# @(#) File: m4/archive.m4
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -46,10 +46,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-08-07 11:14:37 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -345,35 +341,8 @@ AC_DEFUN([_ARCHIVE_XXX], [dnl
 
 
 # =============================================================================
-#
-# $Log: archive.m4,v $
-# Revision 1.1.2.8  2011-08-07 11:14:37  brian
-# - mostly mandriva and ubuntu build updates
-#
-# Revision 1.1.2.7  2011-05-31 09:46:01  brian
-# - new distros
-#
-# Revision 1.1.2.6  2011-02-07 04:48:32  brian
-# - updated configure and build scripts
-#
-# Revision 1.1.2.5  2010-11-28 13:55:51  brian
-# - update build requirements, proper autoconf functions, build updates
-#
-# Revision 1.1.2.4  2009-07-23 16:37:50  brian
-# - updates for release
-#
-# Revision 1.1.2.3  2009-07-21 11:06:12  brian
-# - changes from release build
-#
-# Revision 1.1.2.2  2009-07-04 03:51:32  brian
-# - updates for release
-#
-# Revision 1.1.2.1  2009-06-29 07:35:53  brian
-# - added new macros for docs and java
-#
-# =============================================================================
 # 
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

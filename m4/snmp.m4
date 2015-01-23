@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: snmp.m4,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-05-31 09:46:02 $
+# @(#) File: m4/snmp.m4
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -46,10 +46,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-05-31 09:46:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -367,56 +363,8 @@ int deny_severity = 0;
 # =============================================================================
 
 # =============================================================================
-#
-# $Log: snmp.m4,v $
-# Revision 1.1.2.7  2011-05-31 09:46:02  brian
-# - new distros
-#
-# Revision 1.1.2.6  2011-05-10 13:45:35  brian
-# - weak modules workup
-#
-# Revision 1.1.2.5  2011-02-07 04:48:32  brian
-# - updated configure and build scripts
-#
-# Revision 1.1.2.4  2010-11-28 13:55:51  brian
-# - update build requirements, proper autoconf functions, build updates
-#
-# Revision 1.1.2.3  2009-07-21 11:06:13  brian
-# - changes from release build
-#
-# Revision 1.1.2.2  2009-07-04 03:51:33  brian
-# - updates for release
-#
-# Revision 1.1.2.1  2009-06-21 11:06:05  brian
-# - added files to new distro
-#
-# Revision 0.9.2.8  2008-09-03 07:13:53  brian
-# - only warn about missing SNMP 32-bit libs
-#
-# Revision 0.9.2.7  2008-04-28 09:41:03  brian
-# - updated headers for release
-#
-# Revision 0.9.2.6  2008/01/13 21:53:04  brian
-# - dlmod SNMP agent build and installation
-#
-# Revision 0.9.2.5  2007/10/18 05:33:30  brian
-# - better checking of NET-SNMP
-#
-# Revision 0.9.2.4  2007/10/15 06:47:49  brian
-# - update to SNMP agent build
-#
-# Revision 0.9.2.3  2007/10/15 01:04:50  brian
-# - updated SNMP build
-#
-# Revision 0.9.2.2  2007/10/13 08:51:41  brian
-# - updates for 2.6.22 FC6 kernel and added MIBs
-#
-# Revision 0.9.2.1  2007/10/13 08:13:17  brian
-# - added macros for SNMP agents
-#
-# =============================================================================
 # 
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

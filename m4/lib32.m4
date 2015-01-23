@@ -3,10 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: lib32.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-09-02 08:46:30 $
+# @(#) File: m4/lib32.m4
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -45,10 +46,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-09-02 08:46:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -283,25 +280,8 @@ m4_define([AH_CHECK_LIB32],
 # =============================================================================
 
 # =============================================================================
-#
-# $Log: lib32.m4,v $
-# Revision 1.1.2.2  2011-09-02 08:46:30  brian
-# - sync up lots of repo and build changes from git
-#
-# Revision 1.1.2.1  2009-06-21 11:06:04  brian
-# - added files to new distro
-#
-# Revision 0.9.2.3  2008-04-28 09:41:03  brian
-# - updated headers for release
-#
-# Revision 0.9.2.2  2007/10/15 06:47:49  brian
-# - update to SNMP agent build
-#
-# Revision 0.9.2.1  2007/10/13 08:13:17  brian
-# - added macros for SNMP agents
-#
-# =============================================================================
 # 
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

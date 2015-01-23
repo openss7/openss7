@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: gcj.m4,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-09-20 09:51:33 $
+# @(#) File: m4/gcj.m4
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -46,10 +46,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-09-20 09:51:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -851,44 +847,8 @@ AC_DEFUN([_GCJ_XXX], [dnl
 # =============================================================================
 
 # =============================================================================
-#
-# $Log: gcj.m4,v $
-# Revision 1.1.2.11  2011-09-20 09:51:33  brian
-# - updates from git
-#
-# Revision 1.1.2.10  2011-05-31 09:46:01  brian
-# - new distros
-#
-# Revision 1.1.2.9  2011-02-07 04:48:32  brian
-# - updated configure and build scripts
-#
-# Revision 1.1.2.8  2011-01-12 03:49:24  brian
-# - support for RHEL 6 kernel
-#
-# Revision 1.1.2.7  2010-11-28 13:55:51  brian
-# - update build requirements, proper autoconf functions, build updates
-#
-# Revision 1.1.2.6  2009-07-21 11:06:13  brian
-# - changes from release build
-#
-# Revision 1.1.2.5  2009-07-13 07:13:27  brian
-# - changes for multiple distro build
-#
-# Revision 1.1.2.4  2009-07-05 12:04:27  brian
-# - updates for release builds
-#
-# Revision 1.1.2.3  2009-07-04 03:51:33  brian
-# - updates for release
-#
-# Revision 1.1.2.2  2009-06-29 07:35:38  brian
-# - improvements to build process
-#
-# Revision 1.1.2.1  2009-06-21 11:06:04  brian
-# - added files to new distro
-#
-# =============================================================================
 # 
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

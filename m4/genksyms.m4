@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 1.1.2.15 $) $Date: 2011-09-20 09:51:33 $
+# @(#) File: m4/genksyms.m4
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -46,10 +46,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-09-20 09:51:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -496,68 +492,8 @@ AC_DEFUN([_KSYMS_], [dnl
 # =============================================================================
 
 # =============================================================================
-#
-# $Log: genksyms.m4,v $
-# Revision 1.1.2.15  2011-09-20 09:51:33  brian
-# - updates from git
-#
-# Revision 1.1.2.14  2011-08-07 11:14:37  brian
-# - mostly mandriva and ubuntu build updates
-#
-# Revision 1.1.2.13  2011-07-27 07:52:18  brian
-# - work to support Mageia/Mandriva compressed kernel modules and URPMI repo
-#
-# Revision 1.1.2.12  2011-06-09 11:30:54  brian
-# - support mageia and mes
-#
-# Revision 1.1.2.11  2011-05-31 09:46:01  brian
-# - new distros
-#
-# Revision 1.1.2.10  2011-05-10 13:45:34  brian
-# - weak modules workup
-#
-# Revision 1.1.2.9  2011-04-11 06:13:43  brian
-# - working up weak updates
-#
-# Revision 1.1.2.8  2011-03-26 04:28:45  brian
-# - updates to build process
-#
-# Revision 1.1.2.7  2011-03-17 07:01:28  brian
-# - build and repo system improvements
-#
-# Revision 1.1.2.6  2011-02-07 04:48:32  brian
-# - updated configure and build scripts
-#
-# Revision 1.1.2.5  2009-07-21 11:06:13  brian
-# - changes from release build
-#
-# Revision 1.1.2.4  2009-07-04 03:51:33  brian
-# - updates for release
-#
-# Revision 1.1.2.3  2009-06-29 07:35:38  brian
-# - improvements to build process
-#
-# Revision 1.1.2.2  2009-06-22 03:34:24  brian
-# - updates for release
-#
-# Revision 1.1.2.1  2009-06-21 11:06:04  brian
-# - added files to new distro
-#
-# Revision 0.9.2.28  2008-09-21 07:40:45  brian
-# - add defaults to environment variables
-#
-# Revision 0.9.2.27  2008-04-28 09:41:03  brian
-# - updated headers for release
-#
-# Revision 0.9.2.26  2007/10/17 20:00:27  brian
-# - slightly different path checks
-#
-# Revision 0.9.2.25  2007/08/12 19:05:30  brian
-# - rearrange and update headers
-#
-# =============================================================================
 # 
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

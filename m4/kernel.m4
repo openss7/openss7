@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 1.1.2.18 $) $Date: 2011-09-20 09:51:33 $
+# @(#) File: m4/kernel.m4
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -46,10 +46,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-09-20 09:51:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -3451,107 +3447,8 @@ AC_DEFUN([_LINUX_KERNEL_], [dnl
 # =============================================================================
 
 # =============================================================================
-#
-# $Log: kernel.m4,v $
-# Revision 1.1.2.18  2011-09-20 09:51:33  brian
-# - updates from git
-#
-# Revision 1.1.2.17  2011-09-02 08:46:30  brian
-# - sync up lots of repo and build changes from git
-#
-# Revision 1.1.2.16  2011-08-07 11:14:37  brian
-# - mostly mandriva and ubuntu build updates
-#
-# Revision 1.1.2.15  2011-07-27 07:52:18  brian
-# - work to support Mageia/Mandriva compressed kernel modules and URPMI repo
-#
-# Revision 1.1.2.14  2011-06-09 11:30:54  brian
-# - support mageia and mes
-#
-# Revision 1.1.2.13  2011-05-31 09:46:01  brian
-# - new distros
-#
-# Revision 1.1.2.12  2011-05-10 13:45:35  brian
-# - weak modules workup
-#
-# Revision 1.1.2.11  2011-04-11 06:13:43  brian
-# - working up weak updates
-#
-# Revision 1.1.2.10  2011-04-05 16:35:11  brian
-# - weak module design
-#
-# Revision 1.1.2.9  2011-03-26 04:28:45  brian
-# - updates to build process
-#
-# Revision 1.1.2.8  2011-03-17 07:01:28  brian
-# - build and repo system improvements
-#
-# Revision 1.1.2.7  2011-02-08 23:39:02  brian
-# - last minute release updates
-#
-# Revision 1.1.2.6  2011-02-07 04:48:32  brian
-# - updated configure and build scripts
-#
-# Revision 1.1.2.5  2011-01-12 03:49:24  brian
-# - support for RHEL 6 kernel
-#
-# Revision 1.1.2.4  2010-11-28 13:55:51  brian
-# - update build requirements, proper autoconf functions, build updates
-#
-# Revision 1.1.2.3  2009-07-24 13:49:44  brian
-# - updates for release build
-#
-# Revision 1.1.2.2  2009-07-21 11:06:13  brian
-# - changes from release build
-#
-# Revision 1.1.2.1  2009-06-21 11:06:04  brian
-# - added files to new distro
-#
-# Revision 0.9.2.173  2008-10-25 10:35:18  brian
-# - updates for autoconf 2.63
-#
-# Revision 0.9.2.172  2008-10-10 10:41:43  brian
-# - more SuSE 2.6.25 build trials
-#
-# Revision 0.9.2.171  2008-10-08 07:24:33  brian
-# - change directories when running cflagcheck
-#
-# Revision 0.9.2.170  2008-10-07 22:58:01  brian
-# - more overrides for cflagcheck
-#
-# Revision 0.9.2.169  2008/09/21 07:40:46  brian
-# - add defaults to environment variables
-#
-# Revision 0.9.2.168  2008-09-08 05:19:00  brian
-# - ubuntu needs KERNELRELEASE too
-#
-# Revision 0.9.2.167  2008-09-08 04:37:28  brian
-# - machine defaults do not exist on recent kernels
-#
-# Revision 0.9.2.166  2008/09/03 01:43:10  brian
-# - might not be Makefile in kmarch directory
-#
-# Revision 0.9.2.165  2008-08-29 05:57:16  brian
-# - remove kernel dependency from debian control file
-#
-# Revision 0.9.2.164  2008-08-20 10:26:57  brian
-# - updates to common files from newnet
-#
-# Revision 0.9.2.163  2008-04-28 09:41:03  brian
-# - updated headers for release
-#
-# Revision 0.9.2.162  2008-04-10 10:53:23  brian
-# - remove deprecated Nexusware support
-#
-# Revision 0.9.2.161  2007/10/17 20:00:27  brian
-# - slightly different path checks
-#
-# Revision 0.9.2.160  2007/08/12 19:05:31  brian
-# - rearrange and update headers
-#
-# =============================================================================
 # 
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

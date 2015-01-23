@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 1.1.2.17 $) $Date: 2011-09-20 09:51:33 $
+# @(#) File: m4/rpm.m4
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -46,10 +46,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-09-20 09:51:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1043,131 +1039,8 @@ AC_DEFUN([_RPM_], [dnl
 # =============================================================================
 
 # =============================================================================
-#
-# $Log: rpm.m4,v $
-# Revision 1.1.2.17  2011-09-20 09:51:33  brian
-# - updates from git
-#
-# Revision 1.1.2.16  2011-09-02 08:46:30  brian
-# - sync up lots of repo and build changes from git
-#
-# Revision 1.1.2.15  2011-08-07 11:14:37  brian
-# - mostly mandriva and ubuntu build updates
-#
-# Revision 1.1.2.14  2011-07-27 07:52:19  brian
-# - work to support Mageia/Mandriva compressed kernel modules and URPMI repo
-#
-# Revision 1.1.2.13  2011-06-09 11:30:54  brian
-# - support mageia and mes
-#
-# Revision 1.1.2.12  2011-05-31 09:46:01  brian
-# - new distros
-#
-# Revision 1.1.2.11  2011-03-17 07:01:28  brian
-# - build and repo system improvements
-#
-# Revision 1.1.2.10  2011-03-06 08:57:20  brian
-# - repository updates
-#
-# Revision 1.1.2.9  2011-02-28 19:51:30  brian
-# - better repository build
-#
-# Revision 1.1.2.8  2011-02-17 18:34:10  brian
-# - repository and rpm build updates
-#
-# Revision 1.1.2.7  2011-02-10 17:29:45  brian
-# - repo updates
-#
-# Revision 1.1.2.6  2011-02-09 17:59:27  brian
-# - repository and rpm updates for suse
-#
-# Revision 1.1.2.5  2011-02-07 04:48:32  brian
-# - updated configure and build scripts
-#
-# Revision 1.1.2.4  2009-07-21 11:06:13  brian
-# - changes from release build
-#
-# Revision 1.1.2.3  2009-07-04 03:51:33  brian
-# - updates for release
-#
-# Revision 1.1.2.2  2009-06-29 07:35:38  brian
-# - improvements to build process
-#
-# Revision 1.1.2.1  2009-06-21 11:06:05  brian
-# - added files to new distro
-#
-# Revision 0.9.2.84  2008-10-31 11:58:28  brian
-# - more distros
-#
-# Revision 0.9.2.83  2008-10-27 12:23:34  brian
-# - suppress warning on each iteration and cache results
-#
-# Revision 0.9.2.82  2008-09-28 06:50:23  brian
-# - change order of spec files
-#
-# Revision 0.9.2.81  2008-09-28 05:52:34  brian
-# - add subsitution of common spec file
-#
-# Revision 0.9.2.80  2008/09/22 17:57:38  brian
-# - substitute rpm subdirectory
-#
-# Revision 0.9.2.79  2008/09/21 14:09:33  brian
-# - correction
-#
-# Revision 0.9.2.78  2008-09-21 07:10:07  brian
-# - environment passed to rpm and dpkg cannot be precious
-#
-# Revision 0.9.2.77  2008/09/20 23:50:05  brian
-# - change fallback from rpmbuild to rpm
-#
-# Revision 0.9.2.76  2008-09-20 23:06:08  brian
-# - corrections
-#
-# Revision 0.9.2.75  2008-09-20 12:15:24  brian
-# - typo
-#
-# Revision 0.9.2.74  2008-09-20 11:17:14  brian
-# - build system updates
-#
-# Revision 0.9.2.73  2008-09-19 06:19:38  brian
-# - typo
-#
-# Revision 0.9.2.72  2008-09-19 05:18:45  brian
-# - separate repo directory by architecture
-#
-# Revision 0.9.2.71  2008/09/18 09:11:01  brian
-# - add more rpm stuff for debian
-#
-# Revision 0.9.2.70  2008-09-17 05:53:03  brian
-# - place source in tarballs directory for remote build
-#
-# Revision 0.9.2.69  2008-09-16 09:47:47  brian
-# - updates to rpmspec files
-#
-# Revision 0.9.2.68  2008-09-12 06:12:09  brian
-# - correction
-#
-# Revision 0.9.2.67  2008-09-12 05:23:20  brian
-# - add repo subdirectories
-#
-# Revision 0.9.2.66  2008/07/23 19:14:41  brian
-# - indicates support to CentOS 5.2
-#
-# Revision 0.9.2.65  2008-04-28 09:41:03  brian
-# - updated headers for release
-#
-# Revision 0.9.2.64  2008/04/27 22:28:39  brian
-# - fix conditional error
-#
-# Revision 0.9.2.63  2007/10/17 20:00:28  brian
-# - slightly different path checks
-#
-# Revision 0.9.2.62  2007/08/12 19:05:31  brian
-# - rearrange and update headers
-#
-# =============================================================================
 # 
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

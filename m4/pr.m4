@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: pr.m4,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-09-20 09:51:33 $
+# @(#) File: m4/pr.m4
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -46,10 +46,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-09-20 09:51:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -161,53 +157,8 @@ AC_DEFUN([_AUTOPR_], [dnl
 # =============================================================================
 
 # =============================================================================
-#
-# $Log: pr.m4,v $
-# Revision 1.1.2.8  2011-09-20 09:51:33  brian
-# - updates from git
-#
-# Revision 1.1.2.7  2011-08-07 11:14:37  brian
-# - mostly mandriva and ubuntu build updates
-#
-# Revision 1.1.2.6  2011-07-27 07:52:19  brian
-# - work to support Mageia/Mandriva compressed kernel modules and URPMI repo
-#
-# Revision 1.1.2.5  2011-06-09 11:30:54  brian
-# - support mageia and mes
-#
-# Revision 1.1.2.4  2011-05-31 09:46:01  brian
-# - new distros
-#
-# Revision 1.1.2.3  2011-02-28 19:51:30  brian
-# - better repository build
-#
-# Revision 1.1.2.2  2011-02-07 04:48:32  brian
-# - updated configure and build scripts
-#
-# Revision 1.1.2.1  2009-06-21 11:06:05  brian
-# - added files to new distro
-#
-# Revision 0.9.2.6  2008-04-28 09:41:03  brian
-# - updated headers for release
-#
-# Revision 0.9.2.5  2007/08/12 19:05:31  brian
-# - rearrange and update headers
-#
-# Revision 0.9.2.4  2006/08/16 07:30:47  brian
-# - changes for SLES 10
-#
-# Revision 0.9.2.3  2006/06/29 23:38:09  brian
-# - more variations for Ubuntu, which in most ways is much like Debian.
-#
-# Revision 0.9.2.2  2006/03/23 05:41:18  brian
-# - renamed auto-pr to send-pr
-#
-# Revision 0.9.2.1  2006/03/21 13:23:45  brian
-# - added problem reports
-#
-# =============================================================================
 # 
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

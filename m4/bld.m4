@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: bld.m4,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-09-20 09:51:32 $
+# @(#) File: m4/bld.m4
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -46,10 +46,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-09-20 09:51:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -789,45 +785,8 @@ AC_DEFUN([_BLD_], [dnl
 # =============================================================================
 
 # =============================================================================
-#
-# $Log: bld.m4,v $
-# Revision 1.1.2.11  2011-09-20 09:51:32  brian
-# - updates from git
-#
-# Revision 1.1.2.10  2011-08-07 11:14:37  brian
-# - mostly mandriva and ubuntu build updates
-#
-# Revision 1.1.2.9  2011-07-27 07:52:18  brian
-# - work to support Mageia/Mandriva compressed kernel modules and URPMI repo
-#
-# Revision 1.1.2.8  2011-06-09 11:30:54  brian
-# - support mageia and mes
-#
-# Revision 1.1.2.7  2011-05-31 09:46:01  brian
-# - new distros
-#
-# Revision 1.1.2.6  2011-05-10 13:45:34  brian
-# - weak modules workup
-#
-# Revision 1.1.2.5  2011-02-28 19:51:29  brian
-# - better repository build
-#
-# Revision 1.1.2.4  2011-02-17 18:34:10  brian
-# - repository and rpm build updates
-#
-# Revision 1.1.2.3  2011-02-08 23:39:02  brian
-# - last minute release updates
-#
-# Revision 1.1.2.2  2011-02-07 04:48:32  brian
-# - updated configure and build scripts
-#
-# Revision 1.1.2.1  2010-11-28 13:25:01  brian
-# - added new build files, removed redundant files
-#
-#
-# =============================================================================
 # 
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

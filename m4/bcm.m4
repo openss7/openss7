@@ -3,10 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: bcm.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:04 $
+# @(#) File: m4/bcm.m4
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -45,10 +46,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2009-06-21 11:06:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -104,22 +101,8 @@ AC_DEFUN([_BCM_OUTPUT], [dnl
 # =============================================================================
 
 # =============================================================================
-#
-# $Log: bcm.m4,v $
-# Revision 1.1.2.1  2009-06-21 11:06:04  brian
-# - added files to new distro
-#
-# Revision 0.9.2.3  2008-04-28 09:41:03  brian
-# - updated headers for release
-#
-# Revision 0.9.2.2  2007/08/12 19:05:30  brian
-# - rearrange and update headers
-#
-# Revision 0.9.2.1  2006/03/20 12:19:02  brian
-# - attempt at BCM fragments
-#
-# =============================================================================
 # 
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

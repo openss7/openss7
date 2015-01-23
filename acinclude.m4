@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.20 $) $Date: 2011-09-20 09:51:30 $
+# @(#) File: acinclude.m4
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,10 +46,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-09-20 09:51:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -4941,74 +4937,8 @@ AC_DEFUN([_OS7_], [dnl
 # =============================================================================
 
 # =============================================================================
-#
-# $Log: acinclude.m4,v $
-# Revision 1.1.2.20  2011-09-20 09:51:30  brian
-# - updates from git
-#
-# Revision 1.1.2.19  2011-09-02 08:46:26  brian
-# - sync up lots of repo and build changes from git
-#
-# Revision 1.1.2.18  2011-06-01 03:00:18  brian
-# - added back ldl support
-#
-# Revision 1.1.2.17  2011-05-31 09:45:59  brian
-# - new distros
-#
-# Revision 1.1.2.16  2011-05-15 12:01:19  brian
-# - many build system refinements
-#
-# Revision 1.1.2.15  2011-05-10 13:45:30  brian
-# - weak modules workup
-#
-# Revision 1.1.2.14  2011-04-05 16:35:10  brian
-# - weak module design
-#
-# Revision 1.1.2.13  2011-03-26 04:28:44  brian
-# - updates to build process
-#
-# Revision 1.1.2.12  2011-03-17 07:01:26  brian
-# - build and repo system improvements
-#
-# Revision 1.1.2.11  2011-02-28 19:51:28  brian
-# - better repository build
-#
-# Revision 1.1.2.10  2011-02-17 18:34:09  brian
-# - repository and rpm build updates
-#
-# Revision 1.1.2.9  2011-02-07 04:48:31  brian
-# - updated configure and build scripts
-#
-# Revision 1.1.2.8  2011-01-13 16:19:07  brian
-# - changes for SLES 11 support
-#
-# Revision 1.1.2.7  2010-11-28 13:35:22  brian
-# - build updates and manual page corrections
-#
-# Revision 1.1.2.6  2009-07-23 16:37:42  brian
-# - updates for release
-#
-# Revision 1.1.2.5  2009-07-21 11:06:11  brian
-# - changes from release build
-#
-# Revision 1.1.2.4  2009-07-13 07:13:26  brian
-# - changes for multiple distro build
-#
-# Revision 1.1.2.3  2009-07-04 03:51:32  brian
-# - updates for release
-#
-# Revision 1.1.2.2  2009-06-29 07:35:34  brian
-# - improvements to build process
-#
-# Revision 1.1.2.1  2009-06-21 10:25:07  brian
-# - added base files to new distro
-#
-# Revision 1.1.2.1  2009-06-21 10:13:20  brian
-# added files
-#
-# =============================================================================
 # 
-# Copyright (c) 2009-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2009-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2009  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

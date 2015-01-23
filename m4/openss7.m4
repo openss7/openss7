@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 1.1.2.13 $) $Date: 2011-09-02 08:46:30 $
+# @(#) File: m4/openss7.m4
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -46,10 +46,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-09-02 08:46:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1286,200 +1282,8 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 
 # =============================================================================
-#
-# $Log: openss7.m4,v $
-# Revision 1.1.2.13  2011-09-02 08:46:30  brian
-# - sync up lots of repo and build changes from git
-#
-# Revision 1.1.2.12  2011-05-31 09:46:01  brian
-# - new distros
-#
-# Revision 1.1.2.11  2011-03-17 07:01:28  brian
-# - build and repo system improvements
-#
-# Revision 1.1.2.10  2011-02-28 19:51:30  brian
-# - better repository build
-#
-# Revision 1.1.2.9  2011-02-07 04:48:32  brian
-# - updated configure and build scripts
-#
-# Revision 1.1.2.8  2010-11-28 13:55:51  brian
-# - update build requirements, proper autoconf functions, build updates
-#
-# Revision 1.1.2.7  2009-07-24 13:49:44  brian
-# - updates for release build
-#
-# Revision 1.1.2.6  2009-07-23 16:37:50  brian
-# - updates for release
-#
-# Revision 1.1.2.5  2009-07-21 11:06:13  brian
-# - changes from release build
-#
-# Revision 1.1.2.4  2009-07-13 07:13:27  brian
-# - changes for multiple distro build
-#
-# Revision 1.1.2.3  2009-07-05 12:04:27  brian
-# - updates for release builds
-#
-# Revision 1.1.2.2  2009-06-29 07:35:38  brian
-# - improvements to build process
-#
-# Revision 1.1.2.1  2009-06-21 11:06:05  brian
-# - added files to new distro
-#
-# Revision 0.9.2.79  2008-10-27 12:23:34  brian
-# - suppress warning on each iteration and cache results
-#
-# Revision 0.9.2.78  2008-10-25 10:35:18  brian
-# - updates for autoconf 2.63
-#
-# Revision 0.9.2.77  2008/09/29 04:21:40  brian
-# - wider paths for tool searches
-#
-# Revision 0.9.2.76  2008/09/26 19:02:40  brian
-# - more doc directory adjustments
-#
-# Revision 0.9.2.75  2008/09/26 18:33:34  brian
-# - adjust defaults for doc directories
-#
-# Revision 0.9.2.74  2008/09/26 18:17:04  brian
-# - doc directories now commonly contain version numbers
-#
-# Revision 0.9.2.73  2008-09-22 21:22:14  brian
-# - handle character release numbers
-#
-# Revision 0.9.2.72  2008-09-22 17:47:19  brian
-# - decrement package release when patching
-#
-# Revision 0.9.2.71  2008/09/22 05:52:21  brian
-# - update stamping corrections
-#
-# Revision 0.9.2.70  2008/09/22 03:23:27  brian
-# - do not run program automatically
-#
-# Revision 0.9.2.69  2008/09/21 11:27:12  brian
-# - add patch level detection
-#
-# Revision 0.9.2.68  2008/09/21 07:45:43  brian
-# - typo
-#
-# Revision 0.9.2.67  2008/09/21 07:40:46  brian
-# - add defaults to environment variables
-#
-# Revision 0.9.2.66  2008-09-20 23:06:08  brian
-# - corrections
-#
-# Revision 0.9.2.65  2008-09-20 11:17:14  brian
-# - build system updates
-#
-# Revision 0.9.2.64  2008-09-18 08:05:07  brian
-# - typo
-#
-# Revision 0.9.2.63  2008-09-18 07:51:45  brian
-# - another LZMA tweak
-#
-# Revision 0.9.2.62  2008-09-17 12:06:02  brian
-# - tarballs directory and LZMA suppression
-#
-# Revision 0.9.2.61  2008-08-02 05:06:15  brian
-# - make LZMA compression detected
-#
-# Revision 0.9.2.60  2008-04-28 09:41:03  brian
-# - updated headers for release
-#
-# Revision 0.9.2.59  2008-04-11 16:23:21  brian
-# - define DVI2PS
-#
-# Revision 0.9.2.58  2007-12-16 03:52:53  brian
-# - updated release files
-#
-# Revision 0.9.2.57  2007/10/18 06:12:53  brian
-# - more -Wundef to remove
-#
-# Revision 0.9.2.56  2007/10/18 05:27:52  brian
-# - remove DVIPS warning
-#
-# Revision 0.9.2.55  2007/10/18 05:03:03  brian
-# - more laxity for flex
-#
-# Revision 0.9.2.54  2007/10/18 04:23:31  brian
-# - -Wundef frags out flex, and missing quotes
-#
-# Revision 0.9.2.53  2007/10/17 20:00:28  brian
-# - slightly different path checks
-#
-# Revision 0.9.2.52  2007/10/17 19:22:32  brian
-# - better tool detection
-#
-# Revision 0.9.2.51  2007/10/17 18:00:13  brian
-# - added latex2html
-#
-# Revision 0.9.2.50  2007/10/17 17:43:02  brian
-# - build updates
-#
-# Revision 0.9.2.49  2007/10/17 13:22:19  brian
-# - correction
-#
-# Revision 0.9.2.48  2007/10/17 08:18:30  brian
-# - corrections
-#
-# Revision 0.9.2.47  2007/10/17 08:07:39  brian
-# - added missing checks
-#
-# Revision 0.9.2.46  2007/10/17 07:36:09  brian
-# - added documentation suppression
-#
-# Revision 0.9.2.45  2007/08/19 11:17:34  brian
-# - spelling correction
-#
-# Revision 0.9.2.44  2007/08/19 11:16:48  brian
-# - add defines for directories
-#
-# Revision 0.9.2.43  2007/08/12 19:05:31  brian
-# - rearrange and update headers
-#
-# Revision 0.9.2.42  2007/03/08 04:28:49  brian
-# - substituions changed for program checking macros
-#
-# Revision 0.9.2.41  2007/02/22 08:36:38  brian
-# - balance parentheses
-#
-# Revision 0.9.2.40  2007-02-12 16:55:47  brian
-# - more autoconf 2.61 support
-#
-# Revision 0.9.2.39  2007/02/12 10:39:48  brian
-# - added support for autoconf 2.61
-#
-# Revision 0.9.2.38  2006/10/21 09:18:51  brian
-# - better config.site generation
-#
-# Revision 0.9.2.37  2006/09/25 08:56:35  brian
-# - corrections by inspection
-#
-# Revision 0.9.2.35  2006/07/25 06:38:52  brian
-# - expanded minor device numbers and optimization and locking corrections
-#
-# Revision 0.9.2.34  2006/07/23 04:04:10  brian
-# - more control for user optimizations
-#
-# Revision 0.9.2.33  2006/07/14 00:12:25  brian
-# - substitute config cache and site filenames
-#
-# Revision 0.9.2.32  2006/03/25 12:55:08  brian
-# - got enable_static backwards
-#
-# Revision 0.9.2.31  2006/03/20 12:12:18  brian
-# - don't build libtool static libraries no devel
-#
-# Revision 0.9.2.30  2006/03/20 11:51:09  brian
-# - added check for --disable-devel
-#
-# Revision 0.9.2.29  2006/03/11 09:49:51  brian
-# - a bit better checking
-#
-# =============================================================================
 # 
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

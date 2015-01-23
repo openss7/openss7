@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: perl.m4,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-05-31 09:46:01 $
+# @(#) File: m4/perl.m4
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -46,10 +46,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-05-31 09:46:01 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -260,53 +256,8 @@ AC_DEFUN([_PERL_LIBRARIES], [dnl
 # =============================================================================
 
 # =============================================================================
-#
-# $Log: perl.m4,v $
-# Revision 1.1.2.7  2011-05-31 09:46:01  brian
-# - new distros
-#
-# Revision 1.1.2.6  2011-02-17 18:34:10  brian
-# - repository and rpm build updates
-#
-# Revision 1.1.2.5  2011-02-07 04:48:32  brian
-# - updated configure and build scripts
-#
-# Revision 1.1.2.4  2010-11-28 13:55:51  brian
-# - update build requirements, proper autoconf functions, build updates
-#
-# Revision 1.1.2.3  2009-07-21 11:06:13  brian
-# - changes from release build
-#
-# Revision 1.1.2.2  2009-07-13 07:13:27  brian
-# - changes for multiple distro build
-#
-# Revision 1.1.2.1  2009-06-21 11:06:05  brian
-# - added files to new distro
-#
-# Revision 0.9.2.7  2008-09-14 02:59:07  brian
-# - correction
-#
-# Revision 0.9.2.6  2008/09/13 21:51:07  brian
-# - avoid searching same perl directories
-#
-# Revision 0.9.2.5  2008-09-03 06:58:35  brian
-# - fix typo
-#
-# Revision 0.9.2.4  2008/09/03 06:47:56  brian
-# - search available library paths
-#
-# Revision 0.9.2.3  2008-09-03 05:22:41  brian
-# - handle SuSE stupid perl packaging
-#
-# Revision 0.9.2.2  2008-04-28 09:41:03  brian
-# - updated headers for release
-#
-# Revision 0.9.2.1  2007/10/13 08:13:17  brian
-# - added macros for SNMP agents
-#
-# =============================================================================
 # 
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

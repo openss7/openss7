@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-09-20 09:51:32 $
+# @(#) File: m4/deb.m4
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -46,10 +46,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-09-20 09:51:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -572,80 +568,8 @@ AC_DEFUN([_DEB_], [dnl
 # =============================================================================
 
 # =============================================================================
-#
-# $Log: deb.m4,v $
-# Revision 1.1.2.11  2011-09-20 09:51:32  brian
-# - updates from git
-#
-# Revision 1.1.2.10  2011-09-02 08:46:29  brian
-# - sync up lots of repo and build changes from git
-#
-# Revision 1.1.2.9  2011-07-27 07:52:18  brian
-# - work to support Mageia/Mandriva compressed kernel modules and URPMI repo
-#
-# Revision 1.1.2.8  2011-05-31 09:46:01  brian
-# - new distros
-#
-# Revision 1.1.2.7  2011-05-10 13:45:34  brian
-# - weak modules workup
-#
-# Revision 1.1.2.6  2011-02-28 19:51:29  brian
-# - better repository build
-#
-# Revision 1.1.2.5  2011-02-07 04:48:32  brian
-# - updated configure and build scripts
-#
-# Revision 1.1.2.4  2009-07-21 11:06:12  brian
-# - changes from release build
-#
-# Revision 1.1.2.3  2009-07-04 03:51:32  brian
-# - updates for release
-#
-# Revision 1.1.2.2  2009-06-29 07:35:38  brian
-# - improvements to build process
-#
-# Revision 1.1.2.1  2009-06-21 11:06:04  brian
-# - added files to new distro
-#
-# Revision 0.9.2.30  2008-10-27 12:23:34  brian
-# - suppress warning on each iteration and cache results
-#
-# Revision 0.9.2.29  2008-09-21 13:39:53  brian
-# - add patch level to debian changelog
-#
-# Revision 0.9.2.28  2008/09/21 07:40:45  brian
-# - add defaults to environment variables
-#
-# Revision 0.9.2.27  2008-09-21 07:10:07  brian
-# - environment passed to rpm and dpkg cannot be precious
-#
-# Revision 0.9.2.26  2008-09-20 23:06:07  brian
-# - corrections
-#
-# Revision 0.9.2.25  2008-09-20 11:17:14  brian
-# - build system updates
-#
-# Revision 0.9.2.24  2008-09-19 06:19:38  brian
-# - typo
-#
-# Revision 0.9.2.23  2008-09-19 05:18:45  brian
-# - separate repo directory by architecture
-#
-# Revision 0.9.2.22  2008-09-13 03:48:33  brian
-# - repo subdirectories
-#
-# Revision 0.9.2.21  2008-04-28 09:41:03  brian
-# - updated headers for release
-#
-# Revision 0.9.2.20  2007/10/17 20:00:26  brian
-# - slightly different path checks
-#
-# Revision 0.9.2.19  2007/08/12 19:05:30  brian
-# - rearrange and update headers
-#
-# =============================================================================
 # 
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

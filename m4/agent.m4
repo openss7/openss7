@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: agent.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-05-31 09:46:01 $
+# @(#) File: m4/agent.m4
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -46,10 +46,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-05-31 09:46:01 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -184,38 +180,8 @@ AC_DEFUN([_AGENT_EXTENSIONS], [dnl
 # =============================================================================
 
 # =============================================================================
-#
-# $Log: agent.m4,v $
-# Revision 1.1.2.5  2011-05-31 09:46:01  brian
-# - new distros
-#
-# Revision 1.1.2.4  2011-02-07 04:48:32  brian
-# - updated configure and build scripts
-#
-# Revision 1.1.2.3  2010-11-28 13:55:51  brian
-# - update build requirements, proper autoconf functions, build updates
-#
-# Revision 1.1.2.2  2009-07-21 11:06:12  brian
-# - changes from release build
-#
-# Revision 1.1.2.1  2009-06-21 11:06:04  brian
-# - added files to new distro
-#
-# Revision 0.9.2.4  2008-04-28 09:41:03  brian
-# - updated headers for release
-#
-# Revision 0.9.2.3  2007/10/18 05:33:30  brian
-# - better checking of NET-SNMP
-#
-# Revision 0.9.2.2  2007/10/15 17:21:26  brian
-# - SNMP updates
-#
-# Revision 0.9.2.1  2007/10/15 06:49:07  brian
-# - added agent checks and mib header
-#
-# =============================================================================
 # 
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

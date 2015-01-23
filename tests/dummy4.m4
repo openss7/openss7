@@ -3,10 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: dummy4.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:49:03 $
+# @(#) File: tests/dummy4.m4
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -60,10 +61,6 @@
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
 #
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2009-06-21 11:49:03 $ by $Author: brian $
-#
 # =============================================================================
 
 AT_SETUP([dummy test4])
@@ -75,34 +72,8 @@ exit 1
 AT_CLEANUP
 
 # =============================================================================
-#
-# $Log: dummy4.m4,v $
-# Revision 1.1.2.1  2009-06-21 11:49:03  brian
-# - added files to new distro
-#
-# Revision 0.9.2.8  2008-05-03 13:23:32  brian
-# - added strx25 sub-package and package updates
-#
-# Revision 0.9.2.7  2008-04-28 12:54:12  brian
-# - update file headers for release
-#
-# Revision 0.9.2.6  2007/12/15 20:20:22  brian
-# - updates
-#
-# Revision 0.9.2.5  2007/08/13 22:46:42  brian
-# - GPLv3 header updates
-#
-# Revision 0.9.2.4  2006/09/18 00:48:49  brian
-# - updated testsuite headers
-#
-# Revision 0.9.2.3  2005/07/04 20:07:55  brian
-# - fixed spelling of CVS keyword
-#
-# Revision 0.9.2.2  2005/05/14 23:59:23  brian
-# - getting autotest up and running
-#
-# =============================================================================
 # 
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
