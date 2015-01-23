@@ -1,10 +1,11 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:48:59 $
+# @(#) File: doc/projects/ss/Makefile.am  Version: @VERSION@  Date: @PACKAGE_DATE@
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -42,10 +43,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2009-06-21 10:48:59 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -92,23 +89,5 @@ endif
 
 include ../../../am/info.am
 
-# =============================================================================
-#
-# $Log: Makefile.am,v $
-# Revision 1.1.2.1  2009-06-21 10:48:59  brian
-# - added files to new distro
-#
-# Revision 0.9.2.4  2008-11-26 12:23:03  brian
-# - correction for FDL update
-#
-# Revision 0.9.2.3  2008-11-26 12:01:23  brian
-# - updated to FDL 1.3
-#
-# Revision 0.9.2.2  2008-08-31 06:57:10  brian
-# - do not customize docs unless maintainer modes and dependency tracking
-#
-# Revision 0.9.2.1  2007/11/06 12:54:57  brian
-# - added more top-level documentation
-#
 # =============================================================================
 # vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

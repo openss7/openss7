@@ -1,10 +1,10 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.13 $) $Date: 2011-09-02 08:46:39 $
+# @(#) File: src/java/Makefile.am  Version: @VERSION@  Date: @PACKAGE_DATE@
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -44,10 +44,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-09-02 08:46:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -4181,47 +4177,5 @@ include ../../am/swig.am
 #SECONDARY: $(MY_SECONDARY)
 #INTERMEDIATE: $(MY_INTERMEDIATE)
 
-# =============================================================================
-#
-# $Log: Makefile.am,v $
-# Revision 1.1.2.13  2011-09-02 08:46:39  brian
-# - sync up lots of repo and build changes from git
-#
-# Revision 1.1.2.12  2011-08-07 11:14:38  brian
-# - mostly mandriva and ubuntu build updates
-#
-# Revision 1.1.2.11  2011-07-21 04:35:59  brian
-# - builds on CentOS 6.0
-#
-# Revision 1.1.2.10  2011-05-31 09:46:08  brian
-# - new distros
-#
-# Revision 1.1.2.9  2010-11-28 14:37:20  brian
-# - java build and other corrections
-#
-# Revision 1.1.2.8  2009-07-24 13:49:45  brian
-# - updates for release build
-#
-# Revision 1.1.2.7  2009-07-21 11:06:15  brian
-# - changes from release build
-#
-# Revision 1.1.2.6  2009-07-13 07:13:30  brian
-# - changes for multiple distro build
-#
-# Revision 1.1.2.5  2009-07-09 12:05:15  brian
-# - updated implementation
-#
-# Revision 1.1.2.4  2009-07-04 03:51:33  brian
-# - updates for release
-#
-# Revision 1.1.2.3  2009-06-29 07:35:37  brian
-# - improvements to build process
-#
-# Revision 1.1.2.2  2009-06-22 03:34:25  brian
-# - updates for release
-#
-# Revision 1.1.2.1  2009-06-21 11:27:54  brian
-# - added files to new distro
-#
 # =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

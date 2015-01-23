@@ -1,11 +1,11 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: bcm.am,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-03-17 07:01:27 $
+# @(#) File: am/bcm.am  Version: @VERSION@  Date: @PACKAGE_DATE@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+## Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 ## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 ## Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 ##
@@ -45,10 +45,6 @@
 ##
 ## Commercial licensing and support of this software is available from OpenSS7
 ## Corporation at a fee.  See http://www.openss7.com/
-##
-## -----------------------------------------------------------------------------
-##
-## Last Modified $Date: 2011-03-17 07:01:27 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -170,23 +166,5 @@ endif
 ## PKG_BUILD_ARCH
 endif
 
-## =============================================================================
-##
-## $Log: bcm.am,v $
-## Revision 1.1.2.5  2011-03-17 07:01:27  brian
-## - build and repo system improvements
-##
-## Revision 1.1.2.4  2009-07-21 11:06:11  brian
-## - changes from release build
-##
-## Revision 1.1.2.3  2009-07-13 07:13:26  brian
-## - changes for multiple distro build
-##
-## Revision 1.1.2.2  2009-06-29 07:35:35  brian
-## - improvements to build process
-##
-## Revision 1.1.2.1  2009-06-21 10:26:00  brian
-## - added files to new distro
-##
 ## =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

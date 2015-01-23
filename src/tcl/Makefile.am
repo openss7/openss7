@@ -1,10 +1,10 @@
 # =============================================================================
 #
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:58 $
+# @(#) File: src/tcl/Makefile.am  Version: @VERSION@  Date: @PACKAGE_DATE@
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -43,10 +43,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-09-02 08:46:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -119,20 +115,5 @@ endif
 
 include ../../am/swig.am
 
-# =============================================================================
-#
-# $Log: Makefile.am,v $
-# Revision 1.1.2.4  2011-09-02 08:46:58  brian
-# - sync up lots of repo and build changes from git
-#
-# Revision 1.1.2.3  2011-03-17 07:01:30  brian
-# - build and repo system improvements
-#
-# Revision 1.1.2.2  2009-07-21 11:06:18  brian
-# - changes from release build
-#
-# Revision 1.1.2.1  2009-07-13 07:13:35  brian
-# - changes for multiple distro build
-#
 # =============================================================================
 # vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

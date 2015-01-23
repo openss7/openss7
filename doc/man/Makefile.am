@@ -1,6 +1,10 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
+# @(#) File: doc/man/Makefile.am  Version: @VERSION@  Date: @PACKAGE_DATE@
+##
+## -----------------------------------------------------------------------------
+## 
 ## Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 ## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 ## Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
