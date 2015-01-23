@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dlpi.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-02-07 04:54:44 $
+ @(#) File: src/lib/dlpi.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,50 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-02-07 04:54:44 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: dlpi.c,v $
- Revision 1.1.2.4  2011-02-07 04:54:44  brian
- - code updates for new distro support
-
- Revision 1.1.2.3  2011-01-12 04:10:33  brian
- - code updates for 2.6.32 kernel and gcc 4.4
-
- Revision 1.1.2.2  2010-11-28 14:21:58  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:37:46  brian
- - added files to new distro
-
- Revision 0.9.2.7  2009-03-05 13:07:17  brian
- - fixes thanks to Larry Capriani's syntax checker
-
- Revision 0.9.2.6  2008-09-10 03:50:08  brian
- - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
-
- Revision 0.9.2.5  2008-08-20 10:57:05  brian
- - fixes and build updates from newnet trip
-
- Revision 0.9.2.4  2008-07-31 17:41:22  brian
- - dlpi library mods
-
- Revision 0.9.2.3  2008/07/08 16:57:34  brian
- - updated libraries and manual pages
-
- Revision 0.9.2.2  2008-07-06 14:58:21  brian
- - improvements
-
- Revision 0.9.2.1  2008-07-01 11:51:00  brian
- - added manual pages and library implementation
-
  *****************************************************************************/
 
-static char const ident[] =
-    "$RCSfile: dlpi.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-02-07 04:54:44 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /* This file can be processed by doxygen(1). */
 
