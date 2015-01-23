@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:51 $
+ @(#) File: src/kernel/uw7compat.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,28 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:51 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: uw7compat.c,v $
- Revision 1.1.2.4  2011-09-02 08:46:51  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.3  2011-05-31 09:46:09  brian
- - new distros
-
- Revision 1.1.2.2  2010-11-28 14:21:57  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:37:17  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:51 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -88,8 +69,8 @@ static char const ident[] = "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 1.1.
 
 #define UW7COMP_DESCRIP		"UnixWare(R) 7.1.3 Compatibility for Linux Fast-STREAMS"
 #define UW7COMP_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define UW7COMP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define UW7COMP_REVISION	"LfS $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:51 $"
+#define UW7COMP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define UW7COMP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define UW7COMP_DEVICE		"UnixWare(R) 7.1.3 Compatibility"
 #define UW7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define UW7COMP_LICENSE		"GPL"

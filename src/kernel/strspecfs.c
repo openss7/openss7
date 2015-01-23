@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-09-20 09:51:39 $
+ @(#) File: src/kernel/strspecfs.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,49 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-20 09:51:39 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: strspecfs.c,v $
- Revision 1.1.2.11  2011-09-20 09:51:39  brian
- - updates from git
-
- Revision 1.1.2.10  2011-09-02 08:46:51  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.9  2011-05-31 09:46:09  brian
- - new distros
-
- Revision 1.1.2.8  2011-04-07 15:24:04  brian
- - weak reference corrections
-
- Revision 1.1.2.7  2011-04-05 16:35:14  brian
- - weak module design
-
- Revision 1.1.2.6  2011-03-26 04:28:48  brian
- - updates to build process
-
- Revision 1.1.2.5  2011-01-13 16:19:08  brian
- - changes for SLES 11 support
-
- Revision 1.1.2.4  2011-01-12 04:10:32  brian
- - code updates for 2.6.32 kernel and gcc 4.4
-
- Revision 1.1.2.3  2010-11-28 14:32:26  brian
- - updates to support debian squeeze 2.6.32 kernel
-
- Revision 1.1.2.2  2009-07-23 16:37:54  brian
- - updates for release
-
- Revision 1.1.2.1  2009-06-21 11:37:17  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-09-20 09:51:39 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 #ifdef NEED_LINUX_AUTOCONF_H
 #include NEED_LINUX_AUTOCONF_H
@@ -140,8 +100,8 @@ static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.
 
 #define SPECFS_DESCRIP		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SPECFS_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-09-20 09:51:39 $"
+#define SPECFS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define SPECFS_REVISION		"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"

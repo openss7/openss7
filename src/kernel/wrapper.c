@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-09-02 08:46:51 $
+ @(#) File: src/kernel/wrapper.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,44 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:51 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: wrapper.c,v $
- Revision 1.1.2.9  2011-09-02 08:46:51  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.8  2011-05-31 09:46:09  brian
- - new distros
-
- Revision 1.1.2.7  2011-04-05 16:35:14  brian
- - weak module design
-
- Revision 1.1.2.6  2011-03-26 04:28:49  brian
- - updates to build process
-
- Revision 1.1.2.5  2011-03-17 07:01:29  brian
- - build and repo system improvements
-
- Revision 1.1.2.4  2011-01-13 16:19:08  brian
- - changes for SLES 11 support
-
- Revision 1.1.2.3  2010-11-28 14:32:26  brian
- - updates to support debian squeeze 2.6.32 kernel
-
- Revision 1.1.2.2  2009-09-01 09:09:51  brian
- - added text image files
-
- Revision 1.1.2.1  2009-07-23 16:39:29  brian
- - added wrapper module
-
  *****************************************************************************/
 
-static char const ident[] =
-    "$RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-09-02 08:46:51 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
@@ -124,8 +89,8 @@ static char const ident[] =
 
 #define WRAPPER_DESCRIP		"SVR 4.2 Symbol Definition Wrappers for Linux Fast-STREAMS"
 #define WRAPPER_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define WRAPPER_COPYRIGHT	"Copyright (c) 2008-2012  Monavacon Limited.  All Rights Reserved."
-#define WRAPPER_REVISION	"LfS $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-09-02 08:46:51 $"
+#define WRAPPER_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define WRAPPER_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define WRAPPER_DEVICE		"SVR 4.2 Wrappers (WRAPPER)"
 #define WRAPPER_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define WRAPPER_LICENSE		"GPL"

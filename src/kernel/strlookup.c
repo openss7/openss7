@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-09-20 09:51:39 $
+ @(#) File: src/kernel/strlookup.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,38 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-20 09:51:39 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: strlookup.c,v $
- Revision 1.1.2.7  2011-09-20 09:51:39  brian
- - updates from git
-
- Revision 1.1.2.6  2011-05-31 09:46:08  brian
- - new distros
-
- Revision 1.1.2.5  2011-04-05 16:35:14  brian
- - weak module design
-
- Revision 1.1.2.4  2011-01-12 04:10:32  brian
- - code updates for 2.6.32 kernel and gcc 4.4
-
- Revision 1.1.2.3  2010-11-28 14:21:56  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.2  2009-09-01 09:09:51  brian
- - added text image files
-
- Revision 1.1.2.1  2009-06-21 11:37:16  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] =
-    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-09-20 09:51:39 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H

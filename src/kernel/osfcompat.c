@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-20 09:51:39 $
+ @(#) File: src/kernel/osfcompat.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,31 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-20 09:51:39 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: osfcompat.c,v $
- Revision 1.1.2.5  2011-09-20 09:51:39  brian
- - updates from git
-
- Revision 1.1.2.4  2011-09-02 08:46:51  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.3  2011-05-31 09:46:08  brian
- - new distros
-
- Revision 1.1.2.2  2010-11-28 14:21:56  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:37:16  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-20 09:51:39 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -91,8 +69,8 @@ static char const ident[] = "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 1.1.
 
 #define OSFCOMP_DESCRIP		"OSF/1.2 Compatibility module for Linux Fast-STREAMS"
 #define OSFCOMP_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define OSFCOMP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define OSFCOMP_REVISION	"LfS $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-20 09:51:39 $"
+#define OSFCOMP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define OSFCOMP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define OSFCOMP_DEVICE		"OSF/1.2 Compatibility"
 #define OSFCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OSFCOMP_LICENSE		"GPL"

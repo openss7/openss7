@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-09-20 09:51:39 $
+ @(#) File: src/kernel/strutil.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,46 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-20 09:51:39 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: strutil.c,v $
- Revision 1.1.2.10  2011-09-20 09:51:39  brian
- - updates from git
-
- Revision 1.1.2.9  2011-05-31 09:46:09  brian
- - new distros
-
- Revision 1.1.2.8  2011-04-07 15:24:04  brian
- - weak reference corrections
-
- Revision 1.1.2.7  2011-04-05 16:35:14  brian
- - weak module design
-
- Revision 1.1.2.6  2011-03-26 04:28:49  brian
- - updates to build process
-
- Revision 1.1.2.5  2011-01-12 04:10:32  brian
- - code updates for 2.6.32 kernel and gcc 4.4
-
- Revision 1.1.2.4  2010-11-28 14:32:26  brian
- - updates to support debian squeeze 2.6.32 kernel
-
- Revision 1.1.2.3  2009-07-23 16:37:54  brian
- - updates for release
-
- Revision 1.1.2.2  2009-07-21 11:06:17  brian
- - changes from release build
-
- Revision 1.1.2.1  2009-06-21 11:37:17  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-09-20 09:51:39 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool, true and false */

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-09-20 09:51:39 $
+ @(#) File: src/kernel/strpipe.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,37 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-20 09:51:39 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: strpipe.c,v $
- Revision 1.1.2.7  2011-09-20 09:51:39  brian
- - updates from git
-
- Revision 1.1.2.6  2011-05-31 09:46:08  brian
- - new distros
-
- Revision 1.1.2.5  2011-03-26 04:28:48  brian
- - updates to build process
-
- Revision 1.1.2.4  2011-01-13 16:19:08  brian
- - changes for SLES 11 support
-
- Revision 1.1.2.3  2010-11-28 14:21:56  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.2  2009-07-23 16:37:53  brian
- - updates for release
-
- Revision 1.1.2.1  2009-06-21 11:37:16  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-09-20 09:51:39 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 #ifdef NEED_LINUX_AUTOCONF_H
 #include NEED_LINUX_AUTOCONF_H
