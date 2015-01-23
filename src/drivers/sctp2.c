@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-09-20 09:51:36 $
+ @(#) File: src/drivers/sctp2.c
 
  -----------------------------------------------------------------------------
 
@@ -45,40 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-20 09:51:36 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: sctp2.c,v $
- Revision 1.1.2.8  2011-09-20 09:51:36  brian
- - updates from git
-
- Revision 1.1.2.7  2011-09-02 08:46:35  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.6  2011-05-31 09:46:05  brian
- - new distros
-
- Revision 1.1.2.5  2011-04-05 16:35:12  brian
- - weak module design
-
- Revision 1.1.2.4  2011-03-26 04:28:47  brian
- - updates to build process
-
- Revision 1.1.2.3  2011-01-12 04:10:30  brian
- - code updates for 2.6.32 kernel and gcc 4.4
-
- Revision 1.1.2.2  2010-11-28 14:32:24  brian
- - updates to support debian squeeze 2.6.32 kernel
-
- Revision 1.1.2.1  2009-06-21 11:20:51  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-09-20 09:51:36 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 #define _SVR4_SOURCE
 #define _SUN_SOURCE
@@ -95,8 +64,8 @@ static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.8 
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) Driver"
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-09-20 09:51:36 $"
-#define SCTP_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
+#define SCTP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SCTP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SCTP_LICENSE	"GPL"

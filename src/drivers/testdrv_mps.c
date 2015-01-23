@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testdrv_mps.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:37 $
+ @(#) File: src/drviers/testdrv_mps.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,25 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:37 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: testdrv_mps.c,v $
- Revision 1.1.2.3  2011-09-02 08:46:37  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.2  2010-11-28 14:21:40  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:20:56  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: testdrv_mps.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:37 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  * This is a test module for MPS compatability.  Its purpose is to test MPS compatability functions
@@ -86,8 +70,8 @@ static char const ident[] = "$RCSfile: testdrv_mps.c,v $ $Name:  $($Revision: 1.
  /* This is simply defines for use with Linux module functions. */
 #define TD_MPS_DESCRIP		"MPS Compatiblity TEST (TEST-DRV-MPS) STREAMS Driver"
 #define TD_MPS_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define TD_MPS_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define TD_MPS_REVISION		"OpenSS7 $RCSfile: testdrv_mps.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:37 $"
+#define TD_MPS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define TD_MPS_REVISION		"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define TD_MPS_DEVICE		"MPS Compatability TEST Driver (TEST-DRV-MPS)"
 #define TD_MPS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TD_MPS_LICENSE		"GPL"

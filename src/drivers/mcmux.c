@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mcmux.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:34 $
+ @(#) File: src/drivers/mcmux.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,28 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:34 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: mcmux.c,v $
- Revision 1.1.2.4  2011-09-02 08:46:34  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.3  2010-11-28 14:21:34  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.2  2009-06-29 07:35:43  brian
- - SVR 4.2 => SVR 4.2 MP
-
- Revision 1.1.2.1  2009-06-21 11:20:49  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: mcmux.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:34 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  * This is MCMUX, a GSM MAP Common Services (MC) driver implementing the MAPI
@@ -87,8 +68,8 @@ static char const ident[] = "$RCSfile: mcmux.c,v $ $Name:  $($Revision: 1.1.2.4 
 
 #define MCMUX_DESCRIP	"3GPP TS 29.002 MAP Common Services (MCMUX) STREAMS Mux Driver"
 #define MCMUX_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define MCMUX_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define MCMUX_REVISION	"Monavacon $RCSfile: mcmux.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:34 $"
+#define MCMUX_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define MCMUX_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define MCMUX_DEVICE	"SVR 4.2 MP STREAMS 3GPP TS 29.002 MAP Common Services (MC) Driver"
 #define MCMUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MCMUX_LICENSE	"GPL"

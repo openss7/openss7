@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_rtp.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:35 $
+ @(#) File: srci/drivers/np_rtp.c
 
  -----------------------------------------------------------------------------
 
@@ -45,32 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:35 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: np_rtp.c,v $
- Revision 1.1.2.5  2011-09-02 08:46:35  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.4  2011-05-31 09:46:05  brian
- - new distros
-
- Revision 1.1.2.3  2011-04-05 16:35:12  brian
- - weak module design
-
- Revision 1.1.2.2  2011-03-26 04:28:47  brian
- - updates to build process
-
- Revision 1.1.2.1  2011-01-12 00:12:08  brian
- - added RTP drivers
-
  *****************************************************************************/
 
-static char const ident[] =
-    "$RCSfile: np_rtp.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:35 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  *  This driver is similar to the NPI-UDP driver in that it provides NPI access to UDP; however, it
@@ -153,8 +130,8 @@ static char const ident[] =
 
 #define NP_DESCRIP	"Real-Time Protocol (RTP) Network Provider (NP) STREAMS Driver"
 #define NP_EXTRA	"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
-#define NP_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_rtp.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:35 $"
+#define NP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define NP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define NP_DEVICE	"SVR 4.2 MP STREAMS NPI NP_RTP Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"

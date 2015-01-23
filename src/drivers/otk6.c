@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-09-02 08:46:35 $
+ @(#) File: src/drivers/otk6.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,37 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:35 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: otk6.c,v $
- Revision 1.1.2.7  2011-09-02 08:46:35  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.6  2011-04-07 15:24:02  brian
- - weak reference corrections
-
- Revision 1.1.2.5  2011-04-05 16:35:12  brian
- - weak module design
-
- Revision 1.1.2.4  2011-03-26 04:28:47  brian
- - updates to build process
-
- Revision 1.1.2.3  2010-11-28 14:21:34  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.2  2009-06-29 07:35:43  brian
- - SVR 4.2 => SVR 4.2 MP
-
- Revision 1.1.2.1  2009-06-21 11:20:50  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-09-02 08:46:35 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  * This file provides a multiplexing driver for RFC 1006 (RFC 2126) OSI Transport over TCP.  The
@@ -423,13 +395,14 @@ extern void tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std);
 
 #define OTK6_DESCRIP	"RFC 1006 TPI OSI Transport Provider STREAMS Driver"
 #define OTK6_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
-#define OTK6_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define OTK6_REVISION	"OpenSS7 $RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-09-02 08:46:35 $"
+#define OTK6_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define OTK6_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define OTK6_DEVICE	"SVR 4.2 MP STREAMS RFC1006 TPI OSI Transport Provider Driver"
 #define OTK6_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define OTK6_LICENSE	"GPL"
 #define OTK6_BANNER	OTK6_DESCRIP	"\n" \
 			OTK6_EXTRA	"\n" \
+			OTK6_REVISION	"\n" \
 			OTK6_COPYRIGHT	"\n" \
 			OTK6_DEVICE	"\n" \
 			OTK6_CONTACT

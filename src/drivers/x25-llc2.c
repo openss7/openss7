@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x25-llc2.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:39 $
+ @(#) File: src/drivers/x25-llc2.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,29 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:39 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: x25-llc2.c,v $
- Revision 1.1.2.4  2011-09-02 08:46:39  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.3  2011-01-18 16:55:52  brian
- - added stub drivers and modules
-
- Revision 1.1.2.2  2010-11-28 14:21:42  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:20:59  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] =
-    "$RCSfile: x25-llc2.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:39 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
@@ -77,8 +57,8 @@ static char const ident[] =
 
 #define LLC2_DESCRIP	"SVR 4.2 DLPI X25-LLC2 Driver for Linux Fast-STREAMS"
 #define LLC2_EXTRA      "Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
-#define LLC2_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define LLC2_REVISION	"OpenSS7 $RCSfile: x25-llc2.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:39 $"
+#define LLC2_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define LLC2_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define LLC2_DEVICE	"SVR 4.2MP DLPI Driver (DLPI) for IEEE 802.2 LLC"
 #define LLC2_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LLC2_LICENSE	"GPL"

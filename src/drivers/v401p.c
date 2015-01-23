@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:38 $
+ @(#) File: src/drivers/v401p.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,25 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:38 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: v401p.c,v $
- Revision 1.1.2.3  2011-09-02 08:46:38  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.2  2010-11-28 14:21:41  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:20:58  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: v401p.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:38 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  *  This is a driver for the Varion V401P card.  It provides only full multi-card access (for speed)
@@ -258,8 +242,8 @@ static char const ident[] = "$RCSfile: v401p.c,v $ $Name:  $($Revision: 1.1.2.3 
 
 #define MX_V400P_DESCRIP	"V40XP: MX (Multiplex) STREAMS Driver"
 #define MX_V400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define MX_V400P_REVISION	"OpenSS7 $RCSfile: v401p.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:38 $"
-#define MX_V400P_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
+#define MX_V400P_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define MX_V400P_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define MX_V400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define MX_V400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MX_V400P_LICENSE	"GPL"

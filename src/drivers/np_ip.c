@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-09-20 09:51:36 $
+ @(#) File: src/drivers/np_ip.c
 
  -----------------------------------------------------------------------------
 
@@ -45,50 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2015-01-11 16:50:15 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: np_ip.c,v $
- Revision 1.1.2.11  2011-09-20 09:51:36  brian
- - updates from git
-
- Revision 1.1.2.10  2011-09-02 08:46:35  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.9  2011-05-31 09:46:05  brian
- - new distros
-
- Revision 1.1.2.8  2011-04-05 16:35:12  brian
- - weak module design
-
- Revision 1.1.2.7  2011-03-26 04:28:46  brian
- - updates to build process
-
- Revision 1.1.2.6  2010-12-02 22:22:44  brian
- - regression fix and np_udp driver
-
- Revision 1.1.2.5  2010-11-28 14:32:24  brian
- - updates to support debian squeeze 2.6.32 kernel
-
- Revision 1.1.2.4  2009-09-01 09:09:50  brian
- - added text image files
-
- Revision 1.1.2.3  2009-07-23 16:37:53  brian
- - updates for release
-
- Revision 1.1.2.2  2009-06-29 07:35:43  brian
- - SVR 4.2 => SVR 4.2 MP
-
- Revision 1.1.2.1  2009-06-21 11:20:50  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-09-20 09:51:36 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  * This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -150,8 +109,8 @@ static char const ident[] =
 
 #define NP_DESCRIP	"Internet Protocol (IP) Network Provider (NP_IP) STREAMS Driver"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
-#define NP_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 1.1.2.11 $) $Date: 2011-09-20 09:51:36 $"
+#define NP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define NP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define NP_DEVICE	"SVR 4.2 MP STREAMS NPI NP_IP Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"

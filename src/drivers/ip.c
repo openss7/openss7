@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-09-02 08:46:33 $
+ @(#) File: src/drivers/ip.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,43 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:33 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: ip.c,v $
- Revision 1.1.2.9  2011-09-02 08:46:33  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.8  2011-05-31 09:46:03  brian
- - new distros
-
- Revision 1.1.2.7  2011-04-07 15:24:02  brian
- - weak reference corrections
-
- Revision 1.1.2.6  2011-04-05 16:35:12  brian
- - weak module design
-
- Revision 1.1.2.5  2011-03-26 04:28:46  brian
- - updates to build process
-
- Revision 1.1.2.4  2010-11-28 14:32:24  brian
- - updates to support debian squeeze 2.6.32 kernel
-
- Revision 1.1.2.3  2009-07-23 16:37:52  brian
- - updates for release
-
- Revision 1.1.2.2  2009-06-29 07:35:43  brian
- - SVR 4.2 => SVR 4.2 MP
-
- Revision 1.1.2.1  2009-06-21 11:20:46  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: ip.c,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-09-02 08:46:33 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -133,8 +99,8 @@ typedef unsigned int socklen_t;
 
 #define IP_DESCRIP	"Internet Protocol (IP) Network Provider STREAMS Driver"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
-#define IP_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-09-02 08:46:33 $"
+#define IP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define IP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define IP_DEVICE	"SVR 4.2 MP STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"

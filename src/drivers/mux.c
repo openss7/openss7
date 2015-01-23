@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:36 $
+ @(#) File: src/drivers/mux.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,34 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-20 09:51:36 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: mux.c,v $
- Revision 1.1.2.6  2011-09-20 09:51:36  brian
- - updates from git
-
- Revision 1.1.2.5  2011-09-02 08:46:34  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.4  2011-05-31 09:46:05  brian
- - new distros
-
- Revision 1.1.2.3  2010-11-28 14:21:34  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.2  2009-06-29 07:35:43  brian
- - SVR 4.2 => SVR 4.2 MP
-
- Revision 1.1.2.1  2009-06-21 11:20:50  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:36 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  *  This driver provides a multiplexing driver as an example and a test program.
@@ -102,8 +77,8 @@ static char const ident[] = "$RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.6 $)
 
 #define MUX_DESCRIP	"SVR 4.2 STREAMS Multiplexing (MUX) Driver"
 #define MUX_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define MUX_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:36 $"
+#define MUX_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define MUX_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define MUX_DEVICE	"SVR 4.2 MP STREAMS Multiplexing Driver (MUX)"
 #define MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MUX_LICENSE	"GPL"

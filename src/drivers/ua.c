@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:38 $
+ @(#) File: src/drivers/ua.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,30 +45,14 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:38 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: ua.c,v $
- Revision 1.1.2.3  2011-09-02 08:46:38  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.2  2010-11-28 14:21:41  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:20:57  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: ua.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:38 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 #define UA_DESCRIP	"SIGTRAN User Adaptation (UA) STREAMS Multiplexing Driver"
 #define UA_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define UA_REVISION	"OpenSS7 $RCSfile: ua.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:38 $"
-#define UA_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define UA_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define UA_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UA_LICENSE	"GPL"

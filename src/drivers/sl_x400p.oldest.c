@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.oldest.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:36 $
+ @(#) File: src/drivers/sl_x400p.oldest.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,22 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2010-11-28 14:21:36 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: sl_x400p.oldest.c,v $
- Revision 1.1.2.2  2010-11-28 14:21:36  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:20:54  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sl_x400p.oldest.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:36 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -97,15 +84,19 @@ static char const ident[] = "$RCSfile: sl_x400p.oldest.c,v $ $Name:  $($Revision
 
 #define SL_X400P_DESCRIP	"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS Driver"
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define SL_X400P_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define SL_X400P_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SL_X400P_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SL_X400P_LICENSE	"GPL"
 #define SL_X400P_BANNER		SL_X400P_DESCRIP	"\n" \
 				SL_X400P_EXTRA	"\n" \
+				SL_X400P_REVISION	"\n" \
 				SL_X400P_COPYRIGHT	"\n" \
 				SL_X400P_DEVICE	"\n" \
 				SL_X400P_CONTACT	"\n"
+#define SL_X400P_SPLASH		SL_X400P_DEVICE	" - " \
+				SL_X400P_REVISION	"\n"
 
 #ifdef LINUX
 MODULE_AUTHOR(SL_X400P_CONTACT);

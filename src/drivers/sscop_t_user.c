@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop_t_user.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-04-07 15:24:03 $
+ @(#) File: src/drviers/sscop_t_user.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,28 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-04-07 15:24:03 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: sscop_t_user.c,v $
- Revision 1.1.2.4  2011-04-07 15:24:03  brian
- - weak reference corrections
-
- Revision 1.1.2.3  2011-04-05 16:35:13  brian
- - weak module design
-
- Revision 1.1.2.2  2010-11-28 14:32:25  brian
- - updates to support debian squeeze 2.6.32 kernel
-
- Revision 1.1.2.1  2009-06-21 11:20:54  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sscop_t_user.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-04-07 15:24:03 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  *  =========================================================================

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-09-20 09:51:36 $
+ @(#) File: src/drivers/sccp.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,37 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-20 09:51:36 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: sccp.c,v $
- Revision 1.1.2.7  2011-09-20 09:51:36  brian
- - updates from git
-
- Revision 1.1.2.6  2011-09-02 08:46:35  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.5  2011-05-31 09:46:05  brian
- - new distros
-
- Revision 1.1.2.4  2011-02-07 04:54:42  brian
- - code updates for new distro support
-
- Revision 1.1.2.3  2011-01-12 04:10:30  brian
- - code updates for 2.6.32 kernel and gcc 4.4
-
- Revision 1.1.2.2  2010-11-28 14:21:35  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:20:51  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-09-20 09:51:36 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  *  This is an SCCP (Signalling Connection Control Part) multiplexing driver which can have MTP
@@ -112,8 +84,8 @@ static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 1.1.2.7 $
 
 #define SCCP_DESCRIP	"SS7 Signalling Connection Control Part (SCCP) STREAMS Multiplexing Driver"
 #define SCCP_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-09-20 09:51:36 $"
-#define SCCP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define SCCP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SCCP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SCCP_LICENSE	"GPL"

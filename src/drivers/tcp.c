@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-09-20 09:51:37 $
+ @(#) File: src/drivers/tcp.c
 
  -----------------------------------------------------------------------------
 
@@ -45,46 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-20 09:51:37 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: tcp.c,v $
- Revision 1.1.2.10  2011-09-20 09:51:37  brian
- - updates from git
-
- Revision 1.1.2.9  2011-09-02 08:46:37  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.8  2011-05-31 09:46:06  brian
- - new distros
-
- Revision 1.1.2.7  2011-04-05 16:35:13  brian
- - weak module design
-
- Revision 1.1.2.6  2011-03-26 04:28:47  brian
- - updates to build process
-
- Revision 1.1.2.5  2010-12-02 22:22:45  brian
- - regression fix and np_udp driver
-
- Revision 1.1.2.4  2010-11-28 14:32:25  brian
- - updates to support debian squeeze 2.6.32 kernel
-
- Revision 1.1.2.3  2009-07-23 16:37:53  brian
- - updates for release
-
- Revision 1.1.2.2  2009-06-29 07:35:44  brian
- - SVR 4.2 => SVR 4.2 MP
-
- Revision 1.1.2.1  2009-06-21 11:20:56  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-09-20 09:51:37 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  *  This driver provides a somewhat different approach to TCP than the inet
@@ -162,8 +125,8 @@ static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.10 $
 
 #define TCP_DESCRIP	"Transport Control Protocol (TCP) STREAMS Driver"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TCP_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-09-20 09:51:37 $"
+#define TCP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define TCP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define TCP_DEVICE	"SVR 4.2 MP STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCP_LICENSE	"GPL"

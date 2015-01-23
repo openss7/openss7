@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lcd.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:33 $
+ @(#) File: src/drivers/lcd.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,25 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:33 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: lcd.c,v $
- Revision 1.1.2.3  2011-09-02 08:46:33  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.2  2010-11-28 14:21:32  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:20:47  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: lcd.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:33 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  * This is a Linux Communications Device (LCD) driver.  This driver provides
@@ -89,8 +73,8 @@ static char const ident[] = "$RCSfile: lcd.c,v $ $Name:  $($Revision: 1.1.2.3 $)
 
 #define	LCD_DESCRIP	"SVR 4.2 Communications Device Driver for Linux Fast-STREAMS"
 #define	LCD_EXTRA	"Part of X/Open Network Services for Linux Fast-STREAMS"
-#define	LCD_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define	LCD_REVISION	"OpenSS7 $RCSfile: lcd.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:33 $"
+#define	LCD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define	LCD_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define	LCD_DEVICE	"SVR 4.2MP Communications Device (CD) for Linux Fast-STREAMS"
 #define	LCD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define	LCD_LICENSE	"GPL"

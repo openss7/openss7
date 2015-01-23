@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 1.1.2.12 $) $Date: 2011-09-20 09:51:38 $
+ @(#) File: src/drivers/udp.c
 
  -----------------------------------------------------------------------------
 
@@ -45,52 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-20 09:51:38 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: udp.c,v $
- Revision 1.1.2.12  2011-09-20 09:51:38  brian
- - updates from git
-
- Revision 1.1.2.11  2011-09-02 08:46:38  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.10  2011-05-31 09:46:06  brian
- - new distros
-
- Revision 1.1.2.9  2011-04-05 16:35:13  brian
- - weak module design
-
- Revision 1.1.2.8  2011-03-26 04:28:47  brian
- - updates to build process
-
- Revision 1.1.2.7  2011-01-12 04:10:30  brian
- - code updates for 2.6.32 kernel and gcc 4.4
-
- Revision 1.1.2.6  2010-12-02 22:22:45  brian
- - regression fix and np_udp driver
-
- Revision 1.1.2.5  2010-11-28 14:32:25  brian
- - updates to support debian squeeze 2.6.32 kernel
-
- Revision 1.1.2.4  2009-09-01 09:09:50  brian
- - added text image files
-
- Revision 1.1.2.3  2009-07-23 16:37:53  brian
- - updates for release
-
- Revision 1.1.2.2  2009-06-29 07:35:44  brian
- - SVR 4.2 => SVR 4.2 MP
-
- Revision 1.1.2.1  2009-06-21 11:20:57  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 1.1.2.12 $) $Date: 2011-09-20 09:51:38 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -170,8 +127,8 @@ static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 1.1.2.12 $
 
 #define TP_DESCRIP	"User Datagram Protocol (UDP) STREAMS Driver"
 #define TP_EXTRA	"Part of the OpenSS7 IP Stack for Linux Fast-STREAMS"
-#define TP_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define TP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 1.1.2.12 $) $Date: 2011-09-20 09:51:38 $"
+#define TP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define TP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define TP_DEVICE	"SVR 4.2 MP STREAMS UDP Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TP_LICENSE	"GPL"

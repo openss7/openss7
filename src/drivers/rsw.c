@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rsw.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:35 $
+ @(#) File: src/drivers/rsw.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,28 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:35 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: rsw.c,v $
- Revision 1.1.2.4  2011-09-02 08:46:35  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.3  2011-03-26 04:28:47  brian
- - updates to build process
-
- Revision 1.1.2.2  2011-01-12 04:10:29  brian
- - code updates for 2.6.32 kernel and gcc 4.4
-
- Revision 1.1.2.1  2010-12-02 22:22:46  brian
- - regression fix and np_udp driver
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: rsw.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:35 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  * This is the RTP-SW multiplexing driver.  It s purpose is to allo a single
@@ -268,8 +249,8 @@ static char const ident[] = "$RCSfile: rsw.c,v $ $Name:  $($Revision: 1.1.2.4 $)
 
 #define RSW_DESCRIP	"Real-Time Protocol (RTP) Switching STREAMS Driver"
 #define RSW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define RSW_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define RSW_REVISION	"OpenSS7 $RCSfile: rsw.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:35 $"
+#define RSW_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define RSW_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define RSW_DEVICE	"SVR 4.2 MP STREAMS RTP Switch Driver"
 #define RSW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RSW_LICENSE	"GPL"

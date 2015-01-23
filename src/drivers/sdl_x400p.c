@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:36 $
+ @(#) File: src/drivers/sdl_x400p.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,25 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:36 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: sdl_x400p.c,v $
- Revision 1.1.2.3  2011-09-02 08:46:36  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.2  2010-11-28 14:21:35  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:20:52  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:36 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  *  This is an SDL (Signalling Data Link) kernel module which provides all of
@@ -95,8 +79,8 @@ static char const ident[] = "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 1.1.
 
 #define SDL_X400P_DESCRIP	"E/T400P-SS7: SS7/SDL (Signalling Data Link) STREAMS Driver"
 #define SDL_X400P_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS."
-#define SDL_X400P_REVISION	"OpenSS7 $RCSfile: sdl_x400p.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:36 $"
-#define SDL_X400P_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define SDL_X400P_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SDL_X400P_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define SDL_X400P_DEVICE	"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SDL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDL_X400P_LICENSE	"GPL"

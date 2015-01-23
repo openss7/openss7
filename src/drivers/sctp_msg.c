@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:05 $
+ @(#) File: src/drivers/sctp_msg.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,28 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-05-31 09:46:05 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: sctp_msg.c,v $
- Revision 1.1.2.4  2011-05-31 09:46:05  brian
- - new distros
-
- Revision 1.1.2.3  2010-11-28 14:21:35  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.2  2009-07-23 16:37:53  brian
- - updates for release
-
- Revision 1.1.2.1  2009-06-21 11:20:52  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:05 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 #define __NO_VERSION__
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:37 $
+ @(#) File: src/drivers/sl_x100p.c
 
  -----------------------------------------------------------------------------
 
@@ -45,34 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-20 09:51:37 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: sl_x100p.c,v $
- Revision 1.1.2.6  2011-09-20 09:51:37  brian
- - updates from git
-
- Revision 1.1.2.5  2011-09-02 08:46:36  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.4  2011-01-12 04:10:30  brian
- - code updates for 2.6.32 kernel and gcc 4.4
-
- Revision 1.1.2.3  2010-11-28 14:21:36  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.2  2009-07-05 12:04:28  brian
- - updates for release builds
-
- Revision 1.1.2.1  2009-06-21 11:20:53  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:37 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -112,8 +87,8 @@ static char const ident[] = "$RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 1.1.2
 
 #define SL_X100P_DESCRIP	"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS Driver"
 #define SL_X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define SL_X100P_REVISION	"OpenSS7 $RCSfile: sl_x100p.c,v $ $Name:  $ ($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:37 $"
-#define SL_X100P_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define SL_X100P_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SL_X100P_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define SL_X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards"
 #define SL_X100P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SL_X100P_LICENSE	"GPL"

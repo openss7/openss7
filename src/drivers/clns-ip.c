@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clns-ip.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:32 $
+ @(#) File: src/drivers/clns-ip.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,28 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:32 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: clns-ip.c,v $
- Revision 1.1.2.4  2011-09-02 08:46:32  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.3  2010-11-28 14:21:31  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.2  2009-06-29 07:35:42  brian
- - SVR 4.2 => SVR 4.2 MP
-
- Revision 1.1.2.1  2009-06-21 11:20:44  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: clns-ip.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:32 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  *  This is an X.233 CLNP driver.
@@ -129,8 +110,8 @@ static char const ident[] = "$RCSfile: clns-ip.c,v $ $Name:  $($Revision: 1.1.2.
 
 #define CLNS_DESCRIP	"CLNS OSI ISO-IP (RFC 1070) Network Provider STREAMS Driver"
 #define CLNS_EXTRA	"Part of the OpenSS7 OSI stack for Linux Fast-STREAMS"
-#define CLNS_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define CLNS_REVISION	"OpenSS7 $RCSfile: clns-ip.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:32 $"
+#define CLNS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define CLNS_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define CLNS_DEVICE	"SVR 4.2 MP STREAMS CLNS OSI ISO-IP (RFC 1070) Network Provider"
 #define CNLS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CNLS_LICENSE	"GPL"

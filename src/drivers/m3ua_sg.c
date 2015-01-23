@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_sg.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:34 $
+ @(#) File: src/drivers/m3ua_sg.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,25 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:34 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: m3ua_sg.c,v $
- Revision 1.1.2.3  2011-09-02 08:46:34  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.2  2010-11-28 14:21:34  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:20:49  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: m3ua_sg.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:34 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 #include <sys/os7/compat.h>
 
@@ -72,15 +56,19 @@ static char const ident[] = "$RCSfile: m3ua_sg.c,v $ $Name:  $($Revision: 1.1.2.
 
 #define M3UA_DESCRIP	"M3UA/SCTP STREAMS Multiplexor"
 #define M3UA_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define M3UA_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define M3UA_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define M3UA_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define M3UA_DEVICES	"Supports OpenSS7 drivers."
 #define M3UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define M3UA_LICENSE	"GPL"
 #define M3UA_BANNER	M3UA_DESCRIP	"\n" \
 			M3UA_EXTRA	"\n" \
+			M3UA_REVISION	"\n" \
 			M3UA_COPYRIGHT	"\n" \
 			M3UA_DEVICES	"\n" \
 			M3UA_CONTACT	"\n"
+#define M3UA_SPLASH	M3UA_DEVICEs	" - " \
+			M3UA_REVISION	"\n"
 
 #ifdef LINUX
 MODULE_AUTHOR(M3UA_CONTACT);

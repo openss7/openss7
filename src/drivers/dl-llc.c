@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl-llc.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:32 $
+ @(#) File: src/drivers/dl-llc.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,31 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:32 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: dl-llc.c,v $
- Revision 1.1.2.5  2011-09-02 08:46:32  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.4  2011-03-26 04:28:46  brian
- - updates to build process
-
- Revision 1.1.2.3  2010-11-28 14:21:31  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.2  2009-07-23 16:37:52  brian
- - updates for release
-
- Revision 1.1.2.1  2009-06-21 11:20:45  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: dl-llc.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:32 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  * This is a DLPI interface LLC driver for Linux.  What it does is provides DLPI access to the Linux
@@ -110,8 +88,8 @@ static char const ident[] = "$RCSfile: dl-llc.c,v $ $Name:  $($Revision: 1.1.2.5
 
 #define LLC_DESCRIP	"UNIX SVR 4.2 LLC Driver for Linux Fast-STREAMS"
 #define LLC_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
-#define LLC_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define LLC_REVISION	"OpenSS7 $RCSfile: dl-llc.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:32 $"
+#define LLC_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define LLC_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define LLC_DEVICE	"SVR 4.2MP IEEE 802.2 LLC Driver (LLC)"
 #define LLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LLC_LICENSE	"GPL"

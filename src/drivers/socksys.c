@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:37 $
+ @(#) File: src/drivers/socket.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,34 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-20 09:51:37 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: socksys.c,v $
- Revision 1.1.2.6  2011-09-20 09:51:37  brian
- - updates from git
-
- Revision 1.1.2.5  2011-09-02 08:46:37  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.4  2011-01-12 04:10:30  brian
- - code updates for 2.6.32 kernel and gcc 4.4
-
- Revision 1.1.2.3  2010-11-28 14:21:36  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.2  2009-06-29 07:35:44  brian
- - SVR 4.2 => SVR 4.2 MP
-
- Revision 1.1.2.1  2009-06-21 11:20:54  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:37 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  *  A Socket System (SOCKSYS) Driver.
@@ -119,8 +94,8 @@ static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 1.1.2.
 
 #define SOCKSYS_DESCRIP		"SVR 4.2 Socket System (SOCKSYS) STREAMS Driver"
 #define SOCKSYS_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SOCKSYS_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:37 $"
+#define SOCKSYS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define SOCKSYS_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define SOCKSYS_DEVICE		"SVR 4.2 MP STREAMS Socket System Driver (SOCKSYS)"
 #define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SOCKSYS_LICENSE		"GPL"

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:35 $
+ @(#) File: src/drivers/loop.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,34 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-20 09:51:35 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: loop.c,v $
- Revision 1.1.2.6  2011-09-20 09:51:35  brian
- - updates from git
-
- Revision 1.1.2.5  2011-09-02 08:46:33  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.4  2011-05-31 09:46:04  brian
- - new distros
-
- Revision 1.1.2.3  2010-11-28 14:21:33  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.2  2009-06-29 07:35:43  brian
- - SVR 4.2 => SVR 4.2 MP
-
- Revision 1.1.2.1  2009-06-21 11:20:47  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:35 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  *  This file contains a classic loop driver for SVR 4.2 MP STREAMS.  The loop driver is a general
@@ -101,8 +76,8 @@ static char const ident[] = "$RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.6 $
 
 #define LOOP_DESCRIP	"SVR 4.2 STREAMS Null Stream (LOOP) Driver"
 #define LOOP_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define LOOP_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:35 $"
+#define LOOP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define LOOP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define LOOP_DEVICE	"SVR 4.2 MP STREAMS Null Stream (LOOP) Device"
 #define LOOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOOP_LICENSE	"GPL"

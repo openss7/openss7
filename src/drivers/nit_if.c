@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) File: src/drivers/nit_if.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,16 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date$ by $Author$
-
- -----------------------------------------------------------------------------
-
- $Log$
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  * This is a nit driver that works like the clone driver.  It accepts registration from other
@@ -83,8 +76,8 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define NIT_DESCRIP	"SVR 4.1 SNIT (NIT_IF) STREAMS Driver"
 #define NIT_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define NIT_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define NIT_REVISION	"LfS $RCSfile$ $Name$($Revision$) $Date$"
+#define NIT_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define NIT_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define NIT_DEVICE	"SVR 4.2 MP STREAMS NIT Driver"
 #define NIT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NIT_LICENSE	"GPL"

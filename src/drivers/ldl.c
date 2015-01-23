@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-09-20 09:51:35 $
+ @(#) File: src/drivers/ldl.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,40 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-20 09:51:35 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: ldl.c,v $
- Revision 1.1.2.8  2011-09-20 09:51:35  brian
- - updates from git
-
- Revision 1.1.2.7  2011-09-02 08:46:33  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.6  2011-07-21 04:35:58  brian
- - builds on CentOS 6.0
-
- Revision 1.1.2.5  2011-06-01 03:00:19  brian
- - added back ldl support
-
- Revision 1.1.2.4  2010-11-28 14:32:24  brian
- - updates to support debian squeeze 2.6.32 kernel
-
- Revision 1.1.2.3  2010-03-10 08:42:19  brian
- - added Optranex files
-
- Revision 1.1.2.2  2009-06-29 07:35:43  brian
- - SVR 4.2 => SVR 4.2 MP
-
- Revision 1.1.2.1  2009-06-21 11:20:47  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: ldl.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-09-20 09:51:35 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 #define _SVR4_SOURCE
 
@@ -107,8 +76,8 @@ static char const ident[] = "$RCSfile: ldl.c,v $ $Name:  $($Revision: 1.1.2.8 $)
 
 #define LDL_DESCRIP	"INET Data Link Provider (DLPI) NET4 STREAMS Driver"
 #define LDL_EXTRA	"Part of the OpenSS7 Protocol Stacks for Linux Fast-STREAMS"
-#define LDL_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 1.1.2.8 $) $Date: 2011-09-20 09:51:35 $"
+#define LDL_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define LDL_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define LDL_DEVICE	"SVR 4.2 MP STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"

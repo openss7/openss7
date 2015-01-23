@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:34 $
+ @(#) File: src/drivers/echo.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,34 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-20 09:51:34 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: echo.c,v $
- Revision 1.1.2.6  2011-09-20 09:51:34  brian
- - updates from git
-
- Revision 1.1.2.5  2011-09-02 08:46:32  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.4  2011-05-31 09:46:03  brian
- - new distros
-
- Revision 1.1.2.3  2010-11-28 14:21:32  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.2  2009-06-29 07:35:43  brian
- - SVR 4.2 => SVR 4.2 MP
-
- Revision 1.1.2.1  2009-06-21 11:20:45  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:34 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 #ifdef NEED_LINUX_AUTOCONF_H
 #include NEED_LINUX_AUTOCONF_H
@@ -92,8 +67,8 @@ static char const ident[] = "$RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.6 $
 
 #define ECHO_DESCRIP	"SVR 4.2 Echo (ECHO) STREAMS Driver"
 #define ECHO_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define ECHO_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:34 $"
+#define ECHO_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define ECHO_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define ECHO_DEVICE	"SVR 4.2 MP STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"

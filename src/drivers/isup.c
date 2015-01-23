@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-09-02 08:46:33 $
+ @(#) File: src/drivers/isup.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,40 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:33 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: isup.c,v $
- Revision 1.1.2.8  2011-09-02 08:46:33  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.7  2011-05-31 09:46:03  brian
- - new distros
-
- Revision 1.1.2.6  2011-02-07 04:54:41  brian
- - code updates for new distro support
-
- Revision 1.1.2.5  2011-01-12 04:10:29  brian
- - code updates for 2.6.32 kernel and gcc 4.4
-
- Revision 1.1.2.4  2010-11-28 14:21:32  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.3  2010-04-01 17:21:54  brian
- - fix missing ISUP_PT_SVACT
-
- Revision 1.1.2.2  2010-02-22 14:48:41  brian
- - added documentation files to build
-
- Revision 1.1.2.1  2009-06-21 11:20:46  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-09-02 08:46:33 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  *  ISUP STUB MULTIPLEXOR
@@ -106,8 +75,8 @@ static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.8 $
 
 #define ISUP_DESCRIP	"ISUP STREAMS Multiplexing Driver"
 #define ISUP_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-09-02 08:46:33 $"
-#define ISUP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define ISUP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define ISUP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define ISUP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ISUP_LICENSE	"GPL"

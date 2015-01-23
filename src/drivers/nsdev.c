@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-02 08:46:35 $
+ @(#) File: src/drivers/nsdev.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,34 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:35 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: nsdev.c,v $
- Revision 1.1.2.6  2011-09-02 08:46:35  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.5  2011-05-31 09:46:05  brian
- - new distros
-
- Revision 1.1.2.4  2011-01-12 04:10:29  brian
- - code updates for 2.6.32 kernel and gcc 4.4
-
- Revision 1.1.2.3  2010-11-28 14:21:34  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.2  2009-06-29 07:35:43  brian
- - SVR 4.2 => SVR 4.2 MP
-
- Revision 1.1.2.1  2009-06-21 11:20:50  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-02 08:46:35 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 #ifdef NEED_LINUX_AUTOCONF_H
 #include NEED_LINUX_AUTOCONF_H
@@ -95,8 +70,8 @@ static char const ident[] = "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 1.1.2.6 
 
 #define NSDEV_DESCRIP	"STREAMS Named Stream Device (NSDEV) STREAMS Driver"
 #define NSDEV_EXTRA	"Part of Linux Fast-STREAMS"
-#define NSDEV_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-02 08:46:35 $"
+#define NSDEV_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define NSDEV_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define NSDEV_DEVICE	"SVR 4.2 MP STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"

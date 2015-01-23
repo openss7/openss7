@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x25-lapb.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:39 $
+ @(#) File: src/drivers/x25-lapb.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,29 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:39 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: x25-lapb.c,v $
- Revision 1.1.2.4  2011-09-02 08:46:39  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.3  2011-01-18 16:55:52  brian
- - added stub drivers and modules
-
- Revision 1.1.2.2  2010-11-28 14:21:42  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:20:58  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] =
-    "$RCSfile: x25-lapb.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:39 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  *  Here is an X.25 lapb (SLP and MLP) driver.  This is a DLPI driver that can push over or link a
@@ -85,8 +65,8 @@ static char const ident[] =
 
 #define LAPB_DESCRIP	"SVR 4.2 DLPI X25-LAPB Driver for Linux Fast-STREAMS"
 #define LAPB_EXTRA      "Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
-#define LAPB_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define LAPB_REVISION	"OpenSS7 $RCSfile: x25-lapb.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:39 $"
+#define LAPB_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define LAPB_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define LAPB_DEVICE	"SVR 4.2MP DLPI Driver (DLPI) for X.25 Link Access Protocol B-Channel (X25-LAPB)"
 #define LAPB_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LAPB_LICENSE	"GPL"

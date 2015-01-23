@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cddev.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:32 $
+ @(#) File: src/drivers/cddev.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,28 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:32 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: cddev.c,v $
- Revision 1.1.2.4  2011-09-02 08:46:32  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.3  2010-11-28 14:21:31  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.2  2009-06-29 07:35:42  brian
- - SVR 4.2 => SVR 4.2 MP
-
- Revision 1.1.2.1  2009-06-21 11:20:44  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: cddev.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:32 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  * This is a multiplexing driver used for providing access to devices that
@@ -89,8 +70,8 @@ static char const ident[] = "$RCSfile: cddev.c,v $ $Name:  $($Revision: 1.1.2.4 
 
 #define CDDEV_DESCRIP	"Communication Device Interface (CDI) Provider STREAMS Driver"
 #define CDDEV_EXTRA	"Part of the OpenSS7 XNS Stack for Linux Fast-STREAMS"
-#define CDDEV_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define CDDEV_REVISION	"OpenSS7 $RCSfile: cddev.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:32 $"
+#define CDDEV_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define CDDEV_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define CDDEV_DEVICE	"SVR 4.2 MP STREAMS CDI Communication Device Interface Provider"
 #define CDDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CDDEV_LICENSE	"GPL"

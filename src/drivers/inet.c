@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-09-20 09:51:34 $
+ @(#) File: src/drivers/inet.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,49 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-20 09:51:34 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: inet.c,v $
- Revision 1.1.2.11  2011-09-20 09:51:34  brian
- - updates from git
-
- Revision 1.1.2.10  2011-09-02 08:46:32  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.9  2011-05-31 09:46:03  brian
- - new distros
-
- Revision 1.1.2.8  2011-04-07 15:24:02  brian
- - weak reference corrections
-
- Revision 1.1.2.7  2011-04-05 16:35:11  brian
- - weak module design
-
- Revision 1.1.2.6  2011-03-26 04:28:46  brian
- - updates to build process
-
- Revision 1.1.2.5  2011-02-07 04:54:41  brian
- - code updates for new distro support
-
- Revision 1.1.2.4  2010-11-28 14:32:24  brian
- - updates to support debian squeeze 2.6.32 kernel
-
- Revision 1.1.2.3  2009-07-23 16:37:52  brian
- - updates for release
-
- Revision 1.1.2.2  2009-06-29 07:35:43  brian
- - SVR 4.2 => SVR 4.2 MP
-
- Revision 1.1.2.1  2009-06-21 11:20:46  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-09-20 09:51:34 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -702,8 +662,8 @@ extern void tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std);
 
 #define SS__DESCRIP	"INET (NET4) STREAMS Driver"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define SS__COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-09-20 09:51:34 $"
+#define SS__COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define SS__REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define SS__DEVICE	"SVR 4.2 MP STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"

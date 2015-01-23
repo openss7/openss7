@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:33 $
+ @(#) File: src/drivers/ip_to_dlpi.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,31 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:33 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: ip_to_dlpi.c,v $
- Revision 1.1.2.5  2011-09-02 08:46:33  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.4  2010-11-28 14:32:24  brian
- - updates to support debian squeeze 2.6.32 kernel
-
- Revision 1.1.2.3  2010-03-10 08:42:19  brian
- - added Optranex files
-
- Revision 1.1.2.2  2009-06-29 07:35:43  brian
- - SVR 4.2 => SVR 4.2 MP
-
- Revision 1.1.2.1  2009-06-21 11:20:46  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:33 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 #include <sys/os7/compat.h>
 
@@ -90,8 +68,8 @@ static char const ident[] = "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 1.1
 
 #define IP2XINET_DESCRIP	"INET Data Link Provider (IP_TO_DLPI) STREAMS Driver"
 #define IP2XINET_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define IP2XINET_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:33 $"
+#define IP2XINET_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define IP2XINET_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define IP2XINET_DEVICE		"SVR 4.2 MP STREAMS INET DLPI Drivers (NET4)"
 #define IP2XINET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP2XINET_LICENSE	"GPL"

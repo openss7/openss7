@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x25-plp.other.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:39 $
+ @(#) File: src/drivers/x25-plp.other.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,28 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:39 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: x25-plp.other.c,v $
- Revision 1.1.2.4  2011-09-02 08:46:39  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.3  2010-11-28 14:21:42  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.2  2009-06-29 07:35:44  brian
- - SVR 4.2 => SVR 4.2 MP
-
- Revision 1.1.2.1  2009-06-21 11:20:59  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: x25-plp.other.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:39 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  * This is an X.25 PLP (LLC2, XOT, SLP and MLP) (CONS) driver per X.223.  It can be used with the
@@ -85,8 +66,8 @@ static char const ident[] = "$RCSfile: x25-plp.other.c,v $ $Name:  $($Revision: 
 
 #define PLP_DESCRIP	"ISO 8208 X.25 Packet Layer Protocol (X25-PLP) Network Provider"
 #define PLP_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
-#define PLP_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define PLP_REVISION	"OpenSS7 $RCSfile: x25-plp.other.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:39 $"
+#define PLP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define PLP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define PLP_DEVICE	"SVR 4.2 MP STREAMS X.25 PLP (ISO 8208) Network Provider"
 #define PLP_CONTACT	"Brian BIdulock <bidulock@openss7.org>"
 #define PLP_LICENSE	"GPL"

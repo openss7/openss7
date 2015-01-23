@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:35 $
+ @(#) File: src/drivers/pipe.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,31 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:35 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: pipe.c,v $
- Revision 1.1.2.5  2011-09-02 08:46:35  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.4  2011-05-31 09:46:05  brian
- - new distros
-
- Revision 1.1.2.3  2010-11-28 14:21:35  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.2  2009-06-29 07:35:44  brian
- - SVR 4.2 => SVR 4.2 MP
-
- Revision 1.1.2.1  2009-06-21 11:20:50  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: pipe.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:35 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 #ifdef NEED_LINUX_AUTOCONF_H
 #include NEED_LINUX_AUTOCONF_H
@@ -92,8 +70,8 @@ static char const ident[] = "$RCSfile: pipe.c,v $ $Name:  $($Revision: 1.1.2.5 $
 
 #define PIPE_DESCRIP	"SVR 4.2 STREAMS-based Pipe (PIPE) STREAMS Driver"
 #define PIPE_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define PIPE_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:35 $"
+#define PIPE_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define PIPE_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
 #define PIPE_DEVICE	"SVR 4.2 MP STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:36 $
+ @(#) File: src/drivers/mtp_min.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,34 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-20 09:51:36 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: mtp_min.c,v $
- Revision 1.1.2.6  2011-09-20 09:51:36  brian
- - updates from git
-
- Revision 1.1.2.5  2011-09-02 08:46:34  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.4  2011-05-31 09:46:04  brian
- - new distros
-
- Revision 1.1.2.3  2011-01-12 04:10:29  brian
- - code updates for 2.6.32 kernel and gcc 4.4
-
- Revision 1.1.2.2  2010-11-28 14:21:34  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:20:49  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:36 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL (Signalling Link)
@@ -102,8 +77,8 @@ static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 1.1.2.
 
 #define MTP_MIN_DESCRIP		"SS7 Message Transfer Part (MTP) STREAMS Multiplexing Driver"
 #define MTP_MIN_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:36 $"
-#define MTP_MIN_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define MTP_MIN_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define MTP_MIN_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define MTP_MIN_DEVICE		"Part of the OpenSS7 Stack for Linux STREAMS."
 #define MTP_MIN_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MTP_MIN_LICENSE		"GPL"

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:36 $
+ @(#) File: src/drivers/sdlm.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,25 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-02 08:46:36 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: sdlm.c,v $
- Revision 1.1.2.3  2011-09-02 08:46:36  brian
- - sync up lots of repo and build changes from git
-
- Revision 1.1.2.2  2010-11-28 14:21:35  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:20:53  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:36 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  *  A Signalling Data Link Multiplexor for the OpenSS7 SS7 Stack.
@@ -91,8 +75,8 @@ static char const ident[] = "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 1.1.2.3 $
 
 #define SDLM_DESCRIP	"SS7/SDL: (Signalling Data Link) Multiplexing STREAMS Driver"
 #define SDLM_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:36 $"
-#define SDLM_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define SDLM_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SDLM_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define SDLM_DEVICE	"Supports OpenSS7 SDL Drivers."
 #define SDLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDLM_LICENSE	"GPL"
