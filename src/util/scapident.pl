@@ -7,9 +7,9 @@ my $progname = $0;
 my $progdir = $0; $progdir =~ s/\/[^\/]*$//;
 
 my $program = $0; $program =~ s/^.*\///;
-my $ident = '$RCSfile: scapident.pl,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:34:48 $';
-my $version = '$Revision: 1.1.2.3 $';
-my $date = '$Date: 2010-11-28 14:34:48 $';
+my $ident = 'src/util/scpaident.pl 2015-01-24T12:37+0000';
+my $version = '1.1';
+my $date = '2015-01-24 12:37';
 my $title = 'OpenSS7 SS7 Analyzer';
 
 my $Title = <<EOF;
@@ -183,8 +183,8 @@ EOF
 		exit 0;
 	}
 	if (/^--version/) {
-		print<<'EOF';
-$RCSfile$ $Name$($Revision$) $Date$
+		print<<EOF;
+$ident
 Copyright (c) 2008, 2009, 2010, 2011, 2012  Monavacon Limited.
 Copyright (c) 2002, 2003, 2004, 2005, 2006, 2007  OpenSS7 Corporation.
 Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001  Brian Bidulock.
@@ -194,13 +194,13 @@ copying permissions.
 EOF
 	}
 	if (/^--copying/) {
-		print<<'EOF';
+		print<<EOF;
 -----------------------------------------------------------------------------
-# @(#) $RCSfile$ $Name$($Revision$) $Date$
+# @(#) $ident
 -----------------------------------------------------------------------------
 Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock\@openss7.org>
 
 All Rights Reserved.
 

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xti.i,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:37:20 $
+ @(#) src/java/org/openss7/xti/xti.i
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -44,25 +44,6 @@
 
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
-
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2010-11-28 14:37:20 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: xti.i,v $
- Revision 1.1.2.4  2010-11-28 14:37:20  brian
- - java build and other corrections
-
- Revision 1.1.2.3  2009-07-13 07:13:31  brian
- - changes for multiple distro build
-
- Revision 1.1.2.2  2009-07-09 12:05:16  brian
- - updated implementation
-
- Revision 1.1.2.1  2009-06-21 11:36:50  brian
- - added files to new distro
 
  *****************************************************************************/
 

@@ -10,10 +10,10 @@
 * agreement or permission of SS8 Networks, Inc.                               *
 *                                                                             *
 *******************************************************************************
-* VERSION      : $Revision: 1.1 $
-* DATE         : $Date: 2008/05/16 12:23:17 $
+* VERSION      : 1.1
+* DATE         : 2008/05/16 12:23:17
 * 
-* MODULE NAME  : $RCSfile: IsupMsgValues.java,v $
+* MODULE NAME  : IsupMsgValues.java,v
 * AUTHOR       : Nilgun Baykal [SS8]
 * DESCRIPTION  : 
 * DATE 1st REL : 

@@ -10,10 +10,10 @@
 * agreement or permission of SS8 Networks, Inc.                               *
 *                                                                             *
 *******************************************************************************
-* VERSION      : $Revision: 1.1 $
-* DATE         : $Date: 2008/05/16 12:23:21 $
+* VERSION      : 1.1
+* DATE         : 2008/05/16 12:23:21
 * 
-* MODULE NAME  : $RCSfile: VectorAddress.java,v $
+* MODULE NAME  : VectorAddress.java,v
 * AUTHOR       : Nilgun Baykal [SS8]
 * DESCRIPTION  : 
 * DATE 1st REL : 

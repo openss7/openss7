@@ -55,7 +55,7 @@ $\ = "\n";
 use strict;
 
 my $program = $0; $program =~ s/^.*\///;
-my $ident = '$RCSfile: mibbrowser,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:34:48 $';
+my $ident = 'src/perl/mibbrowser 2015-01-24T12:30+0000';
 my $version = '$Revision: 1.1.2.3 $';
 my $date = '$Date: 2010-11-28 14:34:48 $';
 my $title = 'OpenSS7 Network Manager';

@@ -52,7 +52,7 @@ $\ = "\n";
 use strict;
 
 my $program = $0; $program =~ s/^.*\///;
-my $ident = '$RCSfile: streams-manager,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:18 $';
+my $ident = 'src/perl/streams-manager 2015-01-24T12:34+0000';
 my $version = '$Revision: 1.1.2.2 $';
 my $date = '$Date: 2009-07-21 11:06:18 $';
 my $title = 'STREAMS SNMP Manager';

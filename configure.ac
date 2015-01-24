@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.13 $) $Date: 2011-07-21 04:35:56 $
+# @(#) configure.ac
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -46,10 +46,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-07-21 04:35:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -301,50 +297,8 @@ _OPENSS7_OUTPUT
 AC_OUTPUT
 
 # =============================================================================
-#
-# $Log: configure.ac,v $
-# Revision 1.1.2.13  2011-07-21 04:35:56  brian
-# - builds on CentOS 6.0
-#
-# Revision 1.1.2.12  2011-07-18 19:42:10  brian
-# - added documentation
-#
-# Revision 1.1.2.11  2011-05-10 13:45:30  brian
-# - weak modules workup
-#
-# Revision 1.1.2.10  2011-02-07 04:48:31  brian
-# - updated configure and build scripts
-#
-# Revision 1.1.2.9  2010-11-28 13:35:22  brian
-# - build updates and manual page corrections
-#
-# Revision 1.1.2.8  2010-02-22 14:48:40  brian
-# - added documentation files to build
-#
-# Revision 1.1.2.7  2009-09-01 09:09:45  brian
-# - added text image files
-#
-# Revision 1.1.2.6  2009-07-24 13:49:43  brian
-# - updates for release build
-#
-# Revision 1.1.2.5  2009-07-21 11:06:11  brian
-# - changes from release build
-#
-# Revision 1.1.2.4  2009-07-13 07:13:26  brian
-# - changes for multiple distro build
-#
-# Revision 1.1.2.3  2009-07-04 03:51:32  brian
-# - updates for release
-#
-# Revision 1.1.2.2  2009-06-29 07:35:34  brian
-# - improvements to build process
-#
-# Revision 1.1.2.1  2009-06-21 10:25:07  brian
-# - added base files to new distro
-#
-# =============================================================================
 # 
-# Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

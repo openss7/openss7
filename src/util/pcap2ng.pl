@@ -54,9 +54,9 @@ my $progname = $0;
 my $progdir = $0; $progdir =~ s/\/[^\/]*$//;
 
 my $program = $0; $program =~ s/^.*\///;
-my $ident = '$RCSfile$ $Name$($Revision$) $Date$';
-my $version = '$Revision$';
-my $date = '$Date$';
+my $ident = 'src/util/pcap2ng.pl 2015-01-24T12:36+0000';
+my $version = '1.1';
+my $date = '2015-01-24';
 my $title = 'OpenSS7 PCAP to PCAP-NG Converter';
 
 my $Title = <<EOF;
@@ -230,8 +230,8 @@ EOF
 		exit 0;
 	}
 	if (/^--version/) {
-		print<<'EOF';
-$RCSfile$ $Name$($Revision$) $Date$
+		print<<EOF;
+$ident
 Copyright (c) 2008, 2009, 2010, 2011, 2012, 2015  Monavacon Limited.
 Copyright (c) 2002, 2003, 2004, 2005, 2006, 2007  OpenSS7 Corporation.
 Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001  Brian Bidulock.
@@ -241,13 +241,13 @@ copying permissions.
 EOF
 	}
 	if (/^--copying/) {
-		print<<'EOF';
+		print<<EOF;
 -----------------------------------------------------------------------------
-# @(#) $RCSfile$ $Name$($Revision$) $Date$
+# @(#) $ident
 -----------------------------------------------------------------------------
 Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock\@openss7.org>
 
 All Rights Reserved.
 

@@ -10,10 +10,10 @@
 * agreement or permission of SS8 Networks, Inc.                               *
 *                                                                             *
 *******************************************************************************
-* VERSION      : $Revision: 1.1 $
-* DATE         : $Date: 2008/05/16 12:23:18 $
+* VERSION      : 1.1
+* DATE         : 2008/05/16 12:23:18
 * 
-* MODULE NAME  : $RCSfile: JainIsupStackImpl.java,v $
+* MODULE NAME  : JainIsupStackImpl.java,v
 * AUTHOR       : Nilgun Baykal [SS8]
 * DESCRIPTION  : 
 * DATE 1st REL : 
