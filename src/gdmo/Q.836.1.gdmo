@@ -1,10 +1,11 @@
---@@ GDMOCHECK $Revision: 1.1.2.1 $
---@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ GDMOCHECK 2015-01-24T09:15+0000
+--@@ Copyright (c), 2008-2015 Monavacon Limited <http://www.monavacon.com/>
+--@@ Copyright (c), 2001-2008 OpenSS7 Corporation <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Wed Nov 21 11:03:37 MST 2007
+--@@ Date: Sat Jan 24 02:47:58 MST 2015
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "M.3100.gdmo" >--
@@ -2701,6 +2702,12 @@ END
 --@@ These modules define ATTRIBUTE j2PathTraceSend.
 --@@ These modules define ATTRIBUTE kind.
 --@@ These modules define ATTRIBUTE labelOfFarEndExchange.
+--@@ These modules define ATTRIBUTE laserBias.
+--@@ These modules define ATTRIBUTE laserBiasTideMarkMax.
+--@@ These modules define ATTRIBUTE laserBiasTideMarkMin.
+--@@ These modules define ATTRIBUTE laserTemperature.
+--@@ These modules define ATTRIBUTE laserTemperatureTideMarkMax.
+--@@ These modules define ATTRIBUTE laserTemperatureTideMarkMin.
 --@@ These modules define ATTRIBUTE lastAttemptResult.
 --@@ These modules define ATTRIBUTE layer2SignalingEntityPtr.
 --@@ These modules define ATTRIBUTE layer3SignalingEntityPtr.
@@ -2812,6 +2819,8 @@ END
 --@@ These modules define ATTRIBUTE outgoingProtocolErrorCounter.
 --@@ These modules define ATTRIBUTE outgoingProtocolErrorThreshold.
 --@@ These modules define ATTRIBUTE owner.
+--@@ These modules define ATTRIBUTE pSC.
+--@@ These modules define ATTRIBUTE pSD.
 --@@ These modules define ATTRIBUTE packages.
 --@@ These modules define ATTRIBUTE pdusReceivedCounter.
 --@@ These modules define ATTRIBUTE pdusReceivedThreshold.
@@ -3017,6 +3026,9 @@ END
 --@@ These modules define ATTRIBUTE trailTraceReceive.
 --@@ These modules define ATTRIBUTE trailTraceSend.
 --@@ These modules define ATTRIBUTE transmissionCharacteristics.
+--@@ These modules define ATTRIBUTE transmitPowerLevel.
+--@@ These modules define ATTRIBUTE transmitPowerLevelTideMarkMax.
+--@@ These modules define ATTRIBUTE transmitPowerLevelTideMarkMin.
 --@@ These modules define ATTRIBUTE trendIndication.
 --@@ These modules define ATTRIBUTE triggerAssociation.
 --@@ These modules define ATTRIBUTE triggerList.
@@ -3171,6 +3183,12 @@ END
 --@@ |  +- itut_q822::currentData
 --@@ |  |  +- itut_g774_1::sdhCurrentData
 --@@ |  |  |  +- itut_g774_1::pathTerminationCurrentData
+--@@ |  |  |  +- itut_g774_1::electricalSourceSPICurrentData
+--@@ |  |  |  +- itut_g774_1::opticalSourceSPICurrentData
+--@@ |  |  |  +- itut_g774_1::msCurrentData
+--@@ |  |  |  +- itut_g774_1::msCurrentDataTR
+--@@ |  |  |  +- itut_g774_1::protectionCurrentData
+--@@ |  |  |  +- itut_g774_1::pathTerminationCurrentDataTR
 --@@ |  |  +- itut_q836_1::iNAPCurrentData
 --@@ +- itut_x738::dynamicScanner
 --@@ |  +- itut_x738::dynamicSimpleScanner
@@ -3196,6 +3214,10 @@ END
 --@@ +- itut_q821::enhancedCurrentAlarmSummaryControl
 --@@ +- itut_q822::historyData
 --@@ |  +- itut_g774_1::pathTerminationHistoryData
+--@@ |  +- itut_g774_1::electricalSPIHistoryData
+--@@ |  +- itut_g774_1::opticalSPIHistoryData
+--@@ |  +- itut_g774_1::msHistoryData
+--@@ |  +- itut_g774_1::protectionHistoryData
 --@@ |  +- itut_q836_1::iNAPHistoryData
 --@@ +- itut_q822::thresholdData
 --@@ +- itut_g774::indirectAdaptorSink
@@ -3626,6 +3648,7 @@ END
 --@@ |  >- itut_q822::thresholdData
 --@@ |  >- itut_g774_3::protectionGroupR1
 --@@ |  |  >- itut_g774_3::protectionUnit
+--@@ |  |  |  >- itut_g774_1::protectionCurrentData
 --@@ |  >- itut_m3100::alarmSeverityAssignmentProfile
 --@@ |  >- itut_x723::applicationProcess
 --@@ |  >- itut_m3100::arcIntervalProfile
@@ -3724,6 +3747,7 @@ END
 --@@ >- itut_g774::electricalSPITTPSink
 --@@ |  >- itut_g774::rsCTPSink
 --@@ >- itut_g774::electricalSPITTPSource
+--@@ |  >- itut_g774_1::electricalSourceSPICurrentData
 --@@ |  >- itut_g774::rsCTPSource
 --@@ >- itut_g774::msTTPBidirectional
 --@@ |  >- itut_g774::augBidirectional
@@ -3741,6 +3765,8 @@ END
 --@@ |  >- itut_g774::msOrderwireCTPSource
 --@@ |  >- itut_g774_3::unprotectedCTPBidirectional
 --@@ >- itut_g774::msTTPSink
+--@@ |  >- itut_g774_1::msCurrentData
+--@@ |  >- itut_g774_1::msCurrentDataTR
 --@@ |  >- itut_g774::augSink
 --@@ |  |  >- itut_g774::au3CTPSinkR1
 --@@ |  |  >- itut_g774::au4CTPSinkR1
@@ -3761,6 +3787,7 @@ END
 --@@ >- itut_g774::opticalSPITTPSink
 --@@ |  >- itut_g774::rsCTPSink
 --@@ >- itut_g774::opticalSPITTPSource
+--@@ |  >- itut_g774_1::opticalSourceSPICurrentData
 --@@ |  >- itut_g774::rsCTPSource
 --@@ >- itut_g774::rsTTPBidirectional
 --@@ |  >- itut_g774::msCTPBidirectional
@@ -3788,14 +3815,17 @@ END
 --@@ >- itut_g774::vc11TTPBidirectionalR1
 --@@ >- itut_g774::vc11TTPSinkR1
 --@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774_1::pathTerminationCurrentDataTR
 --@@ >- itut_g774::vc11TTPSource
 --@@ >- itut_g774::vc12TTPBidirectionalR1
 --@@ >- itut_g774::vc12TTPSinkR1
 --@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774_1::pathTerminationCurrentDataTR
 --@@ >- itut_g774::vc12TTPSource
 --@@ >- itut_g774::vc2TTPBidirectionalR1
 --@@ >- itut_g774::vc2TTPSinkR1
 --@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774_1::pathTerminationCurrentDataTR
 --@@ >- itut_g774::vc2TTPSource
 --@@ >- itut_g774::vc3TTPBidirectionalR1
 --@@ |  >- itut_g774::tug2Bidirectional
@@ -3813,6 +3843,7 @@ END
 --@@ |  >- itut_g774::vcnUserChannelCTPSource
 --@@ >- itut_g774::vc3TTPSinkR1
 --@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774_1::pathTerminationCurrentDataTR
 --@@ |  >- itut_g774::tug2Sink
 --@@ |  |  >- itut_g774::tu11CTPSinkR1
 --@@ |  |  >- itut_g774::tu12CTPSinkR1
@@ -3835,6 +3866,7 @@ END
 --@@ |  >- itut_g774::vcnUserChannelCTPSource
 --@@ >- itut_g774::vc4TTPSinkR1
 --@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774_1::pathTerminationCurrentDataTR
 --@@ |  >- itut_g774::tug3Sink
 --@@ |  |  >- itut_g774::tu3CTPSinkR1
 --@@ |  |  >- itut_g774::tug2Sink +++
@@ -3847,6 +3879,8 @@ END
 --@@ >- itut_g774_3::protectedTTPBidirectional
 --@@ |  >- itut_g774::augBidirectional +++
 --@@ >- itut_g774_3::protectedTTPSink
+--@@ |  >- itut_g774_1::msCurrentData
+--@@ |  >- itut_g774_1::msCurrentDataTR
 --@@ |  >- itut_g774::augSink +++
 --@@ >- itut_g774_3::protectedTTPSource
 --@@ |  >- itut_g774::augSource +++

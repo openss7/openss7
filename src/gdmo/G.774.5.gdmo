@@ -1,10 +1,11 @@
---@@ GDMOCHECK $Revision: 1.1.2.1 $
---@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ GDMOCHECK 2015-01-24T09:15+0000
+--@@ Copyright (c), 2008-2015 Monavacon Limited <http://www.monavacon.com/>
+--@@ Copyright (c), 2001-2008 OpenSS7 Corporation <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Thu Sep 13 13:20:28 MDT 2007
+--@@ Date: Sat Jan 24 02:44:46 MST 2015
 --@@ 
 --< GDMO.Include "X.739.gdmo" >--
 --< GDMO.Include "G.774.gdmo" >--
@@ -1024,8 +1025,18 @@ END
 --@@ |  +- itut_q822::currentData
 --@@ |  |  +- itut_g774_1::sdhCurrentData
 --@@ |  |  |  +- itut_g774_1::pathTerminationCurrentData
+--@@ |  |  |  +- itut_g774_1::electricalSourceSPICurrentData
+--@@ |  |  |  +- itut_g774_1::opticalSourceSPICurrentData
+--@@ |  |  |  +- itut_g774_1::msCurrentData
+--@@ |  |  |  +- itut_g774_1::msCurrentDataTR
+--@@ |  |  |  +- itut_g774_1::protectionCurrentData
+--@@ |  |  |  +- itut_g774_1::pathTerminationCurrentDataTR
 --@@ +- itut_q822::historyData
 --@@ |  +- itut_g774_1::pathTerminationHistoryData
+--@@ |  +- itut_g774_1::electricalSPIHistoryData
+--@@ |  +- itut_g774_1::opticalSPIHistoryData
+--@@ |  +- itut_g774_1::msHistoryData
+--@@ |  +- itut_g774_1::protectionHistoryData
 --@@ +- itut_q822::thresholdData
 --@@
 
@@ -1059,6 +1070,7 @@ END
 --@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
 --@@ |  >- itut_g774_3::protectionGroupR1
 --@@ |  |  >- itut_g774_3::protectionUnit
+--@@ |  |  |  >- itut_g774_1::protectionCurrentData
 --@@ |  >- itut_m3100::alarmSeverityAssignmentProfile
 --@@ |  >- itut_x723::applicationProcess
 --@@ |  >- itut_m3100::arcIntervalProfile
@@ -1131,6 +1143,7 @@ END
 --@@ |  >- itut_g774::rsCTPSink
 --@@ >- itut_g774::electricalSPITTPSource
 --@@ |  >- itut_g774::rsCTPSource
+--@@ |  >- itut_g774_1::electricalSourceSPICurrentData
 --@@ >- itut_g774::msTTPBidirectional
 --@@ |  >- itut_g774::augBidirectional
 --@@ |  |  >- itut_g774::au3CTPBidirectionalR1
@@ -1153,6 +1166,8 @@ END
 --@@ |  >- itut_g774::msDatacomCTPSink
 --@@ |  >- itut_g774::msOrderwireCTPSink
 --@@ |  >- itut_g774_3::unprotectedCTPSink
+--@@ |  >- itut_g774_1::msCurrentData
+--@@ |  >- itut_g774_1::msCurrentDataTR
 --@@ >- itut_g774::msTTPSource
 --@@ |  >- itut_g774::augSource
 --@@ |  |  >- itut_g774::au3CTPSource
@@ -1168,6 +1183,7 @@ END
 --@@ |  >- itut_g774::rsCTPSink
 --@@ >- itut_g774::opticalSPITTPSource
 --@@ |  >- itut_g774::rsCTPSource
+--@@ |  >- itut_g774_1::opticalSourceSPICurrentData
 --@@ >- itut_g774::rsTTPBidirectional
 --@@ |  >- itut_g774::msCTPBidirectional
 --@@ |  >- itut_g774::msCTPSink
@@ -1194,14 +1210,17 @@ END
 --@@ >- itut_g774::vc11TTPBidirectionalR1
 --@@ >- itut_g774::vc11TTPSinkR1
 --@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774_1::pathTerminationCurrentDataTR
 --@@ >- itut_g774::vc11TTPSource
 --@@ >- itut_g774::vc12TTPBidirectionalR1
 --@@ >- itut_g774::vc12TTPSinkR1
 --@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774_1::pathTerminationCurrentDataTR
 --@@ >- itut_g774::vc12TTPSource
 --@@ >- itut_g774::vc2TTPBidirectionalR1
 --@@ >- itut_g774::vc2TTPSinkR1
 --@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774_1::pathTerminationCurrentDataTR
 --@@ >- itut_g774::vc2TTPSource
 --@@ >- itut_g774::vc3TTPBidirectionalR1
 --@@ |  >- itut_g774::tug2Bidirectional
@@ -1224,6 +1243,7 @@ END
 --@@ |  |  >- itut_g774::tu2CTPSinkR1
 --@@ |  >- itut_g774::vcnUserChannelCTPSink
 --@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774_1::pathTerminationCurrentDataTR
 --@@ >- itut_g774::vc3TTPSourceR1
 --@@ |  >- itut_g774::tug2Source
 --@@ |  |  >- itut_g774::tu11CTPSource
@@ -1245,6 +1265,7 @@ END
 --@@ |  |  >- itut_g774::tug2Sink +++
 --@@ |  >- itut_g774::vcnUserChannelCTPSink
 --@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774_1::pathTerminationCurrentDataTR
 --@@ >- itut_g774::vc4TTPSourceR1
 --@@ |  >- itut_g774::tug3Source
 --@@ |  |  >- itut_g774::tu3CTPSource
@@ -1254,6 +1275,8 @@ END
 --@@ |  >- itut_g774::augBidirectional +++
 --@@ >- itut_g774_3::protectedTTPSink
 --@@ |  >- itut_g774::augSink +++
+--@@ |  >- itut_g774_1::msCurrentData
+--@@ |  >- itut_g774_1::msCurrentDataTR
 --@@ >- itut_g774_3::protectedTTPSource
 --@@ |  >- itut_g774::augSource +++
 --@@ itut_m3100::networkR1

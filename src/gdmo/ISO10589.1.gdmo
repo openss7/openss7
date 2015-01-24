@@ -1,10 +1,11 @@
---@@ GDMOCHECK $Revision: 1.1.2.1 $
---@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ GDMOCHECK 2015-01-24T09:15+0000
+--@@ Copyright (c), 2008-2015 Monavacon Limited <http://www.monavacon.com/>
+--@@ Copyright (c), 2001-2008 OpenSS7 Corporation  <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Wed Nov 21 10:49:42 MST 2007
+--@@ Date: Sat Jan 24 02:45:09 MST 2015
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "X.723.gdmo" >--
@@ -19,11 +20,12 @@
 --< GDMO.Copyright
 --  =============================================================================
 --  
---  @(#) $RCSfile: ISO10589.1.gdmo,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:22:51 $
+--  @(#) src/gdmo/ISO10589.1.gdmo
 --  
 --  -----------------------------------------------------------------------------
 --  
---  Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+--  Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+--  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 --  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 --  
 --  All Rights Reserved.
@@ -61,10 +63,6 @@
 --  
 --  Commercial licensing and support of this software is available from OpenSS7
 --  Corporation at a fee.  See http://www.openss7.com/
---  
---  -----------------------------------------------------------------------------
---  
---  Last Modified $Date: 2009-06-21 11:22:51 $ by $Author: brian $
 --  
 --  =============================================================================
 --  >--

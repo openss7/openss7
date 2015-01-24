@@ -1,11 +1,11 @@
 #!/usr/bin/perl
 # =============================================================================
 # 
-# @(#) $RCSfile: asn1check,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:34:48 $
+# @(#) src/gdmo/asn1check
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -44,25 +44,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2010-11-28 14:34:48 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: asn1check,v $
-# Revision 1.1.2.3  2010-11-28 14:34:48  brian
-# - updates to perlvar
-#
-# Revision 1.1.2.2  2009-07-21 11:06:14  brian
-# - changes from release build
-#
-# Revision 1.1.2.1  2009-06-21 11:22:58  brian
-# - added files to new distro
-#
-# Revision 0.9.2.1  2007/09/29 14:39:49  brian
-# - added new gdmos idls asns
 #
 # =============================================================================
 
@@ -103,7 +84,7 @@ EOF
 	if (/^--version/) {
 		print<<'EOF';
 $RCSfile: asn1check,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:34:48 $
-Copyright (c) 2008, 2009  Monavacon Limited.
+Copyright (c) 2008, 2009, 2010, 2015  Monavacon Limited.
 Copyright (c) 2002, 2003, 2004, 2005, 2006, 2007  OpenSS7 Corporation.
 Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001  Brian Bidulock.
 All Rights Reserved.  Distributed my OpenSS7 Corporation under AGPL
@@ -117,7 +98,7 @@ EOF
 -----------------------------------------------------------------------------
 @(#) $RCSfile: asn1check,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:34:48 $
 -----------------------------------------------------------------------------
-Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 

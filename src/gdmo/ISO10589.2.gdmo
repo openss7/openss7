@@ -1,10 +1,11 @@
---@@ GDMOCHECK $Revision: 1.1.2.1 $
---@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ GDMOCHECK 2015-01-24T09:15+0000
+--@@ Copyright (c), 2008-2015 Monavacon Limited <http://www.monavacon.com/>
+--@@ Copyright (c), 2001-2008 OpenSS7 Corporation  <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Wed Nov 21 19:13:28 MST 2007
+--@@ Date: Sat Jan 24 02:45:13 MST 2015
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "X.723.gdmo" >--
@@ -19,11 +20,12 @@
 --< GDMO.Copyright
 --  =============================================================================
 --  
---  @(#) $RCSfile: ISO10589.2.gdmo,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:22:51 $
+--  @(#) src/gdmo/ISO10589.2.gdmo
 --  
 --  -----------------------------------------------------------------------------
 --  
---  Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+--  Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+--  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 --  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 --  
 --  All Rights Reserved.
@@ -61,10 +63,6 @@
 --  
 --  Commercial licensing and support of this software is available from OpenSS7
 --  Corporation at a fee.  See http://www.openss7.com/
---  
---  -----------------------------------------------------------------------------
---  
---  Last Modified $Date: 2009-06-21 11:22:51 $ by $Author: brian $
 --  
 --  =============================================================================
 --  >--
@@ -2653,6 +2651,10 @@ END
 --@@ |  +- itut_x283::networkConnection
 --@@ +- itut_x723::subsystem
 --@@ |  +- itut_x283::networkSubsystem
+--@@ +- iso_10589_2::adjacency
+--@@ +- iso_10589_2::virtualAdjacency
+--@@ +- iso_10589_2::destination
+--@@ +- iso_10589_2::reachableAddress
 --@@ +- itut_x283::linkage
 --@@ +- itut_x283::x25PLE
 --@@ |  +- itut_x283::x25PLE_DTE
@@ -2669,12 +2671,6 @@ END
 --@@ |  |  +- itut_x283::virtualCall_DCE
 --@@ +- itut_x283::virtualCallIVMO
 --@@ +- itut_x283::dSeriesCounts
---@@ +- iso_10589_2::adjacency
---@@ +- iso_10589_2::virtualAdjacency
---@@ +- iso_10589_2::destination
---@@ |  +- iso_10589_2::destinationSystem
---@@ |  +- iso_10589_2::destinationArea
---@@ +- iso_10589_2::reachableAddress
 --@@
 
 --@@
@@ -2695,7 +2691,14 @@ END
 --@@ >- itut_x283::networkSubsystem
 --@@ |  >- itut_x283::networkEntity
 --@@ |  |  >- itut_x283::cLNS
+--@@ |  |  |  >- iso_10589_2::virtualAdjacency
+--@@ |  |  |  >- iso_10589_2::destinationSystem
+--@@ |  |  |  >- iso_10589_2::destinationArea
 --@@ |  |  |  >- itut_x283::linkage
+--@@ |  |  |  |  >- iso_10589_2::adjacency
+--@@ |  |  |  |  >- iso_10589_2::adjacency
+--@@ |  |  |  |  >- iso_10589_2::reachableAddress
+--@@ |  |  |  |  >- iso_10589_2::reachableAddress
 --@@ |  |  |  |  >- iso_10589_2::adjacency
 --@@ |  |  |  |  >- iso_10589_2::adjacency
 --@@ |  |  |  |  >- iso_10589_2::reachableAddress

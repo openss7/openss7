@@ -1,10 +1,11 @@
---@@ GDMOCHECK $Revision: 1.1.2.1 $
---@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ GDMOCHECK 2015-01-24T09:15+0000
+--@@ Copyright (c), 2008-2015 Monavacon Limited <http://www.monavacon.com/>
+--@@ Copyright (c), 2001-2008 OpenSS7 Corporation  <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Wed Nov 21 19:16:17 MST 2007
+--@@ Date: Sat Jan 24 02:45:44 MST 2015
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "X.723.gdmo" >--
@@ -44,11 +45,12 @@
 --< GDMO.Copyright
 --  =============================================================================
 --  
---  @(#) $RCSfile: M.3100.2005.gdmo,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:22:52 $
+--  @(#) src/gdmo/M.3100.2005.gdmo
 --  
 --  -----------------------------------------------------------------------------
 --  
---  Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+--  Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+--  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 --  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 --  
 --  All Rights Reserved.
@@ -86,10 +88,6 @@
 --  
 --  Commercial licensing and support of this software is available from OpenSS7
 --  Corporation at a fee.  See http://www.openss7.com/
---  
---  -----------------------------------------------------------------------------
---  
---  Last Modified $Date: 2009-06-21 11:22:52 $ by $Author: brian $
 --  
 --  =============================================================================
 --  >--
@@ -8809,14 +8807,14 @@ END
 --@@ |  |  +- itut_x721::securityAlarmReportRecord
 --@@ |  |  +- itut_x721::stateChangeRecord
 --@@ |  |  +- itut_x723::communicationsInformationRecord
---@@ |  |  +- itut_x738::bufferedScanReportRecord
---@@ |  |  +- itut_x738::scanReportRecord
---@@ |  |  +- itut_x738::statisticalReportRecord
 --@@ |  |  +- itut_x742::usageMeteringRecord
 --@@ |  |  +- itut_x745::schedulingConflictRecord
 --@@ |  |  +- itut_x745::testResultsRecord
 --@@ |  |  +- itut_x746::operationResultRecord
 --@@ |  |  +- itut_g774_3::apsReportRecord
+--@@ |  |  +- itut_x738::bufferedScanReportRecord
+--@@ |  |  +- itut_x738::scanReportRecord
+--@@ |  |  +- itut_x738::statisticalReportRecord
 --@@ +- itut_x721::system
 --@@ +- itut_x723::applicationProcess
 --@@ +- itut_x723::communicationsEntity
@@ -8826,28 +8824,6 @@ END
 --@@ +- itut_x723::sap2
 --@@ +- itut_x723::singlePeerConnection
 --@@ +- itut_x723::subsystem
---@@ +- itut_x739::scanner
---@@ |  +- itut_x739::monitorMetric
---@@ |  |  +- itut_x739::meanMonitor
---@@ |  |  |  +- itut_x739::algorithmIndicatingMeanMonitor
---@@ |  |  |  +- itut_x739::movingAverageMeanMonitor
---@@ |  |  |  |  +- itut_x739::meanAndMinMaxMonitor
---@@ |  |  |  |  +- itut_x739::meanAndPercentileMonitor
---@@ |  |  |  |  +- itut_x739::meanAndVarianceMonitor
---@@ |  +- itut_x738::bufferedScanner
---@@ |  +- itut_x738::heterogeneousScanner
---@@ |  +- itut_x738::homogeneousScanner
---@@ |  |  +- itut_x738::ensembleStatisticScanner
---@@ |  |  |  +- itut_x738::meanScanner
---@@ |  |  |  |  +- itut_x738::meanVarianceScanner
---@@ |  |  |  +- itut_x738::minMaxScanner
---@@ |  |  |  +- itut_x738::percentileScanner
---@@ |  |  +- itut_x738::simpleScanner
---@@ |  +- itut_q822::currentData
---@@ |  |  +- itut_g774_1::sdhCurrentData
---@@ |  |  |  +- itut_g774_1::pathTerminationCurrentData
---@@ +- itut_x738::dynamicScanner
---@@ |  +- itut_x738::dynamicSimpleScanner
 --@@ +- itut_x742::usageMeteringControlObject
 --@@ +- itut_x742::usageMeteringDataObject
 --@@ +- itut_x745::testActionPerformer
@@ -8870,6 +8846,10 @@ END
 --@@ +- itut_q821::enhancedCurrentAlarmSummaryControl
 --@@ +- itut_q822::historyData
 --@@ |  +- itut_g774_1::pathTerminationHistoryData
+--@@ |  +- itut_g774_1::electricalSPIHistoryData
+--@@ |  +- itut_g774_1::opticalSPIHistoryData
+--@@ |  +- itut_g774_1::msHistoryData
+--@@ |  +- itut_g774_1::protectionHistoryData
 --@@ +- itut_q822::thresholdData
 --@@ +- itut_g774::indirectAdaptorSink
 --@@ |  +- itut_g774::augSink
@@ -8902,14 +8882,7 @@ END
 --@@ |  +- itut_g774_4::connectionProtection
 --@@ |  +- itut_g774_4::mpConnectionProtection
 --@@ +- itut_m3100::abstractLink
---@@ |  +- itut_m3100::logicalLink
---@@ |  +- itut_m3100::topologicalLink
 --@@ +- itut_m3100::abstractLinkEnd
---@@ |  +- itut_m3100::abstractLinkEndR1
---@@ |  +- itut_m3100::logicalLinkEnd
---@@ |  |  +- itut_m3100::logicalLinkEndR1
---@@ |  +- itut_m3100::topologicalLinkEnd
---@@ |  |  +- itut_m3100::topologicalLinkEndR1
 --@@ +- itut_m3100::accessGroup
 --@@ +- itut_m3100::alarmReportingControlManager
 --@@ +- itut_m3100::alarmSeverityAssignmentProfile
@@ -8917,280 +8890,50 @@ END
 --@@ +- itut_m3100::attributeRanges
 --@@ +- itut_m3100::circuitEndPointSubgroup
 --@@ +- itut_m3100::crossConnection
---@@ |  +- itut_m3100::crossConnectionR1
---@@ |  +- itut_m3100::namedCrossConnection
 --@@ +- itut_m3100::equipment
---@@ |  +- itut_m3100::equipmentR1
---@@ |  |  +- itut_m3100::circuitPack
---@@ |  |  +- itut_m3100::equipmentR2
---@@ |  |  |  +- itut_m3100::circuitPackR1
---@@ |  |  +- itut_m3100::equipmentHolder
 --@@ +- itut_m3100::externalPoint
---@@ |  +- itut_m3100::controlPoint
---@@ |  +- itut_m3100::scanPoint
 --@@ +- itut_m3100::fabric
---@@ |  +- itut_g774_4::sncpFabric
---@@ |  +- itut_m3100::fabricR1
---@@ |  |  +- itut_m3100::fabricR2
---@@ |  |  |  +- itut_m3100::fabricR3
---@@ |  |  |  |  +- itut_m3100::fabricR4
 --@@ +- itut_m3100::gtp
---@@ |  +- itut_m3100::gtpR1
 --@@ +- itut_m3100::managedElement
---@@ |  +- itut_g774::sdhNE
---@@ |  +- itut_m3100::managedElementR1
---@@ |  |  +- itut_m3100::managedElementR2
 --@@ +- itut_m3100::managedElementComplex
 --@@ +- itut_m3100::mpCrossConnection
---@@ |  +- itut_m3100::mpCrossConnectionR1
---@@ |  +- itut_m3100::namedMpCrossConnection
 --@@ +- itut_m3100::network
---@@ |  +- itut_m3100::networkR1
---@@ |  |  +- itut_m3100::layerNetworkDomain
---@@ |  |  |  +- itut_m3100::layerNetworkDomainR1
 --@@ +- itut_m3100::physicalPort
 --@@ +- itut_m3100::pipe
---@@ |  +- itut_m3100::connectionR1
---@@ |  +- itut_m3100::trailR1
 --@@ +- itut_m3100::pipeR2
---@@ |  +- itut_m3100::linkConnection
---@@ |  +- itut_m3100::subNetworkConnection
---@@ |  +- itut_m3100::trailR2
 --@@ +- itut_m3100::protectionUnitR1
 --@@ +- itut_m3100::software
---@@ |  +- itut_m3100::softwareR1
 --@@ +- itut_m3100::subNetwork
 --@@ +- itut_m3100::terminationPoint
---@@ |  +- itut_m3100::connectionTerminationPointSink
---@@ |  |  +- itut_g774::au3CTPSinkR1
---@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSinkR1
---@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
---@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
---@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
---@@ |  |  +- itut_g774::au4CTPSinkR1
---@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSinkR1
---@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
---@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
---@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
---@@ |  |  +- itut_g774::msCTPSink
---@@ |  |  |  +- itut_g774::msCTPBidirectional
---@@ |  |  +- itut_g774::msDatacomCTPSink
---@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
---@@ |  |  +- itut_g774::msOrderwireCTPSink
---@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
---@@ |  |  +- itut_g774::rsCTPSink
---@@ |  |  |  +- itut_g774::rsCTPBidirectional
---@@ |  |  +- itut_g774::rsDatacomCTPSink
---@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
---@@ |  |  +- itut_g774::rsOrderwireCTPSink
---@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
---@@ |  |  +- itut_g774::rsUserChannelCTPSink
---@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
---@@ |  |  +- itut_g774::tu11CTPSinkR1
---@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSinkR1
---@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
---@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
---@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
---@@ |  |  +- itut_g774::tu12CTPSinkR1
---@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSinkR1
---@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
---@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
---@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
---@@ |  |  +- itut_g774::tu2CTPSinkR1
---@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSinkR1
---@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
---@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
---@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
---@@ |  |  +- itut_g774::tu3CTPSinkR1
---@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSinkR1
---@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
---@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
---@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
---@@ |  |  +- itut_g774::vcnUserChannelCTPSink
---@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
---@@ |  |  +- itut_g774_3::unprotectedCTPSink
---@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
---@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
---@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
---@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
---@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
---@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
---@@ |  |  |  +- itut_g774::msCTPBidirectional
---@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
---@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
---@@ |  |  |  +- itut_g774::rsCTPBidirectional
---@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
---@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
---@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
---@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
---@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
---@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
---@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
---@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
---@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
---@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
---@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
---@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
---@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
---@@ |  +- itut_m3100::connectionTerminationPointSource
---@@ |  |  +- itut_g774::au3CTPSource
---@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSource
---@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
---@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
---@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
---@@ |  |  +- itut_g774::au4CTPSource
---@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSource
---@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
---@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
---@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
---@@ |  |  +- itut_g774::msCTPSource
---@@ |  |  |  +- itut_g774::msCTPBidirectional
---@@ |  |  +- itut_g774::msDatacomCTPSource
---@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
---@@ |  |  +- itut_g774::msOrderwireCTPSource
---@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
---@@ |  |  +- itut_g774::rsCTPSource
---@@ |  |  |  +- itut_g774::rsCTPBidirectional
---@@ |  |  +- itut_g774::rsDatacomCTPSource
---@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
---@@ |  |  +- itut_g774::rsOrderwireCTPSource
---@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
---@@ |  |  +- itut_g774::rsUserChannelCTPSource
---@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
---@@ |  |  +- itut_g774::tu11CTPSource
---@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSource
---@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
---@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
---@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
---@@ |  |  +- itut_g774::tu12CTPSource
---@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSource
---@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
---@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
---@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
---@@ |  |  +- itut_g774::tu2CTPSource
---@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSource
---@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
---@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
---@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
---@@ |  |  +- itut_g774::tu3CTPSource
---@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSource
---@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
---@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
---@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
---@@ |  |  +- itut_g774::vcnUserChannelCTPSource
---@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
---@@ |  |  +- itut_g774_3::unprotectedCTPSource
---@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
---@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
---@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
---@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
---@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
---@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
---@@ |  |  |  +- itut_g774::msCTPBidirectional
---@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
---@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
---@@ |  |  |  +- itut_g774::rsCTPBidirectional
---@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
---@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
---@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
---@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
---@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
---@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
---@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
---@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
---@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
---@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
---@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
---@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
---@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
---@@ |  +- itut_m3100::networkTerminationPoint
---@@ |  |  +- itut_m3100::genericTransportTTP
---@@ |  |  |  +- itut_m3100::genericTransportTTPR1
---@@ |  |  +- itut_m3100::networkCTPSink
---@@ |  |  |  +- itut_m3100::networkCTPBidirectional
---@@ |  |  +- itut_m3100::networkCTPSource
---@@ |  |  |  +- itut_m3100::networkCTPBidirectional
---@@ |  |  +- itut_m3100::networkTTPSink
---@@ |  |  |  +- itut_m3100::networkTTPBidirectional
---@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
---@@ |  |  |  +- itut_m3100::networkTTPSinkR1
---@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
---@@ |  |  +- itut_m3100::networkTTPSource
---@@ |  |  |  +- itut_m3100::networkTTPBidirectional
---@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
---@@ |  +- itut_m3100::trailTerminationPointSink
---@@ |  |  +- itut_g774::electricalSPITTPSink
---@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
---@@ |  |  +- itut_g774::msTTPSink
---@@ |  |  |  +- itut_g774::msTTPBidirectional
---@@ |  |  +- itut_g774::opticalSPITTPSink
---@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
---@@ |  |  +- itut_g774::rsTTPSink
---@@ |  |  |  +- itut_g774::rsTTPBidirectional
---@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
---@@ |  |  |  +- itut_g774::rsTTPTrailTraceSink
---@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
---@@ |  |  +- itut_g774::vc11TTPSinkR1
---@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
---@@ |  |  +- itut_g774::vc12TTPSinkR1
---@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
---@@ |  |  +- itut_g774::vc2TTPSinkR1
---@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
---@@ |  |  +- itut_g774::vc3TTPSinkR1
---@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
---@@ |  |  +- itut_g774::vc4TTPSinkR1
---@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
---@@ |  |  +- itut_g774_3::protectedTTPSink
---@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
---@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
---@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
---@@ |  |  |  +- itut_g774::msTTPBidirectional
---@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
---@@ |  |  |  +- itut_g774::rsTTPBidirectional
---@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
---@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
---@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
---@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
---@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
---@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
---@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
---@@ |  +- itut_m3100::trailTerminationPointSource
---@@ |  |  +- itut_g774::electricalSPITTPSource
---@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
---@@ |  |  +- itut_g774::msTTPSource
---@@ |  |  |  +- itut_g774::msTTPBidirectional
---@@ |  |  +- itut_g774::opticalSPITTPSource
---@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
---@@ |  |  +- itut_g774::rsTTPSource
---@@ |  |  |  +- itut_g774::rsTTPBidirectional
---@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
---@@ |  |  |  +- itut_g774::rsTTPTrailTraceSource
---@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
---@@ |  |  +- itut_g774::vc11TTPSource
---@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
---@@ |  |  +- itut_g774::vc12TTPSource
---@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
---@@ |  |  +- itut_g774::vc2TTPSource
---@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
---@@ |  |  +- itut_g774::vc3TTPSourceR1
---@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
---@@ |  |  +- itut_g774::vc4TTPSourceR1
---@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
---@@ |  |  +- itut_g774_3::protectedTTPSource
---@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
---@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
---@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
---@@ |  |  |  +- itut_g774::msTTPBidirectional
---@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
---@@ |  |  |  +- itut_g774::rsTTPBidirectional
---@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
---@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
---@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
---@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
---@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
---@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
---@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
 --@@ +- itut_m3100::tpPool
+--@@ +- itut_x739::scanner
+--@@ |  +- itut_q822::currentData
+--@@ |  |  +- itut_g774_1::sdhCurrentData
+--@@ |  |  |  +- itut_g774_1::pathTerminationCurrentData
+--@@ |  |  |  +- itut_g774_1::electricalSourceSPICurrentData
+--@@ |  |  |  +- itut_g774_1::opticalSourceSPICurrentData
+--@@ |  |  |  +- itut_g774_1::msCurrentData
+--@@ |  |  |  +- itut_g774_1::msCurrentDataTR
+--@@ |  |  |  +- itut_g774_1::protectionCurrentData
+--@@ |  |  |  +- itut_g774_1::pathTerminationCurrentDataTR
+--@@ |  +- itut_x739::monitorMetric
+--@@ |  |  +- itut_x739::meanMonitor
+--@@ |  |  |  +- itut_x739::algorithmIndicatingMeanMonitor
+--@@ |  |  |  +- itut_x739::movingAverageMeanMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndMinMaxMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndPercentileMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndVarianceMonitor
+--@@ |  +- itut_x738::bufferedScanner
+--@@ |  +- itut_x738::heterogeneousScanner
+--@@ |  +- itut_x738::homogeneousScanner
+--@@ |  |  +- itut_x738::ensembleStatisticScanner
+--@@ |  |  |  +- itut_x738::meanScanner
+--@@ |  |  |  |  +- itut_x738::meanVarianceScanner
+--@@ |  |  |  +- itut_x738::minMaxScanner
+--@@ |  |  |  +- itut_x738::percentileScanner
+--@@ |  |  +- itut_x738::simpleScanner
+--@@ +- itut_x738::dynamicScanner
+--@@ |  +- itut_x738::dynamicSimpleScanner
 --@@
 
 --@@
@@ -9208,16 +8951,12 @@ END
 --@@ |  |  |  >- itut_x723::singlePeerConnection
 --@@ |  |  >- itut_x723::sap1
 --@@ |  >- itut_x723::sap2
---@@ >- itut_x739::scanner
---@@ >- itut_x738::dynamicSimpleScanner
---@@ >- itut_x739::scanner
 --@@ >- itut_x742::usageMeteringControlObject
 --@@ >- itut_x746::scheduler
 --@@ >- itut_x746::typeOfDayController
---@@ itut_q822::currentData
---@@ >- itut_q822::historyData
---@@ itut_g774_1::sdhCurrentData
---@@ >- itut_q822::historyData
+--@@ >- itut_x739::scanner
+--@@ >- itut_x738::dynamicSimpleScanner
+--@@ >- itut_x739::scanner
 --@@ itut_x521::organization
 --@@ >- itut_m3100::managedElement
 --@@ |  >- itut_x746::scheduler
@@ -9228,6 +8967,7 @@ END
 --@@ |  >- itut_q822::thresholdData
 --@@ |  >- itut_g774_3::protectionGroupR1
 --@@ |  |  >- itut_g774_3::protectionUnit
+--@@ |  |  |  >- itut_g774_1::protectionCurrentData
 --@@ |  >- itut_m3100::alarmSeverityAssignmentProfile
 --@@ |  >- itut_x723::applicationProcess
 --@@ |  >- itut_m3100::arcIntervalProfile
@@ -9239,6 +8979,12 @@ END
 --@@ |  |  >- itut_m3100::physicalPort
 --@@ |  |  >- itut_m3100::software
 --@@ |  |  |  >- itut_m3100::software
+--@@ |  |  |  >- itut_m3100::software
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::externalPoint
+--@@ |  |  >- itut_m3100::physicalPort
+--@@ |  |  >- itut_m3100::software +++
 --@@ |  >- itut_m3100::equipment +++
 --@@ |  >- itut_x721::eventForwardingDiscriminator
 --@@ |  >- itut_x721::eventForwardingDiscriminator
@@ -9250,6 +8996,13 @@ END
 --@@ |  |  >- itut_m3100::mpCrossConnection
 --@@ |  |  |  >- itut_m3100::crossConnection
 --@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::tpPool
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::gtp
+--@@ |  |  >- itut_m3100::mpCrossConnection +++
 --@@ |  |  >- itut_m3100::tpPool
 --@@ |  >- itut_m3100::fabric +++
 --@@ |  >- itut_m3100::genericTransportTTP
@@ -9261,13 +9014,42 @@ END
 --@@ |  >- itut_x723::subsystem +++
 --@@ |  >- itut_x745::testActionPerformer
 --@@ |  |  >- itut_x745::testObject
+--@@ |  |  >- itut_x745::testObject
 --@@ |  >- itut_m3100::trailTerminationPointSink
+--@@ |  |  >- itut_m3100::connectionTerminationPointSink
 --@@ |  |  >- itut_m3100::connectionTerminationPointSink
 --@@ |  >- itut_m3100::trailTerminationPointSource
 --@@ |  |  >- itut_m3100::connectionTerminationPointSource
+--@@ |  |  >- itut_m3100::connectionTerminationPointSource
+--@@ |  >- itut_x742::usageMeteringControlObject
+--@@ |  >- itut_m3100::alarmSeverityAssignmentProfile
+--@@ |  >- itut_x723::applicationProcess
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::attributeRanges
+--@@ |  >- itut_m3100::equipment +++
+--@@ |  >- itut_m3100::equipment +++
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::fabric +++
+--@@ |  >- itut_m3100::fabric +++
+--@@ |  >- itut_m3100::genericTransportTTP
+--@@ |  >- itut_x721::log +++
+--@@ |  >- itut_m3100::physicalPort
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x738::simpleScanner
+--@@ |  >- itut_m3100::software +++
+--@@ |  >- itut_x723::subsystem +++
+--@@ |  >- itut_x745::testActionPerformer +++
+--@@ |  >- itut_m3100::trailTerminationPointSink +++
+--@@ |  >- itut_m3100::trailTerminationPointSource +++
 --@@ |  >- itut_x742::usageMeteringControlObject
 --@@ >- itut_m3100::managedElementComplex
 --@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::managedElement +++
 --@@ |  >- itut_m3100::arcIntervalProfile
 --@@ |  >- itut_m3100::externalPoint
 --@@ |  >- itut_m3100::managedElement +++
@@ -9279,189 +9061,24 @@ END
 --@@ |  >- itut_m3100::managedElement +++
 --@@ |  >- itut_m3100::network
 --@@ |  >- itut_m3100::trailR1
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::connectionR1
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::network
+--@@ |  >- itut_m3100::trailR1
+--@@ >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ >- itut_m3100::network +++
 --@@ itut_x521::organizationalUnit
 --@@ >- itut_m3100::managedElement +++
 --@@ >- itut_m3100::managedElementComplex +++
 --@@ >- itut_m3100::network +++
---@@ itut_g774_4::sncpFabric
---@@ >- itut_g774_4::connectionProtectionGroupR1
---@@ |  >- itut_g774_4::connectionProtection
---@@ |  >- itut_g774_4::mpConnectionProtection
---@@ |  |  >- itut_m3100::crossConnection
---@@ >- itut_m3100::crossConnection
---@@ >- itut_m3100::mpCrossConnection +++
---@@ itut_g774::sdhNE
---@@ >- itut_g774::electricalSPITTPBidirectional
---@@ |  >- itut_g774::rsCTPBidirectional
---@@ |  >- itut_g774::rsCTPSink
---@@ |  >- itut_g774::rsCTPSource
---@@ >- itut_g774::electricalSPITTPSink
---@@ |  >- itut_g774::rsCTPSink
---@@ >- itut_g774::electricalSPITTPSource
---@@ |  >- itut_g774::rsCTPSource
---@@ >- itut_g774::msTTPBidirectional
---@@ |  >- itut_g774::augBidirectional
---@@ |  |  >- itut_g774::au3CTPBidirectionalR1
---@@ |  |  >- itut_g774::au3CTPSinkR1
---@@ |  |  >- itut_g774::au3CTPSource
---@@ |  |  >- itut_g774::au4CTPBidirectionalR1
---@@ |  |  >- itut_g774::au4CTPSinkR1
---@@ |  |  >- itut_g774::au4CTPSource
---@@ |  >- itut_g774::msDatacomCTPBidirectional
---@@ |  >- itut_g774::msDatacomCTPSink
---@@ |  >- itut_g774::msDatacomCTPSource
---@@ |  >- itut_g774::msOrderwireCTPBidirectional
---@@ |  >- itut_g774::msOrderwireCTPSink
---@@ |  >- itut_g774::msOrderwireCTPSource
---@@ |  >- itut_g774_3::unprotectedCTPBidirectional
---@@ >- itut_g774::msTTPSink
---@@ |  >- itut_g774::augSink
---@@ |  |  >- itut_g774::au3CTPSinkR1
---@@ |  |  >- itut_g774::au4CTPSinkR1
---@@ |  >- itut_g774::msDatacomCTPSink
---@@ |  >- itut_g774::msOrderwireCTPSink
---@@ |  >- itut_g774_3::unprotectedCTPSink
---@@ >- itut_g774::msTTPSource
---@@ |  >- itut_g774::augSource
---@@ |  |  >- itut_g774::au3CTPSource
---@@ |  |  >- itut_g774::au4CTPSource
---@@ |  >- itut_g774::msDatacomCTPSource
---@@ |  >- itut_g774::msOrderwireCTPSource
---@@ |  >- itut_g774_3::unprotectedCTPSource
---@@ >- itut_g774::opticalSPITTPBidirectional
---@@ |  >- itut_g774::rsCTPBidirectional
---@@ |  >- itut_g774::rsCTPSink
---@@ |  >- itut_g774::rsCTPSource
---@@ >- itut_g774::opticalSPITTPSink
---@@ |  >- itut_g774::rsCTPSink
---@@ >- itut_g774::opticalSPITTPSource
---@@ |  >- itut_g774::rsCTPSource
---@@ >- itut_g774::rsTTPBidirectional
---@@ |  >- itut_g774::msCTPBidirectional
---@@ |  >- itut_g774::msCTPSink
---@@ |  >- itut_g774::msCTPSource
---@@ |  >- itut_g774::rsDatacomCTPBidirectional
---@@ |  >- itut_g774::rsDatacomCTPSink
---@@ |  >- itut_g774::rsDatacomCTPSource
---@@ |  >- itut_g774::rsOrderwireCTPBidirectional
---@@ |  >- itut_g774::rsOrderwireCTPSink
---@@ |  >- itut_g774::rsOrderwireCTPSource
---@@ |  >- itut_g774::rsUserChannelCTPBidirectional
---@@ |  >- itut_g774::rsUserChannelCTPSink
---@@ |  >- itut_g774::rsUserChannelCTPSource
---@@ >- itut_g774::rsTTPSink
---@@ |  >- itut_g774::msCTPSink
---@@ |  >- itut_g774::rsDatacomCTPSink
---@@ |  >- itut_g774::rsOrderwireCTPSink
---@@ |  >- itut_g774::rsUserChannelCTPSink
---@@ >- itut_g774::rsTTPSource
---@@ |  >- itut_g774::msCTPSource
---@@ |  >- itut_g774::rsDatacomCTPSource
---@@ |  >- itut_g774::rsOrderwireCTPSource
---@@ |  >- itut_g774::rsUserChannelCTPSource
---@@ >- itut_g774::vc11TTPBidirectionalR1
---@@ >- itut_g774::vc11TTPSinkR1
---@@ |  >- itut_g774_1::pathTerminationCurrentData
---@@ >- itut_g774::vc11TTPSource
---@@ >- itut_g774::vc12TTPBidirectionalR1
---@@ >- itut_g774::vc12TTPSinkR1
---@@ |  >- itut_g774_1::pathTerminationCurrentData
---@@ >- itut_g774::vc12TTPSource
---@@ >- itut_g774::vc2TTPBidirectionalR1
---@@ >- itut_g774::vc2TTPSinkR1
---@@ |  >- itut_g774_1::pathTerminationCurrentData
---@@ >- itut_g774::vc2TTPSource
---@@ >- itut_g774::vc3TTPBidirectionalR1
---@@ |  >- itut_g774::tug2Bidirectional
---@@ |  |  >- itut_g774::tu11CTPBidirectionalR1
---@@ |  |  >- itut_g774::tu11CTPSinkR1
---@@ |  |  >- itut_g774::tu11CTPSource
---@@ |  |  >- itut_g774::tu12CTPBidirectionalR1
---@@ |  |  >- itut_g774::tu12CTPSinkR1
---@@ |  |  >- itut_g774::tu12CTPSource
---@@ |  |  >- itut_g774::tu2CTPBidirectionalR1
---@@ |  |  >- itut_g774::tu2CTPSinkR1
---@@ |  |  >- itut_g774::tu2CTPSource
---@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
---@@ |  >- itut_g774::vcnUserChannelCTPSink
---@@ |  >- itut_g774::vcnUserChannelCTPSource
---@@ >- itut_g774::vc3TTPSinkR1
---@@ |  >- itut_g774_1::pathTerminationCurrentData
---@@ |  >- itut_g774::tug2Sink
---@@ |  |  >- itut_g774::tu11CTPSinkR1
---@@ |  |  >- itut_g774::tu12CTPSinkR1
---@@ |  |  >- itut_g774::tu2CTPSinkR1
---@@ |  >- itut_g774::vcnUserChannelCTPSink
---@@ >- itut_g774::vc3TTPSourceR1
---@@ |  >- itut_g774::tug2Source
---@@ |  |  >- itut_g774::tu11CTPSource
---@@ |  |  >- itut_g774::tu12CTPSource
---@@ |  |  >- itut_g774::tu2CTPSource
---@@ |  >- itut_g774::vcnUserChannelCTPSource
---@@ >- itut_g774::vc4TTPBidirectionalR1
---@@ |  >- itut_g774::tug3Bidirectional
---@@ |  |  >- itut_g774::tu3CTPBidirectionalR1
---@@ |  |  >- itut_g774::tu3CTPSinkR1
---@@ |  |  >- itut_g774::tu3CTPSource
---@@ |  |  >- itut_g774::tug2Bidirectional +++
---@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
---@@ |  >- itut_g774::vcnUserChannelCTPSink
---@@ |  >- itut_g774::vcnUserChannelCTPSource
---@@ >- itut_g774::vc4TTPSinkR1
---@@ |  >- itut_g774_1::pathTerminationCurrentData
---@@ |  >- itut_g774::tug3Sink
---@@ |  |  >- itut_g774::tu3CTPSinkR1
---@@ |  |  >- itut_g774::tug2Sink +++
---@@ |  >- itut_g774::vcnUserChannelCTPSink
---@@ >- itut_g774::vc4TTPSourceR1
---@@ |  >- itut_g774::tug3Source
---@@ |  |  >- itut_g774::tu3CTPSource
---@@ |  |  >- itut_g774::tug2Source +++
---@@ |  >- itut_g774::vcnUserChannelCTPSource
---@@ >- itut_g774_3::protectedTTPBidirectional
---@@ |  >- itut_g774::augBidirectional +++
---@@ >- itut_g774_3::protectedTTPSink
---@@ |  >- itut_g774::augSink +++
---@@ >- itut_g774_3::protectedTTPSource
---@@ |  >- itut_g774::augSource +++
---@@ itut_m3100::networkR1
---@@ >- itut_m3100::layerNetworkDomain
---@@ |  >- itut_m3100::accessGroup
---@@ |  >- itut_m3100::linkConnection
---@@ |  >- itut_m3100::logicalLink
---@@ |  >- itut_m3100::logicalLinkEnd
---@@ |  >- itut_m3100::networkCTPSink
---@@ |  >- itut_m3100::networkCTPSource
---@@ |  >- itut_m3100::networkTTPSink
---@@ |  >- itut_m3100::networkTTPSource
---@@ |  >- itut_m3100::subNetwork
---@@ |  |  >- itut_m3100::logicalLinkEnd
---@@ |  |  >- itut_m3100::networkCTPSink
---@@ |  |  >- itut_m3100::networkCTPSource
---@@ |  |  >- itut_m3100::networkTTPSink
---@@ |  |  >- itut_m3100::networkTTPSource
---@@ |  |  >- itut_m3100::subNetworkConnection
---@@ |  |  >- itut_m3100::topologicalLinkEnd
---@@ |  >- itut_m3100::topologicalLink
---@@ |  |  >- itut_m3100::linkConnection
---@@ |  >- itut_m3100::topologicalLinkEnd
---@@ |  >- itut_m3100::trailR2
+--@@ >- itut_m3100::managedElement +++
 --@@ >- itut_m3100::managedElementComplex +++
---@@ itut_g774_5::au3SupervisedCTPSinkR1
---@@ >- itut_g774_1::pathTerminationCurrentData
---@@ itut_g774_5::au4SupervisedCTPSinkR1
---@@ >- itut_g774_1::pathTerminationCurrentData
---@@ itut_g774_5::tu11SupervisedCTPSinkR1
---@@ >- itut_g774_1::pathTerminationCurrentData
---@@ itut_g774_5::tu12SupervisedCTPSinkR1
---@@ >- itut_g774_1::pathTerminationCurrentData
---@@ itut_g774_5::tu2SupervisedCTPSinkR1
---@@ >- itut_g774_1::pathTerminationCurrentData
---@@ itut_g774_5::tu3SupervisedCTPSinkR1
---@@ >- itut_g774_1::pathTerminationCurrentData
---@@ itut_m3100::trailTerminationPointBidirectional
---@@ >- itut_m3100::connectionTerminationPointSink
---@@ >- itut_m3100::connectionTerminationPointSource
---@@ itut_m3100::trailTerminationPointBidirectional +++
+--@@ >- itut_m3100::network +++
+--@@ itut_q822::currentData
+--@@ >- itut_q822::historyData
+--@@ itut_g774_1::sdhCurrentData
+--@@ >- itut_q822::historyData
 --@@
 --@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

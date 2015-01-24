@@ -1,10 +1,11 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:22:53 $
+# @(#) src/gdmo/Makefile
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -42,31 +43,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2009-06-21 11:22:53 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: Makefile,v $
-# Revision 1.1.2.1  2009-06-21 11:22:53  brian
-# - added files to new distro
-#
-# Revision 0.9.2.5  2008-12-24 16:35:02  brian
-# - gdmo updates
-#
-# Revision 0.9.2.4  2007/12/15 20:20:36  brian
-# - updates
-#
-# Revision 0.9.2.3  2007/09/29 14:28:07  brian
-# - update gdmos and asns
-#
-# Revision 0.9.2.2  2007/09/09 22:58:48  brian
-# - updates for namespace
-#
-# Revision 0.9.2.1  2007/09/06 10:58:59  brian
-# - added new gdmo files
 #
 # =============================================================================
 
@@ -330,7 +306,9 @@ stubs: $(STUBFILES)
 diffs: $(NEW_GDMOS)
 	@list='$(NEW_GDMOS)'; for f in $$list; do \
 		g=`echo $$f | sed -e 's,\.new,,'` ; \
-		vimdiff $$f $$g ; \
+		if (diff "$$f" "$$g" >/dev/null 2>&1); then \
+			vimdiff $$f $$g ; \
+		fi ; \
 	done
 
 $(NEW_GDMOS) : %.new.gdmo : %.gdmo
