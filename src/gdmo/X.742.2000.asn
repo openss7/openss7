@@ -1,14 +1,17 @@
---@@ GDMOCHECK $Revision: 1.1.2.1 $
---@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ GDMOCHECK 2015-01-24T09:15+0000
+--@@ Copyright (c), 2008-2015 Monavacon Limited <http://www.monavacon.com/>
+--@@ Copyright (c), 2001-2008 OpenSS7 Corporation <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Sat Sep 15 10:37:58 MDT 2007
+--@@ Date: Sat Jan 24 05:16:40 MST 2015
 --@@ 
---< GDMO.Document "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995" { joint-iso-ccitt ms(9) function(2) part10(10) } >--
+--< GDMO.Document "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995"
+--  { joint-iso-ccitt ms(9) function(2) part10(10) } >--
 MODULE "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995" { joint-iso-ccitt ms(9) function(2) part10(10) }
---< ASN1.Version 1990 UMFObjId { joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 0 } >--
+--< ASN1.Version 1990 UMFObjId
+--  { joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 0 } >--
 -- A.9 Definition of ASN.1 modules
 UMFObjId { joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 0 }
 DEFINITIONS ::=
@@ -250,10 +253,11 @@ UsageInfoSet UMF-USAGE ::= {
 -- registration block shall always be present. This constraint ensures that a usage metering record
 -- only applies to the one requester and that there is only one set of correlation information.
 END-- Corrigendum 1
+
+
 END
---< GDMO.EndDocument "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995" { joint-iso-ccitt ms(9) function(2) part10(10) } >--
-
-
+--< GDMO.EndDocument "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995"
+--  { joint-iso-ccitt ms(9) function(2) part10(10) } >--
 --@@ 
 --@@ end of gdmos
 --@@ 

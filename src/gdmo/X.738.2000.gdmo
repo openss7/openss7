@@ -1,10 +1,11 @@
---@@ GDMOCHECK $Revision: 1.1.2.1 $
---@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ GDMOCHECK 2015-01-24T09:15+0000
+--@@ Copyright (c), 2008-2015 Monavacon Limited <http://www.monavacon.com/>
+--@@ Copyright (c), 2001-2008 OpenSS7 Corporation <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Wed Nov 21 11:10:36 MST 2007
+--@@ Date: Sat Jan 24 04:09:06 MST 2015
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "X.739.gdmo" >--
@@ -21,11 +22,12 @@
 --< GDMO.Copyright
 --  =============================================================================
 --  
---  @(#) $RCSfile: X.738.2000.gdmo,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:22:55 $
+--  @(#) src/gdmo/X.738.2000.gdmo
 --  
 --  -----------------------------------------------------------------------------
 --  
---  Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+--  Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+--  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 --  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 --  
 --  All Rights Reserved.
@@ -63,10 +65,6 @@
 --  
 --  Commercial licensing and support of this software is available from OpenSS7
 --  Corporation at a fee.  See http://www.openss7.com/
---  
---  -----------------------------------------------------------------------------
---  
---  Last Modified $Date: 2009-06-21 11:22:55 $ by $Author: brian $
 --  
 --  =============================================================================
 --  >--
@@ -974,14 +972,14 @@ END
 --@@ |  |  +- itut_x721::securityAlarmReportRecord
 --@@ |  |  +- itut_x721::stateChangeRecord
 --@@ |  |  +- itut_x723::communicationsInformationRecord
+--@@ |  |  +- itut_x738::bufferedScanReportRecord
+--@@ |  |  +- itut_x738::scanReportRecord
+--@@ |  |  +- itut_x738::statisticalReportRecord
 --@@ |  |  +- itut_x742::usageMeteringRecord
 --@@ |  |  +- itut_x745::schedulingConflictRecord
 --@@ |  |  +- itut_x745::testResultsRecord
 --@@ |  |  +- itut_x746::operationResultRecord
 --@@ |  |  +- itut_g774_3::apsReportRecord
---@@ |  |  +- itut_x738::bufferedScanReportRecord
---@@ |  |  +- itut_x738::scanReportRecord
---@@ |  |  +- itut_x738::statisticalReportRecord
 --@@ +- itut_x721::system
 --@@ +- itut_x723::applicationProcess
 --@@ +- itut_x723::communicationsEntity
@@ -991,6 +989,7 @@ END
 --@@ +- itut_x723::sap2
 --@@ +- itut_x723::singlePeerConnection
 --@@ +- itut_x723::subsystem
+--@@ +- itut_x738::dynamicScanner
 --@@ +- itut_x742::usageMeteringControlObject
 --@@ +- itut_x742::usageMeteringDataObject
 --@@ +- itut_x745::testActionPerformer
@@ -1013,6 +1012,10 @@ END
 --@@ +- itut_q821::enhancedCurrentAlarmSummaryControl
 --@@ +- itut_q822::historyData
 --@@ |  +- itut_g774_1::pathTerminationHistoryData
+--@@ |  +- itut_g774_1::electricalSPIHistoryData
+--@@ |  +- itut_g774_1::opticalSPIHistoryData
+--@@ |  +- itut_g774_1::msHistoryData
+--@@ |  +- itut_g774_1::protectionHistoryData
 --@@ +- itut_q822::thresholdData
 --@@ +- itut_g774::indirectAdaptorSink
 --@@ |  +- itut_g774::augSink
@@ -1335,9 +1338,18 @@ END
 --@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
 --@@ +- itut_m3100::tpPool
 --@@ +- itut_x739::scanner
+--@@ |  +- itut_x738::bufferedScanner
+--@@ |  +- itut_x738::heterogeneousScanner
+--@@ |  +- itut_x738::homogeneousScanner
 --@@ |  +- itut_q822::currentData
 --@@ |  |  +- itut_g774_1::sdhCurrentData
 --@@ |  |  |  +- itut_g774_1::pathTerminationCurrentData
+--@@ |  |  |  +- itut_g774_1::electricalSourceSPICurrentData
+--@@ |  |  |  +- itut_g774_1::opticalSourceSPICurrentData
+--@@ |  |  |  +- itut_g774_1::msCurrentData
+--@@ |  |  |  +- itut_g774_1::msCurrentDataTR
+--@@ |  |  |  +- itut_g774_1::protectionCurrentData
+--@@ |  |  |  +- itut_g774_1::pathTerminationCurrentDataTR
 --@@ |  +- itut_x739::monitorMetric
 --@@ |  |  +- itut_x739::meanMonitor
 --@@ |  |  |  +- itut_x739::algorithmIndicatingMeanMonitor
@@ -1345,17 +1357,6 @@ END
 --@@ |  |  |  |  +- itut_x739::meanAndMinMaxMonitor
 --@@ |  |  |  |  +- itut_x739::meanAndPercentileMonitor
 --@@ |  |  |  |  +- itut_x739::meanAndVarianceMonitor
---@@ |  +- itut_x738::bufferedScanner
---@@ |  +- itut_x738::heterogeneousScanner
---@@ |  +- itut_x738::homogeneousScanner
---@@ |  |  +- itut_x738::ensembleStatisticScanner
---@@ |  |  |  +- itut_x738::meanScanner
---@@ |  |  |  |  +- itut_x738::meanVarianceScanner
---@@ |  |  |  +- itut_x738::minMaxScanner
---@@ |  |  |  +- itut_x738::percentileScanner
---@@ |  |  +- itut_x738::simpleScanner
---@@ +- itut_x738::dynamicScanner
---@@ |  +- itut_x738::dynamicSimpleScanner
 --@@
 
 --@@
@@ -1373,6 +1374,8 @@ END
 --@@ |  |  |  >- itut_x723::singlePeerConnection
 --@@ |  |  >- itut_x723::sap1
 --@@ |  >- itut_x723::sap2
+--@@ >- itut_x738::dynamicSimpleScanner
+--@@ >- itut_x739::scanner
 --@@ >- itut_x742::usageMeteringControlObject
 --@@ >- itut_x746::scheduler
 --@@ >- itut_x746::typeOfDayController
@@ -1389,6 +1392,7 @@ END
 --@@ |  >- itut_q822::thresholdData
 --@@ |  >- itut_g774_3::protectionGroupR1
 --@@ |  |  >- itut_g774_3::protectionUnit
+--@@ |  |  |  >- itut_g774_1::protectionCurrentData
 --@@ |  >- itut_m3100::alarmSeverityAssignmentProfile
 --@@ |  >- itut_x723::applicationProcess
 --@@ |  >- itut_m3100::arcIntervalProfile
@@ -1459,6 +1463,7 @@ END
 --@@ >- itut_g774::electricalSPITTPSink
 --@@ |  >- itut_g774::rsCTPSink
 --@@ >- itut_g774::electricalSPITTPSource
+--@@ |  >- itut_g774_1::electricalSourceSPICurrentData
 --@@ |  >- itut_g774::rsCTPSource
 --@@ >- itut_g774::msTTPBidirectional
 --@@ |  >- itut_g774::augBidirectional
@@ -1476,6 +1481,8 @@ END
 --@@ |  >- itut_g774::msOrderwireCTPSource
 --@@ |  >- itut_g774_3::unprotectedCTPBidirectional
 --@@ >- itut_g774::msTTPSink
+--@@ |  >- itut_g774_1::msCurrentData
+--@@ |  >- itut_g774_1::msCurrentDataTR
 --@@ |  >- itut_g774::augSink
 --@@ |  |  >- itut_g774::au3CTPSinkR1
 --@@ |  |  >- itut_g774::au4CTPSinkR1
@@ -1496,6 +1503,7 @@ END
 --@@ >- itut_g774::opticalSPITTPSink
 --@@ |  >- itut_g774::rsCTPSink
 --@@ >- itut_g774::opticalSPITTPSource
+--@@ |  >- itut_g774_1::opticalSourceSPICurrentData
 --@@ |  >- itut_g774::rsCTPSource
 --@@ >- itut_g774::rsTTPBidirectional
 --@@ |  >- itut_g774::msCTPBidirectional
@@ -1523,14 +1531,17 @@ END
 --@@ >- itut_g774::vc11TTPBidirectionalR1
 --@@ >- itut_g774::vc11TTPSinkR1
 --@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774_1::pathTerminationCurrentDataTR
 --@@ >- itut_g774::vc11TTPSource
 --@@ >- itut_g774::vc12TTPBidirectionalR1
 --@@ >- itut_g774::vc12TTPSinkR1
 --@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774_1::pathTerminationCurrentDataTR
 --@@ >- itut_g774::vc12TTPSource
 --@@ >- itut_g774::vc2TTPBidirectionalR1
 --@@ >- itut_g774::vc2TTPSinkR1
 --@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774_1::pathTerminationCurrentDataTR
 --@@ >- itut_g774::vc2TTPSource
 --@@ >- itut_g774::vc3TTPBidirectionalR1
 --@@ |  >- itut_g774::tug2Bidirectional
@@ -1548,6 +1559,7 @@ END
 --@@ |  >- itut_g774::vcnUserChannelCTPSource
 --@@ >- itut_g774::vc3TTPSinkR1
 --@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774_1::pathTerminationCurrentDataTR
 --@@ |  >- itut_g774::tug2Sink
 --@@ |  |  >- itut_g774::tu11CTPSinkR1
 --@@ |  |  >- itut_g774::tu12CTPSinkR1
@@ -1570,6 +1582,7 @@ END
 --@@ |  >- itut_g774::vcnUserChannelCTPSource
 --@@ >- itut_g774::vc4TTPSinkR1
 --@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774_1::pathTerminationCurrentDataTR
 --@@ |  >- itut_g774::tug3Sink
 --@@ |  |  >- itut_g774::tu3CTPSinkR1
 --@@ |  |  >- itut_g774::tug2Sink +++
@@ -1582,6 +1595,8 @@ END
 --@@ >- itut_g774_3::protectedTTPBidirectional
 --@@ |  >- itut_g774::augBidirectional +++
 --@@ >- itut_g774_3::protectedTTPSink
+--@@ |  >- itut_g774_1::msCurrentData
+--@@ |  >- itut_g774_1::msCurrentDataTR
 --@@ |  >- itut_g774::augSink +++
 --@@ >- itut_g774_3::protectedTTPSource
 --@@ |  >- itut_g774::augSource +++

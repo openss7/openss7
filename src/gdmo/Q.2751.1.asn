@@ -1,13 +1,12 @@
---@@ GDMOCHECK $Revision: 1.1.2.1 $
---@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ GDMOCHECK 2015-01-24T09:15+0000
+--@@ Copyright (c), 2008-2015 Monavacon Limited <http://www.monavacon.com/>
+--@@ Copyright (c), 2001-2008 OpenSS7 Corporation <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Fri Sep 14 02:16:09 MDT 2007
+--@@ Date: Sat Jan 24 05:16:26 MST 2015
 --@@ 
---< ASN1.Version 1990 Q2751DefinedTypesModule
---  { itu(0) recommendation(0) q(17) omap2(2751) part1(1) informationModel(0) asn1Modules(2) q2751DefinedTypesModule(0) } >--
 -- 8.10 Abstract syntax productions
 -- The syntax of this ASN.1 is based on Recommendation X.208.
 -- The default values have been taken from Table 5/Q.2140.

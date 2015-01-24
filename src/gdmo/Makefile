@@ -306,9 +306,7 @@ stubs: $(STUBFILES)
 diffs: $(NEW_GDMOS)
 	@list='$(NEW_GDMOS)'; for f in $$list; do \
 		g=`echo $$f | sed -e 's,\.new,,'` ; \
-		if (diff "$$f" "$$g" >/dev/null 2>&1); then \
-			vimdiff $$f $$g ; \
-		fi ; \
+		vimdiff $$f $$g ; \
 	done
 
 $(NEW_GDMOS) : %.new.gdmo : %.gdmo

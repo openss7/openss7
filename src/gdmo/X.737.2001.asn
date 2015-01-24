@@ -1,10 +1,11 @@
---@@ GDMOCHECK $Revision: 1.1.2.1 $
---@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ GDMOCHECK 2015-01-24T09:15+0000
+--@@ Copyright (c), 2008-2015 Monavacon Limited <http://www.monavacon.com/>
+--@@ Copyright (c), 2001-2008 OpenSS7 Corporation <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Sat Sep 15 10:33:10 MDT 2007
+--@@ Date: Sat Jan 24 05:16:37 MST 2015
 --@@ 
 -- A.7 Supporting productions
 -- This subclause specifies the required ASN.1 value notation for the value reference used in the MANAGED OBJECT

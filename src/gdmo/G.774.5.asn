@@ -1,10 +1,11 @@
---@@ GDMOCHECK $Revision: 1.1.2.1 $
---@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ GDMOCHECK 2015-01-24T09:15+0000
+--@@ Copyright (c), 2008-2015 Monavacon Limited <http://www.monavacon.com/>
+--@@ Copyright (c), 2001-2008 OpenSS7 Corporation <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Fri Sep 14 12:04:56 MDT 2007
+--@@ Date: Sat Jan 24 05:16:17 MST 2015
 --@@ 
 --< GDMO.Document "ITU-T Rec. G.774.5"
 --  { itu-t(0) recommendation(0) g(7) g774(774) hyphen(127) cs(5) informationModel(0) } >--
