@@ -3,12 +3,12 @@
 @c vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 @c =========================================================================
 @c
-@c @(#) $Id: pgw.texi,v 1.1.2.3 2011-02-07 02:21:36 brian Exp $
+@c @(#) doc/projects/pgw/pgw.texi
 @c
 @c =========================================================================
 @c
 @c Copyright (c) 2010-2011  Optranex Incorporated <http://www.optranex.com/>
-@c Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 @c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 @c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
@@ -84,9 +84,6 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2011-02-07 02:21:36 $ by $Author: brian $
-@c
-@c =========================================================================
 
 @setfilename pgw.info
 @include ../../../scripts/texi/args.texi
@@ -112,7 +109,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
 Copyright @copyright{} 2010-2011  @uref{http://www.optranex.com/, Optranex Incorporated} @*
-Copyright @copyright{} 2008-2010  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2015  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -186,7 +183,7 @@ Canada @*
 
 @noindent
 Copyright @copyright{} 2010-2011  @uref{http://www.optranex.com/, Optranex Incorporated} @*
-Copyright @copyright{} 2008-2010  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2015  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
