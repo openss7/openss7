@@ -1,11 +1,11 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-TC.mib,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-07-18 19:42:21 $
+-- @(#) src/mibs/OPENSS7-TC.mib
 --
 -- -----------------------------------------------------------------------------
 --
--- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 -- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 -- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 --
@@ -53,22 +53,6 @@
 -- Commercial licensing and support of this software is available from OpenSS7
 -- Corporation at a fee.  See http://www.openss7.com/
 --
--- -----------------------------------------------------------------------------
---
--- Last Modified $Date: 2011-07-18 19:42:21 $ by $Author: brian $
---
--- -----------------------------------------------------------------------------
---
--- $Log: OPENSS7-TC.mib,v $
--- Revision 1.1.2.3  2011-07-18 19:42:21  brian
--- - added documentation
---
--- Revision 1.1.2.2  2010-03-10 08:42:20  brian
--- - added Optranex files
---
--- Revision 1.1.2.1  2009-06-21 11:39:32  brian
--- - added files to new distro
---
 -- =============================================================================
 
 OPENSS7-TC DEFINITIONS ::= BEGIN
@@ -99,7 +83,7 @@ openss7TC MODULE-IDENTITY
 	"This module defines textual conventions use throughout the 
 	 OpenSS7 enterprise MIBs.
 
-         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2008-2015  Monavacon Limited
          Copyright (c) 2001-2008  OpenSS7 Corporation
          Copyright (c) 1997-2001  Brian F. G. Bidulock
 

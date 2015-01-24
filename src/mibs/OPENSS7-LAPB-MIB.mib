@@ -1,11 +1,11 @@
 -- vim: ft=mib comments=\f\b\:\"ITU\-T,\f\b\:ITU\-T,\f\:\",\b\:\-\-,\:\-\-,\f\b\:\-,\f\b\:\· fo+=tcqlornw12 tw=64 ai nocin nosi sts=4 sw=4 et
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-LAPB-MIB.mib,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-07-18 19:42:18 $
+-- @(#) src/mibs/OPENSS7-LAPB-MIB.mib
 --
 -- -----------------------------------------------------------------------------
 --
--- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 -- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 -- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 --
@@ -53,19 +53,6 @@
 -- Commercial licensing and support of this software is available from OpenSS7
 -- Corporation at a fee.  See http://www.openss7.com/
 --
--- -----------------------------------------------------------------------------
---
--- Last Modified $Date: 2011-07-18 19:42:18 $ by $Author: brian $
---
--- -----------------------------------------------------------------------------
---
--- $Log: OPENSS7-LAPB-MIB.mib,v $
--- Revision 1.1.2.2  2011-07-18 19:42:18  brian
--- - added documentation
---
--- Revision 1.1.2.1  2009-06-21 11:39:30  brian
--- - added files to new distro
---
 -- =============================================================================
 
 OPENSS7-LAPB-MIB DEFINITIONS ::= BEGIN
@@ -102,7 +89,7 @@ lapbMIB MODULE-IDENTITY
         "Provides a management information base for X.25 LAPB 
          based on ITU-T Rec. X.282 | ISO/IEC 10742.
          
-         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2008-2015  Monavacon Limited
          Copyright (c) 2001-2008  OpenSS7 Corporation
          Copyright (c) 1997-2001  Brian F. G. Bidulock
          

@@ -1,11 +1,11 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-MAP-MIB.mib,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-07-18 19:42:19 $
+-- @(#) src/mibs/OPENSS7-MAP-MIB.mib
 --
 -- -----------------------------------------------------------------------------
 --
--- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 -- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 -- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 --
@@ -53,19 +53,6 @@
 -- Commercial licensing and support of this software is available from OpenSS7
 -- Corporation at a fee.  See http://www.openss7.com/
 --
--- -----------------------------------------------------------------------------
---
--- Last Modified $Date: 2011-07-18 19:42:19 $ by $Author: brian $
---
--- -----------------------------------------------------------------------------
---
--- $Log: OPENSS7-MAP-MIB.mib,v $
--- Revision 1.1.2.2  2011-07-18 19:42:19  brian
--- - added documentation
---
--- Revision 1.1.2.1  2009-06-21 11:39:30  brian
--- - added files to new distro
---
 -- =============================================================================
 
 OPENSS7-MAP-MIB DEFINITIONS ::= BEGIN
@@ -104,7 +91,7 @@ mapMIB MODULE-IDENTITY
 	"This is a MIB providing management information in accordance 
 	 with .
 
-         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2008-2015  Monavacon Limited
          Copyright (c) 2001-2008  OpenSS7 Corporation
          Copyright (c) 1997-2001  Brian F. G. Bidulock
 

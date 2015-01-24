@@ -1,11 +1,11 @@
 -- vim: ft=mib comments=\f\b\:\"ITU\-T,\f\b\:ITU\-T,\f\:\",\b\:\-\-,\:\-\-,\f\b\:\-,\f\b\:\· fo+=tcqlornw12 tw=64 ai nocin nosi sts=4 sw=4 et
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-RTPXC-OM-MIB.mib,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2011-07-18 19:45:07 $
+-- @(#) src/mibs/OPENSS7-RTPXC-OM-MIB.mib
 --
 -- -----------------------------------------------------------------------------
 --
--- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 -- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 -- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 --
@@ -53,16 +53,6 @@
 -- Commercial licensing and support of this software is available from OpenSS7
 -- Corporation at a fee.  See http://www.openss7.com/
 --
--- -----------------------------------------------------------------------------
---
--- Last Modified $Date: 2011-07-18 19:45:07 $ by $Author: brian $
---
--- -----------------------------------------------------------------------------
---
--- $Log: OPENSS7-RTPXC-OM-MIB.mib,v $
--- Revision 1.1.2.1  2011-07-18 19:45:07  brian
--- - added new MIBs
---
 -- =============================================================================
 
 OPENSS7-RTPXC-OM-MIB DEFINITIONS ::= BEGIN
@@ -96,7 +86,7 @@ rtpxcOmMIB MODULE-IDENTITY
     DESCRIPTION 
         "
          
-         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2008-2015  Monavacon Limited
          Copyright (c) 2001-2008  OpenSS7 Corporation
          Copyright (c) 1997-2001  Brian F. G. Bidulock
          
