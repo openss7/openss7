@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 1.1.2.6 2011-04-07 15:24:03 brian Exp $
+ @(#) src/include/sys/irix/ddi.h
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -44,31 +44,6 @@
 
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
-
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-04-07 15:24:03 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: ddi.h,v $
- Revision 1.1.2.6  2011-04-07 15:24:03  brian
- - weak reference corrections
-
- Revision 1.1.2.5  2011-04-06 21:33:05  brian
- - corrections
-
- Revision 1.1.2.4  2011-04-05 16:35:13  brian
- - weak module design
-
- Revision 1.1.2.3  2010-11-28 14:21:50  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.2  2009-07-21 11:06:15  brian
- - changes from release build
-
- Revision 1.1.2.1  2009-06-21 11:26:46  brian
- - added files to new distro
 
  *****************************************************************************/
 

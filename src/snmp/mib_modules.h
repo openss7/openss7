@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: mib_modules.h,v 1.1.2.2 2010-11-28 14:22:13 brian Exp $
+ @(#) src/snmp/mib_modules.h
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -44,31 +44,6 @@
 
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
-
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2010-11-28 14:22:13 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: mib_modules.h,v $
- Revision 1.1.2.2  2010-11-28 14:22:13  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:42:33  brian
- - added files to new distro
-
- Revision 0.9.2.4  2008-04-28 09:47:28  brian
- - updated headers for release
-
- Revision 0.9.2.3  2007/12/15 20:20:08  brian
- - updates
-
- Revision 0.9.2.2  2007/10/15 19:02:42  brian
- - net-snmp build corrections
-
- Revision 0.9.2.1  2007/10/15 06:49:08  brian
- - added agent checks and mib header
 
  *****************************************************************************/
 

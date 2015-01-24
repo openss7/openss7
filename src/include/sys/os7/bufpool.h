@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: bufpool.h,v 1.1.2.3 2011-09-20 09:51:38 brian Exp $
+ @(#) src/include/sys/os7/bufpool.h
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -44,22 +44,6 @@
 
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
-
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-09-20 09:51:38 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: bufpool.h,v $
- Revision 1.1.2.3  2011-09-20 09:51:38  brian
- - updates from git
-
- Revision 1.1.2.2  2010-11-28 14:32:25  brian
- - updates to support debian squeeze 2.6.32 kernel
-
- Revision 1.1.2.1  2009-06-21 11:26:48  brian
- - added files to new distro
 
  *****************************************************************************/
 

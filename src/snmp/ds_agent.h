@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: ds_agent.h,v 1.1.2.2 2010-11-28 14:22:11 brian Exp $
+ @(#) src/snmp/ds_agent.h
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -44,28 +44,6 @@
 
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
-
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2010-11-28 14:22:11 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: ds_agent.h,v $
- Revision 1.1.2.2  2010-11-28 14:22:11  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:42:32  brian
- - added files to new distro
-
- Revision 0.9.2.3  2008-04-28 09:47:28  brian
- - updated headers for release
-
- Revision 0.9.2.2  2007/12/15 20:20:08  brian
- - updates
-
- Revision 0.9.2.1  2007/10/15 01:03:06  brian
- - added local file for compatibility
 
  *****************************************************************************/
 

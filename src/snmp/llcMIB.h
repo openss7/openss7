@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: llcMIB.h,v 1.1.2.2 2010-11-28 14:22:12 brian Exp $
+ @(#) src/snmp/llcMIB.h
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -44,37 +44,6 @@
 
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
-
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2010-11-28 14:22:12 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: llcMIB.h,v $
- Revision 1.1.2.2  2010-11-28 14:22:12  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:42:32  brian
- - added files to new distro
-
- Revision 0.9.2.6  2009-01-19 13:32:02  brian
- - updating standalone agents
-
- Revision 0.9.2.5  2009-01-10 17:37:44  brian
- - updated agents and mibs
-
- Revision 0.9.2.4  2009-01-04 13:16:18  brian
- - updated agents
-
- Revision 0.9.2.3  2009-01-02 15:04:23  brian
- - updated agents
-
- Revision 0.9.2.2  2008-12-31 16:04:55  brian
- - updated mibs
-
- Revision 0.9.2.1  2008-12-27 15:42:07  brian
- - correct ignore file
 
  *****************************************************************************/
 

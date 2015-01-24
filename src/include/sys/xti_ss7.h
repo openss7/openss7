@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: xti_ss7.h,v 1.1.2.2 2010-11-28 14:21:50 brian Exp $
+ @(#) src/include/sys/xti_ss7.h
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -44,19 +44,6 @@
 
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
-
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2010-11-28 14:21:50 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: xti_ss7.h,v $
- Revision 1.1.2.2  2010-11-28 14:21:50  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:25:39  brian
- - added files to new distro
 
  *****************************************************************************/
 

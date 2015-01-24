@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) src/include/sys/bufmod.h
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,13 +45,6 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date$ by $Author$
-
- -----------------------------------------------------------------------------
-
- $Log$
  *****************************************************************************/
 
 #ifndef _SYS_BUFMOD_H

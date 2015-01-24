@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: lmi_ioctl.h,v 1.1.2.2 2010-11-28 14:21:47 brian Exp $
+ @(#) src/include/ss7/lmi_ioctl.h
 
  -----------------------------------------------------------------------------
 
@@ -44,19 +44,6 @@
 
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
-
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2010-11-28 14:21:47 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: lmi_ioctl.h,v $
- Revision 1.1.2.2  2010-11-28 14:21:47  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:25:33  brian
- - added files to new distro
 
  *****************************************************************************/
 

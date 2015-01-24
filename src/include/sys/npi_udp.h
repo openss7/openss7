@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: npi_udp.h,v 1.1.2.4 2011-01-12 04:10:31 brian Exp $
+ @(#) src/include/sys/npi_udp.h
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -44,25 +44,6 @@
 
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
-
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-01-12 04:10:31 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: npi_udp.h,v $
- Revision 1.1.2.4  2011-01-12 04:10:31  brian
- - code updates for 2.6.32 kernel and gcc 4.4
-
- Revision 1.1.2.3  2010-12-02 22:22:46  brian
- - regression fix and np_udp driver
-
- Revision 1.1.2.2  2010-11-28 14:21:49  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:25:37  brian
- - added files to new distro
 
  *****************************************************************************/
 

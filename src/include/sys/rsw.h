@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: rsw.h,v 1.1.2.1 2010-12-02 22:22:46 brian Exp $
+ @(#) src/include/sys/rsw.h
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -44,16 +44,6 @@
 
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
-
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2010-12-02 22:22:46 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: rsw.h,v $
- Revision 1.1.2.1  2010-12-02 22:22:46  brian
- - regression fix and np_udp driver
 
  *****************************************************************************/
 

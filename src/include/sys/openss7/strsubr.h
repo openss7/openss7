@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 1.1.2.6 2011-04-05 16:35:13 brian Exp $
+ @(#) src/include/sys/openss7/strsubr.h
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -44,31 +44,6 @@
 
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
-
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-04-05 16:35:13 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: strsubr.h,v $
- Revision 1.1.2.6  2011-04-05 16:35:13  brian
- - weak module design
-
- Revision 1.1.2.5  2011-03-26 04:28:48  brian
- - updates to build process
-
- Revision 1.1.2.4  2011-01-12 04:10:31  brian
- - code updates for 2.6.32 kernel and gcc 4.4
-
- Revision 1.1.2.3  2010-11-28 14:21:52  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.2  2009-06-29 07:35:42  brian
- - SVR 4.2 => SVR 4.2 MP
-
- Revision 1.1.2.1  2009-06-21 11:26:48  brian
- - added files to new distro
 
  *****************************************************************************/
 

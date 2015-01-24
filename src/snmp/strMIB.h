@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: strMIB.h,v 1.1.2.2 2010-11-28 14:22:20 brian Exp $
+ @(#) src/snmp/strMIB.h
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -44,85 +44,6 @@
 
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
-
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2010-11-28 14:22:20 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: strMIB.h,v $
- Revision 1.1.2.2  2010-11-28 14:22:20  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:42:35  brian
- - added files to new distro
-
- Revision 0.9.2.22  2009-02-18 20:19:02  brian
- - updated agents
-
- Revision 0.9.2.21  2009-01-19 10:39:41  brian
- - added new standalone agent
-
- Revision 0.9.2.20  2009-01-16 20:25:50  brian
- - working up streams mibs and agents
-
- Revision 0.9.2.19  2009-01-16 14:06:59  brian
- - update STREAMS mib
-
- Revision 0.9.2.18  2009-01-15 17:50:29  brian
- - working module tables
-
- Revision 0.9.2.17  2009-01-14 14:32:01  brian
- - working up agents
-
- Revision 0.9.2.16  2009-01-10 17:19:50  brian
- - updated agents
-
- Revision 0.9.2.15  2009-01-04 13:16:13  brian
- - updated agents
-
- Revision 0.9.2.14  2009-01-03 10:51:14  brian
- - updated agent
-
- Revision 0.9.2.13  2009-01-02 15:04:20  brian
- - updated agents
-
- Revision 0.9.2.12  2008-12-31 16:04:53  brian
- - updated mibs
-
- Revision 0.9.2.11  2008-12-24 13:42:16  brian
- - updated mibs
-
- Revision 0.9.2.10  2008-10-07 19:04:22  brian
- - strStrhold is a TruthValue
-
- Revision 0.9.2.9  2008/07/28 05:14:09  brian
- - updates to mib builder and corrections to agent
-
- Revision 0.9.2.8  2008-04-28 12:54:07  brian
- - update file headers for release
-
- Revision 0.9.2.7  2008/01/14 18:04:58  brian
- - update tests and MIBS
-
- Revision 0.9.2.6  2008/01/03 11:14:00  brian
- - compile and index updates
-
- Revision 0.9.2.5  2007/12/29 23:27:41  brian
- - updated mib
-
- Revision 0.9.2.4  2007/12/29 23:01:52  brian
- - working up mib2c
-
- Revision 0.9.2.3  2007/12/15 20:20:09  brian
- - updates
-
- Revision 0.9.2.2  2007/10/15 01:04:51  brian
- - updated SNMP build
-
- Revision 0.9.2.1  2007/10/13 08:54:36  brian
- - added MIB agent files
 
  *****************************************************************************/
 

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: mxMIB.h,v 1.1.2.2 2010-11-28 14:22:15 brian Exp $
+ @(#) src/snmp/mxMIB.h
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -44,64 +44,6 @@
 
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
-
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2010-11-28 14:22:15 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: mxMIB.h,v $
- Revision 1.1.2.2  2010-11-28 14:22:15  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:42:34  brian
- - added files to new distro
-
- Revision 0.9.2.15  2009-02-18 20:18:59  brian
- - updated agents
-
- Revision 0.9.2.14  2009-01-19 13:31:56  brian
- - updating standalone agents
-
- Revision 0.9.2.13  2009-01-16 20:40:56  brian
- - working up mibs and agents
-
- Revision 0.9.2.12  2009-01-14 14:31:21  brian
- - working up agents
-
- Revision 0.9.2.11  2009-01-10 17:46:47  brian
- - updated agents and mibs
-
- Revision 0.9.2.10  2009-01-04 13:16:11  brian
- - updated agents
-
- Revision 0.9.2.9  2009-01-03 10:51:11  brian
- - updated agent
-
- Revision 0.9.2.8  2009-01-02 15:04:18  brian
- - updated agents
-
- Revision 0.9.2.7  2008-12-31 16:04:51  brian
- - updated mibs
-
- Revision 0.9.2.6  2008-12-24 13:40:57  brian
- - updated mibs
-
- Revision 0.9.2.5  2008-07-31 17:40:16  brian
- - SNMP updates
-
- Revision 0.9.2.4  2008-04-28 23:39:59  brian
- - updated headers for release
-
- Revision 0.9.2.3  2008/01/14 19:55:03  brian
- - updated stub files
-
- Revision 0.9.2.2  2008/01/03 12:46:00  brian
- - updates for new mib2c
-
- Revision 0.9.2.1  2008/01/01 13:59:38  brian
- - added new mibs
 
  *****************************************************************************/
 

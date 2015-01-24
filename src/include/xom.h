@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: xom.h,v 1.1.2.3 2010-11-28 14:21:45 brian Exp $
+ @(#) src/include/xom.h
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -44,22 +44,6 @@
 
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
-
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2010-11-28 14:21:45 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: xom.h,v $
- Revision 1.1.2.3  2010-11-28 14:21:45  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.2  2009-07-13 07:13:28  brian
- - changes for multiple distro build
-
- Revision 1.1.2.1  2009-06-21 11:23:46  brian
- - added files to new distro
 
  *****************************************************************************/
 

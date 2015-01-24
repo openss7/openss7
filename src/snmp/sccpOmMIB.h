@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: sccpOmMIB.h,v 1.1.2.3 2011-07-18 19:42:26 brian Exp $
+ @(#) src/snmp/sccpOmMIB.h
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -44,52 +44,6 @@
 
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
-
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-07-18 19:42:26 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: sccpOmMIB.h,v $
- Revision 1.1.2.3  2011-07-18 19:42:26  brian
- - added documentation
-
- Revision 1.1.2.2  2010-11-28 14:22:16  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:42:34  brian
- - added files to new distro
-
- Revision 0.9.2.11  2009-02-18 20:18:53  brian
- - updated agents
-
- Revision 0.9.2.10  2009-01-19 13:31:49  brian
- - updating standalone agents
-
- Revision 0.9.2.9  2009-01-16 20:45:00  brian
- - updating mibs and agents
-
- Revision 0.9.2.8  2009-01-14 14:30:06  brian
- - working up agents
-
- Revision 0.9.2.7  2009-01-10 17:09:21  brian
- - updated agents
-
- Revision 0.9.2.6  2009-01-04 13:16:05  brian
- - updated agents
-
- Revision 0.9.2.5  2009-01-03 10:51:06  brian
- - updated agent
-
- Revision 0.9.2.4  2009-01-02 15:04:15  brian
- - updated agents
-
- Revision 0.9.2.3  2008-12-31 16:04:47  brian
- - updated mibs
-
- Revision 0.9.2.2  2008-12-24 13:08:26  brian
- - building ss7confd
 
  *****************************************************************************/
 

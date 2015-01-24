@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: x25MIB.h,v 1.1.2.2 2010-11-28 14:22:21 brian Exp $
+ @(#) src/snmp/x25MIB.h
 
  -----------------------------------------------------------------------------
 
@@ -44,28 +44,6 @@
 
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
-
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2010-11-28 14:22:21 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: x25MIB.h,v $
- Revision 1.1.2.2  2010-11-28 14:22:21  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:42:36  brian
- - added files to new distro
-
- Revision 0.9.2.3  2009-01-04 13:16:15  brian
- - updated agents
-
- Revision 0.9.2.2  2009-01-03 10:51:15  brian
- - updated agent
-
- Revision 0.9.2.1  2009-01-02 15:04:25  brian
- - updated agents
 
  *****************************************************************************/
 
