@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:12 $
+ @(#) File: src/test/ldltest.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -58,29 +58,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-05-31 09:46:12 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: ldltest.c,v $
- Revision 1.1.2.4  2011-05-31 09:46:12  brian
- - new distros
-
- Revision 1.1.2.3  2011-01-12 04:10:34  brian
- - code updates for 2.6.32 kernel and gcc 4.4
-
- Revision 1.1.2.2  2010-11-28 14:22:22  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:44:15  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] =
-    "$RCSfile: ldltest.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:12 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  *  ldltest: Test program for dlpi driver
