@@ -1,10 +1,10 @@
 //  ==========================================================================
 //  
-//  @(#) $Id: streams.cc,v 1.1.2.2 2010-11-28 14:22:21 brian Exp $
+//  @(#) src/tcl/streams/streams.cc
 //  
 //  --------------------------------------------------------------------------
 //  
-//  Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+//  Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 //  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 //  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 //  
@@ -46,22 +46,9 @@
 //  Commercial licensing and support of this software is available from
 //  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 //  
-//  --------------------------------------------------------------------------
-//  
-//  Last Modified $Date: 2010-11-28 14:22:21 $ by $Author: brian $
-//  
-//  --------------------------------------------------------------------------
-//  
-//  $Log: streams.cc,v $
-//  Revision 1.1.2.2  2010-11-28 14:22:21  brian
-//  - remove #ident, protect _XOPEN_SOURCE
-//
-//  Revision 1.1.2.1  2009-07-13 07:13:36  brian
-//  - changes for multiple distro build
-//
 //  ==========================================================================
 
-static char const ident[] = "$Id: streams.cc,v 1.1.2.2 2010-11-28 14:22:21 brian Exp $";
+static char const ident[] = "src/tcl/streams/streams.cc (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #pragma implementation
 #include "streams.hh"

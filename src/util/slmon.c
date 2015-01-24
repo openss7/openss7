@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/util/slmon.c
+ @(#) src/util/slmon.c
 
  -----------------------------------------------------------------------------
 
@@ -280,7 +280,7 @@ output_header(void)
 
 	ftimestamp();
 	fprint_time(stdout);
-	fprintf(stdout, " # SS7MON $Id: slmon.c,v 1.1.2.4 2011-05-31 09:46:19 brian Exp $ Output File Header\n");
+	fprintf(stdout, " # SS7MON src/util/slmon.c (" PACKAGE_ENVR " " PACKAGE_DATE ") Output File Header\n");
 	uname(&uts);
 	fprint_time(stdout);
 	fprintf(stdout, " # machine %s %s %s %s %s\n", uts.sysname, uts.nodename, uts.release,

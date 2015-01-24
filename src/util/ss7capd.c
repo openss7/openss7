@@ -410,7 +410,7 @@ output_header(void)
 	ftimestamp();
 	fprint_time(stdout);
 	fprintf(stdout,
-		" # SS7CAPD $Id: ss7capd.c,v 1.1.2.4 2011-05-31 09:46:19 brian Exp $ Output File Header\n");
+		" # SS7CAPD src/util/ss7capd.c (" PACKAGE_ENVR " " PACKAGE_DATE ") Output File Header\n");
 	uname(&uts);
 	fprint_time(stdout);
 	fprintf(stdout, " # machine: %s %s %s %s %s\n", uts.sysname, uts.nodename, uts.release,

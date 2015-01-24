@@ -1,10 +1,10 @@
 //  ==========================================================================
 //  
-//  @(#) $Id: mibbrowser.js,v 1.1.2.1 2011-07-18 19:49:11 brian Exp $
+//  @(#) src/javascript/mibbrowser.js
 //  
 //  --------------------------------------------------------------------------
 //  
-//  Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+//  Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 //  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 //  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 //  
@@ -46,16 +46,6 @@
 //  Commercial licensing and support of this software is available from
 //  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 //  
-//  --------------------------------------------------------------------------
-//  
-//  Last Modified $Date: 2011-07-18 19:49:11 $ by $Author: brian $
-//  
-//  --------------------------------------------------------------------------
-//  
-//  $Log: mibbrowser.js,v $
-//  Revision 1.1.2.1  2011-07-18 19:49:11  brian
-//  - added javascript based mib browser
-//
 //  ==========================================================================
 
 var images = new Array;

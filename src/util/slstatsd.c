@@ -337,7 +337,7 @@ slstats_header(void)
 
 	ftimestamp();
 	fprint_time(stdout);
-	fprintf(stdout, " # SLSTATSD $Id: slstatsd.c,v 1.1.2.2 2010-11-28 14:22:38 brian Exp $ Output Header\n");
+	fprintf(stdout, " # SLSTATSD src/util/slstatsd.c (" PACKAGE_ENVR " " PACKAGE_DATE ") Output Header\n");
 	uname(&uts);
 	fprint_time(stdout);
 	fprintf(stdout, " # machine: %s %s %s %s %s\n", uts.sysname, uts.nodename, uts.release,

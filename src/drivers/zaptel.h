@@ -58,8 +58,6 @@
  * Copyright (C) 2001, Linux Support Services, Inc.
  *
  * All rights reserved.
- *
- * $Id: zaptel.h,v 1.1.2.2 2010-11-28 14:21:42 brian Exp $
  */
 
 #ifndef _LINUX_ZAPTEL_H

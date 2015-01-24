@@ -1,6 +1,6 @@
 //  ==========================================================================
 //  
-//  @(#) $Id$
+//  @(#) src/gdmo/base.cpp
 //  
 //  --------------------------------------------------------------------------
 //  
@@ -44,19 +44,9 @@
 //  Commercial licensing and support of this software is available from
 //  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 //  
-//  --------------------------------------------------------------------------
-//  
-//  Last Modified $Date$ by $Author$
-//  
-//  --------------------------------------------------------------------------
-//  
-//  $Log$
-//  Revision 0.9.2.1  2007/09/06 10:59:09  brian
-//  - added new gdmo files
-//
 //  ==========================================================================
 
-static char const ident[] = "$Id$";
+static char const ident[] = "src/gdmo/base.cpp (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 GdmoObject::GdmoObject(const char *n) : name(n) { };
 

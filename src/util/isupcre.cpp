@@ -1,6 +1,6 @@
 // ==========================================================================
 // 
-// @(#) $Id: isupcre.cpp,v 1.1.2.2 2003/11/07 17:29:01 brian Exp $
+// @(#) src/util/isupcre.cpp
 // 
 // --------------------------------------------------------------------------
 // 
@@ -44,13 +44,9 @@
 // Commercial licensing and support of this software is available from
 // OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 // 
-// --------------------------------------------------------------------------
-// 
-// Last Modified $Date: 2003/11/07 17:29:01 $ by $Author: brian $
-// 
 // ==========================================================================
 
-static char const ident[] = "$Id: isupcre.cpp,v 1.1.2.2 2003/11/07 17:29:01 brian Exp $";
+static char const ident[] = "src/util/isupcre.cpp (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 extern "C" {
 #	include <stropts.h>
