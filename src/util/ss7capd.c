@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ss7capd.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:19 $
+ @(#) File: src/util/ss7capd.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,28 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-05-31 09:46:19 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: ss7capd.c,v $
- Revision 1.1.2.4  2011-05-31 09:46:19  brian
- - new distros
-
- Revision 1.1.2.3  2011-01-12 04:10:36  brian
- - code updates for 2.6.32 kernel and gcc 4.4
-
- Revision 1.1.2.2  2010-11-28 14:22:38  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:47:55  brian
- - added files to new distro
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: ss7capd.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:19 $";
+static char const ident[] = "File: " "src/util/ss7capd.c" "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -148,7 +129,7 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -195,7 +176,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock.\n\
 \n\
-Copyright (c) 2008, 2009, 2010, 2011  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2011, 2015  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -205,7 +186,7 @@ Distributed by OpenSS7 under GNU Affero General Public License Version 3,\n\
 with conditions, incorporated herein by reference.\n\
 \n\
 See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.4 $ $Date: 2011-05-31 09:46:19 $");
+", NAME, PACKAGE, VERSION, PACKAGE_ENVR " " PACKAGE_DATE);
 }
 
 static void
