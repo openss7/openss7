@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:42:29 $
+# @(#) doc/papers/inet/Makefile
 #
 # -----------------------------------------------------------------------------
 #
@@ -42,10 +42,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2009-06-21 10:42:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -275,32 +271,5 @@ MY_PHONY += clean clean-fig clean-gif clean-png clean-eps clean-pdf clean-dat
 
 .PHONY: $(MY_PHONY)
 
-# =============================================================================
-#
-# $Log: Makefile,v $
-# Revision 1.1.2.1  2009-06-21 10:42:29  brian
-# - added files to new distro
-#
-# Revision 0.9.2.7  2008-04-28 22:52:09  brian
-# - updated headers for release
-#
-# Revision 0.9.2.6  2007/08/14 04:27:01  brian
-# - GPLv3 header update
-#
-# Revision 0.9.2.5  2007/06/17 01:56:54  brian
-# - updates for release, remove any later language
-#
-# Revision 0.9.2.4  2007/06/13 20:31:40  brian
-# - added papers to release
-#
-# Revision 0.9.2.3  2007/05/17 22:38:16  brian
-# - added new data files, performance report updates
-#
-# Revision 0.9.2.2  2007/05/07 18:41:39  brian
-# - updated papers
-#
-# Revision 0.9.2.1  2007/05/03 21:28:27  brian
-# - added paper
-#
 # =============================================================================
 # vim: ft=make sw=4

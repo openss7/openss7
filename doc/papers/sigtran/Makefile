@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:43:17 $
+# @(#) doc/papers/sigtran/Makefile
 #
 # -----------------------------------------------------------------------------
 #
@@ -42,10 +42,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2009-06-21 10:43:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -275,35 +271,5 @@ MY_PHONY += clean clean-fig clean-gif clean-png clean-eps clean-pdf clean-dat
 
 .PHONY: $(MY_PHONY)
 
-# =============================================================================
-#
-# $Log: Makefile,v $
-# Revision 1.1.2.1  2009-06-21 10:43:17  brian
-# - added files to new distro
-#
-# Revision 0.9.2.5  2008-04-29 01:52:17  brian
-# - updated headers for release
-#
-# Revision 0.9.2.4  2007/08/14 08:33:43  brian
-# - GPLv3 header update
-#
-# Revision 0.9.2.3  2007/06/17 02:00:49  brian
-# - updates for release, remove any later language
-#
-# Revision 0.9.2.2  2007/06/13 20:31:27  brian
-# - added papers to release
-#
-# Revision 0.9.2.1  2007/05/28 11:34:38  brian
-# - added new paper
-#
-# Revision 0.9.2.3  2007/05/17 22:38:16  brian
-# - added new data files, performance report updates
-#
-# Revision 0.9.2.2  2007/05/07 18:41:39  brian
-# - updated papers
-#
-# Revision 0.9.2.1  2007/05/03 21:28:27  brian
-# - added paper
-#
 # =============================================================================
 # vim: ft=make

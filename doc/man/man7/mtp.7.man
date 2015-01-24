@@ -207,7 +207,6 @@ $LIST$
 .]
 .Sh IDENTIFICATION
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
-.\"OpenSS7 for Linux Fast-STREAMS: $Name:  $($Revision: 1.1.2.2 $); $Date: 2011-02-07 02:18:28 $.
 .Pp
 \f(HRCopyright \(co 1997-2005 OpenSS7 Corp.
 All Rights Reserved.

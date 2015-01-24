@@ -572,7 +572,7 @@ XTI/TLI[4], TPI[5], XPG5, XNS 5.2[6], SUSv2[7].
 Trademarks mentioned are the property of their owners.
 
 @subsubheading VERSIONS
-OpenSS7 XTI Library: $Name:  $($Revision: 1.1.2.2 $); $Date: 2011-02-07 02:21:33 $.
+OpenSS7 XTI Library: (@value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}) @value{PACKAGE_DATE}
 
 @subsubheading AUTHOR
 @format
@@ -737,7 +737,7 @@ Trademarks mentioned are the property of their owners.
 @subsubheading VERSIONS
 @format
 @flushleft
-Linux Fast-STREAMS: $Name:  $($Revision: 1.1.2.2 $); $Date: 2011-02-07 02:21:33 $.
+Linux Fast-STREAMS: (@value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}) @value{PACKAGE_DATE}
 @end flushleft
 @end format
 

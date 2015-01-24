@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:43:32 $
+# @(#) doc/papers/streams/Makefile
 #
 # -----------------------------------------------------------------------------
 #
@@ -43,10 +43,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2009-06-21 10:43:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -276,31 +272,3 @@ MY_PHONY += clean clean-fig clean-gif clean-png clean-eps clean-pdf clean-dat
 
 .PHONY: $(MY_PHONY)
 
-# =============================================================================
-#
-# $Log: Makefile,v $
-# Revision 1.1.2.1  2009-06-21 10:43:32  brian
-# - added files to new distro
-#
-# Revision 0.9.2.7  2008-04-28 12:54:00  brian
-# - update file headers for release
-#
-# Revision 0.9.2.6  2007/12/15 20:19:46  brian
-# - updates
-#
-# Revision 0.9.2.5  2007/08/13 22:46:01  brian
-# - GPLv3 header updates
-#
-# Revision 0.9.2.4  2007/06/17 01:56:49  brian
-# - updates for release, remove any later language
-#
-# Revision 0.9.2.3  2007/06/13 20:31:34  brian
-# - added papers to release
-#
-# Revision 0.9.2.2  2007/05/07 18:41:37  brian
-# - updated papers
-#
-# Revision 0.9.2.1  2007/05/03 21:35:08  brian
-# - added paper
-#
-# =============================================================================
