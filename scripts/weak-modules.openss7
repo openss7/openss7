@@ -1,11 +1,11 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: weak-modules.openss7,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2011-05-10 13:45:31 $
+# @(#) scripts/weak-modules.openss7
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -45,10 +45,6 @@
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
 #
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-05-10 13:45:31 $ by $Author: brian $
-#
 # =============================================================================
 
 # Determine which modules have been weak updated and relink those that can be
@@ -81,7 +77,7 @@ progname="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: weak-modules.openss7,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2011-05-10 13:45:31 $'
+ident='scripts/weak-modules.openss7 2015-01-24T07:26+0000'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -665,11 +661,4 @@ fi
 
 exit $retval
 
-# =============================================================================
-#
-# $Log: weak-modules.openss7,v $
-# Revision 1.1.2.1  2011-05-10 13:45:31  brian
-# - weak modules workup
-#
-# =============================================================================
 # vim: ft=sh sw=4 et nocin nosi

@@ -1,11 +1,11 @@
 #!/usr/bin/awk -f
 # =============================================================================
 #
-# @(#) $RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-04-11 06:13:43 $
+# @(#) scripts/strconf.awk
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -44,10 +44,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-04-11 06:13:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -144,7 +140,7 @@ function usage(output)
 	return
     print "\
 " me ":\n\
-  $Id: strconf.awk,v 1.1.2.10 2011-04-11 06:13:43 brian Exp $\n\
+  scripts/strconf.awk\n\
 Usage:\n\
   [awk -f ]" me " -- [options] [INPUT ...]\n\
   [awk -f ]" me " -- -" gensub(/!/, "", 1, longopts["help"]) ", --help\n\
@@ -272,7 +268,7 @@ function version(output)
 	return
     print "\
 Version 2.1\n\
-$Id: strconf.awk,v 1.1.2.10 2011-04-11 06:13:43 brian Exp $\n\
+scripts/strconf.awk\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
@@ -295,7 +291,7 @@ function copying(output)
 	return
     print "\
 --------------------------------------------------------------------------------\n\
-$Id: strconf.awk,v 1.1.2.10 2011-04-11 06:13:43 brian Exp $\n\
+scripts/strconf.awk\n\
 --------------------------------------------------------------------------------\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
@@ -761,7 +757,7 @@ function write_hconfig(file,    name, prefix) {
     print "\
 /******************************************************************* vim: ft=c\n\
 \n\
- @(#) $Id: strconf.awk,v 1.1.2.10 2011-04-11 06:13:43 brian Exp $\n\
+ @(#) " file "\n\
 \n\
  -----------------------------------------------------------------------------\n\
 \n\
@@ -870,7 +866,7 @@ function write_modconf(file) {
     print "\
 /******************************************************************* vim: ft=c\n\
 \n\
- @(#) $Id: strconf.awk,v 1.1.2.10 2011-04-11 06:13:43 brian Exp $\n\
+ @(#) " file "\n\
 \n\
  -----------------------------------------------------------------------------\n\
 \n\
@@ -1075,7 +1071,7 @@ function write_makenodes(file) {
  * EDITS TO THIS FILE WILL BE LOST: EDIT strconf.awk INSTEAD.\n\
  */\n\
 \n\
-static char const ident[] = \"$RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-04-11 06:13:43 $\";\n\
+static char const ident[] = \"makenodes (\" PACKAGE_ENVR \" \" PACKAGE_DATE \")\";\n\
 \n\
 #if defined(LINUX)\n\
 #	include <sys/types.h>\n\
@@ -1813,7 +1809,7 @@ function write_pkgobject(pkgobject,    file, object, name, prefix, count, first,
  * EDITS TO THIS FILE WILL BE LOST: EDIT strconf.awk INSTEAD.\n\
  */\n\
 \n\
-static char const ident[] = \"$RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-04-11 06:13:43 $\";\n\
+static char const ident[] = \"pkgobject (\" PACKAGE_ENVR \" \" PACKAGE_DATE \")\";\n\
 \n\
 #include <linux/config.h>\n\
 #include <linux/version.h>\n\
@@ -2142,38 +2138,4 @@ END {
 	close(file)
 }
 
-# =============================================================================
-#
-# $Log: strconf.awk,v $
-# Revision 1.1.2.10  2011-04-11 06:13:43  brian
-# - working up weak updates
-#
-# Revision 1.1.2.9  2011-04-05 16:35:10  brian
-# - weak module design
-#
-# Revision 1.1.2.8  2011-03-26 04:28:46  brian
-# - updates to build process
-#
-# Revision 1.1.2.7  2011-03-17 07:01:29  brian
-# - build and repo system improvements
-#
-# Revision 1.1.2.6  2011-02-28 19:51:28  brian
-# - better repository build
-#
-# Revision 1.1.2.5  2011-01-18 17:03:37  brian
-# - create by default in mkdev script
-#
-# Revision 1.1.2.4  2010-11-28 14:01:53  brian
-# - awk script updates and corrections
-#
-# Revision 1.1.2.3  2009-09-08 10:46:51  brian
-# - changes to avoid haldaemon problems
-#
-# Revision 1.1.2.2  2009-07-23 16:37:52  brian
-# - updates for release
-#
-# Revision 1.1.2.1  2009-07-21 11:06:21  brian
-# - new awk scripts for release check
-#
-# =============================================================================
 # vim: ft=awk sw=4 nocin nosi fo+=tcqlorn

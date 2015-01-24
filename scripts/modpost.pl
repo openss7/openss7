@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w
 # =============================================================================
 #
-# @(#) $RCSfile: modpost.pl,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 03:44:13 $
+# @(#) scripts/modpost.pl
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -45,10 +45,6 @@
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
 #
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-01-12 03:44:13 $ by $Author: brian $
-#
 # =============================================================================
 
 # 2.6 Kernel modpost ala perl
@@ -81,7 +77,7 @@ $default{'cachefile'} = $ENV{MODPOST_CACHE};
 $debug = 0;
 $verbose = 1;
 
-$ident = '$RCSfile: modpost.pl,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 03:44:13 $';
+$ident = 'scripts/modpost.pl 2015-01-24T07:11+0000'
 $version = '3.0.0';
 
 $show = 'yes';
@@ -812,20 +808,4 @@ if ($command =~ /^(none|process)$/) {
 
 exit $retval;
 
-# =============================================================================
-#
-# $Log: modpost.pl,v $
-# Revision 1.1.2.3  2011-01-12 03:44:13  brian
-# - update awk scripts and work around gawk close bug
-#
-# Revision 1.1.2.2  2009-06-21 12:41:53  brian
-# - updated headers
-#
-# Revision 1.1.2.1  2009-06-21 11:16:41  brian
-# - added files to new distro
-#
-# Revision 0.9.2.1  2008-10-29 18:14:57  brian
-# - commit working files for release
-#
-# =============================================================================
 # vim: ft=perl sw=4

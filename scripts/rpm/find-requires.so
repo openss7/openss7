@@ -121,11 +121,11 @@ END {
 
 # =============================================================================
 #
-# @(#) $RCSfile: find-requires.so,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:31 $
+# @(#) scripts/find-requires.so
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -164,22 +164,6 @@ END {
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-09-02 08:46:31 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: find-requires.so,v $
-# Revision 1.1.2.3  2011-09-02 08:46:31  brian
-# - sync up lots of repo and build changes from git
-#
-# Revision 1.1.2.2  2011-05-10 13:45:32  brian
-# - weak modules workup
-#
-# Revision 1.1.2.1  2009-09-02 02:33:59  brian
-# - added missing files
 #
 # =============================================================================
 # vim: ft=awk tw=80 sw=4 nocin nosi fo+=tcqlorn

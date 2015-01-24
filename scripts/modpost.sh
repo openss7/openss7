@@ -1,11 +1,11 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-01-12 03:44:13 $
+# @(#) scripts/modpost.sh
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -45,10 +45,6 @@
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
 #
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-01-12 03:44:13 $ by $Author: brian $
-#
 # =============================================================================
 
 # 2.6 Kernel modpost ala bash
@@ -82,7 +78,7 @@ modename="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-01-12 03:44:13 $'
+ident='scripts/modpost.sh 2015-01-24T07:11+0000'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -1262,41 +1258,4 @@ esac
 
 exit $retval
 
-# =============================================================================
-#
-# $Log: modpost.sh,v $
-# Revision 1.1.2.6  2011-01-12 03:44:13  brian
-# - update awk scripts and work around gawk close bug
-#
-# Revision 1.1.2.5  2009-07-21 11:06:13  brian
-# - changes from release build
-#
-# Revision 1.1.2.4  2009-06-29 07:35:26  brian
-# - updated rpm spec and symvers
-#
-# Revision 1.1.2.3  2009-06-22 03:34:25  brian
-# - updates for release
-#
-# Revision 1.1.2.2  2009-06-21 12:41:53  brian
-# - updated headers
-#
-# Revision 1.1.2.1  2009-06-21 11:16:41  brian
-# - added files to new distro
-#
-# Revision 0.9.2.25  2008-09-04 06:02:28  brian
-# - corrections for recent 2.6.25.4 kernels
-#
-# Revision 0.9.2.24  2008-04-28 09:23:10  brian
-# - updated script headers for release
-#
-# Revision 0.9.2.23  2008-04-10 18:00:50  brian
-# - handle new EXPORT_UNUSED_SYMBOL
-#
-# Revision 0.9.2.22  2007/08/12 18:08:02  brian
-# - more header corrections
-#
-# Revision 0.9.2.21  2007/08/12 17:47:21  brian
-# - updated script headers
-#
-# =============================================================================
 # vim: ft=sh sw=4

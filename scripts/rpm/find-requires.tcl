@@ -59,11 +59,11 @@ END {
 
 # =============================================================================
 #
-# @(#) $RCSfile: find-requires.tcl,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-10 13:45:32 $
+# @(#) scripts/find-requires.tcl
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -102,22 +102,6 @@ END {
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-05-10 13:45:32 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: find-requires.tcl,v $
-# Revision 1.1.2.3  2011-05-10 13:45:32  brian
-# - weak modules workup
-#
-# Revision 1.1.2.2  2011-02-07 04:48:33  brian
-# - updated configure and build scripts
-#
-# Revision 1.1.2.1  2009-07-24 13:49:45  brian
-# - updates for release build
 #
 # =============================================================================
 # vim: ft=awk tw=80 sw=4 nocin nosi fo+=tcqlorn

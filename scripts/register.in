@@ -125,7 +125,7 @@ fi
 program=`$ECHO "$0" | $SED -e 's,^.*/,,'`
 modename="$program"
 
-ident='$RCSfile: register.in,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2011-09-02 08:07:43 $'
+ident='scripts/register.in (@VERSION@) @PACKAGE_DATE@'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.

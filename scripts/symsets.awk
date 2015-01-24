@@ -1,11 +1,11 @@
 #!/usr/bin/awk -f
 # =============================================================================
 #
-# @(#) $RCSfile: symsets.awk,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-03-26 04:28:46 $
+# @(#) scripts/symsets.awk
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -44,10 +44,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-03-26 04:28:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -140,7 +136,7 @@ function usage(output)
 	return
     print "\
 " me ":\n\
-  $Id: symsets.awk,v 1.1.2.2 2011-03-26 04:28:46 brian Exp $\n\
+  scripts/symsets.awk\n\
 Usage:\n\
   awk -f " me " -- [options] [INPUT ...]\n\
   awk -f " me " -- -" longopts["help"] "\n\
@@ -256,7 +252,7 @@ function version(output)
 	return
     print "\
 Version 2.1\n\
-$Id: symsets.awk,v 1.1.2.2 2011-03-26 04:28:46 brian Exp $\n\
+scripts/symsets.awk\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
@@ -279,7 +275,7 @@ function copying(output)
 	return
     print "\
 --------------------------------------------------------------------------------\n\
-$Id: symsets.awk,v 1.1.2.2 2011-03-26 04:28:46 brian Exp $\n\
+scripts/symsets.awk\n\
 --------------------------------------------------------------------------------\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
@@ -1355,15 +1351,4 @@ END {
 	close(file)
 }
 
-# =============================================================================
-#
-# $Log: symsets.awk,v $
-# Revision 1.1.2.2  2011-03-26 04:28:46  brian
-# - updates to build process
-#
-# Revision 1.1.2.1  2011-03-17 07:01:22  brian
-# - added new symsets script
-#
-#
-# =============================================================================
 # vim: ft=awk sw=4 nocin nosi fo+=tcqlorn

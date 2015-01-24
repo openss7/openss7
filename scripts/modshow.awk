@@ -1,11 +1,11 @@
 #!/usr/bin/awk -f
 # =============================================================================
 # 
-# @(#) $RCSfile: modshow.awk,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2011-04-07 15:24:01 $
+# @(#) scripts/modshow.awk
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -44,10 +44,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-04-07 15:24:01 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -142,7 +138,7 @@ function usage(output)
 	return
     print "\
 " me ":\n\
-  $Id: modshow.awk,v 1.1.2.1 2011-04-07 15:24:01 brian Exp $\n\
+  scripts/modshow.awk\n\
 Usage:\n\
   [awk -f ]" me " -- [options] [mode] [MODULE ...]\n\
   [awk -f ]" me " -- -" gensub(/!/, "", 1, longopts["help"]) ", --help\n\
@@ -269,7 +265,7 @@ function version(output)
 	return
     print "\
 Version 2.1\n\
-$Id: modshow.awk,v 1.1.2.1 2011-04-07 15:24:01 brian Exp $\n\
+scripts/modshow.awk\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
@@ -292,7 +288,7 @@ function copying(output)
 	return
     print "\
 --------------------------------------------------------------------------------\n\
-$Id: modshow.awk,v 1.1.2.1 2011-04-07 15:24:01 brian Exp $\n\
+scripts/modshow.awk\n\
 --------------------------------------------------------------------------------\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
@@ -862,11 +858,4 @@ END {
 	close(file)
 }
 
-# =============================================================================
-#
-# $Log: modshow.awk,v $
-# Revision 1.1.2.1  2011-04-07 15:24:01  brian
-# - weak reference corrections
-#
-# =============================================================================
 # vim: ft=awk sw=4 nocin nosi fo+=tcqlorn

@@ -1,11 +1,11 @@
 #!/usr/bin/awk -f
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7-modules,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-09-20 09:51:33 $
+# @(#) scripts/openss7-modules
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -44,10 +44,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-09-20 09:51:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -148,7 +144,7 @@ function usage(output)
 	return
     print "\
 " me ":\n\
-  $Id: openss7-modules,v 1.1.2.11 2011-09-20 09:51:33 brian Exp $\n\
+  scripts/openss7-modules\n\
 Usage:\n\
   [awk -f ]" me " -- [options] [mode] [" longargs["kernels"] "]\n\
   [awk -f ]" me " -- -" gensub(/!/, "", 1, longopts["help"]) ", --help\n\
@@ -275,7 +271,7 @@ function version(output)
 	return
     print "\
 Version 2.1\n\
-$Id: openss7-modules,v 1.1.2.11 2011-09-20 09:51:33 brian Exp $\n\
+scripts/openss7-modules\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
@@ -298,7 +294,7 @@ function copying(output)
 	return
     print "\
 --------------------------------------------------------------------------------\n\
-$Id: openss7-modules,v 1.1.2.11 2011-09-20 09:51:33 brian Exp $\n\
+scripts/openss7-modules\n\
 --------------------------------------------------------------------------------\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
@@ -3414,41 +3410,4 @@ END {
 	close(file)
 }
 
-# =============================================================================
-#
-# $Log: openss7-modules,v $
-# Revision 1.1.2.11  2011-09-20 09:51:33  brian
-# - updates from git
-#
-# Revision 1.1.2.10  2011-09-02 08:46:30  brian
-# - sync up lots of repo and build changes from git
-#
-# Revision 1.1.2.9  2011-07-28 09:40:37  brian
-# - updates to debian debuginfo build and mandriva compressed manpages and modules
-#
-# Revision 1.1.2.8  2011-07-27 07:52:20  brian
-# - work to support Mageia/Mandriva compressed kernel modules and URPMI repo
-#
-# Revision 1.1.2.7  2011-05-31 09:46:02  brian
-# - new distros
-#
-# Revision 1.1.2.6  2011-05-15 12:01:20  brian
-# - many build system refinements
-#
-# Revision 1.1.2.5  2011-05-10 13:45:31  brian
-# - weak modules workup
-#
-# Revision 1.1.2.4  2011-04-12 06:33:27  brian
-# - passes distcheck
-#
-# Revision 1.1.2.3  2011-04-11 06:13:43  brian
-# - working up weak updates
-#
-# Revision 1.1.2.2  2011-04-07 15:24:01  brian
-# - weak reference corrections
-#
-# Revision 1.1.2.1  2011-04-05 16:35:10  brian
-# - weak module design
-#
-# =============================================================================
 # vim: ft=awk sw=4 nocin nosi fo+=tcqlorn

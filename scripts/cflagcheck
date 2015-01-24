@@ -1,11 +1,11 @@
 #!/usr/bin/make -skf
 # =============================================================================
 #
-# @(#) $RCSfile: cflagcheck,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-05-31 09:46:02 $
+# @(#) scripts/cflagcheck
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -44,10 +44,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-05-31 09:46:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -155,37 +151,3 @@ debug_flags='-DDEBUG_HASH=0 -DDEBUG_HASH2=63'
 endif
 
 
-# =============================================================================
-#
-# $Log: cflagcheck,v $
-# Revision 1.1.2.5  2011-05-31 09:46:02  brian
-# - new distros
-#
-# Revision 1.1.2.4  2011-01-12 03:44:13  brian
-# - update awk scripts and work around gawk close bug
-#
-# Revision 1.1.2.3  2010-11-28 14:01:53  brian
-# - awk script updates and corrections
-#
-# Revision 1.1.2.2  2009-06-21 12:41:53  brian
-# - updated headers
-#
-# Revision 1.1.2.1  2009-06-21 11:16:41  brian
-# - added files to new distro
-#
-# Revision 0.9.2.11  2008-09-08 05:19:00  brian
-# - ubuntu needs KERNELRELEASE too
-#
-# Revision 0.9.2.10  2008-09-03 09:04:43  brian
-# - handle new kernel makefile flags
-#
-# Revision 0.9.2.9  2008-09-03 08:23:59  brian
-# - handle newer names for kernel flags
-#
-# Revision 0.9.2.8  2008-04-28 09:23:10  brian
-# - updated script headers for release
-#
-# Revision 0.9.2.7  2007/08/12 17:47:20  brian
-# - updated script headers
-#
-# =============================================================================

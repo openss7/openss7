@@ -1,11 +1,11 @@
 #!/bin/bash
 # =============================================================================
 #
-# @(#) $RCSfile: modsyms.sh,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-21 12:41:53 $
+# @(#) scripts/modsyms.sh
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -45,10 +45,6 @@
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
 #
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2009-06-21 12:41:53 $ by $Author: brian $
-#
 # =============================================================================
 
 ECHO='echo'
@@ -78,7 +74,7 @@ modename="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: modsyms.sh,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-21 12:41:53 $'
+ident='scripts/modsyms.sh 2015-01-24T07:12+0000'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -555,23 +551,4 @@ esac
 
 exit 0
 
-# =============================================================================
-#
-# $Log: modsyms.sh,v $
-# Revision 1.1.2.2  2009-06-21 12:41:53  brian
-# - updated headers
-#
-# Revision 1.1.2.1  2009-06-21 11:16:41  brian
-# - added files to new distro
-#
-# Revision 0.9.2.10  2008-04-28 09:23:11  brian
-# - updated script headers for release
-#
-# Revision 0.9.2.9  2007/08/12 18:08:02  brian
-# - more header corrections
-#
-# Revision 0.9.2.8  2007/08/12 17:47:21  brian
-# - updated script headers
-#
-# =============================================================================
 # vim: ft=sh sw=4

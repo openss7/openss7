@@ -1,11 +1,11 @@
 #!/usr/bin/awk -f
 # =============================================================================
 #
-# @(#) $RCSfile: modpost.awk,v $ $Name:  $($Revision: 1.1.2.20 $) $Date: 2011-09-20 09:51:33 $
+# @(#) scripts/modpost.awk
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -44,10 +44,6 @@
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-09-20 09:51:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -147,7 +143,7 @@ function usage(output)
 	return
     print "\
 " me ":\n\
-  $Id: modpost.awk,v 1.1.2.20 2011-09-20 09:51:33 brian Exp $\n\
+  scripts/modpost.awk\n\
 Usage:\n\
   [awk -f ]" me " -- [options] [MODULE ...]\n\
   [awk -f ]" me " -- -" gensub(/!/, "", 1, longopts["help"]) ", --help\n\
@@ -274,7 +270,7 @@ function version(output)
 	return
     print "\
 Version 2.1\n\
-$Id: modpost.awk,v 1.1.2.20 2011-09-20 09:51:33 brian Exp $\n\
+scripts/modpost.awk\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
@@ -297,7 +293,7 @@ function copying(output)
 	return
     print "\
 --------------------------------------------------------------------------------\n\
-$Id: modpost.awk,v 1.1.2.20 2011-09-20 09:51:33 brian Exp $\n\
+scripts/modpost.awk\n\
 --------------------------------------------------------------------------------\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
@@ -2266,68 +2262,4 @@ END {
 	close(file)
 }
 
-# =============================================================================
-#
-# $Log: modpost.awk,v $
-# Revision 1.1.2.20  2011-09-20 09:51:33  brian
-# - updates from git
-#
-# Revision 1.1.2.19  2011-08-07 11:14:38  brian
-# - mostly mandriva and ubuntu build updates
-#
-# Revision 1.1.2.18  2011-07-27 07:52:20  brian
-# - work to support Mageia/Mandriva compressed kernel modules and URPMI repo
-#
-# Revision 1.1.2.17  2011-07-18 19:42:16  brian
-# - added documentation
-#
-# Revision 1.1.2.16  2011-05-31 09:46:02  brian
-# - new distros
-#
-# Revision 1.1.2.15  2011-05-15 12:01:20  brian
-# - many build system refinements
-#
-# Revision 1.1.2.14  2011-05-10 13:45:31  brian
-# - weak modules workup
-#
-# Revision 1.1.2.13  2011-04-12 06:33:27  brian
-# - passes distcheck
-#
-# Revision 1.1.2.12  2011-04-11 06:13:43  brian
-# - working up weak updates
-#
-# Revision 1.1.2.11  2011-04-08 12:35:42  brian
-# - documented openss7-modules script
-#
-# Revision 1.1.2.10  2011-04-06 21:33:05  brian
-# - corrections
-#
-# Revision 1.1.2.9  2011-04-05 16:35:10  brian
-# - weak module design
-#
-# Revision 1.1.2.8  2011-03-26 04:28:46  brian
-# - updates to build process
-#
-# Revision 1.1.2.7  2011-03-17 07:01:29  brian
-# - build and repo system improvements
-#
-# Revision 1.1.2.6  2011-01-12 03:44:13  brian
-# - update awk scripts and work around gawk close bug
-#
-# Revision 1.1.2.5  2010-11-28 14:01:53  brian
-# - awk script updates and corrections
-#
-# Revision 1.1.2.4  2009-09-08 10:46:51  brian
-# - changes to avoid haldaemon problems
-#
-# Revision 1.1.2.3  2009-09-01 09:09:50  brian
-# - added text image files
-#
-# Revision 1.1.2.2  2009-07-23 16:37:51  brian
-# - updates for release
-#
-# Revision 1.1.2.1  2009-07-21 11:06:21  brian
-# - new awk scripts for release check
-#
-# =============================================================================
 # vim: ft=awk sw=4 nocin nosi fo+=tcqlorn
