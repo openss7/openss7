@@ -1,0 +1,40 @@
+syn keyword mibValue InetAddressType InetAddress
+syn keyword mibValue TransportAddress TransportAddressType TransportAddressDomain
+syn keyword mibValue AdministrativeState OperationalState UsageState
+syn keyword mibValue ProceduralStatus AlarmStatus AvailabilityStatus
+syn keyword mibValue StandbyStatus ControlStatus UnknownStatus SimpleNameType NameType
+syn keyword mibValue PerfCurrentCount PerfIntervalCount PerfTotalCount
+syn keyword mibValue CommonLanguageName UTCTime ExtUTCTime VariablePointer
+syn keyword mibValue ObjectInstance ObjectClass SpecificIdentifier PerceivedSeverity
+syn keyword mibValue ProbableCause AttributeId TimePeriod IntervalsOfDay WeekMask
+syn keyword mibValue CharacteristicInfo SystemTimingSource
+syn keyword mibValue Unsigned32 Unsigned64
+syn keyword mibValue HCPerfValidIntervals HCPerfInvalidIntervals
+syn keyword mibValue HCPerfTimeElapsed HCPerfIntervalThreshold
+syn keyword mibValue HCPerfCurrentCount HCPerfIntervalCount HCPerfTotalCount
+syn keyword mibValue InterfaceIndex InterfaceIndexOrZero
+syn keyword mibValue PhysicalIndex PhysicalIndexOrZero
+syn keyword mibValue ZeroBasedCounter64 CounterBasedGauge64
+syn keyword mibValue ZeroBasedCounter32
+syn keyword mibValue Utf8String LongUtf8String
+syn keyword mibValue DisplayString PhysAddress MacAddress TruthValue TestAndIncr
+syn keyword mibValue AutonomousType VariablePointer RowPointer RowStatus
+syn keyword mibValue TimeStamp TimeInterval DateAndTime StorageType TDomain
+syn keyword mibValue TAddress
+syn keyword mibValue CircuitCode CircuitIdentificationCode MilliSeconds
+syn keyword mibValue tmnObjectInstance tmnPerceivedSeverity tmnProbableCause
+syn keyword mibValue Ss7ProtocolVariant SpType NetworkPointCode
+syn keyword mibValue SnmpAdminString
+syn keyword mibValue SlsList
+syn keyword mibValue MtpCongestionLevel MtpLinkStatus MtpNetworkIndicator MtpSpType
+syn keyword mibValue MtpLinkFailureReason MtpUserPartStatus MtpUserPart MtpGsTreatment
+syn keyword mibValue MtpAvailabilityStatus MtpOptions MtpTransmissionRate MtpSiMask
+syn keyword mibValue MtpPointCodeFormat MtpCongestedState MtpResultOfAction MtpSapAddress
+syn keyword mibValue zeroDotZero
+syn keyword mibValue SigtranOptions RegistrationPolicy AspIdPolicy InterfaceIdentifierText
+syn keyword mibValue AssociationPolicy AspState AsState TrafficMode InterfaceIdentifier
+syn keyword mibValue ProtocolVersion
+syn keyword mibValue VisibleString GraphicString Ss7LoadShareAlgorithm SlsCode SlCode SlCodeList
+syn keyword mibValue PointCode IdAndPointCode RelatedLinkGroupNumber MtpSlType
+syn keyword mibValue GnmAlarmStatus
+
