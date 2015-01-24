@@ -384,7 +384,7 @@ for d in $defaults ; do
 done
 
 if test X$show_vers = Xyes ; then
-    $echo "$progname:"' Version $Name:  $($Revision: 1.1.2.1 $) $Date: 2011-05-10 13:45:31 $'
+    $echo "$progname:"' Version (1.1.2.1) 2011-05-10 13:45:31'
 fi
 
 if test $debug -gt 1 -o $verbose -gt 1 ; then

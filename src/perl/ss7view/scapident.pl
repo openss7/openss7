@@ -8,8 +8,8 @@ my $progdir = $0; $progdir =~ s/\/[^\/]*$//;
 
 my $program = $0; $program =~ s/^.*\///;
 my $ident = 'src/perl/ss7view/scapident.pl 2015-01-24T12:33+0000';
-my $version = '$Revision: 1.1.2.3 $';
-my $date = '$Date: 2010-11-28 14:34:48 $';
+my $version = '1.1.2.3';
+my $date = '2010-11-28 14:34:48';
 my $title = 'OpenSS7 SS7 Analyzer';
 
 my $Title = <<EOF;

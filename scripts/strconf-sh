@@ -361,7 +361,7 @@ if test -n "$prev" ; then
 fi
 
 if test X"$show_version" = Xyes ; then
-    $echo "$progname:"' Version $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:01:53 $'
+    $echo "$progname:"' Version (1.1.2.2) 2010-11-28 14:01:53'
 fi
 
 if test X"$show_help" = Xyes ; then

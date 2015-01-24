@@ -2150,7 +2150,7 @@ Distributed by OpenSS7 under GNU Affero General Public License Version 3,\n\
 with conditions, incorporated herein by reference.\n\
 \n\
 See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision$ $Date$");
+", NAME, PACKAGE, VERSION, PACKAGE_ENVR " " PACKAGE_DATE);
 }
 
 static void

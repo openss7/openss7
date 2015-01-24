@@ -1117,7 +1117,7 @@ Distributed by OpenSS7 under GNU Affero General Public License Version 3,\n\
 with conditions, incorporated herein by reference.\n\
 \n\
 See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.2 $ $Date: 2010-11-28 14:22:39 $");
+", NAME, PACKAGE, VERSION, PACKAGE_ENVR " " PACKAGE_DATE);
 }
 
 void
