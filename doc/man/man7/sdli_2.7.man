@@ -2,7 +2,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: sdli_2.7.man,v 1.1.2.1 2009-06-21 10:36:23 brian Exp $
+.\" @(#) doc/man/man7/sdli_2.7.man
 .\"
 .\" =========================================================================
 .\"
@@ -54,24 +54,6 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:36:23 $ by $Author: brian $
-.\"
-.\" -------------------------------------------------------------------------
-.\"
-.\" $Log: sdli_2.7.man,v $
-.\" Revision 1.1.2.1  2009-06-21 10:36:23  brian
-.\" - added files to new distro
-.\"
-.\" Revision 0.9.2.8  2008-04-29 07:10:31  brian
-.\" - updating headers for release
-.\"
-.\" Revision 0.9.2.7  2006/12/27 16:36:00  brian
-.\" - added slpmod module and fixups for make check target
-.\"
-.\" Revision 0.9.2.6  2006/04/05 09:43:21  brian
-.\" - moved .so line and updated headers
-.\"
-.\" =========================================================================
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
 no-default-database

@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: openss7-modules.8.man,v 1.1.2.3 2011-05-10 13:45:34 brian Exp $
+.\" @(#) doc/man/man8/openss7-modules.8.man
 .\"
 .\" =========================================================================
 .\"
@@ -81,24 +81,6 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2011-05-10 13:45:34 $ by $Author: brian $
-.\"
-.\" -------------------------------------------------------------------------
-.\"
-.\" $Log: openss7-modules.8.man,v $
-.\" Revision 1.1.2.3  2011-05-10 13:45:34  brian
-.\" - weak modules workup
-.\"
-.\" Revision 1.1.2.2  2011-04-11 06:13:42  brian
-.\" - working up weak updates
-.\"
-.\" Revision 1.1.2.1  2011-04-08 12:35:41  brian
-.\" - documented openss7-modules script
-.\"
-.\" Revision 1.1.2.2  2011-02-07 02:18:31  brian
-.\" - updated manual pages
-.\"
-.\" =========================================================================
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
 no-default-database
