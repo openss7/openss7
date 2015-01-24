@@ -65,7 +65,7 @@ static char const ident[] = "src/modules/mstr.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define MSTR_DESCRIP	"Multi-Stream (MSTR) STREAMS Module"
 #define MSTR_EXTRA	"Part of Linux Fast-STREAMS"
 #define MSTR_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define MSTR_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define MSTR_REVISION	"OpenSS7 src/modules/mstr.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define MSTR_DEVICE	"SVR 4.2 MP STREAMS Multi-Stream Module"
 #define MSTR_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MSTR_LICENSE	"GPL"

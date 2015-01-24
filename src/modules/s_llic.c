@@ -68,7 +68,7 @@ static char const ident[] = "src/modules/s_llic.c (" PACKAGE_ENVR ") " PACKAGE_D
 #define S_LLIC_DESCRIP		"Spider LLI Admin Compatibility Module for Linux Fast-STREAMS"
 #define S_LLIC_EXTRA		"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define S_LLIC_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define S_LLIC_REVISION		"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define S_LLIC_REVISION	"OpenSS7 src/modules/s_llic.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define S_LLIC_DEVICE		"SVR 4.2MP DLPI Devices"
 #define S_LLIC_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define S_LLIC_LICENSE		"GPL"

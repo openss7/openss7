@@ -212,8 +212,8 @@ static char const ident[] = "src/modules/pckt.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define PCKT_DESCRIP		"Packet Mode Module (PCKT) STREAMS Module"
 #define PCKT_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define PCKT_COPYRIGHT		"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define PCKT_REVISION		"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define PCKT_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define PCKT_REVISION	"OpenSS7 src/modules/pckt.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define PCKT_DEVICE		"SVR 4.2 MP STREAMS Packet Mode Module (PCKT)"
 #define PCKT_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PCKT_LICENSE		"GPL"

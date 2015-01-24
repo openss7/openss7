@@ -68,7 +68,7 @@ static char const ident[] = "src/drivers/spx.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SPX_DESCRIP	"SVR 4.2 STREAMS Pipe (SPX) Driver"
 #define SPX_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define SPX_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SPX_REVISION	"OpenSS7 src/drivers/spx.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SPX_DEVICE	"SVR 4.2 MP STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"

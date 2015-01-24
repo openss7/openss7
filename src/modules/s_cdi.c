@@ -65,7 +65,7 @@ static char const ident[] = "src/modules/s_cdi.c (" PACKAGE_ENVR ") " PACKAGE_DA
 
 #define S_CDI_DESCRIP	"S_CDI STREAMS Module"
 #define S_CDI_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define S_CDI_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define S_CDI_REVISION	"OpenSS7 src/modules/s_cdi.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define S_CDI_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define S_CDI_DEVICE	"Provides OpenSS7 SpiderWAN to CDI (S_CDI)"
 #define S_CDI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

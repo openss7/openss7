@@ -77,7 +77,7 @@ static char const ident[] = "src/drivers/nit_if.c (" PACKAGE_ENVR ") " PACKAGE_D
 #define NIT_DESCRIP	"SVR 4.1 SNIT (NIT_IF) STREAMS Driver"
 #define NIT_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NIT_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define NIT_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define NIT_REVISION	"OpenSS7 src/drivers/nit_if.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define NIT_DEVICE	"SVR 4.2 MP STREAMS NIT Driver"
 #define NIT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NIT_LICENSE	"GPL"

@@ -87,7 +87,7 @@ static char const ident[] = "src/modules/tpi_sccp.c (" PACKAGE_ENVR ") " PACKAGE
 #define TPI_SCCP_DESCRIP	"SCCPI to TPI Conversion Module for Linux Fast-STREAMS"
 #define TPI_SCCP_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define TPI_SCCP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define TPI_SCCP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define TPI_SCCP_REVISION	"OpenSS7 src/modules/tpi_sccp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TPI_SCCP_DEVICE		"SVR 4.2MP SCCPI to TPI Conversion Module (TPI) for SCCP"
 #define TPI_SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TPI_SCCP_LICENSE	"GPL"

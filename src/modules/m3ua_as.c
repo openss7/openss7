@@ -121,7 +121,7 @@ static char const ident[] = "src/modules/m3ua_as.c (" PACKAGE_ENVR ") " PACKAGE_
 
 #define M3UA_AS_DESCRIP		"M3UA/SCTP Message Transfer Part (MTP) STREAMS Module"
 #define M3UA_AS_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define M3UA_AS_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define M3UA_AS_REVISION	"OpenSS7 src/modules/m3ua_as.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define M3UA_AS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define M3UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M3UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

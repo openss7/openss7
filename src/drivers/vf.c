@@ -78,7 +78,7 @@ static char const ident[] = "src/drivers/vf.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 #define VF_DESCRIP	"SVR 4.2 STREAMS Verification (VF) Driver"
 #define VF_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define VF_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define VF_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define VF_REVISION	"OpenSS7 src/drivers/vf.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define VF_DEVICE	"SVR 4.2 MP STREAMS Verification Driver (VF)"
 #define VF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define VF_LICENSE	"GPL"

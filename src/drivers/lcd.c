@@ -74,7 +74,7 @@ static char const ident[] = "src/drivers/lcd.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define	LCD_DESCRIP	"SVR 4.2 Communications Device Driver for Linux Fast-STREAMS"
 #define	LCD_EXTRA	"Part of X/Open Network Services for Linux Fast-STREAMS"
 #define	LCD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define	LCD_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define	LCD_REVISION	"OpenSS7 src/drivers/lcd.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define	LCD_DEVICE	"SVR 4.2MP Communications Device (CD) for Linux Fast-STREAMS"
 #define	LCD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define	LCD_LICENSE	"GPL"

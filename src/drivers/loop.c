@@ -77,7 +77,7 @@ static char const ident[] = "src/drivers/loop.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define LOOP_DESCRIP	"SVR 4.2 STREAMS Null Stream (LOOP) Driver"
 #define LOOP_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOOP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define LOOP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define LOOP_REVISION	"OpenSS7 src/drivers/loop.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define LOOP_DEVICE	"SVR 4.2 MP STREAMS Null Stream (LOOP) Device"
 #define LOOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOOP_LICENSE	"GPL"

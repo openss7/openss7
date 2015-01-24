@@ -77,7 +77,7 @@ static char const ident[] = "src/drivers/ldl.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define LDL_DESCRIP	"INET Data Link Provider (DLPI) NET4 STREAMS Driver"
 #define LDL_EXTRA	"Part of the OpenSS7 Protocol Stacks for Linux Fast-STREAMS"
 #define LDL_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define LDL_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define LDL_REVISION	"OpenSS7 src/drivers/ldl.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define LDL_DEVICE	"SVR 4.2 MP STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"

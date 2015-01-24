@@ -70,7 +70,7 @@ static char const ident[] = "src/modules/dlaix.c (" PACKAGE_ENVR ") " PACKAGE_DA
 #define DLAIX_DESCRIP	"LAPB over HDLC Module for Linux Fast-STREAMS"
 #define DLAIX_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define DLAIX_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define DLAIX_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define DLAIX_REVISION	"OpenSS7 src/modules/dlaix.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define DLAIX_DEVICE	"SVR 4.2MP LAPB over HDLC Module (LAPB) for X.25"
 #define DLAIX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DLAIX_LICENSE	"GPL"

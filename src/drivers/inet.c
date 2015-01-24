@@ -663,7 +663,7 @@ extern void tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std);
 #define SS__DESCRIP	"INET (NET4) STREAMS Driver"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define SS__COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SS__REVISION	"OpenSS7 src/drivers/inet.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SS__DEVICE	"SVR 4.2 MP STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"

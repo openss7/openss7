@@ -71,7 +71,7 @@ static char const ident[] = "src/modules/mx_pmod.c (" PACKAGE_ENVR ") " PACKAGE_
 
 #define MX_DESCRIP	"MX (Multiplex) STREAMS Pipe Module"
 #define MX_EXTRA	"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
-#define MX_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define MX_REVISION	"OpenSS7 src/modules/mx_pmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define MX_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define MX_DEVICE	"Provides OpenSS7 MX pipe driver."
 #define MX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

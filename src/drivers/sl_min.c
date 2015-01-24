@@ -56,7 +56,7 @@ static char const ident[] = "src/drivers/sl_min.c (" PACKAGE_ENVR ") " PACKAGE_D
 
 #define SL_MIN_DESCRIP		"SS7/IP Signalling Link (SL) STREAMS Multiplexing Driver"
 #define SL_MIN_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define SL_MIN_REVISION		"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SL_MIN_REVISION	"OpenSS7 src/drivers/sl_min.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SL_MIN_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define SL_MIN_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_MIN_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

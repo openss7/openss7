@@ -71,7 +71,7 @@ static char const ident[] = "src/drivers/cddev.c (" PACKAGE_ENVR ") " PACKAGE_DA
 #define CDDEV_DESCRIP	"Communication Device Interface (CDI) Provider STREAMS Driver"
 #define CDDEV_EXTRA	"Part of the OpenSS7 XNS Stack for Linux Fast-STREAMS"
 #define CDDEV_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define CDDEV_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define CDDEV_REVISION	"OpenSS7 src/drivers/cddev.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define CDDEV_DEVICE	"SVR 4.2 MP STREAMS CDI Communication Device Interface Provider"
 #define CDDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CDDEV_LICENSE	"GPL"

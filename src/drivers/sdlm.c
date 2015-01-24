@@ -75,7 +75,7 @@ static char const ident[] = "src/drivers/sdlm.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define SDLM_DESCRIP	"SS7/SDL: (Signalling Data Link) Multiplexing STREAMS Driver"
 #define SDLM_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define SDLM_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SDLM_REVISION	"OpenSS7 src/drivers/sdlm.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SDLM_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define SDLM_DEVICE	"Supports OpenSS7 SDL Drivers."
 #define SDLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

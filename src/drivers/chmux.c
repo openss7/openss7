@@ -108,7 +108,7 @@ static char const ident[] = "src/drivers/chmux.c (" PACKAGE_ENVR ") " PACKAGE_DA
 
 #define CH_MUX_DESCRIP		"CH Multiplex (CH-MUX) STREAMS Multiplexing Driver"
 #define CH_MUX_EXTRA		"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
-#define CH_MUX_REVISION		"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define CH_MUX_REVISION	"OpenSS7 src/drivers/chmux.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define CH_MUX_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define CH_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define CH_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

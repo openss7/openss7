@@ -113,7 +113,7 @@ static char const ident[] = "src/drivers/np_udp.c (" PACKAGE_ENVR ") " PACKAGE_D
 #define NP_DESCRIP	"User Datagram Protocol (UDP) Network Provider (NP_UDP) STREAMS Driver"
 #define NP_EXTRA	"Part of the OpenSS7 IP Stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define NP_REVISION	"OpenSS7 src/drivers/np_udp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define NP_DEVICE	"SVR 4.2 MP STREAMS NPI NP_UDP Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"

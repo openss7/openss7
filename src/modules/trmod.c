@@ -69,7 +69,7 @@ static char const ident[] = "src/modules/trmod.c (" PACKAGE_ENVR ") " PACKAGE_DA
 #define TRMOD_DESCRIP	"TCAP Q.771 Transaction Sublayer (TR) STREAMS Module"
 #define TRMOD_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define TRMOD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define TRMOD_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define TRMOD_REVISION	"OpenSS7 src/modules/trmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TRMOD_DEVICE	"SVR 4.2 MP STREAMS Q.771 Transaction Sublayer (TR) Module"
 #define TRMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TRMOD_LICENSE	"GPL"

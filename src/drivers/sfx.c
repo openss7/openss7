@@ -70,7 +70,7 @@ static char const ident[] = "src/drivers/sfx.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SFX_DESCRIP	"SVR 4.2 STREAMS-based FIFOs Driver"
 #define SFX_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SFX_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define SFX_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SFX_REVISION	"OpenSS7 src/drivers/sfx.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SFX_DEVICE	"SVR 4.2 MP STREAMS-based FIFOs"
 #define SFX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SFX_LICENSE	"GPL"

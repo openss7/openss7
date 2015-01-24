@@ -65,7 +65,7 @@ static char const ident[] = "src/modules/npi_conv.c (" PACKAGE_ENVR ") " PACKAGE
 #define NPI_CONV_DESCRIP	"NPI Endian Conversion (NPI-CONV) for Linux Fast-STREAMS"
 #define NPI_CONV_EXTRA		"Part of Linux Fast-STREAMS"
 #define NPI_CONV_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define NPI_CONV_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define NPI_CONV_REVISION	"OpenSS7 src/modules/npi_conv.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define NPI_CONV_DEVICE		"SVR 4.2 NPI Endian Conversion (NPI-CONV) for STREAMS"
 #define NPI_CONV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NPI_CONV_LICENSE	"GPL"

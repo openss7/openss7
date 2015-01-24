@@ -83,7 +83,7 @@ static char const ident[] = "src/drivers/tua.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 
 #define TUA_DESCRIP	"TUA STREAMS Multiplexing Driver"
 #define TUA_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define TUA_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define TUA_REVISION	"OpenSS7 src/drivers/tua.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TUA_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define TUA_DEVICE	"Supports OpenSS7 TCAP TCI/TRI Interface Pseudo-Device Drivers."
 #define TUA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

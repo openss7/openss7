@@ -72,7 +72,7 @@ static char const ident[] = "src/modules/itot.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define ITOT_DESCRIP	"RFC 2161 ISO Transport over TCP (ITOT) STREAMS Module"
 #define ITOT_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define ITOT_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define ITOT_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define ITOT_REVISION	"OpenSS7 src/modules/itot.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define ITOT_DEVICE	"SVR 4.2 MP STREAMS ITOT Module for RFC 2126 (ITOT)"
 #define ITOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ITOT_LICENSE	"GPL"

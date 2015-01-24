@@ -71,7 +71,7 @@ static char const ident[] = "src/modules/connld.c (" PACKAGE_ENVR ") " PACKAGE_D
 #define CONNLD_DESCRIP		"SVR 4.2 Connection Line Discipline (CONNLD) STREAMS Module"
 #define CONNLD_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CONNLD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define CONNLD_REVISION		"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define CONNLD_REVISION	"OpenSS7 src/modules/connld.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define CONNLD_DEVICE		"SVR 4.2 CONNLD Module for STREAMS-based pipes"
 #define CONNLD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CONNLD_LICENSE		"GPL"

@@ -69,7 +69,7 @@ static char const ident[] = "src/modules/tpiperf.c (" PACKAGE_ENVR ") " PACKAGE_
 #define TPIPERF_DESCRIP		"TPI Performance (TPIPERF) STREAMS Module"
 #define TPIPERF_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TPIPERF_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define TPIPERF_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define TPIPERF_REVISION	"OpenSS7 src/modules/tpiperf.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TPIPERF_DEVICE		"SVR 4.2 MP STREAMS TPI Performance Module (TPIPERF)"
 #define TPIPERF_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TPIPERF_LICENSE		"GPL"

@@ -68,7 +68,7 @@ static char const ident[] = "src/modules/s_nli.c (" PACKAGE_ENVR ") " PACKAGE_DA
 #define S_NLI_DESCRIP	"Spider X25 Compatibility Module for Linux Fast-STREAMS"
 #define S_NLI_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define S_NLI_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define S_NLI_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define S_NLI_REVISION	"OpenSS7 src/modules/s_nli.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define S_NLI_DEVICE	"SVR 4.2MP CDI CD_HDLC Devices"
 #define S_NLI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define S_NLI_LICENSE	"GPL"

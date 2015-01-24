@@ -93,7 +93,7 @@ static char const ident[] = "src/modules/rtp_ch.c (" PACKAGE_ENVR ") " PACKAGE_D
 
 #define RTPCH_DESCRIP	"RTP-CH STREAMS Module"
 #define RTPCH_EXTRA	"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
-#define RTPCH_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define RTPCH_REVISION	"OpenSS7 src/modules/rtp_ch.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define RTPCH_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define RTPCH_DEVICE	"Provides OpenSS7 RTP to CH module."
 #define RTPCH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

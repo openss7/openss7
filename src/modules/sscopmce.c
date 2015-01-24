@@ -67,7 +67,7 @@ static char const ident[] = "src/modules/sscopmce.c (" PACKAGE_ENVR ") " PACKAGE
 
 #define SSCOPMCE_DESCRIP	"MTP3B-SSCOPMCE STREAMS Module"
 #define SSCOPMCE_EXTRA		"Part of the OpenSS7 ATM Stack for Linux Fast-STREAMS"
-#define SSCOPMCE_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SSCOPMCE_REVISION	"OpenSS7 src/modules/sscopmce.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SSCOPMCE_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define SSCOPMCE_DEVICE		"Provides OpenSS7 MTP3B-I.432.3-SSCOPMCE module."
 #define SSCOPMCE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

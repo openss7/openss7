@@ -81,7 +81,7 @@ static char const ident[] = "src/modules/nit_pf.c (" PACKAGE_ENVR ") " PACKAGE_D
 #define PF_DESCRIP	"SVR 4.1 SNIT Packet Filter (PF) STREAMS Module"
 #define PF_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PF_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define PF_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define PF_REVISION	"OpenSS7 src/modules/nit_pf.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define PF_DEVICE	"SVR 4.1 SNIT Packet Filter (PF) for STREAMS."
 #define PF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PF_LICENSE	"GPL"

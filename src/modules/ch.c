@@ -87,7 +87,7 @@ static char const ident[] = "src/modules/ch.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 #define CH_DESCRIP	"OpenSS7 Channel Module (CH) STREAMS Module"
 #define CH_EXTRA	"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
 #define CH_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define CH_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define CH_REVISION	"OpenSS7 src/modules/ch.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define CH_DEVICE	"SVR 4.2 MP STREAMS Channel Module (CH)"
 #define CH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CH_LICENSE	"GPL"

@@ -103,8 +103,8 @@ References
 
 #define PTEM_DESCRIP		"Pseudo-Terminal Emulation Module (PTEM) STREAMS Module"
 #define PTEM_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define PTEM_COPYRIGHT		"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define PTEM_REVISION		"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define PTEM_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define PTEM_REVISION	"OpenSS7 src/modules/ptem.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define PTEM_DEVICE		"SVR 4.2 MP STREAMS Pseudo-Terminal Emulation Module (PTEM)"
 #define PTEM_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PTEM_LICENSE		"GPL"

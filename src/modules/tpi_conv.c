@@ -73,7 +73,7 @@ static char const ident[] = "src/modules/tpi_conv.c (" PACKAGE_ENVR ") " PACKAGE
 #define TPI_CONV_DESCRIP	"TPI Endian Conversion (TPI-CONV) for Linux Fast-STREAMS"
 #define TPI_CONV_EXTRA		"Part of OpenSS7 Linux Fast-STREAMS"
 #define TPI_CONV_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define TPI_CONV_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define TPI_CONV_REVISION	"OpenSS7 src/modules/tpi_conv.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TPI_CONV_DEVICE		"SVR 4.2 TPI Endian Conversion (TPI-CONV) for STREAMS"
 #define TPI_CONV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TPI_CONV_LICENSE	"GPL"

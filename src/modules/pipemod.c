@@ -76,7 +76,7 @@ static char const ident[] = "src/modules/pipemod.c (" PACKAGE_ENVR ") " PACKAGE_
 #define PIPEMOD_DESCRIP		"SVR 4.2 Pipe Module (PIPEMOD) STREAMS Module"
 #define PIPEMOD_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPEMOD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define PIPEMOD_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define PIPEMOD_REVISION	"OpenSS7 src/modules/pipemod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define PIPEMOD_DEVICE		"SVR 4.2 Pipe Module for STREAMS-based Pipes"
 #define PIPEMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PIPEMOD_LICENSE		"GPL"

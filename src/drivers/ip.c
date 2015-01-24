@@ -100,7 +100,7 @@ typedef unsigned int socklen_t;
 #define IP_DESCRIP	"Internet Protocol (IP) Network Provider STREAMS Driver"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define IP_REVISION	"OpenSS7 src/drivers/ip.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define IP_DEVICE	"SVR 4.2 MP STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"

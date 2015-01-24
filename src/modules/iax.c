@@ -72,7 +72,7 @@ static char const ident[] = "src/modules/iax.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 
 #define IAX_DESCRIP	"IAX STREAMS Module"
 #define IAX_EXTRA	"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
-#define IAX_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define IAX_REVISION	"OpenSS7 src/modules/iax.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define IAX_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define IAX_DEVICE	"Provides OpenSS7 Asterisk (IAX)"
 #define IAX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

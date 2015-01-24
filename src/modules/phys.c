@@ -83,7 +83,7 @@ static char const ident[] = "src/modules/phys.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define PHYS_DESCRIP	"MTP3B-PHYS STREAMS Module"
 #define PHYS_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define PHYS_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define PHYS_REVISION	"OpenSS7 src/modules/phys.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define PHYS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define PHYS_DEVICE	"Provides OpenSS7 MTP3B-I.432.3-PHYS module."
 #define PHYS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

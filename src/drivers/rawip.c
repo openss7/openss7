@@ -127,7 +127,7 @@ static char const ident[] = "src/drivers/rawip.c (" PACKAGE_ENVR ") " PACKAGE_DA
 #define TP_DESCRIP	"Raw Internet Protocol (RAWIP) STREAMS Driver"
 #define TP_EXTRA	"Part of the OpenSS7 IP Stack for Linux Fast-STREAMS"
 #define TP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define TP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define TP_REVISION	"OpenSS7 src/drivers/rawip.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TP_DEVICE	"SVR 4.2 MP STREAMS RAW IP Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TP_LICENSE	"GPL"

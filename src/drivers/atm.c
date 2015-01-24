@@ -74,7 +74,7 @@ static char const ident[] = "src/drivers/atm.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 
 #define ATM_DESCRIP	"ATM STREAMS Multiplexing Driver"
 #define ATM_EXTRA	"Part of the OpenSS7 ATM Stack for Linux Fast-STREAMS"
-#define ATM_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define ATM_REVISION	"OpenSS7 src/drivers/atm.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define ATM_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define ATM_DEVICE	"Provides OpenSS7 ATM I.432.X Pseudo-Device Driver."
 #define ATM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

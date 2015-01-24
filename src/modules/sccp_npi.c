@@ -85,7 +85,7 @@ static char const ident[] = "src/modules/sccp_npi.c (" PACKAGE_ENVR ") " PACKAGE
 #define SCCP_NPI_DESCRIP	"SCCPI to NPI Conversion Module for Linux Fast-STREAMS"
 #define SCCP_NPI_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SCCP_NPI_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define SCCP_NPI_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SCCP_NPI_REVISION	"OpenSS7 src/modules/sccp_npi.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SCCP_NPI_DEVICE		"SVR 4.2MP SCCPI to NPI Conversion Module (NPI) for SCCP"
 #define SCCP_NPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SCCP_NPI_LICENSE	"GPL"

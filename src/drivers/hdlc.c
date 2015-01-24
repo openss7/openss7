@@ -80,7 +80,7 @@ static char const ident[] = "src/drivers/hdlc.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define HDLC_DESCRIP	"HDLC STREAMS Multiplexing Driver"
 #define HDLC_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
-#define HDLC_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define HDLC_REVISION	"OpenSS7 src/drivers/hdlc.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define HDLC_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define HDLC_DEVICE	"Supports Linux HDLC devices."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

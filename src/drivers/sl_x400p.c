@@ -117,7 +117,7 @@ static char const ident[] = "src/drivers/sl_x400p.c (" PACKAGE_ENVR ") " PACKAGE
 
 #define SL_X400P_DESCRIP	"X400P-SS7: SS7/SL (Signalling Link) STREAMS Driver"
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define SL_X400P_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SL_X400P_REVISION	"OpenSS7 src/drivers/sl_x400p.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SL_X400P_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -74,7 +74,7 @@ static char const ident[] = "src/modules/mtp_tpi.c (" PACKAGE_ENVR ") " PACKAGE_
 
 #define MTP_TPI_DESCRIP		"SS7 Message Transfer Part (MTP) TPI STREAMS Module"
 #define MTP_TPI_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define MTP_TPI_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define MTP_TPI_REVISION	"OpenSS7 src/modules/mtp_tpi.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define MTP_TPI_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define MTP_TPI_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_TPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

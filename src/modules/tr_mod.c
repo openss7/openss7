@@ -93,7 +93,7 @@ static char const ident[] = "src/modules/tr_mod.c (" PACKAGE_ENVR ") " PACKAGE_D
 
 #define TR_DESCRIP	"SS7/TCAP-TR (TCAP Transaction Handling) STREAMS Module"
 #define TR_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define TR_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define TR_REVISION	"OpenSS7 src/modules/tr_mod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TR_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define TR_DEVICE	"Provides OpenSS7 TCAP-TR module."
 #define TR_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

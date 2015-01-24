@@ -87,7 +87,7 @@ static char const ident[] = "src/modules/sdt_tpi.c (" PACKAGE_ENVR ") " PACKAGE_
 #define SDT_TPI_DESCRIP		"SS7/IP Signalling Data Terminal (SDT) STREAMS Module"
 #define SDT_TPI_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SDT_TPI_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define SDT_TPI_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SDT_TPI_REVISION	"OpenSS7 src/modules/sdt_tpi.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SDT_TPI_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDT_TPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SDT_TPI_LICENSE		"GPL"

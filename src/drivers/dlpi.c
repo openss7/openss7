@@ -92,7 +92,7 @@ static char const ident[] = "src/drivers/dlpi.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define DLPI_DESCRIP	"UNIX SVR 4.2 DLPI Driver for Linux Fast-STREAMS"
 #define DLPI_EXTRA	"Part of the OpenSS7 Protocol Stacks for Linux Fast-STREAMS"
 #define DLPI_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define DLPI_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define DLPI_REVISION	"OpenSS7 src/drivers/dlpi.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define DLPI_DEVICE	"SVR 4.2MP DLPI Driver (DLPI)"
 #define DLPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DLPI_LICENSE	"GPL"

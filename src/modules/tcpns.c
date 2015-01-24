@@ -82,7 +82,7 @@ static char const ident[] = "src/modules/tcpns.c (" PACKAGE_ENVR ") " PACKAGE_DA
 #define TCPNS_DESCRIP	"RFC 1006/2126 ISOT/ITOT NS (TCPNS) STREAMS Module"
 #define TCPNS_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define TCPNS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define TCPNS_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define TCPNS_REVISION	"OpenSS7 src/modules/tcpns.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TCPNS_DEVICE	"SVR 4.2 MP STREAMS NS Module for RFC 1006/2126 ISOT/ITOT"
 #define TCPNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCPNS_LICENSE	"GPL"

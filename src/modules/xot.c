@@ -87,7 +87,7 @@ static char const ident[] = "src/modules/xot.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define XOT_DESCRIP	"X.25 over TCP Module for Linux Fast-STREAMS"
 #define XOT_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define XOT_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define XOT_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define XOT_REVISION	"OpenSS7 src/modules/xot.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define XOT_DEVICE	"SVR 4.2MP X.25 over TCP Module (XOT) for X.25 CONS"
 #define XOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define XOT_LICENSE	"GPL"

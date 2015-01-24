@@ -80,7 +80,7 @@ static char const ident[] = "src/modules/npi.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define NPI_DESCRIP	"NLI to NPI Conversion Module for Linux Fast-STREAMS"
 #define NPI_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define NPI_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define NPI_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define NPI_REVISION	"OpenSS7 src/modules/npi.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define NPI_DEVICE	"SVR 4.2MP NLI to NPI Conversion Module (NPI) for X.25 CONS"
 #define NPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NPI_LICENSE	"GPL"

@@ -95,7 +95,7 @@ static char const ident[] = "src/drivers/socksys.c (" PACKAGE_ENVR ") " PACKAGE_
 #define SOCKSYS_DESCRIP		"SVR 4.2 Socket System (SOCKSYS) STREAMS Driver"
 #define SOCKSYS_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SOCKSYS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define SOCKSYS_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SOCKSYS_REVISION	"OpenSS7 src/drivers/socksys.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SOCKSYS_DEVICE		"SVR 4.2 MP STREAMS Socket System Driver (SOCKSYS)"
 #define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SOCKSYS_LICENSE		"GPL"

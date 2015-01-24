@@ -77,7 +77,7 @@ static char const ident[] = "src/modules/sdl_cd.c (" PACKAGE_ENVR ") " PACKAGE_D
 
 #define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS Module"
 #define SDL_DESCRIP	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define SDL_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SDL_REVISION	"OpenSS7 src/modules/sdl_cd.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SDL_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define SDL_DEVICE	"Provides OpenSS7 SDL-CD module."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

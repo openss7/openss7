@@ -61,7 +61,7 @@ static char const ident[] = "src/modules/lapf.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define LAPF_DESCRIP	"LAPF STREAMS Module"
 #define LAPF_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
-#define LAPF_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define LAPF_REVISION	"OpenSS7 src/modules/lapf.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define LAPF_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define LAPF_DEVICE	"Provides OpenSS7 Link Access Protocol Frame Relay (LAPF)"
 #define LAPF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

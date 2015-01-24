@@ -69,7 +69,7 @@ static char const ident[] = "src/drivers/trmux.c (" PACKAGE_ENVR ") " PACKAGE_DA
 #define TRMUX_DESCRIP	"TCAP Q.771 Transaction Sublayer (TR) STREAMS Driver"
 #define TRMUX_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define TRMUX_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define TRMUX_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define TRMUX_REVISION	"OpenSS7 src/drivers/trmux.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TRMUX_DEVICE	"SVR 4.2 MP STREAMS Q.771 Transaction Sublayer (TR) Driver"
 #define TRMUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TRMUX_LICENSE	"GPL"

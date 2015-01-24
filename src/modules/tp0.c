@@ -73,7 +73,7 @@ static char const ident[] = "src/modules/tp0.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TP0_DESCRIP	"RFC 1006 and RFC 2126 (TP0) STREAMS Module"
 #define TP0_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define TP0_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define TP0_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define TP0_REVISION	"OpenSS7 src/modules/tp0.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TP0_DEVICE	"SVR 4.2 MP STREAMS TP0 Module for RFC 1006 and RFC 2126"
 #define TP0_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TP0_LICENSE	"GPL"

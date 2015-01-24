@@ -74,7 +74,7 @@ static char const ident[] = "src/drivers/sdt_acb56.c (" PACKAGE_ENVR ") " PACKAG
 
 #define ACB56_DESCRIP	"ACB56: SS7/SDT (Signalling Data Terminal) STREAMS Driver"
 #define ACB56_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define ACB56_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define ACB56_REVISION	"OpenSS7 src/drivers/sdt_acb56.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define ACB56_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define ACB56_DEVICES	"Supports the SeaLevel ACB56(tm) V.35 boards"
 #define ACB56_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

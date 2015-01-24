@@ -77,7 +77,7 @@ static char const ident[] = "src/drivers/bpf.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define BPF_DESCRIP	"Berkeley Packet Filter (BPF) STREAMS Driver"
 #define BPF_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define BPF_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define BPF_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define BPF_REVISION	"OpenSS7 src/drivers/bpf.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define BPF_DEVICE	"SVR 4.2 MP STREAMS BPF Driver"
 #define BPF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define BPF_LICENSE	"GPL"

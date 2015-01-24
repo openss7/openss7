@@ -131,7 +131,7 @@ static char const ident[] = "src/drivers/np_rtp.c (" PACKAGE_ENVR ") " PACKAGE_D
 #define NP_DESCRIP	"Real-Time Protocol (RTP) Network Provider (NP) STREAMS Driver"
 #define NP_EXTRA	"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define NP_REVISION	"OpenSS7 src/drivers/np_rtp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define NP_DEVICE	"SVR 4.2 MP STREAMS NPI NP_RTP Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"

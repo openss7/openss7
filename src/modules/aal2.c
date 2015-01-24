@@ -68,7 +68,7 @@ static char const ident[] = "src/modules/aal2.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define AAL2_DESCRIP	"MTP3B-AAL2 STREAMS Module"
 #define AAL2_EXTRA	"Part of the OpenSS7 ATM Stack for Linux Fast-STREAMS"
-#define AAL2_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define AAL2_REVISION	"OpenSS7 src/modules/aal2.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define AAL2_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define AAL2_DEVICE	"Provides OpenSS7 MTP3B-I.432.3-AAL2 module."
 #define AAL2_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

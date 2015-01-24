@@ -70,7 +70,7 @@ static char const ident[] = "src/kernel/maccompat.c (" PACKAGE_ENVR ") " PACKAGE
 #define MACCOMP_DESCRIP		"Mac OpenTransport Version 1.5r2 Compatibility for Linux Fast-STREAMS"
 #define MACCOMP_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MACCOMP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define MACCOMP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define MACCOMP_REVISION	"OpenSS7 src/kernel/maccompat.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define MACCOMP_DEVICE		"Mac OpenTransport Version 1.5r2 Compatibility"
 #define MACCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MACCOMP_LICENSE		"GPL"

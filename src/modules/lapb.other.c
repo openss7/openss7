@@ -76,7 +76,7 @@ static char const ident[] = "src/modules/lapb.other.c (" PACKAGE_ENVR ") " PACKA
 #define LAPB_DESCRIP	"Link Access Procedure Balanced (LAPB) STREAMS Module"
 #define LAPB_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define LAPB_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define LAPB_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define LAPB_REVISION	"OpenSS7 src/modules/lapb.other.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define LAPB_DEVICE	"SVR 4.2 MP STREAMS Link Access Procedure Balanced (LAPB)"
 #define LAPB_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LAPB_LICENSE	"GPL"

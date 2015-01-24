@@ -63,8 +63,8 @@ static char const ident[] = "src/modules/cdpmod.c (" PACKAGE_ENVR ") " PACKAGE_D
 
 #define CDPMOD_DESCRIP	"HDLC Pipe Module for Linux Fast-STREAMS"
 #define CDPMOD_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
-#define CDPMOD_COPYRIGHT "Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define CDPMOD_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define CDPMOD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define CDPMOD_REVISION	"OpenSS7 src/modules/cdpmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define CDPMOD_DEVICE	"SVR 4.2MP CD PIPE Module (CDPMOD) for HDLC"
 #define CDPMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CDPMOD_LICENSE	"GPL"

@@ -69,7 +69,7 @@ static char const ident[] = "src/drivers/ip_to_dlpi.c (" PACKAGE_ENVR ") " PACKA
 #define IP2XINET_DESCRIP	"INET Data Link Provider (IP_TO_DLPI) STREAMS Driver"
 #define IP2XINET_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP2XINET_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define IP2XINET_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define IP2XINET_REVISION	"OpenSS7 src/drivers/ip_to_dlpi.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define IP2XINET_DEVICE		"SVR 4.2 MP STREAMS INET DLPI Drivers (NET4)"
 #define IP2XINET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP2XINET_LICENSE	"GPL"

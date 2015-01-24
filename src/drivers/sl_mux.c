@@ -89,7 +89,7 @@ static char const ident[] = "src/drivers/sl_mux.c (" PACKAGE_ENVR ") " PACKAGE_D
 
 #define SL_MUX_DESCRIP		"SL-MUX: SS7/SL (Signalling Link) STREAMS Multiplexing Driver"
 #define SL_MUX_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define SL_MUX_REVISION		"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SL_MUX_REVISION	"OpenSS7 src/drivers/sl_mux.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SL_MUX_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define SL_MUX_DEVICE		"Supports the OpenSS7 MTP2 and INET transport drivers."
 #define SL_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

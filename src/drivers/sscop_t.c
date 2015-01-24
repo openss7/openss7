@@ -53,7 +53,7 @@ static char const ident[] = "src/drivers/sscop_t.c (" PACKAGE_ENVR ") " PACKAGE_
 
 #define SSCOP_TPI_DESCRIP	"SSCOP-MCE/IP STREAMS Driver"
 #define SSCOP_TPI_EXTRA		"Part of the OpenSS7 ATM Stack for Linux Fast-STREAMS"
-#define SSCOP_TPI_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SSCOP_TPI_REVISION	"OpenSS7 src/drivers/sscop_t.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SSCOP_TPI_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define SSCOP_TPI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SSCOP_TPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

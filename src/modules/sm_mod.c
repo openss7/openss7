@@ -57,7 +57,7 @@ static char const ident[] = "src/modules/sm_mod.c (" PACKAGE_ENVR ") " PACKAGE_D
 
 #define SM_MOD_DESCRIP		"SIMPLE SINGLE LINK MTP"
 #define SM_MOD_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define SM_MOD_REVISION		"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SM_MOD_REVISION	"OpenSS7 src/modules/sm_mod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SM_MOD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define SM_MOD_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SM_MOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

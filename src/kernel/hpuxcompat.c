@@ -70,7 +70,7 @@ static char const ident[] = "src/kernel/hpuxcompat.c (" PACKAGE_ENVR ") " PACKAG
 #define HPUXCOMP_DESCRIP	"HP-UX 11i v2 Compatibility for Linux Fast-STREAMS"
 #define HPUXCOMP_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define HPUXCOMP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define HPUXCOMP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define HPUXCOMP_REVISION	"OpenSS7 src/kernel/hpuxcompat.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define HPUXCOMP_DEVICE		"HP-UX 11i v2 Compatibility"
 #define HPUXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define HPUXCOMP_LICENSE	"GPL"

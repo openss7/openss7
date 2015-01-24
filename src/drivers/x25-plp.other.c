@@ -67,7 +67,7 @@ static char const ident[] = "src/drivers/x25-plp.other.c (" PACKAGE_ENVR ") " PA
 #define PLP_DESCRIP	"ISO 8208 X.25 Packet Layer Protocol (X25-PLP) Network Provider"
 #define PLP_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define PLP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define PLP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define PLP_REVISION	"OpenSS7 src/drivers/x25-plp.other.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define PLP_DEVICE	"SVR 4.2 MP STREAMS X.25 PLP (ISO 8208) Network Provider"
 #define PLP_CONTACT	"Brian BIdulock <bidulock@openss7.org>"
 #define PLP_LICENSE	"GPL"

@@ -91,7 +91,7 @@ static char const ident[] = "src/drivers/rtp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define RTP_DESCRIP	"Real-Time Protocol (RTP) STREAMS Driver"
 #define RTP_EXTRA	"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
 #define RTP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define RTP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define RTP_REVISION	"OpenSS7 src/drivers/rtp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define RTP_DEVICE	"SVR 4.2 MP STREAMS RTP Driver"
 #define RTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RTP_LICENSE	"GPL"

@@ -101,7 +101,7 @@ static char const ident[] = "src/drivers/mg.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #define MG_DESCRIP	"SS7 Media Gateway (MG) STREAMS Multiplexing Driver"
 #define MG_EXTRA	"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
-#define MG_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define MG_REVISION	"OpenSS7 src/drivers/mg.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define MG_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define MG_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

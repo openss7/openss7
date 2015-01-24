@@ -87,7 +87,7 @@ static char const ident[] = "src/drivers/sl_x100p.c (" PACKAGE_ENVR ") " PACKAGE
 
 #define SL_X100P_DESCRIP	"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS Driver"
 #define SL_X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define SL_X100P_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SL_X100P_REVISION	"OpenSS7 src/drivers/sl_x100p.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SL_X100P_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define SL_X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards"
 #define SL_X100P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

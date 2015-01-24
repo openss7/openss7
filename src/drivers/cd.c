@@ -76,7 +76,7 @@ static char const ident[] = "src/drivers/cd.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 #define CD_DESCRIP	"OSI Communication Device Provider (CD) STREAMS Driver"
 #define CD_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define CD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define CD_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define CD_REVISION	"OpenSS7 src/drivers/cd.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define CD_DEVICE	"SVR 4.2 MP STREAMS CDI OSI Communications Device Provider"
 #define CD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CD_LICENSE	"GPL"

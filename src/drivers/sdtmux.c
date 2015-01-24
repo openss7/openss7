@@ -69,7 +69,7 @@ static char const ident[] = "src/drivers/sdtmux.c (" PACKAGE_ENVR ") " PACKAGE_D
 
 #define SDTM_DESCRIP	"Signalling Data Terminal (SDT) STREAMS Multiplexing Driver"
 #define SDTM_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define SDTM_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SDTM_REVISION	"OpenSS7 src/drivers/sdtmux.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SDTM_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define SDTM_DEVICE	"Part of the OpenSS7 Stack for STREAMS."
 #define SDTM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -58,7 +58,7 @@ static char const ident[] = "src/drivers/x25-llc2.c (" PACKAGE_ENVR ") " PACKAGE
 #define LLC2_DESCRIP	"SVR 4.2 DLPI X25-LLC2 Driver for Linux Fast-STREAMS"
 #define LLC2_EXTRA      "Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define LLC2_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define LLC2_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define LLC2_REVISION	"OpenSS7 src/drivers/x25-llc2.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define LLC2_DEVICE	"SVR 4.2MP DLPI Driver (DLPI) for IEEE 802.2 LLC"
 #define LLC2_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LLC2_LICENSE	"GPL"

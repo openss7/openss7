@@ -66,7 +66,7 @@ static char const ident[] = "src/modules/sdl_sctp.c (" PACKAGE_ENVR ") " PACKAGE
 
 #define SDL_SCTP_DESCRIP	"SS7/SCTP Signalling Data Link (SDL) STREAMS Module"
 #define SDL_SCTP_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define SDL_SCTP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SDL_SCTP_REVISION	"OpenSS7 src/modules/sdl_sctp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SDL_SCTP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define SDL_SCTP_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDL_SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

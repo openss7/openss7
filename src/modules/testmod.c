@@ -76,7 +76,7 @@ static char const ident[] = "src/modules/testmod.c (" PACKAGE_ENVR ") " PACKAGE_
 #define TESTMOD_DESCRIP		"SVR 4.2 Test Module for Linux Fast-STREAMS"
 #define TESTMOD_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TESTMOD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define TESTMOD_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define TESTMOD_REVISION	"OpenSS7 src/modules/testmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TESTMOD_DEVICE		"SVR 4.2 Test Module for STREAMS"
 #define TESTMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TESTMOD_LICENSE		"GPL"

@@ -112,7 +112,7 @@ static char const ident[] = "src/drivers/isua_as.c (" PACKAGE_ENVR ") " PACKAGE_
 
 #define ISUA_AS_DESCRIP		"ISUA/SCTP AS MTP STREAMS Multiplexing Driver"
 #define ISUA_AS_EXTRA		"Part of the OpenSS7 ISDN Stack for Linux Fast-STREAMS"
-#define ISUA_AS_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define ISUA_AS_REVISION	"OpenSS7 src/drivers/isua_as.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define ISUA_AS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define ISUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

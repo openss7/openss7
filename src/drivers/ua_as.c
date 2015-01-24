@@ -143,7 +143,7 @@ static char const ident[] = "src/drivers/ua_as.c (" PACKAGE_ENVR ") " PACKAGE_DA
 
 #define UA_AS_DESCRIP	"UA/SCTP AS MTP STREAMS Multiplexing Driver"
 #define UA_AS_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define UA_AS_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define UA_AS_REVISION	"OpenSS7 src/drivers/ua_as.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define UA_AS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define UA_AS_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define UA_AS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

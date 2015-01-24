@@ -143,7 +143,7 @@ static char const ident[] = "src/drivers/matrix.c (" PACKAGE_ENVR ") " PACKAGE_D
 
 #define MATRIX_DESCRIP		"MATRIX (MX) STREAMS Multiplexing Driver"
 #define MATRIX_EXTRA		"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
-#define MATRIX_REVISION		"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define MATRIX_REVISION	"OpenSS7 src/drivers/matrix.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define MATRIX_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define MATRIX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MATRIX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

@@ -70,7 +70,7 @@ static char const ident[] = "src/drivers/m3ua.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define M3UA_DESCRIP	"M3UA STREAMS Multiplexing Driver"
 #define M3UA_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define M3UA_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define M3UA_REVISION	"OpenSS7 src/drivers/m3ua.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define M3UA_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define M3UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M3UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

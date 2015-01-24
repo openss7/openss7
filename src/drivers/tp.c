@@ -99,7 +99,7 @@ typedef unsigned int socklen_t;
 #define TP_DESCRIP	"OSI Transport Provider (TP) STREAMS Driver"
 #define TP_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define TP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define TP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define TP_REVISION	"OpenSS7 src/drivers/tp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TP_DEVICE	"SVR 4.2 MP STREAMS TPI OSI Transport Provider Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@opens7.org>"
 #define TP_LICENSE	"GPL"

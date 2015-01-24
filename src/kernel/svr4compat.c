@@ -70,7 +70,7 @@ static char const ident[] = "src/kernel/svr4compat.c (" PACKAGE_ENVR ") " PACKAG
 #define SVR4COMP_DESCRIP	"UNIX(R) SVR 4.2 MP Compatibility module for Linux Fast-STREAMS"
 #define SVR4COMP_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR4COMP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define SVR4COMP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SVR4COMP_REVISION	"OpenSS7 src/kernel/svr4compat.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR4COMP_LICENSE	"GPL"

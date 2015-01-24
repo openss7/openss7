@@ -64,7 +64,7 @@ static char const ident[] = "src/modules/isos.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define ISOS_DESCRIP	"SVR 4.2 ISO Transport over SCTP for Linux Fast-STREAMS"
 #define ISOS_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define ISOS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define ISOS_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define ISOS_REVISION	"OpenSS7 src/modules/isos.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define ISOS_DEVICE	"SVR 4.2MP STREAMS ISO Transport over SCTP (ISOS)"
 #define ISOS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ISOS_LICENSE	"GPL"

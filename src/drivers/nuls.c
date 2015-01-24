@@ -67,7 +67,7 @@ static char const ident[] = "src/drivers/nuls.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define NULS_DESCRIP	"SVR 4.2 Null Stream (NULS) STREAMS Driver"
 #define NULS_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define NULS_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define NULS_REVISION	"OpenSS7 src/drivers/nuls.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define NULS_DEVICE	"SVR 4.2 MP STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NULS_LICENSE	"GPL"

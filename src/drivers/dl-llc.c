@@ -89,7 +89,7 @@ static char const ident[] = "src/drivers/dl-llc.c (" PACKAGE_ENVR ") " PACKAGE_D
 #define LLC_DESCRIP	"UNIX SVR 4.2 LLC Driver for Linux Fast-STREAMS"
 #define LLC_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define LLC_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define LLC_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define LLC_REVISION	"OpenSS7 src/drivers/dl-llc.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define LLC_DEVICE	"SVR 4.2MP IEEE 802.2 LLC Driver (LLC)"
 #define LLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LLC_LICENSE	"GPL"

@@ -87,7 +87,7 @@ static char const ident[] = "src/drivers/sad.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SAD_DESCRIP	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define SAD_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SAD_REVISION	"OpenSS7 src/drivers/sad.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SAD_DEVICE	"SVR 4.2 MP STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"

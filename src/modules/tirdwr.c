@@ -66,7 +66,7 @@ static char const ident[] = "src/modules/tirdwr.c (" PACKAGE_ENVR ") " PACKAGE_D
 #define TIRDWR_DESCRIP		"Read Write Module for XTI/TLI Devices (TIRDWR) STREAMS Module"
 #define TIRDWR_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define TIRDWR_REVISION		"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define TIRDWR_REVISION	"OpenSS7 src/modules/tirdwr.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TIRDWR_DEVICE		"SVR 4.2 MP STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"

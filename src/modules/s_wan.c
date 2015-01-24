@@ -70,7 +70,7 @@ static char const ident[] = "src/modules/s_wan.c (" PACKAGE_ENVR ") " PACKAGE_DA
 #define S_WAN_DESCRIP	"Spider WAN Compatibility Module for Linux Fast-STREAMS"
 #define S_WAN_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define S_WAN_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define S_WAN_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define S_WAN_REVISION	"OpenSS7 src/modules/s_wan.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define S_WAN_DEVICE	"SVR 4.2MP CDI CD_HDLC Devices"
 #define S_WAN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define S_WAN_LICENSE	"GPL"

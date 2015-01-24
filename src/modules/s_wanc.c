@@ -68,7 +68,7 @@ static char const ident[] = "src/modules/s_wanc.c (" PACKAGE_ENVR ") " PACKAGE_D
 #define S_WANC_DESCRIP		"Spider WAN Admin Compatibility Module for Linux Fast-STREAMS"
 #define S_WANC_EXTRA		"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define S_WANC_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define S_WANC_REVISION		"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define S_WANC_REVISION	"OpenSS7 src/modules/s_wanc.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define S_WANC_DEVICE		"SVR 4.2MP CDI CD_HDLC Devices"
 #define S_WANC_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define S_WANC_LICENSE		"GPL"

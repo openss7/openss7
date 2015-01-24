@@ -85,7 +85,7 @@ static char const ident[] = "src/modules/mtp_mod.c (" PACKAGE_ENVR ") " PACKAGE_
 
 #define MT_DESCRIP	"SS7/MTP (Minimal MTP) STREAMS Module"
 #define MT_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define MT_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define MT_REVISION	"OpenSS7 src/modules/mtp_mod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define MT_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define MT_DEVICE	"Provides OpenSS7 MTP Minimal Module."
 #define MT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

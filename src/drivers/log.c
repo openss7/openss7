@@ -93,7 +93,7 @@ static char const ident[] = "src/drivers/log.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define LOG_DESCRIP	"SVR 4.2 STREAMS Log (STRLOG) Driver"
 #define LOG_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define LOG_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define LOG_REVISION	"OpenSS7 src/drivers/log.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define LOG_DEVICE	"SVR 4.2 MP STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"

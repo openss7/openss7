@@ -157,7 +157,7 @@ compat_ptr(compat_uptr_t uptr)
 #define STH_DESCRIP	"SVR 4.2 Stream Head (STH) STREAMS Module"
 #define STH_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define STH_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define STH_REVISION	"OpenSS7 src/modules/sth.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define STH_DEVICE	"SVR 4.2 MP STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"

@@ -70,8 +70,8 @@ static char const ident[] = "src/modules/ip_strm_mod.c (" PACKAGE_ENVR ") " PACK
 
 #define IP_TO_STREAMS_DESCRIP		"IP STREAMS Module (IP_TO_STREAMS) STREAMS Module"
 #define IP_TO_STREAMS_EXTRA		"Part of the OpenSS7 IP Stack for Linux Fast-STREAMS"
-#define IP_TO_STREAMS_COPYRIGHT		"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define IP_TO_STREAMS_REVISION		"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define IP_TO_STREAMS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define IP_TO_STREAMS_REVISION	"OpenSS7 src/modules/ip_strm_mod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define IP_TO_STREAMS_DEVICE		"SVR 4.2 MP STREAMS IP STREAMS Module (IP_TO_STREAMS)"
 #define IP_TO_STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define IP_TO_STREAMS_LICENSE		"GPL"

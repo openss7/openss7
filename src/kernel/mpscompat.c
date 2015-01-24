@@ -73,7 +73,7 @@ static char const ident[] = "src/kernel/mpscompat.c (" PACKAGE_ENVR ") " PACKAGE
 #define MPSCOMP_DESCRIP		"Mentat Portable STREAMS Compatibility for Linux Fast-STREAMS"
 #define MPSCOMP_EXTRA		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define MPSCOMP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define MPSCOMP_REVISION	"OpenSS7 src/kernel/mpscompat.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"

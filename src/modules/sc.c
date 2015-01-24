@@ -78,7 +78,7 @@ static char const ident[] = "src/modules/sc.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 #define SC_DESCRIP	"STREAMS Configuration (SC) STREAMS Module" 
 #define SC_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define SC_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SC_REVISION	"OpenSS7 src/modules/sc.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SC_DEVICE	"SVR 4.2 MP STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"

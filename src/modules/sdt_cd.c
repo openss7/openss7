@@ -85,7 +85,7 @@ static char const ident[] = "src/modules/sdt_cd.c (" PACKAGE_ENVR ") " PACKAGE_D
 
 #define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS Module"
 #define SDT_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define SDT_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SDT_REVISION	"OpenSS7 src/modules/sdt_cd.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SDT_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define SDT_DEVICE	"Provides OpenSS7 SDT-CD module."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -70,7 +70,7 @@ static char const ident[] = "src/kernel/os7compat.c (" PACKAGE_ENVR ") " PACKAGE
 #define OS7COMP_DESCRIP		"OpenSS7 STREAMS Compatibility module for Linux Fast-STREAMS"
 #define OS7COMP_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OS7COMP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define OS7COMP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define OS7COMP_REVISION	"OpenSS7 src/kernel/os7compat.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define OS7COMP_DEVICE		"OpenSS7 Compatibility"
 #define OS7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OS7COMP_LICENSE		"GPL"

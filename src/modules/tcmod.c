@@ -60,7 +60,7 @@ static char const ident[] = "src/modules/tcmod.c (" PACKAGE_ENVR ") " PACKAGE_DA
 #define TCMOD_DESCRIP	"ITU_T Q.771 TC for ITU-T Q.771 TR (TCMOD) STREAMS Module"
 #define TCMOD_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define TCMOD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define TCMOD_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define TCMOD_REVISION	"OpenSS7 src/modules/tcmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TCMOD_DEVICE	"ITU-T Q.771 TC modules for ITU-T Q.771 TR"
 #define TCMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCMOD_LICENSE	"GPL"

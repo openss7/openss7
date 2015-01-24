@@ -125,7 +125,7 @@ static char const ident[] = "src/modules/sockmod.c (" PACKAGE_ENVR ") " PACKAGE_
 #define SMOD_DESCRIP	"Socket Module for TPI Devices (SOCKMOD) STREAMS Module"
 #define SMOD_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SMOD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define SMOD_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SMOD_REVISION	"OpenSS7 src/modules/sockmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SMOD_DEVICE	"SVR 3.2 STREAMS Socket Module for TPI Devices (SOCKMOD)"
 #define SMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SMOD_LICENSE	"GPL"

@@ -71,7 +71,7 @@ static char const ident[] = "src/drivers/testdrv_mps.c (" PACKAGE_ENVR ") " PACK
 #define TD_MPS_DESCRIP		"MPS Compatiblity TEST (TEST-DRV-MPS) STREAMS Driver"
 #define TD_MPS_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TD_MPS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define TD_MPS_REVISION		"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define TD_MPS_REVISION	"OpenSS7 src/drivers/testdrv_mps.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TD_MPS_DEVICE		"MPS Compatability TEST Driver (TEST-DRV-MPS)"
 #define TD_MPS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TD_MPS_LICENSE		"GPL"

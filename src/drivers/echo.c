@@ -68,7 +68,7 @@ static char const ident[] = "src/drivers/echo.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define ECHO_DESCRIP	"SVR 4.2 Echo (ECHO) STREAMS Driver"
 #define ECHO_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define ECHO_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define ECHO_REVISION	"OpenSS7 src/drivers/echo.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define ECHO_DEVICE	"SVR 4.2 MP STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"

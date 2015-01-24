@@ -78,7 +78,7 @@ static char const ident[] = "src/modules/timod.c (" PACKAGE_ENVR ") " PACKAGE_DA
 #define TIMOD_DESCRIP	"XTI Library Module for TLI Devices (TIMOD) STREAMS Module"
 #define TIMOD_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define TIMOD_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define TIMOD_REVISION	"OpenSS7 src/modules/timod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TIMOD_DEVICE	"SVR 4.2 MP STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"

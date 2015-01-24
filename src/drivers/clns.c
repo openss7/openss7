@@ -138,7 +138,7 @@ static char const ident[] = "src/drivers/clns.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define CLNS_DESCRIP	"OSI CLNS Network Provider STREAMS Driver"
 #define CLNS_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define CLNS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define CLNS_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define CLNS_REVISION	"OpenSS7 src/drivers/clns.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define CLNS_DEVICE	"SVR 4.2 MP STREAMS CLNS OSI Network Provider"
 #define CLNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLNS_LICENSE	"GPL"

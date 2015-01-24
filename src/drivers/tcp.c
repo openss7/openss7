@@ -126,7 +126,7 @@ static char const ident[] = "src/drivers/tcp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TCP_DESCRIP	"Transport Control Protocol (TCP) STREAMS Driver"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TCP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define TCP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define TCP_REVISION	"OpenSS7 src/drivers/tcp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TCP_DEVICE	"SVR 4.2 MP STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCP_LICENSE	"GPL"

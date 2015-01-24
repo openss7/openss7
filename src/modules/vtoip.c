@@ -74,7 +74,7 @@ static char const ident[] = "src/modules/vtoip.c (" PACKAGE_ENVR ") " PACKAGE_DA
 
 #define VTOIP_DESCRIP	"VTOIP STREAMS Module"
 #define VTOIP_EXTRA	"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
-#define VTOIP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define VTOIP_REVISION	"OpenSS7 src/modules/vtoip.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define VTOIP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define VTOIP_DEVICE	"Provides OpenSS7 Voice Trunking over IP (VTOIP)"
 #define VTOIP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

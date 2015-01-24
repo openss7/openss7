@@ -70,7 +70,7 @@ static char const ident[] = "src/modules/xos.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define XOS_DESCRIP	"X.25 over SCTP Module for Linux Fast-STREAMS"
 #define XOS_EXTRA	"Part fo the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define XOS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define XOS_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define XOS_REVISION	"OpenSS7 src/modules/xos.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define XOS_DEVICE	"SVR 4.2MP X.25 over SCTP Module (XOS) for X.25 CONS"
 #define XOS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define XOS_LICENSE	"GPL"

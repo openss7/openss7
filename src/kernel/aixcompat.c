@@ -70,7 +70,7 @@ static char const ident[] = "src/kernel/aixcompat.c (" PACKAGE_ENVR ") " PACKAGE
 #define AIXCOMP_DESCRIP		"AIX 5L Version 5.1 Compatibility for Linx Fast-STREAMS"
 #define AIXCOMP_EXTRA		"Part of hUNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define AIXCOMP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define AIXCOMP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define AIXCOMP_REVISION	"OpenSS7 src/kernel/aixcompat.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define AIXCOMP_DEVICE		"AIX 5L Version 5.1 Compatibility"
 #define AIXCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define AIXCOMP_LICENSE		"GPL"

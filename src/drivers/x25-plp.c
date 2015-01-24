@@ -82,7 +82,7 @@ static char const ident[] = "src/drivers/x25-plp.c (" PACKAGE_ENVR ") " PACKAGE_
 #define PLP_DESCRIP	"SVR 4.2 NLI X.25 PLP Driver for Linux Fast-STREAMS"
 #define PLP_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define PLP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define PLP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define PLP_REVISION	"OpenSS7 src/drivers/x25-plp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define PLP_DEVICE	"SVR 4.2MP NLI Driver (NLI) for X.25/ISO 8208"
 #define PLP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PLP_LICENSE	"GPL"

@@ -69,7 +69,7 @@ static char const ident[] = "src/drivers/mcmux.c (" PACKAGE_ENVR ") " PACKAGE_DA
 #define MCMUX_DESCRIP	"3GPP TS 29.002 MAP Common Services (MCMUX) STREAMS Mux Driver"
 #define MCMUX_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define MCMUX_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define MCMUX_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define MCMUX_REVISION	"OpenSS7 src/drivers/mcmux.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define MCMUX_DEVICE	"SVR 4.2 MP STREAMS 3GPP TS 29.002 MAP Common Services (MC) Driver"
 #define MCMUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MCMUX_LICENSE	"GPL"

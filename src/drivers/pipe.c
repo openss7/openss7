@@ -71,7 +71,7 @@ static char const ident[] = "src/drivers/pipe.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define PIPE_DESCRIP	"SVR 4.2 STREAMS-based Pipe (PIPE) STREAMS Driver"
 #define PIPE_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPE_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define PIPE_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define PIPE_REVISION	"OpenSS7 src/drivers/pipe.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define PIPE_DEVICE	"SVR 4.2 MP STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"

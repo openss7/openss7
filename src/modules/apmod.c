@@ -73,7 +73,7 @@ static char const ident[] = "src/modules/apmod.c (" PACKAGE_ENVR ") " PACKAGE_DA
 #define APLI_DESCRIP	"ACSE/Presentation Layer (APLI) Library Module (APMOD) STREAMS Module"
 #define APLI_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define APLI_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define APLI_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define APLI_REVISION	"OpenSS7 src/modules/apmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define APLI_DEVICE	"SVR 4.2 MP STREAMS APLI Module for APLI"
 #define APLI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define APLI_LICENSE	"GPL"

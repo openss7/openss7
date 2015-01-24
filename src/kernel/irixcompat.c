@@ -70,7 +70,7 @@ static char const ident[] = "src/kernel/irixcompat.c (" PACKAGE_ENVR ") " PACKAG
 #define IRIXCOMP_DESCRIP	"IRIX 6.5.17 Compatibility module for Linux Fast-STREAMS"
 #define IRIXCOMP_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IRIXCOMP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define IRIXCOMP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define IRIXCOMP_REVISION	"OpenSS7 src/kernel/irixcompat.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define IRIXCOMP_DEVICE		"IRIX 6.5.17 Compatibility"
 #define IRIXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IRIXCOMP_LICENSE	"GPL"

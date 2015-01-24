@@ -88,7 +88,7 @@ static char const ident[] = "src/drivers/tl.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 #define TI_DESCRIP	"SVR 4.2 Transport Layer (TL) STREAMS Driver"
 #define TI_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TI_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define TI_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define TI_REVISION	"OpenSS7 src/drivers/tl.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TI_DEVICE	"SVR 4.2 MP STREAMS TI Driver"
 #define TI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TI_LICENSE	"GPL"

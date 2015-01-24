@@ -76,7 +76,7 @@ static char const ident[] = "src/modules/tdm_ip.c (" PACKAGE_ENVR ") " PACKAGE_D
 #define TDM_IP_DESCRIP		"TDM over IP (TDM-IP) STREAMS Module"
 #define TDM_IP_EXTRA		"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
 #define TDM_IP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define TDM_IP_REVISION		"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define TDM_IP_REVISION	"OpenSS7 src/modules/tdm_ip.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TDM_IP_DEVICE		"SVR 4.2 MP STREAMS TDM-IP MODULE"
 #define TDM_IP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TDM_IP_LICENSE		"GPL"

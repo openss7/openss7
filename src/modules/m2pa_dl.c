@@ -54,7 +54,7 @@ static char const ident[] = "src/modules/m2pa_dl.c (" PACKAGE_ENVR ") " PACKAGE_
 
 #define M2PA_DL_DESCRIP		"M2PA/SCTP SS7 Data Link (DL) STREAMS Module"
 #define M2PA_DL_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define M2PA_DL_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define M2PA_DL_REVISION	"OpenSS7 src/modules/m2pa_dl.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define M2PA_DL_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define M2PA_DL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS"
 #define M2PA_DL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

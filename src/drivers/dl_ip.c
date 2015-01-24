@@ -74,7 +74,7 @@ static char const ident[] = "src/drivers/dl_ip.c (" PACKAGE_ENVR ") " PACKAGE_DA
 #define DL_DESCRIP	"Internet Protocol (IP) Data Link Provider (DL_IP) STREAMS Driver"
 #define DL_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define DL_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define DL_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define DL_REVISION	"OpenSS7 src/drivers/dl_ip.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define DL_DEVICE	"SVR 4.2 MP STREAMS DLPI DL_IP Data Link Provider"
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DL_LICENSE	"GPL"

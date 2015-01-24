@@ -65,7 +65,7 @@ static char const ident[] = "src/drivers/tali.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define TALI_DESCRIP	"TALI STREAMS Multiplexing Driver"
 #define TALI_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define TALI_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define TALI_REVISION	"OpenSS7 src/drivers/tali.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TALI_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define TALI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TALI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

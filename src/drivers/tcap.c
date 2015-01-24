@@ -96,7 +96,7 @@ static char const ident[] = "src/drivers/tcap.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define TCAP_DESCRIP	"SS7 Transaction Capabilities Application Part (TCAP) STREAMS Multiplexing Driver"
 #define TCAP_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define TCAP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define TCAP_REVISION	"OpenSS7 src/drivers/tcap.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TCAP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define TCAP_DEVICE	"Supports OpenSS7 SCCP NPI Interface Pseudo-Device Drivers."
 #define TCAP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

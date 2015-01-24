@@ -142,7 +142,7 @@ static char const ident[] = "src/drivers/mx.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #define MX_DESCRIP	"MX (MX) STREAMS Multiplexing Driver"
 #define MX_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define MX_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define MX_REVISION	"OpenSS7 src/drivers/mx.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define MX_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define MX_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

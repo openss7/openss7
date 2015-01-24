@@ -61,7 +61,7 @@ static char const ident[] = "src/modules/lpp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 
 #define LPP_DESCRIP	"LPP STREAMS Module"
 #define LPP_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
-#define LPP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define LPP_REVISION	"OpenSS7 src/modules/lpp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define LPP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define LPP_DEVICE	"Provides OpenSS7 Lightweight Presentation Protocol (LPP)"
 #define LPP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

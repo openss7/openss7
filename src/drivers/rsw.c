@@ -250,7 +250,7 @@ static char const ident[] = "src/drivers/rsw.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define RSW_DESCRIP	"Real-Time Protocol (RTP) Switching STREAMS Driver"
 #define RSW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RSW_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define RSW_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define RSW_REVISION	"OpenSS7 src/drivers/rsw.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define RSW_DEVICE	"SVR 4.2 MP STREAMS RTP Switch Driver"
 #define RSW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RSW_LICENSE	"GPL"

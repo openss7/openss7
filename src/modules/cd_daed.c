@@ -64,7 +64,7 @@ static char const ident[] = "src/modules/cd_daed.c (" PACKAGE_ENVR ") " PACKAGE_
 #define CD_DAED_DESCRIP		"Q.703/T1.111.3 DAED: (Delimination Alignment and Error Detection) STREAMS Module"
 #define CD_DAED_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define CD_DAED_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define CD_DAED_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define CD_DAED_REVISION	"OpenSS7 src/modules/cd_daed.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define CD_DAED_DEVICE		"SVR 4.2 MP STREAMS CDI DAED Module for SS7 Channel Devices (DAED)."
 #define CD_DAED_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CD_DAED_LICENSE		"GPL"

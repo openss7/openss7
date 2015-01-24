@@ -70,7 +70,7 @@ static char const ident[] = "src/kernel/suncompat.c (" PACKAGE_ENVR ") " PACKAGE
 #define SUNCOMP_DESCRIP		"Solaris(R) 8 Compatibility for Linux Fast-STREAMS"
 #define SUNCOMP_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define SUNCOMP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SUNCOMP_REVISION	"OpenSS7 src/kernel/suncompat.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"

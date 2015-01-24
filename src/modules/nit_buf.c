@@ -81,7 +81,7 @@ static char const ident[] = "src/modules/nit_buf.c (" PACKAGE_ENVR ") " PACKAGE_
 #define NBUF_DESCRIP	"SVR 4.1 SNI Buffer Module (NBUF) STREAMS Module"
 #define NBUF_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NBUF_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define NBUF_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define NBUF_REVISION	"OpenSS7 src/modules/nit_buf.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define NBUF_DEVICE	"SVR 4.1 SNIT Buffer Module (NBUF) for STREAMS."
 #define NBUF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NBUF_LICENSE	"GPL"

@@ -144,7 +144,7 @@ static char const ident[] = "src/modules/ldterm.c (" PACKAGE_ENVR ") " PACKAGE_D
 #define LDTERM_DESCRIP		"Line Discipline for Terminals (LDTERM) STREAMS Module"
 #define LDTERM_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDTERM_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define LDTERM_REVISION		"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define LDTERM_REVISION	"OpenSS7 src/modules/ldterm.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define LDTERM_DEVICE		"SVR 4.2 MP STREAMS Line Discipline Module (LDTERM)"
 #define LDTERM_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LDTERM_LICENSE		"GPL"

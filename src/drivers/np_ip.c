@@ -110,7 +110,7 @@ static char const ident[] = "src/drivers/np_ip.c (" PACKAGE_ENVR ") " PACKAGE_DA
 #define NP_DESCRIP	"Internet Protocol (IP) Network Provider (NP_IP) STREAMS Driver"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define NP_REVISION	"OpenSS7 src/drivers/np_ip.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define NP_DEVICE	"SVR 4.2 MP STREAMS NPI NP_IP Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"

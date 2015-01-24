@@ -61,7 +61,7 @@ static char const ident[] = "src/modules/lapd.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define LAPD_DESCRIP	"LAPD STREAMS Module"
 #define LAPD_EXTRA	"Part of the OpenSS7 ISDN Stack for Linux Fast-STREAMS"
-#define LAPD_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define LAPD_REVISION	"OpenSS7 src/modules/lapd.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define LAPD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define LAPD_DEVICE	"Provides OpenSS7 Link Access Protocol D-Channel (LAPD)"
 #define LAPD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -64,7 +64,7 @@ static char const ident[] = "src/drivers/tr.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #define TR_DESCRIP	"TCAP TR STREAMS Multiplexing Driver"
 #define TR_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define TR_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define TR_REVISION	"OpenSS7 src/drivers/tr.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TR_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define TR_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TR_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -81,8 +81,8 @@ static char const ident[] = "src/modules/mapmod.c (" PACKAGE_ENVR ") " PACKAGE_D
 
 #define MCMOD_DESCRIP		"GSM 29.002 MAP Common Services for ITU-T Q.771 TC STREAMS Module"
 #define MCMOD_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define MCMOD_COPYRIGHT		"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define MCMOD_REVISION		"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define MCMOD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define MCMOD_REVISION	"OpenSS7 src/modules/mapmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define MCMOD_DEVICE		"GSM 29.002 MAP Common Services module for ITU-T Q.771 TC"
 #define MCMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MCMOD_LICENSE		"GPL"

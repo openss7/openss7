@@ -88,7 +88,7 @@ static char const ident[] = "src/modules/cd.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 #define CD_DESCRIP	"Communications Device (CD) STREAMS Module"
 #define CD_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define CD_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define CD_REVISION	"OpenSS7 src/modules/cd.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define CD_DEVICE	"SVR 4.2 MP STREAMS Communications Device (CD)"
 #define CD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CD_LICENSE	"GPL"

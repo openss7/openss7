@@ -88,8 +88,8 @@ static char const ident[] = "src/modules/pfmod.c (" PACKAGE_ENVR ") " PACKAGE_DA
 
 #define PFMOD_DESCRIP		"SVR 4.2 Packet Filter Module (PFMOD) STREAMS Module"
 #define PFMOD_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define PFMOD_COPYRIGHT		"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define PFMOD_REVISION		"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define PFMOD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define PFMOD_REVISION	"OpenSS7 src/modules/pfmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define PFMOD_DEVICE		"SVR 4.2 Packet Filter Module (PFMOD) for STREAMS"
 #define PFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PFMOD_LICENSE		"GPL"

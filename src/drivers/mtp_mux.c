@@ -63,7 +63,7 @@ static char const ident[] = "src/drivers/mtp_mux.c (" PACKAGE_ENVR ") " PACKAGE_
 
 #define MTP_MUX_DESCRIP		"MTP-MUX SS7/MTP (Message Transfer Part) STREAMS Multiplexing Driver"
 #define MTP_MUX_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define MTP_MUX_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define MTP_MUX_REVISION	"OpenSS7 src/drivers/mtp_mux.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define MTP_MUX_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define MTP_MUX_DEVICE		"Supports the OpenSS7 MTP and M3UA drivers."
 #define MTP_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

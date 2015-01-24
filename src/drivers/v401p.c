@@ -242,7 +242,7 @@ static char const ident[] = "src/drivers/v401p.c (" PACKAGE_ENVR ") " PACKAGE_DA
 
 #define MX_V400P_DESCRIP	"V40XP: MX (Multiplex) STREAMS Driver"
 #define MX_V400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define MX_V400P_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define MX_V400P_REVISION	"OpenSS7 src/drivers/v401p.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define MX_V400P_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define MX_V400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define MX_V400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

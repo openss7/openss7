@@ -71,7 +71,7 @@ static char const ident[] = "src/modules/testmod_mps.c (" PACKAGE_ENVR ") " PACK
 #define TM_MPS_DESCRIP		"MPS Compatibility Test Module (TEST-MOD-MPS) STREAMS Module"
 #define TM_MPS_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TM_MPS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define TM_MPS_REVISION		"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define TM_MPS_REVISION	"OpenSS7 src/modules/testmod_mps.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TM_MPS_DEVICE		"MPS Compatability TEST Module (TEST-MOD-MPS)"
 #define TM_MPS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TM_MPS_LICENSE		"GPL"

@@ -64,7 +64,7 @@ static char const ident[] = "src/modules/cmot.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define CMOT_DESCRIP	"CMOT STREAMS Module"
 #define CMOT_EXTRA      "Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define CMOT_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define CMOT_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define CMOT_REVISION	"OpenSS7 src/modules/cmot.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define CMOT_DEVICE	"SVR 4.2MP CMISE over TCP (CMOT)"
 #define CMOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CMOT_LICENSE	"GPL"

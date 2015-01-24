@@ -71,7 +71,7 @@ static char const ident[] = "src/drivers/nsdev.c (" PACKAGE_ENVR ") " PACKAGE_DA
 #define NSDEV_DESCRIP	"STREAMS Named Stream Device (NSDEV) STREAMS Driver"
 #define NSDEV_EXTRA	"Part of Linux Fast-STREAMS"
 #define NSDEV_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define NSDEV_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define NSDEV_REVISION	"OpenSS7 src/drivers/nsdev.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define NSDEV_DEVICE	"SVR 4.2 MP STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"

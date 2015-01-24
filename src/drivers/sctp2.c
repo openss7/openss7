@@ -64,7 +64,7 @@ static char const ident[] = "src/drivers/sctp2.c (" PACKAGE_ENVR ") " PACKAGE_DA
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) Driver"
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define SCTP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SCTP_REVISION	"OpenSS7 src/drivers/sctp2.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SCTP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

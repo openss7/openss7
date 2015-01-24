@@ -70,7 +70,7 @@ static char const ident[] = "src/drivers/sua.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 
 #define SUA_DESCRIP	"SUA STREAMS Multiplexing Driver"
 #define SUA_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define SUA_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SUA_REVISION	"OpenSS7 src/drivers/sua.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SUA_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define SUA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SUA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

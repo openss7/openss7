@@ -65,7 +65,7 @@ static char const ident[] = "src/drivers/llc.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 
 #define DL_DESCRIP	"Data Link (DL) for IEEE 802.2 LLC STREAMS Driver"
 #define DL_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
-#define DL_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define DL_REVISION	"OpenSS7 src/drivers/llc.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define DL_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define DL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

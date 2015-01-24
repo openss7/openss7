@@ -83,7 +83,7 @@ static char const ident[] = "src/modules/hdlc.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define HDLC_DESCRIP	"HDLC over CH Module for Linux Fast-STREAMS"
 #define HDLC_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define HDLC_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define HDLC_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define HDLC_REVISION	"OpenSS7 src/modules/hdlc.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define HDLC_DEVICE	"SVR 4.2MP HDLC over CH Module (HDLC) for X.25"
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define HDLC_LICENSE	"GPL"

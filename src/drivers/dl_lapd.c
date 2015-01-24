@@ -63,7 +63,7 @@ static char const ident[] = "src/drivers/dl_lapd.c (" PACKAGE_ENVR ") " PACKAGE_
 
 #define DL_LAPD_DESCRIP		"LAPD Data Link (DL-LAPD) STREAMS (DLPI) Driver"
 #define DL_LAPD_EXTRA		"Part of the OpenSS7 ISDN Stack for Linux Fast-STREAMS"
-#define DL_LAPD_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define DL_LAPD_REVISION	"OpenSS7 src/drivers/dl_lapd.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define DL_LAPD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define DL_LAPD_DEVICE		"Supports Linux Fast-STREAMS and OpenSS7 CDI Devices."
 #define DL_LAPD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

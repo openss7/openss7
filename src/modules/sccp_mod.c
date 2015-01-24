@@ -88,7 +88,7 @@ static char const ident[] = "src/modules/sccp_mod.c (" PACKAGE_ENVR ") " PACKAGE
 
 #define SC_DESCRIP	"SS7/SCCP (SCCP Minimal Module) STREAMS Module"
 #define SC_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define SC_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SC_REVISION	"OpenSS7 src/modules/sccp_mod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SC_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define SC_DEVICE	"Provides OpenSS7 SCCP module."
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

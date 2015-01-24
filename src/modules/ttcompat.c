@@ -476,7 +476,7 @@ struct ltchars {
 #define TTCOMPAT_DESCRIP	"Packet Mode (TTCOMPAT) STREAMS Module"
 #define TTCOMPAT_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TTCOMPAT_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define TTCOMPAT_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define TTCOMPAT_REVISION	"OpenSS7 src/modules/ttcompat.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TTCOMPAT_DEVICE		"SVR 4.2 MP STREAMS Packet Mode Module (TTCOMPAT)"
 #define TTCOMPAT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TTCOMPAT_LICENSE	"GPL"

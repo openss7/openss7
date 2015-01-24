@@ -78,8 +78,8 @@ static char const ident[] = "src/drivers/dl2.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #include <linux/netdevice.h>
 #define ND_DESCRIP	"NETDEV (DL) STREAMS Multiplexing Driver"
 #define ND_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define ND_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
-#define ND_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
+#define ND_REVISION	"OpenSS7 src/drivers/dl2.c (" PACKAGE_ENVR ") " PACKAGE_DATE
+#define ND_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define ND_DEVICE	"Supports Linux HDLC devices."
 #define ND_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ND_LICENSE	"GPL"

@@ -75,7 +75,7 @@ static char const ident[] = "src/drivers/fifo.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define FIFO_DESCRIP	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define FIFO_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define FIFO_REVISION	"OpenSS7 src/drivers/fifo.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define FIFO_DEVICE	"SVR 4.2 MP STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL"

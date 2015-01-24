@@ -74,7 +74,7 @@ static char const ident[] = "src/modules/hdlc.old.c (" PACKAGE_ENVR ") " PACKAGE
 
 #define HDLC_DESCRIP	"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS Module"
 #define HDLC_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
-#define HDLC_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define HDLC_REVISION	"OpenSS7 src/modules/hdlc.old.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define HDLC_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define HDLC_DEVICE	"Supports OpenSS7 Channel Drivers."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -90,7 +90,7 @@ static char const ident[] = "src/drivers/nf.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 #define NF_DESCRIP	"Netfilter (NF) STREAMS Driver"
 #define NF_EXTRA	"Part of the OpenSS7 IP Stack for Linux Fast-STREAMS"
 #define NF_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define NF_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define NF_REVISION	"OpenSS7 src/drivers/nf.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define NF_DEVICE	"SVR 4.2 MP STREAMS NETFILTER Driver"
 #define NF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NF_LICENSE	"GPL"

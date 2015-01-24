@@ -58,7 +58,7 @@ static char const ident[] = "src/modules/dl_sl.c (" PACKAGE_ENVR ") " PACKAGE_DA
 
 #define DL_SL_DESCRIP	"DLPI/SLI Conversion STREAMS Module"
 #define DL_SL_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define DL_SL_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define DL_SL_REVISION	"OpenSS7 src/modules/dl_sl.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define DL_SL_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define DL_SL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define DL_SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

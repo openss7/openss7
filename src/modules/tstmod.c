@@ -61,7 +61,7 @@ static char const ident[] = "src/modules/tstmod.c (" PACKAGE_ENVR ") " PACKAGE_D
 
 #define TSTMOD_DESCRIP	"TSTMOD STREAMS Module"
 #define TSTMOD_EXTRA	"Part of Linux Fast-STREAMS"
-#define TSTMOD_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define TSTMOD_REVISION	"OpenSS7 src/modules/tstmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TSTMOD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define TSTMOD_DEVICE	"Provides OpenSS7 Test Module (TSTMOD)"
 #define TSTMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -61,7 +61,7 @@ static char const ident[] = "src/modules/itos.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define ITOS_DESCRIP	"ITOS STREAMS Module"
 #define ITOS_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
-#define ITOS_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define ITOS_REVISION	"OpenSS7 src/modules/itos.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define ITOS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define ITOS_DEVICE	"Provides OpenSS7 ISO Transport over SCTP (ITOS)"
 #define ITOS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

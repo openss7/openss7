@@ -60,7 +60,7 @@ static char const ident[] = "src/modules/ch_x400p.c (" PACKAGE_ENVR ") " PACKAGE
 
 #define CH_SDL_DESCRIP		"X400P-SS7 Channel (CH) STREAMS Module"
 #define CH_SDL_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define CH_SDL_REVISION		"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define CH_SDL_REVISION	"OpenSS7 src/modules/ch_x400p.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define CH_SDL_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define CH_SDL_DEVICE		"Supports SDLI pseudo-device drivers."
 #define CH_SDL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

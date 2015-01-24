@@ -72,7 +72,7 @@ static char const ident[] = "src/modules/m2tp.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define M2TP_DESCRIP	"M2TP/SCTP MTP2 Tunneling Protocol (SL) STREAMS Module"
 #define M2TP_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define M2TP_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define M2TP_REVISION	"OpenSS7 src/modules/m2tp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define M2TP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
 #define M2TP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

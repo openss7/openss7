@@ -80,7 +80,7 @@ static char const ident[] = "src/modules/xx25.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define XX25_DESCRIP	"XX25 Module for X.25-PLP (X25MOD) STREAMS Module"
 #define XX25_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define XX25_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define XX25_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define XX25_REVISION	"OpenSS7 src/modules/xx25.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define XX25_DEVICE	"SVR 4.2 MP STREAMS XX25 Module for X.25-PLP (X25MOD)"
 #define XX25_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define XX25_LICENSE	"GPL"

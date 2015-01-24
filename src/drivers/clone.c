@@ -68,7 +68,7 @@ static char const ident[] = "src/drivers/clone.c (" PACKAGE_ENVR ") " PACKAGE_DA
 #define CLONE_DESCRIP	"SVR 4.2 STREAMS Clone Driver"
 #define CLONE_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define CLONE_REVISION	"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define CLONE_REVISION	"OpenSS7 src/drivers/clone.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define CLONE_DEVICE	"SVR 4.2 MP STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"

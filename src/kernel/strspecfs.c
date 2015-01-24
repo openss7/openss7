@@ -101,7 +101,7 @@ static char const ident[] = "src/kernel/strspecfs.c (" PACKAGE_ENVR ") " PACKAGE
 #define SPECFS_DESCRIP		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define SPECFS_REVISION		"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SPECFS_REVISION	"OpenSS7 src/kernel/strspecfs.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"

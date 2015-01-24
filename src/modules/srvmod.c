@@ -79,7 +79,7 @@ static char const ident[] = "src/modules/srvmod.c (" PACKAGE_ENVR ") " PACKAGE_D
 #define SRVMOD_DESCRIP		"SVR 4.2 Buffer Module (SRVMOD) for STREAMS"
 #define SRVMOD_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SRVMOD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define SRVMOD_REVISION		"OpenSS7 File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE
+#define SRVMOD_REVISION	"OpenSS7 src/modules/srvmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SRVMOD_DEVICE		"SVR 4.2 Buffer Module (SRVMOD) for STREAMS"
 #define SRVMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SRVMOD_LICENSE		"GPL"
