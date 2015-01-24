@@ -802,10 +802,6 @@ function write_hconfig(file,    name, prefix) {
  Commercial licensing and support of this software is available from OpenSS7\n\
  Corporation at a fee.  See http://www.openss7.com/\n\
 \n\
- -----------------------------------------------------------------------------\n\
-\n\
- Last Modified $Date: 2011-04-11 06:13:43 $ by $Author: brian $\n\
-\n\
  *****************************************************************************/\n\
 \n\
 #ifndef __SYS_" toupper(values["package"]) "_CONFIG_H__\n\
@@ -910,10 +906,6 @@ function write_modconf(file) {
 \n\
  Commercial licensing and support of this software is available from OpenSS7\n\
  Corporation at a fee.  See http://www.openss7.com/\n\
-\n\
- -----------------------------------------------------------------------------\n\
-\n\
- Last Modified $Date: 2011-04-11 06:13:43 $ by $Author: brian $\n\
 \n\
  *****************************************************************************/\n\
 \n\
