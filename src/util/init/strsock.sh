@@ -1,7 +1,8 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strsock.sh,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-10 13:45:37 $
-# Copyright (c) 2001-2011  OpenSS7 Corporation <http://www.openss7.com>
+# @(#) src/util/init/strsock.sh
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
 #
@@ -223,11 +224,12 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strsock.sh,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-10 13:45:37 $
+# @(#) src/util/init/strsock.sh
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2011  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -265,56 +267,6 @@ esac
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-05-10 13:45:37 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: strsock.sh,v $
-# Revision 1.1.2.3  2011-05-10 13:45:37  brian
-# - weak modules workup
-#
-# Revision 1.1.2.2  2011-01-12 00:19:32  brian
-# - modprobe no longer accepts k option
-#
-# Revision 1.1.2.1  2009-06-21 11:47:58  brian
-# - added files to new distro
-#
-# Revision 0.9.2.11  2008-10-21 22:42:20  brian
-# - handle verbose better in debian initscripts
-#
-# Revision 0.9.2.10  2008-04-28 22:33:35  brian
-# - updated headers for release
-#
-# Revision 0.9.2.9  2007/08/14 05:17:31  brian
-# - GPLv3 header update
-#
-# Revision 0.9.2.8  2007/03/08 22:42:45  brian
-# - correct redirect
-#
-# Revision 0.9.2.7  2007/03/08 22:12:41  brian
-# - update headers
-#
-# Revision 0.9.2.6  2007/03/08 22:08:10  brian
-# - sense of VERBOSE reversed
-#
-# Revision 0.9.2.5  2007/03/08 20:25:08  brian
-# - ubuntu looks for lsb info in init scripts
-#
-# Revision 0.9.2.4  2006/10/16 00:21:24  brian
-# - do not load too many kernel modules on init
-#
-# Revision 0.9.2.3  2006/10/13 07:00:09  brian
-# - load drivers but not modules by default, but remove modules
-#
-# Revision 0.9.2.2  2006/10/13 04:00:16  brian
-# - corrected init scripts and config files
-#
-# Revision 0.9.2.1  2006/08/23 10:04:12  brian
-# - started STREAMS Sockets package
-#
 #
 # =============================================================================
 # vim: ft=sh sw=4 tw=80

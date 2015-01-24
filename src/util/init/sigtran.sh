@@ -1,7 +1,8 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: sigtran.sh,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-01-12 00:19:32 $
-# Copyright (c) 2001-2011  OpenSS7 Corporation <http://www.openss7.com>
+# @(#) src/util/init/sigtran.sh
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
 #
@@ -221,11 +222,12 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: sigtran.sh,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-01-12 00:19:32 $
+# @(#) src/util/init/sigtran.sh
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2011  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -263,46 +265,6 @@ esac
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-01-12 00:19:32 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: sigtran.sh,v $
-# Revision 1.1.2.2  2011-01-12 00:19:32  brian
-# - modprobe no longer accepts k option
-#
-# Revision 1.1.2.1  2009-06-21 11:47:57  brian
-# - added files to new distro
-#
-# Revision 0.9.2.9  2008-10-21 22:42:13  brian
-# - handle verbose better in debian initscripts
-#
-# Revision 0.9.2.8  2008-04-29 01:52:26  brian
-# - updated headers for release
-#
-# Revision 0.9.2.7  2007/08/14 08:34:22  brian
-# - GPLv3 header update
-#
-# Revision 0.9.2.6  2007/03/09 04:39:14  brian
-# - update module list
-#
-# Revision 0.9.2.5  2007/03/08 22:42:54  brian
-# - correct redirect
-#
-# Revision 0.9.2.4  2007/03/08 22:12:48  brian
-# - update headers
-#
-# Revision 0.9.2.3  2007/03/08 22:08:21  brian
-# - sense of VERBOSE reversed
-#
-# Revision 0.9.2.2  2007/03/08 20:25:24  brian
-# - ubuntu looks for lsb info in init scripts
-#
-# Revision 0.9.2.1  2006/10/16 10:42:52  brian
-# - added new package files
 #
 # =============================================================================
 # vim: ft=sh sw=4 tw=80

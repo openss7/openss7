@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slconf_yac.y,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:59:52 $
+ @(#) src/util/slconf_yac.y
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,29 +45,13 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2011-01-18 16:59:52 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: slconf_yac.y,v $
- Revision 1.1.2.3  2011-01-18 16:59:52  brian
- - added back to compile
-
- Revision 1.1.2.2  2010-11-28 14:22:38  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:47:55  brian
- - added files to new distro
-
  *****************************************************************************/
 
 /* C DECLARATIONS */
 
 %{
 
-static char const ident[] = "$RCSfile: slconf_yac.y,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:59:52 $";
+static char const ident[] = "src/util/slconf_yac.y (" PACKAGE_ENVR " " PACKAGE_DATE ")";
 
 #include <stropts.h>
 #include <stdlib.h>

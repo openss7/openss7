@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: asnlex.l,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:36 $
+ @(#) src/util/asnlex.l
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,29 +45,13 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2010-11-28 14:22:36 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: asnlex.l,v $
- Revision 1.1.2.3  2010-11-28 14:22:36  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.2  2009-06-21 12:41:53  brian
- - updated headers
-
- Revision 1.1.2.1  2009-06-21 11:47:53  brian
- - added files to new distro
-
  *****************************************************************************/
 
 /* C DECLARATIONS */
 
 %{
 
-static char const ident[] = "$RCSfile: asnlex.l,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:36 $";
+static char const ident[] = "src/util/asnlex.l (" PACKAGE_ENVR " " PACKAGE_DATE ")";
 
 #include <unistd.h> /* isatty(), official flex 2.5.4a skeleton misses this */
 

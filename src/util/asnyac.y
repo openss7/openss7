@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: asnyac.y,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:36 $
+ @(#) src/util/asnyac.y
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,26 +45,13 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2010-11-28 14:22:36 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: asnyac.y,v $
- Revision 1.1.2.2  2010-11-28 14:22:36  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:47:53  brian
- - added files to new distro
-
  *****************************************************************************/
 
 /* C DECLARATIONS */
 
 %{
 
-static char const ident[] = "$RCSfile: asnyac.y,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:36 $";
+static char const ident[] = "src/util/asnyac.y (" PACKAGE_ENVR " " PACKAGE_DATE ")";
 
 #include <stdlib.h>
 #include <unistd.h>

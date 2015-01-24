@@ -1,7 +1,8 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strbcm.sh,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-01-12 00:19:32 $
-# Copyright (c) 2001-2011  OpenSS7 Corporation <http://www.openss7.com>
+# @(#) src/util/init/strbcm.sh
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
 #
@@ -221,11 +222,12 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strbcm.sh,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-01-12 00:19:32 $
+# @(#) src/util/init/strbcm.sh
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2011  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -263,55 +265,6 @@ esac
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-01-12 00:19:32 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: strbcm.sh,v $
-# Revision 1.1.2.2  2011-01-12 00:19:32  brian
-# - modprobe no longer accepts k option
-#
-# Revision 1.1.2.1  2009-06-21 11:47:57  brian
-# - added files to new distro
-#
-# Revision 0.9.2.12  2008-10-21 22:42:14  brian
-# - handle verbose better in debian initscripts
-#
-# Revision 0.9.2.11  2008-04-28 17:31:03  brian
-# - updates for release
-#
-# Revision 0.9.2.10  2007/08/14 02:46:35  brian
-# - GPLv3 headers
-#
-# Revision 0.9.2.9  2007/03/08 22:42:48  brian
-# - correct redirect
-#
-# Revision 0.9.2.8  2007/03/08 22:12:43  brian
-# - update headers
-#
-# Revision 0.9.2.7  2007/03/08 22:08:15  brian
-# - sense of VERBOSE reversed
-#
-# Revision 0.9.2.6  2007/03/08 20:25:15  brian
-# - ubuntu looks for lsb info in init scripts
-#
-# Revision 0.9.2.5  2006/10/16 00:21:16  brian
-# - do not load too many kernel modules on init
-#
-# Revision 0.9.2.4  2006/10/13 06:59:51  brian
-# - load drivers but not modules by default, but remove modules
-#
-# Revision 0.9.2.3  2006/10/13 03:59:53  brian
-# - corrected init scripts and config files
-#
-# Revision 0.9.2.2  2006/08/16 07:40:46  brian
-# - rework addition and removal of kernel modules
-#
-# Revision 0.9.2.1  2006/03/08 11:18:05  brian
-# - completing package
 #
 # =============================================================================
 

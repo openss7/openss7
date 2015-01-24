@@ -1,11 +1,11 @@
 #!/usr/bin/perl
 # =============================================================================
 # 
-# @(#) $RCSfile$ $Name$($Revision$) $Date$
+# @(#) src/util/pcap2ng.pl
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -45,10 +45,6 @@
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
 #
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date$ by $Author$
-#
 # =============================================================================
 
 eval 'exec /usr/bin/perl -S $0 ${1+"$@"}'
@@ -75,7 +71,7 @@ $Title =~ s/^\n*//;
 my $Version = <<EOF;
 Version $version
 $ident
-Copyright (c) 2008-2012  Monavacon Limited.    All Rights Reserved.
+Copyright (c) 2008-2015  Monavacon Limited.    All Rights Reserved.
 Copyright (c) 2001-2008  OpenSS7 Corporation.  All Rights Reserved.
 Copyright (c) 1997-2000  Brian F. G. Bidulock. All Rights Reserved.
 Distributed under Affero GPL Version 3, included here by reference.
@@ -91,7 +87,7 @@ ________________________________________________________________________________
 $ident
 ________________________________________________________________________________
 
-Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
+Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock\@openss7.org>
 
@@ -119,7 +115,7 @@ my $CopyingMono = <<EOF;
 --------------------------------------------------------------------------------
 $ident
 --------------------------------------------------------------------------------
-Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
+Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock\@openss7.org>
 
@@ -236,7 +232,7 @@ EOF
 	if (/^--version/) {
 		print<<'EOF';
 $RCSfile$ $Name$($Revision$) $Date$
-Copyright (c) 2008, 2009, 2010, 2011, 2012  Monavacon Limited.
+Copyright (c) 2008, 2009, 2010, 2011, 2012, 2015  Monavacon Limited.
 Copyright (c) 2002, 2003, 2004, 2005, 2006, 2007  OpenSS7 Corporation.
 Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001  Brian Bidulock.
 All Rights Reserved.  Distributed my OpenSS7 Corporation under AGPL
@@ -249,7 +245,7 @@ EOF
 -----------------------------------------------------------------------------
 # @(#) $RCSfile$ $Name$($Revision$) $Date$
 -----------------------------------------------------------------------------
-Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
+Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 

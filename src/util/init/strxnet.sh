@@ -1,7 +1,8 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strxnet.sh,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-01-12 00:19:33 $
-# Copyright (c) 2001-2011  OpenSS7 Corporation <http://www.openss7.com>
+# @(#) src/util/init/strxnet.sh
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
 #
@@ -221,11 +222,12 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strxnet.sh,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-01-12 00:19:33 $
+# @(#) src/util/init/strxnet.sh
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2011  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -263,28 +265,6 @@ esac
 #
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2011-01-12 00:19:33 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: strxnet.sh,v $
-# Revision 1.1.2.2  2011-01-12 00:19:33  brian
-# - modprobe no longer accepts k option
-#
-# Revision 1.1.2.1  2009-06-21 11:47:58  brian
-# - added files to new distro
-#
-# Revision 0.9.2.10  2008-10-21 22:42:22  brian
-# - handle verbose better in debian initscripts
-#
-# Revision 0.9.2.9  2008-04-28 18:38:42  brian
-# - header updates for release
-#
-# Revision 0.9.2.8  2007/08/14 04:01:30  brian
-# - GPLv3 header update
 #
 # =============================================================================
 # vim: ft=sh sw=4 tw=80

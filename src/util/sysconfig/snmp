@@ -1,6 +1,6 @@
 ## 
-# @(#) $RCSfile: snmp,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-05-10 13:45:38 $
-# Copyright (c) 2008-2011  Monavacon Limited.
+# @(#) src/util/sysconfig/snmp
+# Copyright (c) 2008-2015  Monavacon Limited.
 # All Rights Reserved.
 ##
 ## net-snmp/ucd-snmp SNMP Daemon Configuration Database
@@ -45,11 +45,11 @@ dlmod	mxMIB	    mxMIB
 # ----- ----------- -----------
 ## =============================================================================
 ## 
-# @(#) $RCSfile: snmp,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-05-10 13:45:38 $
+# @(#) src/util/sysconfig/snmp
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+## Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 ## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 ## Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 ##
@@ -89,19 +89,6 @@ dlmod	mxMIB	    mxMIB
 ##
 ## Commercial licensing and support of this software is available from OpenSS7
 ## Corporation at a fee.  See http://www.openss7.com/
-##
-## -----------------------------------------------------------------------------
-##
-## Last Modified $Date: 2011-05-10 13:45:38 $ by $Author: brian $
-##
-## -----------------------------------------------------------------------------
-##
-## $Log: snmp,v $
-## Revision 1.1.2.2  2011-05-10 13:45:38  brian
-## - weak modules workup
-##
-## Revision 1.1.2.1  2009-06-21 11:48:00  brian
-## - added files to new distro
 ##
 ## =============================================================================
 ## vim: ft=conf comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
