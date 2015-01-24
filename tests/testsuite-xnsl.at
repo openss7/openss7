@@ -1,12 +1,13 @@
 dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-xnsl.at,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:49:04 $
+dnl @(#) tests/testsuite-xnsl.at
 dnl
 dnl --------------------------------------------------------------------------
 dnl
+dnl Copyright (c) 2008-2015  Monavacon Limitied <http://www.monavacon.com/>
 dnl Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+dnl Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl
 dnl All Rights Reserved.
 dnl
@@ -59,10 +60,6 @@ dnl
 dnl Commercial licensing and support of this software is available from OpenSS7
 dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
-dnl --------------------------------------------------------------------------
-dnl
-dnl Last Modified $Date: 2009-06-21 11:49:04 $ by $Author: brian $
-dnl
 dnl ==========================================================================
 
 m4_divert_push([DEFAULTS])
@@ -77,11 +74,5 @@ m4_divert_pop([DEFAULTS])
 AT_TESTED([test-xnsl])
 AT_BANNER([XNSL library tests])
 
-dnl ==========================================================================
-dnl
-dnl $Log: testsuite-xnsl.at,v $
-dnl Revision 1.1.2.1  2009-06-21 11:49:04  brian
-dnl - added files to new distro
-dnl
 dnl ==========================================================================
 dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78

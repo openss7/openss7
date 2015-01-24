@@ -1,12 +1,13 @@
 dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-m2ua_as.at,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:49:03 $
+dnl @(#) tests/testsuite-m2ua_as.at
 dnl
 dnl --------------------------------------------------------------------------
 dnl
+dnl Copyright (c) 2008-2015  Monavacon Limitied <http://www.monavacon.com/>
 dnl Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+dnl Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl
 dnl All Rights Reserved.
 dnl
@@ -58,10 +59,6 @@ dnl --------------------------------------------------------------------------
 dnl
 dnl Commercial licensing and support of this software is available from OpenSS7
 dnl Corporation at a fee.  See http://www.openss7.com/
-dnl
-dnl --------------------------------------------------------------------------
-dnl
-dnl Last Modified $Date: 2009-06-21 11:49:03 $ by $Author: brian $
 dnl
 dnl ==========================================================================
 
@@ -347,11 +344,5 @@ AT_KEYWORDS([m2ua-as CPT IOT Optional M2UA_GEH 08])
 AT_CHECK([test_m2ua_as "4.1.8"], [], [ignore], [], [], [])
 AT_CLEANUP
 
-dnl ==========================================================================
-dnl
-dnl $Log: testsuite-m2ua_as.at,v $
-dnl Revision 1.1.2.1  2009-06-21 11:49:03  brian
-dnl - added files to new distro
-dnl
 dnl ==========================================================================
 dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
