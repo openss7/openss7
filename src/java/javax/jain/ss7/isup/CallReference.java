@@ -1,7 +1,7 @@
 /*
- @(#) $RCSfile: CallReference.java,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-09-02 08:46:47 $ <p>
+ @(#) src/java/javax/jain/ss7/isup/CallReference.java <p>
  
- Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+ Copyright &copy; 2008-2015  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
  Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
  Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
  
@@ -38,9 +38,7 @@
  
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See
- <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
- 
- Last Modified $Date: 2011-09-02 08:46:47 $ by $Author: brian $
+ <a href="http://www.openss7.com/">http://www.openss7.com/</a>
  */
 
 package javax.jain.ss7.isup;
