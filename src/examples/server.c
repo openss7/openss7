@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: server.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:43 $
+ @(#) File: src/examples/server.c
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -45,25 +45,9 @@
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2010-11-28 14:21:43 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: server.c,v $
- Revision 1.1.2.2  2010-11-28 14:21:43  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2009-06-21 11:21:17  brian
- - added files to new distro
-
- Revision 0.9.2.1  2008-06-18 16:43:14  brian
- - added new files for NLI and DLPI
-
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: server.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:43 $";
+static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
 
 /*
  * From Tru64 UNIX Network Programmer's Guide AR-H9UE-TE.

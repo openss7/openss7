@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sscop_recv.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:37 $";
+static char const ident[] = "src/drivers/sscop_recv.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  =========================================================================

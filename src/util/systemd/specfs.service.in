@@ -1,0 +1,14 @@
+[Unit]
+Description=Special Shadow Filesystem
+Documentation=man:specfs(5)
+Conflicts=streams-shutdown.target
+Before=dev-streams.mount streams-shutdown.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=@systemddir@/specfs start
+ExecStop=@systemddir@/specfs stop
+
+[Install]
+RequiredBy=streams.target

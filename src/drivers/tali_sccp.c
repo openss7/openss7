@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: tali_sccp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:40 $";
+static char const ident[] = "src/drivers/tali_sccp.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #include <sys/os7/compat.h>
 

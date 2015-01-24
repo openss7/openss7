@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sua_spp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:37 $";
+static char const ident[] = "src/drivers/sua_spp.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #define __NO_VERSION__
 

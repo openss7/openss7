@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:52 $";
+static char const ident[] = "src/modules/ip_strm_mod.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 
 #include <sys/os7/compat.h>

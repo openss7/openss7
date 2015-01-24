@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-20 09:51:37 $";
+static char const ident[] = "src/drivers/sl_x400p.auto.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the

@@ -1,0 +1,16 @@
+[Unit]
+Description=STREAMS
+Documentation=man:streams(4)
+ConditionPathIsMountPoint=/dev/streams
+Conflicts=streams-shutdown.target
+Before=streams-shutdown.target
+After=dev-streams.mount
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=@systemddir@/streams start
+ExecStop=@systemddir@/streams stop
+
+[Install]
+RequiredBy=streams.target
