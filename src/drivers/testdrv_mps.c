@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/testdrv_mps.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is a test module for MPS compatability.  Its purpose is to test MPS compatability functions

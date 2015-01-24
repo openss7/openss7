@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/nit_buf.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is NIT_BUF, a classical STREAMS buffering module similar to bufmod(4) that performs the

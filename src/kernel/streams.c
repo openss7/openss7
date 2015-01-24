@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/kernel/streams.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /* can we just include these into one big compilation unit? */
 

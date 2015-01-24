@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/kernel/strsyms.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 //#define __NO_VERSION__
 //#define EXPORT_SYMTAB

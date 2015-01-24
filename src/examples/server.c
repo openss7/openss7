@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/examples/server.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * From Tru64 UNIX Network Programmer's Guide AR-H9UE-TE.

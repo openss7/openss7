@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/np.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This multiplexing driver is a master device driver for Network Provider streams presenting a

@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/mtp3b.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is an MTP3b module for use by MTP3b.  It can be pushed over an SSCOPE SSCF module to provide

@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/mcmux.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is MCMUX, a GSM MAP Common Services (MC) driver implementing the MAPI

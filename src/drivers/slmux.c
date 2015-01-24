@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/slmux.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #define SL_SL_MINOR	0	/* /dev/streams/sl/sl */
 #define SL_ADM_MINOR	1	/* /dev/streams/sl/sl-admin */

@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/lib/xhostent.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #include <netx25/x25_proto.h>
 #include <netx25/xnetdb.h>

@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " "src/util/slconfd.c" "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/util/slconfd.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is a configuration daemon for the SL-MUX multiplexing driver.  Its purpose is to open

@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/chmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  CH-MOD: This is a channel module that can be pushed over one end of a Streams-based pipe to form

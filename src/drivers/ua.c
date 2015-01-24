@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/ua.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #define UA_DESCRIP	"SIGTRAN User Adaptation (UA) STREAMS Multiplexing Driver"
 #define UA_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"

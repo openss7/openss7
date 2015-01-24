@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/tp0.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  ISO Transport Class 0 over TCP/IP (TP0)

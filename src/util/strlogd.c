@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " "src/util/strlogd.c" "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/util/strlogd.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  SVR 4.2 Daemon: strlogd - (Daemon) Receives console log messages from the

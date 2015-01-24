@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " "src/util/sdlautomon.c" "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/util/sdlautomon.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * The purpose of this utility is to perform auto-configuration of the

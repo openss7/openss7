@@ -60,7 +60,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/test/test-xnsl.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is a basic test program for the Network Services Library, libxnsl,

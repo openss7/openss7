@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/tpi_sccp.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is a pushable STREAMS module that converts between the SCCPI (Signalling Connection Control

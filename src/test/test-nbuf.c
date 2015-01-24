@@ -60,7 +60,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/test/test-nbuf.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is a ferry-clip NBUF conformance test program for testing the OpenSS7

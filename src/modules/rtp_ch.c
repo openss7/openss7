@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/rtp_ch.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is the RTP-CH module.  This is a pushable STREAMS module that can be

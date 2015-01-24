@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/bpf.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is a bpf driver that works like the clone driver.  It accepts registration from other

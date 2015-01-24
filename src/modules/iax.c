@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/iax.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is an IAX module.  It pushes over a UDP Stream that provides connectivity to the peer IAX

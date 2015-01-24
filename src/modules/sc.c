@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/sc.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This

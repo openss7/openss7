@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/mtp_mod.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * MTP-MOD is a minimal MTP in the spirit of Q.710 but which also supports ANSI and other variants.

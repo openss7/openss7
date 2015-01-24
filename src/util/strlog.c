@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " "src/util/strlog.c" "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/util/strlog.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  Linux Fast-STREAMS Utility: strlog - logs STREAMS error or trace messages

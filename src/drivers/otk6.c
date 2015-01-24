@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/otk6.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This file provides a multiplexing driver for RFC 1006 (RFC 2126) OSI Transport over TCP.  The

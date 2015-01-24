@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/ch_pmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is CH-PMOD.  This is a pushable STREAMS module that can be pushed on one end of a

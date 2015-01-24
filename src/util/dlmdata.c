@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " "src/util/dlmdata.c" "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/util/dlmdata.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * SYNOPSIS:

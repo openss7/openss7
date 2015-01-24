@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/sdtmux.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is an SDT multiplexing driver for multiplexing SDT upper streams into

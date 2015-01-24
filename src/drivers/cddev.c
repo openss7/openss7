@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/cddev.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is a multiplexing driver used for providing access to devices that

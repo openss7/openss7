@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " "src/util/fdetach.c" "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/util/fdetach.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /* 
  *  SVR 4.2 Utility: fdetach(8)

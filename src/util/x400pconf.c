@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " "src/util/x400pconf.c" "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/util/x400pconf.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 int my_argc;
 char **my_argv;

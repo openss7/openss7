@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/x25-plp.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is a multiplexing driver for the X.25 Packet Layer Protocol (PLP).  It

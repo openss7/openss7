@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/atm.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is an ATM multiplexing driver.  The driver links CDI Streams beneath the multiplexing driver

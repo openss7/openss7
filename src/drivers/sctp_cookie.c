@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/sctp_cookie.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This file contains all the algorithms for generating MAC for SCTP cookies

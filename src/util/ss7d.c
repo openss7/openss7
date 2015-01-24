@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " "src/util/ss7d.c" "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/util/ss7d.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is ss7d(8).  The purpose of the daemon is to configure the SS7 stack from configuration

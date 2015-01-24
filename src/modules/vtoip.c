@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/vtoip.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is a Y.1452 VToIP (Voice Trunking over IP) module.  It pushes over a UDP

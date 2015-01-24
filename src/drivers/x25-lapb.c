@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/x25-lapb.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  Here is an X.25 lapb (SLP and MLP) driver.  This is a DLPI driver that can push over or link a

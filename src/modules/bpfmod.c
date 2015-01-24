@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/bpfmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is BPFMOD a partial implementation of the classical Berkeley Packet Filter.  The missing

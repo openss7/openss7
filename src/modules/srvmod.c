@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/srvmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is SRVMOD a STREAMS buffering module that performs no actions other than acting as a

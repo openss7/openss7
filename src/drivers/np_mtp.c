@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/np_mtp.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This will be a simple conversion module that converts between the MTPI interface and the NPI

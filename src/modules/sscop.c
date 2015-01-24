@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/sscop.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is an SSCOPE module for use with MTP3b.  It can be pushed over an AAL5 Stream to provide the

@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/rtp_test.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /** @file
   * This is the RTP-TEST module.  This is a pushable STREAMS module that can be

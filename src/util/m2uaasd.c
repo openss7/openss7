@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " "src/util/m2uaasd.c" "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/util/m2uaasd.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is a configuration daemon for the M2UA-AS multiplexing driver.  Its purpose is to open a

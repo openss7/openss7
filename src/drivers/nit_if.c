@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/nit_if.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is a nit driver that works like the clone driver.  It accepts registration from other

@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/rmux.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  RMUX is a remote multiplexing driver using SCTP.  Its purpose is to make remote STREAMS devices

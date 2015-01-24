@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " "src/util/slmon.c" "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/util/slmon.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is a signalling link monitoring utiltiy for the SL-MUX multiplexing driver.  It purpose is

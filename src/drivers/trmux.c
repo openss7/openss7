@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/trmux.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is TRMUX, a TCAP Translaction Sublayer (TR) driver implementing the TRI

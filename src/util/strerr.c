@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " "src/util/strerr.c" "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/util/strerr.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  SVR 4.2 Daemon: strerr - (Daemon) Receives error log messages from the STREAMS

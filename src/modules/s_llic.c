@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/s_llic.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is s_llic, a pushable STREAMS module that interprets the SpiderX25

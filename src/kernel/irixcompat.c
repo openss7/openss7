@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/kernel/irixcompat.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or

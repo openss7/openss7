@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/zap.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 static int
 zap_m_ioctl(struct zt_chan *chan, queue_t *q, mblk_t *mp)

@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/m3ua_as.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is an M3UA multiplexing driver for the AS side of the ASP-SGP communications.  It works like

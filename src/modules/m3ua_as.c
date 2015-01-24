@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/m3ua_as.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is the AS side of M3UA implemented as a pushable module that pushes over an SCTP NPI

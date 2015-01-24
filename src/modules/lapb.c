@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/lapb.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is a LAPB module that pushes over a stream implementing an HDLC

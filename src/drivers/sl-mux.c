@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/sl-mux.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is a signalling link multiplexer: its primary purpose is to provide a single nexus for the

@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/dl_sl.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is a simple conversion module that converts between the OpenSS7 Signalling Link Interface

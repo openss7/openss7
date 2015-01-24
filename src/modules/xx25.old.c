@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/xx25.old.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * X25MOD - XX25 Module: This is an X.25 module that is pushed over a X.25-PLP stream supporting the

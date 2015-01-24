@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/sdl_sctp.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 
 #define _SUN_SOURCE	1

@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/ch.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is a CH multiplexing driver.  MX stream are linked beneath the lower multiplex and CH

@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/cd.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is a pushable STREAMS module that provides the High-Level Data Link

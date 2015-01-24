@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/dlpi.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * Welcome to the final interation of the Linux DL driver.  This driver opens

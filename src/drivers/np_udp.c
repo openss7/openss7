@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/np_udp.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This driver provides the functionality of a UDP (User Datagram Protocol) hook similary to udp

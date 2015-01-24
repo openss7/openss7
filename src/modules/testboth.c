@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/testboth.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #include <unistd.h>
 #include <stdio.h>

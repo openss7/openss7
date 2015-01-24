@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " "src/util/ss7capsetdir.c" "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/util/ss7capsetdir.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #include <stropts.h>
 #include <stdlib.h>

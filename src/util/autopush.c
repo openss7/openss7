@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " "src/util/autopush.c" "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/util/autopush.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /* 
  *  autopush(8)

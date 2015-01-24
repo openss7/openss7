@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/xos.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is a XOS [draft-bidulock-tsvwg-xos-00] module.  It pushes over a TCP

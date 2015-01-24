@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/log.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is

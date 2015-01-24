@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " "src/util/usage.c" "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/util/usage.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE

@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/dl-llc.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is a DLPI interface LLC driver for Linux.  What it does is provides DLPI access to the Linux

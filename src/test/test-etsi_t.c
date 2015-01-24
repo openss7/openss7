@@ -60,7 +60,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/test/test-etsi_t.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This file is for testing the sctp_t module.  It is provided for the

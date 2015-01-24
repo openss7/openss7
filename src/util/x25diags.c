@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " "src/util/x25diags.c" "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/util/x25diags.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 
 /* x25diags converts the numeric argument to a message using the definitions

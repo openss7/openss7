@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/x25-plp.other.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is an X.25 PLP (LLC2, XOT, SLP and MLP) (CONS) driver per X.223.  It can be used with the

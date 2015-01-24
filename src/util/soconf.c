@@ -49,7 +49,7 @@
 
 /* This is a little utility program that performs socket input-output controls. */
 
-static char const ident[] = "File: " "src/util/soconf.c" "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/util/soconf.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #include <stdint.h>
 #include <stropts.h>

@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/sdt_ch.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is SDT-CH.  It is a pushable STREAMS module that can be pushed over a CH Stream providing

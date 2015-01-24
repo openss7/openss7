@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/tua_sgp.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  UA_RKMM_REG_REQ	0x1

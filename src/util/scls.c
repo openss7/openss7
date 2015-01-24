@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " "src/util/scls.c" "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/util/scls.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /* 
  *  AIX Utility: scls - Produces a list of module and driver names.

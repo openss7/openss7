@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/s_wan.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * The s_wan pushable STREAMS module is a module that converts between the

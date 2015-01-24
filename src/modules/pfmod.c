@@ -54,7 +54,7 @@
  $Log$
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/pfmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is PFMOD a classical STREAMS packet filtering module that performs the actions described in

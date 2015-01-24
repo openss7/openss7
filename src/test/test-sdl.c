@@ -60,7 +60,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/test/test-sdl.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 int card = 0;
 int span = 0;

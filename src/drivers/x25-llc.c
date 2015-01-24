@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/x25-llc.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is a driver for the IEEE 802.2 Logical Link Contrl (LLC).  It presents

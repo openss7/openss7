@@ -60,7 +60,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/test/test-clone.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #include <sys/types.h>
 #include <stropts.h>

@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " "src/util/slstatsd.c" "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/util/slstatsd.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is slstatsd(8).  The purpose of this program is to open a connection

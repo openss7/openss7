@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/timod.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is TIMOD an XTI library interface module for TPI Revision 2 transport

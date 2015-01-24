@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " "src/util/ss7statsd.c" "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/util/ss7statsd.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /* This file can be processed with doxygen(1). */
 

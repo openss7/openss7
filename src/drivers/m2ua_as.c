@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/m2ua_as.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is an M2UA multiplexing driver.  It is necessary to use a multiplexing driver because most

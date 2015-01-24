@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/sth.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */

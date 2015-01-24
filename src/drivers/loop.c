@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/loop.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This file contains a classic loop driver for SVR 4.2 MP STREAMS.  The loop driver is a general

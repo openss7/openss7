@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/sdlm.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  A Signalling Data Link Multiplexor for the OpenSS7 SS7 Stack.

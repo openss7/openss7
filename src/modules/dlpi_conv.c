@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/dlpi_conv.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  DLPI-CONV is a simple endian conversion module for use with the RMUX driver.  It converts

@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/aal1.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is an ATM Adaptation Layer (AAL) Type 1 (AAL1) for passing packets of fixed length across

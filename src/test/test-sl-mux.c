@@ -60,7 +60,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/test/test-sl-mux.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is a test case executable program for testing the signalling link multiplexing driver.  The

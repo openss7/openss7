@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " "src/util/dlcommon.c" "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/util/dlcommon.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * Common (shared) DLPI test routines.

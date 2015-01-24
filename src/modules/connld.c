@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/connld.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /* 
  *  This is CONNLD, a pipe module which generate new pipes for each open of an

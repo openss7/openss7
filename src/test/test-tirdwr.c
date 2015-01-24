@@ -60,7 +60,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/test/test-tirdwr.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  These is a ferry-clip TIRDWR conformance test program for testing the

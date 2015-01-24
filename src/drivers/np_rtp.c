@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/np_rtp.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This driver is similar to the NPI-UDP driver in that it provides NPI access to UDP; however, it

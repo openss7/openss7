@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " "src/util/strconf.c" "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/util/strconf.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /* 
  * SVR 4.2 Utility: strconf - Queries stream configuration.

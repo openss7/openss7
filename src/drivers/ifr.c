@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/ifr.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This file is the IFR (Frame Relay) driver.  It accepts WAN Streams linked

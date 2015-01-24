@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " "src/util/ldlconfig.c" "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/util/ldlconfig.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  ldlconfig: A configuration helper for ldl clients

@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/cd.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This module is a master device driver for Communications Device Streams presending the

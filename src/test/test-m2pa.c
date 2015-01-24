@@ -60,7 +60,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/test/test-m2pa.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #define TEST_M2PA   1
 #define TEST_X400   0

@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/mtp_min.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL (Signalling Link)

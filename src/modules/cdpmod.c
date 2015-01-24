@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/cdpmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is a CD pipe module.  It pushes over one side of a STREAMS-based pipe

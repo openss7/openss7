@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/ldl2.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is a complete rewrite (reimplementation) of the Linux Data Link driver.  There are a

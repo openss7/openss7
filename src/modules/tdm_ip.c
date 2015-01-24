@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/tdm_ip.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is a Y.1453 TDM-IP module.  It pushes over a UDP Stream that provides connectivity to the

@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/dl_ip.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is a DLPI driver for the IP subsystem.  The purpose of the driver is to directly access the

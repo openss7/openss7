@@ -60,7 +60,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/test/testlog.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is a little user space program to test the correctness of the formatting of the data blocks

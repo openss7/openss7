@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/sdl_ch.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * `This is the SDL-CH STREAMS pushable module.  Its purpose is to convert from a general purpose

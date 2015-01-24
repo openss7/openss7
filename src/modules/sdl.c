@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/sdl.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 
 //#define _SVR4_SOURCE	1

@@ -60,7 +60,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/test/perftest.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  These are benchmark performance tests on a pipe for testing LiS

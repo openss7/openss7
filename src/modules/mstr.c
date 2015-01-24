@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/mstr.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is a single-stream to multi-stream conversion module.  What it does is accept a

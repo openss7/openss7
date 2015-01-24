@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/slm.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is an SLM (Signalling Link Management) multiplexing driver which also supports M2UA.  It

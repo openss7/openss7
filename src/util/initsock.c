@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " "src/util/initsock.c" "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/util/initsock.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 600

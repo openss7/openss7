@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " "src/util/mxconf.c" "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/util/mxconf.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #include <stdint.h>
 #include <stropts.h>

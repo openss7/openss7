@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/sad.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * STREAMS Administrative Driver (SAD) for Linux Fast-STREAMS.  Note that this driver also acts as a

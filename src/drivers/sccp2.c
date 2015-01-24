@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/sccp2.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is a second generation SCCP driver.  The driver uses the capabilities of the MPS

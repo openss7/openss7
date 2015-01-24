@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/rsw.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is the RTP-SW multiplexing driver.  It s purpose is to allo a single

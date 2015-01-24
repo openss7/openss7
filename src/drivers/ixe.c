@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/ixe.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is the IXE (IP over X.25 Encapsulation) driver. It accepts X.25 PLP

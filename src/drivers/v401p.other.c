@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/v401p.other.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is a driver for the Varion V401P card.  It provides only full multi-card access (for speed)

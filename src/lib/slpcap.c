@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/lib/slpcap.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is a replacement libpcap to permit live capture of SS7 SDUs using ethereal or wireshark.

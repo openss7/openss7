@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/modules/nit_pf.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is NIT_PF, a classical STREAMS packet filter module similar to pfmod(4) that performs the

@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "File: " __FILE__ "  Version: " PACKAGE_ENVR "  Date: " PACKAGE_DATE;
+static char const ident[] = "src/drivers/zapmux.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  MX Primitives issued down to MX provider.
