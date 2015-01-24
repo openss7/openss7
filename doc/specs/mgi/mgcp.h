@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mgcp.h,v 1.1.2.2 2010-11-28 14:21:31 brian Exp $
+ @(#) doc/specs/mgi/mgcp.h
 
  -----------------------------------------------------------------------------
 
@@ -44,22 +44,6 @@
 
  Commercial licensing and support of this software is available from OpenSS7
  Corporation at a fee.  See http://www.openss7.com/
-
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2010-11-28 14:21:31 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: mgcp.h,v $
- Revision 1.1.2.2  2010-11-28 14:21:31  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.1  2010-02-22 14:25:53  brian
- - added new documentation files
-
- Revision 1.1.2.1  2009-06-21 11:25:34  brian
- - added files to new distro
 
  *****************************************************************************/
 
