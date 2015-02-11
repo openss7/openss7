@@ -1,0 +1,459 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) doc/man/man8/tp24config.8.man
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH TP24CONFIG 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@"
+.SH NAME
+.B tp24config
+\- configure TP0/2/4 parameters
+.\"
+.\"
+.SH SYNPOSIS
+.PP
+.ad l
+.nh
+.HP \w'\fB\)tp24config\fP\ 'u
+\fB\)tp24config\fP [\fIoptions\fP]
+.PD 0
+.HP
+\fB\)tp24config\fP
+{\fB-h\fP|\fB--help\fP}
+.HP
+\fB\)tp24config\fP
+{\fB-V\fP|\fB--version\fP}
+.HP
+\fB\)tp24config\fP
+{\fB-C\fP|\fB--copying\fP}
+.PD
+.ad b
+.hy 6
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+Sets the value for the specified TP0/2/4 configuration parameters.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.SS Command Options
+The following command options are mutually exclusive: only one command option
+should be present on the command line at a time.  The exceptions are the
+\fB-h\fP, \fB-V\fP and \fB-C\fP options that can be specified alone, or with
+any other option.
+If no command option is supplied,
+.B tp24config
+displays all parameter values.
+.TP
+\fB-h\fP, \fB--help\fP
+When this option is encountered, display usage information to
+.IR stdout ,
+stop options procressing, and exit without taking further action.
+.TP
+\fB-V\fP, \fB--version\fP
+When this option is encountered, display version information to
+.IR stdout ,
+stop options procressing, and exit without taking further action.
+.TP
+\fB-C\fP, \fB--copying\fP
+When this option is encountered, display copying information to
+.IR stdout ,
+stop options procressing, and exit without taking further action.
+.\"
+.SS Common Options
+.PP
+The following common options can be specified together with a command option.
+It is not an error to specify options that are not necessary for the command
+option with which they are specified.
+Note that long options can be specified with a single leading dash for
+compatability.
+Note also that all times are specified in milliseconds.
+.TP
+\fB--inactivity\fP \fItime\fP
+(Class 4 only.)
+Inactivity time; the amout of time that TP4 CLNS maintains a transport
+connection without any data transmission before it terminates the connection.
+If this argument is not specified, it defaults to 960,000 (960 seconds; 16
+minutes).
+.TP
+\fB--retransmit\fP \fItime\fP
+(Class 4 only.)
+The amount of time that TP4 CLNS waits without receiving an acknowledgment of
+a TPDU it sent before it retransmits the TPDU.  (The maximum number of times
+the same TPDU can be transmitted can be specified with the \fB-n\fP option.)
+TP4 CLNS automatically adjusts the value of this parameter individually for
+each connection based on the performance of the network.  If this option is
+not specified, it defaults to 30,000 (30 seconds).
+.TP
+\fB--window\fP \fItime\fP
+(Class 4 only.)
+Window timer value; the period of inactivity that can occur before TP4 CLNS
+sends an \(lq\)Ack\(rq\) packet to the peer entity with which a connection is
+established.  If this option is not specified, its value defaults to 120,000
+(120 seconds).
+.TP
+\fB--ack\fP \fItime\fP
+(Class 4 only.)
+Local acknowledgment delay; the maximum amount of time TP4 CLNS can delay
+acknowledgement of a TPDU it receives.  If this argument is not specified,
+its value defaults to 512 (0.512 seconds).
+.TP
+\fB--flow\fP \fItime\fP
+If TP0/2/4 has no receive credit available, it checks the available resources
+every \fItime\fP milliseconds until credit becomes available.  If this option
+is not specified, its value defaults to 208 (0.208 seconds).
+.TP
+\fB--n\fP \fIiterations\fP
+(Class 4 only.)
+Maximum number of times a TPDU can be sent without being acknowledged.  If
+this argument is not specified, its value defaults to 4.
+.TP
+\fB--credit\fP \fIvalue\fP
+(Classes 2 and 4 only.)
+Maximum value to which TP2 or TP4 can adjust the window size; that is, the
+number of unacknowledged TPDUs that can be outstanding on a connection.  If
+this option is not specified, its value defaults to 4.
+.TP
+\fB--initial\fP \fIvalue\fP
+(Class 4 only.)
+The initial window size when the connection is first established.  TP4 CLNS
+will adjust this value up to the maximum automatically.  If this argument is
+not specified, its value defaults to 1.
+.TP
+\fB--maxtpdu\fP \fIvalue\fP
+Maximum size of a TPDU.  It is recommended that you select one of the
+following values: 128, 256, 512 or 1024 bytes.  If this option is not
+specified, its value defaults to 1024.  If you change the default, it is
+important that you ensure there are sufficient STREAMS buffers of the
+appropriate size.  Use the
+.BR strstat (8)
+utility to determine the number of buffers available in the size you specify,
+and increase this number if necessary using the procedures outlined for
+installation.  If this option is not specified, its value defaults to 512. 
+.TP
+\fB--maxtidu\fP \fIvalue\fP
+Maximum number of bytes of the data units passed between the XTI/TLI library,
+.BR xti (3),
+and the TP0/2/4 STREAMS driver.  If this is larger than the TPDU size, the
+STREAMS driver will fragment the message into TPDU-size packets before
+sending it to Transport.  If this option is not specified, its value defaults
+to 504.
+.TP
+\fB--checksum\fP \fIflag\fP
+(Class 4 only.)
+If \fIflag\fP is a nonzero value, the TPDU checksum features is enabled; if
+zero, it is disabled.  Enabling this feature slows down TP4 CLNS operation
+significantly.  If this option is not specified, its value defaults to 0
+(disabled).
+.TP
+\fB--extended\fP \fIflag\fP
+(Class 4 only.)
+If \fIflag\fP is a nonzero value, transport proposes to use extended TPDU
+sequencing when it initiates a connect request (CR) TPDU; if zero, transport
+proposes normal sequencing.  If this option is not specified, its value
+defaults to 1 (enabled).
+.TP
+\fB--propose\fP \fIflag\fP
+(Class 4 only.)
+If \fIflag\fP is a nonzero value, transport proposes to use extended TPDU
+sequencing when it initiates a connect request (CR) TPDU; if zero, transport
+proposes normal sequencing.  If this option is not specified, its value
+defaults to 1 (enabled).
+.TP
+\fB--transaction\fP \fItime\fP
+The number of millisecons that a network connection is held open waiting for
+an ISO 8602 UD TPDU.  (ISO 8602 connectionless transport protocol only.)  If
+this option is not specified, its value defaults to 60,000 (60 seconds).
+.TP
+\fB--ts1\fP \fItime\fP
+(Classes 0 and 2 only.)
+The maximum amount of time that transport will wait for a response after CR
+TPDU has been transmitted.  If this option is not specified, its value
+defaults to 60,000 (60 seconds).
+.TP
+\fB--ts2\fP \fItime\fP
+(Classes 0 and 2 only.)
+The maximum amount of time that transport will wait for a response after a DR
+TPDU has been transmitted.  If this option is not specified, its value
+defaults to 30,000 (30 seconds).
+.TP
+\fB--delay\fP \fItime\fP
+The time delay before disconnecting the network connection.  The purpose of
+this small delay is to avoid loss of data during network layer disconnection.
+If this option is not specified, its value defaults to 1000 (1 second).
+.TP
+\fB--idle\fP \fItime\fP
+The maximum time that an idle network connection will be left open.  If this
+argument is not specified, its value defaults to 300,000 (300 seconds).
+.TP
+\fB--useflow\fP \fIflag\fP
+If \fIflag\fP is a zero value, transport attempts to negotiate non-use of
+explicit flow control.  If you do not include this option, its value defaults
+to 1 (forces Class 2 to use explicit flow control).
+.TP
+\fB--ccitt\fP \fIflag\fP
+If \fIflag\fP is a nonzero value, the transport protocol follows CCITT
+conformance rules in regard to the classes proposed in CR TPDUs.  If either
+Class 2 or 4 is requested by the user, Class 0 is proposed as an alternate
+class.  If \fIflag\fP is zero, no alternate Class parameter is transmitted in
+a CR TPDU.
+.TP
+\fB-q\fP, \fB--quiet\fP
+Suppress normal output.  Only the return code of the command is of interest.
+This has the same effect as \fB--verbose=0\fP.
+Enables quiet mode.  Only error messages are displayed.
+.TP
+\fB-d\fP, \fB--debug\fP [\fIlevel\fP]
+Specify or increase the debugging verbosity.  Sets the debugging verbosity to
+\fIlevel\fP, when given, or simply increases the debuggin verbosity by one
+(1) when \fIlevel\fP is not given.  This option can be repeated.
+.TP
+\fB-v\fP, \fB--verbose\fP [\fIlevel\fP]
+Specify or increase the output verbosity.  Sets the output verbosity to
+\fIlevel\fP, when given, or simply increases the output verbosity by one when
+\fIlevel\fP is not given.  This option can be repeated.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+The
+.B tp24config
+command takes no non-option arguments.
+.\"
+.\"
+.\".SH OUTPUT FORMAT
+.\".PP
+.\"
+.\"
+.SH EXAMPLE OUTPUT
+.PP
+The following is an example output when no command options are specified.
+.PP
+.nf
+ NOTE: All timer values specified in number of milliseconds
+Reference timer value (class 4 only):                 400000
+Inactivity timer value (class 4 only):                960000
+Retransmit timer value (class 4 only):                 30000
+Window timer value (class 4 only):                    120000
+Local acknowledgement delay (class 4 only):              512
+Local flow control interval (all classes):               208
+Max number of retransmissions (class 4 only):              4
+Target window size (class 2 and 4):                        4
+Initial window size (class 4 only):                        1
+Maximum TPDU size (all classes):                         512
+Maximum TIDU size (all classes):                         504
+Checksum enable (class 4 only):                            0
+Prefer use of extended sequence numbers (class 2 and 4):   1
+Propose use of extended sequence numbers (class 2 and 4):  1
+Disconnect timer value (CLTS only):                   120000
+Optional TS1 timer (class 0/2):                        60000
+Optional TS2 timer (class 2):                          60000
+Disconnection timer value (class 2 and 4):              2000
+Incoming network connection idle timer:               300000
+Use of explicit flow control (class 2 only):               1
+CCITT 1988 X.224 alternate class 0 enable (class 2 and 4): 1
+Max number of transport connections (read/only):          48
+.fi
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero (0) indicates that the command was successful; one (1)
+indicates that an error occured and a diagnostic message is printed to
+.IR stderr ;
+two (2) indicates the the option or argument syntax was in error and a
+diagnostic message is printed to
+.IR stderr .
+.PP
+The
+.B --quiet
+option suppresses the printing of normal output to
+.I stdout
+and diagnostic messages to
+.IR stderr .
+.\"
+.SS Error Messages
+.PP
+The following error messages can be issued:
+.TP
+.B could not open \fIdevice\fP
+The TP0/2/4 driver has not been installed or the
+.BR osid (8)
+daemon is not running.
+Make sure that the protocol stack has been initialized.  Stop and start the
+OSI Transport Service (see
+.BR osinetwork (8)).
+If the stack cannot be started because of missing drivers, then reinstall the
+software.
+.TP
+tp24config: unknown parameter \fIp\fP
+You specified an option on the command line that was not recognized.  Check
+the list of options and reenter the command line.
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.\".SH FILES
+.\".PP
+.\"
+.\"
+.\".SH DEVICES
+.\".PP
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR osid (8),
+.BR osinetwork (8),
+.BR tp24stat (8).
+.\"
+.\"
+.SH BUGS
+.PP
+.B tp24config
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B tp24config
+is compatible with
+.IR "IRIS OSI"
+.[
+irixosi
+.]
+with the following compatability considerations:
+.IP \(em \w'\(em\(em'u
+Options \fB-q\fP, \fB-v\fP, \fB-h\fP, \fB-V\fP, \fB-C\fP, and all long
+options, are specific to this
+.B @PACKAGE_TITLE@
+implementation of
+.B strxt
+and should not be used by portable command scripts.
+.IP \(em
+No other implementation documents the \fB-q\fP, \fB-v\fP, \fB-h\fP, \fB-V\fP
+and \fB-C\fP options.  They should not be used by portable command scripts.
+.IP \(em
+Options \fB--help\fP and \fB--version\fP are provided for compatibility with
+GNU coding standards; \fB--copying\fP, OpenSS7 coding standards.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "IRIS OSI"
+.[
+irixosi
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B tp24config
+first appeared in
+.IR "IRIS OSI" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
