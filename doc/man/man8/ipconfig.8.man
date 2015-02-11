@@ -101,7 +101,7 @@ search-ignore CGIQOSTU
 .TH IPCONFIG 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@"
 .SH NAME
 .B ipconfig
-\- configure TP4/IP parameters
+\- configure TP4/CLNP parameters
 .\"
 .\"
 .SH SYNOPSIS
@@ -127,7 +127,7 @@ search-ignore CGIQOSTU
 .\"
 .SH DESCRIPTION
 .PP
-Sets values for TP4/IP communications parameters and displays current
+Sets values for TP4/CLNP communications parameters and displays current
 parameter values.
 .\"
 .\"
@@ -164,30 +164,30 @@ compatibility.
 .TP
 \fB--lifetime\fP \fIunits\fP
 Specifies the amount of time (in units of 500 milliseconds) that other
-systems will consider valid an IPDU send from this system.  If you do not
+systems will consider valid an NPDU send from this system.  If you do not
 specify a value for this parameter, it defaults to 20 (10 seconds).
 .TP
 \fB--checksum\fP \fIflag\fP
-If \fIflag\fP is zero, the IP checksum mechanism is disabled.  Any other
+If \fIflag\fP is zero, the CLNP checksum mechanism is disabled.  Any other
 value enables it.  If you do not specify a value for this parameter, it
 defaults to zero (disabled).
 .TP
 \fB--report\fP \fIflag\fP
-If \fIflag\fP is zero, the error report request bit in outgoing IPDUs is not
+If \fIflag\fP is zero, the error report request bit in outgoing NPDUs is not
 set; otherwise, it is set.  This bit specifies that if an error is detected
-in the IPDU, the entity that detects the error may send an Error Report (ER)
+in the NPDU, the entity that detects the error may send an Error Report (ER)
 PDU.  If you do not specify a value for this parameter, it defaults to zero
 (disabled).
 .TP
 \fB--segment\fP \fIflag\fP
-If \fIflag\fP is zero, outgoing IPDUs cannot be segmented; otherwise, they
+If \fIflag\fP is zero, outgoing NPDUs cannot be segmented; otherwise, they
 can be segmented.  If you do not include this option, its value defaults to
 one (enabled).
 .TP
 \fB--reasmbly\fP \fIunits\fP
 Specifies the maximum amount of time (in units of 500 milliseconds) in which
-all segments of an IPDU must be received.  If the lifetime parameter within
-the IPDU is smaller, it take precedence over the value specified in this
+all segments of an NPDU must be received.  If the lifetime parameter within
+the NPDU is smaller, it take precedence over the value specified in this
 argument.  If you do not include this option, its value defaults to 20 (10
 seconds).
 .TP
@@ -256,7 +256,7 @@ and diagnostic messages to
 The following error messages can be generated:
 .TP
 .B could not open \fIdriver\fP
-The TP4/IP driver is not available.  The most likely cause of this error is
+The TP4/CLNP driver is not available.  The most likely cause of this error is
 that the
 .BR STREAMS (9)
 stack has not been initialized.  Invoke the
@@ -269,7 +269,7 @@ die no recognize one or more of the options you entered on the command line.
 Check the list of option names and reenter the command line.
 .TP
 .B ipconfig: cannot set \fIname\fP parameter
-A value you specified was rejected by the TP4/IP module.  Use a different
+A value you specified was rejected by the TP4/CLNP module.  Use a different
 value.
 .\"
 .\"
@@ -335,6 +335,8 @@ documentation.
 .B ipconfig
 first appeared in
 .IR "IRIS OSI" .
+This command was named at a time when IP stood for Internetworking Protocol:
+another name for CLNP.
 .\"
 .\"
 .[
