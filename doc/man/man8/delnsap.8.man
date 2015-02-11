@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) doc/man/man8/addnsap.8.man
+.\" @(#) doc/man/man8/delnsap.8.man
 .\"
 .\" =========================================================================
 .\"
@@ -98,27 +98,27 @@ search-ignore CGIQOSTU
 .so openss7.macros
 .\"
 .\"
-.TH ADDNSAP 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@"
+.TH DELNSAP 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@"
 .SH NAME
-.B addnsap
-\- add static entry to CLNP routing table
+.BR del ", " delnsap
+\- delete a CLNP routing table entry
 .\"
 .\"
 .SH SYNOPSIS
 .PP
 .ad l
 .nh
-.HP \w'\fB\)addnsap\fP\ 'u
-\fB\)addnsap\fP \fINSAP_Address\fP \fISNPA_Address\fP [\fIport\fP]
+.HP \w'\fB\)delnsap\fP\ 'u
+\fB\)delnsap\fP \fINSAP_Address\fP
 .PD 0
 .HP
-\fB\)addnsap\fP
+\fB\)delnsap\fP
 {\fB-h\fP|\fB--help\fP}
 .HP
-\fB\)addnsap\fP
+\fB\)delnsap\fP
 {\fB-V\fP|\fB--version\fP}
 .HP
-\fB\)addnsap\fP
+\fB\)delnsap\fP
 {\fB-C\fP|\fB--copying\fP}
 .PD
 .ad b
@@ -127,16 +127,7 @@ search-ignore CGIQOSTU
 .\"
 .SH DESCRIPTION
 .PP
-The
-.B addnsap
-utility allows you to add the addresses of remote systems to the local CLNP
-routing table.  When ES-IS routing exchange protocol is being used, the user
-does not normally have to be aware of this table: it is modified dynamically
-as remote systems go on- and off-line.  However, this protocol may not always
-be able to provide the necessary routing information for all reachable
-systems (for example, systems that do not use the ES-IS protocol).  The
-.B addnsap
-utility provides a means of entering the routing information manually.
+Delete one entry in the CLNP routing table.
 .\"
 .\"
 .SH OPTIONS
@@ -186,35 +177,11 @@ Specify or increase the output verbosity.  Sets the output verbosity to
 .\"
 .SH ARGUMENTS
 .PP
-.B addnsap
+.B delnsap
 takes the following non-option arguments:
 .TP
 .I NSAP_Address
-The NSAP address of the remote user.  Only hexadecimal digits are accepted.
-Do not punctuate the NSAP address with spaces, periods, or other characters.
-.TP
-.I SNPA_Address
-The SNPA address of the remote system (if the system is on the same
-subnetwork) or of the first intermediate system (if the system is on a
-different subnetwork than the local system) in the path to the remote system.
-The SNPA address consists of 7 bytes.  The first 6 bytes identify the
-factory-installed MAC address; the seventh specifies the LSAP address (always
-FE).  Only hexadecimal digits are accepted.  Do not enter spaces or other
-punctuation.
-If you are adding a system reachable though a wide area network, the SNPA is
-in X.121 format (up to 15 decimal digits).
-.TP
-.I port
-An optional argument that specifies the MAC driver that is attached to the
-subnetwork over which the remote system is accessed.  The port number of a
-MAC driver is specified in the STREAMS configuration file.
-
-If you are adding a system reachable over a wide area network, specify the
-port number of the SNDCF driver.  This number is one higher than the port
-number of the last MAC driver.
-
-If you do not specify a port, the default is 0 (the first MAC driver on the
-system).
+The NSAP address of the remote system whose path is to be deleted.
 .\"
 .\"
 .SH DIAGNOSTICS
@@ -237,24 +204,19 @@ and diagnostic messages to
 .PP
 The following error messages can be generated:
 .TP
-.B usage: addnsap dst snpa [port]
-You entered the command line arguments incorrectly.
-Reenter the command line making sure you enter at least the correct
-destination NSAP address and SNPA.
+.B usage: del nspa-address
+You entered the command line arguments incorrectly.  Reenter the command line
+making sure you enter one valid NSAP address.
 .TP
-.B add: invalid NSAP-address length
+.B del: invalid NSPA-adddress length
 The NSAP address you entered was too long or contained an odd number of
 characters.  Check the NSAP address and reenter the corrected command line.
 The address must contain an even number of hexadecimal characters (since a
 byte consists of 2 digits), and its length must be 40 characters or less.
 .TP
-.B add: invalid SNPA-address length
-The SNPA address contained the wrong number of characters.  Check the SNPA
-address and reenter the corrected command line.
-.TP
-.B add: invalid hexadecimal character \fIc\fP in address
+.B dle: invalid hexadecimal character \fIc\fP in address
 A character that was not a valid hexadecimal digit was specified in either
-the NSAP or SNPA address.  Check the NSAP or SNPA address, and reenter the
+the NSAP address.  Check the NSAP address, and reenter the
 command line.  These addresses must contain only the characters 0 thru 9 and
 a thru f (or A thru F).
 .\"
@@ -275,19 +237,19 @@ configured as an end-system).
 .\"
 .SH SEE ALSO
 .PP
-.BR delnsap (8),
+.BR addnsap (8),
 .BR osid (8).
 .\"
 .\"
 .SH BUGS
 .PP
-.B addnsap
+.B delnsap
 has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.B addnsap
+.B delnsap
 is compatible with
 .IR "IRIS OSI"
 .[
@@ -320,7 +282,7 @@ documentation.
 .\"
 .SH HISTORY
 .PP
-.B addnsap
+.B delnsap
 first appeared in
 .IR "IRIS OSI" .
 .\"
