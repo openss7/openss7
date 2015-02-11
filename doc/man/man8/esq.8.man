@@ -138,6 +138,8 @@ The following command options are mutually exclusive: only one command option
 should be present on the command line at a time.  The exceptions are the
 \fB-h\fP, \fB-V\fP and \fB-C\fP options that can be specified alone, or with
 any other option.
+If no option is specified, the command displays current configuration
+parameters.
 .TP
 \fB-h\fP, \fB--help\fP
 When this option is encountered, display usage information to
