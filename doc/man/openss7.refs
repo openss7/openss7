@@ -5154,6 +5154,16 @@ Part 1: Protocol Specification
 %C Mountainview, California
 %U http://techpubs.sgi.com/
 
+%L IRIXOSI
+%R IRIS\(rg OSI
+%K irixosi
+%T IRIS\(rg OSI Transport Service Administration Guide
+%D 1992
+%Q Silicon Graphics, Inc.
+%I SGI Technical Publications
+%C Mountainview, California
+%U http://techpubs.sgi.com/
+
 %L CCCSMAD
 %R PowerMAX OS STREAMS
 %K cccsmad
