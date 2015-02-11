@@ -158,12 +158,12 @@ Specifies TP Class 4 and CONS.
 \fB-h\fP, \fB--help\fP
 When this option is encountered, display usage information to
 .IR stdout ,
-stop options procressing, and exit without taking further action.
+stop options processing, and exit without taking further action.
 .TP
 \fB-V\fP, \fB--version\fP
 When this option is encountered, display version information to
 .IR stdout ,
-stop options procressing, and exit without taking further action.
+stop options processing, and exit without taking further action.
 Prints the version number of
 .BR strxt .
 Choosing this switch will disable
@@ -173,7 +173,7 @@ from executing.
 \fB-C\fP, \fB--copying\fP
 When this option is encountered, display copying information to
 .IR stdout ,
-stop options procressing, and exit without taking further action.
+stop options processing, and exit without taking further action.
 .\"
 .SS Common Options
 .PP
@@ -293,7 +293,7 @@ is compatible with
 .[
 irixosi
 .]
-with the following compatability considerations:
+with the following compatibility considerations:
 .IP \(em \w'\(em\(em'u
 Options \fB-q\fP, \fB-v\fP, \fB-h\fP, \fB-V\fP, \fB-C\fP, and all long
 options, are specific to this

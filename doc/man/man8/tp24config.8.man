@@ -144,17 +144,17 @@ displays all parameter values.
 \fB-h\fP, \fB--help\fP
 When this option is encountered, display usage information to
 .IR stdout ,
-stop options procressing, and exit without taking further action.
+stop options processing, and exit without taking further action.
 .TP
 \fB-V\fP, \fB--version\fP
 When this option is encountered, display version information to
 .IR stdout ,
-stop options procressing, and exit without taking further action.
+stop options processing, and exit without taking further action.
 .TP
 \fB-C\fP, \fB--copying\fP
 When this option is encountered, display copying information to
 .IR stdout ,
-stop options procressing, and exit without taking further action.
+stop options processing, and exit without taking further action.
 .\"
 .SS Common Options
 .PP
@@ -162,7 +162,7 @@ The following common options can be specified together with a command option.
 It is not an error to specify options that are not necessary for the command
 option with which they are specified.
 Note that long options can be specified with a single leading dash for
-compatability.
+compatibility.
 Note also that all times are specified in milliseconds.
 .TP
 \fB--inactivity\fP \fItime\fP
@@ -420,7 +420,7 @@ is compatible with
 .[
 irixosi
 .]
-with the following compatability considerations:
+with the following compatibility considerations:
 .IP \(em \w'\(em\(em'u
 Options \fB-q\fP, \fB-v\fP, \fB-h\fP, \fB-V\fP, \fB-C\fP, and all long
 options, are specific to this
