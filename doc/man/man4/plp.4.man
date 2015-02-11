@@ -6,7 +6,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -183,7 +183,7 @@ following fashion:
 .IP \(bu \w'\(bu\(em'u
 When the PLP Stream is connected, using the
 .BR N_CONN_REQ (7)
-primitive, the driver usese the NSAPs to determine whether an existing data
+primitive, the driver uses the NSAPs to determine whether an existing data
 link exists, and if it does, the Stream is associated with that data link.  if
 a suitable data link does not exist, a request is issued to a connection
 manager daemon listening on the connection management Stream.
