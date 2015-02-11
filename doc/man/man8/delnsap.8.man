@@ -225,6 +225,13 @@ a thru f (or A thru F).
 .PP
 This command only works on systems using the ES-IS protocol (that is,
 configured as an end-system).
+.PP
+This utility does not check whether the routing table entry you wish to
+delete was added using the
+.BR addnsap (8)
+utility or was added by the ES-IS routing exchange protocol.  If ES-IS added
+it, you can delete it temporarily, but it will likely reappear after several
+seconds.
 .\"
 .\"
 .\".SH FILES
