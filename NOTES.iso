@@ -86,6 +86,8 @@ ISO/TR 9577 (X.263) NLPIDs
 --------------------------
 
 - 00000000 - 0x00 ISO/IEC 8473-1 | X.233 (inactive subset)
+- 00000001 - 0x01 ITU-T Rec. T.70 (minimum network layer functionality)
+- 00000011 - 0x03 ITU-T Rec. X.633 (network layer fast-byte protocol)
 
 - 00001000 - 0x08 Q.931, Q.932, Q.933, X.36, ISO/IEC 11572, ISO/IEC 11582
 - 00001001 - 0x09 Q.2931
@@ -100,9 +102,16 @@ ISO/TR 9577 (X.263) NLPIDs
 - 10000001 - 0x81 CLNL  (ISO/IEC 8473-1 | X.233) (active subset)
 - 10000010 - 0x82 ES-IS (ISO 9542)
 - 10000011 - 0x83 IS-IS (ISO/IEC 10589)
+- 10000100 - 0x84 X.25 SDCP  (ISO/IEC 8878 Annex A)
 - 10000101 - 0x85 IDRP  (ISO/IEC 10747) (Not used, 0x81 instead)
 - 10001010 - 0x8A SNARE (ISO/IEC 10030)
 - 10001011 - 0x8B X.273 (ISO/IEC 11577) (NLS)
+
+- 10110000 - 0xC0 FRF.9
+- 10110001 - 0xC1 FRF.12
+- 10110010 - 0xC2 FRF OA&M
+- 10110011 - 0xC3 FRF.priv
+
 - 10001110 - 0x8E IPv6  (RFC 2460)
 - 11001100 - 0xCC IPv4  (RFC 0791)
 - 11001111 - 0xCF PPP   (RFC 1548)
