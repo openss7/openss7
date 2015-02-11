@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) doc/man/man8/esq.8.man
+.\" @(#) doc/man/man8/isq.8.man
 .\"
 .\" =========================================================================
 .\"
@@ -100,25 +100,25 @@ search-ignore CGIQOSTU
 .\"
 .TH ESQ 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@"
 .SH NAME
-.B esq
-\- view reachable end-system addresses
+.B isq
+\- view reachable intermediate-system addresses
 .\"
 .\"
 .SH SYNOPSIS
 .PP
 .ad l
 .nh
-.HP \w'\fB\)esq\fP\ 'u
-\fB\)esq\fP [\fIoptions\fP]
+.HP \w'\fB\)isq\fP\ 'u
+\fB\)isq\fP [\fIoptions\fP]
 .PD 0
 .HP
-\fB\)esq\fP
+\fB\)isq\fP
 {\fB-h\fP|\fB--help\fP}
 .HP
-\fB\)esq\fP
+\fB\)isq\fP
 {\fB-V\fP|\fB--version\fP}
 .HP
-\fB\)esq\fP
+\fB\)isq\fP
 {\fB-C\fP|\fB--copying\fP}
 .PD
 .ad b
@@ -127,8 +127,8 @@ search-ignore CGIQOSTU
 .\"
 .SH DESCRIPTION
 .PP
-Display the NSAP and SNPA addresses of all end systems that have entries in
-the ES-IS CLNP routing table.
+Displays the network entity title and SNPA address of each intermediate
+system that has an entry in the CLNP routing table
 .\"
 .\"
 .SH OPTIONS
@@ -180,7 +180,7 @@ Specify or increase the output verbosity.  Sets the output verbosity to
 .\"
 .SH ARGUMENTS
 .PP
-.B esq
+.B isq
 does not accept non-option arguments.
 .\"
 .\"
@@ -193,8 +193,10 @@ does not accept non-option arguments.
 The following is an example of the command output:
 .PP
 .nf
-                NSAP address   SNPA address    Hold
-490004000600010207010061B101 0207010061B1FE     44
+        Network entity title   SNPA address   Hold
+490004000600010207010030A400 0207010030A4FE    61
+4900040006000100AA0002305900 00AA00023059FE    29
+490004000600010207010071B100 0207010071B1FE    58
 .fi
 .\"
 .\"
@@ -218,29 +220,22 @@ and diagnostic messages to
 .PP
 The following error messages can be generated:
 .TP
-.B esq: no End System table in this kernel
+.B isq: no Intermediate System table in this kernel
 The OSI transport service kernel modules are not installed.  Install the
 transport service kernel modules.
 .\"
 .\"
 .SH NOTICES
 .PP
-In addition to the NSAP and SNPA addresses, this utility also displays the
-\(lq\)hold\(rq\) time for each remote system.  This value indicates how many
-seconds the entry will be held before it is removed if the local system does
-not receive a hello packet from the remote system.  If the hold time is
-listed as zero (0), the entry was added statically and will never be
-automatically deleted.
+In addition to the network entity title and SNPA address, this utility also
+displays the \(lq\)hold\(rq\) time for each intermediate system.  This value
+indicates in how many seconds the entry will be removed if the local system
+does not receive a hello packet from the intermediate system.
 .PP
-If this command is executed from an end system (ES), it is likely to show only end
-systems that were entered statically with the
-.BR addnsap (8)
-utility, those that are being accessed currently, or those that have been
-accessed more recently than the hold period.
-.PP
-If this command is executed from an intermediate system (IS), it will show
-static entries and end systems that have recently transmitted
-\(le\)Hello\(rq\) protocol data units (PDUs).
+The maximum number of intermediate system entries the ES-IS CLNP routing
+table can hold is 8.
+(Note that this is not a limitation for
+.BR OpenSS7 \(tm.)
 .PP
 This command works only on systems that use ES-IS.
 .\"
@@ -255,7 +250,7 @@ This command works only on systems that use ES-IS.
 .\"
 .SH SEE ALSO
 .PP
-.BR isq (8),
+.BR esq (8),
 .BR addnsap (8),
 .BR delnsap (8),
 .BR osid (8).
@@ -263,13 +258,13 @@ This command works only on systems that use ES-IS.
 .\"
 .SH BUGS
 .PP
-.B esq
+.B isq
 has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.B esq
+.B isq
 is compatible with
 .IR "IRIS OSI"
 .[
@@ -302,7 +297,7 @@ documentation.
 .\"
 .SH HISTORY
 .PP
-.B esq
+.B isq
 first appeared in
 .IR "IRIS OSI" .
 .\"
