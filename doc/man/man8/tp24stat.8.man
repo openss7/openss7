@@ -1,0 +1,449 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) doc/man/man8/tp24stat.8.man
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH TP24STAT 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@"
+.SH NAME
+.B tp24stat
+\- display TP0/2/4 statistics concerning network operation
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.ad l
+.nh
+.HP \w'\fB\)tp24stat\fP\ 'u
+\fB\)tp24stat\fP [\fIoptions\fP]
+.PD 0
+.HP
+\fB\)tp24stat\fP
+{\fB-h\fP|\fB--help\fP}
+.HP
+\fB\)tp24stat\fP
+{\fB-V\fP|\fB--version\fP}
+.HP
+\fB\)tp24stat\fP
+{\fB-C\fP|\fB--copying\fP}
+.PD
+.ad b
+.hy 6
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+Reads and displays various statistics TP0/2/4 keeps concerning network
+operation.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.SS Command Options
+The following command options are mutually exclusive: only one command option
+should be present on the command line at a time.  The exceptions are the
+\fB-h\fP, \fB-V\fP and \fB-C\fP options that can be specified alone, or with
+any other option.
+When
+.B tp24stat
+is used without a command option, it displays statistics information and
+exits.
+.TP
+\fB-h\fP, \fB--help\fP
+When this option is encountered, display usage information to
+.IR stdout ,
+stop options procressing, and exit without taking further action.
+.TP
+\fB-V\fP, \fB--version\fP
+When this option is encountered, display version information to
+.IR stdout ,
+stop options procressing, and exit without taking further action.
+.TP
+\fB-C\fP, \fB--copying\fP
+When this option is encountered, display copying information to
+.IR stdout ,
+stop options procressing, and exit without taking further action.
+.\"
+.SS Common Options
+.PP
+The following common options can be specified together with a command option.
+It is not an error to specify options that are not necessary for the command
+option with which they are specified.
+.TP
+\fB-q\fP, \fB--quiet\fP
+Suppress normal output.  Only the return code of the command is of interest.
+This has the same effect as \fB--verbose=0\fP.
+Enables quiet mode.  Only error messages are displayed.
+.TP
+\fB-d\fP, \fB--debug\fP [\fIlevel\fP]
+Specify or increase the debugging verbosity.  Sets the debugging verbosity to
+\fIlevel\fP, when given, or simply increases the debuggin verbosity by one
+(1) when \fIlevel\fP is not given.  This option can be repeated.
+.TP
+\fB-v\fP, \fB--verbose\fP [\fIlevel\fP]
+Specify or increase the output verbosity.  Sets the output verbosity to
+\fIlevel\fP, when given, or simply increases the output verbosity by one when
+\fIlevel\fP is not given.  This option can be repeated.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+The
+.B tp24stat
+command takes no non-option arguments.
+.\"
+.\"
+.SH OUTPUT FORMAT
+.PP
+.TP
+.B Number of open and established connections
+The number of connections currently open and in the data transfer phase.
+.TP
+.B Total number of TPDU's transmitted
+The number of TPDUs send from this system.  This number includes
+retransmitted TPDUs.
+.TP
+.B Number of DT TPDU's transmitted
+The number of complete Data Transfer (DT) TPDUs this system has transmitted.
+This number does not include retransmitted TPDUs.
+.TP
+.B Number of DT TPDU's received
+The number of complete (DT) TPDUs this system has received.
+.TP
+.B Number of AK TPDU's transmitted
+The number of Acknowledge (AK) TPDUs this system has transmitted, including
+duplicate AK TPDUs.
+.TP
+.B Number of AK TPDU's received
+The number of Acknowledge (AK) TPDUs this system has received, including
+duplicates.
+.TP
+.B Number of ED TPDU's transmitted
+The number of Expedited Data (ED) TPDUs this system has transmitted.  This
+count does not include retransmitted ED TPDUs.
+.TP
+.B Number of ED TPDU's received
+The number of Expedited Data (ED) TPDUs this system has received.
+.TP
+.B Number of UD TPDU's transmitted
+The number of Unit Data (UD) TPDUs this system has transmitted.
+.TP
+.B Number of UD TPDU's received
+The number of Unit Data (UD) TPDUs this system has received.
+.TP
+.B Total number of TPDU's retransmitted
+The number of retransmitted Connection Request (CR), Connect Confirm (CC),
+Data Transfer (DT), Expedited Data (ED), and Disconnect Request (DR) TPDUs
+this system has retransmitted.
+.TP
+.B Number of DT TPDU's retransmitted
+The number of Data Transfer (DT) TPDUs this system has retransmitted.
+.TP
+.B Number of ED TPDU's retransmitted
+The number of Expedited Data (ED) TPDUs this system has retransmitted.
+.TP
+.B Number of received window closures
+The number of credit reductions in which the window is closed after the
+reduction.
+.TP
+.B Number of credit reductions
+The number of credit reductions in which the window remains open after the
+reduction.
+.TP
+.B Number of duplicate DT TPDU's received
+The number of duplicate Data Transfer (DT) TPDUs this system has received and
+discarded.
+.TP
+.B Number of duplicate ED TPDU's received
+The number of duplicate Expedited Data (ED) TPDUs this system has received
+and discarded.
+.TP
+.B Number of out of window DT TPDU's rcvd
+The number of times this system has received Data Transfer (DT) TPDU with a
+sequence number higher than the upper window edge.
+.TP
+.B Number of out of sequence AK TPDU's rcvd
+The number of times this system has received an out-of-sequence Acknowledge
+(AK) TPDU.  This counter does not include duplicate AK TPDUs.
+.TP
+.B Successfully established incoming connections
+The number of times this system has received a Connect Request (CR) TPDU that
+resulted in an established connection.
+.TP
+.B Successfully established outgoing connections
+The number of times this ssytem has transmitted a Connect Request (CR) TPDU
+that resulted in an established connection.
+.TP
+.B Number of rejected incoming connections
+The number of times this system has received a Connect Request (CR) TPDU that
+did not result in an established connection.
+.TP
+.B Number of rejected outgoing connections
+The number of times this system has transmitted a Connect Request (CR) TPDU
+that did not result in an established connection.
+.TP
+.B Number of user rejected incoming connections
+The number of times a TSU of this system has rejected an incoming connection.
+.TP
+.B Incoming CR TPDU's rejected due to configuration
+The number of times this system has received a Connect Request (CR) TPDU, and
+responded to it with a Disconnect Request (DR) TPDU.  This counter is
+incremented when the transport reason code returned is 2, 3, 130, 131, 132,
+135 or 136.
+.TP
+.B Outgoing CR TPDU's rejected due to configuration
+The number of times the system has received a Disconnect Request (DR) TPDU in
+response to a Connection Request (CR) TPDU it transmitted.  This counter s
+incremented when the transport reason code s 2, 3, 130, 131, 132, 135 or 136.
+The most likely cause of this error is that no TSU is bound to the address
+received in the Connect Request (CR) TPDU.
+.TP
+.B Incoming CR TPDU's rejected due to protocol error
+The number of times the system received a Disconnect Request (DR) or Error
+Report (ER) TPDU in response to a Connect Request (CR) TPDU.  This counter is
+incremented when the transport reason code returned is 0, 133 or 138.
+.TP
+.B Number of TPDU transmission timeouts
+The number of instances in which the system has retransmitted a TPDU the maximum
+number of times without receiving any response.
+.TP
+.B Number of inactivity timeouts
+The number of times a transport state machine in the system has timed out
+because no TPDUs were received on the connection.
+.TP
+.B Number of received TPDUs causing a protocol error
+The number of TPDUs the system receives that contain a protocol error and
+cause the transport protocol to transmit a Disconnect Request (DR) TPDU.
+This TPDU will contain the tansport reason code 133.
+.TP
+.B Number of DR or ER TPDU received indicating a protocol error
+The number of times the system has received a Disconnect Request (DR) or
+Error Request (ER) TPDU indicating that a TPDU that the system transmitted
+previously (other than a CR TPDU) contained a protocol error.
+.TP
+.B Number of TPDU's with invalid checksum
+The number of times the system discarded a TPDU because the checksum
+indicated that the TPDU was bad.
+.TP
+.B Number of received TPDU's ignored (bad header)
+The number of times the system received a TPDU with an incorrect header.
+.TP
+.B Number of received and ignored UD TPDUs
+The number of times the system received a Unit Data (UD) TPDU and discarded
+it for any reason.
+.TP
+.B Number of incoming network connects with invalid protocol ID
+The number of times that a packet is received by Transport and the CALL user
+data field (protocol identification) does not include either ISO 8073 or ISO
+8602.
+.TP
+.B Number of network layer reset indications
+The number of times the network layer was reset.
+.TP
+.B Number of transport TS1/TS2 timeouts
+The number of timeouts following transmission of a CR TPDU or a DR TPDU.
+.TP
+.B Number of network layer abnormal disconnects
+The number of network layer disconnects (received by Transport) that cause an
+abnormal transport layer disconnect.
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero (0) indicates that the command was successful; one (1)
+indicates that an error occured and a diagnostic message is printed to
+.IR stderr ;
+two (2) indicates the the option or argument syntax was in error and a
+diagnostic message is printed to
+.IR stderr .
+.PP
+The
+.B --quiet
+option suppresses the printing of normal output to
+.I stdout
+and diagnostic messages to
+.IR stderr .
+.\"
+.SS Error Messages
+.PP
+The following error messages can be issued:
+.TP
+.B could not open device
+The TP0/2/4 driver has not been installed or the
+.BR osid (8)
+daemon is not running.
+Make sure that the protocol stack has been initialized.  Stop and start the
+OSI Transport Service (see
+.BR osinetwork (8)).
+If the stack cannot be started because of missing drivers, then reinstall the
+software.
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.\".SH FILES
+.\".PP
+.\"
+.\"
+.\".SH DEVICES
+.\".PP
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR osid (8),
+.BR osinetwork (8),
+.BR tp24config (8).
+.\"
+.\"
+.SH BUGS
+.PP
+.B tp24stat
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B tp24stat
+is compatible with
+.IR "IRIS OSI"
+.[
+irixosi
+.]
+with the following compatability considerations:
+.IP \(em \w'\(em\(em'u
+Options \fB-q\fP, \fB-v\fP, \fB-h\fP, \fB-V\fP, \fB-C\fP, and all long
+options, are specific to this
+.B @PACKAGE_TITLE@
+implementation of
+.B strxt
+and should not be used by portable command scripts.
+.IP \(em
+No other implementation documents the \fB-q\fP, \fB-v\fP, \fB-h\fP, \fB-V\fP
+and \fB-C\fP options.  They should not be used by portable command scripts.
+.IP \(em
+Options \fB--help\fP and \fB--version\fP are provided for compatibility with
+GNU coding standards; \fB--copying\fP, OpenSS7 coding standards.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "IRIS OSI"
+.[
+irixosi
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B tp24stat
+first appeared in
+.IR "IRIS OSI" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
