@@ -151,11 +151,16 @@ as well as X.25/LLC2 as described in ISO/IEC 8881.
 .[
 ISO/IEC 8881
 .]
-This approach can utilize a SNARE for both address and route determination
-using configuration information or redirection information per ISO/IEC 10030.
+This approach can utilize a SNARE
 .[
 ISO/IEC 10030
 .]
+or ARE
+.[
+x116
+.]
+for both address and route determination
+using configuration information or redirection information.
 .IP 2.
 Another way is providing CONS over X.25, but providing X.25 using an X.25
 over TCP protocol such as

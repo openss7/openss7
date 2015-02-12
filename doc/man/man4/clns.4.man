@@ -543,7 +543,23 @@ iso9542
 .]
 For each interface, the following information applies:
 .IP \(bu \w'\(bu\(em'u
-Whether the Network systems is acting as an End System, an Intermediate System, a SNARE, or
+Whether the Network systems is acting as an End System,
+.[
+iso9542
+.]
+an Intermediate System,
+.[
+iso10589
+.]
+a SNARE,
+.[
+iso10030
+.]
+or ARE,
+.[
+x116
+.]
+or
 combinations of these.
 .IP \(bu
 Whether the Network system is supporting Configuration Information, Route Redirection Information,
