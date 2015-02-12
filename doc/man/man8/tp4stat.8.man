@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) doc/man/man8/tp24stat.8.man
+.\" @(#) doc/man/man8/tp4stat.8.man
 .\"
 .\" =========================================================================
 .\"
@@ -98,27 +98,27 @@ search-ignore CGIQOSTU
 .so openss7.macros
 .\"
 .\"
-.TH TP24STAT 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@"
+.TH TP4STAT 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@"
 .SH NAME
-.B tp24stat
-\- display TP0/2/4 statistics concerning network operation
+.B tp4stat
+\- read TP4 network management statistics
 .\"
 .\"
 .SH SYNOPSIS
 .PP
 .ad l
 .nh
-.HP \w'\fB\)tp24stat\fP\ 'u
-\fB\)tp24stat\fP [\fIoptions\fP]
+.HP \w'\fB\)tp4stat\fP\ 'u
+\fB\)tp4stat\fP [\fIoptions\fP]
 .PD 0
 .HP
-\fB\)tp24stat\fP
+\fB\)tp4stat\fP
 {\fB-h\fP|\fB--help\fP}
 .HP
-\fB\)tp24stat\fP
+\fB\)tp4stat\fP
 {\fB-V\fP|\fB--version\fP}
 .HP
-\fB\)tp24stat\fP
+\fB\)tp4stat\fP
 {\fB-C\fP|\fB--copying\fP}
 .PD
 .ad b
@@ -127,8 +127,14 @@ search-ignore CGIQOSTU
 .\"
 .SH DESCRIPTION
 .PP
-Reads and displays various statistics TP0/2/4 keeps concerning network
-operation.
+Read the various statistics TP4 keeps concerning network operation.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+The
+.B tp24stat
+command takes no non-option arguments.
 .\"
 .\"
 .SH OPTIONS
@@ -139,7 +145,7 @@ should be present on the command line at a time.  The exceptions are the
 \fB-h\fP, \fB-V\fP and \fB-C\fP options that can be specified alone, or with
 any other option.
 When
-.B tp24stat
+.B tp4stat
 is used without a command option, it displays statistics information and
 exits.
 .TP
@@ -180,40 +186,37 @@ Specify or increase the output verbosity.  Sets the output verbosity to
 \fIlevel\fP is not given.  This option can be repeated.
 .\"
 .\"
-.SH ARGUMENTS
-.PP
-The
-.B tp24stat
-command takes no non-option arguments.
-.\"
-.\"
 .SH OUTPUT FORMAT
 .PP
 .TP
 .B Number of open and established connections
-The number of connections currently open and in the data transfer phase.
+The number of connections currently open and in the data transfer phase at
+this system.
 .TP
 .B Total number of TPDU's transmitted
-The number of TPDUs send from this system.  This number includes
+The total number of TPDUs sent from this system.  This number includes
 retransmitted TPDUs.
+.TP
+.B Total number of TPDU's received
+The number of correctly formatted TPDUs this system has received.
 .TP
 .B Number of DT TPDU's transmitted
 The number of complete Data Transfer (DT) TPDUs this system has transmitted.
 This number does not include retransmitted TPDUs.
 .TP
 .B Number of DT TPDU's received
-The number of complete (DT) TPDUs this system has received.
+The number of complete Data Transfer (DT) TPDUs this system has received.
 .TP
 .B Number of AK TPDU's transmitted
 The number of Acknowledge (AK) TPDUs this system has transmitted, including
-duplicate AK TPDUs.
+duplicated AK TPDUs.
 .TP
 .B Number of AK TPDU's received
 The number of Acknowledge (AK) TPDUs this system has received, including
 duplicates.
 .TP
 .B Number of ED TPDU's transmitted
-The number of Expedited Data (ED) TPDUs this system has transmitted.  This
+The number of Expedite Data (ED) TPDUs this system has transmitted.  This
 count does not include retransmitted ED TPDUs.
 .TP
 .B Number of ED TPDU's received
@@ -226,9 +229,9 @@ The number of Unit Data (UD) TPDUs this system has transmitted.
 The number of Unit Data (UD) TPDUs this system has received.
 .TP
 .B Total number of TPDU's retransmitted
-The number of retransmitted Connection Request (CR), Connect Confirm (CC),
-Data Transfer (DT), Expedited Data (ED), and Disconnect Request (DR) TPDUs
-this system has retransmitted.
+The number of retransmitted Connect Request (CR), Connect Confirm (CC), Data
+Transfer (DT), Expedite Data (ED), and Disconnect Request (DR) TPDUs this
+system has retransmitted.
 .TP
 .B Number of DT TPDU's retransmitted
 The number of Data Transfer (DT) TPDUs this system has retransmitted.
@@ -236,7 +239,7 @@ The number of Data Transfer (DT) TPDUs this system has retransmitted.
 .B Number of ED TPDU's retransmitted
 The number of Expedited Data (ED) TPDUs this system has retransmitted.
 .TP
-.B Number of received window closures
+.B Number of receive window closures
 The number of credit reductions in which the window is closed after the
 reduction.
 .TP
@@ -249,11 +252,11 @@ The number of duplicate Data Transfer (DT) TPDUs this system has received and
 discarded.
 .TP
 .B Number of duplicate ED TPDU's received
-The number of duplicate Expedited Data (ED) TPDUs this system has received
-and discarded.
+The number of duplicate Expedite Data (ED) TPDUs this system has received and
+discarded.
 .TP
-.B Number of out of window DT TPDU's rcvd
-The number of times this system has received Data Transfer (DT) TPDU with a
+.B Number of out of window DT TPDU's received
+The number of times this system has received a Data Transfer (DT) TPDU with a
 sequence number higher than the upper window edge.
 .TP
 .B Number of out of sequence AK TPDU's rcvd
@@ -266,9 +269,9 @@ resulted in an established connection.
 .TP
 .B Successfully established outgoing connections
 The number of times this system has transmitted a Connect Request (CR) TPDU
-that resulted in an established connection.
+that result in an established connection.
 .TP
-.B Number of rejected incoming connections
+.B Number of rejected incoming connnections
 The number of times this system has received a Connect Request (CR) TPDU that
 did not result in an established connection.
 .TP
@@ -330,21 +333,6 @@ The number of times the system received a TPDU with an incorrect header.
 .B Number of received and ignored UD TPDUs
 The number of times the system received a Unit Data (UD) TPDU and discarded
 it for any reason.
-.TP
-.B Number of incoming network connects with invalid protocol ID
-The number of times that a packet is received by Transport and the CALL user
-data field (protocol identification) does not include either ISO 8073 or ISO
-8602.
-.TP
-.B Number of network layer reset indications
-The number of times the network layer was reset.
-.TP
-.B Number of transport TS1/TS2 timeouts
-The number of timeouts following transmission of a CR TPDU or a DR TPDU.
-.TP
-.B Number of network layer abnormal disconnects
-The number of network layer disconnects (received by Transport) that cause an
-abnormal transport layer disconnect.
 .\"
 .\"
 .\".SH EXAMPLES
@@ -371,15 +359,8 @@ and diagnostic messages to
 .PP
 The following error messages can be issued:
 .TP
-.B could not open device
-The TP0/2/4 driver has not been installed or the
-.BR osid (8)
-daemon is not running.
-Make sure that the protocol stack has been initialized.  Stop and start the
-OSI Transport Service (see
-.BR osinetwork (8)).
-If the stack cannot be started because of missing drivers, then reinstall the
-software.
+.B could not open \fIdevice\fP
+The TP4/CLNP driver has not been installed.  Install it.
 .\"
 .\"
 .\".SH NOTICES
@@ -398,18 +379,18 @@ software.
 .PP
 .BR osid (8),
 .BR osinetwork (8),
-.BR tp24config (8).
+.BR tp4config (8).
 .\"
 .\"
 .SH BUGS
 .PP
-.B tp24stat
+.B tp4stat
 has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.B tp24stat
+.B tp4stat
 is compatible with
 .IR "IRIS OSI"
 .[
@@ -442,7 +423,7 @@ documentation.
 .\"
 .SH HISTORY
 .PP
-.B tp24stat
+.B tp4stat
 first appeared in
 .IR "IRIS OSI" .
 .\"

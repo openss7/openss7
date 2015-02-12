@@ -167,7 +167,7 @@ Note also that all times are specified in milliseconds.
 .TP
 \fB--inactivity\fP \fItime\fP
 (Class 4 only.)
-Inactivity time; the amout of time that TP4 CLNS maintains a transport
+Inactivity time; the amount of time that TP4 CLNS maintains a transport
 connection without any data transmission before it terminates the connection.
 If this argument is not specified, it defaults to 960,000 (960 seconds; 16
 minutes).
