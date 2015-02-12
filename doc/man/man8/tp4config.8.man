@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) doc/man/man8/tp24config.8.man
+.\" @(#) doc/man/man8/tp4config.8.man
 .\"
 .\" =========================================================================
 .\"
@@ -98,27 +98,27 @@ search-ignore CGIQOSTU
 .so openss7.macros
 .\"
 .\"
-.TH TP24CONFIG 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@"
+.TH TP4CONFIG 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@"
 .SH NAME
-.B tp24config
-\- configure TP0/2/4 parameters
+.B tp4config
+\- configure TP4 parameters
 .\"
 .\"
 .SH SYNOPSIS
 .PP
 .ad l
 .nh
-.HP \w'\fB\)tp24config\fP\ 'u
-\fB\)tp24config\fP [\fIoptions\fP]
+.HP \w'\fB\)tp4config\fP\ 'u
+\fB\)tp4config\fP [\fIoptions\fP]
 .PD 0
 .HP
-\fB\)tp24config\fP
+\fB\)tp4config\fP
 {\fB-h\fP|\fB--help\fP}
 .HP
-\fB\)tp24config\fP
+\fB\)tp4config\fP
 {\fB-V\fP|\fB--version\fP}
 .HP
-\fB\)tp24config\fP
+\fB\)tp4config\fP
 {\fB-C\fP|\fB--copying\fP}
 .PD
 .ad b
@@ -127,7 +127,12 @@ search-ignore CGIQOSTU
 .\"
 .SH DESCRIPTION
 .PP
-Sets the value for the specified TP0/2/4 configuration parameters.
+Sets the value for the specified TP4
+.[
+iso8073
+.]
+configuration parameters, then displays all parameter values.  Note that all
+times are specified in milliseconds.
 .\"
 .\"
 .SH OPTIONS
@@ -138,7 +143,7 @@ should be present on the command line at a time.  The exceptions are the
 \fB-h\fP, \fB-V\fP and \fB-C\fP options that can be specified alone, or with
 any other option.
 If no command option is supplied,
-.B tp24config
+.B tp4config
 displays all parameter values.
 .TP
 \fB-h\fP, \fB--help\fP
@@ -166,133 +171,97 @@ compatibility.
 Note also that all times are specified in milliseconds.
 .TP
 \fB--inactivity\fP \fItime\fP
-(Class 4 only.)
-Inactivity time; the amout of time that TP4 CLNS maintains a transport
+Inactivity time; the amount of time that TP4 maintains a transport
 connection without any data transmission before it terminates the connection.
-If this argument is not specified, it defaults to 960,000 (960 seconds; 16
-minutes).
+If this option is not specified, it defaults to the value derived from the
+product of the current retransmit count (\fB--n\fP option) and the window
+size (\fB--window\fP option).
 .TP
 \fB--retransmit\fP \fItime\fP
-(Class 4 only.)
-The amount of time that TP4 CLNS waits without receiving an acknowledgment of
-a TPDU it sent before it retransmits the TPDU.  (The maximum number of times
-the same TPDU can be transmitted can be specified with the \fB-n\fP option.)
-TP4 CLNS automatically adjusts the value of this parameter individually for
-each connection based on the performance of the network.  If this option is
-not specified, it defaults to 30,000 (30 seconds).
+The amount of time that TP4 initially waits without receiving an
+acknowledgement of a TPDU it sent before it retransmits the TPDU.  (The
+maximum number of times the same TPDU can be transmitted can be specified
+with the \fB--n\fP option.)  TP4 automatically adjusts the value of this
+parameter individually for each connection based on the performance of the
+network.  If this option is not specified, it defaults to 2000 (2 seconds).
+.TP
+\fB--upper\fP \fItime\fP
+The upper bound on the retransmit timer; the largest value to which TP4 can
+set the retransmit time.  If this option is not specified, it defaults to
+10000 (10 seconds).
+.TP
+\fB--lower\fP \fItime\fP
+The lower bound on the retransmit timer; the smallest value to which TP4 can
+set the retransmit time.  If this argument is not specified, it defaults to
+10 (10 milliseconds).
 .TP
 \fB--window\fP \fItime\fP
-(Class 4 only.)
-Window timer value; the period of inactivity that can occur before TP4 CLNS
-sends an \(lq\)Ack\(rq\) packet to the peer entity with which a connection is
-established.  If this option is not specified, its value defaults to 120,000
-(120 seconds).
+The period of inactivity that can occur before TP4 sends the hello packet to
+the peer entity with which a connection is established.  If you do not
+include this option, its value defaults to 20000 (20 seconds).
 .TP
 \fB--ack\fP \fItime\fP
-(Class 4 only.)
-Local acknowledgment delay; the maximum amount of time TP4 CLNS can delay
-acknowledgement of a TPDU it receives.  If this argument is not specified,
-its value defaults to 512 (0.512 seconds).
+The local acknowledgement delay; the maximum amount of time TP4 can delay
+acknowledgement of a TPDU it receives.  If you do not include this option,
+its value defaults to 100 (0.1 seconds).
 .TP
 \fB--flow\fP \fItime\fP
-If TP0/2/4 has no receive credit available, it checks the available resources
-every \fItime\fP milliseconds until credit becomes available.  If this option
-is not specified, its value defaults to 208 (0.208 seconds).
+If TP4 has no receive credit available, it checks the available resources
+every \fItime\fP milliseconds until credit becomes available.  If you do not
+include this option, its value defaults to 100 (0.1 seconds).
 .TP
 \fB--n\fP \fIiterations\fP
-(Class 4 only.)
-Maximum number of times a TPDU can be sent without being acknowledged.  If
-this argument is not specified, its value defaults to 4.
+The maximum number of times a TPDU can be sent without being acknowledged.
+If you do not include this option, its value defaults to 9.
 .TP
 \fB--credit\fP \fIvalue\fP
-(Classes 2 and 4 only.)
-Maximum value to which TP2 or TP4 can adjust the window size; that is, the
+The maximum value to which TP4 can adjust the window size; that is, the
 number of unacknowledged TPDUs that can be outstanding on a connection.  If
-this option is not specified, its value defaults to 4.
+you do not include this option, its value defaults to 4.
 .TP
 \fB--initial\fP \fIvalue\fP
-(Class 4 only.)
-The initial window size when the connection is first established.  TP4 CLNS
-will adjust this value up to the maximum automatically.  If this argument is
-not specified, its value defaults to 1.
+The initial window size when the connection is first established.  TP4 will
+adjust this value up to the maximum automatically.  If you do not include
+this option, its value defaults to 1.
 .TP
 \fB--maxtpdu\fP \fIvalue\fP
-Maximum size of a TPDU.  It is recommended that you select one of the
-following values: 128, 256, 512 or 1024 bytes.  If this option is not
-specified, its value defaults to 1024.  If you change the default, it is
-important that you ensure there are sufficient STREAMS buffers of the
-appropriate size.  Use the
+The maximum size of a TPDU.  It is recommended that you select one of the
+following values: 128, 256, 512, 1024 or 2048 octets.  If you do not include
+this option, its value defaults to 1024.  If you change the default, it is
+important that you ensure that there are sufficient
+.BR STREAMS (9)
+buffers of the appropriate size.  Use the
 .BR strstat (8)
 utility to determine the number of buffers available in the size you specify,
-and increase this number if necessary using the procedures outlined for
-installation.  If this option is not specified, its value defaults to 512. 
-.TP
-\fB--maxtidu\fP \fIvalue\fP
-Maximum number of bytes of the data units passed between the XTI/TLI library,
-.BR xti (3),
-and the TP0/2/4 STREAMS driver.  If this is larger than the TPDU size, the
-STREAMS driver will fragment the message into TPDU-size packets before
-sending it to Transport.  If this option is not specified, its value defaults
-to 504.
+and increase this number if necessary.
+
+.B Note:
+.B @PACKAGE@
+does not limit buffer pools of various sizes, so the foregoing is not
+applicable to
+.BR "@PACKAGE@" .
 .TP
 \fB--checksum\fP \fIflag\fP
-(Class 4 only.)
-If \fIflag\fP is a nonzero value, the TPDU checksum features is enabled; if
-zero, it is disabled.  Enabling this feature slows down TP4 CLNS operation
-significantly.  If this option is not specified, its value defaults to 0
+If \fIflag\fP is a nonzero value, the TPDU checksum feature is enabled; if
+zero, it is disabled.  Enabling this feature slows down TP4 operation
+significantly.  If you do not include this option, its value defaults to zero
 (disabled).
 .TP
-\fB--extended\fP \fIflag\fP
-(Class 4 only.)
-If \fIflag\fP is a nonzero value, transport proposes to use extended TPDU
-sequencing when it initiates a connect request (CR) TPDU; if zero, transport
-proposes normal sequencing.  If this option is not specified, its value
-defaults to 1 (enabled).
-.TP
 \fB--propose\fP \fIflag\fP
-(Class 4 only.)
-If \fIflag\fP is a nonzero value, transport proposes to use extended TPDU
-sequencing when it initiates a connect request (CR) TPDU; if zero, transport
-proposes normal sequencing.  If this option is not specified, its value
-defaults to 1 (enabled).
+If \fIflag\fP is a nonzero value, TP4 proposes to use extended TPDU
+sequencing when it initiates a connect request (CR) TPDU; if zero, TP4
+proposes normal sequencing.  If you do not include this option, its value
+defaults to one (enabled).
 .TP
-\fB--transaction\fP \fItime\fP
-The number of millisecons that a network connection is held open waiting for
-an ISO 8602 UD TPDU.  (ISO 8602 connectionless transport protocol only.)  If
-this option is not specified, its value defaults to 60,000 (60 seconds).
-.TP
-\fB--ts1\fP \fItime\fP
-(Classes 0 and 2 only.)
-The maximum amount of time that transport will wait for a response after CR
-TPDU has been transmitted.  If this option is not specified, its value
-defaults to 60,000 (60 seconds).
-.TP
-\fB--ts2\fP \fItime\fP
-(Classes 0 and 2 only.)
-The maximum amount of time that transport will wait for a response after a DR
-TPDU has been transmitted.  If this option is not specified, its value
-defaults to 30,000 (30 seconds).
-.TP
-\fB--delay\fP \fItime\fP
-The time delay before disconnecting the network connection.  The purpose of
-this small delay is to avoid loss of data during network layer disconnection.
-If this option is not specified, its value defaults to 1000 (1 second).
-.TP
-\fB--idle\fP \fItime\fP
-The maximum time that an idle network connection will be left open.  If this
-argument is not specified, its value defaults to 300,000 (300 seconds).
-.TP
-\fB--useflow\fP \fIflag\fP
-If \fIflag\fP is a zero value, transport attempts to negotiate non-use of
-explicit flow control.  If you do not include this option, its value defaults
-to 1 (forces Class 2 to use explicit flow control).
-.TP
-\fB--ccitt\fP \fIflag\fP
-If \fIflag\fP is a nonzero value, the transport protocol follows CCITT
-conformance rules in regard to the classes proposed in CR TPDUs.  If either
-Class 2 or 4 is requested by the user, Class 0 is proposed as an alternate
-class.  If \fIflag\fP is zero, no alternate Class parameter is transmitted in
-a CR TPDU.
+\fB--decca\fP \fIflag\fP
+If \fIflag\fP is a nonzero value, the DEC congestion avoidance flag is
+enabled; if zero, the flag is disabled.  If you do not include this option,
+its value defaults to zero (disabled).
+
+Keep in mind that the DEC congestion avoidance algorithm is effective only if
+all end and intermediate systems in a network use it.  Refer to the National
+Institute of Standards and Technology (NIST) Special Publication 500-162 for
+details on this algorithm.
 .TP
 \fB-q\fP, \fB--quiet\fP
 Suppress normal output.  Only the return code of the command is of interest.
@@ -313,7 +282,7 @@ Specify or increase the output verbosity.  Sets the output verbosity to
 .SH ARGUMENTS
 .PP
 The
-.B tp24config
+.B tp4config
 command takes no non-option arguments.
 .\"
 .\"
@@ -326,29 +295,23 @@ command takes no non-option arguments.
 The following is an example output when no command options are specified.
 .PP
 .nf
- NOTE: All timer values specified in number of milliseconds
-Reference timer value (class 4 only):                 400000
-Inactivity timer value (class 4 only):                960000
-Retransmit timer value (class 4 only):                 30000
-Window timer value (class 4 only):                    120000
-Local acknowledgement delay (class 4 only):              512
-Local flow control interval (all classes):               208
-Max number of retransmissions (class 4 only):              4
-Target window size (class 2 and 4):                        4
-Initial window size (class 4 only):                        1
-Maximum TPDU size (all classes):                         512
-Maximum TIDU size (all classes):                         504
-Checksum enable (class 4 only):                            0
-Prefer use of extended sequence numbers (class 2 and 4):   1
-Propose use of extended sequence numbers (class 2 and 4):  1
-Disconnect timer value (CLTS only):                   120000
-Optional TS1 timer (class 0/2):                        60000
-Optional TS2 timer (class 2):                          60000
-Disconnection timer value (class 2 and 4):              2000
-Incoming network connection idle timer:               300000
-Use of explicit flow control (class 2 only):               1
-CCITT 1988 X.224 alternate class 0 enable (class 2 and 4): 1
-Max number of transport connections (read/only):          48
+Inactivity time:                              400000
+Initial retransmit timer:                       2000
+Upper bound on retransmit timer:               25000
+Lower bound on retransmit timer:                  50
+Window timer value:                            20000
+Local acknowledgment delay:                      100
+Local flow control interval:                      10
+Max number of transmissions:                      10
+Target window size:                                4
+Initial window size:                               1
+Maximum TPDU size:                              1024
+Maximum TIDU size:                              1016
+Checksum enable:                                   0
+Prefer use of extended sequence numbers:           1
+Propose use of extended sequence numbers:          1
+DEC Congestion avoidance enable:                   0
+Max number of transport connections (read/only):  32
 .fi
 .\"
 .\"
@@ -373,18 +336,11 @@ and diagnostic messages to
 The following error messages can be issued:
 .TP
 .B could not open \fIdevice\fP
-The TP0/2/4 driver has not been installed or the
-.BR osid (8)
-daemon is not running.
-Make sure that the protocol stack has been initialized.  Stop and start the
-OSI Transport Service (see
-.BR osinetwork (8)).
-If the stack cannot be started because of missing drivers, then reinstall the
-software.
+The TP4/CLNP driver has not been installed.  Install it.
 .TP
-tp24config: unknown parameter \fIp\fP
-You specified an option on the command line that was not recognized.  Check
-the list of options and reenter the command line.
+.B tp4config: unknown parameter \fIp\fP
+An unrecognized option was specified on the command line.  Check the list of
+options and reenter the command line.
 .\"
 .\"
 .\".SH NOTICES
@@ -403,18 +359,18 @@ the list of options and reenter the command line.
 .PP
 .BR osid (8),
 .BR osinetwork (8),
-.BR tp24stat (8).
+.BR tp4stat (8).
 .\"
 .\"
 .SH BUGS
 .PP
-.B tp24config
+.B tp4config
 has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.B tp24config
+.B tp4config
 is compatible with
 .IR "IRIS OSI"
 .[
@@ -447,7 +403,7 @@ documentation.
 .\"
 .SH HISTORY
 .PP
-.B tp24config
+.B tp4config
 first appeared in
 .IR "IRIS OSI" .
 .\"
