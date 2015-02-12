@@ -6,7 +6,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -269,7 +269,7 @@ parameter.  Appropriate error codes are as follows:
 .RB [ MSYSERR ]
 A
 .B Linux\(rg
-system error occured and the
+system error occurred and the
 .IR errno (3)
 is contained in the
 .I mtp_unix_error

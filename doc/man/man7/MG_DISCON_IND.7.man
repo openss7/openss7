@@ -6,7 +6,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -148,15 +148,15 @@ the following flags:
 .RS
 .TP
 .B MGF_IC_DIR
-disconnection has occured in the incoming (to the termination point)
+disconnection has occurred in the incoming (to the termination point)
 direction.
 .TP
 .B MGF_OG_DIR
-disconnection has occured in the outgoing (from the termination point)
+disconnection has occurred in the outgoing (from the termination point)
 direction.
 .TP
 .B MGF_BOTH_DIR
-disconnection has occured in both directions.  This flag is a bitwise OR of
+disconnection has occurred in both directions.  This flag is a bitwise OR of
 the
 .BR MGF_IC_DIR " and " MGF_OG_DIR
 flags.

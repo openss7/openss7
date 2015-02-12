@@ -6,7 +6,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -326,7 +326,7 @@ Contains the primitive
 .BR SL_LINK_CONGESTED_IND (7).
 .TP
 .I sl_timestamp
-Contains the timestamp (system time) that this event occured for the purpose
+Contains the timestamp (system time) that this event occurred for the purpose
 of event reporting.
 .TP
 .I sl_cong_level
@@ -356,7 +356,7 @@ Contains the primitive
 .BR SL_LINK_CONGESTION_CEASED_IND (7).
 .TP
 .I sl_timestamp
-Contains the timestamp (system time) that this event occured for the purpose
+Contains the timestamp (system time) that this event occurred for the purpose
 of event reporting.
 .TP
 .I sl_cong_level
@@ -423,7 +423,7 @@ Contains the primitive
 .BR SL_IN_SERVICE_IND (7).
 .TP
 .I sl_timestamp
-Contains the timestamp (system time) that this event occured for the purpose
+Contains the timestamp (system time) that this event occurred for the purpose
 of event reporting.
 .TP
 .I sl_reason
@@ -469,7 +469,7 @@ Contains the primitive
 .BR SL_REMOTE_PROCESSOR_OUTAGE_IND (7).
 .TP
 .I sl_timestamp
-Contains the timestamp (system time) that this event occured for the purpose
+Contains the timestamp (system time) that this event occurred for the purpose
 of event reporting.
 .RE
 .TP
@@ -492,7 +492,7 @@ Contains the primitive
 .BR SL_REMOTE_PROCESSOR_RECOVERED_IND (7).
 .TP
 .I sl_timestamp
-Contains the timestamp (system time) that this event occured for the purpose
+Contains the timestamp (system time) that this event occurred for the purpose
 of event reporting.
 .RE
 .TP

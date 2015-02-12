@@ -6,7 +6,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -254,7 +254,7 @@ or
 system call failed.
 .TP
 .RB [ DLPIAPI_EINTR ]
-an interrupt occured before the command could complete.
+an interrupt occurred before the command could complete.
 .TP
 .RB [ DLPIAPI_EAGAIN ]
 a non-blocking attempt on an empty or flow controlled DLPI Stream would have
@@ -288,7 +288,7 @@ automatic initialization of the PPA failed.
 the PPA had not been initialized prior to this request.
 .TP
 .RB [ DL_SYSERR ]
-a \fBLinux\fP system error has occured and the \fBLinux\fP system error is
+a \fBLinux\fP system error has occurred and the \fBLinux\fP system error is
 indicated in the
 .IR errno (3)
 global variable.

@@ -6,7 +6,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -363,7 +363,7 @@ message with the error number(s) set to
 should not be used to return an error to an
 .BR ioctl (2s)
 system call.
-Unless a fatal error has truly occured, an
+Unless a fatal error has truly occurred, an
 .BR M_IOCNAK (9)
 message should be used instead.
 .IP \(bu

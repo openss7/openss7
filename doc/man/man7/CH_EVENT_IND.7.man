@@ -6,7 +6,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -122,7 +122,7 @@ typedef struct CH_event_ind {
 \s+1\fR
 .fi
 .SH DESCRIPTION
-Indicates that an event has occured associated with the attached and enabled
+Indicates that an event has occurred associated with the attached and enabled
 channel.
 .SH PARAMETERS
 This primitive contains the following parameters:
@@ -138,7 +138,7 @@ See
 below.
 .TP
 .I ch_slot
-indicates the slot of a multiple slot channel upon which the event occured.
+indicates the slot of a multiple slot channel upon which the event occurred.
 For non-multiple slot channels, this field is coded zero (0) by the channel
 service provider and may be ignored by the channel service user.
 .SH FLAGS
@@ -167,13 +167,13 @@ indicates that the CTS (Clear to Send) lead has been asserted or deasserted.
 indicates that the RI (Ring Indicator) lead has been asserted or deassrted.
 .TP
 .B CH_EVT_YEL_ALARM
-indicates that a Yellow alarm has occured on the group containing the channel.
+indicates that a Yellow alarm has occurred on the group containing the channel.
 .TP
 .B CH_EVT_BLU_ALARM
-indicates that a Blue alarm has occured on the group contianing the channel.
+indicates that a Blue alarm has occurred on the group contianing the channel.
 .TP
 .B CH_EVT_RED_ALARM
-indicates that a Red alarm has occured on the group contianing the channel.
+indicates that a Red alarm has occurred on the group contianing the channel.
 .TP
 .B CH_EVT_NO_ALARM
 indicates that all previously indicated alarms have cleared.

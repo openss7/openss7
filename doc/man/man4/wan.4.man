@@ -6,7 +6,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -535,13 +535,14 @@ structure contains the following members:
 The count of the number of frames transmitted without error.
 .TP
 .I hc_txurun
-The count of the number of frames transmitted for which tranmitter underruns occured.
+The count of the number of frames transmitted for which tranmitter underruns occurred.
 .TP
 .I hc_rxgood
 The count of the number of frames received without error.
 .TP
 .I hc_rxorun
-The count of the number of frames received for which receiver overruns occured.
+The count of the number of frames received for which receiver overruns
+occurred.
 .TP
 .I hc_rxcrc
 The count of the number of frames received that contained CRC or Framing errors.

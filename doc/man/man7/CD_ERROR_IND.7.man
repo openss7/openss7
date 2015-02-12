@@ -6,7 +6,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -124,7 +124,7 @@ typedef struct {
 .fi
 .SH DESCRIPTION
 This provider originated primitives indicates that an asynchronous error has
-occured and indicates the error number and new state of the CD provider.
+occurred and indicates the error number and new state of the CD provider.
 .SS Parameters
 This primitive contains the following parameters:
 .TP

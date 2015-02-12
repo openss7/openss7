@@ -6,7 +6,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -504,7 +504,7 @@ Failed during Recovery from a DLPI opertion failure.
 A DLPI error occurs:
 .TP \w'[\fBDLPI_EMODENOTSUP\fP]\(em'u
 .RB [ DL_SYSERR ]
-A system error has occured and the \fBLinux\fP system error code is indicated
+A system error has occurred and the \fBLinux\fP system error code is indicated
 in the \fIerrno\fP(3) global variable.
 .PD 0
 .PD
@@ -525,7 +525,7 @@ Insufficient buffers were immediately available to satisfy the request.
 Insufficient \fISTREAMS\fP resources were available to satisfy the request.
 .TP
 .RB [ EAGAIN ]
-A temporary failure occured and the DLS user should reissue the request.
+A temporary failure occurred and the DLS user should reissue the request.
 .TP
 .RB [ EBUSY ]
 THe control information in the request has already been subjected to the

@@ -6,7 +6,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -339,7 +339,7 @@ conversion was not possible.
 .RI [ other ]
 .RI \(lq "n2a: unknown error %d" \(rq
 .br
-An internal error occured in the
+An internal error occurred in the
 .BR libxnsl (3)
 library or a loaded shared object.
 .I %d

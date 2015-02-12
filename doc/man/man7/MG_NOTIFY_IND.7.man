@@ -6,7 +6,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -123,7 +123,7 @@ typedef struct MG_notify_ind {
 .SH DESCRIPTION
 Indicates that the event for which notifications were requested with the
 .BR MG_NOTIFY_REQ (7)
-primitive has occured.  The
+primitive has occurred.  The
 .B MG_NOTIFY_IND
 primitive is the notification of that event.
 .SH PARAMETERS
@@ -140,16 +140,16 @@ provider-specific flags.  See
 .TP
 .I mg_se_id
 indicates the session identifier of the communications session for which the
-event occured, or zero (0) to indicate no communications session is
+event occurred, or zero (0) to indicate no communications session is
 associated with the event.
 .TP
 .I mg_tp_id
 indicates the termination point identifier of the termination point for which
-the event occured, or zero (0) to indicate that the event is not associated
+the event occurred, or zero (0) to indicate that the event is not associated
 with a specific termination point.
 .TP
 .I mg_ch_id
-indicates the channel identifier of the channel for which the event occured,
+indicates the channel identifier of the channel for which the event occurred,
 or zero (0) to indicate that the event is not associated with a specific
 channel.
 .TP

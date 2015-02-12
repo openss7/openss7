@@ -6,7 +6,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -611,7 +611,7 @@ request or ressponse may be successful if the DLS user reissues the request or
 response primitive at a later time when resources become available.
 .TP
 [\fB\)EAGAIN\fP] \(em \fI\*(lqResource temporarily unavailable\*(rq\fP
-A temporary failure occured and the DLS user should reissue the request or
+A temporary failure occurred and the DLS user should reissue the request or
 response.
 .TP
 [\fB\)EBUSY\fP] \(em \fI\*(lqDevice or resource busy\*(rq\fP

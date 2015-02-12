@@ -6,7 +6,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -423,7 +423,7 @@ The file descriptor
 has outstanding connection indications.
 .TP
 .RB [ TLOOK ]
-An asynchronous event occured before the call could complete.  See \fBt_look\fR(3) for more information.
+An asynchronous event occurred before the call could complete.  See \fBt_look\fR(3) for more information.
 .TP
 .RB [ TNOTSUPPORT ]
 The call requires the use of a TLI primitive not supported by the underlying transport provider.
@@ -432,7 +432,7 @@ The call requires the use of a TLI primitive not supported by the underlying tra
 The call was issued with the interface in an incorrect state.
 .TP
 .RB [ TPROTO ]
-A protocol error occured between the XTI/TLI library and the underlying transport provider.
+A protocol error occurred between the XTI/TLI library and the underlying transport provider.
 .TP
 .RB [ TPROVMISMATCH ]
 The transport provider associated with
@@ -453,7 +453,7 @@ is listening (i.e. it was bound with a
 > 0).
 .TP
 .RB [ TSYSERR ]
-A \fBLinux\fR system error occured and the \fBLinux\fR error number is set in \fIerrno\fR(3).
+A \fBLinux\fR system error occurred and the \fBLinux\fR error number is set in \fIerrno\fR(3).
 .\"
 .\"
 .SH "SEE ALSO"

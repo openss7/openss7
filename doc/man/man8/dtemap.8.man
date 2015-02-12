@@ -253,7 +253,7 @@ input file:
 .SH DIAGNOSTICS
 .PP
 An exit status of zero (0) indicates that the command was successful; one (1)
-indicates that an error occured and a diagnostic message is printed to
+indicates that an error occurred and a diagnostic message is printed to
 .IR stderr ;
 two (2) indicates the the option or argument syntax was in error and a
 diagnostic message is printed to

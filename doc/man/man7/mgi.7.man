@@ -6,7 +6,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -161,7 +161,7 @@ entity.  These primitives are of two types; ones that originate from the MGC,
 and others that originate from the MG.  The primitives that originate from the
 MGC make requests to the MG, or respond to an indication of an event of the
 MG.  The primitives that originate from the MG ar either confirmation of a
-request or are indications to the MGC that the event has occured.
+request or are indications to the MGC that the event has occurred.
 .PP
 The MGI allows the MG to be configured with any media gateway controller
 (such as ISDN or H.225.0 call control) that also conforms to the MGI.
@@ -347,7 +347,7 @@ In addition, it is possible that an autonomous disconnect from a
 communications session occurs without the request of the media gateway
 controller.  In this case, the media disconnection service is used to indicate
 to the media gateway controller that an autnomous disconnect from the
-communications session has occured.
+communications session has occurred.
 The media disconnection service uses the following primitives:
 .IP \(em 4
 .BR MG_DISCON_REQ (7):

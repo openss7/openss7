@@ -6,7 +6,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -310,7 +310,7 @@ for more information on option formats.
 The call would block due to flow control.
 .TP
 .RB [ TLOOK ]
-An asynchronous event occured before the call could complete.  See
+An asynchronous event occurred before the call could complete.  See
 .BR t_look (3)
 for more information.
 .TP
@@ -321,10 +321,10 @@ The call requires the use of a TLI primitive not supported by the underlying tra
 The call was issued with the interface in an incorrect state.
 .TP
 .RB [ TPROTO ]
-A protocol error occured between the XTI/TLI library and the underlying transport provider.
+A protocol error occurred between the XTI/TLI library and the underlying transport provider.
 .TP
 .RB [ TSYSERR ]
-A \fBLinux\fR system error occured and the \fBLinux\fR error number is set in
+A \fBLinux\fR system error occurred and the \fBLinux\fR error number is set in
 .IR errno (3).
 .\"
 .\"

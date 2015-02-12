@@ -6,7 +6,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -314,7 +314,7 @@ typedef struct {
 Contains the primitive \fBSLS_LINK_CONGESTED_IND\fR.
 .TP
 .I sls_timestamp
-Contains the timestamp (system time) that this event occured for the purpose
+Contains the timestamp (system time) that this event occurred for the purpose
 of event reporting.
 .TP
 .I sls_cong_level
@@ -343,7 +343,7 @@ typedef struct {
 Contains the primitive \fBSLS_LINK_CONGESTION_CEASED_IND\fR.
 .TP
 .I sls_timestamp
-Contains the timestamp (system time) that this event occured for the purpose
+Contains the timestamp (system time) that this event occurred for the purpose
 of event reporting.
 .TP
 .I sls_cong_level
@@ -407,7 +407,7 @@ typedef struct {
 Contains the primitive \fBSLS_IN_SERVICE_IND\fR.
 .TP
 .I sls_timestamp
-Contains the timestamp (system time) that this event occured for the purpose
+Contains the timestamp (system time) that this event occurred for the purpose
 of event reporting.
 .TP
 .I sls_reason
@@ -452,7 +452,7 @@ typedef struct {
 Contains the primitive \fBSLS_REMOTE_PROCESSOR_OUTAGE_IND\fR.
 .TP
 .I sls_timestamp
-Contains the timestamp (system time) that this event occured for the purpose
+Contains the timestamp (system time) that this event occurred for the purpose
 of event reporting.
 .RE
 .TP
@@ -474,7 +474,7 @@ typedef struct {
 Contains the primitive \fBSLS_REMOTE_PROCESSOR_RECOVERED_IND\fR.
 .TP
 .I sls_timestamp
-Contains the timestamp (system time) that this event occured for the purpose
+Contains the timestamp (system time) that this event occurred for the purpose
 of event reporting.
 .RE
 .TP

@@ -6,7 +6,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -284,7 +284,7 @@ T}
 .RE
 .TP
 .I operation_notification_status_return
-Takes an eror value if a communications error occured during the execution of the asynchronous
+Takes an eror value if a communications error occurred during the execution of the asynchronous
 operation or notification, and
 .RB [ MP_SUCCESS ]
 otherwise.  The possible error values are listed for each individual operation int he corresponding

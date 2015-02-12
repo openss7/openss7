@@ -295,7 +295,7 @@ member, they are ignored by
 .BR poll ()).
 .TP \w'POLLWRNORM\(em'u
 .B POLLERR
-An error has occured on the file.
+An error has occurred on the file.
 For
 .IR STREAMS (4)
 special files, this event occurs when a
@@ -303,7 +303,7 @@ special files, this event occurs when a
 message arrives at the stream head.
 .TP
 .B POLLHUP
-A hangup has occured on the file.
+A hangup has occurred on the file.
 For
 .IR STREAMS (4)
 special files, this event occurs when a
@@ -317,7 +317,7 @@ The corresponding
 is invalid.
 .TP
 .B POLLMSG
-A pending signal has occured on the file.
+A pending signal has occurred on the file.
 For
 .IR STREAMS (4)
 special files, this event occurs when a
@@ -363,7 +363,7 @@ if the condition is true, even if the application did not set the corresponding
 bit in
 .IR events .
 .PP
-If none of the defined events have occured on any selected file descriptor,
+If none of the defined events have occurred on any selected file descriptor,
 .BR poll ()
 waits at least
 .I timeout

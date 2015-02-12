@@ -6,7 +6,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -648,7 +648,7 @@ acknowledgement.
 The error acknowledgement service uses the following primitives:
 .IP \(em 4
 .BR TC_ERROR_ACK (7):
-This primitive indicates to the TC-user that a non-fatal error has occured in the last TC-user
+This primitive indicates to the TC-user that a non-fatal error has occurred in the last TC-user
 originated request or response primitive (see
 .BR "" \(lq "ERROR HANDLING" \(rq)
 on the

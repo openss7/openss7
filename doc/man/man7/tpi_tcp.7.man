@@ -6,7 +6,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -1328,7 +1328,7 @@ The primitive would place the interface out of state.
 The sequence number provided did not correspond to an outstanding connection indication.
 .TP
 .RB [ TSYSERR ]
-A system error occured and the UNIX error code is present in the
+A system error occurred and the UNIX error code is present in the
 .I UNIX_error
 field of the primitive.
 .TP

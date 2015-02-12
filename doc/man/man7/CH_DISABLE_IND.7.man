@@ -6,7 +6,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -119,7 +119,8 @@ typedef struct CH_disable_ind {
 Indicates that an autonomous disabling of the channel associated with the
 stream upon which the primitive is issued.
 .PP
-This primitive indicates that an error or other asynchronous event has occured
+This primitive indicates that an error or other asynchronous event has
+occurred
 that has resulted in the autonomous disabling of the channel associated with
 the stream upon which the primitive is issued.
 .PP

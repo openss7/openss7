@@ -6,7 +6,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -559,7 +559,7 @@ fails, it prints a diagnostic message on standard error,
 .IR stderr ,
 and exits with an exit status of one
 .RB ( 1 )
-if an internal failure occured, and an exit status of two
+if an internal failure occurred, and an exit status of two
 .RB ( 2 )
 if there was an error in option syntax.
 .\"
