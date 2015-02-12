@@ -1,0 +1,317 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) doc/man/man8/nsap.8.man
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH NSAP 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@"
+.SH NAME
+.B nsap
+\- specify or display NSAP addresses
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.ad l
+.nh
+.HP \w'\fB\)nsap\fP\ 'u
+\fB\)nsap\fP [\fIoptions\fP] [\fINSAP_Address\fP] [\fINSAP_Address\fP] ...
+.PD 0
+.HP
+\fB\)nsap\fP
+{\fB-h\fP|\fB--help\fP}
+.HP
+\fB\)nsap\fP
+{\fB-V\fP|\fB--version\fP}
+.HP
+\fB\)nsap\fP
+{\fB-C\fP|\fB--copying\fP}
+.PD
+.ad b
+.hy 6
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+Specifies one or more local NSAP addresses and displays the NSAP addresses
+that are already in use.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.SS Command Options
+The following command options are mutually exclusive: only one command option
+should be present on the command line at a time.  The exceptions are the
+\fB-h\fP, \fB-V\fP and \fB-C\fP options that can be specified alone, or with
+any other option.
+.TP
+\fB-h\fP, \fB--help\fP
+When this option is encountered, display usage information to
+.IR stdout ,
+stop options processing, and exit without taking further action.
+.TP
+\fB-V\fP, \fB--version\fP
+When this option is encountered, display version information to
+.IR stdout ,
+stop options processing, and exit without taking further action.
+.TP
+\fB-C\fP, \fB--copying\fP
+When this option is encountered, display copying information to
+.IR stdout ,
+stop options processing, and exit without taking further action.
+.\"
+.SS Common Options
+.PP
+The following common options can be specified together with a command option.
+It is not an error to specify options that are not necessary for the command
+option with which they are specified.
+.TP
+\fB-q\fP, \fB--quiet\fP
+Suppress normal output.  Only the return code of the command is of interest.
+This has the same effect as \fB--verbose=0\fP.
+Enables quiet mode.  Only error messages are displayed.
+.TP
+\fB-d\fP, \fB--debug\fP [\fIlevel\fP]
+Specify or increase the debugging verbosity.  Sets the debugging verbosity to
+\fIlevel\fP, when given, or simply increases the debuggin verbosity by one
+(1) when \fIlevel\fP is not given.  This option can be repeated.
+.TP
+\fB-v\fP, \fB--verbose\fP [\fIlevel\fP]
+Specify or increase the output verbosity.  Sets the output verbosity to
+\fIlevel\fP, when given, or simply increases the output verbosity by one when
+\fIlevel\fP is not given.  This option can be repeated.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.B nsap
+accepts the following optional arguments:
+.TP
+[\fINSAP_Address\fP] [\fINSAP_Address\fP] ...
+If no arguments are specified, the currently activated NSAP addresses are
+displayed.  If one or more arguments are specified, each is taken to be an
+NSAP address to be activated.
+.\"
+.\"
+.SH OUTPUT FORMAT
+.PP
+.nf
+NSU                       NSAP address
+  1       49000400060001020701012b5501
+  2       490004000600010000C0767E1001
+.fi
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero (0) indicates that the command was successful; one (1)
+indicates that an error occured and a diagnostic message is printed to
+.IR stderr ;
+two (2) indicates the the option or argument syntax was in error and a
+diagnostic message is printed to
+.IR stderr .
+.PP
+The
+.B --quiet
+option suppresses the printing of normal output to
+.I stdout
+and diagnostic messages to
+.IR stderr .
+.\"
+.SS Error Messages
+.PP
+The following error messages can be generated:
+.TP
+.B nsap: no network layer in this kernel
+The TP4/CLNP driver is not present.  Install it.
+.TP
+.B nsap: invalid address length \fIn\fP
+The NSAP address entered was too long or it contained an odd number
+of characters.  Check the NSAP address and reenter the corrected
+command line.  The address must contain an even number of hexadecimal
+characters (since a byte consists of two digits), and its length must be 40
+characters or less.
+.TP
+.B nsap: invalid hexadecimal character \fIc\fP in address
+The NSAP address you entered contained a character that was not a valid
+hexadecimal digit.  Check the NSAP address and reenter the
+command line.  NSAP addresses must contain only the characters 0 thru
+9 and a thru f (or A thru F).
+.\"
+.\"
+.SH NOTICES
+.PP
+The maximum number of local NSAP addresses that can be used is eight. (Note:
+this is not a limitation under
+.BR OpenSS7 \(tm.)
+.PP
+Default local NSAP addresses are specified when the software is installed.
+Use this utility to specify additional NSAP addresses.
+.\"
+.\"
+.\".SH FILES
+.\".PP
+.\"
+.\"
+.\".SH DEVICES
+.\".PP
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR STREAMS (9),
+.BR osid (8).
+.\"
+.\"
+.SH BUGS
+.PP
+.B nsap
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B nsap
+is compatible with
+.IR "IRIS OSI"
+.[
+irixosi
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+Options \fB-q\fP, \fB-v\fP, \fB-h\fP, \fB-V\fP, \fB-C\fP, and all long
+options, are specific to this
+.B @PACKAGE_TITLE@
+implementation of
+.B strxt
+and should not be used by portable command scripts.
+.IP \(em
+No other implementation documents the \fB-q\fP, \fB-v\fP, \fB-h\fP, \fB-V\fP
+and \fB-C\fP options.  They should not be used by portable command scripts.
+.IP \(em
+Options \fB--help\fP and \fB--version\fP are provided for compatibility with
+GNU coding standards; \fB--copying\fP, OpenSS7 coding standards.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "IRIS OSI"
+.[
+irixosi
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B nsap
+first appeared in
+.IR "IRIS OSI" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+
+
+
