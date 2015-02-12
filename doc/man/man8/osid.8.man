@@ -1,0 +1,490 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) doc/man/man8/osid.8.man
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH OSID 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@"
+.SH NAME
+.B osid
+\- OSI transport daemon
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.ad l
+.nh
+.HP \w'\fB\)osid\fP\ 'u
+\fB\)osid\fP [\fIoptions\fP]
+.PD 0
+.HP
+\fB\)osid\fP
+{\fB-h\fP|\fB--help\fP}
+.HP
+\fB\)osid\fP
+{\fB-V\fP|\fB--version\fP}
+.HP
+\fB\)osid\fP
+{\fB-C\fP|\fB--copying\fP}
+.PD
+.ad b
+.hy 6
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B osid
+.BR STREAMS (9)
+configuration utility constructs the STREAMS protocol stack from LAN and WAN
+STREAMS drivers.
+.B osid
+determines which drivers to include in the protocol stack be reading the
+.B /etc/osid.cfg
+configuration file.
+.PP
+The sequence of steps that the
+.B osid
+daemon performs is described below:
+.IP 1. \w'1.\(em\ 'u
+The
+.B osid
+program forks a daemon process, then terminates.  The daemon process
+continues running to maintain the protocol stack.
+.IP 2.
+.B osid
+opens the timer driver.
+.B Note:
+.I "@PACKAGE@"
+does not have (or need) a timer driver.
+.IP 3.
+If the TP0/2/4 driver is available, (part of the WAN components),
+.B osid
+build the connection-oriented service (CONS) stack by opening the TP0/2/4
+driver and linking a number of X.25 Streams underneath it.
+.IP 4.
+If the TP4/CLNP driver (part of the LAN components) is present,
+.B osid
+builds the connectionless stack.
+If the LLC1 driver is present, it links one or more MAC drivers under the
+LLC1 driver, then links the LLC1 Stream under the TP4/CLNP driver.
+.[
+iso8473_4
+.]
+.IP 5.
+If the TP4/CLNP driver is present, and the SNDCF driver is present in
+addition to or instead of the LLC1 driver,
+.B osid
+opens SNDCF, links a number of X.25 PLP Streams under it, and links the SNDCF
+Stream under the TP4/CLNP Stream.
+.[
+iso8473_2
+.]
+.[
+iso8473_3
+.]
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+The
+.B osid
+command takes no non-option arguments.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.SS Command Options
+The following command options are mutually exclusive: only one command option
+should be present on the command line at a time.  The exceptions are the
+\fB-h\fP, \fB-V\fP and \fB-C\fP options that can be specified alone, or with
+any other option.
+When
+.B osid
+is used without a command option, it runs the daemon.
+.TP
+\fB-h\fP, \fB--help\fP
+When this option is encountered, display usage information to
+.IR stdout ,
+stop options processing, and exit without taking further action.
+.TP
+\fB-V\fP, \fB--version\fP
+When this option is encountered, display version information to
+.IR stdout ,
+stop options processing, and exit without taking further action.
+.TP
+\fB-C\fP, \fB--copying\fP
+When this option is encountered, display copying information to
+.IR stdout ,
+stop options processing, and exit without taking further action.
+.\"
+.SS Common Options
+.PP
+The following common options can be specified together with a command option.
+It is not an error to specify options that are not necessary for the command
+option with which they are specified.
+.TP
+\fB-q\fP, \fB--quiet\fP
+Suppress normal output.  Only the return code of the command is of interest.
+This has the same effect as \fB--verbose=0\fP.
+Enables quiet mode.  Only error messages are displayed.
+.TP
+\fB-d\fP, \fB--debug\fP [\fIlevel\fP]
+Specify or increase the debugging verbosity.  Sets the debugging verbosity to
+\fIlevel\fP, when given, or simply increases the debuggin verbosity by one
+(1) when \fIlevel\fP is not given.  This option can be repeated.
+.TP
+\fB-v\fP, \fB--verbose\fP [\fIlevel\fP]
+Specify or increase the output verbosity.  Sets the output verbosity to
+\fIlevel\fP, when given, or simply increases the output verbosity by one when
+\fIlevel\fP is not given.  This option can be repeated.
+.\"
+.\"
+.SH FILE FORMAT
+.PP
+.\"
+.\"
+.\"
+.\"
+.SH EXAMPLES
+.PP
+The configuration utility is designed so that it automatically builds the
+correct protocol stack based on the specific and generic entries that the
+.B osid.cfg
+file contains.  The requirements of different network environments are shown
+in the examples below.
+.\"
+.SS Configuring a LAN End System
+.PP
+The following is an example
+.B osid.cfg
+file designed to meet LAN end system configuration.
+.PP
+.RS
+.nf
+# Generic module names
+TP4                 device=/dev/cots    # TP_610
+LLC1                device=/dev/dlr     # DLPI_610
+
+# MAC driver port 0 [ SGI Ethernet Card ]
+PORT0               device=/dev/snif unit=0 esgaddr
+
+# Mandatory lower layer support timer [ TIMER ]
+TIMER               device=/dev/tmr
+
+# LT-610 Class 4 Transport over CLNS [ TP_610 ]
+TP_610              device=/dev/cots
+
+# LT-610 LAN support [ DLPI_610 ]
+DLPI_610            device=/dev/dlp
+.fi
+.RE
+.PP
+This end-system configuration file contains definitions for transport
+protocol class 4 and DLPI
+.[
+dlpi
+.]
+drivers.  The system pollbug variable variable is set to true (as in all of
+the scenarios given).  Just one port
+.RB ( PORT0 )
+is specified, and this port uses end-system group addressing
+.RB ( esgaddr ).
+.\"
+.SS Configuring a LAN Intermediate System
+.PP
+The following is an example of an
+.B osid.cfg
+file designed to meet LAN intermediate system configuration requirements.
+.PP
+.RS
+.nf
+# Generic module names
+TP4                 device=/dev/cots
+LLC1                device=/dev/dlr
+
+# Mandatory lower layer support timer [ TIMER ]
+TIMER               device=/dev/tmr
+
+# LT-610 Class 4 Transport over CLNS [ TP_610 ]
+TP_610              device=/dev/cots
+
+# LT-610 LAN support (required if LAN supported ) [ DLPI_610 ]
+DLPI_610            device=/dev/dlr
+
+# MAC driver port 0 [ SGI Ethernet Card ]
+PORT0               device=/dev/snif unit=0 isgaddr
+
+# MAC driver port 1 [ SGI Ethernet Card ]
+PORT1               device=/dev/snif units=1 isgaddr
+.fi
+.RE
+.PP
+This intermediate system configuration file contains definitions for
+Transport Protocol Class 4 and Data Link Layer drivers.  Note, however, that
+two ports
+.RB ( PORT0
+and
+.BR PORT1 )
+are in use, and that intermediate system group addressing
+.RB ( isgaddr )
+is employed.
+.\"
+.SS Configuring a LAN/WAN End System to Intermediate System
+.PP
+The following is an example of an
+.B osid.cfg
+file designed to meet end system to intermediate system configuration:
+.PP
+.RS
+.nf
+# Generic module names
+TP4                 device=/dev/cots     # TP_610
+SNDCF               device=/dev/sndc     # SNDCF_610
+LLC1                device=/dev/dlr      # DLPI_610
+TP024               device=/dev/cox      # TP_325
+
+# Mandatory lower layer support timer [ TIMER ]
+TIMER               device=/dev/tmr
+
+# Class 0/2/4 transport service provider [ TP_325 driver ]
+TP_325              device=/dev/cox
+
+# LT-610 Class 4 Transport over CLNS [ TP_610 ]
+TP_610              device=/dev/cots
+
+# LT-610 LAN support  [ required if LAN supported ] [ DLP_610 ]
+DLPI_610            device=/dev/dlr
+
+# MAC driver port 0 [ SGI Ethernet Card ]
+PORT0               device=/dev/snif unit=0 esgaddr
+
+# LT-610 WAN support ( required if CLNS over X.25 supported ) [ SNDCF_610 ]
+SNDCF_610           device=/dev/sndc
+
+# X.25 Interface Driver Entries
+MX25_0              device=/dev/sx25 loc_dte=12345678901111 nvcs=4
+.fi
+.RE
+.PP
+This end system to intermeditate system configuration file contains
+definnitions for Transport Protocol Class 4, SNDCF, Transport Class 0/2/4,
+and Data Link Layer drivers.  One port
+.RB ( PORT0 )
+is in use, and end-system group addressing
+.RB ( esgaddr (8))
+is employed.  The number of virtual circuits
+.RB ( nvcs )
+is set to four (4).
+.PP
+.\"
+.SS Configuring a WAN System
+.PP
+The following is an example of an
+.B osid.cfg
+file designed ot meet WAN requirements:
+.PP
+.RS
+.nf
+# Generic module name
+TP024                device=/dev/cox             # TP_325
+
+# Mandatory lower layer support timer [ TIMER ]
+TIMER                device=/dev/tmr
+
+# Class 0/2/4 transport service provider [ TP_325 driver ]
+TP_324               device=/dev/cox
+
+# X.25 Interface Driver Entries
+MX25_1               device=/dev/sx25 loc_dte=1234568901111 nvcs=4
+.fi
+.RE
+.PP
+This WAN configuration file contains definitions for Transport Protocol Class
+0/2/4 and X.25 interface drivers.  \fBMX25_1\fP specifies CPU-ID 2, port 1
+(in other words, a single WAN card, or the first WAN card if two are
+installed).  The number of virtual circuits
+.RB ( ncvs )
+is set to four (4).
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero (0) indicates that the command was successful; one (1)
+indicates that an error occurred and a diagnostic message is printed to
+.IR stderr ;
+two (2) indicates the the option or argument syntax was in error and a
+diagnostic message is printed to
+.IR stderr .
+.PP
+The
+.B --quiet
+option suppresses the printing of normal output to
+.I stdout
+and diagnostic messages to
+.IR stderr .
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.\".SH FILES
+.\".PP
+.\"
+.\"
+.\".SH DEVICES
+.\".PP
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR STREAMS (9),
+.BR osinetwork (8).
+.\"
+.\"
+.SH BUGS
+.PP
+.B osid
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B osid
+is compatible with
+.IR "IRIS OSI"
+.[
+irixosi
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+Options \fB-q\fP, \fB-v\fP, \fB-h\fP, \fB-V\fP, \fB-C\fP, and all long
+options, are specific to this
+.B @PACKAGE_TITLE@
+implementation of
+.B strxt
+and should not be used by portable command scripts.
+.IP \(em
+No other implementation documents the \fB-q\fP, \fB-v\fP, \fB-h\fP, \fB-V\fP
+and \fB-C\fP options.  They should not be used by portable command scripts.
+.IP \(em
+Options \fB--help\fP and \fB--version\fP are provided for compatibility with
+GNU coding standards; \fB--copying\fP, OpenSS7 coding standards.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "IRIS OSI"
+.[
+irixosi
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B osid
+first appeared in
+.IR "IRIS OSI" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
