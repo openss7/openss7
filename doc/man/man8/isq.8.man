@@ -98,7 +98,7 @@ search-ignore CGIQOSTU
 .so openss7.macros
 .\"
 .\"
-.TH ESQ 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@"
+.TH ISQ 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@"
 .SH NAME
 .B isq
 \- view reachable intermediate-system addresses
