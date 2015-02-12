@@ -1,0 +1,345 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) doc/man/man8/mac.8.man
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH MAC 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@"
+.SH NAME
+.B mac
+\- read MAC entity management statistics
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.ad l
+.nh
+.HP \w'\fB\)mac\fP\ 'u
+\fB\)mac\fP [\fIoptions\fP] [\fIport\fP]
+.PD 0
+.HP
+\fB\)mac\fP
+{\fB-h\fP|\fB--help\fP}
+.HP
+\fB\)mac\fP
+{\fB-V\fP|\fB--version\fP}
+.HP
+\fB\)mac\fP
+{\fB-C\fP|\fB--copying\fP}
+.PD
+.ad b
+.hy 6
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+Read the various statistics a MAC driver may keep.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.SS Command Options
+The following command options are mutually exclusive: only one command option
+should be present on the command line at a time.  The exceptions are the
+\fB-h\fP, \fB-V\fP and \fB-C\fP options that can be specified alone, or with
+any other option.
+.TP
+\fB-h\fP, \fB--help\fP
+When this option is encountered, display usage information to
+.IR stdout ,
+stop options processing, and exit without taking further action.
+.TP
+\fB-V\fP, \fB--version\fP
+When this option is encountered, display version information to
+.IR stdout ,
+stop options processing, and exit without taking further action.
+.TP
+\fB-C\fP, \fB--copying\fP
+When this option is encountered, display copying information to
+.IR stdout ,
+stop options processing, and exit without taking further action.
+.\"
+.SS Common Options
+.PP
+The following common options can be specified together with a command option.
+It is not an error to specify options that are not necessary for the command
+option with which they are specified.
+.TP
+\fB-q\fP, \fB--quiet\fP
+Suppress normal output.  Only the return code of the command is of interest.
+This has the same effect as \fB--verbose=0\fP.
+Enables quiet mode.  Only error messages are displayed.
+.TP
+\fB-d\fP, \fB--debug\fP [\fIlevel\fP]
+Specify or increase the debugging verbosity.  Sets the debugging verbosity to
+\fIlevel\fP, when given, or simply increases the debuggin verbosity by one
+(1) when \fIlevel\fP is not given.  This option can be repeated.
+.TP
+\fB-v\fP, \fB--verbose\fP [\fIlevel\fP]
+Specify or increase the output verbosity.  Sets the output verbosity to
+\fIlevel\fP, when given, or simply increases the output verbosity by one when
+\fIlevel\fP is not given.  This option can be repeated.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.B mac
+accepts the following optional arguments:
+.TP
+.I port
+An optional argument that specifies which MAC driver's management statistics
+you wish to view.  The port number is determined by the MAC driver's unit
+number assigned in the
+.BR STREAMS (9)
+configuration file.
+
+If no port is specified, the default is zero (0); that is, the first port
+assigned by the driver.
+.\"
+.\"
+.\".SH FILE FORMAT
+.\".PP
+.\"
+.\"
+.\"
+.\"
+.SH OUTPUT FORMAT
+.PP
+.TP
+.B Number of successful transmissions
+The number of MAC frames the system has successfully transmitted.
+.TP
+.B Number of successful frames received
+The number of MAC frames the system has successfully received.
+.TP
+.B Number of broadcast frames received
+The number of MAC broadcast frames the system has successfully received.
+.TP
+.B Number of broadcast frames transmitted
+The number of MAC broadcast frames the system has successfully transmitted.
+.TP
+.B Number of broadcast frames the system has successfully transmitted
+The number of MAC multicast frames the system has successfully transmitted.
+.TP
+.B Number of broadcast frames the system has successfully received
+The number of MAC multicast frames the system has successfully received.
+.TP
+.B Number of multicast frames transmitted
+The number of multicast frames transmitted.
+.TP
+.B Number of multicast frames rejected
+The number of MAC frames the system has rejected for any reason.
+.TP
+.B Number of frames dropped due to lack of a STREAMS buffer
+The number of MAC frames the system has discarded because no STREAMS buffer
+could be allocated.
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero (0) indicates that the command was successful; one (1)
+indicates that an error occured and a diagnostic message is printed to
+.IR stderr ;
+two (2) indicates the the option or argument syntax was in error and a
+diagnostic message is printed to
+.IR stderr .
+.PP
+The
+.B --quiet
+option suppresses the printing of normal output to
+.I stdout
+and diagnostic messages to
+.IR stderr .
+.\"
+.SS Error Messages
+.PP
+The following error messages can be generated:
+.TP
+.B PORT\fin\fB not configured
+The port you specified does not exist.  Check the
+.BR STREAMS (9)
+configuration file (\fB/etc/osid.cfg\fP) as specified in
+.BR osid (8)
+to determine the ports that are available.
+.TP
+.B could not open \fIdevice\fP
+The name of the device whose port number you specified could not be opened.
+Either the configuration file is incorrect, or the MAC driver was installed
+incorrectly or its kernel modules is not in the kernel.
+View the contents of the \fB/dev/osid.cfg\fP file to make sure that the
+device name for the MAC drivers is correct.  If it is, you will probably have
+to reinstall the MAC driver kernel module into the kernel.
+.TP
+.B mac: PORT\fIn\fB unit=u
+The unit number associated with the port you specified could not be
+activated.  Either the LAN card is not installed, or it is faulty.  Check the
+LAN card to make sure it is fully operational.
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.\".SH FILES
+.\".PP
+.\"
+.\"
+.\".SH DEVICES
+.\".PP
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR STREAMS (9),
+.BR osid (8).
+.\"
+.\"
+.SH BUGS
+.PP
+.B mac
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B mac
+is compatible with
+.IR "IRIS OSI"
+.[
+irixosi
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+Options \fB-q\fP, \fB-v\fP, \fB-h\fP, \fB-V\fP, \fB-C\fP, and all long
+options, are specific to this
+.B @PACKAGE_TITLE@
+implementation of
+.B strxt
+and should not be used by portable command scripts.
+.IP \(em
+No other implementation documents the \fB-q\fP, \fB-v\fP, \fB-h\fP, \fB-V\fP
+and \fB-C\fP options.  They should not be used by portable command scripts.
+.IP \(em
+Options \fB--help\fP and \fB--version\fP are provided for compatibility with
+GNU coding standards; \fB--copying\fP, OpenSS7 coding standards.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "IRIS OSI"
+.[
+irixosi
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B mac
+first appeared in
+.IR "IRIS OSI" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
