@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) doc/man/man8/rtl.8.man
+.\" @(#) doc/man/man8/sndcmap.8.man
 .\"
 .\" =========================================================================
 .\"
@@ -98,27 +98,27 @@ search-ignore CGIQOSTU
 .so openss7.macros
 .\"
 .\"
-.TH RTL 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@"
+.TH SNDCMAP 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@"
 .SH NAME
-.B rtl
-\- load a static CLNP routing table
+.B sndcmap
+\- download a DTE/Port mapping table
 .\"
 .\"
 .SH SYNOPSIS
 .PP
 .ad l
 .nh
-.HP \w'\fB\)rtl\fP\ 'u
-\fB\)rtl\fP [\fIoptions\fP] \fIfile\fP
+.HP \w'\fB\)sndcmap\fP\ 'u
+\fB\)sndcmap\fP [\fIoptions\fP] \fIfile\fP
 .PD 0
 .HP
-\fB\)rtl\fP
+\fB\)sndcmap\fP
 {\fB-h\fP|\fB--help\fP}
 .HP
-\fB\)rtl\fP
+\fB\)sndcmap\fP
 {\fB-V\fP|\fB--version\fP}
 .HP
-\fB\)rtl\fP
+\fB\)sndcmap\fP
 {\fB-C\fP|\fB--copying\fP}
 .PD
 .ad b
@@ -127,11 +127,9 @@ search-ignore CGIQOSTU
 .\"
 .SH DESCRIPTION
 .PP
-Load a static CLNP
-.[
-iso8473
-.]
-routing table produced with the network directory compiler.
+This utility downloads a mapping table to the SNDCF driver that allows the
+called DTE address in an outgoing call request to be associated with a local
+port number.
 .\"
 .\"
 .SH ARGUMENTS
@@ -139,7 +137,8 @@ routing table produced with the network directory compiler.
 The following non-option arguments are accepted:
 .TP
 .I file
-The name of a file created with the network directory compiler.
+Specifies the input file that contains the mapping information.  See
+\(lq\)FILE FORMAT\(rq\), below.
 .\"
 .\"
 .SH OPTIONS
@@ -150,7 +149,7 @@ should be present on the command line at a time.  The exceptions are the
 \fB-h\fP, \fB-V\fP and \fB-C\fP options that can be specified alone, or with
 any other option.
 When
-.B rtl
+.B sndcmap
 is used without a command option, it loads the specified file.
 .TP
 \fB-h\fP, \fB--help\fP
@@ -190,6 +189,39 @@ Specify or increase the output verbosity.  Sets the output verbosity to
 \fIlevel\fP is not given.  This option can be repeated.
 .\"
 .\"
+.SH FILE FORMAT
+.PP
+Following is an example input file.  The \'#\' sign indicates a comment.
+.PP
+.nf
+#  called dte address   local port
+   3259002918           0
+   12 *                 0
+   7298765432222        1
+.fi
+.PP
+Ports are specified using the convention described in
+.BR osid (8).
+Depending on the interface card, some ports are not relevant.  The default is
+to choose any available port.
+.PP
+The asterisk wild-card character, \'*\', (separated by a space from the
+remainder of the address) may be used to specify all DTE's beginning with
+certain values: for example, \'333 *\' refers to all DTEs beginning with
+\'333\'.  All uneven DTE addresses must be padded with \'f\'.
+
+Use of the
+.B sndcmap
+utility is only required if it is necessary to route requests to a particular
+port.  If, for example, all ports on the card(s) being used are associated
+with the same network, use of
+.B sndcmap
+is not necessary, though it may still be used if desired.  If no
+.B sndcmap
+input file is donwloaded, SNDCF simply uses any available port on which to
+send the call requested.
+.\"
+.\"
 .\".SH EXAMPLES
 .\".PP
 .\"
@@ -210,44 +242,9 @@ option suppresses the printing of normal output to
 and diagnostic messages to
 .IR stderr .
 .\"
-.SS Error Messages
-.PP
-The following error messages can be issued:
-.TP
-.B usage: rtl filename
-A filename was not entered or extraneous parameters were entered.  Reenter
-the command line and specify one routing file.
-.TP
-.B rtl: cannot open routing table
-The specified routing table does not exist.  Check the path and filename of
-the routing table and reenter the command line.
-.TP
-.B rtl: empty file
-The routing table file specified on the command line was empty.  Recreate the
-routing table with the network directory compiler.
-.TP
-.B rtl: no memory
-Memory for the routing table could not be allocated.
-.TP
-.B rtl: read error
-The routing table file is corrupted.  Recreate the routing table.
 .\"
-.\"
-.SH NOTICES
-.PP
-This utility only works on intermediate systems or end systems that do not
-use ES-IS.
-.[
-iso9542
-.]
-.PP
-A routing table is required only if ES-IS protocol
-.[
-iso9542
-.]
-is not used in the network.
-.PP
-The number of entries that the routing table can contain is limited to 64.
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
 .\".SH FILES
@@ -258,19 +255,21 @@ The number of entries that the routing table can contain is limited to 64.
 .\".PP
 .\"
 .\"
-.\".SH SEE ALSO
-.\".PP
+.SH SEE ALSO
+.PP
+.BR osid (8),
+.BR osinetwork (8).
 .\"
 .\"
 .SH BUGS
 .PP
-.B rtl
+.B sndcmap
 has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.B rtl
+.B sndcmap
 is compatible with
 .IR "IRIS OSI"
 .[
@@ -303,7 +302,7 @@ documentation.
 .\"
 .SH HISTORY
 .PP
-.B rtl
+.B sndcmap
 first appeared in
 .IR "IRIS OSI" .
 .\"
