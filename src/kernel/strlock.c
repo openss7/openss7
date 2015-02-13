@@ -487,6 +487,8 @@ EXPORT_SYMBOL_GPL(strlock_open_check);
 int
 strlock_init(void)
 {
+	(void) strlock_region;
+	(void) strlock_digest;
 	return (0);
 }
 
