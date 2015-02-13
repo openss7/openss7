@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/util/addnsap.c
+ @(#) File: src/util/delnsap.c
 
  -----------------------------------------------------------------------------
 
@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/util/addnsap.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] = "src/util/delnsap.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 600
@@ -72,11 +72,9 @@ static int output = 1;			/* default normal output */
 static int dryrun = 0;			/* dry run */
 
 static char nsapaddr[BUFSIZ + 1] = "";
-static char snpaaddr[BUFSIZ + 1] = "";
-static short port = 0;
 
 static void
-do_add(int argc, char *argv[])
+do_del(int argc, char *argv[])
 {
 }
 
@@ -156,7 +154,7 @@ usage(int argc, char *argv[])
 		return;
 	(void) fprintf(stderr, "\
 Usage:\n\
-    %1$s [options] NSAP SNPA [PORT]\n\
+    %1$s [options] NSAP\n\
     %1$s {-h|--help}\n\
     %1$s {-V|--version}\n\
     %1$s {-C|--copying}\n\
@@ -170,20 +168,16 @@ help(int argc, char *argv[])
 		return;
 	(void) fprintf(stdout, "\
 Usage:\n\
-    %1$s [options] NSAP SNPA [PORT]\n\
+    %1$s [options] NSAP\n\
     %1$s {-h|--help}\n\
     %1$s {-V|--version}\n\
     %1$s {-C|--copying}\n\
 Arguments:\n\
     NSAP\n\
         NSAP address of the remote user\n\
-    SNPA\n\
-        SNPA address of the remote ES or IS\n\
-    PORT\n\
-        MAC driver (optional)\n\
 Options:\n\
   Command: (-a assumed if none given)\n\
-    -a, --add\n\
+    -D, --del\n\
         add the NSAP to SNPA address mapping\n\
     -h, --help, -?, --?\n\
         print this usage information and exit\n\
@@ -221,7 +215,7 @@ main(int argc, char *argv[])
 		int option_index = 0;
                 /* *INDENT-OFF* */
                 static struct option long_options[] = {
-                        {"add",         no_argument,            NULL, 'a'},
+                        {"del",         no_argument,            NULL, 'D'},
 			{"dryrun",	no_argument,		NULL, 'n'},
 			{"quiet",	no_argument,		NULL, 'q'},
 			{"debug",	optional_argument,	NULL, 'd'},
@@ -234,9 +228,9 @@ main(int argc, char *argv[])
                 };
                 /* *INDENT-ON* */
 
-		c = getopt_long_only(argc, argv, "and::v::hVC?W:", long_options, &option_index);
+		c = getopt_long_only(argc, argv, "Dnd::v::hVC?W:", long_options, &option_index);
 #else				/* _GNU_SOURCE */
-		c = getopt(argc, argv, "anqd:vhVC?");
+		c = getopt(argc, argv, "Dnqd:vhVC?");
 #endif				/* _GNU_SOURCE */
 		if (c == -1) {
 			if (debug)
@@ -246,7 +240,7 @@ main(int argc, char *argv[])
 		switch (c) {
 		case 0:
 			goto bad_usage;
-		case 'a':	/* -a, --add */
+		case 'D':	/* -D, --del */
 			if (command != COMMAND_DFLT)
 				goto bad_option;
 			command = COMMAND_NSAP;
@@ -350,80 +344,10 @@ main(int argc, char *argv[])
 			goto bad_nonopt;
 		}
 	}
-	/* SNPA_Address argument */
-	if (debug)
-		fprintf(stderr, "%s: testing SNPA address\n", argv[0]);
-	if (optind < argc) {
-		len = strnlen(argv[optind], BUFSIZ + 1);
-		/* Two formats: MAC + LSAP: 14 hexadecimal digits ending in [Ff][Ee] or X.121
-		   format (up to 15 decimal digits */
-		if (len < 2 || len > 15 || len > BUFSIZ) {
-			if (output || debug)
-				fprintf(stderr, "%s: invalid SNPA-address length %d\n", argv[0],
-					len);
-			goto bad_nonopt;
-		}
-		strncpy(snpaaddr, argv[optind], BUFSIZ);
-		/* check this later */
-		optind++;
-		if ((snpaaddr[len - 1] == 'e' || snpaaddr[len - 1] == 'E') &&
-		    (snpaaddr[len - 2] == 'f' || snpaaddr[len - 2] == 'F')) {
-			/* MAC+LSAP: 14 hexadecimal digits ending in [Ff][Ee] */
-			if (len != 14) {
-				if (output || debug)
-					fprintf(stderr, "%s: invalid SNPA-address length %d\n",
-						argv[0], len);
-				goto bad_nonopt;
-			}
-			/* check for hexadecimal digits only */
-			if ((bad = strspn(snpaaddr, "0123456789abcdefABCDEF")) < len) {
-				if (output || debug)
-					fprintf(stderr,
-						"%s: invalid hexadecimal character '%c' in address",
-						argv[0], snpaaddr[bad]);
-				goto bad_nonopt;
-			}
-		} else {
-			/* X.121 format: up to 15 decimal digits */
-			if (len > 15) {
-				if (output || debug)
-					fprintf(stderr, "%s: invalid SNPA-address length %d\n",
-						argv[0], len);
-				goto bad_nonopt;
-			}
-			/* check for decimal digits only */
-			if ((bad = strspn(snpaaddr, "0123456789")) < len) {
-				if (output || debug)
-					fprintf(stderr,
-						"%s: invalid decimal character '%c' in address",
-						argv[0], snpaaddr[bad]);
-				goto bad_nonopt;
-			}
-		}
-	} else {
-		if (command == COMMAND_NSAP || command == COMMAND_DFLT) {
-			if (output || debug)
-				fprintf(stderr, "%s: missing SNPA address\n", argv[0]);
-			goto bad_nonopt;
-		}
-	}
-	/* PORT argument */
-	if (optind < argc) {
-		if ((val = strtol(optarg, NULL, 0)) < 0)
-			goto bad_nonopt;
-		port = val;
-		/* check this later */
-		optind++;
-	}
-	if (optind < argc) {
-		if (debug)
-			fprintf(stderr, "%s: excess non-option arguments\n", argv[0]);
-		goto bad_nonopt;
-	}
 	switch (command) {
 	case COMMAND_DFLT:
 	case COMMAND_NSAP:
-		do_add(argc, argv);
+		do_del(argc, argv);
 		break;
 	case COMMAND_HELP:
 		help(argc, argv);
