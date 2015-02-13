@@ -89,6 +89,9 @@ int header_generic(struct variable *, oid *, size_t *, int, size_t *, WriteMetho
 #include "mib_modules.h"
 #endif				/* HAVE_NET_SNMP_AGENT_MIB_MODULES_H */
 #endif				/* HAVE_UCD_SNMP_MIB_MODULES_H */
+#ifdef HAVE_NETSNMP_MEMDUP
+#include "ucd_memdup.h"
+#endif
 #include <stdint.h>
 #include <signal.h>
 #include <sys/stat.h>		/* for struct stat, fstat() */

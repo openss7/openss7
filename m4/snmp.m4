@@ -214,6 +214,13 @@ AC_DEFUN([_SNMP_HEADERS], [dnl
 #include <ucd-snmp/default_store.h>
 #include <ucd-snmp/snmp_alarm.h>
 ])
+    AC_EGREP_HEADER([netsnmp_memdup],[net-snmp/library/tools.h],
+	[need_memdup=yes], [need_memdup=no])
+    if test ${need_memdup:-no} = yes ; then
+	AC_DEFINE([HAVE_NETSNMP_MEMDUP],[1],[When defined, net-nsmp is
+	    missing the memdup function but has the netsnmp_memdup
+	    function.])
+    fi
     CPPFLAGS="$snmp_save_CPPFLAGS"
 ])# _SNMP_HEADERS
 # =============================================================================
