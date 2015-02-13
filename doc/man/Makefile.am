@@ -2867,13 +2867,18 @@ openss7_man_MANS = \
 	man7/ua_as_lm.7 \
 	man7/undoc.7 \
 	man7/wan.7 \
+	man8/addnsap.8 \
 	man8/autopush.8 \
 	man8/bicc.8 \
 	man8/bua.8 \
 	man8/chand.8 \
 	man8/cpc388.8 \
+	man8/del.8 \
+	man8/delnsap.8 \
 	man8/ds1.8 \
 	man8/ds1ext.8 \
+	man8/dtemap.8 \
+	man8/esq.8 \
 	man8/fattach.8 \
 	man8/fdetach.8 \
 	man8/h225.8 \
@@ -2883,8 +2888,11 @@ openss7_man_MANS = \
 	man8/ifrtune.8 \
 	man8/initsock.8 \
 	man8/insf.8 \
+	man8/ipconfig.8 \
+	man8/ipstat.8 \
 	man8/isdn.8 \
 	man8/isdnconfd.8 \
+	man8/isq.8 \
 	man8/isua.8 \
 	man8/isup.8 \
 	man8/iua.8 \
@@ -2911,6 +2919,7 @@ openss7_man_MANS = \
 	man8/m2uaconf.8 \
 	man8/m3tp.8 \
 	man8/m3ua.8 \
+	man8/mac.8 \
 	man8/mfeproto.8 \
 	man8/mfevc.8 \
 	man8/mgconfd.8 \
@@ -2918,16 +2927,24 @@ openss7_man_MANS = \
 	man8/mtp.8 \
 	man8/mtpconfig.8 \
 	man8/mxmib.8 \
+	man8/net.8 \
+	man8/netitle.8 \
+	man8/nsap.8 \
 	man8/nuimap.8 \
 	man8/openss7.8 \
 	man8/openss7_mknod.8 \
 	man8/openss7-modules.8 \
 	man8/openss7-update.8 \
+	man8/osid.8 \
 	man8/osinetd.8 \
 	man8/perftest.8 \
 	man8/perftestn.8 \
 	man8/phymib.8 \
+	man8/pingllc.8 \
 	man8/pvcmap.8 \
+	man8/rtgconfig.8 \
+	man8/rtgstat.8 \
+	man8/rtl.8 \
 	man8/sccp.8 \
 	man8/scls.8 \
 	man8/sctp.8 \
@@ -2940,6 +2957,7 @@ openss7_man_MANS = \
 	man8/slconfig.8 \
 	man8/slmon.8 \
 	man8/sls.8 \
+	man8/sndcmap.8 \
 	man8/soconfig.8 \
 	man8/soip.8 \
 	man8/specfs.8 \
@@ -2962,6 +2980,8 @@ openss7_man_MANS = \
 	man8/strsetup.8 \
 	man8/strtune.8 \
 	man8/strvf.8 \
+	man8/strxt.8 \
+	man8/sttxt.8 \
 	man8/sua.8 \
 	man8/tcap.8 \
 	man8/tcapconf.8 \
@@ -3052,6 +3072,10 @@ openss7_man_MANS = \
 	man8/test-xnsl.8 \
 	man8/test-xnsl_thr.8 \
 	man8/testlog.8 \
+	man8/tp24config.8 \
+	man8/tp24stat.8 \
+	man8/tp4config.8 \
+	man8/tp4stat.8 \
 	man8/tua.8 \
 	man8/uaconfd.8 \
 	man8/undoc.8 \
@@ -7254,13 +7278,18 @@ openss7_dist_noinst_MANS = \
 	man7/ua_as_lm.7.man \
 	man7/undoc.7.man \
 	man7/wan.7.man \
+	man8/addnsap.8.man \
 	man8/autopush.8.man \
 	man8/bicc.8.man \
 	man8/bua.8.man \
 	man8/chand.8.man \
 	man8/cpc388.8.man \
+	man8/del.8.man \
+	man8/delnsap.8.man \
 	man8/ds1.8.man \
 	man8/ds1ext.8.man \
+	man8/dtemap.8.man \
+	man8/esq.8.man \
 	man8/fattach.8.man \
 	man8/fdetach.8.man \
 	man8/h225.8.man \
@@ -7270,8 +7299,11 @@ openss7_dist_noinst_MANS = \
 	man8/ifrtune.8.man \
 	man8/initsock.8.man \
 	man8/insf.8.man \
+	man8/ipconfig.8.man \
+	man8/ipstat.8.man \
 	man8/isdn.8.man \
 	man8/isdnconfd.8.man \
+	man8/isq.8.man \
 	man8/isua.8.man \
 	man8/isup.8.man \
 	man8/iua.8.man \
@@ -7298,6 +7330,7 @@ openss7_dist_noinst_MANS = \
 	man8/m2uaconf.8.man \
 	man8/m3tp.8.man \
 	man8/m3ua.8.man \
+	man8/mac.8.man \
 	man8/mfeproto.8.man \
 	man8/mfevc.8.man \
 	man8/mgconfd.8.man \
@@ -7305,16 +7338,24 @@ openss7_dist_noinst_MANS = \
 	man8/mtp.8.man \
 	man8/mtpconfig.8.man \
 	man8/mxmib.8.man \
+	man8/net.8.man \
+	man8/netitle.8.man \
+	man8/nsap.8.man \
 	man8/nuimap.8.man \
 	man8/openss7.8.man \
 	man8/openss7_mknod.8.man \
 	man8/openss7-modules.8.man \
 	man8/openss7-update.8.man \
+	man8/osid.8.man \
 	man8/osinetd.8.man \
 	man8/perftest.8.man \
 	man8/perftestn.8.man \
 	man8/phymib.8.man \
+	man8/pingllc.8.man \
 	man8/pvcmap.8.man \
+	man8/rtgconfig.8.man \
+	man8/rtgstat.8.man \
+	man8/rtl.8.man \
 	man8/sccp.8.man \
 	man8/scls.8.man \
 	man8/sctp.8.man \
@@ -7327,6 +7368,7 @@ openss7_dist_noinst_MANS = \
 	man8/slconfig.8.man \
 	man8/slmon.8.man \
 	man8/sls.8.man \
+	man8/sndcmap.8.man \
 	man8/soconfig.8.man \
 	man8/soip.8.man \
 	man8/specfs.8.man \
@@ -7349,6 +7391,8 @@ openss7_dist_noinst_MANS = \
 	man8/strsetup.8.man \
 	man8/strtune.8.man \
 	man8/strvf.8.man \
+	man8/strxt.8.man \
+	man8/sttxt.8.man \
 	man8/sua.8.man \
 	man8/tcap.8.man \
 	man8/tcapconf.8.man \
@@ -7439,6 +7483,10 @@ openss7_dist_noinst_MANS = \
 	man8/test-xnsl.8.man \
 	man8/test-xnsl_thr.8.man \
 	man8/testlog.8.man \
+	man8/tp24config.8.man \
+	man8/tp24stat.8.man \
+	man8/tp4config.8.man \
+	man8/tp4stat.8.man \
 	man8/tua.8.man \
 	man8/uaconfd.8.man \
 	man8/undoc.8.man \
