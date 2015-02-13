@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/util/addnap.c
+ @(#) File: src/util/addnsap.c
 
  -----------------------------------------------------------------------------
 
@@ -72,8 +72,8 @@ static int output = 1;			/* default normal output */
 static int extended = 0;		/* extended format */
 static int dryrun = 0;			/* dry run */
 
-static char nsap[BUFSIZ + 1] = "";
-static char snap[BUFSIZ + 1] = "";
+static char nsapaddr[BUFSIZ + 1] = "";
+static char snpaaddr[BUFSIZ + 1] = "";
 static short port = 0;
 
 static void
