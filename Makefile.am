@@ -2156,6 +2156,16 @@ dtemap_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= dtemap
 
+## =====================================================================
+
+esq_SOURCES			= src/util/esq.c
+esq_CPPFLAGS			= $(UTIL_INCLUDES)
+esq_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+esq_LDFLAGS			= $(USER_LDFLAGS)
+esq_LDADD			= libstreams.la
+
+sbin_PROGRAMS			+= esq
+
 ## ---------------------------------------------------------------------
 ## pkglibexec_PROGRAMS
 ## ---------------------------------------------------------------------
