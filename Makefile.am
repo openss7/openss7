@@ -2116,6 +2116,16 @@ m2paconfig_LDADD		= libstreams.la
 
 sbin_PROGRAMS			+= m2paconfig
 
+## =====================================================================
+
+addnsap_SOURCES			= src/util/addnsap.c
+addnsap_CPPFLAGS		= $(UTIL_INCLUDES)
+addnsap_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+addnsap_LDFLAGS			= $(USER_LDFLAGS)
+addnsap_LDADD			= libstreams.la
+
+sbin_PROGRAMS			+= addnsap
+
 ## ---------------------------------------------------------------------
 ## pkglibexec_PROGRAMS
 ## ---------------------------------------------------------------------
