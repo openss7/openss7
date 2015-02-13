@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openss7 1.2.2\n"
 "Report-Msgid-Bugs-To: bugs@openss7.org\n"
-"POT-Creation-Date: 2015-01-15 04:06-0700\n"
+"POT-Creation-Date: 2015-02-13 04:33-0700\n"
 "PO-Revision-Date: 2009-05-08 20:16-0600\n"
 "Last-Translator: Brian F. G. Bidulock <bidulock@openss7.org>\n"
 "Language-Team: German\n"
@@ -47,26 +47,26 @@ msgstr ""
 #. TRANS nc_error(3) variable.  The last netconfig(3) or netpath(3) operation was
 #. TRANS successful.
 #.
-#: src/lib/apli.c:1758 src/lib/netselect.c:698 src/lib/sockpath.c:507
-#: src/lib/xap.c:1737 src/lib/xnsl.c:950
+#: src/lib/apli.c:1745 src/lib/netselect.c:685 src/lib/sockpath.c:494
+#: src/lib/xap.c:1724 src/lib/xnsl.c:937
 msgid "no error"
 msgstr ""
 
 #. TRANS AP_ACCES - Roughly equivalent to UNIX system error EPERM.
 #.
-#: src/lib/apli.c:1762
+#: src/lib/apli.c:1749
 msgid "request to bind to specified address denied"
 msgstr ""
 
 #. TRANS AP_AGAIN - Roughly equivalent to UNIX system error EAGAIN.
 #.
-#: src/lib/apli.c:1766
+#: src/lib/apli.c:1753
 msgid "request not completed"
 msgstr ""
 
 #. TRANS AP_BADATTRVAL -
 #.
-#: src/lib/apli.c:1770
+#: src/lib/apli.c:1757
 msgid "bad value for environment attribute"
 msgstr ""
 
@@ -75,7 +75,7 @@ msgstr ""
 #. TRANS ap_snd(3) function contained a value that was not valid in the current
 #. TRANS state or context.
 #.
-#: src/lib/apli.c:1777
+#: src/lib/apli.c:1764
 msgid "cdata field value invalid: act_id"
 msgstr ""
 
@@ -84,7 +84,7 @@ msgstr ""
 #. TRANS function contained a value that was not valid in the current state or
 #. TRANS context.
 #.
-#: src/lib/apli.c:1784
+#: src/lib/apli.c:1771
 msgid "cdata field value invalid: diag"
 msgstr ""
 
@@ -93,7 +93,7 @@ msgstr ""
 #. TRANS function contained a value that was not valid in the current state or
 #. TRANS context.
 #.
-#: src/lib/apli.c:1791
+#: src/lib/apli.c:1778
 msgid "cdata field value invalid: event"
 msgstr ""
 
@@ -102,7 +102,7 @@ msgstr ""
 #. TRANS ap_snd(3) function contained a value that was not valid in the current
 #. TRANS state or context.
 #.
-#: src/lib/apli.c:1798
+#: src/lib/apli.c:1785
 msgid "cdata field value invalid: old_act_id"
 msgstr ""
 
@@ -111,7 +111,7 @@ msgstr ""
 #. TRANS ap_snd(3) function contained a value that was not valid in the current
 #. TRANS state or context.
 #.
-#: src/lib/apli.c:1805
+#: src/lib/apli.c:1792
 msgid "cdata field value invalid: old_conn_id"
 msgstr ""
 
@@ -120,7 +120,7 @@ msgstr ""
 #. TRANS ap_snd(3) function contained a value that was not valid in the current
 #. TRANS state or context.
 #.
-#: src/lib/apli.c:1812
+#: src/lib/apli.c:1799
 msgid "cdata field value invalid: pabort_ind"
 msgstr ""
 
@@ -129,7 +129,7 @@ msgstr ""
 #. TRANS function contained a value that was not valid in the current state or
 #. TRANS context.
 #.
-#: src/lib/apli.c:1819
+#: src/lib/apli.c:1806
 msgid "cdata field value invalid: res"
 msgstr ""
 
@@ -138,7 +138,7 @@ msgstr ""
 #. TRANS ap_snd(3) function contained a value that was not valid in the current
 #. TRANS state or context.
 #.
-#: src/lib/apli.c:1826
+#: src/lib/apli.c:1813
 msgid "cdata field value invalid: res_src"
 msgstr ""
 
@@ -147,7 +147,7 @@ msgstr ""
 #. TRANS ap_snd(3) function contained a value that was not valid in the current
 #. TRANS state or context.
 #.
-#: src/lib/apli.c:1833
+#: src/lib/apli.c:1820
 msgid "cdata field value invalid: resync_type"
 msgstr ""
 
@@ -156,7 +156,7 @@ msgstr ""
 #. TRANS function contained a value that was not valid in the current state or
 #. TRANS context.
 #.
-#: src/lib/apli.c:1840
+#: src/lib/apli.c:1827
 msgid "cdata field value invalid: rsn"
 msgstr ""
 
@@ -165,7 +165,7 @@ msgstr ""
 #. TRANS function contained a value that was not valid in the current state or
 #. TRANS context.
 #.
-#: src/lib/apli.c:1847
+#: src/lib/apli.c:1834
 msgid "cdata field value invalid: src"
 msgstr ""
 
@@ -174,7 +174,7 @@ msgstr ""
 #. TRANS ap_snd(3) function contained a value that was not valid in the current
 #. TRANS state or context.
 #.
-#: src/lib/apli.c:1854
+#: src/lib/apli.c:1841
 msgid "cdata field value invalid: sync_p_sn"
 msgstr ""
 
@@ -183,7 +183,7 @@ msgstr ""
 #. TRANS ap_snd(3) function contained a value that was not valid in the current
 #. TRANS state or context.
 #.
-#: src/lib/apli.c:1861
+#: src/lib/apli.c:1848
 msgid "cdata field value invalid: sync_type"
 msgstr ""
 
@@ -192,7 +192,7 @@ msgstr ""
 #. TRANS ap_snd(3) function contained a value that was not valid in the current
 #. TRANS state or context.
 #.
-#: src/lib/apli.c:1868
+#: src/lib/apli.c:1855
 msgid "cdata field value invalid: tokens"
 msgstr ""
 
@@ -202,7 +202,7 @@ msgstr ""
 #. TRANS determined that the choice of encoding for the envelope of the user data
 #. TRANS was incorrect.
 #.
-#: src/lib/apli.c:1876
+#: src/lib/apli.c:1863
 msgid "bad encoding chosen in enveloping function"
 msgstr ""
 
@@ -213,7 +213,7 @@ msgstr ""
 #. TRANS specific value.  Therefore, the call to ap_snd(3) has failed because a
 #. TRANS mandatory attribute is not set.
 #.
-#: src/lib/apli.c:1885
+#: src/lib/apli.c:1872
 msgid "a mandatory attribute is not set"
 msgstr ""
 
@@ -231,7 +231,7 @@ msgstr ""
 #. TRANS correspond to an APLI instances and therefore cannot be acted upon by the
 #. TRANS APLI library function.
 #.
-#: src/lib/apli.c:1901
+#: src/lib/apli.c:1888
 msgid "not a presentation service endpoint"
 msgstr ""
 
@@ -242,7 +242,7 @@ msgstr ""
 #. TRANS indicates that a combination of flags passed by the user was invalid per
 #. TRANS the specification of the flags.
 #.
-#: src/lib/apli.c:1910
+#: src/lib/apli.c:1897
 msgid "combination of flags is invalid"
 msgstr ""
 
@@ -259,7 +259,7 @@ msgstr ""
 #. TRANS call, and will, instead, return this error indicating that it could not
 #. TRANS free structure members.
 #.
-#: src/lib/apli.c:1925
+#: src/lib/apli.c:1912
 msgid "could not free structure members"
 msgstr ""
 
@@ -271,19 +271,19 @@ msgstr ""
 #. TRANS not correspond to any of these symbolic constants, then the structure type
 #. TRANS is unknown and this error generated.
 #.
-#: src/lib/apli.c:1935
+#: src/lib/apli.c:1922
 msgid "unknown structure type"
 msgstr ""
 
 #. TRANS AP_BADLSTATE -
 #.
-#: src/lib/apli.c:1939
+#: src/lib/apli.c:1926
 msgid "instance in bad state for that command"
 msgstr ""
 
 #. TRANS AP_BADPARSE -
 #.
-#: src/lib/apli.c:1943
+#: src/lib/apli.c:1930
 msgid "attribute parse failed"
 msgstr ""
 
@@ -295,7 +295,7 @@ msgstr ""
 #. TRANS sptype, does not correspond to a symbolic constant know to the APLI
 #. TRANS library.
 #.
-#: src/lib/apli.c:1953
+#: src/lib/apli.c:1940
 msgid "unrecognized primitive from user"
 msgstr ""
 
@@ -310,7 +310,7 @@ msgstr ""
 #. TRANS the flags argument and no subsequent call to ap_snd(3) without the AP_MORE
 #. TRANS bit set has been sent).
 #.
-#: src/lib/apli.c:1966
+#: src/lib/apli.c:1953
 msgid "not restored due to more bit on (AP_MORE set)"
 msgstr ""
 
@@ -319,7 +319,7 @@ msgstr ""
 #. TRANS which is not applicable to the roles (intiiator or responder) for which
 #. TRANS the APLI instance is allowed (as per environment attribute ROLE_ALLOWED).
 #.
-#: src/lib/apli.c:1973
+#: src/lib/apli.c:1960
 msgid "request invalid due to value of AP_ROLE"
 msgstr ""
 
@@ -334,7 +334,7 @@ msgstr ""
 #. TRANS ap_save(3) function will fail while the AP_MORE bit is set, with this
 #. TRANS error code.
 #.
-#: src/lib/apli.c:1986
+#: src/lib/apli.c:1973
 msgid "not save due to more bit on (AP_MORE set)"
 msgstr ""
 
@@ -342,73 +342,73 @@ msgstr ""
 #. TRANS ap_restore(3) is not a valid file pointer.  It may be NULL or does not
 #. TRANS represent a valid file stream open for writing.
 #.
-#: src/lib/apli.c:1992
+#: src/lib/apli.c:1979
 msgid "invalid FILE pointer"
 msgstr ""
 
 #. TRANS AP_BADUBUF -
 #.
-#: src/lib/apli.c:1996
+#: src/lib/apli.c:1983
 msgid "bad length for user data"
 msgstr ""
 
 #. TRANS AP_HANGUP -
 #.
-#: src/lib/apli.c:2000
+#: src/lib/apli.c:1987
 msgid "association close or aborted"
 msgstr ""
 
 #. TRANS AP_INTERNAL -
 #.
-#: src/lib/apli.c:2004
+#: src/lib/apli.c:1991
 msgid "internal error"
 msgstr ""
 
 #. TRANS AP_LOOK -
 #.
-#: src/lib/apli.c:2008
+#: src/lib/apli.c:1995
 msgid "a pending event requires attention"
 msgstr ""
 
 #. TRANS AP_NOATTR -
 #.
-#: src/lib/apli.c:2012
+#: src/lib/apli.c:1999
 msgid "no such attribute"
 msgstr ""
 
 #. TRANS AP_NOENV -
 #.
-#: src/lib/apli.c:2016
+#: src/lib/apli.c:2003
 msgid "no environment for that fd"
 msgstr ""
 
 #. TRANS AP_NOMEM -
 #.
-#: src/lib/apli.c:2020
+#: src/lib/apli.c:2007
 msgid "could not allocate enough memory"
 msgstr ""
 
 #. TRANS AP_NOREAD -
 #.
-#: src/lib/apli.c:2024
+#: src/lib/apli.c:2011
 msgid "attribute is not readable"
 msgstr ""
 
 #. TRANS AP_NOSET -
 #.
-#: src/lib/apli.c:2028
+#: src/lib/apli.c:2015
 msgid "attribute is not setable"
 msgstr ""
 
 #. TRANS AP_NOWRITE -
 #.
-#: src/lib/apli.c:2032
+#: src/lib/apli.c:2019
 msgid "attribute is not writable"
 msgstr ""
 
 #. TRANS AP_PDUREJ -
 #.
-#: src/lib/apli.c:2036
+#: src/lib/apli.c:2023
 msgid "invalid PDU rejected"
 msgstr ""
 
@@ -422,241 +422,241 @@ msgstr ""
 #. TRANS are even permitted to change t_errno to some other value, when the call
 #. TRANS is actually successful.
 #.
-#: src/lib/cdiapi.c:2685 src/lib/xnet.c:5684
+#: src/lib/cdiapi.c:2672 src/lib/xnet.c:5665
 msgid "No error"
 msgstr ""
 
 #. TRANS  CD_BADADDRESS: Address was invalid.
 #.
-#: src/lib/cdiapi.c:2689
+#: src/lib/cdiapi.c:2676
 msgid "Address was invalid"
 msgstr ""
 
 #. TRANS  CD_BADADDRTYPE: Invalid address type.
 #.
-#: src/lib/cdiapi.c:2693
+#: src/lib/cdiapi.c:2680
 msgid "Invalid address type"
 msgstr ""
 
 #. TRANS  CD_BADDIAL: Dial information was invalid.
 #.
-#: src/lib/cdiapi.c:2697
+#: src/lib/cdiapi.c:2684
 msgid "Dial information was invalid"
 msgstr ""
 
 #. TRANS  CD_BADDIALTYPE: Invalid dial information type.
 #.
-#: src/lib/cdiapi.c:2701
+#: src/lib/cdiapi.c:2688
 msgid "Invalid dial information type"
 msgstr ""
 
 #. TRANS  CD_BADDISPOSAL: Invalid disposal parameter.
 #.
-#: src/lib/cdiapi.c:2705
+#: src/lib/cdiapi.c:2692
 msgid "Invalid disposal parameter"
 msgstr ""
 
 #. TRANS  CD_BADFRAME: Defective SDU received.
 #.
-#: src/lib/cdiapi.c:2709
+#: src/lib/cdiapi.c:2696
 msgid "Defective SDU received"
 msgstr ""
 
 #. TRANS  CD_BADPPA: Invalid PPA identifier.
 #.
-#: src/lib/cdiapi.c:2713
+#: src/lib/cdiapi.c:2700
 msgid "Invalid PPA identifier"
 msgstr ""
 
 #. TRANS  CD_BADPRIM: Unrecognized primitive.
 #.
-#: src/lib/cdiapi.c:2717
+#: src/lib/cdiapi.c:2704
 msgid "Unrecognized primitive"
 msgstr ""
 
 #. TRANS  CD_DISC: Disconnected.
 #.
-#: src/lib/cdiapi.c:2721
+#: src/lib/cdiapi.c:2708
 msgid "Disconnected"
 msgstr ""
 
 #. TRANS  CD_EVENT: Protocol-specific event occurred.
 #.
-#: src/lib/cdiapi.c:2725
+#: src/lib/cdiapi.c:2712
 msgid "Protocol-specific event occurred"
 msgstr ""
 
 #. TRANS  CD_FATALERR: Device has become unusable.
 #.
-#: src/lib/cdiapi.c:2729
+#: src/lib/cdiapi.c:2716
 msgid "Device has become unusable"
 msgstr ""
 
 #. TRANS  CD_INITFAILED: Line initialization failed.
 #.
-#: src/lib/cdiapi.c:2733
+#: src/lib/cdiapi.c:2720
 msgid "Line initialization failed"
 msgstr ""
 
 #. TRANS  CD_NOTSUPP: Primitive not supported by this device.
 #.
-#: src/lib/cdiapi.c:2737
+#: src/lib/cdiapi.c:2724
 msgid "Primitive not supported by this device"
 msgstr ""
 
 #. TRANS  CD_OUTSTATE: Primitive was issued from an invalid state.
 #.
-#: src/lib/cdiapi.c:2741
+#: src/lib/cdiapi.c:2728
 msgid "Primitive was issued from an invalid state"
 msgstr ""
 
 #. TRANS  CD_PROTOSHORT: M_PROTO block too short.
 #.
-#: src/lib/cdiapi.c:2745
+#: src/lib/cdiapi.c:2732
 msgid "M_PROTO block too short"
 msgstr ""
 
 #. TRANS  CD_READTIMEOUT: Read request timed out before data arrived.
 #.
-#: src/lib/cdiapi.c:2749
+#: src/lib/cdiapi.c:2736
 msgid "Read request timed out before data arrived"
 msgstr ""
 
 #. TRANS  CD_SYSERR: UNIX system error.
 #.
-#: src/lib/cdiapi.c:2753
+#: src/lib/cdiapi.c:2740
 msgid "UNIX system error"
 msgstr ""
 
 #. TRANS  CD_WRITEFAIL: Unitdata request failed.
 #.
-#: src/lib/cdiapi.c:2757
+#: src/lib/cdiapi.c:2744
 msgid "Unitdata request failed"
 msgstr ""
 
 #. TRANS  Any other value: Unknown error.
 #.
-#: src/lib/cdiapi.c:2761 src/lib/dlpiapi.c:2474
+#: src/lib/cdiapi.c:2748 src/lib/dlpiapi.c:2458
 msgid "Unknown error"
 msgstr ""
 
 #. TRANS  No explanation.
 #.
-#: src/lib/cdiapi.c:2770
+#: src/lib/cdiapi.c:2757
 msgid "No explanation"
 msgstr ""
 
 #. TRANS  CD_CRCERR: CRC or FCS error.
 #.
-#: src/lib/cdiapi.c:2774
+#: src/lib/cdiapi.c:2761
 msgid "CRC or FCS error"
 msgstr ""
 
 #. TRANS  CD_DLE_EOT: DLE EOT detected.
 #.
-#: src/lib/cdiapi.c:2778
+#: src/lib/cdiapi.c:2765
 msgid "DLE EOT detected"
 msgstr ""
 
 #. TRANS  CD_FORMAT: Format error detected.
 #.
-#: src/lib/cdiapi.c:2782
+#: src/lib/cdiapi.c:2769
 msgid "Format error detected"
 msgstr ""
 
 #. TRANS  CD_HDLC_ABORT: Aborted frame detected.
 #.
-#: src/lib/cdiapi.c:2786
+#: src/lib/cdiapi.c:2773
 msgid "Aborted frame detected"
 msgstr ""
 
 #. TRANS  CD_OVERRUN: Input overrun.
 #.
-#: src/lib/cdiapi.c:2790
+#: src/lib/cdiapi.c:2777
 msgid "Input overrun"
 msgstr ""
 
 #. TRANS  CD_TOOSHORT: Frame too short.
 #.
-#: src/lib/cdiapi.c:2794
+#: src/lib/cdiapi.c:2781
 msgid "Frame too short"
 msgstr ""
 
 #. TRANS  CD_INCOMPLETE: Partial frame received.
 #.
-#: src/lib/cdiapi.c:2798
+#: src/lib/cdiapi.c:2785
 msgid "Partial frame received"
 msgstr ""
 
 #. TRANS  CD_BUSY: Telephone was busy.
 #.
-#: src/lib/cdiapi.c:2802
+#: src/lib/cdiapi.c:2789
 msgid "Telephone was busy"
 msgstr ""
 
 #. TRANS  CD_NOASNWER: Connection went unanswered.
 #.
-#: src/lib/cdiapi.c:2806
+#: src/lib/cdiapi.c:2793
 msgid "Connection went unanswered"
 msgstr ""
 
 #. TRANS  CD_CALLREJECT: Connection rejected.
 #.
-#: src/lib/cdiapi.c:2810
+#: src/lib/cdiapi.c:2797
 msgid "Connection rejected"
 msgstr ""
 
 #. TRANS  CD_HDLC_IDLE: HDLC line went idle.
 #.
-#: src/lib/cdiapi.c:2814
+#: src/lib/cdiapi.c:2801
 msgid "HDLC line went idle"
 msgstr ""
 
 #. TRANS  CD_HDLC_NOTIDLE: HDLC line no longer idle.
 #.
-#: src/lib/cdiapi.c:2818
+#: src/lib/cdiapi.c:2805
 msgid "HDLC line no longer idle"
 msgstr ""
 
 #. TRANS  CD_QUIESCENT: Line being reassigned.
 #.
-#: src/lib/cdiapi.c:2822
+#: src/lib/cdiapi.c:2809
 msgid "Line being reassigned"
 msgstr ""
 
 #. TRANS  CD_RESUMED: Line has been reassigned.
 #.
-#: src/lib/cdiapi.c:2826
+#: src/lib/cdiapi.c:2813
 msgid "Line has been reassigned"
 msgstr ""
 
 #. TRANS  CD_DSRTIMEOUT: Did not see DSR in time.
 #.
-#: src/lib/cdiapi.c:2830
+#: src/lib/cdiapi.c:2817
 msgid "Did not see DSR in time"
 msgstr ""
 
 #. TRANS  CD_LAN_COLLISIONS: LAN excessive collisions.
 #.
-#: src/lib/cdiapi.c:2834
+#: src/lib/cdiapi.c:2821
 msgid "LAN excessive collisions"
 msgstr ""
 
 #. TRANS  CD_LAN_REFUSED: LAN message refused.
 #.
-#: src/lib/cdiapi.c:2838
+#: src/lib/cdiapi.c:2825
 msgid "LAN message refused"
 msgstr ""
 
 #. TRANS  CD_LAN_NOSTATION: LAN no such station.
 #.
-#: src/lib/cdiapi.c:2842
+#: src/lib/cdiapi.c:2829
 msgid "LAN no such station"
 msgstr ""
 
 #. TRANS  CD_LOSTCTS: Lost Clear to Send signal.
 #.
-#: src/lib/cdiapi.c:2846
+#: src/lib/cdiapi.c:2833
 msgid "Lost Clear to Send signal"
 msgstr ""
 
@@ -676,13 +676,13 @@ msgstr ""
 #. TRANS  subroutine that will return this function.  See dlpi_bind(3),
 #. TRANS  DL_BIND_REQ(7) and DL_ERROR_ACK(7) for more information.
 #.
-#: src/lib/dlpiapi.c:2362 src/lib/dlpi.c:3189
+#: src/lib/dlpiapi.c:2346 src/lib/dlpi.c:3148
 msgid "Bad LSAP selector"
 msgstr ""
 
 #. TRANS  DL_BADADDR: DLSAP addr in improper format or invalid.
 #.
-#: src/lib/dlpiapi.c:2366
+#: src/lib/dlpiapi.c:2350
 msgid "DLSAP addr in improper format or invalid"
 msgstr ""
 
@@ -706,7 +706,7 @@ msgstr ""
 #. TRANS
 #. TRANS  Other uses of this error code are not supoprted by the DLPI Library.
 #.
-#: src/lib/dlpiapi.c:2370 src/lib/dlpi.c:3232
+#: src/lib/dlpiapi.c:2354 src/lib/dlpi.c:3191
 msgid "Improper permissions for request"
 msgstr ""
 
@@ -723,7 +723,7 @@ msgstr ""
 #. TRANS  this consists largely of the bind and unbind subroutines.  See
 #. TRANS  dlpi_bind(3), dlpi_unbind(3), DL_BIND_REQ(7) and DL_UNBIND_REQ(7).
 #.
-#: src/lib/dlpiapi.c:2374 src/lib/dlpi.c:3245
+#: src/lib/dlpiapi.c:2358 src/lib/dlpi.c:3204
 msgid "Primitive issued in improper state"
 msgstr ""
 
@@ -737,19 +737,19 @@ msgstr ""
 #. TRANS  of the associate DL_ERROR_ACK primitive, or, when returned by the DLPI
 #. TRANS  Library subroutines, contained in the errno(3) global variable.
 #.
-#: src/lib/dlpiapi.c:2378 src/lib/dlpi.c:3255
+#: src/lib/dlpiapi.c:2362 src/lib/dlpi.c:3214
 msgid "UNIX system error occurred"
 msgstr ""
 
 #. TRANS  DL_BADCORR: Seq number not from outstand DL_CONN_IND.
 #.
-#: src/lib/dlpiapi.c:2382
+#: src/lib/dlpiapi.c:2366
 msgid "Seq number not from outstand DL_CONN_IND"
 msgstr ""
 
 #. TRANS  DL_BADDATA: User data exceeded provider limit.
 #.
-#: src/lib/dlpiapi.c:2386 src/lib/dlpi.c:3265
+#: src/lib/dlpiapi.c:2370 src/lib/dlpi.c:3224
 msgid "User data exceeded provider limit"
 msgstr ""
 
@@ -764,7 +764,7 @@ msgstr ""
 #. TRANS  does not support the DL_CLDLS service mode, this error code is returned.
 #. TRANS  See dlpi_bind(3) and DL_BIND_REQ(7).
 #.
-#: src/lib/dlpiapi.c:2390 src/lib/dlpi.c:3276
+#: src/lib/dlpiapi.c:2374 src/lib/dlpi.c:3235
 msgid "Requested service not supplied by provider"
 msgstr ""
 
@@ -778,7 +778,7 @@ msgstr ""
 #. TRANS  When the determined PPA is not appropriate for the driver, this error
 #. TRANS  code is returned.  See dlpi_open(3) and DL_ATTACH_REQ(7).
 #.
-#: src/lib/dlpiapi.c:2394 src/lib/dlpi.c:3286
+#: src/lib/dlpiapi.c:2378 src/lib/dlpi.c:3245
 msgid "Specified PPA was invalid"
 msgstr ""
 
@@ -793,7 +793,7 @@ msgstr ""
 #. TRANS  extension primitives that are not known to the DLS provider.  See
 #. TRANS  dlpi_enabnotify(3) and dlpi_disabnotify(3).
 #.
-#: src/lib/dlpiapi.c:2398 src/lib/dlpi.c:3297
+#: src/lib/dlpiapi.c:2382 src/lib/dlpi.c:3256
 msgid "Primitive received not known by provider"
 msgstr ""
 
@@ -803,13 +803,13 @@ msgstr ""
 #. TRANS  is not currently returned by any function in the DLPI Library for a
 #. TRANS  properly functioning DLS provider.  See DL_UDQOS_REQ(7).
 #.
-#: src/lib/dlpiapi.c:2402 src/lib/dlpi.c:3303
+#: src/lib/dlpiapi.c:2386 src/lib/dlpi.c:3262
 msgid "QOS parameters contained invalid values"
 msgstr ""
 
 #. TRANS  DL_BADQOSTYPE: QOS structure type is unknown/unsupported.
 #.
-#: src/lib/dlpiapi.c:2406
+#: src/lib/dlpiapi.c:2390
 msgid "QOS structure type is unknown/unsupported"
 msgstr ""
 
@@ -819,7 +819,7 @@ msgstr ""
 #. TRANS  currently returned by any function in the DLPI Library for a properly
 #. TRANS  functioning DLS provider.  See DL_CONNECT_RES(7).
 #.
-#: src/lib/dlpiapi.c:2410 src/lib/dlpi.c:3315
+#: src/lib/dlpiapi.c:2394 src/lib/dlpi.c:3274
 msgid "Token used not an active stream"
 msgstr ""
 
@@ -829,7 +829,7 @@ msgstr ""
 #. TRANS  not currently returned by any function in the DLPI Library for a properly
 #. TRANS  functioning DLS provider.  See DL_BIND_REQ(7).
 #.
-#: src/lib/dlpiapi.c:2414 src/lib/dlpi.c:3321
+#: src/lib/dlpiapi.c:2398 src/lib/dlpi.c:3280
 msgid "Attempted second bind with dl_max_conind"
 msgstr ""
 
@@ -846,25 +846,25 @@ msgstr ""
 #. TRANS  or bind.  See dlpi_open(3), dlpi_bind(3), DL_ATTACH_REQ(7) and
 #. TRANS  DL_BIND_REQ(7).
 #.
-#: src/lib/dlpiapi.c:2418 src/lib/dlpi.c:3334
+#: src/lib/dlpiapi.c:2402 src/lib/dlpi.c:3293
 msgid "Physical Link initialization failed"
 msgstr ""
 
 #. TRANS  DL_NOADDR: Provider couldn't allocate alternate address.
 #.
-#: src/lib/dlpiapi.c:2422
+#: src/lib/dlpiapi.c:2406
 msgid "Provider couldn't allocate alternate address"
 msgstr ""
 
 #. TRANS  DL_NOTINIT: Physical Link not initialized.
 #.
-#: src/lib/dlpiapi.c:2426
+#: src/lib/dlpiapi.c:2410
 msgid "Physical Link not initialized"
 msgstr ""
 
 #. TRANS  DL_UNDELIVERABLE: Previous data unit could not be delivered.
 #.
-#: src/lib/dlpiapi.c:2430 src/lib/dlpi.c:3363
+#: src/lib/dlpiapi.c:2414 src/lib/dlpi.c:3322
 msgid "Previous data unit could not be delivered"
 msgstr ""
 
@@ -879,7 +879,7 @@ msgstr ""
 #. TRANS  dlpi_enabmulti(3), dlpi_enabnotify(3), dlpi_get_physaddr(3),
 #. TRANS  dlpi_promiscoff(3), dlpi_promiscon(3) and dlpi_set_physaddr(3).
 #.
-#: src/lib/dlpiapi.c:2434 src/lib/dlpi.c:3374
+#: src/lib/dlpiapi.c:2418 src/lib/dlpi.c:3333
 msgid "Primitive is known but not supported"
 msgstr ""
 
@@ -895,13 +895,13 @@ msgstr ""
 #. TRANS  dlpi_enabmulti(3) library call.  See dlpi_enabmulti(3) and
 #. TRANS  DL_ENABMULTI_REQ(7).
 #.
-#: src/lib/dlpiapi.c:2438 src/lib/dlpi.c:3386
+#: src/lib/dlpiapi.c:2422 src/lib/dlpi.c:3345
 msgid "Limit exceeded"
 msgstr ""
 
 #. TRANS  DL_NOTENAB: Promiscuous mode not enabled.
 #.
-#: src/lib/dlpiapi.c:2442
+#: src/lib/dlpiapi.c:2426
 msgid "Promiscuous mode not enabled"
 msgstr ""
 
@@ -915,13 +915,13 @@ msgstr ""
 #. TRANS  physical address, this error code is returned.  See dlpi_set_physaddr(3)
 #. TRANS  and DL_SET_PHYS_ADDR_REQ(7).
 #.
-#: src/lib/dlpiapi.c:2446 src/lib/dlpi.c:3407
+#: src/lib/dlpiapi.c:2430 src/lib/dlpi.c:3366
 msgid "Other streams for PPA in post-attached state"
 msgstr ""
 
 #. TRANS  DL_NOAUTO: Automatic handling of XID and TEST response not supported.
 #.
-#: src/lib/dlpiapi.c:2450
+#: src/lib/dlpiapi.c:2434
 msgid "Automatic handling of XID and TEST response not supported"
 msgstr ""
 
@@ -931,7 +931,7 @@ msgstr ""
 #. TRANS  is not currently returned by any function in the DLPI Library for a
 #. TRANS  properly functioning DLS provider.  See DL_BIND_REQ(7).
 #.
-#: src/lib/dlpiapi.c:2454 src/lib/dlpi.c:3419
+#: src/lib/dlpiapi.c:2438 src/lib/dlpi.c:3378
 msgid "Automatic handling of XID not supported"
 msgstr ""
 
@@ -941,7 +941,7 @@ msgstr ""
 #. TRANS  is not currently returned by any function in the DLPI Library for a
 #. TRANS  properly functioning DLS provider.  See DL_BIND_REQ(7).
 #.
-#: src/lib/dlpiapi.c:2458 src/lib/dlpi.c:3425
+#: src/lib/dlpiapi.c:2442 src/lib/dlpi.c:3384
 msgid "Automatic handling of TEST not supported"
 msgstr ""
 
@@ -951,7 +951,7 @@ msgstr ""
 #. TRANS  currently returned by any function in the DLPI Library for a properly
 #. TRANS  functioning DLS provider.  See DL_XID_REQ(7).
 #.
-#: src/lib/dlpiapi.c:2462 src/lib/dlpi.c:3431
+#: src/lib/dlpiapi.c:2446 src/lib/dlpi.c:3390
 msgid "Automatic handling of XID response"
 msgstr ""
 
@@ -961,7 +961,7 @@ msgstr ""
 #. TRANS  currently returned by any function in the DLPI Library for a properly
 #. TRANS  functioning DLS provider.  See DL_TEST_REQ(7).
 #.
-#: src/lib/dlpiapi.c:2466 src/lib/dlpi.c:3437
+#: src/lib/dlpiapi.c:2450 src/lib/dlpi.c:3396
 msgid "Automatic handling of TEST response"
 msgstr ""
 
@@ -971,53 +971,53 @@ msgstr ""
 #. TRANS  not currently returned by any function in the DLPI Library for a properly
 #. TRANS  functioning DLS provider.  See DL_CONNECT_RES(7).
 #.
-#: src/lib/dlpiapi.c:2470 src/lib/dlpi.c:3443
+#: src/lib/dlpiapi.c:2454 src/lib/dlpi.c:3402
 msgid "Pending outstanding connect indications"
 msgstr ""
 
 #. TRANS  Values from 0x80-0xff: Device-specific error.
 #.
-#: src/lib/dlpiapi.c:2478
+#: src/lib/dlpiapi.c:2462
 msgid "Device-specific error"
 msgstr ""
 
 #. TRANS  This MAC type corresponds to an interface to an IEEE 802.3 CSMA/CD
 #. TRANS  network.
 #.
-#: src/lib/dlpi.c:2032
+#: src/lib/dlpi.c:1991
 msgid "IEEE 802.3 CSMA/CD"
 msgstr ""
 
 #. TRANS  This MAC type corresponds to an interface to an IEEE 802.4 Token
 #. TRANS  Passing Bus network.
 #.
-#: src/lib/dlpi.c:2037
+#: src/lib/dlpi.c:1996
 msgid "IEEE 802.4 Token Passing Bus"
 msgstr ""
 
 #. TRANS  This MAC type corresponds to an interface to an IEEE 802.5 Token
 #. TRANS  Passing Ring (Token Ring).
 #.
-#: src/lib/dlpi.c:2042
+#: src/lib/dlpi.c:2001
 msgid "IEEE 802.5 Token Passing Ring"
 msgstr ""
 
 #. TRANS  This MAC type corresponds to an interface to an IEEE 802.6 Metro Net
 #. TRANS  network.
 #.
-#: src/lib/dlpi.c:2047
+#: src/lib/dlpi.c:2006
 msgid "IEEE 802.6 Metro Net"
 msgstr ""
 
 #. TRANS  This MAC type corresponds to an interface to an Ethernet Bus network.
 #.
-#: src/lib/dlpi.c:2051
+#: src/lib/dlpi.c:2010
 msgid "Ethernet Bus"
 msgstr ""
 
 #. TRANS  This MAC type corresponds to an interface to ISO HDLC data link.
 #.
-#: src/lib/dlpi.c:2055
+#: src/lib/dlpi.c:2014
 msgid "ISO HDLC Protocol Support"
 msgstr ""
 
@@ -1025,40 +1025,40 @@ msgstr ""
 #. TRANS  link.  This may be synchronous character protocols such as BSC or
 #. TRANS  DDCMP.
 #.
-#: src/lib/dlpi.c:2061
+#: src/lib/dlpi.c:2020
 msgid "Character Synchronous Protocol Support"
 msgstr ""
 
 #. TRANS  This MAC type corresponds to an IBM Channel-to-Channel Adapter.
 #.
-#: src/lib/dlpi.c:2065
+#: src/lib/dlpi.c:2024
 msgid "IBM Channel-to-Channel Adapter"
 msgstr ""
 
 #. TRANS  This MAC type corresponds to a Fiber Distributed Data Interface (FDDI)
 #. TRANS  to an FDDI LAN.
 #.
-#: src/lib/dlpi.c:2070
+#: src/lib/dlpi.c:2029
 msgid "Fiber Distributed Data Interface"
 msgstr ""
 
 #. TRANS  This MAC type corresponse to an interface other than those listed
 #. TRANS  above.
 #.
-#: src/lib/dlpi.c:2075
+#: src/lib/dlpi.c:2034
 msgid "Other Interface"
 msgstr ""
 
 #. TRANS  This MAC type corresponds to a Fibre Channel Interface.
 #.
-#: src/lib/dlpi.c:2079
+#: src/lib/dlpi.c:2038
 msgid "Fibre Channel Interface"
 msgstr ""
 
 #. TRANS  This MAC type corresponds to an ATM (Asynchronous Transfer Mode)
 #. TRANS  Interface.
 #.
-#: src/lib/dlpi.c:2084
+#: src/lib/dlpi.c:2043
 msgid "ATM (Asynchronous Transfer Mode)"
 msgstr ""
 
@@ -1066,82 +1066,82 @@ msgstr ""
 #. TRANS  Classical IP Interface.  In this case a "classical" IP interface is one
 #. TRANS  that corresponds to RFC 1577, which uses a classical approach by name.
 #.
-#: src/lib/dlpi.c:2090
+#: src/lib/dlpi.c:2049
 msgid "ATM Classical IP Interface"
 msgstr ""
 
 #. TRANS  This MAC type corresponds to an X.25 LAPB (Link Access Procedure,
 #. TRANS  Balanced) Interface [ITU-T Recommenation X.25, ISO/IEC 7776].
 #.
-#: src/lib/dlpi.c:2095
+#: src/lib/dlpi.c:2054
 msgid "X.25 LAPB Interface"
 msgstr ""
 
 #. TRANS  This MAC type corresponds to a Q.921 LAPD (Link Access Procedure,
 #. TRANS  D-Channel) Interface [ITU-T Recommendation Q.921].
 #.
-#: src/lib/dlpi.c:2100
+#: src/lib/dlpi.c:2059
 msgid "ISDN Interface"
 msgstr ""
 
 #. TRANS  This MAC type corresponds to a High Performance Parallel Interface.
 #.
-#: src/lib/dlpi.c:2104
+#: src/lib/dlpi.c:2063
 msgid "HIPPI Interface"
 msgstr ""
 
 #. TRANS  This MAC type corresponds a 100 Based VG Ethernet.  This MAC type is
 #. TRANS  deprecated.  Use DL_ETHER or DL_ETH_CSMA instead.
 #.
-#: src/lib/dlpi.c:2109
+#: src/lib/dlpi.c:2068
 msgid "100 Based VG Ethernet"
 msgstr ""
 
 #. TRANS  This MAC type corresponse to 100 Based VG Token Ring [IEEE 802.5].
 #. TRANS  This MAC type is deprecated.  Use DL_TPR instead.
 #.
-#: src/lib/dlpi.c:2114
+#: src/lib/dlpi.c:2073
 msgid "100 Based VG Token Ring"
 msgstr ""
 
 #. TRANS  This MAC type coresponds to Ethernet II and CSMA/CD [IEEE 802.2 and
 #. TRANS  802.3] on the same medium.
 #.
-#: src/lib/dlpi.c:2119
+#: src/lib/dlpi.c:2078
 msgid "ISO 8802/3 and Ethernet"
 msgstr ""
 
 #. TRANS  This MAC type coresponds to 100 Base T Ethernet.  This MAC type is
 #. TRANS  deprecated.  Use DL_ETHER or DL_ETH_CSMA instead.
 #.
-#: src/lib/dlpi.c:2124
+#: src/lib/dlpi.c:2083
 msgid "100 Base T"
 msgstr ""
 
 #. TRANS  This MAC type corresponds to an Infiniband interface.
 #.
-#: src/lib/dlpi.c:2128
+#: src/lib/dlpi.c:2087
 msgid "Infiniband"
 msgstr ""
 
 #. TRANS  This MAC type corresponds to a Frame Relay LAPF (Link Access Procedure
 #. TRANS  Frame-Relay) WAN data link.
 #.
-#: src/lib/dlpi.c:2133
+#: src/lib/dlpi.c:2092
 msgid "Frame Relay LAPF"
 msgstr ""
 
 #. TRANS  This MAC type corresponds to an interface using Multi-protocol over
 #. TRANS  Frame Relay.
 #.
-#: src/lib/dlpi.c:2138
+#: src/lib/dlpi.c:2097
 msgid "Multi-protocol over Frame Relay"
 msgstr ""
 
 #. TRANS  This MAC type corresponds to an interface using Character Asyncrhonous
 #. TRANS  Protocol.
 #.
-#: src/lib/dlpi.c:2143
+#: src/lib/dlpi.c:2102
 msgid "Character Asynchronous Protocol"
 msgstr ""
 
@@ -1149,27 +1149,27 @@ msgstr ""
 #. TRANS  IP interface is one that corresponds to RFC 877, which is a long
 #. TRANS  standing and, therefore, classical standards specification.
 #.
-#: src/lib/dlpi.c:2149
+#: src/lib/dlpi.c:2108
 msgid "X.25 Classical IP Interface"
 msgstr ""
 
 #. TRANS  This MAC type corresponds to a Software Loopback.
 #.
-#: src/lib/dlpi.c:2153
+#: src/lib/dlpi.c:2112
 msgid "Software Loopback"
 msgstr ""
 
 #. TRANS  This MAC type corresponds to an IPv4 tunnel.  This MAC type is a
 #. TRANS  Solaris extension.
 #.
-#: src/lib/dlpi.c:2163
+#: src/lib/dlpi.c:2122
 msgid "IPv4 Tunnel Link"
 msgstr ""
 
 #. TRANS  This MAC type corresponds to an IPv6 tunnel.  This MAC type is a
 #. TRANS  Solaris extension.
 #.
-#: src/lib/dlpi.c:2168
+#: src/lib/dlpi.c:2127
 msgid "IPv6 Tunnel Link"
 msgstr ""
 
@@ -1177,14 +1177,14 @@ msgstr ""
 #. TRANS  provided for VLAN and other pseudo-interfaces.  This MAC type is a
 #. TRANS  Solaris extension.
 #.
-#: src/lib/dlpi.c:2174
+#: src/lib/dlpi.c:2133
 msgid "Virtual Network Interface"
 msgstr ""
 
 #. TRANS  This MAC type corresponds to a WiFi [IEEE 802.11] interface.  This MAC
 #. TRANS  type is a Solaris extension.
 #.
-#: src/lib/dlpi.c:2179
+#: src/lib/dlpi.c:2138
 msgid "IEEE 802.11"
 msgstr ""
 
@@ -1192,7 +1192,7 @@ msgstr ""
 #. TRANS  successfully.  Any other value returned from a DLPI Library function
 #. TRANS  indicates failure.
 #.
-#: src/lib/dlpi.c:3030
+#: src/lib/dlpi.c:2989
 msgid "DLPI operation succeeded"
 msgstr ""
 
@@ -1203,7 +1203,7 @@ msgstr ""
 #. TRANS  generic error condition used only when there is not a more specific error
 #. TRANS  condition that applies.
 #.
-#: src/lib/dlpi.c:3039
+#: src/lib/dlpi.c:2998
 msgid "Invalid argument"
 msgstr ""
 
@@ -1213,7 +1213,7 @@ msgstr ""
 #. TRANS  correctly (e.g.  contained control characters).  This error code is only
 #. TRANS  returned in response to the dlpi_open() library call.  See dlpi_open(3).
 #.
-#: src/lib/dlpi.c:3047
+#: src/lib/dlpi.c:3006
 msgid "Invalid DLPI linkname"
 msgstr ""
 
@@ -1222,7 +1222,7 @@ msgstr ""
 #. TRANS  to which it refers dos not exist.  This error code is only returned in
 #. TRANS  response to the dlpi_open() library call.  See dlpi_open(3).
 #.
-#: src/lib/dlpi.c:3054
+#: src/lib/dlpi.c:3013
 msgid "DLPI link does not exist"
 msgstr ""
 
@@ -1233,7 +1233,7 @@ msgstr ""
 #. TRANS  operation).  This error code is only returned in response to the
 #. TRANS  dlpi_open() library call.  See dlpi_open(3).
 #.
-#: src/lib/dlpi.c:3063
+#: src/lib/dlpi.c:3022
 msgid "Bad DLPI link"
 msgstr ""
 
@@ -1245,7 +1245,7 @@ msgstr ""
 #. TRANS  error indicate that the passed in link handle is invalid and does not
 #. TRANS  reference an open data link.  See dlpi_open(3) and dlpi_close(3).
 #.
-#: src/lib/dlpi.c:3073
+#: src/lib/dlpi.c:3032
 msgid "Invalid DLPI handle"
 msgstr ""
 
@@ -1256,7 +1256,7 @@ msgstr ""
 #. TRANS  a user-settable time interval, the library call returns with this error
 #. TRANS  code.
 #.
-#: src/lib/dlpi.c:3082
+#: src/lib/dlpi.c:3041
 msgid "DLPI operation timed out"
 msgstr ""
 
@@ -1267,7 +1267,7 @@ msgstr ""
 #. TRANS  level of support required by the library is insufficient, it returns with
 #. TRANS  this error code.  See dlpi_info(3) and DL_INFO_ACK(7).
 #.
-#: src/lib/dlpi.c:3091
+#: src/lib/dlpi.c:3050
 msgid "Unsupported DLPI version"
 msgstr ""
 
@@ -1278,7 +1278,7 @@ msgstr ""
 #. TRANS  Note that the DL_UNSUPPORTED error code will be returned in the same
 #. TRANS  situation for dlpi_bind(3).  See dlpi_info(3) and DL_INFO_ACK(7).
 #.
-#: src/lib/dlpi.c:3100
+#: src/lib/dlpi.c:3059
 msgid "Unsupported DLPI connection mode"
 msgstr ""
 
@@ -1289,7 +1289,7 @@ msgstr ""
 #. TRANS  Library call, dlpi_bind(), fails with this error code.  See dlpi_bind(3)
 #. TRANS  and DL_BIND_REQ(7).
 #.
-#: src/lib/dlpi.c:3109
+#: src/lib/dlpi.c:3068
 msgid "Unavailable DLPI SAP"
 msgstr ""
 
@@ -1299,7 +1299,7 @@ msgstr ""
 #. TRANS  condition has occured during recovery, the DLPI Library call returns this
 #. TRANS  error code.  See dlpi_open(3) and dlpi_bind(3).
 #.
-#: src/lib/dlpi.c:3117
+#: src/lib/dlpi.c:3076
 msgid "DLPI operation failed"
 msgstr ""
 
@@ -1310,7 +1310,7 @@ msgstr ""
 #. TRANS  devices to be Style-2.  If however, such a device happens to report
 #. TRANS  Style-1, this error is returned.  See dlpi_open(3) and DL_ATTACH_REQ(7).
 #.
-#: src/lib/dlpi.c:3126
+#: src/lib/dlpi.c:3085
 msgid "DLPI style-2 node reports style-1"
 msgstr ""
 
@@ -1321,7 +1321,7 @@ msgstr ""
 #. TRANS  error code is not returned by any function in the DLPI Library for a
 #. TRANS  proper functioning DLS provider.
 #.
-#: src/lib/dlpi.c:3135
+#: src/lib/dlpi.c:3094
 msgid "Bad DLPI message"
 msgstr ""
 
@@ -1331,7 +1331,7 @@ msgstr ""
 #. TRANS  mode.  In the case that the DLS provider does not support raw mode, this
 #. TRANS  error code is returned.  See dlpi_open(3) and dlpi_ioctl(4).
 #.
-#: src/lib/dlpi.c:3143
+#: src/lib/dlpi.c:3102
 msgid "DLPI raw mode not supported"
 msgstr ""
 
@@ -1340,7 +1340,7 @@ msgstr ""
 #. TRANS  to that call does not specify a valid notification.  See
 #. TRANS  dlpi_enabnotify(3) and DL_NOTIFY_REQ(7).
 #.
-#: src/lib/dlpi.c:3150
+#: src/lib/dlpi.c:3109
 msgid "Invalid DLPI notification type"
 msgstr ""
 
@@ -1349,7 +1349,7 @@ msgstr ""
 #. TRANS  does not support the DL_NOTIFY_REQ primitive, this error code is returned
 #. TRANS  by the library call.  See dlpi_enabnotify(3) and DL_NOTIFY_REQ(7).
 #.
-#: src/lib/dlpi.c:3157
+#: src/lib/dlpi.c:3116
 msgid "DLPI notification not supported by link"
 msgstr ""
 
@@ -1362,7 +1362,7 @@ msgstr ""
 #. TRANS  supplied to the dlpi_disabnotify() library call, the call returns this
 #. TRANS  error code.  See dlpi_disabnotify(3).
 #.
-#: src/lib/dlpi.c:3168
+#: src/lib/dlpi.c:3127
 msgid "Invalid DLPI notification identifier"
 msgstr ""
 
@@ -1387,7 +1387,7 @@ msgstr ""
 #. TRANS
 #. TRANS  Other uses of this error code are not supoprted by the DLPI Library.
 #.
-#: src/lib/dlpi.c:3212
+#: src/lib/dlpi.c:3171
 msgid "DLSAP address in improper format or invalid"
 msgstr ""
 
@@ -1395,7 +1395,7 @@ msgstr ""
 #. TRANS  error code is not currently returned by any function in the DLPI Library
 #. TRANS  for a properly functioning DLS provider.
 #.
-#: src/lib/dlpi.c:3261
+#: src/lib/dlpi.c:3220
 msgid "Sequence number not from outstanding DL_CONN_IND"
 msgstr ""
 
@@ -1403,7 +1403,7 @@ msgstr ""
 #. TRANS  code is not currently returned by any function in the DLPI Library for a
 #. TRANS  properly functioning DLS provider.  See DL_UDQOS_REQ(7).
 #.
-#: src/lib/dlpi.c:3309
+#: src/lib/dlpi.c:3268
 msgid "QOS structure type is unknown or unsupported"
 msgstr ""
 
@@ -1416,7 +1416,7 @@ msgstr ""
 #. TRANS  provider may return this error code.  See dlpi_bind(3) and
 #. TRANS  DL_BIND_REQ(7).
 #.
-#: src/lib/dlpi.c:3345
+#: src/lib/dlpi.c:3304
 msgid "Provider could not allocate alternate address"
 msgstr ""
 
@@ -1432,7 +1432,7 @@ msgstr ""
 #. TRANS  or bound, this error code is returned.  See dlpi_open(3), dlpi_bind(3),
 #. TRANS  DL_ATTACH_REQ(7) and DL_BIND_REQ(7).
 #.
-#: src/lib/dlpi.c:3359
+#: src/lib/dlpi.c:3318
 msgid "Physical link not initialized"
 msgstr ""
 
@@ -1445,7 +1445,7 @@ msgstr ""
 #. TRANS  the DLS provider.  See dlpi_promiscoff(3), dlpi_disabmulti(3),
 #. TRANS  DL_PROMISCOFF_REQ(7) and DL_DISABMULTI_REQ(7).
 #.
-#: src/lib/dlpi.c:3397
+#: src/lib/dlpi.c:3356
 msgid "Promiscuous mode or multicast address not enabled"
 msgstr ""
 
@@ -1453,21 +1453,21 @@ msgstr ""
 #. TRANS  This error code is not currently returned by any function in the DLPI
 #. TRANS  Library for a properly functioning DLS provider.  See DL_BIND_REQ(7).
 #.
-#: src/lib/dlpi.c:3413
+#: src/lib/dlpi.c:3372
 msgid "Automatic handling of XID and TEST response not supported. "
 msgstr ""
 
 #. TRANS Corresponds to the ND_TRY_AGAIN constant.  This is a fatal error in the
 #. TRANS sense that name-to-address mapping translations will stop at this point.
 #.
-#: src/lib/netdir.c:703 src/lib/xnsl.c:1678
+#: src/lib/netdir.c:690 src/lib/xnsl.c:1665
 msgid "n2a: non-authoritative host not found"
 msgstr ""
 
 #. TRANS Corresponds to the ND_NO_RECOVERY constant.  This is a fatal error in the
 #. TRANS sense that name-to-address mapping translations will stop at this point.
 #.
-#: src/lib/netdir.c:708 src/lib/xnsl.c:1683
+#: src/lib/netdir.c:695 src/lib/xnsl.c:1670
 msgid "n2a: non-recoverable error"
 msgstr ""
 
@@ -1475,27 +1475,27 @@ msgstr ""
 #. TRANS error in the sense that name-to-address mapping translations will stop at
 #. TRANS this point.
 #.
-#: src/lib/netdir.c:714 src/lib/xnsl.c:1689
+#: src/lib/netdir.c:701 src/lib/xnsl.c:1676
 msgid "n2a: no data record of requested type"
 msgstr ""
 
 #. TRANS Corresponds to the ND_BADARG constant.  This is a fatal error in the sense
 #. TRANS that name-to-address mapping translations will stop at this point.
 #.
-#: src/lib/netdir.c:719 src/lib/xnsl.c:1694
+#: src/lib/netdir.c:706 src/lib/xnsl.c:1681
 msgid "n2a: bad arguments passed to routine"
 msgstr ""
 
 #. TRANS Corresponds to the ND_NOMEM constant.  This is a fatal error in the sense
 #. TRANS that name-to-address mapping translations will stop at this point.
 #.
-#: src/lib/netdir.c:724 src/lib/xnsl.c:1699
+#: src/lib/netdir.c:711 src/lib/xnsl.c:1686
 msgid "n2a: memory allocation failed"
 msgstr ""
 
 #. TRANS Corresponds to the ND_OK constant.  This is not an error.
 #.
-#: src/lib/netdir.c:728 src/lib/xnsl.c:1703
+#: src/lib/netdir.c:715 src/lib/xnsl.c:1690
 msgid "n2a: successful completion"
 msgstr ""
 
@@ -1503,7 +1503,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.
 #.
-#: src/lib/netdir.c:734 src/lib/xnsl.c:1709
+#: src/lib/netdir.c:721 src/lib/xnsl.c:1696
 msgid "n2a: hostname not found"
 msgstr ""
 
@@ -1511,7 +1511,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.
 #.
-#: src/lib/netdir.c:740 src/lib/xnsl.c:1715
+#: src/lib/netdir.c:727 src/lib/xnsl.c:1702
 msgid "n2a: service name not found"
 msgstr ""
 
@@ -1519,7 +1519,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.  %1$s is a dlerror(3) string.
 #.
-#: src/lib/netdir.c:746 src/lib/xnsl.c:1721
+#: src/lib/netdir.c:733 src/lib/xnsl.c:1708
 #, c-format
 msgid "n2a: symbol missing in shared object: %s"
 msgstr ""
@@ -1528,7 +1528,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.  %1$s is a dlerror(3) string.
 #.
-#: src/lib/netdir.c:752 src/lib/xnsl.c:1727
+#: src/lib/netdir.c:739 src/lib/xnsl.c:1714
 #, c-format
 msgid "n2a: could not open shared object: %s"
 msgstr ""
@@ -1537,7 +1537,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.
 #.
-#: src/lib/netdir.c:758 src/lib/xnsl.c:1733
+#: src/lib/netdir.c:745 src/lib/xnsl.c:1720
 msgid "n2a: access denied for shared object"
 msgstr ""
 
@@ -1545,7 +1545,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.
 #.
-#: src/lib/netdir.c:764 src/lib/xnsl.c:1739
+#: src/lib/netdir.c:751 src/lib/xnsl.c:1726
 msgid "n2a: attempt to free unknown object"
 msgstr ""
 
@@ -1553,7 +1553,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.
 #.
-#: src/lib/netdir.c:770 src/lib/xnsl.c:1745
+#: src/lib/netdir.c:757 src/lib/xnsl.c:1732
 msgid "n2a: unknown option passed"
 msgstr ""
 
@@ -1561,7 +1561,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.
 #.
-#: src/lib/netdir.c:776 src/lib/xnsl.c:1751
+#: src/lib/netdir.c:763 src/lib/xnsl.c:1738
 msgid "n2a: control operation failed"
 msgstr ""
 
@@ -1569,7 +1569,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.
 #.
-#: src/lib/netdir.c:782 src/lib/xnsl.c:1757
+#: src/lib/netdir.c:769 src/lib/xnsl.c:1744
 msgid "n2a: system error"
 msgstr ""
 
@@ -1577,7 +1577,7 @@ msgstr ""
 #. TRANS the sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.
 #.
-#: src/lib/netdir.c:788 src/lib/xnsl.c:1763
+#: src/lib/netdir.c:775 src/lib/xnsl.c:1750
 msgid "n2a: conversion not possible"
 msgstr ""
 
@@ -1585,7 +1585,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point. %1$d is the error number.
 #.
-#: src/lib/netdir.c:794 src/lib/xnsl.c:1769
+#: src/lib/netdir.c:781 src/lib/xnsl.c:1756
 #, c-format
 msgid "n2a: unknown error %d"
 msgstr ""
@@ -1599,7 +1599,7 @@ msgstr ""
 #. TRANS Corresponds to the NC_NOMEM constant.  Out of memory.  Memory could not be
 #. TRANS allocated to complete the last netconfig(3) or netpath(3) operation.
 #.
-#: src/lib/netselect.c:703 src/lib/sockpath.c:512 src/lib/xnsl.c:955
+#: src/lib/netselect.c:690 src/lib/sockpath.c:499 src/lib/xnsl.c:942
 msgid "out of memory"
 msgstr ""
 
@@ -1615,7 +1615,7 @@ msgstr ""
 #. TRANS endnetconfig(3), or endnetpath(3) function was called out of order: that
 #. TRANS is, before setnetconfig(3) or setnetpath(3) was called.
 #.
-#: src/lib/netselect.c:709 src/lib/sockpath.c:518 src/lib/xnsl.c:961
+#: src/lib/netselect.c:696 src/lib/sockpath.c:505 src/lib/xnsl.c:948
 msgid "routine called out of order"
 msgstr ""
 
@@ -1628,7 +1628,7 @@ msgstr ""
 #. TRANS Corresponds to the NC_OPENFAIL constant.  The /etc/netconfig file could
 #. TRANS not be opened for reading.  %1$s is the name of the /etc/netconfig file.
 #.
-#: src/lib/netselect.c:714 src/lib/sockpath.c:523 src/lib/xnsl.c:966
+#: src/lib/netselect.c:701 src/lib/sockpath.c:510 src/lib/xnsl.c:953
 #, c-format
 msgid "could not open %s"
 msgstr ""
@@ -1657,7 +1657,7 @@ msgstr ""
 #. TRANS is the name of the /etc/netconfig file.  %2$d is the field number.  %3$d
 #. TRANS is the line number.
 #.
-#: src/lib/netselect.c:724 src/lib/sockpath.c:533 src/lib/xnsl.c:976
+#: src/lib/netselect.c:711 src/lib/sockpath.c:520 src/lib/xnsl.c:963
 #, c-format
 msgid "syntax error in %s: field %d of line %d"
 msgstr ""
@@ -1675,7 +1675,7 @@ msgstr ""
 #. TRANS argument to the getnetconfigent(3) subroutine was not found in any entry
 #. TRANS in the /etc/netconfig file.  %1$s is the name of the /etc/netconfig file.
 #.
-#: src/lib/netselect.c:730 src/lib/sockpath.c:540 src/lib/xnsl.c:982
+#: src/lib/netselect.c:717 src/lib/sockpath.c:527 src/lib/xnsl.c:969
 #, c-format
 msgid "netid not found in %s"
 msgstr ""
@@ -1697,7 +1697,7 @@ msgstr ""
 #. TRANS /etc/netconfig file contains no entries.  %1$s is the name of the
 #. TRANS /etc/netconfig file.
 #.
-#: src/lib/netselect.c:738 src/lib/sockpath.c:547 src/lib/xnsl.c:990
+#: src/lib/netselect.c:725 src/lib/sockpath.c:534 src/lib/xnsl.c:977
 #, c-format
 msgid "no more entries in %s"
 msgstr ""
@@ -1707,7 +1707,7 @@ msgstr ""
 #. TRANS situation should not occur and represents a bug in the library.  %1$d is
 #. TRANS the decimal value of the unknown error number.
 #.
-#: src/lib/netselect.c:745 src/lib/sockpath.c:554 src/lib/xnsl.c:997
+#: src/lib/netselect.c:732 src/lib/sockpath.c:541 src/lib/xnsl.c:984
 #, c-format
 msgid "unknown error number %d"
 msgstr ""
@@ -1719,112 +1719,112 @@ msgstr ""
 #. TRANS AP_ACCES - (1) [Note: The text here should be a short string of about less
 #. TRANS than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1742
+#: src/lib/xap.c:1729
 msgid "Request to bind to specified address denied."
 msgstr ""
 
 #. TRANS AP_AGAIN - (2) [Note: The text here should be a short string of about less
 #. TRANS than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1747
+#: src/lib/xap.c:1734
 msgid "Request not completed."
 msgstr ""
 
 #. TRANS AP_BADATTRVAL - (3) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1752
+#: src/lib/xap.c:1739
 msgid "Bad value for environment attribute."
 msgstr ""
 
 #. TRANS AP_BADCD_ACT_ID - (4) [Note: The text here should be a short string of
 #. TRANS about less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1757
+#: src/lib/xap.c:1744
 msgid "Cdata field value invalid: act_id."
 msgstr ""
 
 #. TRANS AP_BADCD_DIAG - (5) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1762
+#: src/lib/xap.c:1749
 msgid "Cdata field valud invalid: diag."
 msgstr ""
 
 #. TRANS AP_BADCD_EVT - (6) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1767
+#: src/lib/xap.c:1754
 msgid "Cdata field valud invalid: event."
 msgstr ""
 
 #. TRANS AP_BADCD_OLD_ACT_ID - (7) [Note: The text here should be a short string of
 #. TRANS about less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1772
+#: src/lib/xap.c:1759
 msgid "Cdata field valud invalid: old_act_id."
 msgstr ""
 
 #. TRANS AP_BADCD_OLD_CONN_ID - (8) [Note: The text here should be a short string
 #. TRANS of about less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1777
+#: src/lib/xap.c:1764
 msgid "Cdata field valud invalid: old_conn_id."
 msgstr ""
 
 #. TRANS AP_BADCD_RES - (9) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1782
+#: src/lib/xap.c:1769
 msgid "Cdata field valud invalid: res."
 msgstr ""
 
 #. TRANS AP_BADCD_RES_SRC - (10) [Note: The text here should be a short string of
 #. TRANS about less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1787
+#: src/lib/xap.c:1774
 msgid "Cdata field valud invalid: res_src."
 msgstr ""
 
 #. TRANS AP_BADCD_RESYNC_TYPE - (11) [Note: The text here should be a short string
 #. TRANS of about less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1792
+#: src/lib/xap.c:1779
 msgid "Cdata field valud invalid: resync_type."
 msgstr ""
 
 #. TRANS AP_BADCD_RSN - (12) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1797
+#: src/lib/xap.c:1784
 msgid "Cdata field valud invalid: rsn."
 msgstr ""
 
 #. TRANS AP_BADCD_SRC - (13) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1802
+#: src/lib/xap.c:1789
 msgid "Cdata field valud invalid: src."
 msgstr ""
 
 #. TRANS AP_BADCD_SYNC_P_SN - (14) [Note: The text here should be a short string of
 #. TRANS about less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1807
+#: src/lib/xap.c:1794
 msgid "Cdata field valud invalid: sync_p_sn."
 msgstr ""
 
 #. TRANS AP_BADCD_SYNC_TYPE - (15) [Note: The text here should be a short string of
 #. TRANS about less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1812
+#: src/lib/xap.c:1799
 msgid "Cdata field valud invalid: sync_type."
 msgstr ""
 
 #. TRANS AP_BADCD_TOKENS - (16) [Note: The text here should be a short string of
 #. TRANS about less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1817
+#: src/lib/xap.c:1804
 msgid "Cdata field valud invalid: tokens."
 msgstr ""
 
@@ -1837,168 +1837,168 @@ msgstr ""
 #. TRANS AP_NOSET - (39) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1822 src/lib/xap.c:1867 src/lib/xap.c:1932
+#: src/lib/xap.c:1809 src/lib/xap.c:1854 src/lib/xap.c:1919
 msgid "xxx"
 msgstr ""
 
 #. TRANS AP_BADENV - (18) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1827
+#: src/lib/xap.c:1814
 msgid "A mandatory attribute is not set."
 msgstr ""
 
 #. TRANS AP_BADF - (19) [Note: The text here should be a short string of about less
 #. TRANS than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1832
+#: src/lib/xap.c:1819
 msgid "Not a presentation service endpoint."
 msgstr ""
 
 #. TRANS AP_BADFLAGS - (20) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1837
+#: src/lib/xap.c:1824
 msgid "The specified combination of flags is invalid."
 msgstr ""
 
 #. TRANS AP_BADFREE - (21) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1842
+#: src/lib/xap.c:1829
 msgid "Could not free structure members."
 msgstr ""
 
 #. TRANS AP_BADKIND - (22) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1847
+#: src/lib/xap.c:1834
 msgid "Unknown structure type."
 msgstr ""
 
 #. TRANS AP_BADLSTATE - (23) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1852
+#: src/lib/xap.c:1839
 msgid "Instance in bad state for that command."
 msgstr ""
 
 #. TRANS AP_BADPARSE - (24) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1857
+#: src/lib/xap.c:1844
 msgid "Attribute parse failed."
 msgstr ""
 
 #. TRANS AP_BADPRIM - (25) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1862
+#: src/lib/xap.c:1849
 msgid "Unrecognized primitive from user."
 msgstr ""
 
 #. TRANS AP_BADRESTR - (27) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1872
+#: src/lib/xap.c:1859
 msgid "Attributes not restored doe to more bit on."
 msgstr ""
 
 #. TRANS AP_BADROLE - (28) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1877
+#: src/lib/xap.c:1864
 msgid "Request invalid due to value of AP_ROLE."
 msgstr ""
 
 #. TRANS AP_BADSAVE - (29) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1882
+#: src/lib/xap.c:1869
 msgid "Attributes not saved dues to more bit on."
 msgstr ""
 
 #. TRANS AP_BADSAVEF - (30) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1887
+#: src/lib/xap.c:1874
 msgid "Invalid FILE pointer."
 msgstr ""
 
 #. TRANS AP_BADUBUF - (31) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1892
+#: src/lib/xap.c:1879
 msgid "Bad length for user data."
 msgstr ""
 
 #. TRANS AP_HANGUP - (32) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1897
+#: src/lib/xap.c:1884
 msgid "Association close or aborted."
 msgstr ""
 
 #. TRANS AP_INTERNAL - (33) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1902
+#: src/lib/xap.c:1889
 msgid "An internal error occured."
 msgstr ""
 
 #. TRANS AP_LOOK - (34) [Note: The text here should be a short string of about less
 #. TRANS than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1907
+#: src/lib/xap.c:1894
 msgid "A pending event requires attention."
 msgstr ""
 
 #. TRANS AP_NOATTR - (35) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1912
+#: src/lib/xap.c:1899
 msgid "No such attribute."
 msgstr ""
 
 #. TRANS AP_NOENV - (36) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1917
+#: src/lib/xap.c:1904
 msgid "No environment for that fd."
 msgstr ""
 
 #. TRANS AP_NOMEM - (37) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1922
+#: src/lib/xap.c:1909
 msgid "Could not allocate enough memory."
 msgstr ""
 
 #. TRANS AP_NOREAD - (38) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1927
+#: src/lib/xap.c:1914
 msgid "Attribute is not readable."
 msgstr ""
 
 #. TRANS AP_NOWRITE - (40) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1937
+#: src/lib/xap.c:1924
 msgid "Attribute is not writable."
 msgstr ""
 
 #. TRANS AP_PDUREJ - (41) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1942
+#: src/lib/xap.c:1929
 msgid "Invalid PDU rejected."
 msgstr ""
 
 #. TRANS AP_AGAIN_DATA_PENDING - (42) [Note: The text here should be a short string
 #. TRANS of about less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1948
+#: src/lib/xap.c:1935
 msgid ""
 "XAP was unable to complete the requested action. Try again. There is an "
 "event available for the user to receive."
@@ -2007,28 +2007,28 @@ msgstr ""
 #. TRANS AP_BADALLOC - (43) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1953
+#: src/lib/xap.c:1940
 msgid "The ap_user_alloc/ap_user_dalloc argument combination was invalid."
 msgstr ""
 
 #. TRANS AP_BADASLSYN - (44) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1958
+#: src/lib/xap.c:1945
 msgid "The transfer syntaxes proposed for the ACSE syntax are not supported."
 msgstr ""
 
 #. TRANS AP_BADDATA - (45) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1963
+#: src/lib/xap.c:1950
 msgid "User data not allowed on this service."
 msgstr ""
 
 #. TRANS AP_BADNSAP - (46) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1968
+#: src/lib/xap.c:1955
 msgid ""
 "The format of the NSAP portion of the Presentation Address is not supported."
 msgstr ""
@@ -2036,7 +2036,7 @@ msgstr ""
 #. TRANS AP_DATA_OVERFLOW - (47) [Note: The text here should be a short string of
 #. TRANS about less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1973
+#: src/lib/xap.c:1960
 msgid ""
 "User data and presentation service pci exceeds 512 bytes on session V1 or "
 "the length of user data exceeds a locally defined limit as stated in the CSQ."
@@ -2045,21 +2045,21 @@ msgstr ""
 #. TRANS AP_NOBUF - (48) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1978
+#: src/lib/xap.c:1965
 msgid "Could not allocate enough buffers."
 msgstr ""
 
 #. TRANS AP_NODATA - (49) [Note: The text here should be a short string of about
 #. TRANS less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1983
+#: src/lib/xap.c:1970
 msgid "An attempt was made to send a primitive with no user data."
 msgstr ""
 
 #. TRANS AP_NO_PRECEDENCE - (50) [Note: The text here should be a short string of
 #. TRANS about less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1988
+#: src/lib/xap.c:1975
 msgid ""
 "The resynchronization requested by the local user does not have precedence "
 "over the on requested by the remote user."
@@ -2068,14 +2068,14 @@ msgstr ""
 #. TRANS AP_NOT_SUPPORTED - (51) [Note: The text here should be a short string of
 #. TRANS about less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1993
+#: src/lib/xap.c:1980
 msgid "The action requested is not supported by this implementation of XAP."
 msgstr ""
 
 #. TRANS AP_SUCCESS_DATA_PENDING - (52) [Note: The text here should be a short
 #. TRANS string of about less than or equal to 64 characters in length.]
 #.
-#: src/lib/xap.c:1998
+#: src/lib/xap.c:1985
 msgid ""
 "The requested action was completed successfully.  There is an event "
 "available for the user to receive."
@@ -2085,7 +2085,7 @@ msgstr ""
 #. TRANS format.  This is not used to provide protocol errors but merely indicate
 #. TRANS an error in the syntactic formatting of the address.
 #.
-#: src/lib/xnet.c:5690
+#: src/lib/xnet.c:5671
 msgid "Bad address format"
 msgstr ""
 
@@ -2093,7 +2093,7 @@ msgstr ""
 #. TRANS This is not used to provide protocol errors but merely indicate an error
 #. TRANS in the the syntactic formatting of the options.
 #.
-#: src/lib/xnet.c:5696
+#: src/lib/xnet.c:5677
 msgid "Bad options format"
 msgstr ""
 
@@ -2101,13 +2101,13 @@ msgstr ""
 #. TRANS the XTI library call, or to use the specified address, or to use the
 #. TRANS specified options.
 #.
-#: src/lib/xnet.c:5702
+#: src/lib/xnet.c:5683
 msgid "Bad permissions"
 msgstr ""
 
 #. TRANS The file descriptor is not known to the XTI library.
 #.
-#: src/lib/xnet.c:5706
+#: src/lib/xnet.c:5687
 msgid "Bad file descriptor"
 msgstr ""
 
@@ -2115,7 +2115,7 @@ msgstr ""
 #. TRANS underlying transport service provider is unable to choose and assign an
 #. TRANS address on the user's behalf.
 #.
-#: src/lib/xnet.c:5712
+#: src/lib/xnet.c:5693
 msgid "Unable to allocate an address"
 msgstr ""
 
@@ -2124,7 +2124,7 @@ msgstr ""
 #. TRANS state in which the XTI library call is not permitted.  The C-Locale text
 #. TRANS is traditional and does not really reflect the situation very well.
 #.
-#: src/lib/xnet.c:5719
+#: src/lib/xnet.c:5700
 msgid "Would place interface out of state"
 msgstr ""
 
@@ -2134,14 +2134,14 @@ msgstr ""
 #. TRANS is invalid (does not correspond to an outstanding connection
 #. TRANS indication).
 #.
-#: src/lib/xnet.c:5727
+#: src/lib/xnet.c:5708
 msgid "Bad call sequence number"
 msgstr ""
 
 #. TRANS A UNIX system error has occured and the errno variable indicates the
 #. TRANS UNIX system error.
 #.
-#: src/lib/xnet.c:5732
+#: src/lib/xnet.c:5713
 msgid "System error"
 msgstr ""
 
@@ -2149,7 +2149,7 @@ msgstr ""
 #. TRANS has occured requiring the user to call the t_look() XTI library call to
 #. TRANS process the asychronous event before proceeding.
 #.
-#: src/lib/xnet.c:5738
+#: src/lib/xnet.c:5719
 msgid "Has to t_look() for event"
 msgstr ""
 
@@ -2161,7 +2161,7 @@ msgstr ""
 #. TRANS limits provided by the transport service provider in response to a a
 #. TRANS t_getinfo() XTI library call.
 #.
-#: src/lib/xnet.c:5748
+#: src/lib/xnet.c:5729
 msgid "Bad amount of data"
 msgstr ""
 
@@ -2170,7 +2170,7 @@ msgstr ""
 #. TRANS accept the addresses or options that were received.  In the C-locale
 #. TRANS this is termed a buffer overflow.
 #.
-#: src/lib/xnet.c:5755
+#: src/lib/xnet.c:5736
 msgid "Buffer was too small"
 msgstr ""
 
@@ -2180,7 +2180,7 @@ msgstr ""
 #. TRANS conditions.  If O_NONBLOCK had not been set, the call would have blocked
 #. TRANS due to flow control.
 #.
-#: src/lib/xnet.c:5763
+#: src/lib/xnet.c:5744
 msgid "Would block due to flow control"
 msgstr ""
 
@@ -2189,7 +2189,7 @@ msgstr ""
 #. TRANS indictation and no such indication was present.  If O_NONBLOCK had not
 #. TRANS been set, the call would have blocked awaiting the indication.
 #.
-#: src/lib/xnet.c:5770
+#: src/lib/xnet.c:5751
 msgid "No data indication"
 msgstr ""
 
@@ -2198,7 +2198,7 @@ msgstr ""
 #. TRANS disconnect indication and no such indication was present.  If O_NONBLOCK
 #. TRANS had not been set, the call would have blocked awaiting the indication.
 #.
-#: src/lib/xnet.c:5777
+#: src/lib/xnet.c:5758
 msgid "No disconnect indication"
 msgstr ""
 
@@ -2207,7 +2207,7 @@ msgstr ""
 #. TRANS unit data indication and no such indication was present.  If O_NONBLOCK
 #. TRANS had not been set, the call would have blocked awaiting the indication.
 #.
-#: src/lib/xnet.c:5784
+#: src/lib/xnet.c:5765
 msgid "No unitdata error indication"
 msgstr ""
 
@@ -2215,7 +2215,7 @@ msgstr ""
 #. TRANS contained illegal information considerting the transport service or
 #. TRANS transport service provider type.
 #.
-#: src/lib/xnet.c:5790
+#: src/lib/xnet.c:5771
 msgid "Bad flags"
 msgstr ""
 
@@ -2225,7 +2225,7 @@ msgstr ""
 #. TRANS O_NONBLOCK had not been set, the call would have blocked awaiting the
 #. TRANS indication.
 #.
-#: src/lib/xnet.c:5798
+#: src/lib/xnet.c:5779
 msgid "No orderly release indication"
 msgstr ""
 
@@ -2239,7 +2239,7 @@ msgstr ""
 #. TRANS or that the underlying transport provider does not support the TPI
 #. TRANS primitives supplied by the XTI library.
 #.
-#: src/lib/xnet.c:5810
+#: src/lib/xnet.c:5791
 msgid "Not supported"
 msgstr ""
 
@@ -2250,7 +2250,7 @@ msgstr ""
 #. TRANS was changing state at the time that the call as generated and that the
 #. TRANS call failed for that reason.
 #.
-#: src/lib/xnet.c:5819
+#: src/lib/xnet.c:5800
 msgid "State is currently changing"
 msgstr ""
 
@@ -2258,7 +2258,7 @@ msgstr ""
 #. TRANS argument.  This error indicates that the structure type provided to
 #. TRANS these calls is either invalid or not supported by the XTI library.
 #.
-#: src/lib/xnet.c:5825
+#: src/lib/xnet.c:5806
 msgid "Structure type not supported"
 msgstr ""
 
@@ -2266,7 +2266,7 @@ msgstr ""
 #. TRANS correspond to a transport service provider or did not exist in the
 #. TRANS filesystem.
 #.
-#: src/lib/xnet.c:5831
+#: src/lib/xnet.c:5812
 msgid "Bad transport provider name"
 msgstr ""
 
@@ -2274,7 +2274,7 @@ msgstr ""
 #. TRANS of oustanding connection indications negotiated as zero (that is, a
 #. TRANS non-listening stream).
 #.
-#: src/lib/xnet.c:5837
+#: src/lib/xnet.c:5818
 msgid "Listener queue length limit is zero"
 msgstr ""
 
@@ -2284,7 +2284,7 @@ msgstr ""
 #. TRANS multiple transport endpoints to be bound to the same address.  The
 #. TRANS address is considered "busy".
 #.
-#: src/lib/xnet.c:5845
+#: src/lib/xnet.c:5826
 msgid "Address already in use"
 msgstr ""
 
@@ -2293,7 +2293,7 @@ msgstr ""
 #. TRANS endpoint has outstanding transport connection indications that have not
 #. TRANS been satisfied by accepting or refusing the connection indication.
 #.
-#: src/lib/xnet.c:5852
+#: src/lib/xnet.c:5833
 msgid "Outstanding connect indications"
 msgstr ""
 
@@ -2304,7 +2304,7 @@ msgstr ""
 #. TRANS service provider other than the transport service provider from which
 #. TRANS the connection indication was received.
 #.
-#: src/lib/xnet.c:5861
+#: src/lib/xnet.c:5842
 msgid "Not same transport provider"
 msgstr ""
 
@@ -2313,7 +2313,7 @@ msgstr ""
 #. TRANS indication on a listening stream for which outstanding connection
 #. TRANS indications exist (qlen > 0).
 #.
-#: src/lib/xnet.c:5868
+#: src/lib/xnet.c:5849
 msgid "Connection acceptor has qlen > 0"
 msgstr ""
 
@@ -2323,7 +2323,7 @@ msgstr ""
 #. TRANS same transport address as that for which the connection indication was
 #. TRANS provided.
 #.
-#: src/lib/xnet.c:5876
+#: src/lib/xnet.c:5857
 msgid "Connection acceptor bound to different address"
 msgstr ""
 
@@ -2334,7 +2334,7 @@ msgstr ""
 #. TRANS already has the maximum number of outstanding connection indications
 #. TRANS will receive this error.
 #.
-#: src/lib/xnet.c:5885
+#: src/lib/xnet.c:5866
 msgid "Connection indicator queue is full"
 msgstr ""
 
@@ -2344,7 +2344,7 @@ msgstr ""
 #. TRANS catch-all error code and thus has the vague C-locale "protocol error"
 #. TRANS description.
 #.
-#: src/lib/xnet.c:5893
+#: src/lib/xnet.c:5874
 msgid "Protocol error"
 msgstr ""
 
@@ -2352,6 +2352,6 @@ msgstr ""
 #. TRANS not known to the XTI library.  This message is used to describe all
 #. TRANS error codes not known to the XTI library.
 #.
-#: src/lib/xnet.c:5899
+#: src/lib/xnet.c:5880
 msgid "Unknown"
 msgstr ""
