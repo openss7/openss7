@@ -109,7 +109,7 @@ search-ignore CGIQOSTU
 .ad l
 .nh
 .HP \w'\fB\)dtemap\fP\ 'u
-\fB\)dtemap\fP [\fB-V\fP] [\fB-s\fP] \fIFILE\fP
+\fB\)dtemap\fP [\fIoptions\fP] \fIFILE\fP
 .PD 0
 .HP
 \fB\)dtemap\fP
@@ -130,7 +130,7 @@ search-ignore CGIQOSTU
 This utility downloads a mapping table to the
 .BR tp (4)
 driver that allows a called NSAP to be mapped to a DTE address (required by
-the X.24 protocol software on the WAN card) and an associated port on the
+the X.25 protocol software on the WAN card) and an associated port on the
 card.
 .\"
 .\"
@@ -194,7 +194,7 @@ takes the following non-option arguments:
 .TP
 .I file
 Specifies the input file that contains the mapping information.  See
-\(le\)FILE FORMAT\(rq\), below.
+\(lq\)FILE FORMAT\(rq\), below.
 .\"
 .\"
 .SH FILE FORMAT

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/util/delnsap.c
+ @(#) File: src/util/dtemap.c
 
  -----------------------------------------------------------------------------
 
@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/util/delnsap.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] = "src/util/dtemap.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 600
@@ -71,10 +71,11 @@ static int debug = 0;			/* default no debug */
 static int output = 1;			/* default normal output */
 static int dryrun = 0;			/* dry run */
 
-static char nsapaddr[BUFSIZ + 1] = "";
+static char filename[BUFSIZ + 1] = "";
+static int filesize = 4096;
 
 static void
-do_nsap(int argc, char *argv[], int start)
+do_dtemap(int argc, char *argv[], int start)
 {
 }
 
@@ -154,7 +155,7 @@ usage(int argc, char *argv[])
 		return;
 	(void) fprintf(stderr, "\
 Usage:\n\
-    %1$s [options] NSAP\n\
+    %1$s [options] FILE\n\
     %1$s {-h|--help}\n\
     %1$s {-V|--version}\n\
     %1$s {-C|--copying}\n\
@@ -168,17 +169,17 @@ help(int argc, char *argv[])
 		return;
 	(void) fprintf(stdout, "\
 Usage:\n\
-    %1$s [options] NSAP\n\
+    %1$s [options] FILE\n\
     %1$s {-h|--help}\n\
     %1$s {-V|--version}\n\
     %1$s {-C|--copying}\n\
 Arguments:\n\
-    NSAP\n\
-        NSAP address of the remote user\n\
+    FILE\n\
+        filename of the map file to load\n\
 Options:\n\
-  Command: (-D assumed if none given)\n\
-    -D, --del\n\
-        add the NSAP to SNPA address mapping\n\
+  Command: (-m assumed if none given)\n\
+    -m, --map\n\
+        map the provided file\n\
     -h, --help, -?, --?\n\
         print this usage information and exit\n\
     -V, --version\n\
@@ -186,6 +187,8 @@ Options:\n\
     -C, --copying\n\
         print copying permission and exit\n\
   Common:\n\
+    -s, --size SIZE\n\
+        specifify the file size, SIZE [default: 4096]\n\
     -n, --dryrun\n\
         check but do not write [default: false]\n\
     -q, --quiet\n\
@@ -199,7 +202,7 @@ Options:\n\
 }
 
 #define COMMAND_DFLT  0
-#define COMMAND_NSAP  1
+#define COMMAND_DMAP  1
 #define COMMAND_HELP  2
 #define COMMAND_VERS  3
 #define COMMAND_COPY  4
@@ -208,7 +211,7 @@ int
 main(int argc, char *argv[])
 {
 	int command = COMMAND_DFLT;
-	int c, val, len, bad;
+	int c, val, len;
 	int start;
 
 	for (;;) {
@@ -216,7 +219,8 @@ main(int argc, char *argv[])
 		int option_index = 0;
                 /* *INDENT-OFF* */
                 static struct option long_options[] = {
-                        {"del",         no_argument,		NULL, 'D'},
+                        {"map",         no_argument,		NULL, 'm'},
+			{"size",	required_argument,	NULL, 's'},
 			{"dryrun",	no_argument,		NULL, 'n'},
 			{"quiet",	no_argument,		NULL, 'q'},
 			{"debug",	optional_argument,	NULL, 'd'},
@@ -229,9 +233,9 @@ main(int argc, char *argv[])
                 };
                 /* *INDENT-ON* */
 
-		c = getopt_long_only(argc, argv, "Dnd::v::hVC?W:", long_options, &option_index);
+		c = getopt_long_only(argc, argv, "ms:nd::v::hVC?W:", long_options, &option_index);
 #else				/* _GNU_SOURCE */
-		c = getopt(argc, argv, "Dnqd:vhVC?");
+		c = getopt(argc, argv, "ms:nqd:vhVC?");
 #endif				/* _GNU_SOURCE */
 		if (c == -1) {
 			if (debug)
@@ -241,10 +245,15 @@ main(int argc, char *argv[])
 		switch (c) {
 		case 0:
 			goto bad_usage;
-		case 'D':	/* -D, --del */
+		case 'D':	/* -m, --map */
 			if (command != COMMAND_DFLT)
 				goto bad_option;
-			command = COMMAND_NSAP;
+			command = COMMAND_DMAP;
+			break;
+		case 's':	/* -s, --size SIZE */
+			if ((val = strtol(optarg, NULL, 0)) <= 0)
+				goto bad_option;
+			filesize = val;
 			break;
 		case 'n':	/* -n, --dryrun */
 			dryrun = 1;
@@ -316,33 +325,25 @@ main(int argc, char *argv[])
 			exit(2);
 		}
 	}
-	/* NSAP_Address argument */
+	/* FILE argument */
 	if (debug)
-		fprintf(stderr, "%s: testing NSAP address\n", argv[0]);
+		fprintf(stderr, "%s: testing FILE name\n", argv[0]);
 	start = optind;
 	if (optind < argc) {
 		len = strnlen(argv[optind], BUFSIZ + 1);
-		if ((len & 0x1) || len > 40 || len > BUFSIZ) {
+		if (0 >= len || len > BUFSIZ) {
 			if (output || debug)
-				fprintf(stderr, "%s: invalid NSAP-address length %d\n", argv[0],
+				fprintf(stderr, "%s: invalid FILE name length %d\n", argv[0],
 					len);
 			goto bad_nonopt;
 		}
-		strncpy(nsapaddr, argv[optind], BUFSIZ);
+		strncpy(filename, argv[optind], BUFSIZ);
 		/* check this later */
 		optind++;
-		/* check for hexadecimal digits only */
-		if ((bad = strspn(nsapaddr, "0123456789abcdefABCDEF")) < len) {
-			if (output || debug)
-				fprintf(stderr,
-					"%s: invalid hexadecimal character '%c' in address",
-					argv[0], nsapaddr[bad]);
-			goto bad_nonopt;
-		}
 	} else {
-		if (command == COMMAND_NSAP || command == COMMAND_DFLT) {
+		if (command == COMMAND_DMAP || command == COMMAND_DFLT) {
 			if (output || debug)
-				fprintf(stderr, "%s: missing NSAP address\n", argv[0]);
+				fprintf(stderr, "%s: missing FILE name\n", argv[0]);
 			goto bad_nonopt;
 		}
 	}
@@ -353,8 +354,8 @@ main(int argc, char *argv[])
 	}
 	switch (command) {
 	case COMMAND_DFLT:
-	case COMMAND_NSAP:
-		do_nsap(argc, argv, start);
+	case COMMAND_DMAP:
+		do_dtemap(argc, argv, start);
 		break;
 	case COMMAND_HELP:
 		help(argc, argv);

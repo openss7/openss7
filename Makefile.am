@@ -2146,6 +2146,16 @@ nsap_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= nsap
 
+## =====================================================================
+
+dtemap_SOURCES			= src/util/dtemap.c
+dtemap_CPPFLAGS			= $(UTIL_INCLUDES)
+dtemap_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+dtemap_LDFLAGS			= $(USER_LDFLAGS)
+dtemap_LDADD			= libstreams.la
+
+sbin_PROGRAMS			+= dtemap
+
 ## ---------------------------------------------------------------------
 ## pkglibexec_PROGRAMS
 ## ---------------------------------------------------------------------
