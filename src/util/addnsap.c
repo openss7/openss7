@@ -69,7 +69,6 @@ static char const ident[] = "src/util/addnsap.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 static int debug = 0;			/* default no debug */
 static int output = 1;			/* default normal output */
-static int extended = 0;		/* extended format */
 static int dryrun = 0;			/* dry run */
 
 static char nsapaddr[BUFSIZ + 1] = "";
@@ -215,11 +214,9 @@ int
 main(int argc, char *argv[])
 {
 	int command = COMMAND_DFLT;
-	int len, bad;
+	int c, val, len, bad;
 
 	for (;;) {
-		int c, val;
-
 #if defined _GNU_SOURCE
 		int option_index = 0;
                 /* *INDENT-OFF* */
@@ -265,7 +262,7 @@ main(int argc, char *argv[])
 			break;
 		case 'd':	/* -d, --debug [level] */
 			if (debug)
-				printf(stderr, "%s: increasing debug verbosity\n", argv[0]);
+				fprintf(stderr, "%s: increasing debug verbosity\n", argv[0]);
 			if (optarg == NULL) {
 				debug++;
 			} else {
