@@ -238,7 +238,7 @@ main(int argc, char *argv[])
 #else				/* _GNU_SOURCE */
 		c = getopt(argc, argv, "anqd:vhVC?");
 #endif				/* _GNU_SOURCE */
-		if (c == 1) {
+		if (c == -1) {
 			if (debug)
 				fprintf(stderr, "%s: done options processing\n", argv[0]);
 			break;
@@ -322,6 +322,8 @@ main(int argc, char *argv[])
 		}
 	}
 	/* NSAP_Address argument */
+	if (debug)
+		fprintf(stderr, "%s: testing NSAP address\n", argv[0]);
 	if (optind < argc) {
 		len = strnlen(argv[optind], BUFSIZ + 1);
 		if ((len & 0x1) || len > 40 || len > BUFSIZ) {
@@ -333,14 +335,24 @@ main(int argc, char *argv[])
 		strncpy(nsapaddr, argv[optind], BUFSIZ);
 		/* check this later */
 		optind++;
+		/* check for hexadecimal digits only */
+		if ((bad = strspn(nsapaddr, "0123456789abcdefABCDEF")) < len) {
+			if (output || debug)
+				fprintf(stderr,
+					"%s: invalid hexadecimal character '%c' in address",
+					argv[0], snpaaddr[bad]);
+			goto bad_nonopt;
+		}
 	} else {
-		if (command == COMMAND_NSAP) {
+		if (command == COMMAND_NSAP || command == COMMAND_DFLT) {
 			if (output || debug)
 				fprintf(stderr, "%s: missing NSAP address\n", argv[0]);
 			goto bad_nonopt;
 		}
 	}
 	/* SNPA_Address argument */
+	if (debug)
+		fprintf(stderr, "%s: testing SNPA address\n", argv[0]);
 	if (optind < argc) {
 		len = strnlen(argv[optind], BUFSIZ + 1);
 		/* Two formats: MAC + LSAP: 14 hexadecimal digits ending in [Ff][Ee] or X.121
@@ -389,7 +401,7 @@ main(int argc, char *argv[])
 			}
 		}
 	} else {
-		if (command == COMMAND_NSAP) {
+		if (command == COMMAND_NSAP || command == COMMAND_DFLT) {
 			if (output || debug)
 				fprintf(stderr, "%s: missing SNPA address\n", argv[0]);
 			goto bad_nonopt;
