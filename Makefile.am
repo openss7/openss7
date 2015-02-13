@@ -2136,6 +2136,16 @@ delnsap_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= delnsap
 
+## =====================================================================
+
+nsap_SOURCES			= src/util/nsap.c
+nsap_CPPFLAGS			= $(UTIL_INCLUDES)
+nsap_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+nsap_LDFLAGS			= $(USER_LDFLAGS)
+nsap_LDADD			= libstreams.la
+
+sbin_PROGRAMS			+= nsap
+
 ## ---------------------------------------------------------------------
 ## pkglibexec_PROGRAMS
 ## ---------------------------------------------------------------------

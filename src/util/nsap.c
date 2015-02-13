@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/util/delnsap.c
+ @(#) File: src/util/nsap.c
 
  -----------------------------------------------------------------------------
 
@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/util/delnsap.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] = "src/util/nsap.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 600
@@ -154,7 +154,7 @@ usage(int argc, char *argv[])
 		return;
 	(void) fprintf(stderr, "\
 Usage:\n\
-    %1$s [options] NSAP\n\
+    %1$s [options] [NSAP] [NSAP] ...\n\
     %1$s {-h|--help}\n\
     %1$s {-V|--version}\n\
     %1$s {-C|--copying}\n\
@@ -168,7 +168,7 @@ help(int argc, char *argv[])
 		return;
 	(void) fprintf(stdout, "\
 Usage:\n\
-    %1$s [options] NSAP\n\
+    %1$s [options] [NSAP] [NSAP] ...\n\
     %1$s {-h|--help}\n\
     %1$s {-V|--version}\n\
     %1$s {-C|--copying}\n\
@@ -176,9 +176,9 @@ Arguments:\n\
     NSAP\n\
         NSAP address of the remote user\n\
 Options:\n\
-  Command: (-D assumed if none given)\n\
-    -D, --del\n\
-        add the NSAP to SNPA address mapping\n\
+  Command: (-l assumed if none given)\n\
+    -l, --list\n\
+        list active NSAP addresses\n\
     -h, --help, -?, --?\n\
         print this usage information and exit\n\
     -V, --version\n\
@@ -216,7 +216,7 @@ main(int argc, char *argv[])
 		int option_index = 0;
                 /* *INDENT-OFF* */
                 static struct option long_options[] = {
-                        {"del",         no_argument,            NULL, 'D'},
+                        {"list",         no_argument,		NULL, 'l'},
 			{"dryrun",	no_argument,		NULL, 'n'},
 			{"quiet",	no_argument,		NULL, 'q'},
 			{"debug",	optional_argument,	NULL, 'd'},
@@ -229,9 +229,9 @@ main(int argc, char *argv[])
                 };
                 /* *INDENT-ON* */
 
-		c = getopt_long_only(argc, argv, "Dnd::v::hVC?W:", long_options, &option_index);
+		c = getopt_long_only(argc, argv, "lnd::v::hVC?W:", long_options, &option_index);
 #else				/* _GNU_SOURCE */
-		c = getopt(argc, argv, "Dnqd:vhVC?");
+		c = getopt(argc, argv, "lnqd:vhVC?");
 #endif				/* _GNU_SOURCE */
 		if (c == -1) {
 			if (debug)
@@ -241,7 +241,7 @@ main(int argc, char *argv[])
 		switch (c) {
 		case 0:
 			goto bad_usage;
-		case 'D':	/* -D, --del */
+		case 'l':	/* -l, --list */
 			if (command != COMMAND_DFLT)
 				goto bad_option;
 			command = COMMAND_NSAP;
@@ -320,7 +320,7 @@ main(int argc, char *argv[])
 	if (debug)
 		fprintf(stderr, "%s: testing NSAP address\n", argv[0]);
 	start = optind;
-	if (optind < argc) {
+	while (optind < argc) {
 		len = strnlen(argv[optind], BUFSIZ + 1);
 		if ((len & 0x1) || len > 40 || len > BUFSIZ) {
 			if (output || debug)
@@ -337,12 +337,6 @@ main(int argc, char *argv[])
 				fprintf(stderr,
 					"%s: invalid hexadecimal character '%c' in address",
 					argv[0], nsapaddr[bad]);
-			goto bad_nonopt;
-		}
-	} else {
-		if (command == COMMAND_NSAP || command == COMMAND_DFLT) {
-			if (output || debug)
-				fprintf(stderr, "%s: missing NSAP address\n", argv[0]);
 			goto bad_nonopt;
 		}
 	}

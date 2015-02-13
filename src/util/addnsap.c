@@ -76,7 +76,7 @@ static char snpaaddr[BUFSIZ + 1] = "";
 static short port = 0;
 
 static void
-do_add(int argc, char *argv[])
+do_nsap(int argc, char *argv[], int start)
 {
 }
 
@@ -215,18 +215,19 @@ main(int argc, char *argv[])
 {
 	int command = COMMAND_DFLT;
 	int c, val, len, bad;
+	int start;
 
 	for (;;) {
 #if defined _GNU_SOURCE
 		int option_index = 0;
                 /* *INDENT-OFF* */
                 static struct option long_options[] = {
-                        {"add",         no_argument,            NULL, 'a'},
+                        {"add",         no_argument,		NULL, 'a'},
 			{"dryrun",	no_argument,		NULL, 'n'},
 			{"quiet",	no_argument,		NULL, 'q'},
 			{"debug",	optional_argument,	NULL, 'd'},
 			{"verbose",	optional_argument,	NULL, 'v'},
-                        {"help",        no_argument,            NULL, 'h'},
+                        {"help",        no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
 			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'H'},
@@ -324,6 +325,7 @@ main(int argc, char *argv[])
 	/* NSAP_Address argument */
 	if (debug)
 		fprintf(stderr, "%s: testing NSAP address\n", argv[0]);
+	start = optind;
 	if (optind < argc) {
 		len = strnlen(argv[optind], BUFSIZ + 1);
 		if ((len & 0x1) || len > 40 || len > BUFSIZ) {
@@ -423,7 +425,7 @@ main(int argc, char *argv[])
 	switch (command) {
 	case COMMAND_DFLT:
 	case COMMAND_NSAP:
-		do_add(argc, argv);
+		do_nsap(argc, argv, start);
 		break;
 	case COMMAND_HELP:
 		help(argc, argv);
