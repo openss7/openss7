@@ -1120,7 +1120,7 @@ main(int argc, char *argv[])
 	int command = COMMAND_DFL;
 
 	for (;;) {
-		int c val;
+		int c, val;
 
 #if defined _GNU_SOURCE
 		int option_index = 0;
