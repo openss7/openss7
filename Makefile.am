@@ -2206,6 +2206,16 @@ mac_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= mac
 
+## =====================================================================
+
+netitle_SOURCES			= src/util/netitle.c
+netitle_CPPFLAGS		= $(UTIL_INCLUDES)
+netitle_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+netitle_LDFLAGS			= $(USER_LDFLAGS)
+netitle_LDADD			= libstreams.la
+
+sbin_PROGRAMS			+= netitle
+
 ## ---------------------------------------------------------------------
 ## pkglibexec_PROGRAMS
 ## ---------------------------------------------------------------------
