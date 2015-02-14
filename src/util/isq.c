@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/util/esq.c
+ @(#) File: src/util/isq.c
 
  -----------------------------------------------------------------------------
 
@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/util/esq.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] = "src/util/isq.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 600
@@ -173,7 +173,7 @@ Usage:\n\
 Options:\n\
   Command: (-l assumed if not specified)\n\
     -l, --list\n\
-        list the NSAP addresses of end systems\n\
+        list the NSAP addresses of intermediate systems\n\
     -h, --help, -?, --?\n\
         print this usage information and exit\n\
     -V, --version\n\

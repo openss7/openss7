@@ -2186,6 +2186,16 @@ ipstat_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= ipstat
 
+## =====================================================================
+
+isq_SOURCES			= src/util/isq.c
+isq_CPPFLAGS			= $(UTIL_INCLUDES)
+isq_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+isq_LDFLAGS			= $(USER_LDFLAGS)
+isq_LDADD			= libstreams.la
+
+sbin_PROGRAMS			+= isq
+
 ## ---------------------------------------------------------------------
 ## pkglibexec_PROGRAMS
 ## ---------------------------------------------------------------------
