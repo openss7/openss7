@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/util/esq.c
+ @(#) File: src/util/ipstat.c
 
  -----------------------------------------------------------------------------
 
@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/util/esq.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] = "src/util/ipstat.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 600
@@ -72,7 +72,7 @@ static int output = 1;			/* default normal output */
 static int dryrun = 0;			/* dry run */
 
 static void
-do_list(int argc, char *argv[], int start)
+do_stat(int argc, char *argv[], int start)
 {
 }
 
@@ -192,7 +192,7 @@ Options:\n\
 }
 
 #define COMMAND_DFLT  0
-#define COMMAND_LIST  1
+#define COMMAND_STAT  1
 #define COMMAND_HELP  2
 #define COMMAND_VERS  3
 #define COMMAND_COPY  4
@@ -234,11 +234,6 @@ main(int argc, char *argv[])
 		switch (c) {
 		case 0:
 			goto bad_usage;
-		case 'D':	/* -D, --del */
-			if (command != COMMAND_DFLT)
-				goto bad_option;
-			command = COMMAND_LIST;
-			break;
 		case 'n':	/* -n, --dryrun */
 			dryrun = 1;
 			break;
@@ -316,8 +311,8 @@ main(int argc, char *argv[])
 	}
 	switch (command) {
 	case COMMAND_DFLT:
-	case COMMAND_LIST:
-		do_list(argc, argv, start);
+	case COMMAND_STAT:
+		do_stat(argc, argv, start);
 		break;
 	case COMMAND_HELP:
 		help(argc, argv);

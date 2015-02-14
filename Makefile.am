@@ -2176,6 +2176,16 @@ ipconfig_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= ipconfig
 
+## =====================================================================
+
+ipstat_SOURCES			= src/util/ipstat.c
+ipstat_CPPFLAGS			= $(UTIL_INCLUDES)
+ipstat_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+ipstat_LDFLAGS			= $(USER_LDFLAGS)
+ipstat_LDADD			= libstreams.la
+
+sbin_PROGRAMS			+= ipstat
+
 ## ---------------------------------------------------------------------
 ## pkglibexec_PROGRAMS
 ## ---------------------------------------------------------------------
