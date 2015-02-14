@@ -2256,6 +2256,16 @@ rtl_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= rtl
 
+## =====================================================================
+
+sndcmap_SOURCES			= src/util/sndcmap.c
+sndcmap_CPPFLAGS		= $(UTIL_INCLUDES)
+sndcmap_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+sndcmap_LDFLAGS			= $(USER_LDFLAGS)
+sndcmap_LDADD			= libstreams.la
+
+sbin_PROGRAMS			+= sndcmap
+
 ## ---------------------------------------------------------------------
 ## pkglibexec_PROGRAMS
 ## ---------------------------------------------------------------------
