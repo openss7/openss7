@@ -2196,6 +2196,16 @@ isq_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= isq
 
+## =====================================================================
+
+mac_SOURCES			= src/util/mac.c
+mac_CPPFLAGS			= $(UTIL_INCLUDES)
+mac_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+mac_LDFLAGS			= $(USER_LDFLAGS)
+mac_LDADD			= libstreams.la
+
+sbin_PROGRAMS			+= mac
+
 ## ---------------------------------------------------------------------
 ## pkglibexec_PROGRAMS
 ## ---------------------------------------------------------------------
