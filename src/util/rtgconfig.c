@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/util/ipconfig.c
+ @(#) File: src/util/rtgconfig.c
 
  -----------------------------------------------------------------------------
 
@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/util/ipconfig.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] = "src/util/rtgconfig.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 600
@@ -71,20 +71,20 @@ static int debug = 0;			/* default no debug */
 static int output = 1;			/* default normal output */
 static int dryrun = 0;			/* dry run */
 
-struct ipconfig {
-	int lifetime;
-	int checksum;
-	int report;
-	int segment;
-	int reasmbly;
+struct rtgconfig {
+	int ct;
+	int rt;
+	int notify;
+	char esqaddr[15];
+	char isqaddr[15];
 };
 
-static struct ipconfig config = {
-	.lifetime = 20,
-	.checksum = 0,
-	.report = 0,
-	.segment = 1,
-	.reasmbly = 20
+static struct rtgconfig config = {
+	.ct = 20,
+	.rt = 45,
+	.notify = 1,
+	.esqaddr = "09002B000004FE",
+	.isqaddr = "09002B000005FE"
 };
 
 static void
@@ -195,16 +195,16 @@ Options:\n\
     -C, --copying\n\
         print copying permission and exit\n\
   Common:\n\
-    -l, --lifetime UNITS\n\
-        lifetime of sent NPDU (500ms increments) [default: 20]\n\
-    -c, --checksum [FLAG], --no-checksum\n\
-        CLNP checksum of NPDUs [default: 0]\n\
-    -r, --report [FLAG], --no-report\n\
-        request error report in O/G NPDUs [default: 0]\n\
-    -s, --segment [FLAG], --no-segment\n\
-        allow NPDU segmentation [default: 1]\n\
-    -a, --reasmbly UNITS\n\
-        reassembly lifetime (500ms increments) [default: 20]\n\
+    -c, --ct SECONDS\n\
+        ES-IS configuration timer (seconds) [default: %2$d]\n\
+    -r, --rt SECONDS\n\
+        ES-IS redirect timer (seconds) [default: %3$d]\n\
+    -y, --notify [FLAG], --no-notify\n\
+        immediate notification [default: %4$d]\n\
+    -e, --esqaddr SNPA\n\
+        ES multicast SNPA address [default: %5$s]\n\
+    -i, --isqaddr SNPA\n\
+        IS multicast SNPA address [default: %6$s]\n\
     -n, --dryrun\n\
         check but do not write [default: false]\n\
     -q, --quiet\n\
@@ -214,7 +214,7 @@ Options:\n\
     -v, --verbose [LEVEL]\n\
         increment or set output verbosity LEVEL [default: 1]\n\
         this option may be repeated.\n\
-", argv[0]);
+", argv[0], config.ct, config.rt, config.notify, config.esqaddr, config.isqaddr);
 }
 
 #define COMMAND_DFLT  0
@@ -227,7 +227,7 @@ int
 main(int argc, char *argv[])
 {
 	int command = COMMAND_DFLT;
-	int c, val;
+	int c, val, len, bad;
 	int start = 0;
 
 	for (;;) {
@@ -235,14 +235,12 @@ main(int argc, char *argv[])
 		int option_index = 0;
                 /* *INDENT-OFF* */
                 static struct option long_options[] = {
-			{"lifetime",	required_argument,	NULL, 'l'},
-			{"checksum",	optional_argument,	NULL, 'c'},
-			{"no-checksum",	no_argument,		NULL, 'K'},
-			{"report",	optional_argument,	NULL, 'r'},
-			{"no-report",	no_argument,		NULL, 'R'},
-			{"segment",	optional_argument,	NULL, 's'},
-			{"no-segment",	no_argument,		NULL, 'S'},
-			{"reasmbly",	required_argument,	NULL, 'a'},
+			{"ct",		required_argument,	NULL, 'c'},
+			{"rt",		required_argument,	NULL, 'r'},
+			{"notify",	optional_argument,	NULL, 'y'},
+			{"no-notify",	no_argument,		NULL, 'Y'},
+			{"esqaddr",	required_argument,	NULL, 'e'},
+			{"isqaddr",	required_argument,	NULL, 'i'},
 			{"dryrun",	no_argument,		NULL, 'n'},
 			{"quiet",	no_argument,		NULL, 'q'},
 			{"debug",	optional_argument,	NULL, 'd'},
@@ -255,9 +253,9 @@ main(int argc, char *argv[])
                 };
                 /* *INDENT-ON* */
 
-		c = getopt_long_only(argc, argv, "l:c::r::s::a:nd::v::hVC?W:", long_options, &option_index);
+		c = getopt_long_only(argc, argv, "c:r:y::Ye:i:nd::v::hVC?W:", long_options, &option_index);
 #else				/* _GNU_SOURCE */
-		c = getopt(argc, argv, "l:c:r:s:a:nqd:vhVC?");
+		c = getopt(argc, argv, "c:r:y:Ye:i:nqd:vhVC?");
 #endif				/* _GNU_SOURCE */
 		if (c == -1) {
 			if (debug)
@@ -267,46 +265,59 @@ main(int argc, char *argv[])
 		switch (c) {
 		case 0:
 			goto bad_usage;
-		case 'l':	/* -l, --lifetime UNITS */
+		case 'c':	/* -c, --ct SECONDS */
 			command = COMMAND_CNFG;
-			config.lifetime = strtoul(optarg, NULL, 0);
+			config.ct = strtoul(optarg, NULL, 0);
 			break;
-		case 'c':	/* -c, --checksum [FLAG] */
+		case 'r':	/* -r, --rt SECONDS */
+			command = COMMAND_CNFG;
+			config.rt = strtoul(optarg, NULL, 0);
+			break;
+		case 'y':	/* -y, --notify [FLAG] */
 			command = COMMAND_CNFG;
 			if (optarg == NULL)
-				config.checksum = 1;
+				config.notify = 1;
 			else
-				config.checksum = strtol(optarg, NULL, 0) ? 1 : 0;
+				config.notify = strtol(optarg, NULL, 0) ? 1 : 0;
 			break;
-		case 'K':	/* --no-checksum */
+		case 'Y':	/* --no-notify */
 			command = COMMAND_CNFG;
-			config.checksum = 0;
+			config.notify = 0;
 			break;
-		case 'r':	/* -r, --report [FLAG] */
+		case 'e':	/* -e, --esqaddr SNPA */
 			command = COMMAND_CNFG;
-			if (optarg == NULL)
-				config.report = 1;
-			else
-				config.report = strtol(optarg, NULL, 0) ? 1 : 0;
+			if ((len = strlen(optarg)) != 14) {
+				if (output || debug)
+					fprintf(stderr, "%s: invalid ES SNPA length %d\n", argv[0], len);
+				goto bad_option;
+			}
+			if ((optarg[12] != 'f' && optarg[12] != 'F')
+			    || (optarg[13] != 'e' && optarg[13] != 'E'))
+				goto bad_option;
+			/* check for hexadecimal digits only */
+			if ((bad = strspn(optarg, "0123456789abcdefABCDEF")) < len) {
+				if (output || debug)
+					fprintf(stderr, "%s: invalid hexadecimal character '%c' in ES SNPA address\n",
+						argv[0], optarg[bad]);
+				goto bad_option;
+			}
+			strncpy(config.esqaddr, optarg, sizeof(config.esqaddr));
 			break;
-		case 'R':	/* --no-report */
+		case 'i':	/* -i, --isqaddr SNPA */
 			command = COMMAND_CNFG;
-			config.report = 0;
-			break;
-		case 's':	/* -s, --segment [FLAG] */
-			command = COMMAND_CNFG;
-			if (optarg == NULL)
-				config.segment = 1;
-			else
-				config.segment = strtol(optarg, NULL, 0) ? 1 : 0;
-			break;
-		case 'S':	/* --no-segment */
-			command = COMMAND_CNFG;
-			config.segment = 0;
-			break;
-		case 'a':	/* -a, --reasmbly UNITS */
-			command = COMMAND_CNFG;
-			config.reasmbly = strtoul(optarg, NULL, 0);
+			if ((len = strlen(optarg)) != 14) {
+				if (output || debug)
+					fprintf(stderr, "%s: invalid IS SNPA length %d\n", argv[0], len);
+				goto bad_option;
+			}
+			/* check for hexadecimal digits only */
+			if ((bad = strspn(optarg, "0123456789abcdefABCDEF")) < len) {
+				if (output || debug)
+					fprintf(stderr, "%s: invalid hexadecimal character '%c' in IS SNPA address\n",
+						argv[0], optarg[bad]);
+				goto bad_option;
+			}
+			strncpy(config.isqaddr, optarg, sizeof(config.isqaddr));
 			break;
 		case 'n':	/* -n, --dryrun */
 			dryrun = 1;

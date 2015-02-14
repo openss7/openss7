@@ -2226,6 +2226,16 @@ pingllc_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= pingllc
 
+## =====================================================================
+
+rtgconfig_SOURCES		= src/util/rtgconfig.c
+rtgconfig_CPPFLAGS		= $(UTIL_INCLUDES)
+rtgconfig_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+rtgconfig_LDFLAGS		= $(USER_LDFLAGS)
+rtgconfig_LDADD			= libstreams.la
+
+sbin_PROGRAMS			+= rtgconfig
+
 ## ---------------------------------------------------------------------
 ## pkglibexec_PROGRAMS
 ## ---------------------------------------------------------------------
