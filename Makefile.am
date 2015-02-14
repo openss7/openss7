@@ -2166,6 +2166,16 @@ esq_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= esq
 
+## =====================================================================
+
+ipconfig_SOURCES		= src/util/ipconfig.c
+ipconfig_CPPFLAGS		= $(UTIL_INCLUDES)
+ipconfig_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+ipconfig_LDFLAGS		= $(USER_LDFLAGS)
+ipconfig_LDADD			= libstreams.la
+
+sbin_PROGRAMS			+= ipconfig
+
 ## ---------------------------------------------------------------------
 ## pkglibexec_PROGRAMS
 ## ---------------------------------------------------------------------
