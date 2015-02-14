@@ -2266,6 +2266,16 @@ sndcmap_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= sndcmap
 
+## =====================================================================
+
+tp24config_SOURCES		= src/util/tp24config.c
+tp24config_CPPFLAGS		= $(UTIL_INCLUDES)
+tp24config_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+tp24config_LDFLAGS		= $(USER_LDFLAGS)
+tp24config_LDADD		= libstreams.la
+
+sbin_PROGRAMS			+= tp24config
+
 ## ---------------------------------------------------------------------
 ## pkglibexec_PROGRAMS
 ## ---------------------------------------------------------------------
