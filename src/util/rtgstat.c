@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/util/dtemap.c
+ @(#) File: src/util/rtgstat.c
 
  -----------------------------------------------------------------------------
 
@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/util/dtemap.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] = "src/util/rtgstat.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 600
@@ -71,11 +71,8 @@ static int debug = 0;			/* default no debug */
 static int output = 1;			/* default normal output */
 static int dryrun = 0;			/* dry run */
 
-static char filename[BUFSIZ + 1] = "";
-static int filesize = 4096;
-
 static void
-do_dtemap(int argc, char *argv[], int start)
+do_stat(int argc, char *argv[], int start)
 {
 }
 
@@ -155,7 +152,7 @@ usage(int argc, char *argv[])
 		return;
 	(void) fprintf(stderr, "\
 Usage:\n\
-    %1$s [options] FILE\n\
+    %1$s [options]\n\
     %1$s {-h|--help}\n\
     %1$s {-V|--version}\n\
     %1$s {-C|--copying}\n\
@@ -169,17 +166,12 @@ help(int argc, char *argv[])
 		return;
 	(void) fprintf(stdout, "\
 Usage:\n\
-    %1$s [options] FILE\n\
+    %1$s [options]\n\
     %1$s {-h|--help}\n\
     %1$s {-V|--version}\n\
     %1$s {-C|--copying}\n\
-Arguments:\n\
-    FILE\n\
-        filename of the map file to load\n\
 Options:\n\
-  Command: (-m assumed if none given)\n\
-    -m, --map\n\
-        map the provided file\n\
+  Command:\n\
     -h, --help, -?, --?\n\
         print this usage information and exit\n\
     -V, --version\n\
@@ -187,8 +179,6 @@ Options:\n\
     -C, --copying\n\
         print copying permission and exit\n\
   Common:\n\
-    -s, --size SIZE\n\
-        specifify the file size, SIZE [default: 4096]\n\
     -n, --dryrun\n\
         check but do not write [default: false]\n\
     -q, --quiet\n\
@@ -202,7 +192,7 @@ Options:\n\
 }
 
 #define COMMAND_DFLT  0
-#define COMMAND_DMAP  1
+#define COMMAND_STAT  1
 #define COMMAND_HELP  2
 #define COMMAND_VERS  3
 #define COMMAND_COPY  4
@@ -211,21 +201,20 @@ int
 main(int argc, char *argv[])
 {
 	int command = COMMAND_DFLT;
-	int c, val, len;
-	int start;
+	int c, val;
+	int start = 0;
 
 	for (;;) {
 #if defined _GNU_SOURCE
 		int option_index = 0;
                 /* *INDENT-OFF* */
                 static struct option long_options[] = {
-			{"map",		no_argument,		NULL, 'm'},
-			{"size",	required_argument,	NULL, 's'},
+                        {"del",         no_argument,		NULL, 'D'},
 			{"dryrun",	no_argument,		NULL, 'n'},
 			{"quiet",	no_argument,		NULL, 'q'},
 			{"debug",	optional_argument,	NULL, 'd'},
 			{"verbose",	optional_argument,	NULL, 'v'},
-			{"help",	no_argument,		NULL, 'h'},
+                        {"help",        no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
 			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'H'},
@@ -233,9 +222,9 @@ main(int argc, char *argv[])
                 };
                 /* *INDENT-ON* */
 
-		c = getopt_long_only(argc, argv, "ms:nd::v::hVC?W:", long_options, &option_index);
+		c = getopt_long_only(argc, argv, "Dnd::v::hVC?W:", long_options, &option_index);
 #else				/* _GNU_SOURCE */
-		c = getopt(argc, argv, "ms:nqd:vhVC?");
+		c = getopt(argc, argv, "Dnqd:vhVC?");
 #endif				/* _GNU_SOURCE */
 		if (c == -1) {
 			if (debug)
@@ -245,16 +234,6 @@ main(int argc, char *argv[])
 		switch (c) {
 		case 0:
 			goto bad_usage;
-		case 'm':	/* -m, --map */
-			if (command != COMMAND_DFLT)
-				goto bad_option;
-			command = COMMAND_DMAP;
-			break;
-		case 's':	/* -s, --size SIZE */
-			if ((val = strtol(optarg, NULL, 0)) <= 0)
-				goto bad_option;
-			filesize = val;
-			break;
 		case 'n':	/* -n, --dryrun */
 			dryrun = 1;
 			break;
@@ -325,27 +304,6 @@ main(int argc, char *argv[])
 			exit(2);
 		}
 	}
-	/* FILE argument */
-	if (debug)
-		fprintf(stderr, "%s: testing FILE name\n", argv[0]);
-	start = optind;
-	if (optind < argc) {
-		len = strnlen(argv[optind], BUFSIZ + 1);
-		if (0 >= len || len > BUFSIZ) {
-			if (output || debug)
-				fprintf(stderr, "%s: invalid FILE name length %d\n", argv[0], len);
-			goto bad_nonopt;
-		}
-		strncpy(filename, argv[optind], BUFSIZ);
-		/* check this later */
-		optind++;
-	} else {
-		if (command == COMMAND_DMAP || command == COMMAND_DFLT) {
-			if (output || debug)
-				fprintf(stderr, "%s: missing FILE name\n", argv[0]);
-			goto bad_nonopt;
-		}
-	}
 	if (optind < argc) {
 		if (debug)
 			fprintf(stderr, "%s: excess non-option arguments\n", argv[0]);
@@ -353,8 +311,8 @@ main(int argc, char *argv[])
 	}
 	switch (command) {
 	case COMMAND_DFLT:
-	case COMMAND_DMAP:
-		do_dtemap(argc, argv, start);
+	case COMMAND_STAT:
+		do_stat(argc, argv, start);
 		break;
 	case COMMAND_HELP:
 		help(argc, argv);

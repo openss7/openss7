@@ -2236,6 +2236,26 @@ rtgconfig_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= rtgconfig
 
+## =====================================================================
+
+rtgstat_SOURCES			= src/util/rtgstat.c
+rtgstat_CPPFLAGS		= $(UTIL_INCLUDES)
+rtgstat_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+rtgstat_LDFLAGS			= $(USER_LDFLAGS)
+rtgstat_LDADD			= libstreams.la
+
+sbin_PROGRAMS			+= rtgstat
+
+## =====================================================================
+
+rtl_SOURCES			= src/util/rtl.c
+rtl_CPPFLAGS			= $(UTIL_INCLUDES)
+rtl_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+rtl_LDFLAGS			= $(USER_LDFLAGS)
+rtl_LDADD			= libstreams.la
+
+sbin_PROGRAMS			+= rtl
+
 ## ---------------------------------------------------------------------
 ## pkglibexec_PROGRAMS
 ## ---------------------------------------------------------------------

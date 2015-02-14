@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/util/dtemap.c
+ @(#) File: src/util/rtl.c
 
  -----------------------------------------------------------------------------
 
@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/util/dtemap.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] = "src/util/rtl.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 600
@@ -75,7 +75,7 @@ static char filename[BUFSIZ + 1] = "";
 static int filesize = 4096;
 
 static void
-do_dtemap(int argc, char *argv[], int start)
+do_rtl(int argc, char *argv[], int start)
 {
 }
 
@@ -175,10 +175,10 @@ Usage:\n\
     %1$s {-C|--copying}\n\
 Arguments:\n\
     FILE\n\
-        filename of the map file to load\n\
+        filename of the route file to load\n\
 Options:\n\
-  Command: (-m assumed if none given)\n\
-    -m, --map\n\
+  Command: (-l assumed if none given)\n\
+    -l, --load\n\
         map the provided file\n\
     -h, --help, -?, --?\n\
         print this usage information and exit\n\
@@ -202,7 +202,7 @@ Options:\n\
 }
 
 #define COMMAND_DFLT  0
-#define COMMAND_DMAP  1
+#define COMMAND_RTLD  1
 #define COMMAND_HELP  2
 #define COMMAND_VERS  3
 #define COMMAND_COPY  4
@@ -219,7 +219,7 @@ main(int argc, char *argv[])
 		int option_index = 0;
                 /* *INDENT-OFF* */
                 static struct option long_options[] = {
-			{"map",		no_argument,		NULL, 'm'},
+                        {"load",	no_argument,		NULL, 'l'},
 			{"size",	required_argument,	NULL, 's'},
 			{"dryrun",	no_argument,		NULL, 'n'},
 			{"quiet",	no_argument,		NULL, 'q'},
@@ -245,10 +245,10 @@ main(int argc, char *argv[])
 		switch (c) {
 		case 0:
 			goto bad_usage;
-		case 'm':	/* -m, --map */
+		case 'l':	/* -l, --load */
 			if (command != COMMAND_DFLT)
 				goto bad_option;
-			command = COMMAND_DMAP;
+			command = COMMAND_RTLD;
 			break;
 		case 's':	/* -s, --size SIZE */
 			if ((val = strtol(optarg, NULL, 0)) <= 0)
@@ -340,7 +340,7 @@ main(int argc, char *argv[])
 		/* check this later */
 		optind++;
 	} else {
-		if (command == COMMAND_DMAP || command == COMMAND_DFLT) {
+		if (command == COMMAND_RTLD || command == COMMAND_DFLT) {
 			if (output || debug)
 				fprintf(stderr, "%s: missing FILE name\n", argv[0]);
 			goto bad_nonopt;
@@ -353,8 +353,8 @@ main(int argc, char *argv[])
 	}
 	switch (command) {
 	case COMMAND_DFLT:
-	case COMMAND_DMAP:
-		do_dtemap(argc, argv, start);
+	case COMMAND_RTLD:
+		do_rtl(argc, argv, start);
 		break;
 	case COMMAND_HELP:
 		help(argc, argv);
