@@ -2216,6 +2216,16 @@ netitle_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= netitle
 
+## =====================================================================
+
+pingllc_SOURCES			= src/util/pingllc.c
+pingllc_CPPFLAGS		= $(UTIL_INCLUDES)
+pingllc_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+pingllc_LDFLAGS			= $(USER_LDFLAGS)
+pingllc_LDADD			= libstreams.la
+
+sbin_PROGRAMS			+= pingllc
+
 ## ---------------------------------------------------------------------
 ## pkglibexec_PROGRAMS
 ## ---------------------------------------------------------------------

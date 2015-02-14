@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/util/addnsap.c
+ @(#) File: src/util/pingllc.c
 
  -----------------------------------------------------------------------------
 
@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/util/addnsap.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] = "src/util/pingllc.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 600
@@ -71,12 +71,13 @@ static int debug = 0;			/* default no debug */
 static int output = 1;			/* default normal output */
 static int dryrun = 0;			/* dry run */
 
-static char nsapaddr[BUFSIZ + 1] = "";
-static char snpaaddr[BUFSIZ + 1] = "";
+static char macaddr[BUFSIZ + 1] = "";
+static int count = 1;
+static int length = 1024;
 static short port = 0;
 
 static void
-do_nsap(int argc, char *argv[], int start)
+do_ping(int argc, char *argv[], int start)
 {
 }
 
@@ -205,7 +206,7 @@ Options:\n\
 }
 
 #define COMMAND_DFLT  0
-#define COMMAND_NSAP  1
+#define COMMAND_PING  1
 #define COMMAND_HELP  2
 #define COMMAND_VERS  3
 #define COMMAND_COPY  4
@@ -250,7 +251,7 @@ main(int argc, char *argv[])
 		case 'a':	/* -a, --add */
 			if (command != COMMAND_DFLT)
 				goto bad_option;
-			command = COMMAND_NSAP;
+			command = COMMAND_PING;
 			break;
 		case 'n':	/* -n, --dryrun */
 			dryrun = 1;
@@ -322,93 +323,57 @@ main(int argc, char *argv[])
 			exit(2);
 		}
 	}
-	/* NSAP_Address argument */
+	/* MAC_Address argument */
 	if (debug)
-		fprintf(stderr, "%s: testing NSAP address\n", argv[0]);
-	start = optind;
+		fprintf(stderr, "%s: testing MAC address\n", argv[0]);
 	if (optind < argc) {
 		len = strnlen(argv[optind], BUFSIZ + 1);
-		if ((len & 0x1) || len > 40 || len > BUFSIZ) {
+		/* MAC: 12 hexadecimal digits */
+		if (len != 12 || len > BUFSIZ) {
 			if (output || debug)
-				fprintf(stderr, "%s: invalid NSAP-address length %d\n", argv[0], len);
+				fprintf(stderr, "%s: invalid MAC-address length %d\n", argv[0], len);
 			goto bad_nonopt;
 		}
-		strncpy(nsapaddr, argv[optind], BUFSIZ);
+		strncpy(macaddr, argv[optind], BUFSIZ);
 		/* check this later */
 		optind++;
 		/* check for hexadecimal digits only */
-		if ((bad = strspn(nsapaddr, "0123456789abcdefABCDEF")) < len) {
+		if ((bad = strspn(macaddr, "0123456789abcdefABCDEF")) < len) {
 			if (output || debug)
 				fprintf(stderr, "%s: invalid hexadecimal character '%c' in address", argv[0],
-					nsapaddr[bad]);
+					macaddr[bad]);
 			goto bad_nonopt;
 		}
 	} else {
-		if (command == COMMAND_NSAP || command == COMMAND_DFLT) {
+		if (command == COMMAND_PING || command == COMMAND_DFLT) {
 			if (output || debug)
-				fprintf(stderr, "%s: missing NSAP address\n", argv[0]);
+				fprintf(stderr, "%s: missing MAC address\n", argv[0]);
 			goto bad_nonopt;
 		}
 	}
-	/* SNPA_Address argument */
-	if (debug)
-		fprintf(stderr, "%s: testing SNPA address\n", argv[0]);
-	if (optind < argc) {
-		len = strnlen(argv[optind], BUFSIZ + 1);
-		/* Two formats: MAC + LSAP: 14 hexadecimal digits ending in [Ff][Ee] or X.121 format (up to
-		   15 decimal digits */
-		if (len < 2 || len > 15 || len > BUFSIZ) {
-			if (output || debug)
-				fprintf(stderr, "%s: invalid SNPA-address length %d\n", argv[0], len);
-			goto bad_nonopt;
-		}
-		strncpy(snpaaddr, argv[optind], BUFSIZ);
-		/* check this later */
-		optind++;
-		if ((snpaaddr[len - 1] == 'e' || snpaaddr[len - 1] == 'E')
-		    && (snpaaddr[len - 2] == 'f' || snpaaddr[len - 2] == 'F')) {
-			/* MAC+LSAP: 14 hexadecimal digits ending in [Ff][Ee] */
-			if (len != 14) {
-				if (output || debug)
-					fprintf(stderr, "%s: invalid SNPA-address length %d\n", argv[0], len);
-				goto bad_nonopt;
-			}
-			/* check for hexadecimal digits only */
-			if ((bad = strspn(snpaaddr, "0123456789abcdefABCDEF")) < len) {
-				if (output || debug)
-					fprintf(stderr, "%s: invalid hexadecimal character '%c' in address",
-						argv[0], snpaaddr[bad]);
-				goto bad_nonopt;
-			}
-		} else {
-			/* X.121 format: up to 15 decimal digits */
-			if (len > 15) {
-				if (output || debug)
-					fprintf(stderr, "%s: invalid SNPA-address length %d\n", argv[0], len);
-				goto bad_nonopt;
-			}
-			/* check for decimal digits only */
-			if ((bad = strspn(snpaaddr, "0123456789")) < len) {
-				if (output || debug)
-					fprintf(stderr, "%s: invalid decimal character '%c' in address",
-						argv[0], snpaaddr[bad]);
-				goto bad_nonopt;
-			}
-		}
-	} else {
-		if (command == COMMAND_NSAP || command == COMMAND_DFLT) {
-			if (output || debug)
-				fprintf(stderr, "%s: missing SNPA address\n", argv[0]);
-			goto bad_nonopt;
-		}
-	}
-	/* PORT argument */
+	/* COUNT argument */
 	if (optind < argc) {
 		if ((val = strtol(argv[optind], NULL, 0)) < 0)
 			goto bad_nonopt;
-		port = val;
+		count = val;
 		/* check this later */
 		optind++;
+		/* LENGTH argument */
+		if (optind < argc) {
+			if ((val = strtol(argv[optind], NULL, 0)) < 0)
+				goto bad_nonopt;
+			length = val;
+			/* check this later */
+			optind++;
+			/* SUBNETWORK argument */
+			if (optind < argc) {
+				if ((val = strtol(argv[optind], NULL, 0)) < 0)
+					goto bad_nonopt;
+				port = val;
+				/* check this later */
+				optind++;
+			}
+		}
 	}
 	if (optind < argc) {
 		if (debug)
@@ -417,8 +382,8 @@ main(int argc, char *argv[])
 	}
 	switch (command) {
 	case COMMAND_DFLT:
-	case COMMAND_NSAP:
-		do_nsap(argc, argv, start);
+	case COMMAND_PING:
+		do_ping(argc, argv, start);
 		break;
 	case COMMAND_HELP:
 		help(argc, argv);
