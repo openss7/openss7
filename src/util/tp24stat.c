@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/util/rtgstat.c
+ @(#) File: src/util/tp24stat.c
 
  -----------------------------------------------------------------------------
 
@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/util/rtgstat.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] = "src/util/tp24stat.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 600

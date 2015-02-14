@@ -2276,6 +2276,16 @@ tp24config_LDADD		= libstreams.la
 
 sbin_PROGRAMS			+= tp24config
 
+## =====================================================================
+
+tp24stat_SOURCES		= src/util/tp24stat.c
+tp24stat_CPPFLAGS		= $(UTIL_INCLUDES)
+tp24stat_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+tp24stat_LDFLAGS		= $(USER_LDFLAGS)
+tp24stat_LDADD			= libstreams.la
+
+sbin_PROGRAMS			+= tp24stat
+
 ## ---------------------------------------------------------------------
 ## pkglibexec_PROGRAMS
 ## ---------------------------------------------------------------------
