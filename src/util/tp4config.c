@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/util/tp24config.c
+ @(#) File: src/util/tp4config.c
 
  -----------------------------------------------------------------------------
 
@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/util/tp24config.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] = "src/util/tp4config.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 600
@@ -71,7 +71,7 @@ static int debug = 0;			/* default no debug */
 static int output = 1;			/* default normal output */
 static int dryrun = 0;			/* dry run */
 
-struct tp24config {
+struct tp4config {
 	int inactivity;
 	int retransmit;
 	int upper;
@@ -97,7 +97,7 @@ struct tp24config {
 	int ccitt;
 };
 
-static struct tp24config config = {
+static struct tp4config config = {
 	.inactivity = 960000,
 	.retransmit = 30000,
 	.upper = 10000,

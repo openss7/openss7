@@ -2286,6 +2286,26 @@ tp24stat_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= tp24stat
 
+## =====================================================================
+
+tp4config_SOURCES		= src/util/tp4config.c
+tp4config_CPPFLAGS		= $(UTIL_INCLUDES)
+tp4config_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+tp4config_LDFLAGS		= $(USER_LDFLAGS)
+tp4config_LDADD			= libstreams.la
+
+sbin_PROGRAMS			+= tp4config
+
+## =====================================================================
+
+tp4stat_SOURCES			= src/util/tp4stat.c
+tp4stat_CPPFLAGS		= $(UTIL_INCLUDES)
+tp4stat_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+tp4stat_LDFLAGS			= $(USER_LDFLAGS)
+tp4stat_LDADD			= libstreams.la
+
+sbin_PROGRAMS			+= tp4stat
+
 ## ---------------------------------------------------------------------
 ## pkglibexec_PROGRAMS
 ## ---------------------------------------------------------------------
