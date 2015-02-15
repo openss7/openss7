@@ -2306,6 +2306,26 @@ tp4stat_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= tp4stat
 
+## =====================================================================
+
+sttxt_SOURCES			= src/util/sttxt.c
+sttxt_CPPFLAGS			= $(UTIL_INCLUDES)
+sttxt_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+sttxt_LDFLAGS			= $(USER_LDFLAGS)
+sttxt_LDADD			= libstreams.la
+
+sbin_PROGRAMS			+= sttxt
+
+## =====================================================================
+
+strxt_SOURCES			= src/util/strxt.c
+strxt_CPPFLAGS			= $(UTIL_INCLUDES)
+strxt_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+strxt_LDFLAGS			= $(USER_LDFLAGS)
+strxt_LDADD			= libstreams.la
+
+sbin_PROGRAMS			+= strxt
+
 ## ---------------------------------------------------------------------
 ## pkglibexec_PROGRAMS
 ## ---------------------------------------------------------------------
