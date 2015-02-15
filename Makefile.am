@@ -2326,6 +2326,16 @@ strxt_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= strxt
 
+## =====================================================================
+
+osid_SOURCES			= src/util/osid.c
+osid_CPPFLAGS			= $(UTIL_INCLUDES)
+osid_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+osid_LDFLAGS			= $(USER_LDFLAGS)
+osid_LDADD			= libstreams.la
+
+sbin_PROGRAMS			+= osid
+
 ## ---------------------------------------------------------------------
 ## pkglibexec_PROGRAMS
 ## ---------------------------------------------------------------------
