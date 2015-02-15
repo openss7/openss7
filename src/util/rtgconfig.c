@@ -227,8 +227,9 @@ int
 main(int argc, char *argv[])
 {
 	int command = COMMAND_DFLT;
-	int c, val, len, bad;
+	int c, val;
 	int start = 0;
+	int len, bad;
 
 	for (;;) {
 #if defined _GNU_SOURCE
@@ -255,7 +256,7 @@ main(int argc, char *argv[])
 
 		c = getopt_long_only(argc, argv, "c:r:y::Ye:i:nd::v::hVC?W:", long_options, &option_index);
 #else				/* _GNU_SOURCE */
-		c = getopt(argc, argv, "c:r:y:Ye:i:nqd:vhVC?");
+		c = getopt(argc, argv, "c:r:yYe:i:nqd:vhVC?");
 #endif				/* _GNU_SOURCE */
 		if (c == -1) {
 			if (debug)
@@ -297,7 +298,8 @@ main(int argc, char *argv[])
 			/* check for hexadecimal digits only */
 			if ((bad = strspn(optarg, "0123456789abcdefABCDEF")) < len) {
 				if (output || debug)
-					fprintf(stderr, "%s: invalid hexadecimal character '%c' in ES SNPA address\n",
+					fprintf(stderr,
+						"%s: invalid hexadecimal character '%c' in ES SNPA address\n",
 						argv[0], optarg[bad]);
 				goto bad_option;
 			}
@@ -313,7 +315,8 @@ main(int argc, char *argv[])
 			/* check for hexadecimal digits only */
 			if ((bad = strspn(optarg, "0123456789abcdefABCDEF")) < len) {
 				if (output || debug)
-					fprintf(stderr, "%s: invalid hexadecimal character '%c' in IS SNPA address\n",
+					fprintf(stderr,
+						"%s: invalid hexadecimal character '%c' in IS SNPA address\n",
 						argv[0], optarg[bad]);
 				goto bad_option;
 			}

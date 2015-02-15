@@ -196,15 +196,15 @@ Options:\n\
         print copying permission and exit\n\
   Common:\n\
     -l, --lifetime UNITS\n\
-        lifetime of sent NPDU (500ms increments) [default: 20]\n\
-    -c, --checksum [FLAG], --no-checksum\n\
-        CLNP checksum of NPDUs [default: 0]\n\
-    -r, --report [FLAG], --no-report\n\
-        request error report in O/G NPDUs [default: 0]\n\
-    -s, --segment [FLAG], --no-segment\n\
-        allow NPDU segmentation [default: 1]\n\
+        lifetime of sent NPDU (500ms increments) [default: %2$d]\n\
+    -k, --checksum [FLAG], -K, --no-checksum\n\
+        CLNP checksum of NPDUs [default: %3$d]\n\
+    -r, --report [FLAG], -R, --no-report\n\
+        request error report in O/G NPDUs [default: %4$d]\n\
+    -s, --segment [FLAG], -S, --no-segment\n\
+        allow NPDU segmentation [default: %5$d]\n\
     -a, --reasmbly UNITS\n\
-        reassembly lifetime (500ms increments) [default: 20]\n\
+        reassembly lifetime (500ms increments) [default: %6$d]\n\
     -n, --dryrun\n\
         check but do not write [default: false]\n\
     -q, --quiet\n\
@@ -214,7 +214,7 @@ Options:\n\
     -v, --verbose [LEVEL]\n\
         increment or set output verbosity LEVEL [default: 1]\n\
         this option may be repeated.\n\
-", argv[0]);
+", argv[0], config.lifetime, config.checksum, config.report, config.segment, config.reasmbly);
 }
 
 #define COMMAND_DFLT  0
@@ -236,7 +236,7 @@ main(int argc, char *argv[])
                 /* *INDENT-OFF* */
                 static struct option long_options[] = {
 			{"lifetime",	required_argument,	NULL, 'l'},
-			{"checksum",	optional_argument,	NULL, 'c'},
+			{"checksum",	optional_argument,	NULL, 'k'},
 			{"no-checksum",	no_argument,		NULL, 'K'},
 			{"report",	optional_argument,	NULL, 'r'},
 			{"no-report",	no_argument,		NULL, 'R'},
@@ -255,9 +255,9 @@ main(int argc, char *argv[])
                 };
                 /* *INDENT-ON* */
 
-		c = getopt_long_only(argc, argv, "l:c::r::s::a:nd::v::hVC?W:", long_options, &option_index);
+		c = getopt_long_only(argc, argv, "l:k::Kr::Rs::Sa:nd::v::hVC?W:", long_options, &option_index);
 #else				/* _GNU_SOURCE */
-		c = getopt(argc, argv, "l:c:r:s:a:nqd:vhVC?");
+		c = getopt(argc, argv, "l:kKrRsSa:nqd:vhVC?");
 #endif				/* _GNU_SOURCE */
 		if (c == -1) {
 			if (debug)
@@ -271,7 +271,7 @@ main(int argc, char *argv[])
 			command = COMMAND_CNFG;
 			config.lifetime = strtoul(optarg, NULL, 0);
 			break;
-		case 'c':	/* -c, --checksum [FLAG] */
+		case 'k':	/* -k, --checksum [FLAG] */
 			command = COMMAND_CNFG;
 			if (optarg == NULL)
 				config.checksum = 1;
