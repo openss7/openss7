@@ -25,72 +25,72 @@ alarmMIB_openss7.c alarmMIB_openss7.h: mib2c mib2c.conf ../mibs/ALARM-MIB.mib
 
 MIBPREFIXES += ianaItuAlarmNumbers
 
-ianaItuAlarmNumbers.mib: ../mibs/ALARM-MIB.mib
-	smidump -k ../mibs/ALARM-MIB.mib>$@ || :
+ianaItuAlarmNumbers.mib: ../mibs/IANA-ITU-ALARM-TC-MIB.mib
+	smidump -k ../mibs/IANA-ITU-ALARM-TC-MIB.mib>$@ || :
 
-ianaItuAlarmNumbers.lint: ../mibs/ALARM-MIB.mib
-	smilint $(SMILINTIGNORES) -ms ../mibs/ALARM-MIB.mib>$@ 2>&1 || :
+ianaItuAlarmNumbers.lint: ../mibs/IANA-ITU-ALARM-TC-MIB.mib
+	smilint $(SMILINTIGNORES) -ms ../mibs/IANA-ITU-ALARM-TC-MIB.mib>$@ 2>&1 || :
 
-ianaItuAlarmNumbers.tree: ../mibs/ALARM-MIB.mib
+ianaItuAlarmNumbers.tree: ../mibs/IANA-ITU-ALARM-TC-MIB.mib
 	snmptranslate -Tp IANA-ITU-ALARM-TC-MIB::ianaItuAlarmNumbers>$@ || :
 
-ianaItuAlarmNumbers_simple.c ianaItuAlarmNumbers_simple.h: mib2c mib2c.conf ../mibs/ALARM-MIB.mib
+ianaItuAlarmNumbers_simple.c ianaItuAlarmNumbers_simple.h: mib2c mib2c.conf ../mibs/IANA-ITU-ALARM-TC-MIB.mib
 	./mib2c -c ./mib2c.conf -f ianaItuAlarmNumbers_simple IANA-ITU-ALARM-TC-MIB::ianaItuAlarmNumbers
 	indent -nhnl ianaItuAlarmNumbers_simple.[ch]
 
-ianaItuAlarmNumbers_storage.c ianaItuAlarmNumbers_storage.h: mib2c mib2c.conf ../mibs/ALARM-MIB.mib
+ianaItuAlarmNumbers_storage.c ianaItuAlarmNumbers_storage.h: mib2c mib2c.conf ../mibs/IANA-ITU-ALARM-TC-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f ianaItuAlarmNumbers_storage IANA-ITU-ALARM-TC-MIB::ianaItuAlarmNumbers
 	indent -nhnl ianaItuAlarmNumbers_storage.[ch]
 
-ianaItuAlarmNumbers_openss7.c ianaItuAlarmNumbers_openss7.h: mib2c mib2c.conf ../mibs/ALARM-MIB.mib
+ianaItuAlarmNumbers_openss7.c ianaItuAlarmNumbers_openss7.h: mib2c mib2c.conf ../mibs/IANA-ITU-ALARM-TC-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f ianaItuAlarmNumbers_openss7 IANA-ITU-ALARM-TC-MIB::ianaItuAlarmNumbers
 	indent -nhnl ianaItuAlarmNumbers_openss7.[ch]
 
 
 MIBPREFIXES += ituAlarmTc
 
-ituAlarmTc.mib: ../mibs/ALARM-MIB.mib
-	smidump -k ../mibs/ALARM-MIB.mib>$@ || :
+ituAlarmTc.mib: ../mibs/ITU-ALARM-TC-MIB.mib
+	smidump -k ../mibs/ITU-ALARM-TC-MIB.mib>$@ || :
 
-ituAlarmTc.lint: ../mibs/ALARM-MIB.mib
-	smilint $(SMILINTIGNORES) -ms ../mibs/ALARM-MIB.mib>$@ 2>&1 || :
+ituAlarmTc.lint: ../mibs/ITU-ALARM-TC-MIB.mib
+	smilint $(SMILINTIGNORES) -ms ../mibs/ITU-ALARM-TC-MIB.mib>$@ 2>&1 || :
 
-ituAlarmTc.tree: ../mibs/ALARM-MIB.mib
+ituAlarmTc.tree: ../mibs/ITU-ALARM-TC-MIB.mib
 	snmptranslate -Tp ITU-ALARM-TC-MIB::ituAlarmTc>$@ || :
 
-ituAlarmTc_simple.c ituAlarmTc_simple.h: mib2c mib2c.conf ../mibs/ALARM-MIB.mib
+ituAlarmTc_simple.c ituAlarmTc_simple.h: mib2c mib2c.conf ../mibs/ITU-ALARM-TC-MIB.mib
 	./mib2c -c ./mib2c.conf -f ituAlarmTc_simple ITU-ALARM-TC-MIB::ituAlarmTc
 	indent -nhnl ituAlarmTc_simple.[ch]
 
-ituAlarmTc_storage.c ituAlarmTc_storage.h: mib2c mib2c.conf ../mibs/ALARM-MIB.mib
+ituAlarmTc_storage.c ituAlarmTc_storage.h: mib2c mib2c.conf ../mibs/ITU-ALARM-TC-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f ituAlarmTc_storage ITU-ALARM-TC-MIB::ituAlarmTc
 	indent -nhnl ituAlarmTc_storage.[ch]
 
-ituAlarmTc_openss7.c ituAlarmTc_openss7.h: mib2c mib2c.conf ../mibs/ALARM-MIB.mib
+ituAlarmTc_openss7.c ituAlarmTc_openss7.h: mib2c mib2c.conf ../mibs/ITU-ALARM-TC-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f ituAlarmTc_openss7 ITU-ALARM-TC-MIB::ituAlarmTc
 	indent -nhnl ituAlarmTc_openss7.[ch]
 
 
 MIBPREFIXES += ituAlarmMIB
 
-ituAlarmMIB.mib: ../mibs/ALARM-MIB.mib
-	smidump -k ../mibs/ALARM-MIB.mib>$@ || :
+ituAlarmMIB.mib: ../mibs/ITU-ALARM-MIB.mib
+	smidump -k ../mibs/ITU-ALARM-MIB.mib>$@ || :
 
-ituAlarmMIB.lint: ../mibs/ALARM-MIB.mib
-	smilint $(SMILINTIGNORES) -ms ../mibs/ALARM-MIB.mib>$@ 2>&1 || :
+ituAlarmMIB.lint: ../mibs/ITU-ALARM-MIB.mib
+	smilint $(SMILINTIGNORES) -ms ../mibs/ITU-ALARM-MIB.mib>$@ 2>&1 || :
 
-ituAlarmMIB.tree: ../mibs/ALARM-MIB.mib
+ituAlarmMIB.tree: ../mibs/ITU-ALARM-MIB.mib
 	snmptranslate -Tp ITU-ALARM-MIB::ituAlarmMIB>$@ || :
 
-ituAlarmMIB_simple.c ituAlarmMIB_simple.h: mib2c mib2c.conf ../mibs/ALARM-MIB.mib
+ituAlarmMIB_simple.c ituAlarmMIB_simple.h: mib2c mib2c.conf ../mibs/ITU-ALARM-MIB.mib
 	./mib2c -c ./mib2c.conf -f ituAlarmMIB_simple ITU-ALARM-MIB::ituAlarmMIB
 	indent -nhnl ituAlarmMIB_simple.[ch]
 
-ituAlarmMIB_storage.c ituAlarmMIB_storage.h: mib2c mib2c.conf ../mibs/ALARM-MIB.mib
+ituAlarmMIB_storage.c ituAlarmMIB_storage.h: mib2c mib2c.conf ../mibs/ITU-ALARM-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f ituAlarmMIB_storage ITU-ALARM-MIB::ituAlarmMIB
 	indent -nhnl ituAlarmMIB_storage.[ch]
 
-ituAlarmMIB_openss7.c ituAlarmMIB_openss7.h: mib2c mib2c.conf ../mibs/ALARM-MIB.mib
+ituAlarmMIB_openss7.c ituAlarmMIB_openss7.h: mib2c mib2c.conf ../mibs/ITU-ALARM-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f ituAlarmMIB_openss7 ITU-ALARM-MIB::ituAlarmMIB
 	indent -nhnl ituAlarmMIB_openss7.[ch]
 
@@ -2135,6 +2135,54 @@ rs232_openss7.c rs232_openss7.h: mib2c mib2c.conf ../mibs/RS-232-MIB.mib
 	indent -nhnl rs232_openss7.[ch]
 
 
+MIBPREFIXES += x25PLPMIB1
+
+x25PLPMIB1.mib: ../mibs/x25-1.mib
+	smidump -k ../mibs/x25-1.mib>$@ || :
+
+x25PLPMIB1.lint: ../mibs/x25-1.mib
+	smilint $(SMILINTIGNORES) -ms ../mibs/x25-1.mib>$@ 2>&1 || :
+
+x25PLPMIB1.tree: ../mibs/x25-1.mib
+	snmptranslate -Tp OPENSS7-X25-PLP-MIB::x25PLPMIB1>$@ || :
+
+x25PLPMIB1_simple.c x25PLPMIB1_simple.h: mib2c mib2c.conf ../mibs/x25-1.mib
+	./mib2c -c ./mib2c.conf -f x25PLPMIB1_simple OPENSS7-X25-PLP-MIB::x25PLPMIB1
+	indent -nhnl x25PLPMIB1_simple.[ch]
+
+x25PLPMIB1_storage.c x25PLPMIB1_storage.h: mib2c mib2c.conf ../mibs/x25-1.mib
+	./mib2c -c ./mib2c.storage.conf -f x25PLPMIB1_storage OPENSS7-X25-PLP-MIB::x25PLPMIB1
+	indent -nhnl x25PLPMIB1_storage.[ch]
+
+x25PLPMIB1_openss7.c x25PLPMIB1_openss7.h: mib2c mib2c.conf ../mibs/x25-1.mib
+	./mib2c -c ./mib2c.openss7.conf -f x25PLPMIB1_openss7 OPENSS7-X25-PLP-MIB::x25PLPMIB1
+	indent -nhnl x25PLPMIB1_openss7.[ch]
+
+
+MIBPREFIXES += x25PLPMIB2
+
+x25PLPMIB2.mib: ../mibs/x25-2.mib
+	smidump -k ../mibs/x25-2.mib>$@ || :
+
+x25PLPMIB2.lint: ../mibs/x25-2.mib
+	smilint $(SMILINTIGNORES) -ms ../mibs/x25-2.mib>$@ 2>&1 || :
+
+x25PLPMIB2.tree: ../mibs/x25-2.mib
+	snmptranslate -Tp OPENSS7-X25-PLP-MIB::x25PLPMIB2>$@ || :
+
+x25PLPMIB2_simple.c x25PLPMIB2_simple.h: mib2c mib2c.conf ../mibs/x25-2.mib
+	./mib2c -c ./mib2c.conf -f x25PLPMIB2_simple OPENSS7-X25-PLP-MIB::x25PLPMIB2
+	indent -nhnl x25PLPMIB2_simple.[ch]
+
+x25PLPMIB2_storage.c x25PLPMIB2_storage.h: mib2c mib2c.conf ../mibs/x25-2.mib
+	./mib2c -c ./mib2c.storage.conf -f x25PLPMIB2_storage OPENSS7-X25-PLP-MIB::x25PLPMIB2
+	indent -nhnl x25PLPMIB2_storage.[ch]
+
+x25PLPMIB2_openss7.c x25PLPMIB2_openss7.h: mib2c mib2c.conf ../mibs/x25-2.mib
+	./mib2c -c ./mib2c.openss7.conf -f x25PLPMIB2_openss7 OPENSS7-X25-PLP-MIB::x25PLPMIB2
+	indent -nhnl x25PLPMIB2_openss7.[ch]
+
+
 MIBPREFIXES += isdnMib
 
 isdnMib.mib: ../mibs/RFC2127-MIB.txt
@@ -2278,7 +2326,6 @@ mxMonMIB_openss7.c mxMonMIB_openss7.h: mib2c mib2c.conf ../mibs/OPENSS7-MX-MON-M
 	./mib2c -c ./mib2c.openss7.conf -f mxMonMIB_openss7 OPENSS7-MX-MON-MIB::mxMonMIB
 	indent -nhnl mxMonMIB_openss7.[ch]
 
-# root = lldpXdot1MIB
 
 MIBPREFIXES += lldpXdot1MIB
 
@@ -2303,7 +2350,6 @@ lldpXdot1MIB_openss7.c lldpXdot1MIB_openss7.h: mib2c mib2c.conf ../mibs/lldp_dot
 	./mib2c -c ./mib2c.openss7.conf -f lldpXdot1MIB_openss7 LLDP-EXT-DOT1-MIB::lldpXdot1MIB
 	indent -nhnl lldpXdot1MIB_openss7.[ch]
 
-# root = lldpXdot3MIB
 
 MIBPREFIXES += lldpXdot3MIB
 
@@ -2328,7 +2374,6 @@ lldpXdot3MIB_openss7.c lldpXdot3MIB_openss7.h: mib2c mib2c.conf ../mibs/lldp_dot
 	./mib2c -c ./mib2c.openss7.conf -f lldpXdot3MIB_openss7 LLDP-EXT-DOT3-MIB::lldpXdot3MIB
 	indent -nhnl lldpXdot3MIB_openss7.[ch]
 
-# root = lldpMIB
 
 MIBPREFIXES += lldpMIB
 
@@ -2353,7 +2398,6 @@ lldpMIB_openss7.c lldpMIB_openss7.h: mib2c mib2c.conf ../mibs/lldp.mib
 	./mib2c -c ./mib2c.openss7.conf -f lldpMIB_openss7 LLDP-MIB::lldpMIB
 	indent -nhnl lldpMIB_openss7.[ch]
 
-# root = lldpXMedMIB
 
 MIBPREFIXES += lldpXMedMIB
 
@@ -2426,7 +2470,6 @@ switchRMON_openss7.c switchRMON_openss7.h: mib2c mib2c.conf /usr/share/mibs/ietf
 	./mib2c -c ./mib2c.openss7.conf -f switchRMON_openss7 SMON-MIB::switchRMON
 	indent -nhnl switchRMON_openss7.[ch]
 
-# root = rmonMibModule
 
 MIBPREFIXES += rmonMibModule
 
