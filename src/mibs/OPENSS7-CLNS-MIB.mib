@@ -1,4 +1,4 @@
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- vim: ft=mib comments=\f\b\:\"ITU\-T,\f\b\:ITU\-T,\f\:\",\b\:\-\-,\:\-\-,\f\b\:\-,\f\b\:\· fo+=tcqlornw12 tw=64 ai nocin nosi sts=4 sw=4 et
 -- =============================================================================
 -- 
 -- @(#) src/mibs/OPENSS7-CLNS-MIB.mib
@@ -270,7 +270,7 @@ cLNSNetworkEntitySystemTypes OBJECT-TYPE
          supported."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 systemTypes, ISO/IEC 
-         9542 ES-IS."
+               9542 ES-IS."
     ::= { cLNSNetworkEntityEntry 2 }
 
 cLNSNetworkEntityTitles OBJECT IDENTIFIER
@@ -1224,7 +1224,7 @@ pDUDiscardReasonNotSpecified OBJECT-IDENTITY
         "SpecificProblem."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 107333 
-         pDUDiscardReasonNotSpecified."
+               pDUDiscardReasonNotSpecified."
     ::= { pDUDiscard 0 }
 
 pDUDiscardProtocolProcedureError OBJECT-IDENTITY
@@ -1233,7 +1233,7 @@ pDUDiscardProtocolProcedureError OBJECT-IDENTITY
         "SpecificProblem."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 107333 
-         pDUDiscardReasonNotSpecified."
+               pDUDiscardReasonNotSpecified."
     ::= { pDUDiscard 1 }
 
 pDUDiscardIncorrectChecksum OBJECT-IDENTITY
@@ -1242,7 +1242,7 @@ pDUDiscardIncorrectChecksum OBJECT-IDENTITY
         "SpecificProblem."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 107333 
-         pDUDiscardReasonNotSpecified."
+               pDUDiscardReasonNotSpecified."
     ::= { pDUDiscard 2 }
 
 pDUDiscardHeaderSyntaxError OBJECT-IDENTITY
@@ -1251,7 +1251,7 @@ pDUDiscardHeaderSyntaxError OBJECT-IDENTITY
         "SpecificProblem."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 107333 
-         pDUDiscardReasonNotSpecified."
+               pDUDiscardReasonNotSpecified."
     ::= { pDUDiscard 4 }
 
 pDUDiscardSegmentationNeededButNotPermitted OBJECT-IDENTITY
@@ -1260,7 +1260,7 @@ pDUDiscardSegmentationNeededButNotPermitted OBJECT-IDENTITY
         "SpecificProblem."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 107333 
-         pDUDiscardReasonNotSpecified."
+               pDUDiscardReasonNotSpecified."
     ::= { pDUDiscard 5 }
 
 pDUDiscardIncompletePDUReceived OBJECT-IDENTITY
@@ -1269,7 +1269,7 @@ pDUDiscardIncompletePDUReceived OBJECT-IDENTITY
         "SpecificProblem."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 107333 
-         pDUDiscardReasonNotSpecified."
+               pDUDiscardReasonNotSpecified."
     ::= { pDUDiscard 6 }
 
 pDUDiscardDuplicateOption OBJECT-IDENTITY
@@ -1278,7 +1278,7 @@ pDUDiscardDuplicateOption OBJECT-IDENTITY
         "SpecificProblem."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 107333 
-         pDUDiscardReasonNotSpecified."
+               pDUDiscardReasonNotSpecified."
     ::= { pDUDiscard 7 }
 
 pDUDiscardDestinationAddressUnreachable OBJECT-IDENTITY
@@ -1287,7 +1287,7 @@ pDUDiscardDestinationAddressUnreachable OBJECT-IDENTITY
         "SpecificProblem."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 107333 
-         pDUDiscardReasonNotSpecified."
+               pDUDiscardReasonNotSpecified."
     ::= { pDUDiscard 128 }
 
 pDUDiscardDestinationAddressUnknown OBJECT-IDENTITY
@@ -1296,7 +1296,7 @@ pDUDiscardDestinationAddressUnknown OBJECT-IDENTITY
         "SpecificProblem."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 107333 
-         pDUDiscardReasonNotSpecified."
+               pDUDiscardReasonNotSpecified."
     ::= { pDUDiscard 129 }
 
 pDUDiscardUnspecifiedSourceRouteingError OBJECT-IDENTITY
@@ -1305,7 +1305,7 @@ pDUDiscardUnspecifiedSourceRouteingError OBJECT-IDENTITY
         "SpecificProblem."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 107333 
-         pDUDiscardReasonNotSpecified."
+               pDUDiscardReasonNotSpecified."
     ::= { pDUDiscard 144 }
 
 pDUDiscardSyntaxErrorInSourceRouteingField OBJECT-IDENTITY
@@ -1314,7 +1314,7 @@ pDUDiscardSyntaxErrorInSourceRouteingField OBJECT-IDENTITY
         "SpecificProblem."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 107333 
-         pDUDiscardReasonNotSpecified."
+               pDUDiscardReasonNotSpecified."
     ::= { pDUDiscard 145 }
 
 pDUDiscardUnknownAddressInSourceRouteingField OBJECT-IDENTITY
@@ -1323,7 +1323,7 @@ pDUDiscardUnknownAddressInSourceRouteingField OBJECT-IDENTITY
         "SpecificProblem."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 107333 
-         pDUDiscardReasonNotSpecified."
+               pDUDiscardReasonNotSpecified."
     ::= { pDUDiscard 146 }
 
 pDUDiscardPathNotAcceptable OBJECT-IDENTITY
@@ -1332,7 +1332,7 @@ pDUDiscardPathNotAcceptable OBJECT-IDENTITY
         "SpecificProblem."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 107333 
-         pDUDiscardReasonNotSpecified."
+               pDUDiscardReasonNotSpecified."
     ::= { pDUDiscard 147 }
 
 pDUDiscardLifetimeExpiredWhileDataUnitInTransit OBJECT-IDENTITY
@@ -1341,7 +1341,7 @@ pDUDiscardLifetimeExpiredWhileDataUnitInTransit OBJECT-IDENTITY
         "SpecificProblem."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 107333 
-         pDUDiscardReasonNotSpecified."
+               pDUDiscardReasonNotSpecified."
     ::= { pDUDiscard 160 }
 
 pDUDiscardLifetimeExpiredDuringReassembly OBJECT-IDENTITY
@@ -1350,7 +1350,7 @@ pDUDiscardLifetimeExpiredDuringReassembly OBJECT-IDENTITY
         "SpecificProblem."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 107333 
-         pDUDiscardReasonNotSpecified."
+               pDUDiscardReasonNotSpecified."
     ::= { pDUDiscard 161 }
 
 pDUDiscardUnsupportedOptionNotSpecified OBJECT-IDENTITY
@@ -1359,7 +1359,7 @@ pDUDiscardUnsupportedOptionNotSpecified OBJECT-IDENTITY
         "SpecificProblem."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 107333 
-         pDUDiscardReasonNotSpecified."
+               pDUDiscardReasonNotSpecified."
     ::= { pDUDiscard 176 }
 
 pDUDiscardUnsupportedProtocolVersion OBJECT-IDENTITY
@@ -1368,7 +1368,7 @@ pDUDiscardUnsupportedProtocolVersion OBJECT-IDENTITY
         "SpecificProblem."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 107333 
-         pDUDiscardReasonNotSpecified."
+               pDUDiscardReasonNotSpecified."
     ::= { pDUDiscard 177 }
 
 pDUDiscardUnsupportedSecurityOption OBJECT-IDENTITY
@@ -1377,7 +1377,7 @@ pDUDiscardUnsupportedSecurityOption OBJECT-IDENTITY
         "SpecificProblem."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 107333 
-         pDUDiscardReasonNotSpecified."
+               pDUDiscardReasonNotSpecified."
     ::= { pDUDiscard 178 }
 
 pDUDiscardUnsupportedSourceRouteingOption OBJECT-IDENTITY
@@ -1386,7 +1386,7 @@ pDUDiscardUnsupportedSourceRouteingOption OBJECT-IDENTITY
         "SpecificProblem."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 107333 
-         pDUDiscardReasonNotSpecified."
+               pDUDiscardReasonNotSpecified."
     ::= { pDUDiscard 179 }
 
 pDUDiscardUnsupportedRecordingOfRouteOption OBJECT-IDENTITY
@@ -1395,7 +1395,7 @@ pDUDiscardUnsupportedRecordingOfRouteOption OBJECT-IDENTITY
         "SpecificProblem."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 107333 
-         pDUDiscardReasonNotSpecified."
+               pDUDiscardReasonNotSpecified."
     ::= { pDUDiscard 180 }
 
 pDUDiscardReassemblyInterference OBJECT-IDENTITY
@@ -1404,7 +1404,7 @@ pDUDiscardReassemblyInterference OBJECT-IDENTITY
         "SpecificProblem."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 107333 
-         pDUDiscardReasonNotSpecified."
+               pDUDiscardReasonNotSpecified."
     ::= { pDUDiscard 181 }
 
 cLNSConformance OBJECT IDENTIFIER
@@ -1425,7 +1425,7 @@ informationType OBJECT-IDENTITY
         "SpecificProblem."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 107333 
-         pDUDiscardReasonNotSpecified."
+               pDUDiscardReasonNotSpecified."
     ::= { 2 13 0 2 0 4 }
 
 iSReachabilityChange OBJECT-IDENTITY
@@ -1434,7 +1434,7 @@ iSReachabilityChange OBJECT-IDENTITY
         "SpecificProblem."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 107333 
-         pDUDiscardReasonNotSpecified."
+               pDUDiscardReasonNotSpecified."
     ::= { informationType 1 }
 
 eSReachabilityChange OBJECT-IDENTITY
@@ -1443,7 +1443,7 @@ eSReachabilityChange OBJECT-IDENTITY
         "SpecificProblem."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 107333 
-         pDUDiscardReasonNotSpecified."
+               pDUDiscardReasonNotSpecified."
     ::= { informationType 2 }
 
 successfulConnectionEstablishment OBJECT-IDENTITY
@@ -1452,7 +1452,7 @@ successfulConnectionEstablishment OBJECT-IDENTITY
         "SpecificProblem."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 107333 
-         pDUDiscardReasonNotSpecified."
+               pDUDiscardReasonNotSpecified."
     ::= { informationType 3 }
 
 -- for SNPAAddress type
@@ -1465,7 +1465,7 @@ sNPADTEAddress OBJECT-IDENTITY
         "sNPAAddressType."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 107333 
-         pDUDiscardReasonNotSpecified."
+               pDUDiscardReasonNotSpecified."
     ::= { sNPAAddressType 1 }
 
 sNPAMACAddress OBJECT-IDENTITY
@@ -1474,7 +1474,7 @@ sNPAMACAddress OBJECT-IDENTITY
         "sNPAAddressType."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 107333 
-         pDUDiscardReasonNotSpecified."
+               pDUDiscardReasonNotSpecified."
     ::= { sNPAAddressType 2 }
 
 cLNSLinkagePackage OBJECT-GROUP
@@ -1639,4 +1639,4 @@ cLNSLinkageISISLevel2BroadcastPackage OBJECT-GROUP
     ::= { cLNSGroups 16 }
 
 END -- end of module OPENSS7-CLNS-MIB.
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- vim: ft=mib comments=\f\b\:\"ITU\-T,\f\b\:ITU\-T,\f\:\",\b\:\-\-,\:\-\-,\f\b\:\-,\f\b\:\· fo+=tcqlornw12 tw=64 ai nocin nosi sts=4 sw=4 et
