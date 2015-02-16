@@ -3429,8 +3429,45 @@ dist_snmpmib_DATA		+= src/mibs/ALARM-MIB.mib \
 				   src/mibs/ATM-TRACE-MIB.mib \
 				   src/mibs/CLNS-MIB.mib \
 				   src/mibs/HC-PerfHist-TC-MIB.mib \
+				   src/mibs/IANA-ITU-ALARM-TC-MIB.mib \
+				   src/mibs/IEEE8021-BRIDGE-MIB.mib \
+				   src/mibs/IEEE8021-CFM-MIB.mib \
+				   src/mibs/IEEE8021-CFM-V2-MIB.mib \
+				   src/mibs/IEEE8021-CN-MIB.mib \
+				   src/mibs/IEEE8021-DDCFM-MIB.mib \
+				   src/mibs/IEEE8021-ECMP-MIB.mib \
+				   src/mibs/IEEE8021-EVB-MIB.mib \
+				   src/mibs/IEEE8021-FQTSS-MIB.mib \
+				   src/mibs/IEEE8021-MSTP-MIB.mib \
+				   src/mibs/IEEE8021-PBB-MIB.mib \
+				   src/mibs/IEEE8021-PBBTE-MIB.mib \
+				   src/mibs/IEEE8021-PB-MIB.mib \
+				   src/mibs/IEEE8021-Q-BRIDGE-MIB.mib \
+				   src/mibs/IEEE8021-SPANNING-TREE-MIB.mib \
+				   src/mibs/IEEE8021-SPB-MIB.mib \
+				   src/mibs/IEEE8021-SRP-MIB.mib \
+				   src/mibs/IEEE8021-TC-MIB.mib \
+				   src/mibs/IEEE8021-TPMR-MIB.mib \
 				   src/mibs/IMA-MIB.mib \
+				   src/mibs/ISIS-MIB.mib \
+				   src/mibs/ITU-ALARM-MIB.mib \
+				   src/mibs/ITU-ALARM-TC-MIB.mib \
 				   src/mibs/LAN-EMULATION-CLIENT-MIB.mib \
+				   src/mibs/lldp_dot1.mib \
+				   src/mibs/lldp_dot3.mib \
+				   src/mibs/LLDP-EXT-DOT1-EVB-EXTENSIONS-MIB.mib \
+				   src/mibs/LLDP-EXT-DOT1-MIB.mib \
+				   src/mibs/LLDP-EXT-DOT1-V2-MIB.mib \
+				   src/mibs/LLDP-EXT-DOT3-MIB.mib \
+				   src/mibs/LLDP-EXT-DOT3-V2-MIB.mib \
+				   src/mibs/LLDP-EXT-MED-MIB.mib \
+				   src/mibs/lldp.mib \
+				   src/mibs/LLDP-MIB.mib \
+				   src/mibs/LLDP-V2-MIB.mib \
+				   src/mibs/LLDP-V2-TC-MIB.mib \
+				   src/mibs/MEGACO-MIB.mib \
+				   src/mibs/MEGACO-RINGING-MIB.mib \
+				   src/mibs/MEGACO-TONES-MIB.mib \
 				   src/mibs/MPOA-MIB.mib \
 				   src/mibs/OPENSS7-ACSE-MIB.mib \
 				   src/mibs/OPENSS7-CDR2-MIB.mib \
@@ -3438,6 +3475,7 @@ dist_snmpmib_DATA		+= src/mibs/ALARM-MIB.mib \
 				   src/mibs/OPENSS7-CLNS-MIB.mib \
 				   src/mibs/OPENSS7-CONS-MIB.mib \
 				   src/mibs/OPENSS7-DL-MIB.mib \
+				   src/mibs/OPENSS7-GCP-MIB.mib \
 				   src/mibs/OPENSS7-GMI-MIB.mib \
 				   src/mibs/OPENSS7-ISO10733-MIB.mib \
 				   src/mibs/OPENSS7-ISUP-MIB.mib \
@@ -3459,11 +3497,22 @@ dist_snmpmib_DATA		+= src/mibs/ALARM-MIB.mib \
 				   src/mibs/OPENSS7-MTP-OM-MIB.mib \
 				   src/mibs/OPENSS7-MTP-TC.mib \
 				   src/mibs/OPENSS7-MX-MIB.mib \
+				   src/mibs/OPENSS7-MX-MON-MIB.mib \
+				   src/mibs/OPENSS7-O248-MIB.mib \
 				   src/mibs/OPENSS7-PHY-MIB.mib \
+				   src/mibs/OPENSS7-PROBE-MIB.mib \
 				   src/mibs/OPENSS7-Q821-MIB.mib \
+				   src/mibs/OPENSS7-RTPSW-MIB.mib \
+				   src/mibs/OPENSS7-RTPSW-OM-MIB.mib \
+				   src/mibs/OPENSS7-RTPXC-MIB.mib \
+				   src/mibs/OPENSS7-RTPXC-OM-MIB.mib \
 				   src/mibs/OPENSS7-SCCP2-MIB.mib \
 				   src/mibs/OPENSS7-SCCP-MIB.mib \
 				   src/mibs/OPENSS7-SCCP-OM-MIB.mib \
+				   src/mibs/OPENSS7-SDHM-MIB.mib \
+				   src/mibs/OPENSS7-SDH-OM-MIB.mib \
+				   src/mibs/OPENSS7-SFP-MIB.mib \
+				   src/mibs/OPENSS7-SFP-OM-MIB.mib \
 				   src/mibs/OPENSS7-SIGTRAN-MIB.mib \
 				   src/mibs/OPENSS7-SIGTRAN-TC.mib \
 				   src/mibs/OPENSS7-SL-MIB.mib \
@@ -3487,9 +3536,11 @@ dist_snmpmib_DATA		+= src/mibs/ALARM-MIB.mib \
 				   src/mibs/OPENSS7-X25-PLP-MIB.mib \
 				   src/mibs/OPENSS7-X400P-MIB.mib \
 				   src/mibs/OPENSS7-X400P-MX-MIB.mib \
+				   src/mibs/OPENSS7-XMON-MIB.mib \
 				   src/mibs/PerfHist-TC-MIB.mib \
 				   src/mibs/PNNI-MIB.mib \
 				   src/mibs/PNNI-MOB-EXT-MIB.mib \
+				   src/mibs/PTOPO-MIB.mib \
 				   src/mibs/RFC1381-MIB.mib \
 				   src/mibs/RFC1382-MIB.mib \
 				   src/mibs/RFC1513-MIB.mib \
@@ -3501,6 +3552,7 @@ dist_snmpmib_DATA		+= src/mibs/ALARM-MIB.mib \
 				   src/mibs/RFC2496-MIB.txt \
 				   src/mibs/RFC2514-MIB.mib \
 				   src/mibs/RFC2515-MIB.mib \
+				   src/mibs/RFC2922-MIB.txt \
 				   src/mibs/RFC3593-MIB.txt \
 				   src/mibs/RFC3873-MIB.txt \
 				   src/mibs/RFC3877-MIB.txt \
@@ -3508,6 +3560,7 @@ dist_snmpmib_DATA		+= src/mibs/ALARM-MIB.mib \
 				   src/mibs/RFC3895-MIB.txt \
 				   src/mibs/RFC3896-MIB.txt \
 				   src/mibs/RFC4133-MIB.mib \
+				   src/mibs/RFC4444-MIB.txt \
 				   src/mibs/RFC4502-MIB.mib \
 				   src/mibs/RFC4805-EXT-MIB.mib \
 				   src/mibs/RFC4805-MIB.txt \
