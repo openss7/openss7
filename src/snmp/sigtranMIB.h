@@ -63,12 +63,21 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct sigtranMIB_data {
+	struct sigtranMIB_data *sigtranMIB_old;
+	uint sigtranMIB_rsvs;
+	uint sigtranMIB_tsts;
+	uint sigtranMIB_sets;
 	uint sigtranMIB_request;
 	ulong sigtranSctpProfileNextIndex;	/* ReadOnly */
 };
 struct sigtranSctpProfileTable_data {
+	struct sigtranSctpProfileTable_data *sigtranSctpProfileTable_old;
+	uint sigtranSctpProfileTable_rsvs;
+	uint sigtranSctpProfileTable_tsts;
+	uint sigtranSctpProfileTable_sets;
 	uint sigtranSctpProfileTable_request;
 	uint sigtranSctpProfileTable_refs;
+	uint sigtranSctpProfileTable_id;
 	ulong sigtranSctpProfileIndex;	/* NoAccess */
 	uint8_t *sigtranSctpProfileName;	/* Create */
 	size_t sigtranSctpProfileNameLen;
@@ -134,6 +143,10 @@ void init_sigtranMIB(void);
 void deinit_sigtranMIB(void);
 int term_sigtranMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_sigtranMIB;
+struct sigtranMIB_data *sigtranMIB_create(void);
+struct sigtranMIB_data *sigtranMIB_duplicate(struct sigtranMIB_data *);
+int sigtranMIB_destroy(struct sigtranMIB_data **);
+int sigtranMIB_add(struct sigtranMIB_data *);
 void parse_sigtranMIB(const char *, char *);
 SNMPCallback store_sigtranMIB;
 void refresh_sigtranMIB(int);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/snmp/gcpMIB.c
+ @(#) src/snmp/gcpMIB.c
 
  -----------------------------------------------------------------------------
 
@@ -530,9 +530,9 @@ struct variable7 gcpMIB_variables[] = {
 #define   GCPINTERFACEREALM     157
 	{(u_char) GCPINTERFACEREALM, ASN_UNSIGNED, RWRITE, var_gcpInterfaceTable, 5, {3, 11, 1, 1, 5}},
 #define   GCPINTERFACETERMID    158
-	{(u_char) GCPINTERFACETERMID,, RWRITE, var_gcpInterfaceTable, 5, {3, 11, 1, 1, 6}},
+	{(u_char) GCPINTERFACETERMID, ASN_OCTET_STR, RWRITE, var_gcpInterfaceTable, 5, {3, 11, 1, 1, 6}},
 #define   GCPINTERFACETERMPATH  159
-	{(u_char) GCPINTERFACETERMPATH,, RWRITE, var_gcpInterfaceTable, 5, {3, 11, 1, 1, 7}},
+	{(u_char) GCPINTERFACETERMPATH, ASN_OCTET_STR, RWRITE, var_gcpInterfaceTable, 5, {3, 11, 1, 1, 7}},
 #define   GCPINTERFACEROWSTATUS  160
 	{(u_char) GCPINTERFACEROWSTATUS, ASN_INTEGER, RWRITE, var_gcpInterfaceTable, 5, {3, 11, 1, 1, 8}},
 #define   GCPADDRESSINTERFACE   161
@@ -745,8 +745,70 @@ gcpMIB_create(void)
 		StorageNew->gcpDefaultSctpLifetime = 0;
 
 	}
+      done:
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	gcpMIB_destroy(&StorageNew);
+	goto done;
+}
+
+/**
+ * @fn struct gcpMIB_data *gcpMIB_duplicate(struct gcpMIB_data *thedata)
+ * @param thedata the mib structure to duplicate
+ * @brief duplicate a mib structure for the mib
+ *
+ * Duplicates the specified mib structure @param thedata and returns a pointer to the newly
+ * allocated mib structure on success, or NULL on failure.
+ */
+struct gcpMIB_data *
+gcpMIB_duplicate(struct gcpMIB_data *thedata)
+{
+	struct gcpMIB_data *StorageNew = SNMP_MALLOC_STRUCT(gcpMIB_data);
+
+	DEBUGMSGTL(("gcpMIB", "gcpMIB_duplicate: duplicating mib... "));
+	if (StorageNew != NULL) {
+		StorageNew->gcpDefaultMgcoIdent = thedata->gcpDefaultMgcoIdent;
+		StorageNew->gcpDefaultMgcoExecutionTime = thedata->gcpDefaultMgcoExecutionTime;
+		StorageNew->gcpDefaultMgcoProvRespTimer = thedata->gcpDefaultMgcoProvRespTimer;
+		StorageNew->gcpDefaultMgcpPendingLimit = thedata->gcpDefaultMgcpPendingLimit;
+		StorageNew->gcpDefaultMgcoLongTimer = thedata->gcpDefaultMgcoLongTimer;
+		StorageNew->gcpDefaultMgcoRtoInit = thedata->gcpDefaultMgcoRtoInit;
+		StorageNew->gcpDefaultMgcoRtoMin = thedata->gcpDefaultMgcoRtoMin;
+		StorageNew->gcpDefaultMgcoRtoMax = thedata->gcpDefaultMgcoRtoMax;
+		StorageNew->gcpDefaultUdpChecksum = thedata->gcpDefaultUdpChecksum;
+		StorageNew->gcpDefaultTcpNoDelay = thedata->gcpDefaultTcpNoDelay;
+		StorageNew->gcpDefaultTcpMaxseg = thedata->gcpDefaultTcpMaxseg;
+		StorageNew->gcpDefaultTcpKeepAlive = thedata->gcpDefaultTcpKeepAlive;
+		StorageNew->gcpDefaultTcpKeepIdle = thedata->gcpDefaultTcpKeepIdle;
+		StorageNew->gcpDefaultTcpKeepAliveItvl = thedata->gcpDefaultTcpKeepAliveItvl;
+		StorageNew->gcpDefaultTcpKeepCount = thedata->gcpDefaultTcpKeepCount;
+		StorageNew->gcpDefaultTcpSynRetrans = thedata->gcpDefaultTcpSynRetrans;
+		StorageNew->gcpDefaultTcpWindowClamp = thedata->gcpDefaultTcpWindowClamp;
+		StorageNew->gcpDefaultSctpNoDelay = thedata->gcpDefaultSctpNoDelay;
+		StorageNew->gcpDefaultSctpMaxseg = thedata->gcpDefaultSctpMaxseg;
+		StorageNew->gcpDefaultSctpHeartbeatItvl = thedata->gcpDefaultSctpHeartbeatItvl;
+		StorageNew->gcpDefaultSctpHearbeat = thedata->gcpDefaultSctpHearbeat;
+		StorageNew->gcpDefaultSctpRtoInitial = thedata->gcpDefaultSctpRtoInitial;
+		StorageNew->gcpDefaultSctpRtoMin = thedata->gcpDefaultSctpRtoMin;
+		StorageNew->gcpDefaultSctpRtoMax = thedata->gcpDefaultSctpRtoMax;
+		StorageNew->gcpDefaultSctpPathMaxRetrans = thedata->gcpDefaultSctpPathMaxRetrans;
+		StorageNew->gcpDefaultSctpCookieLife = thedata->gcpDefaultSctpCookieLife;
+		StorageNew->gcpDefaultSctpCookieInc = thedata->gcpDefaultSctpCookieInc;
+		StorageNew->gcpDefaultSctpMaxInitRetries = thedata->gcpDefaultSctpMaxInitRetries;
+		StorageNew->gcpDefaultSctpMaxBurst = thedata->gcpDefaultSctpMaxBurst;
+		StorageNew->gcpDefaultSctpAssocMaxRetrans = thedata->gcpDefaultSctpAssocMaxRetrans;
+		StorageNew->gcpDefaultSctpSackDelay = thedata->gcpDefaultSctpSackDelay;
+		StorageNew->gcpDefaultSctpLifetime = thedata->gcpDefaultSctpLifetime;
+	}
+      done:
+	DEBUGMSGTL(("gcpMIB", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	gcpMIB_destroy(&StorageNew);
+	goto done;
 }
 
 /**
@@ -797,7 +859,7 @@ gcpMIB_add(struct gcpMIB_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for gcpMIB entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case gcpMIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -913,6 +975,62 @@ store_gcpMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	}
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int check_gcpMIB(struct gcpMIB_data *StorageTmp, struct gcpMIB_data *StorageOld)
+ * @param StorageTmp the data as updated
+ * @param StorageOld the data previous to update
+ *
+ * This function is used by mibs.  It is used to check, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the ACTION phase.  The COMMIT phase does not ensue unless this check passes.  This function can
+ * return SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before
+ * the varbinds on the mib were applied; the values in StorageTmp are the new values.  The function
+ * is permitted to change the values in StorageTmp to correct them; however, preferences should be
+ * made for setting values that were not in the varbinds.
+ */
+int
+check_gcpMIB(struct gcpMIB_data *StorageTmp, struct gcpMIB_data *StorageOld)
+{
+	/* XXX: provide code to check the scalars for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_gcpMIB(struct gcpMIB_data *StorageTmp, struct gcpMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase)
+ *
+ * This function is used by mibs.  It is used to update, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the COMMIT phase.  The start of the ACTION phase performs a consistency check on the mib before
+ * allowing the request to proceed to the COMMIT phase.  The COMMIT phase then arrives here with
+ * consistency already checked (see check_gcpMIB()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied: the values in StorageTmp are the new values.
+ */
+int
+update_gcpMIB(struct gcpMIB_data *StorageTmp, struct gcpMIB_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	gcpMIB_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn revert_gcpMIB(struct 
+ * @fn void revert_gcpMIB(struct gcpMIB_data *StorageTmp, struct gcpMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase)
+ */
+void
+revert_gcpMIB(struct gcpMIB_data *StorageTmp, struct gcpMIB_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_gcpMIB(StorageOld, NULL);
 }
 
 /**
@@ -1232,37 +1350,58 @@ gcpMsTable_create(void)
 	DEBUGMSGTL(("gcpMIB", "gcpMsTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->gcpMsName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->gcpMsNameLen = strlen("");
-		if (memdup((u_char **) &StorageNew->gcpMsAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if ((StorageNew->gcpMsName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->gcpMsNameLen = 0;
+		StorageNew->gcpMsName[StorageNew->gcpMsNameLen] = 0;
+		if (memdup((u_char **) &StorageNew->gcpMsAlarmStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->gcpMsAlarmStatusLen = 1;
 		StorageNew->gcpMsOperationalState = 0;
 		StorageNew->gcpMsUsageState = 0;
-		if ((StorageNew->gcpMsManagedElementType = (uint8_t *) strdup("")) != NULL)
-			StorageNew->gcpMsManagedElementTypeLen = strlen("");
-		if ((StorageNew->gcpMsModelCode = (uint8_t *) strdup("")) != NULL)
-			StorageNew->gcpMsModelCodeLen = strlen("");
-		if ((StorageNew->gcpMsVendorName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->gcpMsVendorNameLen = strlen("");
-		if ((StorageNew->gcpMsUserLabel = (uint8_t *) strdup("")) != NULL)
-			StorageNew->gcpMsUserLabelLen = strlen("");
-		if ((StorageNew->gcpMsVersion = (uint8_t *) strdup("")) != NULL)
-			StorageNew->gcpMsVersionLen = strlen("");
-		if ((StorageNew->gcpMsAsaProfilePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->gcpMsManagedElementType = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->gcpMsManagedElementTypeLen = 0;
+		StorageNew->gcpMsManagedElementType[StorageNew->gcpMsManagedElementTypeLen] = 0;
+		if ((StorageNew->gcpMsModelCode = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->gcpMsModelCodeLen = 0;
+		StorageNew->gcpMsModelCode[StorageNew->gcpMsModelCodeLen] = 0;
+		if ((StorageNew->gcpMsVendorName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->gcpMsVendorNameLen = 0;
+		StorageNew->gcpMsVendorName[StorageNew->gcpMsVendorNameLen] = 0;
+		if ((StorageNew->gcpMsUserLabel = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->gcpMsUserLabelLen = 0;
+		StorageNew->gcpMsUserLabel[StorageNew->gcpMsUserLabelLen] = 0;
+		if ((StorageNew->gcpMsVersion = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->gcpMsVersionLen = 0;
+		StorageNew->gcpMsVersion[StorageNew->gcpMsVersionLen] = 0;
+		if ((StorageNew->gcpMsAsaProfilePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->gcpMsAsaProfilePointerLen = 2;
-		if ((StorageNew->gcpMsNetworkElementAliases = (uint8_t *) strdup("")) != NULL)
-			StorageNew->gcpMsNetworkElementAliasesLen = strlen("");
+		if ((StorageNew->gcpMsNetworkElementAliases = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->gcpMsNetworkElementAliasesLen = 0;
+		StorageNew->gcpMsNetworkElementAliases[StorageNew->gcpMsNetworkElementAliasesLen] = 0;
 		StorageNew->gcpMsRowStatus = 0;
 		StorageNew->gcpMsRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	gcpMsTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct gcpMsTable_data *gcpMsTable_duplicate(struct gcpMsTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1274,6 +1413,54 @@ gcpMsTable_duplicate(struct gcpMsTable_data *thedata)
 
 	DEBUGMSGTL(("gcpMIB", "gcpMsTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->gcpMsTable_id = thedata->gcpMsTable_id;
+		StorageNew->gcpMsId = thedata->gcpMsId;
+		if (!(StorageNew->gcpMsName = malloc(thedata->gcpMsNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpMsName, thedata->gcpMsName, thedata->gcpMsNameLen);
+		StorageNew->gcpMsNameLen = thedata->gcpMsNameLen;
+		StorageNew->gcpMsName[StorageNew->gcpMsNameLen] = 0;
+		if (!(StorageNew->gcpMsAlarmStatus = malloc(thedata->gcpMsAlarmStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpMsAlarmStatus, thedata->gcpMsAlarmStatus, thedata->gcpMsAlarmStatusLen);
+		StorageNew->gcpMsAlarmStatusLen = thedata->gcpMsAlarmStatusLen;
+		StorageNew->gcpMsAlarmStatus[StorageNew->gcpMsAlarmStatusLen] = 0;
+		StorageNew->gcpMsOperationalState = thedata->gcpMsOperationalState;
+		StorageNew->gcpMsUsageState = thedata->gcpMsUsageState;
+		if (!(StorageNew->gcpMsManagedElementType = malloc(thedata->gcpMsManagedElementTypeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpMsManagedElementType, thedata->gcpMsManagedElementType, thedata->gcpMsManagedElementTypeLen);
+		StorageNew->gcpMsManagedElementTypeLen = thedata->gcpMsManagedElementTypeLen;
+		StorageNew->gcpMsManagedElementType[StorageNew->gcpMsManagedElementTypeLen] = 0;
+		if (!(StorageNew->gcpMsModelCode = malloc(thedata->gcpMsModelCodeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpMsModelCode, thedata->gcpMsModelCode, thedata->gcpMsModelCodeLen);
+		StorageNew->gcpMsModelCodeLen = thedata->gcpMsModelCodeLen;
+		StorageNew->gcpMsModelCode[StorageNew->gcpMsModelCodeLen] = 0;
+		if (!(StorageNew->gcpMsVendorName = malloc(thedata->gcpMsVendorNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpMsVendorName, thedata->gcpMsVendorName, thedata->gcpMsVendorNameLen);
+		StorageNew->gcpMsVendorNameLen = thedata->gcpMsVendorNameLen;
+		StorageNew->gcpMsVendorName[StorageNew->gcpMsVendorNameLen] = 0;
+		if (!(StorageNew->gcpMsUserLabel = malloc(thedata->gcpMsUserLabelLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpMsUserLabel, thedata->gcpMsUserLabel, thedata->gcpMsUserLabelLen);
+		StorageNew->gcpMsUserLabelLen = thedata->gcpMsUserLabelLen;
+		StorageNew->gcpMsUserLabel[StorageNew->gcpMsUserLabelLen] = 0;
+		if (!(StorageNew->gcpMsVersion = malloc(thedata->gcpMsVersionLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpMsVersion, thedata->gcpMsVersion, thedata->gcpMsVersionLen);
+		StorageNew->gcpMsVersionLen = thedata->gcpMsVersionLen;
+		StorageNew->gcpMsVersion[StorageNew->gcpMsVersionLen] = 0;
+		if (!(StorageNew->gcpMsAsaProfilePointer = snmp_duplicate_objid(thedata->gcpMsAsaProfilePointer, thedata->gcpMsAsaProfilePointerLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->gcpMsAsaProfilePointerLen = thedata->gcpMsAsaProfilePointerLen;
+		if (!(StorageNew->gcpMsNetworkElementAliases = malloc(thedata->gcpMsNetworkElementAliasesLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpMsNetworkElementAliases, thedata->gcpMsNetworkElementAliases, thedata->gcpMsNetworkElementAliasesLen);
+		StorageNew->gcpMsNetworkElementAliasesLen = thedata->gcpMsNetworkElementAliasesLen;
+		StorageNew->gcpMsNetworkElementAliases[StorageNew->gcpMsNetworkElementAliasesLen] = 0;
+		StorageNew->gcpMsRowStatus = thedata->gcpMsRowStatus;
 	}
       done:
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
@@ -1385,7 +1572,7 @@ gcpMsTable_del(struct gcpMsTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for gcpMsTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case gcpMsTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1529,38 +1716,55 @@ gcpMgTable_create(void)
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->gcpMsId = 0;
 		StorageNew->gcpMgLocation = 0;
-		if ((StorageNew->gcpMgName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->gcpMgNameLen = strlen("");
-		if ((StorageNew->gcpMgDomainName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->gcpMgDomainNameLen = strlen("");
-		if ((StorageNew->gcpMgDeviceName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->gcpMgDeviceNameLen = strlen("");
-		if ((StorageNew->gcpMgMtpAddress = (uint8_t *) strdup("")) != NULL)
-			StorageNew->gcpMgMtpAddressLen = strlen("");
+		if ((StorageNew->gcpMgName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->gcpMgNameLen = 0;
+		StorageNew->gcpMgName[StorageNew->gcpMgNameLen] = 0;
+		if ((StorageNew->gcpMgDomainName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->gcpMgDomainNameLen = 0;
+		StorageNew->gcpMgDomainName[StorageNew->gcpMgDomainNameLen] = 0;
+		if ((StorageNew->gcpMgDeviceName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->gcpMgDeviceNameLen = 0;
+		StorageNew->gcpMgDeviceName[StorageNew->gcpMgDeviceNameLen] = 0;
+		if ((StorageNew->gcpMgMtpAddress = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->gcpMgMtpAddressLen = 0;
+		StorageNew->gcpMgMtpAddress[StorageNew->gcpMgMtpAddressLen] = 0;
 		StorageNew->gcpMgAdminState = 0;
 		StorageNew->gcpMgOperState = 0;
-		if (memdup((u_char **) &StorageNew->gcpMgAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->gcpMgAlarmStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->gcpMgAlarmStatusLen = 1;
-		if ((StorageNew->gcpMgAsaProfilePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->gcpMgAsaProfilePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->gcpMgAsaProfilePointerLen = 2;
 		StorageNew->gcpMgUsageState = 0;
-		if (memdup((u_char **) &StorageNew->gcpMgAvailStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->gcpMgAvailStatus, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->gcpMgAvailStatusLen = 2;
-		if (memdup((u_char **) &StorageNew->gcpMgProcStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->gcpMgProcStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->gcpMgProcStatusLen = 1;
 		StorageNew->gcpMgPg = 0;
 		StorageNew->gcpMgStandbyStatus = 0;
 		StorageNew->gcpMgRowStatus = 0;
 		StorageNew->gcpMgRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	gcpMgTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct gcpMgTable_data *gcpMgTable_duplicate(struct gcpMgTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1572,6 +1776,54 @@ gcpMgTable_duplicate(struct gcpMgTable_data *thedata)
 
 	DEBUGMSGTL(("gcpMIB", "gcpMgTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->gcpMgTable_id = thedata->gcpMgTable_id;
+		StorageNew->gcpMsId = thedata->gcpMsId;
+		StorageNew->gcpMgId = thedata->gcpMgId;
+		StorageNew->gcpMgLocation = thedata->gcpMgLocation;
+		if (!(StorageNew->gcpMgName = malloc(thedata->gcpMgNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpMgName, thedata->gcpMgName, thedata->gcpMgNameLen);
+		StorageNew->gcpMgNameLen = thedata->gcpMgNameLen;
+		StorageNew->gcpMgName[StorageNew->gcpMgNameLen] = 0;
+		if (!(StorageNew->gcpMgDomainName = malloc(thedata->gcpMgDomainNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpMgDomainName, thedata->gcpMgDomainName, thedata->gcpMgDomainNameLen);
+		StorageNew->gcpMgDomainNameLen = thedata->gcpMgDomainNameLen;
+		StorageNew->gcpMgDomainName[StorageNew->gcpMgDomainNameLen] = 0;
+		if (!(StorageNew->gcpMgDeviceName = malloc(thedata->gcpMgDeviceNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpMgDeviceName, thedata->gcpMgDeviceName, thedata->gcpMgDeviceNameLen);
+		StorageNew->gcpMgDeviceNameLen = thedata->gcpMgDeviceNameLen;
+		StorageNew->gcpMgDeviceName[StorageNew->gcpMgDeviceNameLen] = 0;
+		if (!(StorageNew->gcpMgMtpAddress = malloc(thedata->gcpMgMtpAddressLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpMgMtpAddress, thedata->gcpMgMtpAddress, thedata->gcpMgMtpAddressLen);
+		StorageNew->gcpMgMtpAddressLen = thedata->gcpMgMtpAddressLen;
+		StorageNew->gcpMgMtpAddress[StorageNew->gcpMgMtpAddressLen] = 0;
+		StorageNew->gcpMgAdminState = thedata->gcpMgAdminState;
+		StorageNew->gcpMgOperState = thedata->gcpMgOperState;
+		if (!(StorageNew->gcpMgAlarmStatus = malloc(thedata->gcpMgAlarmStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpMgAlarmStatus, thedata->gcpMgAlarmStatus, thedata->gcpMgAlarmStatusLen);
+		StorageNew->gcpMgAlarmStatusLen = thedata->gcpMgAlarmStatusLen;
+		StorageNew->gcpMgAlarmStatus[StorageNew->gcpMgAlarmStatusLen] = 0;
+		if (!(StorageNew->gcpMgAsaProfilePointer = snmp_duplicate_objid(thedata->gcpMgAsaProfilePointer, thedata->gcpMgAsaProfilePointerLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->gcpMgAsaProfilePointerLen = thedata->gcpMgAsaProfilePointerLen;
+		StorageNew->gcpMgUsageState = thedata->gcpMgUsageState;
+		if (!(StorageNew->gcpMgAvailStatus = malloc(thedata->gcpMgAvailStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpMgAvailStatus, thedata->gcpMgAvailStatus, thedata->gcpMgAvailStatusLen);
+		StorageNew->gcpMgAvailStatusLen = thedata->gcpMgAvailStatusLen;
+		StorageNew->gcpMgAvailStatus[StorageNew->gcpMgAvailStatusLen] = 0;
+		if (!(StorageNew->gcpMgProcStatus = malloc(thedata->gcpMgProcStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpMgProcStatus, thedata->gcpMgProcStatus, thedata->gcpMgProcStatusLen);
+		StorageNew->gcpMgProcStatusLen = thedata->gcpMgProcStatusLen;
+		StorageNew->gcpMgProcStatus[StorageNew->gcpMgProcStatusLen] = 0;
+		StorageNew->gcpMgPg = thedata->gcpMgPg;
+		StorageNew->gcpMgStandbyStatus = thedata->gcpMgStandbyStatus;
+		StorageNew->gcpMgRowStatus = thedata->gcpMgRowStatus;
 	}
       done:
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
@@ -1683,7 +1935,7 @@ gcpMgTable_del(struct gcpMgTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for gcpMgTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case gcpMgTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1830,38 +2082,55 @@ gcpMgcTable_create(void)
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->gcpMsId = 0;
 		StorageNew->gcpMgcLocation = 0;
-		if ((StorageNew->gcpMgcName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->gcpMgcNameLen = strlen("");
-		if ((StorageNew->gcpMgcDomainName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->gcpMgcDomainNameLen = strlen("");
-		if ((StorageNew->gcpMgcDeviceName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->gcpMgcDeviceNameLen = strlen("");
-		if ((StorageNew->gcpMgcMtpAddress = (uint8_t *) strdup("")) != NULL)
-			StorageNew->gcpMgcMtpAddressLen = strlen("");
+		if ((StorageNew->gcpMgcName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->gcpMgcNameLen = 0;
+		StorageNew->gcpMgcName[StorageNew->gcpMgcNameLen] = 0;
+		if ((StorageNew->gcpMgcDomainName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->gcpMgcDomainNameLen = 0;
+		StorageNew->gcpMgcDomainName[StorageNew->gcpMgcDomainNameLen] = 0;
+		if ((StorageNew->gcpMgcDeviceName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->gcpMgcDeviceNameLen = 0;
+		StorageNew->gcpMgcDeviceName[StorageNew->gcpMgcDeviceNameLen] = 0;
+		if ((StorageNew->gcpMgcMtpAddress = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->gcpMgcMtpAddressLen = 0;
+		StorageNew->gcpMgcMtpAddress[StorageNew->gcpMgcMtpAddressLen] = 0;
 		StorageNew->gcpMgcAdminState = 0;
 		StorageNew->gcpMgcOperState = 0;
-		if (memdup((u_char **) &StorageNew->gcpMgcAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->gcpMgcAlarmStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->gcpMgcAlarmStatusLen = 1;
-		if ((StorageNew->gcpMgcAsaProfilePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->gcpMgcAsaProfilePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->gcpMgcAsaProfilePointerLen = 2;
 		StorageNew->gcpMgcUsageState = 0;
-		if (memdup((u_char **) &StorageNew->gcpMgcAvailStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->gcpMgcAvailStatus, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->gcpMgcAvailStatusLen = 2;
-		if (memdup((u_char **) &StorageNew->gcpMgcProcStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->gcpMgcProcStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->gcpMgcProcStatusLen = 1;
 		StorageNew->gcpMgcPg = 0;
 		StorageNew->gcpMgcStandbyStatus = 0;
 		StorageNew->gcpMgcRowStatus = 0;
 		StorageNew->gcpMgcRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	gcpMgcTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct gcpMgcTable_data *gcpMgcTable_duplicate(struct gcpMgcTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1873,6 +2142,54 @@ gcpMgcTable_duplicate(struct gcpMgcTable_data *thedata)
 
 	DEBUGMSGTL(("gcpMIB", "gcpMgcTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->gcpMgcTable_id = thedata->gcpMgcTable_id;
+		StorageNew->gcpMsId = thedata->gcpMsId;
+		StorageNew->gcpMgcId = thedata->gcpMgcId;
+		StorageNew->gcpMgcLocation = thedata->gcpMgcLocation;
+		if (!(StorageNew->gcpMgcName = malloc(thedata->gcpMgcNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpMgcName, thedata->gcpMgcName, thedata->gcpMgcNameLen);
+		StorageNew->gcpMgcNameLen = thedata->gcpMgcNameLen;
+		StorageNew->gcpMgcName[StorageNew->gcpMgcNameLen] = 0;
+		if (!(StorageNew->gcpMgcDomainName = malloc(thedata->gcpMgcDomainNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpMgcDomainName, thedata->gcpMgcDomainName, thedata->gcpMgcDomainNameLen);
+		StorageNew->gcpMgcDomainNameLen = thedata->gcpMgcDomainNameLen;
+		StorageNew->gcpMgcDomainName[StorageNew->gcpMgcDomainNameLen] = 0;
+		if (!(StorageNew->gcpMgcDeviceName = malloc(thedata->gcpMgcDeviceNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpMgcDeviceName, thedata->gcpMgcDeviceName, thedata->gcpMgcDeviceNameLen);
+		StorageNew->gcpMgcDeviceNameLen = thedata->gcpMgcDeviceNameLen;
+		StorageNew->gcpMgcDeviceName[StorageNew->gcpMgcDeviceNameLen] = 0;
+		if (!(StorageNew->gcpMgcMtpAddress = malloc(thedata->gcpMgcMtpAddressLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpMgcMtpAddress, thedata->gcpMgcMtpAddress, thedata->gcpMgcMtpAddressLen);
+		StorageNew->gcpMgcMtpAddressLen = thedata->gcpMgcMtpAddressLen;
+		StorageNew->gcpMgcMtpAddress[StorageNew->gcpMgcMtpAddressLen] = 0;
+		StorageNew->gcpMgcAdminState = thedata->gcpMgcAdminState;
+		StorageNew->gcpMgcOperState = thedata->gcpMgcOperState;
+		if (!(StorageNew->gcpMgcAlarmStatus = malloc(thedata->gcpMgcAlarmStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpMgcAlarmStatus, thedata->gcpMgcAlarmStatus, thedata->gcpMgcAlarmStatusLen);
+		StorageNew->gcpMgcAlarmStatusLen = thedata->gcpMgcAlarmStatusLen;
+		StorageNew->gcpMgcAlarmStatus[StorageNew->gcpMgcAlarmStatusLen] = 0;
+		if (!(StorageNew->gcpMgcAsaProfilePointer = snmp_duplicate_objid(thedata->gcpMgcAsaProfilePointer, thedata->gcpMgcAsaProfilePointerLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->gcpMgcAsaProfilePointerLen = thedata->gcpMgcAsaProfilePointerLen;
+		StorageNew->gcpMgcUsageState = thedata->gcpMgcUsageState;
+		if (!(StorageNew->gcpMgcAvailStatus = malloc(thedata->gcpMgcAvailStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpMgcAvailStatus, thedata->gcpMgcAvailStatus, thedata->gcpMgcAvailStatusLen);
+		StorageNew->gcpMgcAvailStatusLen = thedata->gcpMgcAvailStatusLen;
+		StorageNew->gcpMgcAvailStatus[StorageNew->gcpMgcAvailStatusLen] = 0;
+		if (!(StorageNew->gcpMgcProcStatus = malloc(thedata->gcpMgcProcStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpMgcProcStatus, thedata->gcpMgcProcStatus, thedata->gcpMgcProcStatusLen);
+		StorageNew->gcpMgcProcStatusLen = thedata->gcpMgcProcStatusLen;
+		StorageNew->gcpMgcProcStatus[StorageNew->gcpMgcProcStatusLen] = 0;
+		StorageNew->gcpMgcPg = thedata->gcpMgcPg;
+		StorageNew->gcpMgcStandbyStatus = thedata->gcpMgcStandbyStatus;
+		StorageNew->gcpMgcRowStatus = thedata->gcpMgcRowStatus;
 	}
       done:
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
@@ -1984,7 +2301,7 @@ gcpMgcTable_del(struct gcpMgcTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for gcpMgcTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case gcpMgcTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2135,38 +2452,52 @@ gcpLinkageTable_create(void)
 		StorageNew->gcpMgcId = 0;
 		StorageNew->gcpLinkageType = 0;
 		StorageNew->gcpLinkageMgcMaster = GCPLINKAGEMGCMASTER_MASTER;
-		if ((StorageNew->gcpLinkageMgcAddress = (uint8_t *) strdup("")) != NULL)
-			StorageNew->gcpLinkageMgcAddressLen = strlen("");
-		if ((StorageNew->gcpLinkageMgAddress = (uint8_t *) strdup("")) != NULL)
-			StorageNew->gcpLinkageMgAddressLen = strlen("");
+		if ((StorageNew->gcpLinkageMgcAddress = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->gcpLinkageMgcAddressLen = 0;
+		StorageNew->gcpLinkageMgcAddress[StorageNew->gcpLinkageMgcAddressLen] = 0;
+		if ((StorageNew->gcpLinkageMgAddress = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->gcpLinkageMgAddressLen = 0;
+		StorageNew->gcpLinkageMgAddress[StorageNew->gcpLinkageMgAddressLen] = 0;
 		StorageNew->gcpLinkageMgcIdent = 0;
 		StorageNew->gcpLinkageMgIdent = 0;
-		if ((StorageNew->gcpLinkageProfile = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->gcpLinkageProfile = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->gcpLinkageProfileLen = 2;
-		if ((StorageNew->gcpLinkageProtocol = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->gcpLinkageProtocol = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->gcpLinkageProtocolLen = 2;
 		StorageNew->gcpLinkageEncoding = 0;
-		if (memdup((u_char **) &StorageNew->gcpLinkageAuthAccess, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->gcpLinkageAuthAccess, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->gcpLinkageAuthAccessLen = 1;
 		StorageNew->gcpLinkageAdminState = 0;
 		StorageNew->gcpLinkageOperState = 0;
-		if (memdup((u_char **) &StorageNew->gcpLinkageProcStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->gcpLinkageProcStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->gcpLinkageProcStatusLen = 1;
-		if (memdup((u_char **) &StorageNew->gcpLinkageAvailStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->gcpLinkageAvailStatus, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->gcpLinkageAvailStatusLen = 2;
 		StorageNew->gcpLinkageAuthentication = 0;
 		StorageNew->gcpLinkageMit = 0;
 		StorageNew->gcpLinkageRowStatus = 0;
 		StorageNew->gcpLinkageRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	gcpLinkageTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct gcpLinkageTable_data *gcpLinkageTable_duplicate(struct gcpLinkageTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2178,6 +2509,52 @@ gcpLinkageTable_duplicate(struct gcpLinkageTable_data *thedata)
 
 	DEBUGMSGTL(("gcpMIB", "gcpLinkageTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->gcpLinkageTable_id = thedata->gcpLinkageTable_id;
+		StorageNew->gcpMsId = thedata->gcpMsId;
+		StorageNew->gcpMgId = thedata->gcpMgId;
+		StorageNew->gcpMsId = thedata->gcpMsId;
+		StorageNew->gcpMgcId = thedata->gcpMgcId;
+		StorageNew->gcpLinkageType = thedata->gcpLinkageType;
+		StorageNew->gcpLinkageMgcMaster = thedata->gcpLinkageMgcMaster;
+		if (!(StorageNew->gcpLinkageMgcAddress = malloc(thedata->gcpLinkageMgcAddressLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpLinkageMgcAddress, thedata->gcpLinkageMgcAddress, thedata->gcpLinkageMgcAddressLen);
+		StorageNew->gcpLinkageMgcAddressLen = thedata->gcpLinkageMgcAddressLen;
+		StorageNew->gcpLinkageMgcAddress[StorageNew->gcpLinkageMgcAddressLen] = 0;
+		if (!(StorageNew->gcpLinkageMgAddress = malloc(thedata->gcpLinkageMgAddressLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpLinkageMgAddress, thedata->gcpLinkageMgAddress, thedata->gcpLinkageMgAddressLen);
+		StorageNew->gcpLinkageMgAddressLen = thedata->gcpLinkageMgAddressLen;
+		StorageNew->gcpLinkageMgAddress[StorageNew->gcpLinkageMgAddressLen] = 0;
+		StorageNew->gcpLinkageMgcIdent = thedata->gcpLinkageMgcIdent;
+		StorageNew->gcpLinkageMgIdent = thedata->gcpLinkageMgIdent;
+		if (!(StorageNew->gcpLinkageProfile = snmp_duplicate_objid(thedata->gcpLinkageProfile, thedata->gcpLinkageProfileLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->gcpLinkageProfileLen = thedata->gcpLinkageProfileLen;
+		if (!(StorageNew->gcpLinkageProtocol = snmp_duplicate_objid(thedata->gcpLinkageProtocol, thedata->gcpLinkageProtocolLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->gcpLinkageProtocolLen = thedata->gcpLinkageProtocolLen;
+		StorageNew->gcpLinkageEncoding = thedata->gcpLinkageEncoding;
+		if (!(StorageNew->gcpLinkageAuthAccess = malloc(thedata->gcpLinkageAuthAccessLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpLinkageAuthAccess, thedata->gcpLinkageAuthAccess, thedata->gcpLinkageAuthAccessLen);
+		StorageNew->gcpLinkageAuthAccessLen = thedata->gcpLinkageAuthAccessLen;
+		StorageNew->gcpLinkageAuthAccess[StorageNew->gcpLinkageAuthAccessLen] = 0;
+		StorageNew->gcpLinkageAdminState = thedata->gcpLinkageAdminState;
+		StorageNew->gcpLinkageOperState = thedata->gcpLinkageOperState;
+		if (!(StorageNew->gcpLinkageProcStatus = malloc(thedata->gcpLinkageProcStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpLinkageProcStatus, thedata->gcpLinkageProcStatus, thedata->gcpLinkageProcStatusLen);
+		StorageNew->gcpLinkageProcStatusLen = thedata->gcpLinkageProcStatusLen;
+		StorageNew->gcpLinkageProcStatus[StorageNew->gcpLinkageProcStatusLen] = 0;
+		if (!(StorageNew->gcpLinkageAvailStatus = malloc(thedata->gcpLinkageAvailStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpLinkageAvailStatus, thedata->gcpLinkageAvailStatus, thedata->gcpLinkageAvailStatusLen);
+		StorageNew->gcpLinkageAvailStatusLen = thedata->gcpLinkageAvailStatusLen;
+		StorageNew->gcpLinkageAvailStatus[StorageNew->gcpLinkageAvailStatusLen] = 0;
+		StorageNew->gcpLinkageAuthentication = thedata->gcpLinkageAuthentication;
+		StorageNew->gcpLinkageMit = thedata->gcpLinkageMit;
+		StorageNew->gcpLinkageRowStatus = thedata->gcpLinkageRowStatus;
 	}
       done:
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
@@ -2291,7 +2668,7 @@ gcpLinkageTable_del(struct gcpLinkageTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for gcpLinkageTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case gcpLinkageTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2443,14 +2820,19 @@ gcpUdpProfileTable_create(void)
 		StorageNew->gcpUdpRowStatus = 0;
 		StorageNew->gcpUdpRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	gcpUdpProfileTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct gcpUdpProfileTable_data *gcpUdpProfileTable_duplicate(struct gcpUdpProfileTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2462,6 +2844,14 @@ gcpUdpProfileTable_duplicate(struct gcpUdpProfileTable_data *thedata)
 
 	DEBUGMSGTL(("gcpMIB", "gcpUdpProfileTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->gcpUdpProfileTable_id = thedata->gcpUdpProfileTable_id;
+		if (!(StorageNew->gcpUdpProfileId = malloc(thedata->gcpUdpProfileIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpUdpProfileId, thedata->gcpUdpProfileId, thedata->gcpUdpProfileIdLen);
+		StorageNew->gcpUdpProfileIdLen = thedata->gcpUdpProfileIdLen;
+		StorageNew->gcpUdpProfileId[StorageNew->gcpUdpProfileIdLen] = 0;
+		StorageNew->gcpUdpChecksum = thedata->gcpUdpChecksum;
+		StorageNew->gcpUdpRowStatus = thedata->gcpUdpRowStatus;
 	}
       done:
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
@@ -2557,7 +2947,7 @@ gcpUdpProfileTable_del(struct gcpUdpProfileTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for gcpUdpProfileTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case gcpUdpProfileTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2650,14 +3040,19 @@ gcpTcpProfileTable_create(void)
 		StorageNew->gcpTcpRowStatus = 0;
 		StorageNew->gcpTcpRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	gcpTcpProfileTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct gcpTcpProfileTable_data *gcpTcpProfileTable_duplicate(struct gcpTcpProfileTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2669,6 +3064,21 @@ gcpTcpProfileTable_duplicate(struct gcpTcpProfileTable_data *thedata)
 
 	DEBUGMSGTL(("gcpMIB", "gcpTcpProfileTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->gcpTcpProfileTable_id = thedata->gcpTcpProfileTable_id;
+		if (!(StorageNew->gcpTcpProfileId = malloc(thedata->gcpTcpProfileIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpTcpProfileId, thedata->gcpTcpProfileId, thedata->gcpTcpProfileIdLen);
+		StorageNew->gcpTcpProfileIdLen = thedata->gcpTcpProfileIdLen;
+		StorageNew->gcpTcpProfileId[StorageNew->gcpTcpProfileIdLen] = 0;
+		StorageNew->gcpTcpNoDelay = thedata->gcpTcpNoDelay;
+		StorageNew->gcpTcpMaxseg = thedata->gcpTcpMaxseg;
+		StorageNew->gcpTcpKeepAlive = thedata->gcpTcpKeepAlive;
+		StorageNew->gcpTcpKeepIdle = thedata->gcpTcpKeepIdle;
+		StorageNew->gcpTcpKeepAliveItvl = thedata->gcpTcpKeepAliveItvl;
+		StorageNew->gcpTcpKeepCount = thedata->gcpTcpKeepCount;
+		StorageNew->gcpTcpSynRetrans = thedata->gcpTcpSynRetrans;
+		StorageNew->gcpTcpWindowClamp = thedata->gcpTcpWindowClamp;
+		StorageNew->gcpTcpRowStatus = thedata->gcpTcpRowStatus;
 	}
       done:
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
@@ -2764,7 +3174,7 @@ gcpTcpProfileTable_del(struct gcpTcpProfileTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for gcpTcpProfileTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case gcpTcpProfileTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2878,14 +3288,19 @@ gcpSctpProfileTable_create(void)
 		StorageNew->gcpSctpRowStatus = 0;
 		StorageNew->gcpSctpRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	gcpSctpProfileTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct gcpSctpProfileTable_data *gcpSctpProfileTable_duplicate(struct gcpSctpProfileTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2897,6 +3312,28 @@ gcpSctpProfileTable_duplicate(struct gcpSctpProfileTable_data *thedata)
 
 	DEBUGMSGTL(("gcpMIB", "gcpSctpProfileTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->gcpSctpProfileTable_id = thedata->gcpSctpProfileTable_id;
+		if (!(StorageNew->gcpSctpProfileId = malloc(thedata->gcpSctpProfileIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpSctpProfileId, thedata->gcpSctpProfileId, thedata->gcpSctpProfileIdLen);
+		StorageNew->gcpSctpProfileIdLen = thedata->gcpSctpProfileIdLen;
+		StorageNew->gcpSctpProfileId[StorageNew->gcpSctpProfileIdLen] = 0;
+		StorageNew->gcpSctpNoDelay = thedata->gcpSctpNoDelay;
+		StorageNew->gcpSctpMaxseg = thedata->gcpSctpMaxseg;
+		StorageNew->gcpSctpHeartbeatItvl = thedata->gcpSctpHeartbeatItvl;
+		StorageNew->gcpSctpHearbeat = thedata->gcpSctpHearbeat;
+		StorageNew->gcpSctpRtoInitial = thedata->gcpSctpRtoInitial;
+		StorageNew->gcpSctpRtoMin = thedata->gcpSctpRtoMin;
+		StorageNew->gcpSctpRtoMax = thedata->gcpSctpRtoMax;
+		StorageNew->gcpSctpPathMaxRetrans = thedata->gcpSctpPathMaxRetrans;
+		StorageNew->gcpSctpCookieLife = thedata->gcpSctpCookieLife;
+		StorageNew->gcpSctpCookieInc = thedata->gcpSctpCookieInc;
+		StorageNew->gcpSctpMaxInitRetries = thedata->gcpSctpMaxInitRetries;
+		StorageNew->gcpSctpMaxBurst = thedata->gcpSctpMaxBurst;
+		StorageNew->gcpSctpAssocMaxRetrans = thedata->gcpSctpAssocMaxRetrans;
+		StorageNew->gcpSctpSackDelay = thedata->gcpSctpSackDelay;
+		StorageNew->gcpSctpLifetime = thedata->gcpSctpLifetime;
+		StorageNew->gcpSctpRowStatus = thedata->gcpSctpRowStatus;
 	}
       done:
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
@@ -2992,7 +3429,7 @@ gcpSctpProfileTable_del(struct gcpSctpProfileTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for gcpSctpProfileTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case gcpSctpProfileTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3103,7 +3540,8 @@ gcpProtGroupTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->gcpProtGroupOperState = 0;
-		if (memdup((u_char **) &StorageNew->gcpProtGroupAvailStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->gcpProtGroupAvailStatus, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->gcpProtGroupAvailStatusLen = 2;
 		StorageNew->gcpProtGroupType = 0;
 		StorageNew->gcpProtGroupRevertive = 0;
@@ -3113,23 +3551,32 @@ gcpProtGroupTable_create(void)
 		StorageNew->gcpProtGroupReleaseingWindowTime = 0;
 		StorageNew->gcpProtGroupHitsCount = 0;
 		StorageNew->gcpProtGroupSwitchType = 0;
-		if ((StorageNew->gcpProtGroupProtectedUnits = (uint8_t *) strdup("")) != NULL)
-			StorageNew->gcpProtGroupProtectedUnitsLen = strlen("");
-		if ((StorageNew->gcpProtGroupProtectingUnits = (uint8_t *) strdup("")) != NULL)
-			StorageNew->gcpProtGroupProtectingUnitsLen = strlen("");
+		if ((StorageNew->gcpProtGroupProtectedUnits = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->gcpProtGroupProtectedUnitsLen = 0;
+		StorageNew->gcpProtGroupProtectedUnits[StorageNew->gcpProtGroupProtectedUnitsLen] = 0;
+		if ((StorageNew->gcpProtGroupProtectingUnits = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->gcpProtGroupProtectingUnitsLen = 0;
+		StorageNew->gcpProtGroupProtectingUnits[StorageNew->gcpProtGroupProtectingUnitsLen] = 0;
 		StorageNew->gcpProtGroupInvokeProtection = 0;
 		StorageNew->gcpProtGroupReleaseProtection = 0;
 		StorageNew->gcpProtGroupRowStatus = 0;
 		StorageNew->gcpProtGroupRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	gcpProtGroupTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct gcpProtGroupTable_data *gcpProtGroupTable_duplicate(struct gcpProtGroupTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3141,6 +3588,35 @@ gcpProtGroupTable_duplicate(struct gcpProtGroupTable_data *thedata)
 
 	DEBUGMSGTL(("gcpMIB", "gcpProtGroupTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->gcpProtGroupTable_id = thedata->gcpProtGroupTable_id;
+		StorageNew->gcpProtGroupId = thedata->gcpProtGroupId;
+		StorageNew->gcpProtGroupOperState = thedata->gcpProtGroupOperState;
+		if (!(StorageNew->gcpProtGroupAvailStatus = malloc(thedata->gcpProtGroupAvailStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpProtGroupAvailStatus, thedata->gcpProtGroupAvailStatus, thedata->gcpProtGroupAvailStatusLen);
+		StorageNew->gcpProtGroupAvailStatusLen = thedata->gcpProtGroupAvailStatusLen;
+		StorageNew->gcpProtGroupAvailStatus[StorageNew->gcpProtGroupAvailStatusLen] = 0;
+		StorageNew->gcpProtGroupType = thedata->gcpProtGroupType;
+		StorageNew->gcpProtGroupRevertive = thedata->gcpProtGroupRevertive;
+		StorageNew->gcpProtGroupSBOLNumber = thedata->gcpProtGroupSBOLNumber;
+		StorageNew->gcpProtGroupWaitToRestoreTime = thedata->gcpProtGroupWaitToRestoreTime;
+		StorageNew->gcpProtGroupSettingWindowTime = thedata->gcpProtGroupSettingWindowTime;
+		StorageNew->gcpProtGroupReleaseingWindowTime = thedata->gcpProtGroupReleaseingWindowTime;
+		StorageNew->gcpProtGroupHitsCount = thedata->gcpProtGroupHitsCount;
+		StorageNew->gcpProtGroupSwitchType = thedata->gcpProtGroupSwitchType;
+		if (!(StorageNew->gcpProtGroupProtectedUnits = malloc(thedata->gcpProtGroupProtectedUnitsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpProtGroupProtectedUnits, thedata->gcpProtGroupProtectedUnits, thedata->gcpProtGroupProtectedUnitsLen);
+		StorageNew->gcpProtGroupProtectedUnitsLen = thedata->gcpProtGroupProtectedUnitsLen;
+		StorageNew->gcpProtGroupProtectedUnits[StorageNew->gcpProtGroupProtectedUnitsLen] = 0;
+		if (!(StorageNew->gcpProtGroupProtectingUnits = malloc(thedata->gcpProtGroupProtectingUnitsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpProtGroupProtectingUnits, thedata->gcpProtGroupProtectingUnits, thedata->gcpProtGroupProtectingUnitsLen);
+		StorageNew->gcpProtGroupProtectingUnitsLen = thedata->gcpProtGroupProtectingUnitsLen;
+		StorageNew->gcpProtGroupProtectingUnits[StorageNew->gcpProtGroupProtectingUnitsLen] = 0;
+		StorageNew->gcpProtGroupInvokeProtection = thedata->gcpProtGroupInvokeProtection;
+		StorageNew->gcpProtGroupReleaseProtection = thedata->gcpProtGroupReleaseProtection;
+		StorageNew->gcpProtGroupRowStatus = thedata->gcpProtGroupRowStatus;
 	}
       done:
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
@@ -3240,7 +3716,7 @@ gcpProtGroupTable_del(struct gcpProtGroupTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for gcpProtGroupTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case gcpProtGroupTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3359,19 +3835,25 @@ gcpSbolTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->gcpProtGroupId = 0;
-		if ((StorageNew->gcpSbolObject = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->gcpSbolObject = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->gcpSbolObjectLen = 2;
 		StorageNew->gcpSbolStatus = 0;
 		StorageNew->gcpSbolStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	gcpSbolTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct gcpSbolTable_data *gcpSbolTable_duplicate(struct gcpSbolTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3383,6 +3865,13 @@ gcpSbolTable_duplicate(struct gcpSbolTable_data *thedata)
 
 	DEBUGMSGTL(("gcpMIB", "gcpSbolTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->gcpSbolTable_id = thedata->gcpSbolTable_id;
+		StorageNew->gcpProtGroupId = thedata->gcpProtGroupId;
+		StorageNew->gcpSbolId = thedata->gcpSbolId;
+		if (!(StorageNew->gcpSbolObject = snmp_duplicate_objid(thedata->gcpSbolObject, thedata->gcpSbolObjectLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->gcpSbolObjectLen = thedata->gcpSbolObjectLen;
+		StorageNew->gcpSbolStatus = thedata->gcpSbolStatus;
 	}
       done:
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
@@ -3480,7 +3969,7 @@ gcpSbolTable_del(struct gcpSbolTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for gcpSbolTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case gcpSbolTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3565,11 +4054,14 @@ gcpProtUnitTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->gcpProtUnitProtecting = 0;
-		if ((StorageNew->gcpProtUnitReliableResourcePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->gcpProtUnitReliableResourcePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->gcpProtUnitReliableResourcePointerLen = 2;
-		if ((StorageNew->gcpProtUnitUnreliableResourcePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->gcpProtUnitUnreliableResourcePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->gcpProtUnitUnreliableResourcePointerLen = 2;
-		if (memdup((u_char **) &StorageNew->gcpProtUnitProtectionStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->gcpProtUnitProtectionStatus, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->gcpProtUnitProtectionStatusLen = 2;
 		StorageNew->gcpProtUnitRequestSource = 0;
 		StorageNew->gcpProtUnitSwitchStatus = 0;
@@ -3581,14 +4073,19 @@ gcpProtUnitTable_create(void)
 		StorageNew->gcpProtUnitRowStatus = 0;
 		StorageNew->gcpProtUnitRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	gcpProtUnitTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct gcpProtUnitTable_data *gcpProtUnitTable_duplicate(struct gcpProtUnitTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3600,6 +4097,30 @@ gcpProtUnitTable_duplicate(struct gcpProtUnitTable_data *thedata)
 
 	DEBUGMSGTL(("gcpMIB", "gcpProtUnitTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->gcpProtUnitTable_id = thedata->gcpProtUnitTable_id;
+		StorageNew->gcpProtUnitId = thedata->gcpProtUnitId;
+		StorageNew->gcpProtUnitProtecting = thedata->gcpProtUnitProtecting;
+		if (!(StorageNew->gcpProtUnitReliableResourcePointer = snmp_duplicate_objid(thedata->gcpProtUnitReliableResourcePointer, thedata->gcpProtUnitReliableResourcePointerLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->gcpProtUnitReliableResourcePointerLen = thedata->gcpProtUnitReliableResourcePointerLen;
+		if (!
+		    (StorageNew->gcpProtUnitUnreliableResourcePointer =
+		     snmp_duplicate_objid(thedata->gcpProtUnitUnreliableResourcePointer, thedata->gcpProtUnitUnreliableResourcePointerLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->gcpProtUnitUnreliableResourcePointerLen = thedata->gcpProtUnitUnreliableResourcePointerLen;
+		if (!(StorageNew->gcpProtUnitProtectionStatus = malloc(thedata->gcpProtUnitProtectionStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpProtUnitProtectionStatus, thedata->gcpProtUnitProtectionStatus, thedata->gcpProtUnitProtectionStatusLen);
+		StorageNew->gcpProtUnitProtectionStatusLen = thedata->gcpProtUnitProtectionStatusLen;
+		StorageNew->gcpProtUnitProtectionStatus[StorageNew->gcpProtUnitProtectionStatusLen] = 0;
+		StorageNew->gcpProtUnitRequestSource = thedata->gcpProtUnitRequestSource;
+		StorageNew->gcpProtUnitSwitchStatus = thedata->gcpProtUnitSwitchStatus;
+		StorageNew->gcpProtUnitSwitchDirection = thedata->gcpProtUnitSwitchDirection;
+		StorageNew->gcpProtUnitRelatedUnit = thedata->gcpProtUnitRelatedUnit;
+		StorageNew->gcpProtUnitAutoSwitchReason = thedata->gcpProtUnitAutoSwitchReason;
+		StorageNew->gcpProtUnitLockoutReleaseFailed = thedata->gcpProtUnitLockoutReleaseFailed;
+		StorageNew->gcpProtUnitPriority = thedata->gcpProtUnitPriority;
+		StorageNew->gcpProtUnitRowStatus = thedata->gcpProtUnitRowStatus;
 	}
       done:
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
@@ -3699,7 +4220,7 @@ gcpProtUnitTable_del(struct gcpProtUnitTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for gcpProtUnitTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case gcpProtUnitTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3813,8 +4334,10 @@ gcpRealmTable_create(void)
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->gcpMsId = 0;
 		StorageNew->gcpMgId = 0;
-		if ((StorageNew->gcpRealmString = (uint8_t *) strdup("")) != NULL)
-			StorageNew->gcpRealmStringLen = strlen("");
+		if ((StorageNew->gcpRealmString = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->gcpRealmStringLen = 0;
+		StorageNew->gcpRealmString[StorageNew->gcpRealmStringLen] = 0;
 		StorageNew->gcpRealmTermsMax = 0;
 		StorageNew->gcpRealmTermsCurrent = 0;
 		StorageNew->gcpRealmTermsHiWat = 0;
@@ -3822,14 +4345,19 @@ gcpRealmTable_create(void)
 		StorageNew->gcpRealmRowStatus = 0;
 		StorageNew->gcpRealmRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	gcpRealmTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct gcpRealmTable_data *gcpRealmTable_duplicate(struct gcpRealmTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3841,6 +4369,20 @@ gcpRealmTable_duplicate(struct gcpRealmTable_data *thedata)
 
 	DEBUGMSGTL(("gcpMIB", "gcpRealmTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->gcpRealmTable_id = thedata->gcpRealmTable_id;
+		StorageNew->gcpMsId = thedata->gcpMsId;
+		StorageNew->gcpMgId = thedata->gcpMgId;
+		StorageNew->gcpRealmId = thedata->gcpRealmId;
+		if (!(StorageNew->gcpRealmString = malloc(thedata->gcpRealmStringLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpRealmString, thedata->gcpRealmString, thedata->gcpRealmStringLen);
+		StorageNew->gcpRealmStringLen = thedata->gcpRealmStringLen;
+		StorageNew->gcpRealmString[StorageNew->gcpRealmStringLen] = 0;
+		StorageNew->gcpRealmTermsMax = thedata->gcpRealmTermsMax;
+		StorageNew->gcpRealmTermsCurrent = thedata->gcpRealmTermsCurrent;
+		StorageNew->gcpRealmTermsHiWat = thedata->gcpRealmTermsHiWat;
+		StorageNew->gcpRealmTermsLoWat = thedata->gcpRealmTermsLoWat;
+		StorageNew->gcpRealmRowStatus = thedata->gcpRealmRowStatus;
 	}
       done:
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
@@ -3940,7 +4482,7 @@ gcpRealmTable_del(struct gcpRealmTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for gcpRealmTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case gcpRealmTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -4039,17 +4581,30 @@ gcpInterfaceTable_create(void)
 		StorageNew->gcpInterfaceMgId = 0;
 		StorageNew->gcpInterfaceType = 0;
 		StorageNew->gcpInterfaceRealm = 0;
+		if ((StorageNew->gcpInterfaceTermId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->gcpInterfaceTermIdLen = 0;
+		StorageNew->gcpInterfaceTermId[StorageNew->gcpInterfaceTermIdLen] = 0;
+		if ((StorageNew->gcpInterfaceTermPath = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->gcpInterfaceTermPathLen = 0;
+		StorageNew->gcpInterfaceTermPath[StorageNew->gcpInterfaceTermPathLen] = 0;
 		StorageNew->gcpInterfaceRowStatus = 0;
 		StorageNew->gcpInterfaceRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	gcpInterfaceTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct gcpInterfaceTable_data *gcpInterfaceTable_duplicate(struct gcpInterfaceTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -4061,6 +4616,24 @@ gcpInterfaceTable_duplicate(struct gcpInterfaceTable_data *thedata)
 
 	DEBUGMSGTL(("gcpMIB", "gcpInterfaceTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->gcpInterfaceTable_id = thedata->gcpInterfaceTable_id;
+		StorageNew->gcpMsId = thedata->gcpMsId;
+		StorageNew->gcpInterfaceId = thedata->gcpInterfaceId;
+		StorageNew->gcpInterfaceIfindex = thedata->gcpInterfaceIfindex;
+		StorageNew->gcpInterfaceMgId = thedata->gcpInterfaceMgId;
+		StorageNew->gcpInterfaceType = thedata->gcpInterfaceType;
+		StorageNew->gcpInterfaceRealm = thedata->gcpInterfaceRealm;
+		if (!(StorageNew->gcpInterfaceTermId = malloc(thedata->gcpInterfaceTermIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpInterfaceTermId, thedata->gcpInterfaceTermId, thedata->gcpInterfaceTermIdLen);
+		StorageNew->gcpInterfaceTermIdLen = thedata->gcpInterfaceTermIdLen;
+		StorageNew->gcpInterfaceTermId[StorageNew->gcpInterfaceTermIdLen] = 0;
+		if (!(StorageNew->gcpInterfaceTermPath = malloc(thedata->gcpInterfaceTermPathLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpInterfaceTermPath, thedata->gcpInterfaceTermPath, thedata->gcpInterfaceTermPathLen);
+		StorageNew->gcpInterfaceTermPathLen = thedata->gcpInterfaceTermPathLen;
+		StorageNew->gcpInterfaceTermPath[StorageNew->gcpInterfaceTermPathLen] = 0;
+		StorageNew->gcpInterfaceRowStatus = thedata->gcpInterfaceRowStatus;
 	}
       done:
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
@@ -4088,6 +4661,10 @@ gcpInterfaceTable_destroy(struct gcpInterfaceTable_data **thedata)
 
 	DEBUGMSGTL(("gcpMIB", "gcpInterfaceTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->gcpInterfaceTermId);
+		StorageDel->gcpInterfaceTermIdLen = 0;
+		SNMP_FREE(StorageDel->gcpInterfaceTermPath);
+		StorageDel->gcpInterfaceTermPathLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -4156,7 +4733,7 @@ gcpInterfaceTable_del(struct gcpInterfaceTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for gcpInterfaceTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case gcpInterfaceTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -4180,6 +4757,18 @@ parse_gcpInterfaceTable(const char *token, char *line)
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->gcpInterfaceMgId, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->gcpInterfaceType, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->gcpInterfaceRealm, &tmpsize);
+	SNMP_FREE(StorageTmp->gcpInterfaceTermId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->gcpInterfaceTermId, &StorageTmp->gcpInterfaceTermIdLen);
+	if (StorageTmp->gcpInterfaceTermId == NULL) {
+		config_perror("invalid specification for gcpInterfaceTermId");
+		return;
+	}
+	SNMP_FREE(StorageTmp->gcpInterfaceTermPath);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->gcpInterfaceTermPath, &StorageTmp->gcpInterfaceTermPathLen);
+	if (StorageTmp->gcpInterfaceTermPath == NULL) {
+		config_perror("invalid specification for gcpInterfaceTermPath");
+		return;
+	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->gcpInterfaceRowStatus, &tmpsize);
 	gcpInterfaceTable_add(StorageTmp);
 	(void) tmpsize;
@@ -4217,6 +4806,8 @@ store_gcpInterfaceTable(int majorID, int minorID, void *serverarg, void *clienta
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->gcpInterfaceMgId, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->gcpInterfaceType, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->gcpInterfaceRealm, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->gcpInterfaceTermId, &StorageTmp->gcpInterfaceTermIdLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->gcpInterfaceTermPath, &StorageTmp->gcpInterfaceTermPathLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->gcpInterfaceRowStatus, &tmpsize);
 			snmpd_store_config(line);
 		}
@@ -4247,21 +4838,30 @@ gcpAddressTable_create(void)
 		StorageNew->gcpInterfaceId = 0;
 		StorageNew->gcpAddressInterface = 0;
 		StorageNew->gcpAddressType = 0;
-		if ((StorageNew->gcpAddressAddr = (uint8_t *) strdup("")) != NULL)
-			StorageNew->gcpAddressAddrLen = strlen("");
-		if ((StorageNew->gcpAddressPortRanges = (uint8_t *) strdup("")) != NULL)
-			StorageNew->gcpAddressPortRangesLen = strlen("");
+		if ((StorageNew->gcpAddressAddr = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->gcpAddressAddrLen = 0;
+		StorageNew->gcpAddressAddr[StorageNew->gcpAddressAddrLen] = 0;
+		if ((StorageNew->gcpAddressPortRanges = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->gcpAddressPortRangesLen = 0;
+		StorageNew->gcpAddressPortRanges[StorageNew->gcpAddressPortRangesLen] = 0;
 		StorageNew->gcpAddressRowStatus = 0;
 		StorageNew->gcpAddressRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	gcpAddressTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct gcpAddressTable_data *gcpAddressTable_duplicate(struct gcpAddressTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -4273,6 +4873,25 @@ gcpAddressTable_duplicate(struct gcpAddressTable_data *thedata)
 
 	DEBUGMSGTL(("gcpMIB", "gcpAddressTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->gcpAddressTable_id = thedata->gcpAddressTable_id;
+		StorageNew->gcpMsId = thedata->gcpMsId;
+		StorageNew->gcpMgId = thedata->gcpMgId;
+		StorageNew->gcpRealmId = thedata->gcpRealmId;
+		StorageNew->gcpInterfaceId = thedata->gcpInterfaceId;
+		StorageNew->gcpAddressId = thedata->gcpAddressId;
+		StorageNew->gcpAddressInterface = thedata->gcpAddressInterface;
+		StorageNew->gcpAddressType = thedata->gcpAddressType;
+		if (!(StorageNew->gcpAddressAddr = malloc(thedata->gcpAddressAddrLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpAddressAddr, thedata->gcpAddressAddr, thedata->gcpAddressAddrLen);
+		StorageNew->gcpAddressAddrLen = thedata->gcpAddressAddrLen;
+		StorageNew->gcpAddressAddr[StorageNew->gcpAddressAddrLen] = 0;
+		if (!(StorageNew->gcpAddressPortRanges = malloc(thedata->gcpAddressPortRangesLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gcpAddressPortRanges, thedata->gcpAddressPortRanges, thedata->gcpAddressPortRangesLen);
+		StorageNew->gcpAddressPortRangesLen = thedata->gcpAddressPortRangesLen;
+		StorageNew->gcpAddressPortRanges[StorageNew->gcpAddressPortRangesLen] = 0;
+		StorageNew->gcpAddressRowStatus = thedata->gcpAddressRowStatus;
 	}
       done:
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
@@ -4378,7 +4997,7 @@ gcpAddressTable_del(struct gcpAddressTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for gcpAddressTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case gcpAddressTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -4461,6 +5080,506 @@ store_gcpAddressTable(int majorID, int minorID, void *serverarg, void *clientarg
 	}
 	DEBUGMSGTL(("gcpMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int activate_gcpMsTable_row(struct gcpMsTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_gcpMsTable_row(struct gcpMsTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_gcpMsTable_row(struct gcpMsTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_gcpMsTable_row(struct gcpMsTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_gcpMgTable_row(struct gcpMgTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_gcpMgTable_row(struct gcpMgTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_gcpMgTable_row(struct gcpMgTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_gcpMgTable_row(struct gcpMgTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_gcpMgcTable_row(struct gcpMgcTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_gcpMgcTable_row(struct gcpMgcTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_gcpMgcTable_row(struct gcpMgcTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_gcpMgcTable_row(struct gcpMgcTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_gcpLinkageTable_row(struct gcpLinkageTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_gcpLinkageTable_row(struct gcpLinkageTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_gcpLinkageTable_row(struct gcpLinkageTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_gcpLinkageTable_row(struct gcpLinkageTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_gcpUdpProfileTable_row(struct gcpUdpProfileTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_gcpUdpProfileTable_row(struct gcpUdpProfileTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_gcpUdpProfileTable_row(struct gcpUdpProfileTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_gcpUdpProfileTable_row(struct gcpUdpProfileTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_gcpTcpProfileTable_row(struct gcpTcpProfileTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_gcpTcpProfileTable_row(struct gcpTcpProfileTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_gcpTcpProfileTable_row(struct gcpTcpProfileTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_gcpTcpProfileTable_row(struct gcpTcpProfileTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_gcpSctpProfileTable_row(struct gcpSctpProfileTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_gcpSctpProfileTable_row(struct gcpSctpProfileTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_gcpSctpProfileTable_row(struct gcpSctpProfileTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_gcpSctpProfileTable_row(struct gcpSctpProfileTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_gcpProtGroupTable_row(struct gcpProtGroupTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_gcpProtGroupTable_row(struct gcpProtGroupTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_gcpProtGroupTable_row(struct gcpProtGroupTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_gcpProtGroupTable_row(struct gcpProtGroupTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_gcpSbolTable_row(struct gcpSbolTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_gcpSbolTable_row(struct gcpSbolTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_gcpSbolTable_row(struct gcpSbolTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_gcpSbolTable_row(struct gcpSbolTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_gcpProtUnitTable_row(struct gcpProtUnitTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_gcpProtUnitTable_row(struct gcpProtUnitTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_gcpProtUnitTable_row(struct gcpProtUnitTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_gcpProtUnitTable_row(struct gcpProtUnitTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_gcpRealmTable_row(struct gcpRealmTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_gcpRealmTable_row(struct gcpRealmTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_gcpRealmTable_row(struct gcpRealmTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_gcpRealmTable_row(struct gcpRealmTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_gcpInterfaceTable_row(struct gcpInterfaceTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_gcpInterfaceTable_row(struct gcpInterfaceTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_gcpInterfaceTable_row(struct gcpInterfaceTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_gcpInterfaceTable_row(struct gcpInterfaceTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_gcpAddressTable_row(struct gcpAddressTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_gcpAddressTable_row(struct gcpAddressTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_gcpAddressTable_row(struct gcpAddressTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_gcpAddressTable_row(struct gcpAddressTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int check_gcpMsTable_row(struct gcpMsTable_data *StorageTmp, struct gcpMsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_gcpMsTable_row(struct gcpMsTable_data *StorageTmp, struct gcpMsTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_gcpMsTable_row(struct gcpMsTable_data *StorageTmp, struct gcpMsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_gcpMsTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_gcpMsTable_row(struct gcpMsTable_data *StorageTmp, struct gcpMsTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	gcpMsTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_gcpMsTable_row(struct gcpMsTable_data *StorageTmp, struct gcpMsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_gcpMsTable_row(struct gcpMsTable_data *StorageTmp, struct gcpMsTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_gcpMsTable_row(StorageOld, NULL);
 }
 
 /**
@@ -4610,6 +5729,64 @@ var_gcpMsTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_gcpMgTable_row(struct gcpMgTable_data *StorageTmp, struct gcpMgTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_gcpMgTable_row(struct gcpMgTable_data *StorageTmp, struct gcpMgTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_gcpMgTable_row(struct gcpMgTable_data *StorageTmp, struct gcpMgTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_gcpMgTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_gcpMgTable_row(struct gcpMgTable_data *StorageTmp, struct gcpMgTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	gcpMgTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_gcpMgTable_row(struct gcpMgTable_data *StorageTmp, struct gcpMgTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_gcpMgTable_row(struct gcpMgTable_data *StorageTmp, struct gcpMgTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_gcpMgTable_row(StorageOld, NULL);
 }
 
 /**
@@ -4785,6 +5962,64 @@ var_gcpMgTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 }
 
 /**
+ * @fn int check_gcpMgcTable_row(struct gcpMgcTable_data *StorageTmp, struct gcpMgcTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_gcpMgcTable_row(struct gcpMgcTable_data *StorageTmp, struct gcpMgcTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_gcpMgcTable_row(struct gcpMgcTable_data *StorageTmp, struct gcpMgcTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_gcpMgcTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_gcpMgcTable_row(struct gcpMgcTable_data *StorageTmp, struct gcpMgcTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	gcpMgcTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_gcpMgcTable_row(struct gcpMgcTable_data *StorageTmp, struct gcpMgcTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_gcpMgcTable_row(struct gcpMgcTable_data *StorageTmp, struct gcpMgcTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_gcpMgcTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_gcpMgcTable_row(struct gcpMgcTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -4956,6 +6191,64 @@ var_gcpMgcTable(struct variable *vp, oid * name, size_t *length, int exact, size
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_gcpLinkageTable_row(struct gcpLinkageTable_data *StorageTmp, struct gcpLinkageTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_gcpLinkageTable_row(struct gcpLinkageTable_data *StorageTmp, struct gcpLinkageTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_gcpLinkageTable_row(struct gcpLinkageTable_data *StorageTmp, struct gcpLinkageTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_gcpLinkageTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_gcpLinkageTable_row(struct gcpLinkageTable_data *StorageTmp, struct gcpLinkageTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	gcpLinkageTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_gcpLinkageTable_row(struct gcpLinkageTable_data *StorageTmp, struct gcpLinkageTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_gcpLinkageTable_row(struct gcpLinkageTable_data *StorageTmp, struct gcpLinkageTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_gcpLinkageTable_row(StorageOld, NULL);
 }
 
 /**
@@ -5146,6 +6439,64 @@ var_gcpLinkageTable(struct variable *vp, oid * name, size_t *length, int exact, 
 }
 
 /**
+ * @fn int check_gcpUdpProfileTable_row(struct gcpUdpProfileTable_data *StorageTmp, struct gcpUdpProfileTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_gcpUdpProfileTable_row(struct gcpUdpProfileTable_data *StorageTmp, struct gcpUdpProfileTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_gcpUdpProfileTable_row(struct gcpUdpProfileTable_data *StorageTmp, struct gcpUdpProfileTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_gcpUdpProfileTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_gcpUdpProfileTable_row(struct gcpUdpProfileTable_data *StorageTmp, struct gcpUdpProfileTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	gcpUdpProfileTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_gcpUdpProfileTable_row(struct gcpUdpProfileTable_data *StorageTmp, struct gcpUdpProfileTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_gcpUdpProfileTable_row(struct gcpUdpProfileTable_data *StorageTmp, struct gcpUdpProfileTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_gcpUdpProfileTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_gcpUdpProfileTable_row(struct gcpUdpProfileTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -5228,6 +6579,64 @@ var_gcpUdpProfileTable(struct variable *vp, oid * name, size_t *length, int exac
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_gcpTcpProfileTable_row(struct gcpTcpProfileTable_data *StorageTmp, struct gcpTcpProfileTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_gcpTcpProfileTable_row(struct gcpTcpProfileTable_data *StorageTmp, struct gcpTcpProfileTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_gcpTcpProfileTable_row(struct gcpTcpProfileTable_data *StorageTmp, struct gcpTcpProfileTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_gcpTcpProfileTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_gcpTcpProfileTable_row(struct gcpTcpProfileTable_data *StorageTmp, struct gcpTcpProfileTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	gcpTcpProfileTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_gcpTcpProfileTable_row(struct gcpTcpProfileTable_data *StorageTmp, struct gcpTcpProfileTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_gcpTcpProfileTable_row(struct gcpTcpProfileTable_data *StorageTmp, struct gcpTcpProfileTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_gcpTcpProfileTable_row(StorageOld, NULL);
 }
 
 /**
@@ -5362,6 +6771,64 @@ var_gcpTcpProfileTable(struct variable *vp, oid * name, size_t *length, int exac
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_gcpSctpProfileTable_row(struct gcpSctpProfileTable_data *StorageTmp, struct gcpSctpProfileTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_gcpSctpProfileTable_row(struct gcpSctpProfileTable_data *StorageTmp, struct gcpSctpProfileTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_gcpSctpProfileTable_row(struct gcpSctpProfileTable_data *StorageTmp, struct gcpSctpProfileTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_gcpSctpProfileTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_gcpSctpProfileTable_row(struct gcpSctpProfileTable_data *StorageTmp, struct gcpSctpProfileTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	gcpSctpProfileTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_gcpSctpProfileTable_row(struct gcpSctpProfileTable_data *StorageTmp, struct gcpSctpProfileTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_gcpSctpProfileTable_row(struct gcpSctpProfileTable_data *StorageTmp, struct gcpSctpProfileTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_gcpSctpProfileTable_row(StorageOld, NULL);
 }
 
 /**
@@ -5548,6 +7015,64 @@ var_gcpSctpProfileTable(struct variable *vp, oid * name, size_t *length, int exa
 }
 
 /**
+ * @fn int check_gcpProtGroupTable_row(struct gcpProtGroupTable_data *StorageTmp, struct gcpProtGroupTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_gcpProtGroupTable_row(struct gcpProtGroupTable_data *StorageTmp, struct gcpProtGroupTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_gcpProtGroupTable_row(struct gcpProtGroupTable_data *StorageTmp, struct gcpProtGroupTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_gcpProtGroupTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_gcpProtGroupTable_row(struct gcpProtGroupTable_data *StorageTmp, struct gcpProtGroupTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	gcpProtGroupTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_gcpProtGroupTable_row(struct gcpProtGroupTable_data *StorageTmp, struct gcpProtGroupTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_gcpProtGroupTable_row(struct gcpProtGroupTable_data *StorageTmp, struct gcpProtGroupTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_gcpProtGroupTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_gcpProtGroupTable_row(struct gcpProtGroupTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -5722,6 +7247,64 @@ var_gcpProtGroupTable(struct variable *vp, oid * name, size_t *length, int exact
 }
 
 /**
+ * @fn int check_gcpSbolTable_row(struct gcpSbolTable_data *StorageTmp, struct gcpSbolTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_gcpSbolTable_row(struct gcpSbolTable_data *StorageTmp, struct gcpSbolTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_gcpSbolTable_row(struct gcpSbolTable_data *StorageTmp, struct gcpSbolTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_gcpSbolTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_gcpSbolTable_row(struct gcpSbolTable_data *StorageTmp, struct gcpSbolTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	gcpSbolTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_gcpSbolTable_row(struct gcpSbolTable_data *StorageTmp, struct gcpSbolTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_gcpSbolTable_row(struct gcpSbolTable_data *StorageTmp, struct gcpSbolTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_gcpSbolTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_gcpSbolTable_row(struct gcpSbolTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -5804,6 +7387,64 @@ var_gcpSbolTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_gcpProtUnitTable_row(struct gcpProtUnitTable_data *StorageTmp, struct gcpProtUnitTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_gcpProtUnitTable_row(struct gcpProtUnitTable_data *StorageTmp, struct gcpProtUnitTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_gcpProtUnitTable_row(struct gcpProtUnitTable_data *StorageTmp, struct gcpProtUnitTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_gcpProtUnitTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_gcpProtUnitTable_row(struct gcpProtUnitTable_data *StorageTmp, struct gcpProtUnitTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	gcpProtUnitTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_gcpProtUnitTable_row(struct gcpProtUnitTable_data *StorageTmp, struct gcpProtUnitTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_gcpProtUnitTable_row(struct gcpProtUnitTable_data *StorageTmp, struct gcpProtUnitTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_gcpProtUnitTable_row(StorageOld, NULL);
 }
 
 /**
@@ -5957,6 +7598,64 @@ var_gcpProtUnitTable(struct variable *vp, oid * name, size_t *length, int exact,
 }
 
 /**
+ * @fn int check_gcpRealmTable_row(struct gcpRealmTable_data *StorageTmp, struct gcpRealmTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_gcpRealmTable_row(struct gcpRealmTable_data *StorageTmp, struct gcpRealmTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_gcpRealmTable_row(struct gcpRealmTable_data *StorageTmp, struct gcpRealmTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_gcpRealmTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_gcpRealmTable_row(struct gcpRealmTable_data *StorageTmp, struct gcpRealmTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	gcpRealmTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_gcpRealmTable_row(struct gcpRealmTable_data *StorageTmp, struct gcpRealmTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_gcpRealmTable_row(struct gcpRealmTable_data *StorageTmp, struct gcpRealmTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_gcpRealmTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_gcpRealmTable_row(struct gcpRealmTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -6068,6 +7767,64 @@ var_gcpRealmTable(struct variable *vp, oid * name, size_t *length, int exact, si
 }
 
 /**
+ * @fn int check_gcpInterfaceTable_row(struct gcpInterfaceTable_data *StorageTmp, struct gcpInterfaceTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_gcpInterfaceTable_row(struct gcpInterfaceTable_data *StorageTmp, struct gcpInterfaceTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_gcpInterfaceTable_row(struct gcpInterfaceTable_data *StorageTmp, struct gcpInterfaceTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_gcpInterfaceTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_gcpInterfaceTable_row(struct gcpInterfaceTable_data *StorageTmp, struct gcpInterfaceTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	gcpInterfaceTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_gcpInterfaceTable_row(struct gcpInterfaceTable_data *StorageTmp, struct gcpInterfaceTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_gcpInterfaceTable_row(struct gcpInterfaceTable_data *StorageTmp, struct gcpInterfaceTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_gcpInterfaceTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_gcpInterfaceTable_row(struct gcpInterfaceTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -6164,14 +7921,14 @@ var_gcpInterfaceTable(struct variable *vp, oid * name, size_t *length, int exact
 		*write_method = write_gcpInterfaceTermId;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->gcpInterfaceTermId;
+		*var_len = StorageTmp->gcpInterfaceTermIdLen;
 		rval = (u_char *) StorageTmp->gcpInterfaceTermId;
 		break;
 	case (u_char) GCPINTERFACETERMPATH:	/* Create */
 		*write_method = write_gcpInterfaceTermPath;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->gcpInterfaceTermPath;
+		*var_len = StorageTmp->gcpInterfaceTermPathLen;
 		rval = (u_char *) StorageTmp->gcpInterfaceTermPath;
 		break;
 	case (u_char) GCPINTERFACEROWSTATUS:	/* Create */
@@ -6185,6 +7942,64 @@ var_gcpInterfaceTable(struct variable *vp, oid * name, size_t *length, int exact
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_gcpAddressTable_row(struct gcpAddressTable_data *StorageTmp, struct gcpAddressTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_gcpAddressTable_row(struct gcpAddressTable_data *StorageTmp, struct gcpAddressTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_gcpAddressTable_row(struct gcpAddressTable_data *StorageTmp, struct gcpAddressTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_gcpAddressTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_gcpAddressTable_row(struct gcpAddressTable_data *StorageTmp, struct gcpAddressTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	gcpAddressTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_gcpAddressTable_row(struct gcpAddressTable_data *StorageTmp, struct gcpAddressTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_gcpAddressTable_row(struct gcpAddressTable_data *StorageTmp, struct gcpAddressTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_gcpAddressTable_row(StorageOld, NULL);
 }
 
 /**
@@ -6307,17 +8122,17 @@ var_gcpAddressTable(struct variable *vp, oid * name, size_t *length, int exact, 
 int
 write_gcpMsName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct gcpMsTable_data *StorageTmp = NULL;
+	struct gcpMsTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpMsName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpMsTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpMsRowStatus) {
@@ -6340,33 +8155,73 @@ write_gcpMsName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpMsName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpMsTable_old) == NULL)
+			if (StorageTmp->gcpMsTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMsTable_old = gcpMsTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMsTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->gcpMsName);
+		StorageTmp->gcpMsName = string;
+		StorageTmp->gcpMsNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMsTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpMsTable_tsts == 0)
+				if ((ret = check_gcpMsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMsTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpMsName for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpMsName;
-		old_length = StorageTmp->gcpMsNameLen;
-		StorageTmp->gcpMsName = string;
-		StorageTmp->gcpMsNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpMsTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMsTable_sets == 0)
+				if ((ret = update_gcpMsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMsTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMsTable_old) != NULL) {
+			gcpMsTable_destroy(&StorageTmp->gcpMsTable_old);
+			StorageTmp->gcpMsTable_rsvs = 0;
+			StorageTmp->gcpMsTable_tsts = 0;
+			StorageTmp->gcpMsTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpMsName = old_value;
-		StorageTmp->gcpMsNameLen = old_length;
+		if ((StorageOld = StorageTmp->gcpMsTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMsTable_sets == 0)
+			revert_gcpMsTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->gcpMsTable_old) == NULL)
+			break;
+		if (StorageOld->gcpMsName != NULL) {
+			SNMP_FREE(StorageTmp->gcpMsName);
+			StorageTmp->gcpMsName = StorageOld->gcpMsName;
+			StorageTmp->gcpMsNameLen = StorageOld->gcpMsNameLen;
+			StorageOld->gcpMsName = NULL;
+			StorageOld->gcpMsNameLen = 0;
+		}
+		if (--StorageTmp->gcpMsTable_rsvs == 0)
+			gcpMsTable_destroy(&StorageTmp->gcpMsTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6386,17 +8241,17 @@ write_gcpMsName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 int
 write_gcpMsAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct gcpMsTable_data *StorageTmp = NULL;
+	struct gcpMsTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpMsAlarmStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpMsTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpMsRowStatus) {
@@ -6426,33 +8281,73 @@ write_gcpMsAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpMsTable_old) == NULL)
+			if (StorageTmp->gcpMsTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMsTable_old = gcpMsTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMsTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->gcpMsAlarmStatus);
+		StorageTmp->gcpMsAlarmStatus = string;
+		StorageTmp->gcpMsAlarmStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMsTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpMsTable_tsts == 0)
+				if ((ret = check_gcpMsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMsTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpMsAlarmStatus for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpMsAlarmStatus;
-		old_length = StorageTmp->gcpMsAlarmStatusLen;
-		StorageTmp->gcpMsAlarmStatus = string;
-		StorageTmp->gcpMsAlarmStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpMsTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMsTable_sets == 0)
+				if ((ret = update_gcpMsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMsTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMsTable_old) != NULL) {
+			gcpMsTable_destroy(&StorageTmp->gcpMsTable_old);
+			StorageTmp->gcpMsTable_rsvs = 0;
+			StorageTmp->gcpMsTable_tsts = 0;
+			StorageTmp->gcpMsTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpMsAlarmStatus = old_value;
-		StorageTmp->gcpMsAlarmStatusLen = old_length;
+		if ((StorageOld = StorageTmp->gcpMsTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMsTable_sets == 0)
+			revert_gcpMsTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->gcpMsTable_old) == NULL)
+			break;
+		if (StorageOld->gcpMsAlarmStatus != NULL) {
+			SNMP_FREE(StorageTmp->gcpMsAlarmStatus);
+			StorageTmp->gcpMsAlarmStatus = StorageOld->gcpMsAlarmStatus;
+			StorageTmp->gcpMsAlarmStatusLen = StorageOld->gcpMsAlarmStatusLen;
+			StorageOld->gcpMsAlarmStatus = NULL;
+			StorageOld->gcpMsAlarmStatusLen = 0;
+		}
+		if (--StorageTmp->gcpMsTable_rsvs == 0)
+			gcpMsTable_destroy(&StorageTmp->gcpMsTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6472,17 +8367,17 @@ write_gcpMsAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_gcpMsUserLabel(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct gcpMsTable_data *StorageTmp = NULL;
+	struct gcpMsTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpMsUserLabel entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpMsTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpMsRowStatus) {
@@ -6505,33 +8400,73 @@ write_gcpMsUserLabel(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpMsUserLabel: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpMsTable_old) == NULL)
+			if (StorageTmp->gcpMsTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMsTable_old = gcpMsTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMsTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->gcpMsUserLabel);
+		StorageTmp->gcpMsUserLabel = string;
+		StorageTmp->gcpMsUserLabelLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMsTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpMsTable_tsts == 0)
+				if ((ret = check_gcpMsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMsTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpMsUserLabel for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpMsUserLabel;
-		old_length = StorageTmp->gcpMsUserLabelLen;
-		StorageTmp->gcpMsUserLabel = string;
-		StorageTmp->gcpMsUserLabelLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpMsTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMsTable_sets == 0)
+				if ((ret = update_gcpMsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMsTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMsTable_old) != NULL) {
+			gcpMsTable_destroy(&StorageTmp->gcpMsTable_old);
+			StorageTmp->gcpMsTable_rsvs = 0;
+			StorageTmp->gcpMsTable_tsts = 0;
+			StorageTmp->gcpMsTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpMsUserLabel = old_value;
-		StorageTmp->gcpMsUserLabelLen = old_length;
+		if ((StorageOld = StorageTmp->gcpMsTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMsTable_sets == 0)
+			revert_gcpMsTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->gcpMsTable_old) == NULL)
+			break;
+		if (StorageOld->gcpMsUserLabel != NULL) {
+			SNMP_FREE(StorageTmp->gcpMsUserLabel);
+			StorageTmp->gcpMsUserLabel = StorageOld->gcpMsUserLabel;
+			StorageTmp->gcpMsUserLabelLen = StorageOld->gcpMsUserLabelLen;
+			StorageOld->gcpMsUserLabel = NULL;
+			StorageOld->gcpMsUserLabelLen = 0;
+		}
+		if (--StorageTmp->gcpMsTable_rsvs == 0)
+			gcpMsTable_destroy(&StorageTmp->gcpMsTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6551,17 +8486,17 @@ write_gcpMsUserLabel(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_gcpMsAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct gcpMsTable_data *StorageTmp = NULL;
+	struct gcpMsTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpMsAsaProfilePointer entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpMsTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpMsRowStatus) {
@@ -6584,31 +8519,71 @@ write_gcpMsAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, s
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value zeroDotZero */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpMsTable_old) == NULL)
+			if (StorageTmp->gcpMsTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMsTable_old = gcpMsTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMsTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->gcpMsAsaProfilePointer);
+		StorageTmp->gcpMsAsaProfilePointer = objid;
+		StorageTmp->gcpMsAsaProfilePointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMsTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpMsTable_tsts == 0)
+				if ((ret = check_gcpMsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMsTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpMsAsaProfilePointer for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpMsAsaProfilePointer;
-		old_length = StorageTmp->gcpMsAsaProfilePointerLen;
-		StorageTmp->gcpMsAsaProfilePointer = objid;
-		StorageTmp->gcpMsAsaProfilePointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpMsTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMsTable_sets == 0)
+				if ((ret = update_gcpMsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMsTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMsTable_old) != NULL) {
+			gcpMsTable_destroy(&StorageTmp->gcpMsTable_old);
+			StorageTmp->gcpMsTable_rsvs = 0;
+			StorageTmp->gcpMsTable_tsts = 0;
+			StorageTmp->gcpMsTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpMsAsaProfilePointer = old_value;
-		StorageTmp->gcpMsAsaProfilePointerLen = old_length;
+		if ((StorageOld = StorageTmp->gcpMsTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMsTable_sets == 0)
+			revert_gcpMsTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->gcpMsTable_old) == NULL)
+			break;
+		if (StorageOld->gcpMsAsaProfilePointer != NULL) {
+			SNMP_FREE(StorageTmp->gcpMsAsaProfilePointer);
+			StorageTmp->gcpMsAsaProfilePointer = StorageOld->gcpMsAsaProfilePointer;
+			StorageTmp->gcpMsAsaProfilePointerLen = StorageOld->gcpMsAsaProfilePointerLen;
+			StorageOld->gcpMsAsaProfilePointer = NULL;
+			StorageOld->gcpMsAsaProfilePointerLen = 0;
+		}
+		if (--StorageTmp->gcpMsTable_rsvs == 0)
+			gcpMsTable_destroy(&StorageTmp->gcpMsTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6628,17 +8603,17 @@ write_gcpMsAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, s
 int
 write_gcpMsNetworkElementAliases(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct gcpMsTable_data *StorageTmp = NULL;
+	struct gcpMsTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpMsNetworkElementAliases entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpMsTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpMsRowStatus) {
@@ -6661,33 +8636,73 @@ write_gcpMsNetworkElementAliases(int action, u_char *var_val, u_char var_val_typ
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpMsNetworkElementAliases: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpMsTable_old) == NULL)
+			if (StorageTmp->gcpMsTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMsTable_old = gcpMsTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMsTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->gcpMsNetworkElementAliases);
+		StorageTmp->gcpMsNetworkElementAliases = string;
+		StorageTmp->gcpMsNetworkElementAliasesLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMsTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpMsTable_tsts == 0)
+				if ((ret = check_gcpMsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMsTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpMsNetworkElementAliases for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpMsNetworkElementAliases;
-		old_length = StorageTmp->gcpMsNetworkElementAliasesLen;
-		StorageTmp->gcpMsNetworkElementAliases = string;
-		StorageTmp->gcpMsNetworkElementAliasesLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpMsTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMsTable_sets == 0)
+				if ((ret = update_gcpMsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMsTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMsTable_old) != NULL) {
+			gcpMsTable_destroy(&StorageTmp->gcpMsTable_old);
+			StorageTmp->gcpMsTable_rsvs = 0;
+			StorageTmp->gcpMsTable_tsts = 0;
+			StorageTmp->gcpMsTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpMsNetworkElementAliases = old_value;
-		StorageTmp->gcpMsNetworkElementAliasesLen = old_length;
+		if ((StorageOld = StorageTmp->gcpMsTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMsTable_sets == 0)
+			revert_gcpMsTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->gcpMsTable_old) == NULL)
+			break;
+		if (StorageOld->gcpMsNetworkElementAliases != NULL) {
+			SNMP_FREE(StorageTmp->gcpMsNetworkElementAliases);
+			StorageTmp->gcpMsNetworkElementAliases = StorageOld->gcpMsNetworkElementAliases;
+			StorageTmp->gcpMsNetworkElementAliasesLen = StorageOld->gcpMsNetworkElementAliasesLen;
+			StorageOld->gcpMsNetworkElementAliases = NULL;
+			StorageOld->gcpMsNetworkElementAliasesLen = 0;
+		}
+		if (--StorageTmp->gcpMsTable_rsvs == 0)
+			gcpMsTable_destroy(&StorageTmp->gcpMsTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6707,12 +8722,14 @@ write_gcpMsNetworkElementAliases(int action, u_char *var_val, u_char var_val_typ
 int
 write_gcpMgLocation(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMgTable_data *StorageTmp = NULL;
+	struct gcpMgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpMgLocation entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpMgTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6745,22 +8762,61 @@ write_gcpMgLocation(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpMgLocation: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			if (StorageTmp->gcpMgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMgTable_old = gcpMgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMgTable_rsvs++;
+		StorageTmp->gcpMgLocation = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpMgTable_tsts == 0)
+				if ((ret = check_gcpMgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpMgLocation for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpMgLocation;
-		StorageTmp->gcpMgLocation = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMgTable_sets == 0)
+				if ((ret = update_gcpMgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			gcpMgTable_destroy(&StorageTmp->gcpMgTable_old);
+			StorageTmp->gcpMgTable_rsvs = 0;
+			StorageTmp->gcpMgTable_tsts = 0;
+			StorageTmp->gcpMgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpMgLocation = old_value;
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMgTable_sets == 0)
+			revert_gcpMgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			break;
+		StorageTmp->gcpMgLocation = StorageOld->gcpMgLocation;
+		if (--StorageTmp->gcpMgTable_rsvs == 0)
+			gcpMgTable_destroy(&StorageTmp->gcpMgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6780,17 +8836,17 @@ write_gcpMgLocation(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_gcpMgName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct gcpMgTable_data *StorageTmp = NULL;
+	struct gcpMgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpMgName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpMgTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpMgRowStatus) {
@@ -6813,33 +8869,73 @@ write_gcpMgName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpMgName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			if (StorageTmp->gcpMgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMgTable_old = gcpMgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMgTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->gcpMgName);
+		StorageTmp->gcpMgName = string;
+		StorageTmp->gcpMgNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpMgTable_tsts == 0)
+				if ((ret = check_gcpMgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpMgName for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpMgName;
-		old_length = StorageTmp->gcpMgNameLen;
-		StorageTmp->gcpMgName = string;
-		StorageTmp->gcpMgNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMgTable_sets == 0)
+				if ((ret = update_gcpMgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			gcpMgTable_destroy(&StorageTmp->gcpMgTable_old);
+			StorageTmp->gcpMgTable_rsvs = 0;
+			StorageTmp->gcpMgTable_tsts = 0;
+			StorageTmp->gcpMgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpMgName = old_value;
-		StorageTmp->gcpMgNameLen = old_length;
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMgTable_sets == 0)
+			revert_gcpMgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			break;
+		if (StorageOld->gcpMgName != NULL) {
+			SNMP_FREE(StorageTmp->gcpMgName);
+			StorageTmp->gcpMgName = StorageOld->gcpMgName;
+			StorageTmp->gcpMgNameLen = StorageOld->gcpMgNameLen;
+			StorageOld->gcpMgName = NULL;
+			StorageOld->gcpMgNameLen = 0;
+		}
+		if (--StorageTmp->gcpMgTable_rsvs == 0)
+			gcpMgTable_destroy(&StorageTmp->gcpMgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6859,17 +8955,17 @@ write_gcpMgName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 int
 write_gcpMgDomainName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct gcpMgTable_data *StorageTmp = NULL;
+	struct gcpMgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpMgDomainName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpMgTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpMgRowStatus) {
@@ -6892,33 +8988,73 @@ write_gcpMgDomainName(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpMgDomainName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			if (StorageTmp->gcpMgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMgTable_old = gcpMgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMgTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->gcpMgDomainName);
+		StorageTmp->gcpMgDomainName = string;
+		StorageTmp->gcpMgDomainNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpMgTable_tsts == 0)
+				if ((ret = check_gcpMgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpMgDomainName for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpMgDomainName;
-		old_length = StorageTmp->gcpMgDomainNameLen;
-		StorageTmp->gcpMgDomainName = string;
-		StorageTmp->gcpMgDomainNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMgTable_sets == 0)
+				if ((ret = update_gcpMgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			gcpMgTable_destroy(&StorageTmp->gcpMgTable_old);
+			StorageTmp->gcpMgTable_rsvs = 0;
+			StorageTmp->gcpMgTable_tsts = 0;
+			StorageTmp->gcpMgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpMgDomainName = old_value;
-		StorageTmp->gcpMgDomainNameLen = old_length;
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMgTable_sets == 0)
+			revert_gcpMgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			break;
+		if (StorageOld->gcpMgDomainName != NULL) {
+			SNMP_FREE(StorageTmp->gcpMgDomainName);
+			StorageTmp->gcpMgDomainName = StorageOld->gcpMgDomainName;
+			StorageTmp->gcpMgDomainNameLen = StorageOld->gcpMgDomainNameLen;
+			StorageOld->gcpMgDomainName = NULL;
+			StorageOld->gcpMgDomainNameLen = 0;
+		}
+		if (--StorageTmp->gcpMgTable_rsvs == 0)
+			gcpMgTable_destroy(&StorageTmp->gcpMgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6938,17 +9074,17 @@ write_gcpMgDomainName(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_gcpMgDeviceName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct gcpMgTable_data *StorageTmp = NULL;
+	struct gcpMgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpMgDeviceName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpMgTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpMgRowStatus) {
@@ -6971,33 +9107,73 @@ write_gcpMgDeviceName(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpMgDeviceName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			if (StorageTmp->gcpMgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMgTable_old = gcpMgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMgTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->gcpMgDeviceName);
+		StorageTmp->gcpMgDeviceName = string;
+		StorageTmp->gcpMgDeviceNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpMgTable_tsts == 0)
+				if ((ret = check_gcpMgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpMgDeviceName for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpMgDeviceName;
-		old_length = StorageTmp->gcpMgDeviceNameLen;
-		StorageTmp->gcpMgDeviceName = string;
-		StorageTmp->gcpMgDeviceNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMgTable_sets == 0)
+				if ((ret = update_gcpMgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			gcpMgTable_destroy(&StorageTmp->gcpMgTable_old);
+			StorageTmp->gcpMgTable_rsvs = 0;
+			StorageTmp->gcpMgTable_tsts = 0;
+			StorageTmp->gcpMgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpMgDeviceName = old_value;
-		StorageTmp->gcpMgDeviceNameLen = old_length;
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMgTable_sets == 0)
+			revert_gcpMgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			break;
+		if (StorageOld->gcpMgDeviceName != NULL) {
+			SNMP_FREE(StorageTmp->gcpMgDeviceName);
+			StorageTmp->gcpMgDeviceName = StorageOld->gcpMgDeviceName;
+			StorageTmp->gcpMgDeviceNameLen = StorageOld->gcpMgDeviceNameLen;
+			StorageOld->gcpMgDeviceName = NULL;
+			StorageOld->gcpMgDeviceNameLen = 0;
+		}
+		if (--StorageTmp->gcpMgTable_rsvs == 0)
+			gcpMgTable_destroy(&StorageTmp->gcpMgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7017,17 +9193,17 @@ write_gcpMgDeviceName(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_gcpMgMtpAddress(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct gcpMgTable_data *StorageTmp = NULL;
+	struct gcpMgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpMgMtpAddress entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpMgTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpMgRowStatus) {
@@ -7050,33 +9226,73 @@ write_gcpMgMtpAddress(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpMgMtpAddress: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			if (StorageTmp->gcpMgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMgTable_old = gcpMgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMgTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->gcpMgMtpAddress);
+		StorageTmp->gcpMgMtpAddress = string;
+		StorageTmp->gcpMgMtpAddressLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpMgTable_tsts == 0)
+				if ((ret = check_gcpMgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpMgMtpAddress for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpMgMtpAddress;
-		old_length = StorageTmp->gcpMgMtpAddressLen;
-		StorageTmp->gcpMgMtpAddress = string;
-		StorageTmp->gcpMgMtpAddressLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMgTable_sets == 0)
+				if ((ret = update_gcpMgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			gcpMgTable_destroy(&StorageTmp->gcpMgTable_old);
+			StorageTmp->gcpMgTable_rsvs = 0;
+			StorageTmp->gcpMgTable_tsts = 0;
+			StorageTmp->gcpMgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpMgMtpAddress = old_value;
-		StorageTmp->gcpMgMtpAddressLen = old_length;
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMgTable_sets == 0)
+			revert_gcpMgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			break;
+		if (StorageOld->gcpMgMtpAddress != NULL) {
+			SNMP_FREE(StorageTmp->gcpMgMtpAddress);
+			StorageTmp->gcpMgMtpAddress = StorageOld->gcpMgMtpAddress;
+			StorageTmp->gcpMgMtpAddressLen = StorageOld->gcpMgMtpAddressLen;
+			StorageOld->gcpMgMtpAddress = NULL;
+			StorageOld->gcpMgMtpAddressLen = 0;
+		}
+		if (--StorageTmp->gcpMgTable_rsvs == 0)
+			gcpMgTable_destroy(&StorageTmp->gcpMgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7096,12 +9312,14 @@ write_gcpMgMtpAddress(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_gcpMgAdminState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMgTable_data *StorageTmp = NULL;
+	struct gcpMgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpMgAdminState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpMgTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7135,22 +9353,61 @@ write_gcpMgAdminState(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpMgAdminState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			if (StorageTmp->gcpMgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMgTable_old = gcpMgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMgTable_rsvs++;
+		StorageTmp->gcpMgAdminState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpMgTable_tsts == 0)
+				if ((ret = check_gcpMgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpMgAdminState for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpMgAdminState;
-		StorageTmp->gcpMgAdminState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMgTable_sets == 0)
+				if ((ret = update_gcpMgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			gcpMgTable_destroy(&StorageTmp->gcpMgTable_old);
+			StorageTmp->gcpMgTable_rsvs = 0;
+			StorageTmp->gcpMgTable_tsts = 0;
+			StorageTmp->gcpMgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpMgAdminState = old_value;
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMgTable_sets == 0)
+			revert_gcpMgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			break;
+		StorageTmp->gcpMgAdminState = StorageOld->gcpMgAdminState;
+		if (--StorageTmp->gcpMgTable_rsvs == 0)
+			gcpMgTable_destroy(&StorageTmp->gcpMgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7170,17 +9427,17 @@ write_gcpMgAdminState(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_gcpMgAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct gcpMgTable_data *StorageTmp = NULL;
+	struct gcpMgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpMgAlarmStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpMgTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpMgRowStatus) {
@@ -7210,33 +9467,73 @@ write_gcpMgAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			if (StorageTmp->gcpMgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMgTable_old = gcpMgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMgTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->gcpMgAlarmStatus);
+		StorageTmp->gcpMgAlarmStatus = string;
+		StorageTmp->gcpMgAlarmStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpMgTable_tsts == 0)
+				if ((ret = check_gcpMgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpMgAlarmStatus for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpMgAlarmStatus;
-		old_length = StorageTmp->gcpMgAlarmStatusLen;
-		StorageTmp->gcpMgAlarmStatus = string;
-		StorageTmp->gcpMgAlarmStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMgTable_sets == 0)
+				if ((ret = update_gcpMgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			gcpMgTable_destroy(&StorageTmp->gcpMgTable_old);
+			StorageTmp->gcpMgTable_rsvs = 0;
+			StorageTmp->gcpMgTable_tsts = 0;
+			StorageTmp->gcpMgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpMgAlarmStatus = old_value;
-		StorageTmp->gcpMgAlarmStatusLen = old_length;
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMgTable_sets == 0)
+			revert_gcpMgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			break;
+		if (StorageOld->gcpMgAlarmStatus != NULL) {
+			SNMP_FREE(StorageTmp->gcpMgAlarmStatus);
+			StorageTmp->gcpMgAlarmStatus = StorageOld->gcpMgAlarmStatus;
+			StorageTmp->gcpMgAlarmStatusLen = StorageOld->gcpMgAlarmStatusLen;
+			StorageOld->gcpMgAlarmStatus = NULL;
+			StorageOld->gcpMgAlarmStatusLen = 0;
+		}
+		if (--StorageTmp->gcpMgTable_rsvs == 0)
+			gcpMgTable_destroy(&StorageTmp->gcpMgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7256,17 +9553,17 @@ write_gcpMgAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_gcpMgAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct gcpMgTable_data *StorageTmp = NULL;
+	struct gcpMgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpMgAsaProfilePointer entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpMgTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpMgRowStatus) {
@@ -7289,31 +9586,71 @@ write_gcpMgAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, s
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value zeroDotZero */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			if (StorageTmp->gcpMgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMgTable_old = gcpMgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMgTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->gcpMgAsaProfilePointer);
+		StorageTmp->gcpMgAsaProfilePointer = objid;
+		StorageTmp->gcpMgAsaProfilePointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpMgTable_tsts == 0)
+				if ((ret = check_gcpMgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpMgAsaProfilePointer for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpMgAsaProfilePointer;
-		old_length = StorageTmp->gcpMgAsaProfilePointerLen;
-		StorageTmp->gcpMgAsaProfilePointer = objid;
-		StorageTmp->gcpMgAsaProfilePointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMgTable_sets == 0)
+				if ((ret = update_gcpMgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			gcpMgTable_destroy(&StorageTmp->gcpMgTable_old);
+			StorageTmp->gcpMgTable_rsvs = 0;
+			StorageTmp->gcpMgTable_tsts = 0;
+			StorageTmp->gcpMgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpMgAsaProfilePointer = old_value;
-		StorageTmp->gcpMgAsaProfilePointerLen = old_length;
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMgTable_sets == 0)
+			revert_gcpMgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			break;
+		if (StorageOld->gcpMgAsaProfilePointer != NULL) {
+			SNMP_FREE(StorageTmp->gcpMgAsaProfilePointer);
+			StorageTmp->gcpMgAsaProfilePointer = StorageOld->gcpMgAsaProfilePointer;
+			StorageTmp->gcpMgAsaProfilePointerLen = StorageOld->gcpMgAsaProfilePointerLen;
+			StorageOld->gcpMgAsaProfilePointer = NULL;
+			StorageOld->gcpMgAsaProfilePointerLen = 0;
+		}
+		if (--StorageTmp->gcpMgTable_rsvs == 0)
+			gcpMgTable_destroy(&StorageTmp->gcpMgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7333,12 +9670,14 @@ write_gcpMgAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, s
 int
 write_gcpMgPg(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpMgTable_data *StorageTmp = NULL;
+	struct gcpMgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpMgPg entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpMgTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7363,22 +9702,61 @@ write_gcpMgPg(int action, u_char *var_val, u_char var_val_type, size_t var_val_l
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpMgPg: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			if (StorageTmp->gcpMgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMgTable_old = gcpMgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMgTable_rsvs++;
+		StorageTmp->gcpMgPg = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpMgTable_tsts == 0)
+				if ((ret = check_gcpMgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpMgPg for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpMgPg;
-		StorageTmp->gcpMgPg = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMgTable_sets == 0)
+				if ((ret = update_gcpMgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			gcpMgTable_destroy(&StorageTmp->gcpMgTable_old);
+			StorageTmp->gcpMgTable_rsvs = 0;
+			StorageTmp->gcpMgTable_tsts = 0;
+			StorageTmp->gcpMgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpMgPg = old_value;
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMgTable_sets == 0)
+			revert_gcpMgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			break;
+		StorageTmp->gcpMgPg = StorageOld->gcpMgPg;
+		if (--StorageTmp->gcpMgTable_rsvs == 0)
+			gcpMgTable_destroy(&StorageTmp->gcpMgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7398,12 +9776,14 @@ write_gcpMgPg(int action, u_char *var_val, u_char var_val_type, size_t var_val_l
 int
 write_gcpMgStandbyStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMgTable_data *StorageTmp = NULL;
+	struct gcpMgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpMgStandbyStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpMgTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7437,22 +9817,61 @@ write_gcpMgStandbyStatus(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpMgStandbyStatus: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			if (StorageTmp->gcpMgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMgTable_old = gcpMgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMgTable_rsvs++;
+		StorageTmp->gcpMgStandbyStatus = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpMgTable_tsts == 0)
+				if ((ret = check_gcpMgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpMgStandbyStatus for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpMgStandbyStatus;
-		StorageTmp->gcpMgStandbyStatus = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMgTable_sets == 0)
+				if ((ret = update_gcpMgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+			gcpMgTable_destroy(&StorageTmp->gcpMgTable_old);
+			StorageTmp->gcpMgTable_rsvs = 0;
+			StorageTmp->gcpMgTable_tsts = 0;
+			StorageTmp->gcpMgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpMgStandbyStatus = old_value;
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMgTable_sets == 0)
+			revert_gcpMgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+			break;
+		StorageTmp->gcpMgStandbyStatus = StorageOld->gcpMgStandbyStatus;
+		if (--StorageTmp->gcpMgTable_rsvs == 0)
+			gcpMgTable_destroy(&StorageTmp->gcpMgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7472,12 +9891,14 @@ write_gcpMgStandbyStatus(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_gcpMgcLocation(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMgcTable_data *StorageTmp = NULL;
+	struct gcpMgcTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpMgcLocation entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpMgcTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7510,22 +9931,61 @@ write_gcpMgcLocation(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpMgcLocation: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			if (StorageTmp->gcpMgcTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMgcTable_old = gcpMgcTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMgcTable_rsvs++;
+		StorageTmp->gcpMgcLocation = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpMgcTable_tsts == 0)
+				if ((ret = check_gcpMgcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgcTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpMgcLocation for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpMgcLocation;
-		StorageTmp->gcpMgcLocation = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMgcTable_sets == 0)
+				if ((ret = update_gcpMgcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgcTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			gcpMgcTable_destroy(&StorageTmp->gcpMgcTable_old);
+			StorageTmp->gcpMgcTable_rsvs = 0;
+			StorageTmp->gcpMgcTable_tsts = 0;
+			StorageTmp->gcpMgcTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpMgcLocation = old_value;
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMgcTable_sets == 0)
+			revert_gcpMgcTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			break;
+		StorageTmp->gcpMgcLocation = StorageOld->gcpMgcLocation;
+		if (--StorageTmp->gcpMgcTable_rsvs == 0)
+			gcpMgcTable_destroy(&StorageTmp->gcpMgcTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7545,17 +10005,17 @@ write_gcpMgcLocation(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_gcpMgcName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct gcpMgcTable_data *StorageTmp = NULL;
+	struct gcpMgcTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpMgcName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpMgcTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpMgcRowStatus) {
@@ -7578,33 +10038,73 @@ write_gcpMgcName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpMgcName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			if (StorageTmp->gcpMgcTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMgcTable_old = gcpMgcTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMgcTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->gcpMgcName);
+		StorageTmp->gcpMgcName = string;
+		StorageTmp->gcpMgcNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpMgcTable_tsts == 0)
+				if ((ret = check_gcpMgcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgcTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpMgcName for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpMgcName;
-		old_length = StorageTmp->gcpMgcNameLen;
-		StorageTmp->gcpMgcName = string;
-		StorageTmp->gcpMgcNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMgcTable_sets == 0)
+				if ((ret = update_gcpMgcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgcTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			gcpMgcTable_destroy(&StorageTmp->gcpMgcTable_old);
+			StorageTmp->gcpMgcTable_rsvs = 0;
+			StorageTmp->gcpMgcTable_tsts = 0;
+			StorageTmp->gcpMgcTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpMgcName = old_value;
-		StorageTmp->gcpMgcNameLen = old_length;
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMgcTable_sets == 0)
+			revert_gcpMgcTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			break;
+		if (StorageOld->gcpMgcName != NULL) {
+			SNMP_FREE(StorageTmp->gcpMgcName);
+			StorageTmp->gcpMgcName = StorageOld->gcpMgcName;
+			StorageTmp->gcpMgcNameLen = StorageOld->gcpMgcNameLen;
+			StorageOld->gcpMgcName = NULL;
+			StorageOld->gcpMgcNameLen = 0;
+		}
+		if (--StorageTmp->gcpMgcTable_rsvs == 0)
+			gcpMgcTable_destroy(&StorageTmp->gcpMgcTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7624,17 +10124,17 @@ write_gcpMgcName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 int
 write_gcpMgcDomainName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct gcpMgcTable_data *StorageTmp = NULL;
+	struct gcpMgcTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpMgcDomainName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpMgcTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpMgcRowStatus) {
@@ -7657,33 +10157,73 @@ write_gcpMgcDomainName(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpMgcDomainName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			if (StorageTmp->gcpMgcTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMgcTable_old = gcpMgcTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMgcTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->gcpMgcDomainName);
+		StorageTmp->gcpMgcDomainName = string;
+		StorageTmp->gcpMgcDomainNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpMgcTable_tsts == 0)
+				if ((ret = check_gcpMgcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgcTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpMgcDomainName for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpMgcDomainName;
-		old_length = StorageTmp->gcpMgcDomainNameLen;
-		StorageTmp->gcpMgcDomainName = string;
-		StorageTmp->gcpMgcDomainNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMgcTable_sets == 0)
+				if ((ret = update_gcpMgcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgcTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			gcpMgcTable_destroy(&StorageTmp->gcpMgcTable_old);
+			StorageTmp->gcpMgcTable_rsvs = 0;
+			StorageTmp->gcpMgcTable_tsts = 0;
+			StorageTmp->gcpMgcTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpMgcDomainName = old_value;
-		StorageTmp->gcpMgcDomainNameLen = old_length;
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMgcTable_sets == 0)
+			revert_gcpMgcTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			break;
+		if (StorageOld->gcpMgcDomainName != NULL) {
+			SNMP_FREE(StorageTmp->gcpMgcDomainName);
+			StorageTmp->gcpMgcDomainName = StorageOld->gcpMgcDomainName;
+			StorageTmp->gcpMgcDomainNameLen = StorageOld->gcpMgcDomainNameLen;
+			StorageOld->gcpMgcDomainName = NULL;
+			StorageOld->gcpMgcDomainNameLen = 0;
+		}
+		if (--StorageTmp->gcpMgcTable_rsvs == 0)
+			gcpMgcTable_destroy(&StorageTmp->gcpMgcTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7703,17 +10243,17 @@ write_gcpMgcDomainName(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_gcpMgcDeviceName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct gcpMgcTable_data *StorageTmp = NULL;
+	struct gcpMgcTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpMgcDeviceName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpMgcTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpMgcRowStatus) {
@@ -7736,33 +10276,73 @@ write_gcpMgcDeviceName(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpMgcDeviceName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			if (StorageTmp->gcpMgcTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMgcTable_old = gcpMgcTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMgcTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->gcpMgcDeviceName);
+		StorageTmp->gcpMgcDeviceName = string;
+		StorageTmp->gcpMgcDeviceNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpMgcTable_tsts == 0)
+				if ((ret = check_gcpMgcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgcTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpMgcDeviceName for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpMgcDeviceName;
-		old_length = StorageTmp->gcpMgcDeviceNameLen;
-		StorageTmp->gcpMgcDeviceName = string;
-		StorageTmp->gcpMgcDeviceNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMgcTable_sets == 0)
+				if ((ret = update_gcpMgcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgcTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			gcpMgcTable_destroy(&StorageTmp->gcpMgcTable_old);
+			StorageTmp->gcpMgcTable_rsvs = 0;
+			StorageTmp->gcpMgcTable_tsts = 0;
+			StorageTmp->gcpMgcTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpMgcDeviceName = old_value;
-		StorageTmp->gcpMgcDeviceNameLen = old_length;
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMgcTable_sets == 0)
+			revert_gcpMgcTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			break;
+		if (StorageOld->gcpMgcDeviceName != NULL) {
+			SNMP_FREE(StorageTmp->gcpMgcDeviceName);
+			StorageTmp->gcpMgcDeviceName = StorageOld->gcpMgcDeviceName;
+			StorageTmp->gcpMgcDeviceNameLen = StorageOld->gcpMgcDeviceNameLen;
+			StorageOld->gcpMgcDeviceName = NULL;
+			StorageOld->gcpMgcDeviceNameLen = 0;
+		}
+		if (--StorageTmp->gcpMgcTable_rsvs == 0)
+			gcpMgcTable_destroy(&StorageTmp->gcpMgcTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7782,17 +10362,17 @@ write_gcpMgcDeviceName(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_gcpMgcMtpAddress(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct gcpMgcTable_data *StorageTmp = NULL;
+	struct gcpMgcTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpMgcMtpAddress entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpMgcTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpMgcRowStatus) {
@@ -7815,33 +10395,73 @@ write_gcpMgcMtpAddress(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpMgcMtpAddress: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			if (StorageTmp->gcpMgcTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMgcTable_old = gcpMgcTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMgcTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->gcpMgcMtpAddress);
+		StorageTmp->gcpMgcMtpAddress = string;
+		StorageTmp->gcpMgcMtpAddressLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpMgcTable_tsts == 0)
+				if ((ret = check_gcpMgcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgcTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpMgcMtpAddress for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpMgcMtpAddress;
-		old_length = StorageTmp->gcpMgcMtpAddressLen;
-		StorageTmp->gcpMgcMtpAddress = string;
-		StorageTmp->gcpMgcMtpAddressLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMgcTable_sets == 0)
+				if ((ret = update_gcpMgcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgcTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			gcpMgcTable_destroy(&StorageTmp->gcpMgcTable_old);
+			StorageTmp->gcpMgcTable_rsvs = 0;
+			StorageTmp->gcpMgcTable_tsts = 0;
+			StorageTmp->gcpMgcTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpMgcMtpAddress = old_value;
-		StorageTmp->gcpMgcMtpAddressLen = old_length;
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMgcTable_sets == 0)
+			revert_gcpMgcTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			break;
+		if (StorageOld->gcpMgcMtpAddress != NULL) {
+			SNMP_FREE(StorageTmp->gcpMgcMtpAddress);
+			StorageTmp->gcpMgcMtpAddress = StorageOld->gcpMgcMtpAddress;
+			StorageTmp->gcpMgcMtpAddressLen = StorageOld->gcpMgcMtpAddressLen;
+			StorageOld->gcpMgcMtpAddress = NULL;
+			StorageOld->gcpMgcMtpAddressLen = 0;
+		}
+		if (--StorageTmp->gcpMgcTable_rsvs == 0)
+			gcpMgcTable_destroy(&StorageTmp->gcpMgcTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7861,12 +10481,14 @@ write_gcpMgcMtpAddress(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_gcpMgcAdminState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMgcTable_data *StorageTmp = NULL;
+	struct gcpMgcTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpMgcAdminState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpMgcTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7900,22 +10522,61 @@ write_gcpMgcAdminState(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpMgcAdminState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			if (StorageTmp->gcpMgcTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMgcTable_old = gcpMgcTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMgcTable_rsvs++;
+		StorageTmp->gcpMgcAdminState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpMgcTable_tsts == 0)
+				if ((ret = check_gcpMgcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgcTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpMgcAdminState for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpMgcAdminState;
-		StorageTmp->gcpMgcAdminState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMgcTable_sets == 0)
+				if ((ret = update_gcpMgcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgcTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			gcpMgcTable_destroy(&StorageTmp->gcpMgcTable_old);
+			StorageTmp->gcpMgcTable_rsvs = 0;
+			StorageTmp->gcpMgcTable_tsts = 0;
+			StorageTmp->gcpMgcTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpMgcAdminState = old_value;
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMgcTable_sets == 0)
+			revert_gcpMgcTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			break;
+		StorageTmp->gcpMgcAdminState = StorageOld->gcpMgcAdminState;
+		if (--StorageTmp->gcpMgcTable_rsvs == 0)
+			gcpMgcTable_destroy(&StorageTmp->gcpMgcTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7935,12 +10596,14 @@ write_gcpMgcAdminState(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_gcpMgcOperState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMgcTable_data *StorageTmp = NULL;
+	struct gcpMgcTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpMgcOperState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpMgcTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7973,22 +10636,61 @@ write_gcpMgcOperState(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpMgcOperState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			if (StorageTmp->gcpMgcTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMgcTable_old = gcpMgcTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMgcTable_rsvs++;
+		StorageTmp->gcpMgcOperState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpMgcTable_tsts == 0)
+				if ((ret = check_gcpMgcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgcTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpMgcOperState for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpMgcOperState;
-		StorageTmp->gcpMgcOperState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMgcTable_sets == 0)
+				if ((ret = update_gcpMgcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgcTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			gcpMgcTable_destroy(&StorageTmp->gcpMgcTable_old);
+			StorageTmp->gcpMgcTable_rsvs = 0;
+			StorageTmp->gcpMgcTable_tsts = 0;
+			StorageTmp->gcpMgcTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpMgcOperState = old_value;
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMgcTable_sets == 0)
+			revert_gcpMgcTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			break;
+		StorageTmp->gcpMgcOperState = StorageOld->gcpMgcOperState;
+		if (--StorageTmp->gcpMgcTable_rsvs == 0)
+			gcpMgcTable_destroy(&StorageTmp->gcpMgcTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8008,17 +10710,17 @@ write_gcpMgcOperState(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_gcpMgcAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct gcpMgcTable_data *StorageTmp = NULL;
+	struct gcpMgcTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpMgcAlarmStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpMgcTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpMgcRowStatus) {
@@ -8048,33 +10750,73 @@ write_gcpMgcAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			if (StorageTmp->gcpMgcTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMgcTable_old = gcpMgcTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMgcTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->gcpMgcAlarmStatus);
+		StorageTmp->gcpMgcAlarmStatus = string;
+		StorageTmp->gcpMgcAlarmStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpMgcTable_tsts == 0)
+				if ((ret = check_gcpMgcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgcTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpMgcAlarmStatus for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpMgcAlarmStatus;
-		old_length = StorageTmp->gcpMgcAlarmStatusLen;
-		StorageTmp->gcpMgcAlarmStatus = string;
-		StorageTmp->gcpMgcAlarmStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMgcTable_sets == 0)
+				if ((ret = update_gcpMgcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgcTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			gcpMgcTable_destroy(&StorageTmp->gcpMgcTable_old);
+			StorageTmp->gcpMgcTable_rsvs = 0;
+			StorageTmp->gcpMgcTable_tsts = 0;
+			StorageTmp->gcpMgcTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpMgcAlarmStatus = old_value;
-		StorageTmp->gcpMgcAlarmStatusLen = old_length;
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMgcTable_sets == 0)
+			revert_gcpMgcTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			break;
+		if (StorageOld->gcpMgcAlarmStatus != NULL) {
+			SNMP_FREE(StorageTmp->gcpMgcAlarmStatus);
+			StorageTmp->gcpMgcAlarmStatus = StorageOld->gcpMgcAlarmStatus;
+			StorageTmp->gcpMgcAlarmStatusLen = StorageOld->gcpMgcAlarmStatusLen;
+			StorageOld->gcpMgcAlarmStatus = NULL;
+			StorageOld->gcpMgcAlarmStatusLen = 0;
+		}
+		if (--StorageTmp->gcpMgcTable_rsvs == 0)
+			gcpMgcTable_destroy(&StorageTmp->gcpMgcTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8094,17 +10836,17 @@ write_gcpMgcAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_gcpMgcAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct gcpMgcTable_data *StorageTmp = NULL;
+	struct gcpMgcTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpMgcAsaProfilePointer entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpMgcTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpMgcRowStatus) {
@@ -8127,31 +10869,71 @@ write_gcpMgcAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, 
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value zeroDotZero */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			if (StorageTmp->gcpMgcTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMgcTable_old = gcpMgcTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMgcTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->gcpMgcAsaProfilePointer);
+		StorageTmp->gcpMgcAsaProfilePointer = objid;
+		StorageTmp->gcpMgcAsaProfilePointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpMgcTable_tsts == 0)
+				if ((ret = check_gcpMgcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgcTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpMgcAsaProfilePointer for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpMgcAsaProfilePointer;
-		old_length = StorageTmp->gcpMgcAsaProfilePointerLen;
-		StorageTmp->gcpMgcAsaProfilePointer = objid;
-		StorageTmp->gcpMgcAsaProfilePointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMgcTable_sets == 0)
+				if ((ret = update_gcpMgcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgcTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			gcpMgcTable_destroy(&StorageTmp->gcpMgcTable_old);
+			StorageTmp->gcpMgcTable_rsvs = 0;
+			StorageTmp->gcpMgcTable_tsts = 0;
+			StorageTmp->gcpMgcTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpMgcAsaProfilePointer = old_value;
-		StorageTmp->gcpMgcAsaProfilePointerLen = old_length;
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMgcTable_sets == 0)
+			revert_gcpMgcTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			break;
+		if (StorageOld->gcpMgcAsaProfilePointer != NULL) {
+			SNMP_FREE(StorageTmp->gcpMgcAsaProfilePointer);
+			StorageTmp->gcpMgcAsaProfilePointer = StorageOld->gcpMgcAsaProfilePointer;
+			StorageTmp->gcpMgcAsaProfilePointerLen = StorageOld->gcpMgcAsaProfilePointerLen;
+			StorageOld->gcpMgcAsaProfilePointer = NULL;
+			StorageOld->gcpMgcAsaProfilePointerLen = 0;
+		}
+		if (--StorageTmp->gcpMgcTable_rsvs == 0)
+			gcpMgcTable_destroy(&StorageTmp->gcpMgcTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8171,12 +10953,14 @@ write_gcpMgcAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, 
 int
 write_gcpMgcUsageState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMgcTable_data *StorageTmp = NULL;
+	struct gcpMgcTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpMgcUsageState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpMgcTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8210,22 +10994,61 @@ write_gcpMgcUsageState(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpMgcUsageState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			if (StorageTmp->gcpMgcTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMgcTable_old = gcpMgcTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMgcTable_rsvs++;
+		StorageTmp->gcpMgcUsageState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpMgcTable_tsts == 0)
+				if ((ret = check_gcpMgcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgcTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpMgcUsageState for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpMgcUsageState;
-		StorageTmp->gcpMgcUsageState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMgcTable_sets == 0)
+				if ((ret = update_gcpMgcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgcTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			gcpMgcTable_destroy(&StorageTmp->gcpMgcTable_old);
+			StorageTmp->gcpMgcTable_rsvs = 0;
+			StorageTmp->gcpMgcTable_tsts = 0;
+			StorageTmp->gcpMgcTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpMgcUsageState = old_value;
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMgcTable_sets == 0)
+			revert_gcpMgcTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			break;
+		StorageTmp->gcpMgcUsageState = StorageOld->gcpMgcUsageState;
+		if (--StorageTmp->gcpMgcTable_rsvs == 0)
+			gcpMgcTable_destroy(&StorageTmp->gcpMgcTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8245,12 +11068,14 @@ write_gcpMgcUsageState(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_gcpMgcPg(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpMgcTable_data *StorageTmp = NULL;
+	struct gcpMgcTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpMgcPg entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpMgcTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8275,22 +11100,61 @@ write_gcpMgcPg(int action, u_char *var_val, u_char var_val_type, size_t var_val_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpMgcPg: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			if (StorageTmp->gcpMgcTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMgcTable_old = gcpMgcTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMgcTable_rsvs++;
+		StorageTmp->gcpMgcPg = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpMgcTable_tsts == 0)
+				if ((ret = check_gcpMgcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgcTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpMgcPg for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpMgcPg;
-		StorageTmp->gcpMgcPg = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMgcTable_sets == 0)
+				if ((ret = update_gcpMgcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgcTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			gcpMgcTable_destroy(&StorageTmp->gcpMgcTable_old);
+			StorageTmp->gcpMgcTable_rsvs = 0;
+			StorageTmp->gcpMgcTable_tsts = 0;
+			StorageTmp->gcpMgcTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpMgcPg = old_value;
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMgcTable_sets == 0)
+			revert_gcpMgcTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			break;
+		StorageTmp->gcpMgcPg = StorageOld->gcpMgcPg;
+		if (--StorageTmp->gcpMgcTable_rsvs == 0)
+			gcpMgcTable_destroy(&StorageTmp->gcpMgcTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8310,12 +11174,14 @@ write_gcpMgcPg(int action, u_char *var_val, u_char var_val_type, size_t var_val_
 int
 write_gcpMgcStandbyStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMgcTable_data *StorageTmp = NULL;
+	struct gcpMgcTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpMgcStandbyStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpMgcTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8349,22 +11215,61 @@ write_gcpMgcStandbyStatus(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpMgcStandbyStatus: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			if (StorageTmp->gcpMgcTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMgcTable_old = gcpMgcTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMgcTable_rsvs++;
+		StorageTmp->gcpMgcStandbyStatus = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpMgcTable_tsts == 0)
+				if ((ret = check_gcpMgcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgcTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpMgcStandbyStatus for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpMgcStandbyStatus;
-		StorageTmp->gcpMgcStandbyStatus = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMgcTable_sets == 0)
+				if ((ret = update_gcpMgcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMgcTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+			gcpMgcTable_destroy(&StorageTmp->gcpMgcTable_old);
+			StorageTmp->gcpMgcTable_rsvs = 0;
+			StorageTmp->gcpMgcTable_tsts = 0;
+			StorageTmp->gcpMgcTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpMgcStandbyStatus = old_value;
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMgcTable_sets == 0)
+			revert_gcpMgcTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+			break;
+		StorageTmp->gcpMgcStandbyStatus = StorageOld->gcpMgcStandbyStatus;
+		if (--StorageTmp->gcpMgcTable_rsvs == 0)
+			gcpMgcTable_destroy(&StorageTmp->gcpMgcTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8384,12 +11289,14 @@ write_gcpMgcStandbyStatus(int action, u_char *var_val, u_char var_val_type, size
 int
 write_gcpLinkageType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpLinkageTable_data *StorageTmp = NULL;
+	struct gcpLinkageTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpLinkageType entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpLinkageTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8437,22 +11344,61 @@ write_gcpLinkageType(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpLinkageType: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			if (StorageTmp->gcpLinkageTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpLinkageTable_old = gcpLinkageTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpLinkageTable_rsvs++;
+		StorageTmp->gcpLinkageType = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpLinkageTable_tsts == 0)
+				if ((ret = check_gcpLinkageTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpLinkageTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpLinkageType for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpLinkageType;
-		StorageTmp->gcpLinkageType = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpLinkageTable_sets == 0)
+				if ((ret = update_gcpLinkageTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpLinkageTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
+			StorageTmp->gcpLinkageTable_rsvs = 0;
+			StorageTmp->gcpLinkageTable_tsts = 0;
+			StorageTmp->gcpLinkageTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpLinkageType = old_value;
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpLinkageTable_sets == 0)
+			revert_gcpLinkageTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			break;
+		StorageTmp->gcpLinkageType = StorageOld->gcpLinkageType;
+		if (--StorageTmp->gcpLinkageTable_rsvs == 0)
+			gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8472,12 +11418,14 @@ write_gcpLinkageType(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_gcpLinkageMgcMaster(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpLinkageTable_data *StorageTmp = NULL;
+	struct gcpLinkageTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpLinkageMgcMaster entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpLinkageTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8511,22 +11459,61 @@ write_gcpLinkageMgcMaster(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpLinkageMgcMaster: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			if (StorageTmp->gcpLinkageTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpLinkageTable_old = gcpLinkageTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpLinkageTable_rsvs++;
+		StorageTmp->gcpLinkageMgcMaster = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpLinkageTable_tsts == 0)
+				if ((ret = check_gcpLinkageTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpLinkageTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpLinkageMgcMaster for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpLinkageMgcMaster;
-		StorageTmp->gcpLinkageMgcMaster = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpLinkageTable_sets == 0)
+				if ((ret = update_gcpLinkageTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpLinkageTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
+			StorageTmp->gcpLinkageTable_rsvs = 0;
+			StorageTmp->gcpLinkageTable_tsts = 0;
+			StorageTmp->gcpLinkageTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpLinkageMgcMaster = old_value;
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpLinkageTable_sets == 0)
+			revert_gcpLinkageTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			break;
+		StorageTmp->gcpLinkageMgcMaster = StorageOld->gcpLinkageMgcMaster;
+		if (--StorageTmp->gcpLinkageTable_rsvs == 0)
+			gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8546,17 +11533,17 @@ write_gcpLinkageMgcMaster(int action, u_char *var_val, u_char var_val_type, size
 int
 write_gcpLinkageMgcAddress(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct gcpLinkageTable_data *StorageTmp = NULL;
+	struct gcpLinkageTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpLinkageMgcAddress entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpLinkageTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpLinkageRowStatus) {
@@ -8579,33 +11566,73 @@ write_gcpLinkageMgcAddress(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpLinkageMgcAddress: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			if (StorageTmp->gcpLinkageTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpLinkageTable_old = gcpLinkageTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpLinkageTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->gcpLinkageMgcAddress);
+		StorageTmp->gcpLinkageMgcAddress = string;
+		StorageTmp->gcpLinkageMgcAddressLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpLinkageTable_tsts == 0)
+				if ((ret = check_gcpLinkageTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpLinkageTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpLinkageMgcAddress for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpLinkageMgcAddress;
-		old_length = StorageTmp->gcpLinkageMgcAddressLen;
-		StorageTmp->gcpLinkageMgcAddress = string;
-		StorageTmp->gcpLinkageMgcAddressLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpLinkageTable_sets == 0)
+				if ((ret = update_gcpLinkageTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpLinkageTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
+			StorageTmp->gcpLinkageTable_rsvs = 0;
+			StorageTmp->gcpLinkageTable_tsts = 0;
+			StorageTmp->gcpLinkageTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpLinkageMgcAddress = old_value;
-		StorageTmp->gcpLinkageMgcAddressLen = old_length;
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpLinkageTable_sets == 0)
+			revert_gcpLinkageTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			break;
+		if (StorageOld->gcpLinkageMgcAddress != NULL) {
+			SNMP_FREE(StorageTmp->gcpLinkageMgcAddress);
+			StorageTmp->gcpLinkageMgcAddress = StorageOld->gcpLinkageMgcAddress;
+			StorageTmp->gcpLinkageMgcAddressLen = StorageOld->gcpLinkageMgcAddressLen;
+			StorageOld->gcpLinkageMgcAddress = NULL;
+			StorageOld->gcpLinkageMgcAddressLen = 0;
+		}
+		if (--StorageTmp->gcpLinkageTable_rsvs == 0)
+			gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8625,17 +11652,17 @@ write_gcpLinkageMgcAddress(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_gcpLinkageMgAddress(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct gcpLinkageTable_data *StorageTmp = NULL;
+	struct gcpLinkageTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpLinkageMgAddress entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpLinkageTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpLinkageRowStatus) {
@@ -8658,33 +11685,73 @@ write_gcpLinkageMgAddress(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpLinkageMgAddress: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			if (StorageTmp->gcpLinkageTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpLinkageTable_old = gcpLinkageTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpLinkageTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->gcpLinkageMgAddress);
+		StorageTmp->gcpLinkageMgAddress = string;
+		StorageTmp->gcpLinkageMgAddressLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpLinkageTable_tsts == 0)
+				if ((ret = check_gcpLinkageTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpLinkageTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpLinkageMgAddress for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpLinkageMgAddress;
-		old_length = StorageTmp->gcpLinkageMgAddressLen;
-		StorageTmp->gcpLinkageMgAddress = string;
-		StorageTmp->gcpLinkageMgAddressLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpLinkageTable_sets == 0)
+				if ((ret = update_gcpLinkageTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpLinkageTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
+			StorageTmp->gcpLinkageTable_rsvs = 0;
+			StorageTmp->gcpLinkageTable_tsts = 0;
+			StorageTmp->gcpLinkageTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpLinkageMgAddress = old_value;
-		StorageTmp->gcpLinkageMgAddressLen = old_length;
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpLinkageTable_sets == 0)
+			revert_gcpLinkageTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			break;
+		if (StorageOld->gcpLinkageMgAddress != NULL) {
+			SNMP_FREE(StorageTmp->gcpLinkageMgAddress);
+			StorageTmp->gcpLinkageMgAddress = StorageOld->gcpLinkageMgAddress;
+			StorageTmp->gcpLinkageMgAddressLen = StorageOld->gcpLinkageMgAddressLen;
+			StorageOld->gcpLinkageMgAddress = NULL;
+			StorageOld->gcpLinkageMgAddressLen = 0;
+		}
+		if (--StorageTmp->gcpLinkageTable_rsvs == 0)
+			gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8704,12 +11771,14 @@ write_gcpLinkageMgAddress(int action, u_char *var_val, u_char var_val_type, size
 int
 write_gcpLinkageMgcIdent(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpLinkageTable_data *StorageTmp = NULL;
+	struct gcpLinkageTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpLinkageMgcIdent entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpLinkageTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8744,22 +11813,61 @@ write_gcpLinkageMgcIdent(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpLinkageMgcIdent: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			if (StorageTmp->gcpLinkageTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpLinkageTable_old = gcpLinkageTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpLinkageTable_rsvs++;
+		StorageTmp->gcpLinkageMgcIdent = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpLinkageTable_tsts == 0)
+				if ((ret = check_gcpLinkageTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpLinkageTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpLinkageMgcIdent for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpLinkageMgcIdent;
-		StorageTmp->gcpLinkageMgcIdent = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpLinkageTable_sets == 0)
+				if ((ret = update_gcpLinkageTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpLinkageTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
+			StorageTmp->gcpLinkageTable_rsvs = 0;
+			StorageTmp->gcpLinkageTable_tsts = 0;
+			StorageTmp->gcpLinkageTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpLinkageMgcIdent = old_value;
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpLinkageTable_sets == 0)
+			revert_gcpLinkageTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			break;
+		StorageTmp->gcpLinkageMgcIdent = StorageOld->gcpLinkageMgcIdent;
+		if (--StorageTmp->gcpLinkageTable_rsvs == 0)
+			gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8779,12 +11887,14 @@ write_gcpLinkageMgcIdent(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_gcpLinkageMgIdent(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpLinkageTable_data *StorageTmp = NULL;
+	struct gcpLinkageTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpLinkageMgIdent entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpLinkageTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8819,22 +11929,61 @@ write_gcpLinkageMgIdent(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpLinkageMgIdent: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			if (StorageTmp->gcpLinkageTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpLinkageTable_old = gcpLinkageTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpLinkageTable_rsvs++;
+		StorageTmp->gcpLinkageMgIdent = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpLinkageTable_tsts == 0)
+				if ((ret = check_gcpLinkageTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpLinkageTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpLinkageMgIdent for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpLinkageMgIdent;
-		StorageTmp->gcpLinkageMgIdent = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpLinkageTable_sets == 0)
+				if ((ret = update_gcpLinkageTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpLinkageTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
+			StorageTmp->gcpLinkageTable_rsvs = 0;
+			StorageTmp->gcpLinkageTable_tsts = 0;
+			StorageTmp->gcpLinkageTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpLinkageMgIdent = old_value;
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpLinkageTable_sets == 0)
+			revert_gcpLinkageTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			break;
+		StorageTmp->gcpLinkageMgIdent = StorageOld->gcpLinkageMgIdent;
+		if (--StorageTmp->gcpLinkageTable_rsvs == 0)
+			gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8854,17 +12003,17 @@ write_gcpLinkageMgIdent(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_gcpLinkageProfile(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct gcpLinkageTable_data *StorageTmp = NULL;
+	struct gcpLinkageTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpLinkageProfile entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpLinkageTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpLinkageRowStatus) {
@@ -8887,31 +12036,71 @@ write_gcpLinkageProfile(int action, u_char *var_val, u_char var_val_type, size_t
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value zeroDotZero */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			if (StorageTmp->gcpLinkageTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpLinkageTable_old = gcpLinkageTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpLinkageTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->gcpLinkageProfile);
+		StorageTmp->gcpLinkageProfile = objid;
+		StorageTmp->gcpLinkageProfileLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpLinkageTable_tsts == 0)
+				if ((ret = check_gcpLinkageTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpLinkageTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpLinkageProfile for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpLinkageProfile;
-		old_length = StorageTmp->gcpLinkageProfileLen;
-		StorageTmp->gcpLinkageProfile = objid;
-		StorageTmp->gcpLinkageProfileLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpLinkageTable_sets == 0)
+				if ((ret = update_gcpLinkageTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpLinkageTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
+			StorageTmp->gcpLinkageTable_rsvs = 0;
+			StorageTmp->gcpLinkageTable_tsts = 0;
+			StorageTmp->gcpLinkageTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpLinkageProfile = old_value;
-		StorageTmp->gcpLinkageProfileLen = old_length;
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpLinkageTable_sets == 0)
+			revert_gcpLinkageTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			break;
+		if (StorageOld->gcpLinkageProfile != NULL) {
+			SNMP_FREE(StorageTmp->gcpLinkageProfile);
+			StorageTmp->gcpLinkageProfile = StorageOld->gcpLinkageProfile;
+			StorageTmp->gcpLinkageProfileLen = StorageOld->gcpLinkageProfileLen;
+			StorageOld->gcpLinkageProfile = NULL;
+			StorageOld->gcpLinkageProfileLen = 0;
+		}
+		if (--StorageTmp->gcpLinkageTable_rsvs == 0)
+			gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8931,17 +12120,17 @@ write_gcpLinkageProfile(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_gcpLinkageProtocol(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct gcpLinkageTable_data *StorageTmp = NULL;
+	struct gcpLinkageTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpLinkageProtocol entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpLinkageTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpLinkageRowStatus) {
@@ -8963,31 +12152,71 @@ write_gcpLinkageProtocol(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpLinkageProtocol: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			if (StorageTmp->gcpLinkageTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpLinkageTable_old = gcpLinkageTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpLinkageTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->gcpLinkageProtocol);
+		StorageTmp->gcpLinkageProtocol = objid;
+		StorageTmp->gcpLinkageProtocolLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpLinkageTable_tsts == 0)
+				if ((ret = check_gcpLinkageTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpLinkageTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpLinkageProtocol for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpLinkageProtocol;
-		old_length = StorageTmp->gcpLinkageProtocolLen;
-		StorageTmp->gcpLinkageProtocol = objid;
-		StorageTmp->gcpLinkageProtocolLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpLinkageTable_sets == 0)
+				if ((ret = update_gcpLinkageTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpLinkageTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
+			StorageTmp->gcpLinkageTable_rsvs = 0;
+			StorageTmp->gcpLinkageTable_tsts = 0;
+			StorageTmp->gcpLinkageTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpLinkageProtocol = old_value;
-		StorageTmp->gcpLinkageProtocolLen = old_length;
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpLinkageTable_sets == 0)
+			revert_gcpLinkageTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			break;
+		if (StorageOld->gcpLinkageProtocol != NULL) {
+			SNMP_FREE(StorageTmp->gcpLinkageProtocol);
+			StorageTmp->gcpLinkageProtocol = StorageOld->gcpLinkageProtocol;
+			StorageTmp->gcpLinkageProtocolLen = StorageOld->gcpLinkageProtocolLen;
+			StorageOld->gcpLinkageProtocol = NULL;
+			StorageOld->gcpLinkageProtocolLen = 0;
+		}
+		if (--StorageTmp->gcpLinkageTable_rsvs == 0)
+			gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9007,12 +12236,14 @@ write_gcpLinkageProtocol(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_gcpLinkageEncoding(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpLinkageTable_data *StorageTmp = NULL;
+	struct gcpLinkageTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpLinkageEncoding entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpLinkageTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9046,22 +12277,61 @@ write_gcpLinkageEncoding(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpLinkageEncoding: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			if (StorageTmp->gcpLinkageTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpLinkageTable_old = gcpLinkageTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpLinkageTable_rsvs++;
+		StorageTmp->gcpLinkageEncoding = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpLinkageTable_tsts == 0)
+				if ((ret = check_gcpLinkageTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpLinkageTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpLinkageEncoding for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpLinkageEncoding;
-		StorageTmp->gcpLinkageEncoding = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpLinkageTable_sets == 0)
+				if ((ret = update_gcpLinkageTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpLinkageTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
+			StorageTmp->gcpLinkageTable_rsvs = 0;
+			StorageTmp->gcpLinkageTable_tsts = 0;
+			StorageTmp->gcpLinkageTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpLinkageEncoding = old_value;
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpLinkageTable_sets == 0)
+			revert_gcpLinkageTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			break;
+		StorageTmp->gcpLinkageEncoding = StorageOld->gcpLinkageEncoding;
+		if (--StorageTmp->gcpLinkageTable_rsvs == 0)
+			gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9081,17 +12351,17 @@ write_gcpLinkageEncoding(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_gcpLinkageAuthAccess(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct gcpLinkageTable_data *StorageTmp = NULL;
+	struct gcpLinkageTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpLinkageAuthAccess entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpLinkageTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpLinkageRowStatus) {
@@ -9121,33 +12391,73 @@ write_gcpLinkageAuthAccess(int action, u_char *var_val, u_char var_val_type, siz
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			if (StorageTmp->gcpLinkageTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpLinkageTable_old = gcpLinkageTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpLinkageTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->gcpLinkageAuthAccess);
+		StorageTmp->gcpLinkageAuthAccess = string;
+		StorageTmp->gcpLinkageAuthAccessLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpLinkageTable_tsts == 0)
+				if ((ret = check_gcpLinkageTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpLinkageTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpLinkageAuthAccess for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpLinkageAuthAccess;
-		old_length = StorageTmp->gcpLinkageAuthAccessLen;
-		StorageTmp->gcpLinkageAuthAccess = string;
-		StorageTmp->gcpLinkageAuthAccessLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpLinkageTable_sets == 0)
+				if ((ret = update_gcpLinkageTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpLinkageTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
+			StorageTmp->gcpLinkageTable_rsvs = 0;
+			StorageTmp->gcpLinkageTable_tsts = 0;
+			StorageTmp->gcpLinkageTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpLinkageAuthAccess = old_value;
-		StorageTmp->gcpLinkageAuthAccessLen = old_length;
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpLinkageTable_sets == 0)
+			revert_gcpLinkageTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			break;
+		if (StorageOld->gcpLinkageAuthAccess != NULL) {
+			SNMP_FREE(StorageTmp->gcpLinkageAuthAccess);
+			StorageTmp->gcpLinkageAuthAccess = StorageOld->gcpLinkageAuthAccess;
+			StorageTmp->gcpLinkageAuthAccessLen = StorageOld->gcpLinkageAuthAccessLen;
+			StorageOld->gcpLinkageAuthAccess = NULL;
+			StorageOld->gcpLinkageAuthAccessLen = 0;
+		}
+		if (--StorageTmp->gcpLinkageTable_rsvs == 0)
+			gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9167,12 +12477,14 @@ write_gcpLinkageAuthAccess(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_gcpLinkageAdminState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpLinkageTable_data *StorageTmp = NULL;
+	struct gcpLinkageTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpLinkageAdminState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpLinkageTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9206,22 +12518,61 @@ write_gcpLinkageAdminState(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpLinkageAdminState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			if (StorageTmp->gcpLinkageTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpLinkageTable_old = gcpLinkageTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpLinkageTable_rsvs++;
+		StorageTmp->gcpLinkageAdminState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpLinkageTable_tsts == 0)
+				if ((ret = check_gcpLinkageTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpLinkageTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpLinkageAdminState for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpLinkageAdminState;
-		StorageTmp->gcpLinkageAdminState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpLinkageTable_sets == 0)
+				if ((ret = update_gcpLinkageTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpLinkageTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
+			StorageTmp->gcpLinkageTable_rsvs = 0;
+			StorageTmp->gcpLinkageTable_tsts = 0;
+			StorageTmp->gcpLinkageTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpLinkageAdminState = old_value;
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpLinkageTable_sets == 0)
+			revert_gcpLinkageTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			break;
+		StorageTmp->gcpLinkageAdminState = StorageOld->gcpLinkageAdminState;
+		if (--StorageTmp->gcpLinkageTable_rsvs == 0)
+			gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9241,17 +12592,17 @@ write_gcpLinkageAdminState(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_gcpLinkageProcStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct gcpLinkageTable_data *StorageTmp = NULL;
+	struct gcpLinkageTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpLinkageProcStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpLinkageTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpLinkageRowStatus) {
@@ -9281,33 +12632,73 @@ write_gcpLinkageProcStatus(int action, u_char *var_val, u_char var_val_type, siz
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			if (StorageTmp->gcpLinkageTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpLinkageTable_old = gcpLinkageTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpLinkageTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->gcpLinkageProcStatus);
+		StorageTmp->gcpLinkageProcStatus = string;
+		StorageTmp->gcpLinkageProcStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpLinkageTable_tsts == 0)
+				if ((ret = check_gcpLinkageTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpLinkageTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpLinkageProcStatus for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpLinkageProcStatus;
-		old_length = StorageTmp->gcpLinkageProcStatusLen;
-		StorageTmp->gcpLinkageProcStatus = string;
-		StorageTmp->gcpLinkageProcStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpLinkageTable_sets == 0)
+				if ((ret = update_gcpLinkageTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpLinkageTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
+			StorageTmp->gcpLinkageTable_rsvs = 0;
+			StorageTmp->gcpLinkageTable_tsts = 0;
+			StorageTmp->gcpLinkageTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpLinkageProcStatus = old_value;
-		StorageTmp->gcpLinkageProcStatusLen = old_length;
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpLinkageTable_sets == 0)
+			revert_gcpLinkageTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			break;
+		if (StorageOld->gcpLinkageProcStatus != NULL) {
+			SNMP_FREE(StorageTmp->gcpLinkageProcStatus);
+			StorageTmp->gcpLinkageProcStatus = StorageOld->gcpLinkageProcStatus;
+			StorageTmp->gcpLinkageProcStatusLen = StorageOld->gcpLinkageProcStatusLen;
+			StorageOld->gcpLinkageProcStatus = NULL;
+			StorageOld->gcpLinkageProcStatusLen = 0;
+		}
+		if (--StorageTmp->gcpLinkageTable_rsvs == 0)
+			gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9327,12 +12718,14 @@ write_gcpLinkageProcStatus(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_gcpLinkageMit(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpLinkageTable_data *StorageTmp = NULL;
+	struct gcpLinkageTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpLinkageMit entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpLinkageTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9362,22 +12755,61 @@ write_gcpLinkageMit(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpLinkageMit: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			if (StorageTmp->gcpLinkageTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpLinkageTable_old = gcpLinkageTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpLinkageTable_rsvs++;
+		StorageTmp->gcpLinkageMit = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpLinkageTable_tsts == 0)
+				if ((ret = check_gcpLinkageTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpLinkageTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpLinkageMit for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpLinkageMit;
-		StorageTmp->gcpLinkageMit = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpLinkageTable_sets == 0)
+				if ((ret = update_gcpLinkageTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpLinkageTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+			gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
+			StorageTmp->gcpLinkageTable_rsvs = 0;
+			StorageTmp->gcpLinkageTable_tsts = 0;
+			StorageTmp->gcpLinkageTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpLinkageMit = old_value;
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpLinkageTable_sets == 0)
+			revert_gcpLinkageTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+			break;
+		StorageTmp->gcpLinkageMit = StorageOld->gcpLinkageMit;
+		if (--StorageTmp->gcpLinkageTable_rsvs == 0)
+			gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9397,12 +12829,14 @@ write_gcpLinkageMit(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_gcpUdpChecksum(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpUdpProfileTable_data *StorageTmp = NULL;
+	struct gcpUdpProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpUdpChecksum entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpUdpProfileTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9435,22 +12869,61 @@ write_gcpUdpChecksum(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpUdpChecksum: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpUdpProfileTable_old) == NULL)
+			if (StorageTmp->gcpUdpProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpUdpProfileTable_old = gcpUdpProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpUdpProfileTable_rsvs++;
+		StorageTmp->gcpUdpChecksum = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpUdpProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpUdpProfileTable_tsts == 0)
+				if ((ret = check_gcpUdpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpUdpProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpUdpChecksum for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpUdpChecksum;
-		StorageTmp->gcpUdpChecksum = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpUdpProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpUdpProfileTable_sets == 0)
+				if ((ret = update_gcpUdpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpUdpProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpUdpProfileTable_old) != NULL) {
+			gcpUdpProfileTable_destroy(&StorageTmp->gcpUdpProfileTable_old);
+			StorageTmp->gcpUdpProfileTable_rsvs = 0;
+			StorageTmp->gcpUdpProfileTable_tsts = 0;
+			StorageTmp->gcpUdpProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpUdpChecksum = old_value;
+		if ((StorageOld = StorageTmp->gcpUdpProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpUdpProfileTable_sets == 0)
+			revert_gcpUdpProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpUdpProfileTable_old) == NULL)
+			break;
+		StorageTmp->gcpUdpChecksum = StorageOld->gcpUdpChecksum;
+		if (--StorageTmp->gcpUdpProfileTable_rsvs == 0)
+			gcpUdpProfileTable_destroy(&StorageTmp->gcpUdpProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9470,12 +12943,14 @@ write_gcpUdpChecksum(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_gcpTcpNoDelay(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpTcpProfileTable_data *StorageTmp = NULL;
+	struct gcpTcpProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpTcpNoDelay entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpTcpProfileTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9508,22 +12983,61 @@ write_gcpTcpNoDelay(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpTcpNoDelay: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) == NULL)
+			if (StorageTmp->gcpTcpProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpTcpProfileTable_old = gcpTcpProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpTcpProfileTable_rsvs++;
+		StorageTmp->gcpTcpNoDelay = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpTcpProfileTable_tsts == 0)
+				if ((ret = check_gcpTcpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpTcpProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpTcpNoDelay for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpTcpNoDelay;
-		StorageTmp->gcpTcpNoDelay = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpTcpProfileTable_sets == 0)
+				if ((ret = update_gcpTcpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpTcpProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) != NULL) {
+			gcpTcpProfileTable_destroy(&StorageTmp->gcpTcpProfileTable_old);
+			StorageTmp->gcpTcpProfileTable_rsvs = 0;
+			StorageTmp->gcpTcpProfileTable_tsts = 0;
+			StorageTmp->gcpTcpProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpTcpNoDelay = old_value;
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpTcpProfileTable_sets == 0)
+			revert_gcpTcpProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) == NULL)
+			break;
+		StorageTmp->gcpTcpNoDelay = StorageOld->gcpTcpNoDelay;
+		if (--StorageTmp->gcpTcpProfileTable_rsvs == 0)
+			gcpTcpProfileTable_destroy(&StorageTmp->gcpTcpProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9543,12 +13057,14 @@ write_gcpTcpNoDelay(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_gcpTcpMaxseg(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpTcpProfileTable_data *StorageTmp = NULL;
+	struct gcpTcpProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpTcpMaxseg entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpTcpProfileTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9578,22 +13094,61 @@ write_gcpTcpMaxseg(int action, u_char *var_val, u_char var_val_type, size_t var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpTcpMaxseg: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) == NULL)
+			if (StorageTmp->gcpTcpProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpTcpProfileTable_old = gcpTcpProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpTcpProfileTable_rsvs++;
+		StorageTmp->gcpTcpMaxseg = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpTcpProfileTable_tsts == 0)
+				if ((ret = check_gcpTcpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpTcpProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpTcpMaxseg for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpTcpMaxseg;
-		StorageTmp->gcpTcpMaxseg = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpTcpProfileTable_sets == 0)
+				if ((ret = update_gcpTcpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpTcpProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) != NULL) {
+			gcpTcpProfileTable_destroy(&StorageTmp->gcpTcpProfileTable_old);
+			StorageTmp->gcpTcpProfileTable_rsvs = 0;
+			StorageTmp->gcpTcpProfileTable_tsts = 0;
+			StorageTmp->gcpTcpProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpTcpMaxseg = old_value;
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpTcpProfileTable_sets == 0)
+			revert_gcpTcpProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) == NULL)
+			break;
+		StorageTmp->gcpTcpMaxseg = StorageOld->gcpTcpMaxseg;
+		if (--StorageTmp->gcpTcpProfileTable_rsvs == 0)
+			gcpTcpProfileTable_destroy(&StorageTmp->gcpTcpProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9613,12 +13168,14 @@ write_gcpTcpMaxseg(int action, u_char *var_val, u_char var_val_type, size_t var_
 int
 write_gcpTcpKeepAlive(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpTcpProfileTable_data *StorageTmp = NULL;
+	struct gcpTcpProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpTcpKeepAlive entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpTcpProfileTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9651,22 +13208,61 @@ write_gcpTcpKeepAlive(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpTcpKeepAlive: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) == NULL)
+			if (StorageTmp->gcpTcpProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpTcpProfileTable_old = gcpTcpProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpTcpProfileTable_rsvs++;
+		StorageTmp->gcpTcpKeepAlive = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpTcpProfileTable_tsts == 0)
+				if ((ret = check_gcpTcpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpTcpProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpTcpKeepAlive for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpTcpKeepAlive;
-		StorageTmp->gcpTcpKeepAlive = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpTcpProfileTable_sets == 0)
+				if ((ret = update_gcpTcpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpTcpProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) != NULL) {
+			gcpTcpProfileTable_destroy(&StorageTmp->gcpTcpProfileTable_old);
+			StorageTmp->gcpTcpProfileTable_rsvs = 0;
+			StorageTmp->gcpTcpProfileTable_tsts = 0;
+			StorageTmp->gcpTcpProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpTcpKeepAlive = old_value;
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpTcpProfileTable_sets == 0)
+			revert_gcpTcpProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) == NULL)
+			break;
+		StorageTmp->gcpTcpKeepAlive = StorageOld->gcpTcpKeepAlive;
+		if (--StorageTmp->gcpTcpProfileTable_rsvs == 0)
+			gcpTcpProfileTable_destroy(&StorageTmp->gcpTcpProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9686,12 +13282,14 @@ write_gcpTcpKeepAlive(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_gcpTcpKeepIdle(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpTcpProfileTable_data *StorageTmp = NULL;
+	struct gcpTcpProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpTcpKeepIdle entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpTcpProfileTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9721,22 +13319,61 @@ write_gcpTcpKeepIdle(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpTcpKeepIdle: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) == NULL)
+			if (StorageTmp->gcpTcpProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpTcpProfileTable_old = gcpTcpProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpTcpProfileTable_rsvs++;
+		StorageTmp->gcpTcpKeepIdle = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpTcpProfileTable_tsts == 0)
+				if ((ret = check_gcpTcpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpTcpProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpTcpKeepIdle for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpTcpKeepIdle;
-		StorageTmp->gcpTcpKeepIdle = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpTcpProfileTable_sets == 0)
+				if ((ret = update_gcpTcpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpTcpProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) != NULL) {
+			gcpTcpProfileTable_destroy(&StorageTmp->gcpTcpProfileTable_old);
+			StorageTmp->gcpTcpProfileTable_rsvs = 0;
+			StorageTmp->gcpTcpProfileTable_tsts = 0;
+			StorageTmp->gcpTcpProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpTcpKeepIdle = old_value;
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpTcpProfileTable_sets == 0)
+			revert_gcpTcpProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) == NULL)
+			break;
+		StorageTmp->gcpTcpKeepIdle = StorageOld->gcpTcpKeepIdle;
+		if (--StorageTmp->gcpTcpProfileTable_rsvs == 0)
+			gcpTcpProfileTable_destroy(&StorageTmp->gcpTcpProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9756,12 +13393,14 @@ write_gcpTcpKeepIdle(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_gcpTcpKeepAliveItvl(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpTcpProfileTable_data *StorageTmp = NULL;
+	struct gcpTcpProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpTcpKeepAliveItvl entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpTcpProfileTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9791,22 +13430,61 @@ write_gcpTcpKeepAliveItvl(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpTcpKeepAliveItvl: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) == NULL)
+			if (StorageTmp->gcpTcpProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpTcpProfileTable_old = gcpTcpProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpTcpProfileTable_rsvs++;
+		StorageTmp->gcpTcpKeepAliveItvl = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpTcpProfileTable_tsts == 0)
+				if ((ret = check_gcpTcpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpTcpProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpTcpKeepAliveItvl for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpTcpKeepAliveItvl;
-		StorageTmp->gcpTcpKeepAliveItvl = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpTcpProfileTable_sets == 0)
+				if ((ret = update_gcpTcpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpTcpProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) != NULL) {
+			gcpTcpProfileTable_destroy(&StorageTmp->gcpTcpProfileTable_old);
+			StorageTmp->gcpTcpProfileTable_rsvs = 0;
+			StorageTmp->gcpTcpProfileTable_tsts = 0;
+			StorageTmp->gcpTcpProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpTcpKeepAliveItvl = old_value;
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpTcpProfileTable_sets == 0)
+			revert_gcpTcpProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) == NULL)
+			break;
+		StorageTmp->gcpTcpKeepAliveItvl = StorageOld->gcpTcpKeepAliveItvl;
+		if (--StorageTmp->gcpTcpProfileTable_rsvs == 0)
+			gcpTcpProfileTable_destroy(&StorageTmp->gcpTcpProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9826,12 +13504,14 @@ write_gcpTcpKeepAliveItvl(int action, u_char *var_val, u_char var_val_type, size
 int
 write_gcpTcpKeepCount(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpTcpProfileTable_data *StorageTmp = NULL;
+	struct gcpTcpProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpTcpKeepCount entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpTcpProfileTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9856,22 +13536,61 @@ write_gcpTcpKeepCount(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpTcpKeepCount: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) == NULL)
+			if (StorageTmp->gcpTcpProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpTcpProfileTable_old = gcpTcpProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpTcpProfileTable_rsvs++;
+		StorageTmp->gcpTcpKeepCount = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpTcpProfileTable_tsts == 0)
+				if ((ret = check_gcpTcpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpTcpProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpTcpKeepCount for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpTcpKeepCount;
-		StorageTmp->gcpTcpKeepCount = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpTcpProfileTable_sets == 0)
+				if ((ret = update_gcpTcpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpTcpProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) != NULL) {
+			gcpTcpProfileTable_destroy(&StorageTmp->gcpTcpProfileTable_old);
+			StorageTmp->gcpTcpProfileTable_rsvs = 0;
+			StorageTmp->gcpTcpProfileTable_tsts = 0;
+			StorageTmp->gcpTcpProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpTcpKeepCount = old_value;
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpTcpProfileTable_sets == 0)
+			revert_gcpTcpProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) == NULL)
+			break;
+		StorageTmp->gcpTcpKeepCount = StorageOld->gcpTcpKeepCount;
+		if (--StorageTmp->gcpTcpProfileTable_rsvs == 0)
+			gcpTcpProfileTable_destroy(&StorageTmp->gcpTcpProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9891,12 +13610,14 @@ write_gcpTcpKeepCount(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_gcpTcpSynRetrans(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpTcpProfileTable_data *StorageTmp = NULL;
+	struct gcpTcpProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpTcpSynRetrans entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpTcpProfileTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9926,22 +13647,61 @@ write_gcpTcpSynRetrans(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpTcpSynRetrans: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) == NULL)
+			if (StorageTmp->gcpTcpProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpTcpProfileTable_old = gcpTcpProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpTcpProfileTable_rsvs++;
+		StorageTmp->gcpTcpSynRetrans = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpTcpProfileTable_tsts == 0)
+				if ((ret = check_gcpTcpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpTcpProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpTcpSynRetrans for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpTcpSynRetrans;
-		StorageTmp->gcpTcpSynRetrans = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpTcpProfileTable_sets == 0)
+				if ((ret = update_gcpTcpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpTcpProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) != NULL) {
+			gcpTcpProfileTable_destroy(&StorageTmp->gcpTcpProfileTable_old);
+			StorageTmp->gcpTcpProfileTable_rsvs = 0;
+			StorageTmp->gcpTcpProfileTable_tsts = 0;
+			StorageTmp->gcpTcpProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpTcpSynRetrans = old_value;
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpTcpProfileTable_sets == 0)
+			revert_gcpTcpProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) == NULL)
+			break;
+		StorageTmp->gcpTcpSynRetrans = StorageOld->gcpTcpSynRetrans;
+		if (--StorageTmp->gcpTcpProfileTable_rsvs == 0)
+			gcpTcpProfileTable_destroy(&StorageTmp->gcpTcpProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9961,12 +13721,14 @@ write_gcpTcpSynRetrans(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_gcpTcpWindowClamp(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpTcpProfileTable_data *StorageTmp = NULL;
+	struct gcpTcpProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpTcpWindowClamp entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpTcpProfileTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9996,22 +13758,61 @@ write_gcpTcpWindowClamp(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpTcpWindowClamp: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) == NULL)
+			if (StorageTmp->gcpTcpProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpTcpProfileTable_old = gcpTcpProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpTcpProfileTable_rsvs++;
+		StorageTmp->gcpTcpWindowClamp = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpTcpProfileTable_tsts == 0)
+				if ((ret = check_gcpTcpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpTcpProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpTcpWindowClamp for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpTcpWindowClamp;
-		StorageTmp->gcpTcpWindowClamp = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpTcpProfileTable_sets == 0)
+				if ((ret = update_gcpTcpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpTcpProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) != NULL) {
+			gcpTcpProfileTable_destroy(&StorageTmp->gcpTcpProfileTable_old);
+			StorageTmp->gcpTcpProfileTable_rsvs = 0;
+			StorageTmp->gcpTcpProfileTable_tsts = 0;
+			StorageTmp->gcpTcpProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpTcpWindowClamp = old_value;
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpTcpProfileTable_sets == 0)
+			revert_gcpTcpProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) == NULL)
+			break;
+		StorageTmp->gcpTcpWindowClamp = StorageOld->gcpTcpWindowClamp;
+		if (--StorageTmp->gcpTcpProfileTable_rsvs == 0)
+			gcpTcpProfileTable_destroy(&StorageTmp->gcpTcpProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10031,12 +13832,14 @@ write_gcpTcpWindowClamp(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_gcpSctpNoDelay(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpSctpProfileTable_data *StorageTmp = NULL;
+	struct gcpSctpProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpSctpNoDelay entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpSctpProfileTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10069,22 +13872,61 @@ write_gcpSctpNoDelay(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpSctpNoDelay: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			if (StorageTmp->gcpSctpProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpSctpProfileTable_old = gcpSctpProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpSctpProfileTable_rsvs++;
+		StorageTmp->gcpSctpNoDelay = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpSctpProfileTable_tsts == 0)
+				if ((ret = check_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpSctpNoDelay for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpSctpNoDelay;
-		StorageTmp->gcpSctpNoDelay = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpSctpProfileTable_sets == 0)
+				if ((ret = update_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
+			StorageTmp->gcpSctpProfileTable_rsvs = 0;
+			StorageTmp->gcpSctpProfileTable_tsts = 0;
+			StorageTmp->gcpSctpProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpSctpNoDelay = old_value;
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpSctpProfileTable_sets == 0)
+			revert_gcpSctpProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		StorageTmp->gcpSctpNoDelay = StorageOld->gcpSctpNoDelay;
+		if (--StorageTmp->gcpSctpProfileTable_rsvs == 0)
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10104,12 +13946,14 @@ write_gcpSctpNoDelay(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_gcpSctpMaxseg(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpSctpProfileTable_data *StorageTmp = NULL;
+	struct gcpSctpProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpSctpMaxseg entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpSctpProfileTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10139,22 +13983,61 @@ write_gcpSctpMaxseg(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpSctpMaxseg: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			if (StorageTmp->gcpSctpProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpSctpProfileTable_old = gcpSctpProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpSctpProfileTable_rsvs++;
+		StorageTmp->gcpSctpMaxseg = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpSctpProfileTable_tsts == 0)
+				if ((ret = check_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpSctpMaxseg for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpSctpMaxseg;
-		StorageTmp->gcpSctpMaxseg = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpSctpProfileTable_sets == 0)
+				if ((ret = update_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
+			StorageTmp->gcpSctpProfileTable_rsvs = 0;
+			StorageTmp->gcpSctpProfileTable_tsts = 0;
+			StorageTmp->gcpSctpProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpSctpMaxseg = old_value;
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpSctpProfileTable_sets == 0)
+			revert_gcpSctpProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		StorageTmp->gcpSctpMaxseg = StorageOld->gcpSctpMaxseg;
+		if (--StorageTmp->gcpSctpProfileTable_rsvs == 0)
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10174,12 +14057,14 @@ write_gcpSctpMaxseg(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_gcpSctpHeartbeatItvl(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpSctpProfileTable_data *StorageTmp = NULL;
+	struct gcpSctpProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpSctpHeartbeatItvl entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpSctpProfileTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10209,22 +14094,61 @@ write_gcpSctpHeartbeatItvl(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpSctpHeartbeatItvl: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			if (StorageTmp->gcpSctpProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpSctpProfileTable_old = gcpSctpProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpSctpProfileTable_rsvs++;
+		StorageTmp->gcpSctpHeartbeatItvl = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpSctpProfileTable_tsts == 0)
+				if ((ret = check_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpSctpHeartbeatItvl for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpSctpHeartbeatItvl;
-		StorageTmp->gcpSctpHeartbeatItvl = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpSctpProfileTable_sets == 0)
+				if ((ret = update_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
+			StorageTmp->gcpSctpProfileTable_rsvs = 0;
+			StorageTmp->gcpSctpProfileTable_tsts = 0;
+			StorageTmp->gcpSctpProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpSctpHeartbeatItvl = old_value;
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpSctpProfileTable_sets == 0)
+			revert_gcpSctpProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		StorageTmp->gcpSctpHeartbeatItvl = StorageOld->gcpSctpHeartbeatItvl;
+		if (--StorageTmp->gcpSctpProfileTable_rsvs == 0)
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10244,12 +14168,14 @@ write_gcpSctpHeartbeatItvl(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_gcpSctpHearbeat(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpSctpProfileTable_data *StorageTmp = NULL;
+	struct gcpSctpProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpSctpHearbeat entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpSctpProfileTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10282,22 +14208,61 @@ write_gcpSctpHearbeat(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpSctpHearbeat: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			if (StorageTmp->gcpSctpProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpSctpProfileTable_old = gcpSctpProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpSctpProfileTable_rsvs++;
+		StorageTmp->gcpSctpHearbeat = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpSctpProfileTable_tsts == 0)
+				if ((ret = check_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpSctpHearbeat for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpSctpHearbeat;
-		StorageTmp->gcpSctpHearbeat = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpSctpProfileTable_sets == 0)
+				if ((ret = update_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
+			StorageTmp->gcpSctpProfileTable_rsvs = 0;
+			StorageTmp->gcpSctpProfileTable_tsts = 0;
+			StorageTmp->gcpSctpProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpSctpHearbeat = old_value;
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpSctpProfileTable_sets == 0)
+			revert_gcpSctpProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		StorageTmp->gcpSctpHearbeat = StorageOld->gcpSctpHearbeat;
+		if (--StorageTmp->gcpSctpProfileTable_rsvs == 0)
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10317,12 +14282,14 @@ write_gcpSctpHearbeat(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_gcpSctpRtoInitial(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpSctpProfileTable_data *StorageTmp = NULL;
+	struct gcpSctpProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpSctpRtoInitial entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpSctpProfileTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10352,22 +14319,61 @@ write_gcpSctpRtoInitial(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpSctpRtoInitial: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			if (StorageTmp->gcpSctpProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpSctpProfileTable_old = gcpSctpProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpSctpProfileTable_rsvs++;
+		StorageTmp->gcpSctpRtoInitial = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpSctpProfileTable_tsts == 0)
+				if ((ret = check_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpSctpRtoInitial for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpSctpRtoInitial;
-		StorageTmp->gcpSctpRtoInitial = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpSctpProfileTable_sets == 0)
+				if ((ret = update_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
+			StorageTmp->gcpSctpProfileTable_rsvs = 0;
+			StorageTmp->gcpSctpProfileTable_tsts = 0;
+			StorageTmp->gcpSctpProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpSctpRtoInitial = old_value;
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpSctpProfileTable_sets == 0)
+			revert_gcpSctpProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		StorageTmp->gcpSctpRtoInitial = StorageOld->gcpSctpRtoInitial;
+		if (--StorageTmp->gcpSctpProfileTable_rsvs == 0)
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10387,12 +14393,14 @@ write_gcpSctpRtoInitial(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_gcpSctpRtoMin(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpSctpProfileTable_data *StorageTmp = NULL;
+	struct gcpSctpProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpSctpRtoMin entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpSctpProfileTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10422,22 +14430,61 @@ write_gcpSctpRtoMin(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpSctpRtoMin: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			if (StorageTmp->gcpSctpProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpSctpProfileTable_old = gcpSctpProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpSctpProfileTable_rsvs++;
+		StorageTmp->gcpSctpRtoMin = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpSctpProfileTable_tsts == 0)
+				if ((ret = check_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpSctpRtoMin for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpSctpRtoMin;
-		StorageTmp->gcpSctpRtoMin = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpSctpProfileTable_sets == 0)
+				if ((ret = update_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
+			StorageTmp->gcpSctpProfileTable_rsvs = 0;
+			StorageTmp->gcpSctpProfileTable_tsts = 0;
+			StorageTmp->gcpSctpProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpSctpRtoMin = old_value;
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpSctpProfileTable_sets == 0)
+			revert_gcpSctpProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		StorageTmp->gcpSctpRtoMin = StorageOld->gcpSctpRtoMin;
+		if (--StorageTmp->gcpSctpProfileTable_rsvs == 0)
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10457,12 +14504,14 @@ write_gcpSctpRtoMin(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_gcpSctpRtoMax(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpSctpProfileTable_data *StorageTmp = NULL;
+	struct gcpSctpProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpSctpRtoMax entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpSctpProfileTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10492,22 +14541,61 @@ write_gcpSctpRtoMax(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpSctpRtoMax: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			if (StorageTmp->gcpSctpProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpSctpProfileTable_old = gcpSctpProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpSctpProfileTable_rsvs++;
+		StorageTmp->gcpSctpRtoMax = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpSctpProfileTable_tsts == 0)
+				if ((ret = check_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpSctpRtoMax for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpSctpRtoMax;
-		StorageTmp->gcpSctpRtoMax = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpSctpProfileTable_sets == 0)
+				if ((ret = update_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
+			StorageTmp->gcpSctpProfileTable_rsvs = 0;
+			StorageTmp->gcpSctpProfileTable_tsts = 0;
+			StorageTmp->gcpSctpProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpSctpRtoMax = old_value;
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpSctpProfileTable_sets == 0)
+			revert_gcpSctpProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		StorageTmp->gcpSctpRtoMax = StorageOld->gcpSctpRtoMax;
+		if (--StorageTmp->gcpSctpProfileTable_rsvs == 0)
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10527,12 +14615,14 @@ write_gcpSctpRtoMax(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_gcpSctpPathMaxRetrans(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpSctpProfileTable_data *StorageTmp = NULL;
+	struct gcpSctpProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpSctpPathMaxRetrans entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpSctpProfileTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10557,22 +14647,61 @@ write_gcpSctpPathMaxRetrans(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpSctpPathMaxRetrans: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			if (StorageTmp->gcpSctpProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpSctpProfileTable_old = gcpSctpProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpSctpProfileTable_rsvs++;
+		StorageTmp->gcpSctpPathMaxRetrans = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpSctpProfileTable_tsts == 0)
+				if ((ret = check_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpSctpPathMaxRetrans for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpSctpPathMaxRetrans;
-		StorageTmp->gcpSctpPathMaxRetrans = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpSctpProfileTable_sets == 0)
+				if ((ret = update_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
+			StorageTmp->gcpSctpProfileTable_rsvs = 0;
+			StorageTmp->gcpSctpProfileTable_tsts = 0;
+			StorageTmp->gcpSctpProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpSctpPathMaxRetrans = old_value;
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpSctpProfileTable_sets == 0)
+			revert_gcpSctpProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		StorageTmp->gcpSctpPathMaxRetrans = StorageOld->gcpSctpPathMaxRetrans;
+		if (--StorageTmp->gcpSctpProfileTable_rsvs == 0)
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10592,12 +14721,14 @@ write_gcpSctpPathMaxRetrans(int action, u_char *var_val, u_char var_val_type, si
 int
 write_gcpSctpCookieLife(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpSctpProfileTable_data *StorageTmp = NULL;
+	struct gcpSctpProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpSctpCookieLife entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpSctpProfileTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10627,22 +14758,61 @@ write_gcpSctpCookieLife(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpSctpCookieLife: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			if (StorageTmp->gcpSctpProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpSctpProfileTable_old = gcpSctpProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpSctpProfileTable_rsvs++;
+		StorageTmp->gcpSctpCookieLife = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpSctpProfileTable_tsts == 0)
+				if ((ret = check_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpSctpCookieLife for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpSctpCookieLife;
-		StorageTmp->gcpSctpCookieLife = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpSctpProfileTable_sets == 0)
+				if ((ret = update_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
+			StorageTmp->gcpSctpProfileTable_rsvs = 0;
+			StorageTmp->gcpSctpProfileTable_tsts = 0;
+			StorageTmp->gcpSctpProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpSctpCookieLife = old_value;
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpSctpProfileTable_sets == 0)
+			revert_gcpSctpProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		StorageTmp->gcpSctpCookieLife = StorageOld->gcpSctpCookieLife;
+		if (--StorageTmp->gcpSctpProfileTable_rsvs == 0)
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10662,12 +14832,14 @@ write_gcpSctpCookieLife(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_gcpSctpCookieInc(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpSctpProfileTable_data *StorageTmp = NULL;
+	struct gcpSctpProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpSctpCookieInc entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpSctpProfileTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10697,22 +14869,61 @@ write_gcpSctpCookieInc(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpSctpCookieInc: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			if (StorageTmp->gcpSctpProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpSctpProfileTable_old = gcpSctpProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpSctpProfileTable_rsvs++;
+		StorageTmp->gcpSctpCookieInc = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpSctpProfileTable_tsts == 0)
+				if ((ret = check_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpSctpCookieInc for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpSctpCookieInc;
-		StorageTmp->gcpSctpCookieInc = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpSctpProfileTable_sets == 0)
+				if ((ret = update_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
+			StorageTmp->gcpSctpProfileTable_rsvs = 0;
+			StorageTmp->gcpSctpProfileTable_tsts = 0;
+			StorageTmp->gcpSctpProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpSctpCookieInc = old_value;
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpSctpProfileTable_sets == 0)
+			revert_gcpSctpProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		StorageTmp->gcpSctpCookieInc = StorageOld->gcpSctpCookieInc;
+		if (--StorageTmp->gcpSctpProfileTable_rsvs == 0)
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10732,12 +14943,14 @@ write_gcpSctpCookieInc(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_gcpSctpMaxInitRetries(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpSctpProfileTable_data *StorageTmp = NULL;
+	struct gcpSctpProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpSctpMaxInitRetries entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpSctpProfileTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10762,22 +14975,61 @@ write_gcpSctpMaxInitRetries(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpSctpMaxInitRetries: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			if (StorageTmp->gcpSctpProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpSctpProfileTable_old = gcpSctpProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpSctpProfileTable_rsvs++;
+		StorageTmp->gcpSctpMaxInitRetries = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpSctpProfileTable_tsts == 0)
+				if ((ret = check_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpSctpMaxInitRetries for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpSctpMaxInitRetries;
-		StorageTmp->gcpSctpMaxInitRetries = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpSctpProfileTable_sets == 0)
+				if ((ret = update_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
+			StorageTmp->gcpSctpProfileTable_rsvs = 0;
+			StorageTmp->gcpSctpProfileTable_tsts = 0;
+			StorageTmp->gcpSctpProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpSctpMaxInitRetries = old_value;
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpSctpProfileTable_sets == 0)
+			revert_gcpSctpProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		StorageTmp->gcpSctpMaxInitRetries = StorageOld->gcpSctpMaxInitRetries;
+		if (--StorageTmp->gcpSctpProfileTable_rsvs == 0)
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10797,12 +15049,14 @@ write_gcpSctpMaxInitRetries(int action, u_char *var_val, u_char var_val_type, si
 int
 write_gcpSctpMaxBurst(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpSctpProfileTable_data *StorageTmp = NULL;
+	struct gcpSctpProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpSctpMaxBurst entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpSctpProfileTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10827,22 +15081,61 @@ write_gcpSctpMaxBurst(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpSctpMaxBurst: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			if (StorageTmp->gcpSctpProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpSctpProfileTable_old = gcpSctpProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpSctpProfileTable_rsvs++;
+		StorageTmp->gcpSctpMaxBurst = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpSctpProfileTable_tsts == 0)
+				if ((ret = check_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpSctpMaxBurst for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpSctpMaxBurst;
-		StorageTmp->gcpSctpMaxBurst = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpSctpProfileTable_sets == 0)
+				if ((ret = update_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
+			StorageTmp->gcpSctpProfileTable_rsvs = 0;
+			StorageTmp->gcpSctpProfileTable_tsts = 0;
+			StorageTmp->gcpSctpProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpSctpMaxBurst = old_value;
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpSctpProfileTable_sets == 0)
+			revert_gcpSctpProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		StorageTmp->gcpSctpMaxBurst = StorageOld->gcpSctpMaxBurst;
+		if (--StorageTmp->gcpSctpProfileTable_rsvs == 0)
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10862,12 +15155,14 @@ write_gcpSctpMaxBurst(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_gcpSctpAssocMaxRetrans(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpSctpProfileTable_data *StorageTmp = NULL;
+	struct gcpSctpProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpSctpAssocMaxRetrans entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpSctpProfileTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10892,22 +15187,61 @@ write_gcpSctpAssocMaxRetrans(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpSctpAssocMaxRetrans: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			if (StorageTmp->gcpSctpProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpSctpProfileTable_old = gcpSctpProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpSctpProfileTable_rsvs++;
+		StorageTmp->gcpSctpAssocMaxRetrans = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpSctpProfileTable_tsts == 0)
+				if ((ret = check_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpSctpAssocMaxRetrans for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpSctpAssocMaxRetrans;
-		StorageTmp->gcpSctpAssocMaxRetrans = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpSctpProfileTable_sets == 0)
+				if ((ret = update_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
+			StorageTmp->gcpSctpProfileTable_rsvs = 0;
+			StorageTmp->gcpSctpProfileTable_tsts = 0;
+			StorageTmp->gcpSctpProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpSctpAssocMaxRetrans = old_value;
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpSctpProfileTable_sets == 0)
+			revert_gcpSctpProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		StorageTmp->gcpSctpAssocMaxRetrans = StorageOld->gcpSctpAssocMaxRetrans;
+		if (--StorageTmp->gcpSctpProfileTable_rsvs == 0)
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10927,12 +15261,14 @@ write_gcpSctpAssocMaxRetrans(int action, u_char *var_val, u_char var_val_type, s
 int
 write_gcpSctpSackDelay(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpSctpProfileTable_data *StorageTmp = NULL;
+	struct gcpSctpProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpSctpSackDelay entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpSctpProfileTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10962,22 +15298,61 @@ write_gcpSctpSackDelay(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpSctpSackDelay: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			if (StorageTmp->gcpSctpProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpSctpProfileTable_old = gcpSctpProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpSctpProfileTable_rsvs++;
+		StorageTmp->gcpSctpSackDelay = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpSctpProfileTable_tsts == 0)
+				if ((ret = check_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpSctpSackDelay for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpSctpSackDelay;
-		StorageTmp->gcpSctpSackDelay = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpSctpProfileTable_sets == 0)
+				if ((ret = update_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
+			StorageTmp->gcpSctpProfileTable_rsvs = 0;
+			StorageTmp->gcpSctpProfileTable_tsts = 0;
+			StorageTmp->gcpSctpProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpSctpSackDelay = old_value;
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpSctpProfileTable_sets == 0)
+			revert_gcpSctpProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		StorageTmp->gcpSctpSackDelay = StorageOld->gcpSctpSackDelay;
+		if (--StorageTmp->gcpSctpProfileTable_rsvs == 0)
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10997,12 +15372,14 @@ write_gcpSctpSackDelay(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_gcpSctpLifetime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpSctpProfileTable_data *StorageTmp = NULL;
+	struct gcpSctpProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpSctpLifetime entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpSctpProfileTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -11032,22 +15409,61 @@ write_gcpSctpLifetime(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpSctpLifetime: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			if (StorageTmp->gcpSctpProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpSctpProfileTable_old = gcpSctpProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpSctpProfileTable_rsvs++;
+		StorageTmp->gcpSctpLifetime = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpSctpProfileTable_tsts == 0)
+				if ((ret = check_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpSctpLifetime for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpSctpLifetime;
-		StorageTmp->gcpSctpLifetime = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpSctpProfileTable_sets == 0)
+				if ((ret = update_gcpSctpProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSctpProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
+			StorageTmp->gcpSctpProfileTable_rsvs = 0;
+			StorageTmp->gcpSctpProfileTable_tsts = 0;
+			StorageTmp->gcpSctpProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpSctpLifetime = old_value;
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpSctpProfileTable_sets == 0)
+			revert_gcpSctpProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+			break;
+		StorageTmp->gcpSctpLifetime = StorageOld->gcpSctpLifetime;
+		if (--StorageTmp->gcpSctpProfileTable_rsvs == 0)
+			gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11067,12 +15483,14 @@ write_gcpSctpLifetime(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_gcpProtGroupType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpProtGroupTable_data *StorageTmp = NULL;
+	struct gcpProtGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpProtGroupType entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpProtGroupTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -11105,22 +15523,61 @@ write_gcpProtGroupType(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpProtGroupType: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			if (StorageTmp->gcpProtGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpProtGroupTable_old = gcpProtGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpProtGroupTable_rsvs++;
+		StorageTmp->gcpProtGroupType = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpProtGroupTable_tsts == 0)
+				if ((ret = check_gcpProtGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpProtGroupType for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpProtGroupType;
-		StorageTmp->gcpProtGroupType = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpProtGroupTable_sets == 0)
+				if ((ret = update_gcpProtGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			gcpProtGroupTable_destroy(&StorageTmp->gcpProtGroupTable_old);
+			StorageTmp->gcpProtGroupTable_rsvs = 0;
+			StorageTmp->gcpProtGroupTable_tsts = 0;
+			StorageTmp->gcpProtGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpProtGroupType = old_value;
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpProtGroupTable_sets == 0)
+			revert_gcpProtGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			break;
+		StorageTmp->gcpProtGroupType = StorageOld->gcpProtGroupType;
+		if (--StorageTmp->gcpProtGroupTable_rsvs == 0)
+			gcpProtGroupTable_destroy(&StorageTmp->gcpProtGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11140,12 +15597,14 @@ write_gcpProtGroupType(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_gcpProtGroupRevertive(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpProtGroupTable_data *StorageTmp = NULL;
+	struct gcpProtGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpProtGroupRevertive entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpProtGroupTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -11178,22 +15637,61 @@ write_gcpProtGroupRevertive(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpProtGroupRevertive: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			if (StorageTmp->gcpProtGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpProtGroupTable_old = gcpProtGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpProtGroupTable_rsvs++;
+		StorageTmp->gcpProtGroupRevertive = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpProtGroupTable_tsts == 0)
+				if ((ret = check_gcpProtGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpProtGroupRevertive for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpProtGroupRevertive;
-		StorageTmp->gcpProtGroupRevertive = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpProtGroupTable_sets == 0)
+				if ((ret = update_gcpProtGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			gcpProtGroupTable_destroy(&StorageTmp->gcpProtGroupTable_old);
+			StorageTmp->gcpProtGroupTable_rsvs = 0;
+			StorageTmp->gcpProtGroupTable_tsts = 0;
+			StorageTmp->gcpProtGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpProtGroupRevertive = old_value;
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpProtGroupTable_sets == 0)
+			revert_gcpProtGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			break;
+		StorageTmp->gcpProtGroupRevertive = StorageOld->gcpProtGroupRevertive;
+		if (--StorageTmp->gcpProtGroupTable_rsvs == 0)
+			gcpProtGroupTable_destroy(&StorageTmp->gcpProtGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11213,12 +15711,14 @@ write_gcpProtGroupRevertive(int action, u_char *var_val, u_char var_val_type, si
 int
 write_gcpProtGroupSBOLNumber(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpProtGroupTable_data *StorageTmp = NULL;
+	struct gcpProtGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpProtGroupSBOLNumber entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpProtGroupTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -11243,22 +15743,61 @@ write_gcpProtGroupSBOLNumber(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpProtGroupSBOLNumber: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			if (StorageTmp->gcpProtGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpProtGroupTable_old = gcpProtGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpProtGroupTable_rsvs++;
+		StorageTmp->gcpProtGroupSBOLNumber = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpProtGroupTable_tsts == 0)
+				if ((ret = check_gcpProtGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpProtGroupSBOLNumber for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpProtGroupSBOLNumber;
-		StorageTmp->gcpProtGroupSBOLNumber = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpProtGroupTable_sets == 0)
+				if ((ret = update_gcpProtGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			gcpProtGroupTable_destroy(&StorageTmp->gcpProtGroupTable_old);
+			StorageTmp->gcpProtGroupTable_rsvs = 0;
+			StorageTmp->gcpProtGroupTable_tsts = 0;
+			StorageTmp->gcpProtGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpProtGroupSBOLNumber = old_value;
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpProtGroupTable_sets == 0)
+			revert_gcpProtGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			break;
+		StorageTmp->gcpProtGroupSBOLNumber = StorageOld->gcpProtGroupSBOLNumber;
+		if (--StorageTmp->gcpProtGroupTable_rsvs == 0)
+			gcpProtGroupTable_destroy(&StorageTmp->gcpProtGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11278,12 +15817,14 @@ write_gcpProtGroupSBOLNumber(int action, u_char *var_val, u_char var_val_type, s
 int
 write_gcpProtGroupWaitToRestoreTime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpProtGroupTable_data *StorageTmp = NULL;
+	struct gcpProtGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpProtGroupWaitToRestoreTime entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpProtGroupTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -11313,22 +15854,61 @@ write_gcpProtGroupWaitToRestoreTime(int action, u_char *var_val, u_char var_val_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpProtGroupWaitToRestoreTime: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			if (StorageTmp->gcpProtGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpProtGroupTable_old = gcpProtGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpProtGroupTable_rsvs++;
+		StorageTmp->gcpProtGroupWaitToRestoreTime = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpProtGroupTable_tsts == 0)
+				if ((ret = check_gcpProtGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpProtGroupWaitToRestoreTime for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpProtGroupWaitToRestoreTime;
-		StorageTmp->gcpProtGroupWaitToRestoreTime = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpProtGroupTable_sets == 0)
+				if ((ret = update_gcpProtGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			gcpProtGroupTable_destroy(&StorageTmp->gcpProtGroupTable_old);
+			StorageTmp->gcpProtGroupTable_rsvs = 0;
+			StorageTmp->gcpProtGroupTable_tsts = 0;
+			StorageTmp->gcpProtGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpProtGroupWaitToRestoreTime = old_value;
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpProtGroupTable_sets == 0)
+			revert_gcpProtGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			break;
+		StorageTmp->gcpProtGroupWaitToRestoreTime = StorageOld->gcpProtGroupWaitToRestoreTime;
+		if (--StorageTmp->gcpProtGroupTable_rsvs == 0)
+			gcpProtGroupTable_destroy(&StorageTmp->gcpProtGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11348,12 +15928,14 @@ write_gcpProtGroupWaitToRestoreTime(int action, u_char *var_val, u_char var_val_
 int
 write_gcpProtGroupSettingWindowTime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpProtGroupTable_data *StorageTmp = NULL;
+	struct gcpProtGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpProtGroupSettingWindowTime entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpProtGroupTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -11383,22 +15965,61 @@ write_gcpProtGroupSettingWindowTime(int action, u_char *var_val, u_char var_val_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpProtGroupSettingWindowTime: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			if (StorageTmp->gcpProtGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpProtGroupTable_old = gcpProtGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpProtGroupTable_rsvs++;
+		StorageTmp->gcpProtGroupSettingWindowTime = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpProtGroupTable_tsts == 0)
+				if ((ret = check_gcpProtGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpProtGroupSettingWindowTime for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpProtGroupSettingWindowTime;
-		StorageTmp->gcpProtGroupSettingWindowTime = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpProtGroupTable_sets == 0)
+				if ((ret = update_gcpProtGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			gcpProtGroupTable_destroy(&StorageTmp->gcpProtGroupTable_old);
+			StorageTmp->gcpProtGroupTable_rsvs = 0;
+			StorageTmp->gcpProtGroupTable_tsts = 0;
+			StorageTmp->gcpProtGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpProtGroupSettingWindowTime = old_value;
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpProtGroupTable_sets == 0)
+			revert_gcpProtGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			break;
+		StorageTmp->gcpProtGroupSettingWindowTime = StorageOld->gcpProtGroupSettingWindowTime;
+		if (--StorageTmp->gcpProtGroupTable_rsvs == 0)
+			gcpProtGroupTable_destroy(&StorageTmp->gcpProtGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11418,12 +16039,14 @@ write_gcpProtGroupSettingWindowTime(int action, u_char *var_val, u_char var_val_
 int
 write_gcpProtGroupReleaseingWindowTime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpProtGroupTable_data *StorageTmp = NULL;
+	struct gcpProtGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpProtGroupReleaseingWindowTime entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpProtGroupTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -11453,22 +16076,61 @@ write_gcpProtGroupReleaseingWindowTime(int action, u_char *var_val, u_char var_v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpProtGroupReleaseingWindowTime: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			if (StorageTmp->gcpProtGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpProtGroupTable_old = gcpProtGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpProtGroupTable_rsvs++;
+		StorageTmp->gcpProtGroupReleaseingWindowTime = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpProtGroupTable_tsts == 0)
+				if ((ret = check_gcpProtGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpProtGroupReleaseingWindowTime for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpProtGroupReleaseingWindowTime;
-		StorageTmp->gcpProtGroupReleaseingWindowTime = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpProtGroupTable_sets == 0)
+				if ((ret = update_gcpProtGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			gcpProtGroupTable_destroy(&StorageTmp->gcpProtGroupTable_old);
+			StorageTmp->gcpProtGroupTable_rsvs = 0;
+			StorageTmp->gcpProtGroupTable_tsts = 0;
+			StorageTmp->gcpProtGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpProtGroupReleaseingWindowTime = old_value;
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpProtGroupTable_sets == 0)
+			revert_gcpProtGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			break;
+		StorageTmp->gcpProtGroupReleaseingWindowTime = StorageOld->gcpProtGroupReleaseingWindowTime;
+		if (--StorageTmp->gcpProtGroupTable_rsvs == 0)
+			gcpProtGroupTable_destroy(&StorageTmp->gcpProtGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11488,12 +16150,14 @@ write_gcpProtGroupReleaseingWindowTime(int action, u_char *var_val, u_char var_v
 int
 write_gcpProtGroupHitsCount(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpProtGroupTable_data *StorageTmp = NULL;
+	struct gcpProtGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpProtGroupHitsCount entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpProtGroupTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -11518,22 +16182,61 @@ write_gcpProtGroupHitsCount(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpProtGroupHitsCount: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			if (StorageTmp->gcpProtGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpProtGroupTable_old = gcpProtGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpProtGroupTable_rsvs++;
+		StorageTmp->gcpProtGroupHitsCount = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpProtGroupTable_tsts == 0)
+				if ((ret = check_gcpProtGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpProtGroupHitsCount for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpProtGroupHitsCount;
-		StorageTmp->gcpProtGroupHitsCount = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpProtGroupTable_sets == 0)
+				if ((ret = update_gcpProtGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			gcpProtGroupTable_destroy(&StorageTmp->gcpProtGroupTable_old);
+			StorageTmp->gcpProtGroupTable_rsvs = 0;
+			StorageTmp->gcpProtGroupTable_tsts = 0;
+			StorageTmp->gcpProtGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpProtGroupHitsCount = old_value;
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpProtGroupTable_sets == 0)
+			revert_gcpProtGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			break;
+		StorageTmp->gcpProtGroupHitsCount = StorageOld->gcpProtGroupHitsCount;
+		if (--StorageTmp->gcpProtGroupTable_rsvs == 0)
+			gcpProtGroupTable_destroy(&StorageTmp->gcpProtGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11553,12 +16256,14 @@ write_gcpProtGroupHitsCount(int action, u_char *var_val, u_char var_val_type, si
 int
 write_gcpProtGroupSwitchType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpProtGroupTable_data *StorageTmp = NULL;
+	struct gcpProtGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpProtGroupSwitchType entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpProtGroupTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -11592,22 +16297,61 @@ write_gcpProtGroupSwitchType(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpProtGroupSwitchType: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			if (StorageTmp->gcpProtGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpProtGroupTable_old = gcpProtGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpProtGroupTable_rsvs++;
+		StorageTmp->gcpProtGroupSwitchType = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpProtGroupTable_tsts == 0)
+				if ((ret = check_gcpProtGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpProtGroupSwitchType for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpProtGroupSwitchType;
-		StorageTmp->gcpProtGroupSwitchType = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpProtGroupTable_sets == 0)
+				if ((ret = update_gcpProtGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			gcpProtGroupTable_destroy(&StorageTmp->gcpProtGroupTable_old);
+			StorageTmp->gcpProtGroupTable_rsvs = 0;
+			StorageTmp->gcpProtGroupTable_tsts = 0;
+			StorageTmp->gcpProtGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpProtGroupSwitchType = old_value;
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpProtGroupTable_sets == 0)
+			revert_gcpProtGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			break;
+		StorageTmp->gcpProtGroupSwitchType = StorageOld->gcpProtGroupSwitchType;
+		if (--StorageTmp->gcpProtGroupTable_rsvs == 0)
+			gcpProtGroupTable_destroy(&StorageTmp->gcpProtGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11627,17 +16371,17 @@ write_gcpProtGroupSwitchType(int action, u_char *var_val, u_char var_val_type, s
 int
 write_gcpProtGroupProtectedUnits(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct gcpProtGroupTable_data *StorageTmp = NULL;
+	struct gcpProtGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpProtGroupProtectedUnits entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpProtGroupTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpProtGroupRowStatus) {
@@ -11660,33 +16404,73 @@ write_gcpProtGroupProtectedUnits(int action, u_char *var_val, u_char var_val_typ
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpProtGroupProtectedUnits: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			if (StorageTmp->gcpProtGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpProtGroupTable_old = gcpProtGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpProtGroupTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->gcpProtGroupProtectedUnits);
+		StorageTmp->gcpProtGroupProtectedUnits = string;
+		StorageTmp->gcpProtGroupProtectedUnitsLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpProtGroupTable_tsts == 0)
+				if ((ret = check_gcpProtGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpProtGroupProtectedUnits for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpProtGroupProtectedUnits;
-		old_length = StorageTmp->gcpProtGroupProtectedUnitsLen;
-		StorageTmp->gcpProtGroupProtectedUnits = string;
-		StorageTmp->gcpProtGroupProtectedUnitsLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpProtGroupTable_sets == 0)
+				if ((ret = update_gcpProtGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			gcpProtGroupTable_destroy(&StorageTmp->gcpProtGroupTable_old);
+			StorageTmp->gcpProtGroupTable_rsvs = 0;
+			StorageTmp->gcpProtGroupTable_tsts = 0;
+			StorageTmp->gcpProtGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpProtGroupProtectedUnits = old_value;
-		StorageTmp->gcpProtGroupProtectedUnitsLen = old_length;
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpProtGroupTable_sets == 0)
+			revert_gcpProtGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			break;
+		if (StorageOld->gcpProtGroupProtectedUnits != NULL) {
+			SNMP_FREE(StorageTmp->gcpProtGroupProtectedUnits);
+			StorageTmp->gcpProtGroupProtectedUnits = StorageOld->gcpProtGroupProtectedUnits;
+			StorageTmp->gcpProtGroupProtectedUnitsLen = StorageOld->gcpProtGroupProtectedUnitsLen;
+			StorageOld->gcpProtGroupProtectedUnits = NULL;
+			StorageOld->gcpProtGroupProtectedUnitsLen = 0;
+		}
+		if (--StorageTmp->gcpProtGroupTable_rsvs == 0)
+			gcpProtGroupTable_destroy(&StorageTmp->gcpProtGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11706,17 +16490,17 @@ write_gcpProtGroupProtectedUnits(int action, u_char *var_val, u_char var_val_typ
 int
 write_gcpProtGroupProtectingUnits(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct gcpProtGroupTable_data *StorageTmp = NULL;
+	struct gcpProtGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpProtGroupProtectingUnits entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpProtGroupTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpProtGroupRowStatus) {
@@ -11739,33 +16523,73 @@ write_gcpProtGroupProtectingUnits(int action, u_char *var_val, u_char var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpProtGroupProtectingUnits: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			if (StorageTmp->gcpProtGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpProtGroupTable_old = gcpProtGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpProtGroupTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->gcpProtGroupProtectingUnits);
+		StorageTmp->gcpProtGroupProtectingUnits = string;
+		StorageTmp->gcpProtGroupProtectingUnitsLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpProtGroupTable_tsts == 0)
+				if ((ret = check_gcpProtGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpProtGroupProtectingUnits for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpProtGroupProtectingUnits;
-		old_length = StorageTmp->gcpProtGroupProtectingUnitsLen;
-		StorageTmp->gcpProtGroupProtectingUnits = string;
-		StorageTmp->gcpProtGroupProtectingUnitsLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpProtGroupTable_sets == 0)
+				if ((ret = update_gcpProtGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			gcpProtGroupTable_destroy(&StorageTmp->gcpProtGroupTable_old);
+			StorageTmp->gcpProtGroupTable_rsvs = 0;
+			StorageTmp->gcpProtGroupTable_tsts = 0;
+			StorageTmp->gcpProtGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpProtGroupProtectingUnits = old_value;
-		StorageTmp->gcpProtGroupProtectingUnitsLen = old_length;
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpProtGroupTable_sets == 0)
+			revert_gcpProtGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			break;
+		if (StorageOld->gcpProtGroupProtectingUnits != NULL) {
+			SNMP_FREE(StorageTmp->gcpProtGroupProtectingUnits);
+			StorageTmp->gcpProtGroupProtectingUnits = StorageOld->gcpProtGroupProtectingUnits;
+			StorageTmp->gcpProtGroupProtectingUnitsLen = StorageOld->gcpProtGroupProtectingUnitsLen;
+			StorageOld->gcpProtGroupProtectingUnits = NULL;
+			StorageOld->gcpProtGroupProtectingUnitsLen = 0;
+		}
+		if (--StorageTmp->gcpProtGroupTable_rsvs == 0)
+			gcpProtGroupTable_destroy(&StorageTmp->gcpProtGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11785,12 +16609,14 @@ write_gcpProtGroupProtectingUnits(int action, u_char *var_val, u_char var_val_ty
 int
 write_gcpProtGroupInvokeProtection(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpProtGroupTable_data *StorageTmp = NULL;
+	struct gcpProtGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpProtGroupInvokeProtection entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpProtGroupTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -11826,22 +16652,61 @@ write_gcpProtGroupInvokeProtection(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpProtGroupInvokeProtection: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			if (StorageTmp->gcpProtGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpProtGroupTable_old = gcpProtGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpProtGroupTable_rsvs++;
+		StorageTmp->gcpProtGroupInvokeProtection = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpProtGroupTable_tsts == 0)
+				if ((ret = check_gcpProtGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpProtGroupInvokeProtection for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpProtGroupInvokeProtection;
-		StorageTmp->gcpProtGroupInvokeProtection = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpProtGroupTable_sets == 0)
+				if ((ret = update_gcpProtGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			gcpProtGroupTable_destroy(&StorageTmp->gcpProtGroupTable_old);
+			StorageTmp->gcpProtGroupTable_rsvs = 0;
+			StorageTmp->gcpProtGroupTable_tsts = 0;
+			StorageTmp->gcpProtGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpProtGroupInvokeProtection = old_value;
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpProtGroupTable_sets == 0)
+			revert_gcpProtGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			break;
+		StorageTmp->gcpProtGroupInvokeProtection = StorageOld->gcpProtGroupInvokeProtection;
+		if (--StorageTmp->gcpProtGroupTable_rsvs == 0)
+			gcpProtGroupTable_destroy(&StorageTmp->gcpProtGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11861,12 +16726,14 @@ write_gcpProtGroupInvokeProtection(int action, u_char *var_val, u_char var_val_t
 int
 write_gcpProtGroupReleaseProtection(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpProtGroupTable_data *StorageTmp = NULL;
+	struct gcpProtGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpProtGroupReleaseProtection entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpProtGroupTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -11902,22 +16769,61 @@ write_gcpProtGroupReleaseProtection(int action, u_char *var_val, u_char var_val_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpProtGroupReleaseProtection: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			if (StorageTmp->gcpProtGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpProtGroupTable_old = gcpProtGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpProtGroupTable_rsvs++;
+		StorageTmp->gcpProtGroupReleaseProtection = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpProtGroupTable_tsts == 0)
+				if ((ret = check_gcpProtGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpProtGroupReleaseProtection for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpProtGroupReleaseProtection;
-		StorageTmp->gcpProtGroupReleaseProtection = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpProtGroupTable_sets == 0)
+				if ((ret = update_gcpProtGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+			gcpProtGroupTable_destroy(&StorageTmp->gcpProtGroupTable_old);
+			StorageTmp->gcpProtGroupTable_rsvs = 0;
+			StorageTmp->gcpProtGroupTable_tsts = 0;
+			StorageTmp->gcpProtGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpProtGroupReleaseProtection = old_value;
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpProtGroupTable_sets == 0)
+			revert_gcpProtGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+			break;
+		StorageTmp->gcpProtGroupReleaseProtection = StorageOld->gcpProtGroupReleaseProtection;
+		if (--StorageTmp->gcpProtGroupTable_rsvs == 0)
+			gcpProtGroupTable_destroy(&StorageTmp->gcpProtGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11937,17 +16843,17 @@ write_gcpProtGroupReleaseProtection(int action, u_char *var_val, u_char var_val_
 int
 write_gcpSbolObject(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct gcpSbolTable_data *StorageTmp = NULL;
+	struct gcpSbolTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpSbolObject entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpSbolTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpSbolStatus) {
@@ -11969,31 +16875,71 @@ write_gcpSbolObject(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpSbolObject: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpSbolTable_old) == NULL)
+			if (StorageTmp->gcpSbolTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpSbolTable_old = gcpSbolTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpSbolTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->gcpSbolObject);
+		StorageTmp->gcpSbolObject = objid;
+		StorageTmp->gcpSbolObjectLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpSbolTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpSbolTable_tsts == 0)
+				if ((ret = check_gcpSbolTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSbolTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpSbolObject for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpSbolObject;
-		old_length = StorageTmp->gcpSbolObjectLen;
-		StorageTmp->gcpSbolObject = objid;
-		StorageTmp->gcpSbolObjectLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpSbolTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpSbolTable_sets == 0)
+				if ((ret = update_gcpSbolTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpSbolTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpSbolTable_old) != NULL) {
+			gcpSbolTable_destroy(&StorageTmp->gcpSbolTable_old);
+			StorageTmp->gcpSbolTable_rsvs = 0;
+			StorageTmp->gcpSbolTable_tsts = 0;
+			StorageTmp->gcpSbolTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpSbolObject = old_value;
-		StorageTmp->gcpSbolObjectLen = old_length;
+		if ((StorageOld = StorageTmp->gcpSbolTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpSbolTable_sets == 0)
+			revert_gcpSbolTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->gcpSbolTable_old) == NULL)
+			break;
+		if (StorageOld->gcpSbolObject != NULL) {
+			SNMP_FREE(StorageTmp->gcpSbolObject);
+			StorageTmp->gcpSbolObject = StorageOld->gcpSbolObject;
+			StorageTmp->gcpSbolObjectLen = StorageOld->gcpSbolObjectLen;
+			StorageOld->gcpSbolObject = NULL;
+			StorageOld->gcpSbolObjectLen = 0;
+		}
+		if (--StorageTmp->gcpSbolTable_rsvs == 0)
+			gcpSbolTable_destroy(&StorageTmp->gcpSbolTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12013,12 +16959,14 @@ write_gcpSbolObject(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_gcpProtUnitProtecting(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpProtUnitTable_data *StorageTmp = NULL;
+	struct gcpProtUnitTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpProtUnitProtecting entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpProtUnitTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -12051,22 +16999,61 @@ write_gcpProtUnitProtecting(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpProtUnitProtecting: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) == NULL)
+			if (StorageTmp->gcpProtUnitTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpProtUnitTable_old = gcpProtUnitTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpProtUnitTable_rsvs++;
+		StorageTmp->gcpProtUnitProtecting = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpProtUnitTable_tsts == 0)
+				if ((ret = check_gcpProtUnitTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtUnitTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpProtUnitProtecting for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpProtUnitProtecting;
-		StorageTmp->gcpProtUnitProtecting = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpProtUnitTable_sets == 0)
+				if ((ret = update_gcpProtUnitTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtUnitTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) != NULL) {
+			gcpProtUnitTable_destroy(&StorageTmp->gcpProtUnitTable_old);
+			StorageTmp->gcpProtUnitTable_rsvs = 0;
+			StorageTmp->gcpProtUnitTable_tsts = 0;
+			StorageTmp->gcpProtUnitTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpProtUnitProtecting = old_value;
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpProtUnitTable_sets == 0)
+			revert_gcpProtUnitTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) == NULL)
+			break;
+		StorageTmp->gcpProtUnitProtecting = StorageOld->gcpProtUnitProtecting;
+		if (--StorageTmp->gcpProtUnitTable_rsvs == 0)
+			gcpProtUnitTable_destroy(&StorageTmp->gcpProtUnitTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12086,17 +17073,17 @@ write_gcpProtUnitProtecting(int action, u_char *var_val, u_char var_val_type, si
 int
 write_gcpProtUnitReliableResourcePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct gcpProtUnitTable_data *StorageTmp = NULL;
+	struct gcpProtUnitTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpProtUnitReliableResourcePointer entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpProtUnitTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpProtUnitRowStatus) {
@@ -12118,31 +17105,71 @@ write_gcpProtUnitReliableResourcePointer(int action, u_char *var_val, u_char var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpProtUnitReliableResourcePointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) == NULL)
+			if (StorageTmp->gcpProtUnitTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpProtUnitTable_old = gcpProtUnitTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpProtUnitTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->gcpProtUnitReliableResourcePointer);
+		StorageTmp->gcpProtUnitReliableResourcePointer = objid;
+		StorageTmp->gcpProtUnitReliableResourcePointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpProtUnitTable_tsts == 0)
+				if ((ret = check_gcpProtUnitTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtUnitTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpProtUnitReliableResourcePointer for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpProtUnitReliableResourcePointer;
-		old_length = StorageTmp->gcpProtUnitReliableResourcePointerLen;
-		StorageTmp->gcpProtUnitReliableResourcePointer = objid;
-		StorageTmp->gcpProtUnitReliableResourcePointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpProtUnitTable_sets == 0)
+				if ((ret = update_gcpProtUnitTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtUnitTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) != NULL) {
+			gcpProtUnitTable_destroy(&StorageTmp->gcpProtUnitTable_old);
+			StorageTmp->gcpProtUnitTable_rsvs = 0;
+			StorageTmp->gcpProtUnitTable_tsts = 0;
+			StorageTmp->gcpProtUnitTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpProtUnitReliableResourcePointer = old_value;
-		StorageTmp->gcpProtUnitReliableResourcePointerLen = old_length;
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpProtUnitTable_sets == 0)
+			revert_gcpProtUnitTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) == NULL)
+			break;
+		if (StorageOld->gcpProtUnitReliableResourcePointer != NULL) {
+			SNMP_FREE(StorageTmp->gcpProtUnitReliableResourcePointer);
+			StorageTmp->gcpProtUnitReliableResourcePointer = StorageOld->gcpProtUnitReliableResourcePointer;
+			StorageTmp->gcpProtUnitReliableResourcePointerLen = StorageOld->gcpProtUnitReliableResourcePointerLen;
+			StorageOld->gcpProtUnitReliableResourcePointer = NULL;
+			StorageOld->gcpProtUnitReliableResourcePointerLen = 0;
+		}
+		if (--StorageTmp->gcpProtUnitTable_rsvs == 0)
+			gcpProtUnitTable_destroy(&StorageTmp->gcpProtUnitTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12162,17 +17189,17 @@ write_gcpProtUnitReliableResourcePointer(int action, u_char *var_val, u_char var
 int
 write_gcpProtUnitUnreliableResourcePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct gcpProtUnitTable_data *StorageTmp = NULL;
+	struct gcpProtUnitTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpProtUnitUnreliableResourcePointer entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpProtUnitTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpProtUnitRowStatus) {
@@ -12194,31 +17221,71 @@ write_gcpProtUnitUnreliableResourcePointer(int action, u_char *var_val, u_char v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpProtUnitUnreliableResourcePointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) == NULL)
+			if (StorageTmp->gcpProtUnitTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpProtUnitTable_old = gcpProtUnitTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpProtUnitTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->gcpProtUnitUnreliableResourcePointer);
+		StorageTmp->gcpProtUnitUnreliableResourcePointer = objid;
+		StorageTmp->gcpProtUnitUnreliableResourcePointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpProtUnitTable_tsts == 0)
+				if ((ret = check_gcpProtUnitTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtUnitTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpProtUnitUnreliableResourcePointer for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpProtUnitUnreliableResourcePointer;
-		old_length = StorageTmp->gcpProtUnitUnreliableResourcePointerLen;
-		StorageTmp->gcpProtUnitUnreliableResourcePointer = objid;
-		StorageTmp->gcpProtUnitUnreliableResourcePointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpProtUnitTable_sets == 0)
+				if ((ret = update_gcpProtUnitTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtUnitTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) != NULL) {
+			gcpProtUnitTable_destroy(&StorageTmp->gcpProtUnitTable_old);
+			StorageTmp->gcpProtUnitTable_rsvs = 0;
+			StorageTmp->gcpProtUnitTable_tsts = 0;
+			StorageTmp->gcpProtUnitTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpProtUnitUnreliableResourcePointer = old_value;
-		StorageTmp->gcpProtUnitUnreliableResourcePointerLen = old_length;
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpProtUnitTable_sets == 0)
+			revert_gcpProtUnitTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) == NULL)
+			break;
+		if (StorageOld->gcpProtUnitUnreliableResourcePointer != NULL) {
+			SNMP_FREE(StorageTmp->gcpProtUnitUnreliableResourcePointer);
+			StorageTmp->gcpProtUnitUnreliableResourcePointer = StorageOld->gcpProtUnitUnreliableResourcePointer;
+			StorageTmp->gcpProtUnitUnreliableResourcePointerLen = StorageOld->gcpProtUnitUnreliableResourcePointerLen;
+			StorageOld->gcpProtUnitUnreliableResourcePointer = NULL;
+			StorageOld->gcpProtUnitUnreliableResourcePointerLen = 0;
+		}
+		if (--StorageTmp->gcpProtUnitTable_rsvs == 0)
+			gcpProtUnitTable_destroy(&StorageTmp->gcpProtUnitTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12238,17 +17305,17 @@ write_gcpProtUnitUnreliableResourcePointer(int action, u_char *var_val, u_char v
 int
 write_gcpProtUnitProtectionStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct gcpProtUnitTable_data *StorageTmp = NULL;
+	struct gcpProtUnitTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpProtUnitProtectionStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpProtUnitTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpProtUnitRowStatus) {
@@ -12278,33 +17345,73 @@ write_gcpProtUnitProtectionStatus(int action, u_char *var_val, u_char var_val_ty
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) == NULL)
+			if (StorageTmp->gcpProtUnitTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpProtUnitTable_old = gcpProtUnitTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpProtUnitTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->gcpProtUnitProtectionStatus);
+		StorageTmp->gcpProtUnitProtectionStatus = string;
+		StorageTmp->gcpProtUnitProtectionStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpProtUnitTable_tsts == 0)
+				if ((ret = check_gcpProtUnitTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtUnitTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpProtUnitProtectionStatus for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpProtUnitProtectionStatus;
-		old_length = StorageTmp->gcpProtUnitProtectionStatusLen;
-		StorageTmp->gcpProtUnitProtectionStatus = string;
-		StorageTmp->gcpProtUnitProtectionStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpProtUnitTable_sets == 0)
+				if ((ret = update_gcpProtUnitTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtUnitTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) != NULL) {
+			gcpProtUnitTable_destroy(&StorageTmp->gcpProtUnitTable_old);
+			StorageTmp->gcpProtUnitTable_rsvs = 0;
+			StorageTmp->gcpProtUnitTable_tsts = 0;
+			StorageTmp->gcpProtUnitTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpProtUnitProtectionStatus = old_value;
-		StorageTmp->gcpProtUnitProtectionStatusLen = old_length;
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpProtUnitTable_sets == 0)
+			revert_gcpProtUnitTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) == NULL)
+			break;
+		if (StorageOld->gcpProtUnitProtectionStatus != NULL) {
+			SNMP_FREE(StorageTmp->gcpProtUnitProtectionStatus);
+			StorageTmp->gcpProtUnitProtectionStatus = StorageOld->gcpProtUnitProtectionStatus;
+			StorageTmp->gcpProtUnitProtectionStatusLen = StorageOld->gcpProtUnitProtectionStatusLen;
+			StorageOld->gcpProtUnitProtectionStatus = NULL;
+			StorageOld->gcpProtUnitProtectionStatusLen = 0;
+		}
+		if (--StorageTmp->gcpProtUnitTable_rsvs == 0)
+			gcpProtUnitTable_destroy(&StorageTmp->gcpProtUnitTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12324,12 +17431,14 @@ write_gcpProtUnitProtectionStatus(int action, u_char *var_val, u_char var_val_ty
 int
 write_gcpProtUnitRequestSource(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpProtUnitTable_data *StorageTmp = NULL;
+	struct gcpProtUnitTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpProtUnitRequestSource entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpProtUnitTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -12362,22 +17471,61 @@ write_gcpProtUnitRequestSource(int action, u_char *var_val, u_char var_val_type,
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpProtUnitRequestSource: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) == NULL)
+			if (StorageTmp->gcpProtUnitTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpProtUnitTable_old = gcpProtUnitTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpProtUnitTable_rsvs++;
+		StorageTmp->gcpProtUnitRequestSource = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpProtUnitTable_tsts == 0)
+				if ((ret = check_gcpProtUnitTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtUnitTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpProtUnitRequestSource for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpProtUnitRequestSource;
-		StorageTmp->gcpProtUnitRequestSource = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpProtUnitTable_sets == 0)
+				if ((ret = update_gcpProtUnitTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtUnitTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) != NULL) {
+			gcpProtUnitTable_destroy(&StorageTmp->gcpProtUnitTable_old);
+			StorageTmp->gcpProtUnitTable_rsvs = 0;
+			StorageTmp->gcpProtUnitTable_tsts = 0;
+			StorageTmp->gcpProtUnitTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpProtUnitRequestSource = old_value;
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpProtUnitTable_sets == 0)
+			revert_gcpProtUnitTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) == NULL)
+			break;
+		StorageTmp->gcpProtUnitRequestSource = StorageOld->gcpProtUnitRequestSource;
+		if (--StorageTmp->gcpProtUnitTable_rsvs == 0)
+			gcpProtUnitTable_destroy(&StorageTmp->gcpProtUnitTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12397,12 +17545,14 @@ write_gcpProtUnitRequestSource(int action, u_char *var_val, u_char var_val_type,
 int
 write_gcpProtUnitPriority(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpProtUnitTable_data *StorageTmp = NULL;
+	struct gcpProtUnitTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpProtUnitPriority entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpProtUnitTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -12427,22 +17577,61 @@ write_gcpProtUnitPriority(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpProtUnitPriority: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) == NULL)
+			if (StorageTmp->gcpProtUnitTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpProtUnitTable_old = gcpProtUnitTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpProtUnitTable_rsvs++;
+		StorageTmp->gcpProtUnitPriority = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpProtUnitTable_tsts == 0)
+				if ((ret = check_gcpProtUnitTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtUnitTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpProtUnitPriority for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpProtUnitPriority;
-		StorageTmp->gcpProtUnitPriority = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpProtUnitTable_sets == 0)
+				if ((ret = update_gcpProtUnitTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpProtUnitTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) != NULL) {
+			gcpProtUnitTable_destroy(&StorageTmp->gcpProtUnitTable_old);
+			StorageTmp->gcpProtUnitTable_rsvs = 0;
+			StorageTmp->gcpProtUnitTable_tsts = 0;
+			StorageTmp->gcpProtUnitTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpProtUnitPriority = old_value;
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpProtUnitTable_sets == 0)
+			revert_gcpProtUnitTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpProtUnitTable_old) == NULL)
+			break;
+		StorageTmp->gcpProtUnitPriority = StorageOld->gcpProtUnitPriority;
+		if (--StorageTmp->gcpProtUnitTable_rsvs == 0)
+			gcpProtUnitTable_destroy(&StorageTmp->gcpProtUnitTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12462,17 +17651,17 @@ write_gcpProtUnitPriority(int action, u_char *var_val, u_char var_val_type, size
 int
 write_gcpRealmString(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct gcpRealmTable_data *StorageTmp = NULL;
+	struct gcpRealmTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpRealmString entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpRealmTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpRealmRowStatus) {
@@ -12495,33 +17684,73 @@ write_gcpRealmString(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpRealmString: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpRealmTable_old) == NULL)
+			if (StorageTmp->gcpRealmTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpRealmTable_old = gcpRealmTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpRealmTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->gcpRealmString);
+		StorageTmp->gcpRealmString = string;
+		StorageTmp->gcpRealmStringLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpRealmTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpRealmTable_tsts == 0)
+				if ((ret = check_gcpRealmTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpRealmTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpRealmString for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpRealmString;
-		old_length = StorageTmp->gcpRealmStringLen;
-		StorageTmp->gcpRealmString = string;
-		StorageTmp->gcpRealmStringLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpRealmTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpRealmTable_sets == 0)
+				if ((ret = update_gcpRealmTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpRealmTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpRealmTable_old) != NULL) {
+			gcpRealmTable_destroy(&StorageTmp->gcpRealmTable_old);
+			StorageTmp->gcpRealmTable_rsvs = 0;
+			StorageTmp->gcpRealmTable_tsts = 0;
+			StorageTmp->gcpRealmTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpRealmString = old_value;
-		StorageTmp->gcpRealmStringLen = old_length;
+		if ((StorageOld = StorageTmp->gcpRealmTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpRealmTable_sets == 0)
+			revert_gcpRealmTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->gcpRealmTable_old) == NULL)
+			break;
+		if (StorageOld->gcpRealmString != NULL) {
+			SNMP_FREE(StorageTmp->gcpRealmString);
+			StorageTmp->gcpRealmString = StorageOld->gcpRealmString;
+			StorageTmp->gcpRealmStringLen = StorageOld->gcpRealmStringLen;
+			StorageOld->gcpRealmString = NULL;
+			StorageOld->gcpRealmStringLen = 0;
+		}
+		if (--StorageTmp->gcpRealmTable_rsvs == 0)
+			gcpRealmTable_destroy(&StorageTmp->gcpRealmTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12541,12 +17770,14 @@ write_gcpRealmString(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_gcpRealmTermsHiWat(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpRealmTable_data *StorageTmp = NULL;
+	struct gcpRealmTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpRealmTermsHiWat entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpRealmTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -12572,22 +17803,61 @@ write_gcpRealmTermsHiWat(int action, u_char *var_val, u_char var_val_type, size_
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 0 */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpRealmTable_old) == NULL)
+			if (StorageTmp->gcpRealmTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpRealmTable_old = gcpRealmTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpRealmTable_rsvs++;
+		StorageTmp->gcpRealmTermsHiWat = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpRealmTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpRealmTable_tsts == 0)
+				if ((ret = check_gcpRealmTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpRealmTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpRealmTermsHiWat for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpRealmTermsHiWat;
-		StorageTmp->gcpRealmTermsHiWat = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpRealmTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpRealmTable_sets == 0)
+				if ((ret = update_gcpRealmTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpRealmTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpRealmTable_old) != NULL) {
+			gcpRealmTable_destroy(&StorageTmp->gcpRealmTable_old);
+			StorageTmp->gcpRealmTable_rsvs = 0;
+			StorageTmp->gcpRealmTable_tsts = 0;
+			StorageTmp->gcpRealmTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpRealmTermsHiWat = old_value;
+		if ((StorageOld = StorageTmp->gcpRealmTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpRealmTable_sets == 0)
+			revert_gcpRealmTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpRealmTable_old) == NULL)
+			break;
+		StorageTmp->gcpRealmTermsHiWat = StorageOld->gcpRealmTermsHiWat;
+		if (--StorageTmp->gcpRealmTable_rsvs == 0)
+			gcpRealmTable_destroy(&StorageTmp->gcpRealmTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12607,12 +17877,14 @@ write_gcpRealmTermsHiWat(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_gcpRealmTermsLoWat(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpRealmTable_data *StorageTmp = NULL;
+	struct gcpRealmTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpRealmTermsLoWat entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpRealmTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -12638,22 +17910,61 @@ write_gcpRealmTermsLoWat(int action, u_char *var_val, u_char var_val_type, size_
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 4294967295 */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpRealmTable_old) == NULL)
+			if (StorageTmp->gcpRealmTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpRealmTable_old = gcpRealmTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpRealmTable_rsvs++;
+		StorageTmp->gcpRealmTermsLoWat = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpRealmTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpRealmTable_tsts == 0)
+				if ((ret = check_gcpRealmTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpRealmTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpRealmTermsLoWat for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpRealmTermsLoWat;
-		StorageTmp->gcpRealmTermsLoWat = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpRealmTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpRealmTable_sets == 0)
+				if ((ret = update_gcpRealmTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpRealmTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpRealmTable_old) != NULL) {
+			gcpRealmTable_destroy(&StorageTmp->gcpRealmTable_old);
+			StorageTmp->gcpRealmTable_rsvs = 0;
+			StorageTmp->gcpRealmTable_tsts = 0;
+			StorageTmp->gcpRealmTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpRealmTermsLoWat = old_value;
+		if ((StorageOld = StorageTmp->gcpRealmTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpRealmTable_sets == 0)
+			revert_gcpRealmTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpRealmTable_old) == NULL)
+			break;
+		StorageTmp->gcpRealmTermsLoWat = StorageOld->gcpRealmTermsLoWat;
+		if (--StorageTmp->gcpRealmTable_rsvs == 0)
+			gcpRealmTable_destroy(&StorageTmp->gcpRealmTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12673,12 +17984,14 @@ write_gcpRealmTermsLoWat(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_gcpInterfaceIfindex(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpInterfaceTable_data *StorageTmp = NULL;
+	struct gcpInterfaceTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpInterfaceIfindex entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpInterfaceTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -12703,22 +18016,61 @@ write_gcpInterfaceIfindex(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpInterfaceIfindex: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) == NULL)
+			if (StorageTmp->gcpInterfaceTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpInterfaceTable_old = gcpInterfaceTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpInterfaceTable_rsvs++;
+		StorageTmp->gcpInterfaceIfindex = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpInterfaceTable_tsts == 0)
+				if ((ret = check_gcpInterfaceTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpInterfaceTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpInterfaceIfindex for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpInterfaceIfindex;
-		StorageTmp->gcpInterfaceIfindex = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpInterfaceTable_sets == 0)
+				if ((ret = update_gcpInterfaceTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpInterfaceTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) != NULL) {
+			gcpInterfaceTable_destroy(&StorageTmp->gcpInterfaceTable_old);
+			StorageTmp->gcpInterfaceTable_rsvs = 0;
+			StorageTmp->gcpInterfaceTable_tsts = 0;
+			StorageTmp->gcpInterfaceTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpInterfaceIfindex = old_value;
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpInterfaceTable_sets == 0)
+			revert_gcpInterfaceTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) == NULL)
+			break;
+		StorageTmp->gcpInterfaceIfindex = StorageOld->gcpInterfaceIfindex;
+		if (--StorageTmp->gcpInterfaceTable_rsvs == 0)
+			gcpInterfaceTable_destroy(&StorageTmp->gcpInterfaceTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12738,12 +18090,14 @@ write_gcpInterfaceIfindex(int action, u_char *var_val, u_char var_val_type, size
 int
 write_gcpInterfaceMgId(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpInterfaceTable_data *StorageTmp = NULL;
+	struct gcpInterfaceTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpInterfaceMgId entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpInterfaceTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -12768,22 +18122,61 @@ write_gcpInterfaceMgId(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpInterfaceMgId: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) == NULL)
+			if (StorageTmp->gcpInterfaceTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpInterfaceTable_old = gcpInterfaceTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpInterfaceTable_rsvs++;
+		StorageTmp->gcpInterfaceMgId = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpInterfaceTable_tsts == 0)
+				if ((ret = check_gcpInterfaceTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpInterfaceTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpInterfaceMgId for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpInterfaceMgId;
-		StorageTmp->gcpInterfaceMgId = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpInterfaceTable_sets == 0)
+				if ((ret = update_gcpInterfaceTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpInterfaceTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) != NULL) {
+			gcpInterfaceTable_destroy(&StorageTmp->gcpInterfaceTable_old);
+			StorageTmp->gcpInterfaceTable_rsvs = 0;
+			StorageTmp->gcpInterfaceTable_tsts = 0;
+			StorageTmp->gcpInterfaceTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpInterfaceMgId = old_value;
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpInterfaceTable_sets == 0)
+			revert_gcpInterfaceTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) == NULL)
+			break;
+		StorageTmp->gcpInterfaceMgId = StorageOld->gcpInterfaceMgId;
+		if (--StorageTmp->gcpInterfaceTable_rsvs == 0)
+			gcpInterfaceTable_destroy(&StorageTmp->gcpInterfaceTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12803,12 +18196,14 @@ write_gcpInterfaceMgId(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_gcpInterfaceType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpInterfaceTable_data *StorageTmp = NULL;
+	struct gcpInterfaceTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpInterfaceType entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpInterfaceTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -12843,22 +18238,61 @@ write_gcpInterfaceType(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpInterfaceType: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) == NULL)
+			if (StorageTmp->gcpInterfaceTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpInterfaceTable_old = gcpInterfaceTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpInterfaceTable_rsvs++;
+		StorageTmp->gcpInterfaceType = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpInterfaceTable_tsts == 0)
+				if ((ret = check_gcpInterfaceTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpInterfaceTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpInterfaceType for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpInterfaceType;
-		StorageTmp->gcpInterfaceType = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpInterfaceTable_sets == 0)
+				if ((ret = update_gcpInterfaceTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpInterfaceTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) != NULL) {
+			gcpInterfaceTable_destroy(&StorageTmp->gcpInterfaceTable_old);
+			StorageTmp->gcpInterfaceTable_rsvs = 0;
+			StorageTmp->gcpInterfaceTable_tsts = 0;
+			StorageTmp->gcpInterfaceTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpInterfaceType = old_value;
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpInterfaceTable_sets == 0)
+			revert_gcpInterfaceTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) == NULL)
+			break;
+		StorageTmp->gcpInterfaceType = StorageOld->gcpInterfaceType;
+		if (--StorageTmp->gcpInterfaceTable_rsvs == 0)
+			gcpInterfaceTable_destroy(&StorageTmp->gcpInterfaceTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12878,12 +18312,14 @@ write_gcpInterfaceType(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_gcpInterfaceRealm(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpInterfaceTable_data *StorageTmp = NULL;
+	struct gcpInterfaceTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpInterfaceRealm entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpInterfaceTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -12908,22 +18344,61 @@ write_gcpInterfaceRealm(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpInterfaceRealm: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) == NULL)
+			if (StorageTmp->gcpInterfaceTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpInterfaceTable_old = gcpInterfaceTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpInterfaceTable_rsvs++;
+		StorageTmp->gcpInterfaceRealm = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpInterfaceTable_tsts == 0)
+				if ((ret = check_gcpInterfaceTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpInterfaceTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpInterfaceRealm for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpInterfaceRealm;
-		StorageTmp->gcpInterfaceRealm = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpInterfaceTable_sets == 0)
+				if ((ret = update_gcpInterfaceTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpInterfaceTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) != NULL) {
+			gcpInterfaceTable_destroy(&StorageTmp->gcpInterfaceTable_old);
+			StorageTmp->gcpInterfaceTable_rsvs = 0;
+			StorageTmp->gcpInterfaceTable_tsts = 0;
+			StorageTmp->gcpInterfaceTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpInterfaceRealm = old_value;
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpInterfaceTable_sets == 0)
+			revert_gcpInterfaceTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) == NULL)
+			break;
+		StorageTmp->gcpInterfaceRealm = StorageOld->gcpInterfaceRealm;
+		if (--StorageTmp->gcpInterfaceTable_rsvs == 0)
+			gcpInterfaceTable_destroy(&StorageTmp->gcpInterfaceTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12943,11 +18418,14 @@ write_gcpInterfaceRealm(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_gcpInterfaceTermId(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static old_value;
-	struct gcpInterfaceTable_data *StorageTmp = NULL;
+	struct gcpInterfaceTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpInterfaceTermId entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpInterfaceTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -12964,27 +18442,82 @@ write_gcpInterfaceTermId(int action, u_char *var_val, u_char var_val_type, size_
 				break;
 			}
 		}
-		if () {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpInterfaceTermId not \n");
+		if (var_val_type != ASN_OCTET_STR) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpInterfaceTermId not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		if () {
+		/* Note: ranges 0..32 */
+		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 32))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpInterfaceTermId: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) == NULL)
+			if (StorageTmp->gcpInterfaceTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpInterfaceTable_old = gcpInterfaceTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpInterfaceTable_rsvs++;
+		if ((string = malloc(var_val_len + 1)) == NULL)
+			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		memcpy((void *) string, (void *) var_val, var_val_len);
+		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->gcpInterfaceTermId);
+		StorageTmp->gcpInterfaceTermId = string;
+		StorageTmp->gcpInterfaceTermIdLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpInterfaceTable_tsts == 0)
+				if ((ret = check_gcpInterfaceTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpInterfaceTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpInterfaceTermId for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpInterfaceTable_sets == 0)
+				if ((ret = update_gcpInterfaceTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpInterfaceTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) != NULL) {
+			gcpInterfaceTable_destroy(&StorageTmp->gcpInterfaceTable_old);
+			StorageTmp->gcpInterfaceTable_rsvs = 0;
+			StorageTmp->gcpInterfaceTable_tsts = 0;
+			StorageTmp->gcpInterfaceTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpInterfaceTable_sets == 0)
+			revert_gcpInterfaceTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) == NULL)
+			break;
+		if (StorageOld->gcpInterfaceTermId != NULL) {
+			SNMP_FREE(StorageTmp->gcpInterfaceTermId);
+			StorageTmp->gcpInterfaceTermId = StorageOld->gcpInterfaceTermId;
+			StorageTmp->gcpInterfaceTermIdLen = StorageOld->gcpInterfaceTermIdLen;
+			StorageOld->gcpInterfaceTermId = NULL;
+			StorageOld->gcpInterfaceTermIdLen = 0;
+		}
+		if (--StorageTmp->gcpInterfaceTable_rsvs == 0)
+			gcpInterfaceTable_destroy(&StorageTmp->gcpInterfaceTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13004,11 +18537,14 @@ write_gcpInterfaceTermId(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_gcpInterfaceTermPath(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static old_value;
-	struct gcpInterfaceTable_data *StorageTmp = NULL;
+	struct gcpInterfaceTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpInterfaceTermPath entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpInterfaceTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -13025,27 +18561,82 @@ write_gcpInterfaceTermPath(int action, u_char *var_val, u_char var_val_type, siz
 				break;
 			}
 		}
-		if () {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpInterfaceTermPath not \n");
+		if (var_val_type != ASN_OCTET_STR) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpInterfaceTermPath not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		if () {
+		/* Note: ranges 0..32 */
+		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 32))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpInterfaceTermPath: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) == NULL)
+			if (StorageTmp->gcpInterfaceTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpInterfaceTable_old = gcpInterfaceTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpInterfaceTable_rsvs++;
+		if ((string = malloc(var_val_len + 1)) == NULL)
+			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		memcpy((void *) string, (void *) var_val, var_val_len);
+		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->gcpInterfaceTermPath);
+		StorageTmp->gcpInterfaceTermPath = string;
+		StorageTmp->gcpInterfaceTermPathLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpInterfaceTable_tsts == 0)
+				if ((ret = check_gcpInterfaceTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpInterfaceTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpInterfaceTermPath for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpInterfaceTable_sets == 0)
+				if ((ret = update_gcpInterfaceTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpInterfaceTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) != NULL) {
+			gcpInterfaceTable_destroy(&StorageTmp->gcpInterfaceTable_old);
+			StorageTmp->gcpInterfaceTable_rsvs = 0;
+			StorageTmp->gcpInterfaceTable_tsts = 0;
+			StorageTmp->gcpInterfaceTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpInterfaceTable_sets == 0)
+			revert_gcpInterfaceTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpInterfaceTable_old) == NULL)
+			break;
+		if (StorageOld->gcpInterfaceTermPath != NULL) {
+			SNMP_FREE(StorageTmp->gcpInterfaceTermPath);
+			StorageTmp->gcpInterfaceTermPath = StorageOld->gcpInterfaceTermPath;
+			StorageTmp->gcpInterfaceTermPathLen = StorageOld->gcpInterfaceTermPathLen;
+			StorageOld->gcpInterfaceTermPath = NULL;
+			StorageOld->gcpInterfaceTermPathLen = 0;
+		}
+		if (--StorageTmp->gcpInterfaceTable_rsvs == 0)
+			gcpInterfaceTable_destroy(&StorageTmp->gcpInterfaceTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13065,12 +18656,14 @@ write_gcpInterfaceTermPath(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_gcpAddressInterface(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpAddressTable_data *StorageTmp = NULL;
+	struct gcpAddressTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpAddressInterface entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpAddressTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -13095,22 +18688,61 @@ write_gcpAddressInterface(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpAddressInterface: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpAddressTable_old) == NULL)
+			if (StorageTmp->gcpAddressTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpAddressTable_old = gcpAddressTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpAddressTable_rsvs++;
+		StorageTmp->gcpAddressInterface = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpAddressTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpAddressTable_tsts == 0)
+				if ((ret = check_gcpAddressTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpAddressTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpAddressInterface for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpAddressInterface;
-		StorageTmp->gcpAddressInterface = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpAddressTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpAddressTable_sets == 0)
+				if ((ret = update_gcpAddressTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpAddressTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpAddressTable_old) != NULL) {
+			gcpAddressTable_destroy(&StorageTmp->gcpAddressTable_old);
+			StorageTmp->gcpAddressTable_rsvs = 0;
+			StorageTmp->gcpAddressTable_tsts = 0;
+			StorageTmp->gcpAddressTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpAddressInterface = old_value;
+		if ((StorageOld = StorageTmp->gcpAddressTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpAddressTable_sets == 0)
+			revert_gcpAddressTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpAddressTable_old) == NULL)
+			break;
+		StorageTmp->gcpAddressInterface = StorageOld->gcpAddressInterface;
+		if (--StorageTmp->gcpAddressTable_rsvs == 0)
+			gcpAddressTable_destroy(&StorageTmp->gcpAddressTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13130,12 +18762,14 @@ write_gcpAddressInterface(int action, u_char *var_val, u_char var_val_type, size
 int
 write_gcpAddressType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpAddressTable_data *StorageTmp = NULL;
+	struct gcpAddressTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpAddressType entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpAddressTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -13172,22 +18806,61 @@ write_gcpAddressType(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpAddressType: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpAddressTable_old) == NULL)
+			if (StorageTmp->gcpAddressTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpAddressTable_old = gcpAddressTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpAddressTable_rsvs++;
+		StorageTmp->gcpAddressType = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpAddressTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpAddressTable_tsts == 0)
+				if ((ret = check_gcpAddressTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpAddressTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpAddressType for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpAddressType;
-		StorageTmp->gcpAddressType = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpAddressTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpAddressTable_sets == 0)
+				if ((ret = update_gcpAddressTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpAddressTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpAddressTable_old) != NULL) {
+			gcpAddressTable_destroy(&StorageTmp->gcpAddressTable_old);
+			StorageTmp->gcpAddressTable_rsvs = 0;
+			StorageTmp->gcpAddressTable_tsts = 0;
+			StorageTmp->gcpAddressTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpAddressType = old_value;
+		if ((StorageOld = StorageTmp->gcpAddressTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpAddressTable_sets == 0)
+			revert_gcpAddressTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpAddressTable_old) == NULL)
+			break;
+		StorageTmp->gcpAddressType = StorageOld->gcpAddressType;
+		if (--StorageTmp->gcpAddressTable_rsvs == 0)
+			gcpAddressTable_destroy(&StorageTmp->gcpAddressTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13207,17 +18880,17 @@ write_gcpAddressType(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_gcpAddressAddr(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct gcpAddressTable_data *StorageTmp = NULL;
+	struct gcpAddressTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpAddressAddr entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpAddressTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpAddressRowStatus) {
@@ -13240,33 +18913,73 @@ write_gcpAddressAddr(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpAddressAddr: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpAddressTable_old) == NULL)
+			if (StorageTmp->gcpAddressTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpAddressTable_old = gcpAddressTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpAddressTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->gcpAddressAddr);
+		StorageTmp->gcpAddressAddr = string;
+		StorageTmp->gcpAddressAddrLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpAddressTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpAddressTable_tsts == 0)
+				if ((ret = check_gcpAddressTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpAddressTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpAddressAddr for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpAddressAddr;
-		old_length = StorageTmp->gcpAddressAddrLen;
-		StorageTmp->gcpAddressAddr = string;
-		StorageTmp->gcpAddressAddrLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpAddressTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpAddressTable_sets == 0)
+				if ((ret = update_gcpAddressTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpAddressTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpAddressTable_old) != NULL) {
+			gcpAddressTable_destroy(&StorageTmp->gcpAddressTable_old);
+			StorageTmp->gcpAddressTable_rsvs = 0;
+			StorageTmp->gcpAddressTable_tsts = 0;
+			StorageTmp->gcpAddressTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpAddressAddr = old_value;
-		StorageTmp->gcpAddressAddrLen = old_length;
+		if ((StorageOld = StorageTmp->gcpAddressTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpAddressTable_sets == 0)
+			revert_gcpAddressTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->gcpAddressTable_old) == NULL)
+			break;
+		if (StorageOld->gcpAddressAddr != NULL) {
+			SNMP_FREE(StorageTmp->gcpAddressAddr);
+			StorageTmp->gcpAddressAddr = StorageOld->gcpAddressAddr;
+			StorageTmp->gcpAddressAddrLen = StorageOld->gcpAddressAddrLen;
+			StorageOld->gcpAddressAddr = NULL;
+			StorageOld->gcpAddressAddrLen = 0;
+		}
+		if (--StorageTmp->gcpAddressTable_rsvs == 0)
+			gcpAddressTable_destroy(&StorageTmp->gcpAddressTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13286,17 +18999,17 @@ write_gcpAddressAddr(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_gcpAddressPortRanges(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct gcpAddressTable_data *StorageTmp = NULL;
+	struct gcpAddressTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpAddressPortRanges entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(gcpAddressTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->gcpAddressRowStatus) {
@@ -13321,33 +19034,73 @@ write_gcpAddressPortRanges(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpAddressPortRanges: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->gcpAddressTable_old) == NULL)
+			if (StorageTmp->gcpAddressTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpAddressTable_old = gcpAddressTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpAddressTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->gcpAddressPortRanges);
+		StorageTmp->gcpAddressPortRanges = string;
+		StorageTmp->gcpAddressPortRangesLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpAddressTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->gcpAddressTable_tsts == 0)
+				if ((ret = check_gcpAddressTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpAddressTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gcpAddressPortRanges for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gcpAddressPortRanges;
-		old_length = StorageTmp->gcpAddressPortRangesLen;
-		StorageTmp->gcpAddressPortRanges = string;
-		StorageTmp->gcpAddressPortRangesLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->gcpAddressTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpAddressTable_sets == 0)
+				if ((ret = update_gcpAddressTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpAddressTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpAddressTable_old) != NULL) {
+			gcpAddressTable_destroy(&StorageTmp->gcpAddressTable_old);
+			StorageTmp->gcpAddressTable_rsvs = 0;
+			StorageTmp->gcpAddressTable_tsts = 0;
+			StorageTmp->gcpAddressTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpAddressPortRanges = old_value;
-		StorageTmp->gcpAddressPortRangesLen = old_length;
+		if ((StorageOld = StorageTmp->gcpAddressTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpAddressTable_sets == 0)
+			revert_gcpAddressTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->gcpAddressTable_old) == NULL)
+			break;
+		if (StorageOld->gcpAddressPortRanges != NULL) {
+			SNMP_FREE(StorageTmp->gcpAddressPortRanges);
+			StorageTmp->gcpAddressPortRanges = StorageOld->gcpAddressPortRanges;
+			StorageTmp->gcpAddressPortRangesLen = StorageOld->gcpAddressPortRangesLen;
+			StorageOld->gcpAddressPortRanges = NULL;
+			StorageOld->gcpAddressPortRangesLen = 0;
+		}
+		if (--StorageTmp->gcpAddressTable_rsvs == 0)
+			gcpAddressTable_destroy(&StorageTmp->gcpAddressTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13367,13 +19120,13 @@ write_gcpAddressPortRanges(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_gcpDefaultMgcoIdent(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultMgcoIdent entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -13395,20 +19148,59 @@ write_gcpDefaultMgcoIdent(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpDefaultMgcoIdent: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultMgcoIdent = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultMgcoIdent;
-		StorageTmp->gcpDefaultMgcoIdent = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultMgcoIdent for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultMgcoIdent = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultMgcoIdent = StorageOld->gcpDefaultMgcoIdent;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13428,13 +19220,13 @@ write_gcpDefaultMgcoIdent(int action, u_char *var_val, u_char var_val_type, size
 int
 write_gcpDefaultMgcoExecutionTime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultMgcoExecutionTime entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -13451,20 +19243,59 @@ write_gcpDefaultMgcoExecutionTime(int action, u_char *var_val, u_char var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpDefaultMgcoExecutionTime: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultMgcoExecutionTime = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultMgcoExecutionTime;
-		StorageTmp->gcpDefaultMgcoExecutionTime = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultMgcoExecutionTime for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultMgcoExecutionTime = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultMgcoExecutionTime = StorageOld->gcpDefaultMgcoExecutionTime;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13484,13 +19315,13 @@ write_gcpDefaultMgcoExecutionTime(int action, u_char *var_val, u_char var_val_ty
 int
 write_gcpDefaultMgcoProvRespTimer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultMgcoProvRespTimer entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -13507,20 +19338,59 @@ write_gcpDefaultMgcoProvRespTimer(int action, u_char *var_val, u_char var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpDefaultMgcoProvRespTimer: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultMgcoProvRespTimer = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultMgcoProvRespTimer;
-		StorageTmp->gcpDefaultMgcoProvRespTimer = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultMgcoProvRespTimer for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultMgcoProvRespTimer = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultMgcoProvRespTimer = StorageOld->gcpDefaultMgcoProvRespTimer;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13540,13 +19410,13 @@ write_gcpDefaultMgcoProvRespTimer(int action, u_char *var_val, u_char var_val_ty
 int
 write_gcpDefaultMgcpPendingLimit(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultMgcpPendingLimit entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_UNSIGNED) {
@@ -13558,20 +19428,59 @@ write_gcpDefaultMgcpPendingLimit(int action, u_char *var_val, u_char var_val_typ
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 5 */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultMgcpPendingLimit = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultMgcpPendingLimit;
-		StorageTmp->gcpDefaultMgcpPendingLimit = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultMgcpPendingLimit for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultMgcpPendingLimit = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultMgcpPendingLimit = StorageOld->gcpDefaultMgcpPendingLimit;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13591,13 +19500,13 @@ write_gcpDefaultMgcpPendingLimit(int action, u_char *var_val, u_char var_val_typ
 int
 write_gcpDefaultMgcoLongTimer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultMgcoLongTimer entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -13613,20 +19522,59 @@ write_gcpDefaultMgcoLongTimer(int action, u_char *var_val, u_char var_val_type, 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpDefaultMgcoLongTimer: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultMgcoLongTimer = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultMgcoLongTimer;
-		StorageTmp->gcpDefaultMgcoLongTimer = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultMgcoLongTimer for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultMgcoLongTimer = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultMgcoLongTimer = StorageOld->gcpDefaultMgcoLongTimer;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13646,13 +19594,13 @@ write_gcpDefaultMgcoLongTimer(int action, u_char *var_val, u_char var_val_type, 
 int
 write_gcpDefaultMgcoRtoInit(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultMgcoRtoInit entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -13669,20 +19617,59 @@ write_gcpDefaultMgcoRtoInit(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpDefaultMgcoRtoInit: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultMgcoRtoInit = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultMgcoRtoInit;
-		StorageTmp->gcpDefaultMgcoRtoInit = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultMgcoRtoInit for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultMgcoRtoInit = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultMgcoRtoInit = StorageOld->gcpDefaultMgcoRtoInit;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13702,13 +19689,13 @@ write_gcpDefaultMgcoRtoInit(int action, u_char *var_val, u_char var_val_type, si
 int
 write_gcpDefaultMgcoRtoMin(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultMgcoRtoMin entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -13724,20 +19711,59 @@ write_gcpDefaultMgcoRtoMin(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpDefaultMgcoRtoMin: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultMgcoRtoMin = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultMgcoRtoMin;
-		StorageTmp->gcpDefaultMgcoRtoMin = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultMgcoRtoMin for you to use, and you have just been asked to do something with it.  Note that anything done here 
+				   must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultMgcoRtoMin = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultMgcoRtoMin = StorageOld->gcpDefaultMgcoRtoMin;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13757,13 +19783,13 @@ write_gcpDefaultMgcoRtoMin(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_gcpDefaultMgcoRtoMax(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultMgcoRtoMax entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -13780,20 +19806,59 @@ write_gcpDefaultMgcoRtoMax(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpDefaultMgcoRtoMax: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultMgcoRtoMax = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultMgcoRtoMax;
-		StorageTmp->gcpDefaultMgcoRtoMax = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultMgcoRtoMax for you to use, and you have just been asked to do something with it.  Note that anything done here 
+				   must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultMgcoRtoMax = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultMgcoRtoMax = StorageOld->gcpDefaultMgcoRtoMax;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13813,13 +19878,13 @@ write_gcpDefaultMgcoRtoMax(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_gcpDefaultUdpChecksum(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultUdpChecksum entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -13838,20 +19903,59 @@ write_gcpDefaultUdpChecksum(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpDefaultUdpChecksum: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultUdpChecksum = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultUdpChecksum;
-		StorageTmp->gcpDefaultUdpChecksum = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultUdpChecksum for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultUdpChecksum = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultUdpChecksum = StorageOld->gcpDefaultUdpChecksum;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13871,13 +19975,13 @@ write_gcpDefaultUdpChecksum(int action, u_char *var_val, u_char var_val_type, si
 int
 write_gcpDefaultTcpNoDelay(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultTcpNoDelay entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -13897,20 +20001,59 @@ write_gcpDefaultTcpNoDelay(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpDefaultTcpNoDelay: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultTcpNoDelay = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultTcpNoDelay;
-		StorageTmp->gcpDefaultTcpNoDelay = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultTcpNoDelay for you to use, and you have just been asked to do something with it.  Note that anything done here 
+				   must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultTcpNoDelay = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultTcpNoDelay = StorageOld->gcpDefaultTcpNoDelay;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13930,13 +20073,13 @@ write_gcpDefaultTcpNoDelay(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_gcpDefaultTcpMaxseg(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultTcpMaxseg entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_UNSIGNED) {
@@ -13953,20 +20096,59 @@ write_gcpDefaultTcpMaxseg(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpDefaultTcpMaxseg: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultTcpMaxseg = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultTcpMaxseg;
-		StorageTmp->gcpDefaultTcpMaxseg = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultTcpMaxseg for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultTcpMaxseg = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultTcpMaxseg = StorageOld->gcpDefaultTcpMaxseg;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13986,13 +20168,13 @@ write_gcpDefaultTcpMaxseg(int action, u_char *var_val, u_char var_val_type, size
 int
 write_gcpDefaultTcpKeepAlive(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultTcpKeepAlive entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -14012,20 +20194,59 @@ write_gcpDefaultTcpKeepAlive(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpDefaultTcpKeepAlive: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultTcpKeepAlive = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultTcpKeepAlive;
-		StorageTmp->gcpDefaultTcpKeepAlive = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultTcpKeepAlive for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultTcpKeepAlive = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultTcpKeepAlive = StorageOld->gcpDefaultTcpKeepAlive;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14045,13 +20266,13 @@ write_gcpDefaultTcpKeepAlive(int action, u_char *var_val, u_char var_val_type, s
 int
 write_gcpDefaultTcpKeepIdle(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultTcpKeepIdle entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -14068,20 +20289,59 @@ write_gcpDefaultTcpKeepIdle(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpDefaultTcpKeepIdle: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultTcpKeepIdle = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultTcpKeepIdle;
-		StorageTmp->gcpDefaultTcpKeepIdle = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultTcpKeepIdle for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultTcpKeepIdle = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultTcpKeepIdle = StorageOld->gcpDefaultTcpKeepIdle;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14101,13 +20361,13 @@ write_gcpDefaultTcpKeepIdle(int action, u_char *var_val, u_char var_val_type, si
 int
 write_gcpDefaultTcpKeepAliveItvl(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultTcpKeepAliveItvl entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -14124,20 +20384,59 @@ write_gcpDefaultTcpKeepAliveItvl(int action, u_char *var_val, u_char var_val_typ
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpDefaultTcpKeepAliveItvl: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultTcpKeepAliveItvl = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultTcpKeepAliveItvl;
-		StorageTmp->gcpDefaultTcpKeepAliveItvl = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultTcpKeepAliveItvl for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultTcpKeepAliveItvl = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultTcpKeepAliveItvl = StorageOld->gcpDefaultTcpKeepAliveItvl;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14157,13 +20456,13 @@ write_gcpDefaultTcpKeepAliveItvl(int action, u_char *var_val, u_char var_val_typ
 int
 write_gcpDefaultTcpKeepCount(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultTcpKeepCount entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_UNSIGNED) {
@@ -14175,20 +20474,59 @@ write_gcpDefaultTcpKeepCount(int action, u_char *var_val, u_char var_val_type, s
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 9 */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultTcpKeepCount = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultTcpKeepCount;
-		StorageTmp->gcpDefaultTcpKeepCount = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultTcpKeepCount for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultTcpKeepCount = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultTcpKeepCount = StorageOld->gcpDefaultTcpKeepCount;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14208,13 +20546,13 @@ write_gcpDefaultTcpKeepCount(int action, u_char *var_val, u_char var_val_type, s
 int
 write_gcpDefaultTcpSynRetrans(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultTcpSynRetrans entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_UNSIGNED) {
@@ -14231,20 +20569,59 @@ write_gcpDefaultTcpSynRetrans(int action, u_char *var_val, u_char var_val_type, 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpDefaultTcpSynRetrans: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultTcpSynRetrans = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultTcpSynRetrans;
-		StorageTmp->gcpDefaultTcpSynRetrans = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultTcpSynRetrans for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultTcpSynRetrans = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultTcpSynRetrans = StorageOld->gcpDefaultTcpSynRetrans;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14264,13 +20641,13 @@ write_gcpDefaultTcpSynRetrans(int action, u_char *var_val, u_char var_val_type, 
 int
 write_gcpDefaultTcpWindowClamp(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultTcpWindowClamp entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_UNSIGNED) {
@@ -14287,20 +20664,59 @@ write_gcpDefaultTcpWindowClamp(int action, u_char *var_val, u_char var_val_type,
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpDefaultTcpWindowClamp: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultTcpWindowClamp = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultTcpWindowClamp;
-		StorageTmp->gcpDefaultTcpWindowClamp = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultTcpWindowClamp for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultTcpWindowClamp = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultTcpWindowClamp = StorageOld->gcpDefaultTcpWindowClamp;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14320,13 +20736,13 @@ write_gcpDefaultTcpWindowClamp(int action, u_char *var_val, u_char var_val_type,
 int
 write_gcpDefaultSctpNoDelay(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultSctpNoDelay entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -14346,20 +20762,59 @@ write_gcpDefaultSctpNoDelay(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpDefaultSctpNoDelay: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultSctpNoDelay = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultSctpNoDelay;
-		StorageTmp->gcpDefaultSctpNoDelay = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultSctpNoDelay for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultSctpNoDelay = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultSctpNoDelay = StorageOld->gcpDefaultSctpNoDelay;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14379,13 +20834,13 @@ write_gcpDefaultSctpNoDelay(int action, u_char *var_val, u_char var_val_type, si
 int
 write_gcpDefaultSctpMaxseg(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultSctpMaxseg entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_UNSIGNED) {
@@ -14402,20 +20857,59 @@ write_gcpDefaultSctpMaxseg(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpDefaultSctpMaxseg: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultSctpMaxseg = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultSctpMaxseg;
-		StorageTmp->gcpDefaultSctpMaxseg = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultSctpMaxseg for you to use, and you have just been asked to do something with it.  Note that anything done here 
+				   must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultSctpMaxseg = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultSctpMaxseg = StorageOld->gcpDefaultSctpMaxseg;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14435,13 +20929,13 @@ write_gcpDefaultSctpMaxseg(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_gcpDefaultSctpHeartbeatItvl(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultSctpHeartbeatItvl entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -14458,20 +20952,59 @@ write_gcpDefaultSctpHeartbeatItvl(int action, u_char *var_val, u_char var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpDefaultSctpHeartbeatItvl: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultSctpHeartbeatItvl = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultSctpHeartbeatItvl;
-		StorageTmp->gcpDefaultSctpHeartbeatItvl = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultSctpHeartbeatItvl for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultSctpHeartbeatItvl = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultSctpHeartbeatItvl = StorageOld->gcpDefaultSctpHeartbeatItvl;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14491,13 +21024,13 @@ write_gcpDefaultSctpHeartbeatItvl(int action, u_char *var_val, u_char var_val_ty
 int
 write_gcpDefaultSctpHearbeat(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultSctpHearbeat entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -14517,20 +21050,59 @@ write_gcpDefaultSctpHearbeat(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpDefaultSctpHearbeat: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultSctpHearbeat = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultSctpHearbeat;
-		StorageTmp->gcpDefaultSctpHearbeat = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultSctpHearbeat for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultSctpHearbeat = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultSctpHearbeat = StorageOld->gcpDefaultSctpHearbeat;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14550,13 +21122,13 @@ write_gcpDefaultSctpHearbeat(int action, u_char *var_val, u_char var_val_type, s
 int
 write_gcpDefaultSctpRtoInitial(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultSctpRtoInitial entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -14573,20 +21145,59 @@ write_gcpDefaultSctpRtoInitial(int action, u_char *var_val, u_char var_val_type,
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpDefaultSctpRtoInitial: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultSctpRtoInitial = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultSctpRtoInitial;
-		StorageTmp->gcpDefaultSctpRtoInitial = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultSctpRtoInitial for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultSctpRtoInitial = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultSctpRtoInitial = StorageOld->gcpDefaultSctpRtoInitial;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14606,13 +21217,13 @@ write_gcpDefaultSctpRtoInitial(int action, u_char *var_val, u_char var_val_type,
 int
 write_gcpDefaultSctpRtoMin(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultSctpRtoMin entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -14629,20 +21240,59 @@ write_gcpDefaultSctpRtoMin(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpDefaultSctpRtoMin: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultSctpRtoMin = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultSctpRtoMin;
-		StorageTmp->gcpDefaultSctpRtoMin = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultSctpRtoMin for you to use, and you have just been asked to do something with it.  Note that anything done here 
+				   must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultSctpRtoMin = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultSctpRtoMin = StorageOld->gcpDefaultSctpRtoMin;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14662,13 +21312,13 @@ write_gcpDefaultSctpRtoMin(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_gcpDefaultSctpRtoMax(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultSctpRtoMax entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -14685,20 +21335,59 @@ write_gcpDefaultSctpRtoMax(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpDefaultSctpRtoMax: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultSctpRtoMax = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultSctpRtoMax;
-		StorageTmp->gcpDefaultSctpRtoMax = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultSctpRtoMax for you to use, and you have just been asked to do something with it.  Note that anything done here 
+				   must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultSctpRtoMax = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultSctpRtoMax = StorageOld->gcpDefaultSctpRtoMax;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14718,13 +21407,13 @@ write_gcpDefaultSctpRtoMax(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_gcpDefaultSctpPathMaxRetrans(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultSctpPathMaxRetrans entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_UNSIGNED) {
@@ -14736,20 +21425,59 @@ write_gcpDefaultSctpPathMaxRetrans(int action, u_char *var_val, u_char var_val_t
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 5 */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultSctpPathMaxRetrans = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultSctpPathMaxRetrans;
-		StorageTmp->gcpDefaultSctpPathMaxRetrans = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultSctpPathMaxRetrans for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultSctpPathMaxRetrans = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultSctpPathMaxRetrans = StorageOld->gcpDefaultSctpPathMaxRetrans;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14769,13 +21497,13 @@ write_gcpDefaultSctpPathMaxRetrans(int action, u_char *var_val, u_char var_val_t
 int
 write_gcpDefaultSctpCookieLife(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultSctpCookieLife entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -14792,20 +21520,59 @@ write_gcpDefaultSctpCookieLife(int action, u_char *var_val, u_char var_val_type,
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpDefaultSctpCookieLife: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultSctpCookieLife = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultSctpCookieLife;
-		StorageTmp->gcpDefaultSctpCookieLife = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultSctpCookieLife for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultSctpCookieLife = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultSctpCookieLife = StorageOld->gcpDefaultSctpCookieLife;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14825,13 +21592,13 @@ write_gcpDefaultSctpCookieLife(int action, u_char *var_val, u_char var_val_type,
 int
 write_gcpDefaultSctpCookieInc(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultSctpCookieInc entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -14848,20 +21615,59 @@ write_gcpDefaultSctpCookieInc(int action, u_char *var_val, u_char var_val_type, 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpDefaultSctpCookieInc: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultSctpCookieInc = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultSctpCookieInc;
-		StorageTmp->gcpDefaultSctpCookieInc = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultSctpCookieInc for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultSctpCookieInc = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultSctpCookieInc = StorageOld->gcpDefaultSctpCookieInc;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14881,13 +21687,13 @@ write_gcpDefaultSctpCookieInc(int action, u_char *var_val, u_char var_val_type, 
 int
 write_gcpDefaultSctpMaxInitRetries(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultSctpMaxInitRetries entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_UNSIGNED) {
@@ -14899,20 +21705,59 @@ write_gcpDefaultSctpMaxInitRetries(int action, u_char *var_val, u_char var_val_t
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 8 */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultSctpMaxInitRetries = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultSctpMaxInitRetries;
-		StorageTmp->gcpDefaultSctpMaxInitRetries = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultSctpMaxInitRetries for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultSctpMaxInitRetries = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultSctpMaxInitRetries = StorageOld->gcpDefaultSctpMaxInitRetries;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14932,13 +21777,13 @@ write_gcpDefaultSctpMaxInitRetries(int action, u_char *var_val, u_char var_val_t
 int
 write_gcpDefaultSctpMaxBurst(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultSctpMaxBurst entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_UNSIGNED) {
@@ -14950,20 +21795,59 @@ write_gcpDefaultSctpMaxBurst(int action, u_char *var_val, u_char var_val_type, s
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 4 */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultSctpMaxBurst = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultSctpMaxBurst;
-		StorageTmp->gcpDefaultSctpMaxBurst = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultSctpMaxBurst for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultSctpMaxBurst = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultSctpMaxBurst = StorageOld->gcpDefaultSctpMaxBurst;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14983,13 +21867,13 @@ write_gcpDefaultSctpMaxBurst(int action, u_char *var_val, u_char var_val_type, s
 int
 write_gcpDefaultSctpAssocMaxRetrans(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultSctpAssocMaxRetrans entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_UNSIGNED) {
@@ -15001,20 +21885,59 @@ write_gcpDefaultSctpAssocMaxRetrans(int action, u_char *var_val, u_char var_val_
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 10 */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultSctpAssocMaxRetrans = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultSctpAssocMaxRetrans;
-		StorageTmp->gcpDefaultSctpAssocMaxRetrans = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultSctpAssocMaxRetrans for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultSctpAssocMaxRetrans = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultSctpAssocMaxRetrans = StorageOld->gcpDefaultSctpAssocMaxRetrans;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -15034,13 +21957,13 @@ write_gcpDefaultSctpAssocMaxRetrans(int action, u_char *var_val, u_char var_val_
 int
 write_gcpDefaultSctpSackDelay(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultSctpSackDelay entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -15057,20 +21980,59 @@ write_gcpDefaultSctpSackDelay(int action, u_char *var_val, u_char var_val_type, 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpDefaultSctpSackDelay: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultSctpSackDelay = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultSctpSackDelay;
-		StorageTmp->gcpDefaultSctpSackDelay = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultSctpSackDelay for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultSctpSackDelay = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultSctpSackDelay = StorageOld->gcpDefaultSctpSackDelay;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -15090,13 +22052,13 @@ write_gcpDefaultSctpSackDelay(int action, u_char *var_val, u_char var_val_type, 
 int
 write_gcpDefaultSctpLifetime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct gcpMIB_data *StorageTmp = NULL;
+	struct gcpMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("gcpMIB", "write_gcpDefaultSctpLifetime entering action=%d...  \n", action));
 	if ((StorageTmp = gcpMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -15113,257 +22075,504 @@ write_gcpDefaultSctpLifetime(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gcpDefaultSctpLifetime: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			if (StorageTmp->gcpMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->gcpMIB_old = gcpMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->gcpMIB_rsvs++;
+		StorageTmp->gcpDefaultSctpLifetime = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->gcpMIB_tsts == 0)
+				if ((ret = check_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->gcpDefaultSctpLifetime;
-		StorageTmp->gcpDefaultSctpLifetime = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->gcpDefaultSctpLifetime for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->gcpMIB_sets == 0)
+				if ((ret = update_gcpMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->gcpMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->gcpMIB_old) != NULL) {
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
+			StorageTmp->gcpMIB_rsvs = 0;
+			StorageTmp->gcpMIB_tsts = 0;
+			StorageTmp->gcpMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gcpDefaultSctpLifetime = old_value;
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->gcpMIB_tsts == 0)
+			revert_gcpMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->gcpMIB_old) == NULL)
+			break;
+		StorageTmp->gcpDefaultSctpLifetime = StorageOld->gcpDefaultSctpLifetime;
+		if (--StorageTmp->gcpMIB_rsvs == 0)
+			gcpMIB_destroy(&StorageTmp->gcpMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int gcpMsTable_consistent(struct gcpMsTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_gcpMsTable_row(struct gcpMsTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the gcpMsTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-gcpMsTable_consistent(struct gcpMsTable_data *thedata)
+can_act_gcpMsTable_row(struct gcpMsTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int gcpMgTable_consistent(struct gcpMgTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_gcpMsTable_row(struct gcpMsTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the gcpMgTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-gcpMgTable_consistent(struct gcpMgTable_data *thedata)
+can_deact_gcpMsTable_row(struct gcpMsTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int gcpMgcTable_consistent(struct gcpMgcTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_gcpMgTable_row(struct gcpMgTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the gcpMgcTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-gcpMgcTable_consistent(struct gcpMgcTable_data *thedata)
+can_act_gcpMgTable_row(struct gcpMgTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int gcpLinkageTable_consistent(struct gcpLinkageTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_gcpMgTable_row(struct gcpMgTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the gcpLinkageTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-gcpLinkageTable_consistent(struct gcpLinkageTable_data *thedata)
+can_deact_gcpMgTable_row(struct gcpMgTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int gcpUdpProfileTable_consistent(struct gcpUdpProfileTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_gcpMgcTable_row(struct gcpMgcTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the gcpUdpProfileTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-gcpUdpProfileTable_consistent(struct gcpUdpProfileTable_data *thedata)
+can_act_gcpMgcTable_row(struct gcpMgcTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int gcpTcpProfileTable_consistent(struct gcpTcpProfileTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_gcpMgcTable_row(struct gcpMgcTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the gcpTcpProfileTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-gcpTcpProfileTable_consistent(struct gcpTcpProfileTable_data *thedata)
+can_deact_gcpMgcTable_row(struct gcpMgcTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int gcpSctpProfileTable_consistent(struct gcpSctpProfileTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_gcpLinkageTable_row(struct gcpLinkageTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the gcpSctpProfileTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-gcpSctpProfileTable_consistent(struct gcpSctpProfileTable_data *thedata)
+can_act_gcpLinkageTable_row(struct gcpLinkageTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int gcpProtGroupTable_consistent(struct gcpProtGroupTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_gcpLinkageTable_row(struct gcpLinkageTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the gcpProtGroupTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-gcpProtGroupTable_consistent(struct gcpProtGroupTable_data *thedata)
+can_deact_gcpLinkageTable_row(struct gcpLinkageTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int gcpSbolTable_consistent(struct gcpSbolTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_gcpUdpProfileTable_row(struct gcpUdpProfileTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the gcpSbolTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-gcpSbolTable_consistent(struct gcpSbolTable_data *thedata)
+can_act_gcpUdpProfileTable_row(struct gcpUdpProfileTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int gcpProtUnitTable_consistent(struct gcpProtUnitTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_gcpUdpProfileTable_row(struct gcpUdpProfileTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the gcpProtUnitTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-gcpProtUnitTable_consistent(struct gcpProtUnitTable_data *thedata)
+can_deact_gcpUdpProfileTable_row(struct gcpUdpProfileTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int gcpRealmTable_consistent(struct gcpRealmTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_gcpTcpProfileTable_row(struct gcpTcpProfileTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the gcpRealmTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-gcpRealmTable_consistent(struct gcpRealmTable_data *thedata)
+can_act_gcpTcpProfileTable_row(struct gcpTcpProfileTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int gcpInterfaceTable_consistent(struct gcpInterfaceTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_gcpTcpProfileTable_row(struct gcpTcpProfileTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the gcpInterfaceTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-gcpInterfaceTable_consistent(struct gcpInterfaceTable_data *thedata)
+can_deact_gcpTcpProfileTable_row(struct gcpTcpProfileTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int gcpAddressTable_consistent(struct gcpAddressTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_gcpSctpProfileTable_row(struct gcpSctpProfileTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the gcpAddressTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-gcpAddressTable_consistent(struct gcpAddressTable_data *thedata)
+can_act_gcpSctpProfileTable_row(struct gcpSctpProfileTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_gcpSctpProfileTable_row(struct gcpSctpProfileTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_gcpSctpProfileTable_row(struct gcpSctpProfileTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_gcpProtGroupTable_row(struct gcpProtGroupTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_gcpProtGroupTable_row(struct gcpProtGroupTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_gcpProtGroupTable_row(struct gcpProtGroupTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_gcpProtGroupTable_row(struct gcpProtGroupTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_gcpSbolTable_row(struct gcpSbolTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_gcpSbolTable_row(struct gcpSbolTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_gcpSbolTable_row(struct gcpSbolTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_gcpSbolTable_row(struct gcpSbolTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_gcpProtUnitTable_row(struct gcpProtUnitTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_gcpProtUnitTable_row(struct gcpProtUnitTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_gcpProtUnitTable_row(struct gcpProtUnitTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_gcpProtUnitTable_row(struct gcpProtUnitTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_gcpRealmTable_row(struct gcpRealmTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_gcpRealmTable_row(struct gcpRealmTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_gcpRealmTable_row(struct gcpRealmTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_gcpRealmTable_row(struct gcpRealmTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_gcpInterfaceTable_row(struct gcpInterfaceTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_gcpInterfaceTable_row(struct gcpInterfaceTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_gcpInterfaceTable_row(struct gcpInterfaceTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_gcpInterfaceTable_row(struct gcpInterfaceTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_gcpAddressTable_row(struct gcpAddressTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_gcpAddressTable_row(struct gcpAddressTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_gcpAddressTable_row(struct gcpAddressTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_gcpAddressTable_row(struct gcpAddressTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
@@ -15380,10 +22589,9 @@ gcpAddressTable_consistent(struct gcpAddressTable_data *thedata)
 int
 write_gcpMsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct gcpMsTable_data *StorageTmp = NULL;
+	struct gcpMsTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct gcpMsTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 14;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -15410,40 +22618,6 @@ write_gcpMsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->gcpMsRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->gcpMsTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->gcpMsTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* gcpMsId */
@@ -15467,12 +22641,43 @@ write_gcpMsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->gcpMsTable_rsvs = 1;
 			vp = vars;
 			StorageNew->gcpMsId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&gcpMsTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->gcpMsRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->gcpMsTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->gcpMsTable_old) == NULL)
+				if (StorageTmp->gcpMsTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->gcpMsTable_old = gcpMsTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->gcpMsTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->gcpMsTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -15482,78 +22687,127 @@ write_gcpMsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = gcpMsTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_gcpMsTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->gcpMsRowStatus;
-			StorageTmp->gcpMsRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = gcpMsTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->gcpMsRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->gcpMsRowStatus != RS_ACTIVE)
+				if ((ret = can_act_gcpMsTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
-			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->gcpMsRowStatus;
-			StorageTmp->gcpMsRowStatus = set_value;
+			/* check that deactivation is possible */
+			if (StorageTmp->gcpMsRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_gcpMsTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
 			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->gcpMsRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_gcpMsTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->gcpMsRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in 
+		   the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_gcpMsTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->gcpMsRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_gcpMsTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+				}
+			break;
+		case RS_NOTINSERVICE:
+			/* state change already performed */
+			if (StorageTmp->gcpMsRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_gcpMsTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
+			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_gcpMsTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->gcpMsRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->gcpMsRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->gcpMsRowStatus = set_value;
+			if ((StorageOld = StorageTmp->gcpMsTable_old) != NULL) {
+				gcpMsTable_destroy(&StorageTmp->gcpMsTable_old);
+				StorageTmp->gcpMsTable_rsvs = 0;
+				StorageTmp->gcpMsTable_tsts = 0;
+				StorageTmp->gcpMsTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			gcpMsTable_destroy(&StorageDel);
-			/* gcpMsTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_gcpMsTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->gcpMsRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_gcpMsTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->gcpMsRowStatus = old_value;
+			if (StorageTmp->gcpMsRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_gcpMsTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -15567,6 +22821,13 @@ write_gcpMsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 				gcpMsTable_del(StorageNew);
 				gcpMsTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->gcpMsTable_old) == NULL)
+				break;
+			if (--StorageTmp->gcpMsTable_rsvs == 0)
+				gcpMsTable_destroy(&StorageTmp->gcpMsTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -15593,10 +22854,9 @@ write_gcpMsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_gcpMgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct gcpMgTable_data *StorageTmp = NULL;
+	struct gcpMgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct gcpMgTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 14;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -15623,40 +22883,6 @@ write_gcpMgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->gcpMgRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->gcpMgTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->gcpMgTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* gcpMsId */
@@ -15692,6 +22918,7 @@ write_gcpMgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->gcpMgTable_rsvs = 1;
 			vp = vars;
 			StorageNew->gcpMsId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -15699,7 +22926,37 @@ write_gcpMgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 			vp = vp->next_variable;
 			header_complex_add_data(&gcpMgTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->gcpMgRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->gcpMgTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+				if (StorageTmp->gcpMgTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->gcpMgTable_old = gcpMgTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->gcpMgTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->gcpMgTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -15709,78 +22966,127 @@ write_gcpMgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = gcpMgTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_gcpMgTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->gcpMgRowStatus;
-			StorageTmp->gcpMgRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = gcpMgTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->gcpMgRowStatus = old_value;
+			if (StorageTmp->gcpMgRowStatus != RS_ACTIVE)
+				if ((ret = can_act_gcpMgTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->gcpMgRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_gcpMgTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->gcpMgRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_gcpMgTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->gcpMgRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in 
+		   the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_gcpMgTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->gcpMgRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_gcpMgTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->gcpMgRowStatus;
-			StorageTmp->gcpMgRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->gcpMgRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_gcpMgTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_gcpMgTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->gcpMgRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->gcpMgRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->gcpMgRowStatus = set_value;
+			if ((StorageOld = StorageTmp->gcpMgTable_old) != NULL) {
+				gcpMgTable_destroy(&StorageTmp->gcpMgTable_old);
+				StorageTmp->gcpMgTable_rsvs = 0;
+				StorageTmp->gcpMgTable_tsts = 0;
+				StorageTmp->gcpMgTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			gcpMgTable_destroy(&StorageDel);
-			/* gcpMgTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_gcpMgTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->gcpMgRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_gcpMgTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->gcpMgRowStatus = old_value;
+			if (StorageTmp->gcpMgRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_gcpMgTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -15794,6 +23100,13 @@ write_gcpMgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 				gcpMgTable_del(StorageNew);
 				gcpMgTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->gcpMgTable_old) == NULL)
+				break;
+			if (--StorageTmp->gcpMgTable_rsvs == 0)
+				gcpMgTable_destroy(&StorageTmp->gcpMgTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -15820,10 +23133,9 @@ write_gcpMgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_gcpMgcRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct gcpMgcTable_data *StorageTmp = NULL;
+	struct gcpMgcTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct gcpMgcTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 14;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -15850,40 +23162,6 @@ write_gcpMgcRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->gcpMgcRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->gcpMgcTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->gcpMgcTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* gcpMsId */
@@ -15919,6 +23197,7 @@ write_gcpMgcRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->gcpMgcTable_rsvs = 1;
 			vp = vars;
 			StorageNew->gcpMsId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -15926,7 +23205,37 @@ write_gcpMgcRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			vp = vp->next_variable;
 			header_complex_add_data(&gcpMgcTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->gcpMgcRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->gcpMgcTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+				if (StorageTmp->gcpMgcTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->gcpMgcTable_old = gcpMgcTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->gcpMgcTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->gcpMgcTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -15936,78 +23245,127 @@ write_gcpMgcRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = gcpMgcTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_gcpMgcTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->gcpMgcRowStatus;
-			StorageTmp->gcpMgcRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = gcpMgcTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->gcpMgcRowStatus = old_value;
+			if (StorageTmp->gcpMgcRowStatus != RS_ACTIVE)
+				if ((ret = can_act_gcpMgcTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->gcpMgcRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_gcpMgcTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->gcpMgcRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_gcpMgcTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->gcpMgcRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_gcpMgcTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->gcpMgcRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_gcpMgcTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->gcpMgcRowStatus;
-			StorageTmp->gcpMgcRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->gcpMgcRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_gcpMgcTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+			break;
+			/* deactivate with underlying device */
+			if (deactivate_gcpMgcTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->gcpMgcRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->gcpMgcRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->gcpMgcRowStatus = set_value;
+			if ((StorageOld = StorageTmp->gcpMgcTable_old) != NULL) {
+				gcpMgcTable_destroy(&StorageTmp->gcpMgcTable_old);
+				StorageTmp->gcpMgcTable_rsvs = 0;
+				StorageTmp->gcpMgcTable_tsts = 0;
+				StorageTmp->gcpMgcTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			gcpMgcTable_destroy(&StorageDel);
-			/* gcpMgcTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_gcpMgcTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->gcpMgcRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_gcpMgcTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->gcpMgcRowStatus = old_value;
+			if (StorageTmp->gcpMgcRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_gcpMgcTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -16021,6 +23379,13 @@ write_gcpMgcRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				gcpMgcTable_del(StorageNew);
 				gcpMgcTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->gcpMgcTable_old) == NULL)
+				break;
+			if (--StorageTmp->gcpMgcTable_rsvs == 0)
+				gcpMgcTable_destroy(&StorageTmp->gcpMgcTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -16047,10 +23412,9 @@ write_gcpMgcRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_gcpLinkageRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct gcpLinkageTable_data *StorageTmp = NULL;
+	struct gcpLinkageTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct gcpLinkageTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 14;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -16077,40 +23441,6 @@ write_gcpLinkageRowStatus(int action, u_char *var_val, u_char var_val_type, size
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->gcpLinkageRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->gcpLinkageTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->gcpLinkageTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* gcpMsId */
@@ -16175,6 +23505,7 @@ write_gcpLinkageRowStatus(int action, u_char *var_val, u_char var_val_type, size
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->gcpLinkageTable_rsvs = 1;
 			vp = vars;
 			StorageNew->gcpMsId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -16186,7 +23517,37 @@ write_gcpLinkageRowStatus(int action, u_char *var_val, u_char var_val_type, size
 			vp = vp->next_variable;
 			header_complex_add_data(&gcpLinkageTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->gcpLinkageRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->gcpLinkageTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+				if (StorageTmp->gcpLinkageTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->gcpLinkageTable_old = gcpLinkageTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->gcpLinkageTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->gcpLinkageTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -16196,78 +23557,127 @@ write_gcpLinkageRowStatus(int action, u_char *var_val, u_char var_val_type, size
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = gcpLinkageTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_gcpLinkageTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->gcpLinkageRowStatus;
-			StorageTmp->gcpLinkageRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = gcpLinkageTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->gcpLinkageRowStatus = old_value;
+			if (StorageTmp->gcpLinkageRowStatus != RS_ACTIVE)
+				if ((ret = can_act_gcpLinkageTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->gcpLinkageRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_gcpLinkageTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->gcpLinkageRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_gcpLinkageTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->gcpLinkageRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_gcpLinkageTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->gcpLinkageRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_gcpLinkageTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->gcpLinkageRowStatus;
-			StorageTmp->gcpLinkageRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->gcpLinkageRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_gcpLinkageTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_gcpLinkageTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->gcpLinkageRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->gcpLinkageRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->gcpLinkageRowStatus = set_value;
+			if ((StorageOld = StorageTmp->gcpLinkageTable_old) != NULL) {
+				gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
+				StorageTmp->gcpLinkageTable_rsvs = 0;
+				StorageTmp->gcpLinkageTable_tsts = 0;
+				StorageTmp->gcpLinkageTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			gcpLinkageTable_destroy(&StorageDel);
-			/* gcpLinkageTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_gcpLinkageTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->gcpLinkageRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_gcpLinkageTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->gcpLinkageRowStatus = old_value;
+			if (StorageTmp->gcpLinkageRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_gcpLinkageTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -16281,6 +23691,13 @@ write_gcpLinkageRowStatus(int action, u_char *var_val, u_char var_val_type, size
 				gcpLinkageTable_del(StorageNew);
 				gcpLinkageTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->gcpLinkageTable_old) == NULL)
+				break;
+			if (--StorageTmp->gcpLinkageTable_rsvs == 0)
+				gcpLinkageTable_destroy(&StorageTmp->gcpLinkageTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -16307,10 +23724,9 @@ write_gcpLinkageRowStatus(int action, u_char *var_val, u_char var_val_type, size
 int
 write_gcpUdpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct gcpUdpProfileTable_data *StorageTmp = NULL;
+	struct gcpUdpProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct gcpUdpProfileTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 14;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -16337,40 +23753,6 @@ write_gcpUdpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->gcpUdpRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->gcpUdpProfileTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->gcpUdpProfileTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* gcpUdpProfileId */
@@ -16395,13 +23777,44 @@ write_gcpUdpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->gcpUdpProfileTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->gcpUdpProfileId, vp->val.string, vp->val_len);
 			StorageNew->gcpUdpProfileIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&gcpUdpProfileTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->gcpUdpRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->gcpUdpProfileTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->gcpUdpProfileTable_old) == NULL)
+				if (StorageTmp->gcpUdpProfileTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->gcpUdpProfileTable_old = gcpUdpProfileTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->gcpUdpProfileTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->gcpUdpProfileTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -16411,78 +23824,127 @@ write_gcpUdpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = gcpUdpProfileTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_gcpUdpProfileTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->gcpUdpRowStatus;
-			StorageTmp->gcpUdpRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = gcpUdpProfileTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->gcpUdpRowStatus = old_value;
+			if (StorageTmp->gcpUdpRowStatus != RS_ACTIVE)
+				if ((ret = can_act_gcpUdpProfileTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
-			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->gcpUdpRowStatus;
-			StorageTmp->gcpUdpRowStatus = set_value;
+			/* check that deactivation is possible */
+			if (StorageTmp->gcpUdpRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_gcpUdpProfileTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
 			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->gcpUdpRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_gcpUdpProfileTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->gcpUdpRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_gcpUdpProfileTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->gcpUdpRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_gcpUdpProfileTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
+					break;
+				case RS_NOTINSERVICE:
+			/* state change already performed */
+			if (StorageTmp->gcpUdpRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_gcpUdpProfileTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
+			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_gcpUdpProfileTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->gcpUdpRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->gcpUdpRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->gcpUdpRowStatus = set_value;
+			if ((StorageOld = StorageTmp->gcpUdpProfileTable_old) != NULL) {
+				gcpUdpProfileTable_destroy(&StorageTmp->gcpUdpProfileTable_old);
+				StorageTmp->gcpUdpProfileTable_rsvs = 0;
+				StorageTmp->gcpUdpProfileTable_tsts = 0;
+				StorageTmp->gcpUdpProfileTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			gcpUdpProfileTable_destroy(&StorageDel);
-			/* gcpUdpProfileTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_gcpUdpProfileTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->gcpUdpRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_gcpUdpProfileTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->gcpUdpRowStatus = old_value;
+			if (StorageTmp->gcpUdpRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_gcpUdpProfileTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -16496,6 +23958,13 @@ write_gcpUdpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				gcpUdpProfileTable_del(StorageNew);
 				gcpUdpProfileTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->gcpUdpProfileTable_old) == NULL)
+				break;
+			if (--StorageTmp->gcpUdpProfileTable_rsvs == 0)
+				gcpUdpProfileTable_destroy(&StorageTmp->gcpUdpProfileTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -16522,10 +23991,9 @@ write_gcpUdpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_gcpTcpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct gcpTcpProfileTable_data *StorageTmp = NULL;
+	struct gcpTcpProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct gcpTcpProfileTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 14;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -16552,40 +24020,6 @@ write_gcpTcpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->gcpTcpRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->gcpTcpProfileTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->gcpTcpProfileTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* gcpTcpProfileId */
@@ -16610,13 +24044,44 @@ write_gcpTcpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->gcpTcpProfileTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->gcpTcpProfileId, vp->val.string, vp->val_len);
 			StorageNew->gcpTcpProfileIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&gcpTcpProfileTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->gcpTcpRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->gcpTcpProfileTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) == NULL)
+				if (StorageTmp->gcpTcpProfileTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->gcpTcpProfileTable_old = gcpTcpProfileTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->gcpTcpProfileTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->gcpTcpProfileTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -16626,78 +24091,127 @@ write_gcpTcpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = gcpTcpProfileTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_gcpTcpProfileTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->gcpTcpRowStatus;
-			StorageTmp->gcpTcpRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = gcpTcpProfileTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->gcpTcpRowStatus = old_value;
+			if (StorageTmp->gcpTcpRowStatus != RS_ACTIVE)
+				if ((ret = can_act_gcpTcpProfileTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->gcpTcpRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_gcpTcpProfileTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->gcpTcpRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_gcpTcpProfileTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->gcpTcpRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_gcpTcpProfileTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->gcpTcpRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_gcpTcpProfileTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->gcpTcpRowStatus;
-			StorageTmp->gcpTcpRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->gcpTcpRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_gcpTcpProfileTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_gcpTcpProfileTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->gcpTcpRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->gcpTcpRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->gcpTcpRowStatus = set_value;
+			if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) != NULL) {
+				gcpTcpProfileTable_destroy(&StorageTmp->gcpTcpProfileTable_old);
+				StorageTmp->gcpTcpProfileTable_rsvs = 0;
+				StorageTmp->gcpTcpProfileTable_tsts = 0;
+				StorageTmp->gcpTcpProfileTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			gcpTcpProfileTable_destroy(&StorageDel);
-			/* gcpTcpProfileTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_gcpTcpProfileTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->gcpTcpRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_gcpTcpProfileTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->gcpTcpRowStatus = old_value;
+			if (StorageTmp->gcpTcpRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_gcpTcpProfileTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -16711,6 +24225,13 @@ write_gcpTcpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				gcpTcpProfileTable_del(StorageNew);
 				gcpTcpProfileTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->gcpTcpProfileTable_old) == NULL)
+				break;
+			if (--StorageTmp->gcpTcpProfileTable_rsvs == 0)
+				gcpTcpProfileTable_destroy(&StorageTmp->gcpTcpProfileTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -16737,10 +24258,9 @@ write_gcpTcpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_gcpSctpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct gcpSctpProfileTable_data *StorageTmp = NULL;
+	struct gcpSctpProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct gcpSctpProfileTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 14;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -16767,40 +24287,6 @@ write_gcpSctpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->gcpSctpRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->gcpSctpProfileTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->gcpSctpProfileTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* gcpSctpProfileId */
@@ -16825,13 +24311,44 @@ write_gcpSctpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->gcpSctpProfileTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->gcpSctpProfileId, vp->val.string, vp->val_len);
 			StorageNew->gcpSctpProfileIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&gcpSctpProfileTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->gcpSctpRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->gcpSctpProfileTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+				if (StorageTmp->gcpSctpProfileTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->gcpSctpProfileTable_old = gcpSctpProfileTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->gcpSctpProfileTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->gcpSctpProfileTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -16841,78 +24358,127 @@ write_gcpSctpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = gcpSctpProfileTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_gcpSctpProfileTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->gcpSctpRowStatus;
-			StorageTmp->gcpSctpRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = gcpSctpProfileTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->gcpSctpRowStatus = old_value;
+			if (StorageTmp->gcpSctpRowStatus != RS_ACTIVE)
+				if ((ret = can_act_gcpSctpProfileTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->gcpSctpRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_gcpSctpProfileTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->gcpSctpRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_gcpSctpProfileTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->gcpSctpRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_gcpSctpProfileTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->gcpSctpRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_gcpSctpProfileTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->gcpSctpRowStatus;
-			StorageTmp->gcpSctpRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->gcpSctpRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_gcpSctpProfileTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_gcpSctpProfileTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->gcpSctpRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->gcpSctpRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->gcpSctpRowStatus = set_value;
+			if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) != NULL) {
+				gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
+				StorageTmp->gcpSctpProfileTable_rsvs = 0;
+				StorageTmp->gcpSctpProfileTable_tsts = 0;
+				StorageTmp->gcpSctpProfileTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			gcpSctpProfileTable_destroy(&StorageDel);
-			/* gcpSctpProfileTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_gcpSctpProfileTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->gcpSctpRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_gcpSctpProfileTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->gcpSctpRowStatus = old_value;
+			if (StorageTmp->gcpSctpRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_gcpSctpProfileTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -16926,6 +24492,13 @@ write_gcpSctpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				gcpSctpProfileTable_del(StorageNew);
 				gcpSctpProfileTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->gcpSctpProfileTable_old) == NULL)
+				break;
+			if (--StorageTmp->gcpSctpProfileTable_rsvs == 0)
+				gcpSctpProfileTable_destroy(&StorageTmp->gcpSctpProfileTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -16952,10 +24525,9 @@ write_gcpSctpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_gcpProtGroupRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct gcpProtGroupTable_data *StorageTmp = NULL;
+	struct gcpProtGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct gcpProtGroupTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 14;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -16982,40 +24554,6 @@ write_gcpProtGroupRowStatus(int action, u_char *var_val, u_char var_val_type, si
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->gcpProtGroupRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->gcpProtGroupTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->gcpProtGroupTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* gcpProtGroupId */
@@ -17039,12 +24577,43 @@ write_gcpProtGroupRowStatus(int action, u_char *var_val, u_char var_val_type, si
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->gcpProtGroupTable_rsvs = 1;
 			vp = vars;
 			StorageNew->gcpProtGroupId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&gcpProtGroupTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->gcpProtGroupRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->gcpProtGroupTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+				if (StorageTmp->gcpProtGroupTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->gcpProtGroupTable_old = gcpProtGroupTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->gcpProtGroupTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->gcpProtGroupTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -17054,78 +24623,127 @@ write_gcpProtGroupRowStatus(int action, u_char *var_val, u_char var_val_type, si
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = gcpProtGroupTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_gcpProtGroupTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->gcpProtGroupRowStatus;
-			StorageTmp->gcpProtGroupRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = gcpProtGroupTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->gcpProtGroupRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->gcpProtGroupRowStatus != RS_ACTIVE)
+				if ((ret = can_act_gcpProtGroupTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
-			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->gcpProtGroupRowStatus;
-			StorageTmp->gcpProtGroupRowStatus = set_value;
+			/* check that deactivation is possible */
+			if (StorageTmp->gcpProtGroupRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_gcpProtGroupTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
 			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->gcpProtGroupRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_gcpProtGroupTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->gcpProtGroupRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_gcpProtGroupTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->gcpProtGroupRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_gcpProtGroupTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+				}
+			break;
+		case RS_NOTINSERVICE:
+			/* state change already performed */
+			if (StorageTmp->gcpProtGroupRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_gcpProtGroupTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
+			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_gcpProtGroupTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->gcpProtGroupRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->gcpProtGroupRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->gcpProtGroupRowStatus = set_value;
+			if ((StorageOld = StorageTmp->gcpProtGroupTable_old) != NULL) {
+				gcpProtGroupTable_destroy(&StorageTmp->gcpProtGroupTable_old);
+				StorageTmp->gcpProtGroupTable_rsvs = 0;
+				StorageTmp->gcpProtGroupTable_tsts = 0;
+				StorageTmp->gcpProtGroupTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			gcpProtGroupTable_destroy(&StorageDel);
-			/* gcpProtGroupTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_gcpProtGroupTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->gcpProtGroupRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_gcpProtGroupTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->gcpProtGroupRowStatus = old_value;
+			if (StorageTmp->gcpProtGroupRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_gcpProtGroupTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -17139,6 +24757,13 @@ write_gcpProtGroupRowStatus(int action, u_char *var_val, u_char var_val_type, si
 				gcpProtGroupTable_del(StorageNew);
 				gcpProtGroupTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->gcpProtGroupTable_old) == NULL)
+				break;
+			if (--StorageTmp->gcpProtGroupTable_rsvs == 0)
+				gcpProtGroupTable_destroy(&StorageTmp->gcpProtGroupTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -17165,10 +24790,9 @@ write_gcpProtGroupRowStatus(int action, u_char *var_val, u_char var_val_type, si
 int
 write_gcpSbolStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct gcpSbolTable_data *StorageTmp = NULL;
+	struct gcpSbolTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct gcpSbolTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 14;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -17195,40 +24819,6 @@ write_gcpSbolStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->gcpSbolStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->gcpSbolTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->gcpSbolTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* gcpProtGroupId */
@@ -17264,6 +24854,7 @@ write_gcpSbolStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->gcpSbolTable_rsvs = 1;
 			vp = vars;
 			StorageNew->gcpProtGroupId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -17271,7 +24862,37 @@ write_gcpSbolStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 			vp = vp->next_variable;
 			header_complex_add_data(&gcpSbolTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->gcpSbolStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->gcpSbolTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->gcpSbolTable_old) == NULL)
+				if (StorageTmp->gcpSbolTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->gcpSbolTable_old = gcpSbolTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->gcpSbolTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->gcpSbolTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -17281,78 +24902,127 @@ write_gcpSbolStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = gcpSbolTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_gcpSbolTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->gcpSbolStatus;
-			StorageTmp->gcpSbolStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = gcpSbolTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->gcpSbolStatus = old_value;
+			if (StorageTmp->gcpSbolStatus != RS_ACTIVE)
+				if ((ret = can_act_gcpSbolTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->gcpSbolStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_gcpSbolTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->gcpSbolStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_gcpSbolTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->gcpSbolStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+		   the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_gcpSbolTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->gcpSbolStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_gcpSbolTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->gcpSbolStatus;
-			StorageTmp->gcpSbolStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->gcpSbolStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_gcpSbolTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_gcpSbolTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->gcpSbolStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->gcpSbolStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->gcpSbolStatus = set_value;
+			if ((StorageOld = StorageTmp->gcpSbolTable_old) != NULL) {
+				gcpSbolTable_destroy(&StorageTmp->gcpSbolTable_old);
+				StorageTmp->gcpSbolTable_rsvs = 0;
+				StorageTmp->gcpSbolTable_tsts = 0;
+				StorageTmp->gcpSbolTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			gcpSbolTable_destroy(&StorageDel);
-			/* gcpSbolTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_gcpSbolTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->gcpSbolStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_gcpSbolTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->gcpSbolStatus = old_value;
+			if (StorageTmp->gcpSbolStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_gcpSbolTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -17366,6 +25036,13 @@ write_gcpSbolStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 				gcpSbolTable_del(StorageNew);
 				gcpSbolTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->gcpSbolTable_old) == NULL)
+				break;
+			if (--StorageTmp->gcpSbolTable_rsvs == 0)
+				gcpSbolTable_destroy(&StorageTmp->gcpSbolTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -17392,10 +25069,9 @@ write_gcpSbolStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_gcpProtUnitRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct gcpProtUnitTable_data *StorageTmp = NULL;
+	struct gcpProtUnitTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct gcpProtUnitTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 14;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -17422,40 +25098,6 @@ write_gcpProtUnitRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->gcpProtUnitRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->gcpProtUnitTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->gcpProtUnitTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* gcpProtUnitId */
@@ -17485,12 +25127,43 @@ write_gcpProtUnitRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->gcpProtUnitTable_rsvs = 1;
 			vp = vars;
 			StorageNew->gcpProtUnitId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&gcpProtUnitTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->gcpProtUnitRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->gcpProtUnitTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->gcpProtUnitTable_old) == NULL)
+				if (StorageTmp->gcpProtUnitTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->gcpProtUnitTable_old = gcpProtUnitTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->gcpProtUnitTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->gcpProtUnitTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -17500,78 +25173,127 @@ write_gcpProtUnitRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = gcpProtUnitTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_gcpProtUnitTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->gcpProtUnitRowStatus;
-			StorageTmp->gcpProtUnitRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = gcpProtUnitTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->gcpProtUnitRowStatus = old_value;
+			if (StorageTmp->gcpProtUnitRowStatus != RS_ACTIVE)
+				if ((ret = can_act_gcpProtUnitTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->gcpProtUnitRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_gcpProtUnitTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->gcpProtUnitRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_gcpProtUnitTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->gcpProtUnitRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_gcpProtUnitTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->gcpProtUnitRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_gcpProtUnitTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->gcpProtUnitRowStatus;
-			StorageTmp->gcpProtUnitRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->gcpProtUnitRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_gcpProtUnitTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_gcpProtUnitTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->gcpProtUnitRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->gcpProtUnitRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->gcpProtUnitRowStatus = set_value;
+			if ((StorageOld = StorageTmp->gcpProtUnitTable_old) != NULL) {
+				gcpProtUnitTable_destroy(&StorageTmp->gcpProtUnitTable_old);
+				StorageTmp->gcpProtUnitTable_rsvs = 0;
+				StorageTmp->gcpProtUnitTable_tsts = 0;
+				StorageTmp->gcpProtUnitTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			gcpProtUnitTable_destroy(&StorageDel);
-			/* gcpProtUnitTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_gcpProtUnitTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->gcpProtUnitRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_gcpProtUnitTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->gcpProtUnitRowStatus = old_value;
+			if (StorageTmp->gcpProtUnitRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_gcpProtUnitTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -17585,6 +25307,13 @@ write_gcpProtUnitRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				gcpProtUnitTable_del(StorageNew);
 				gcpProtUnitTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->gcpProtUnitTable_old) == NULL)
+				break;
+			if (--StorageTmp->gcpProtUnitTable_rsvs == 0)
+				gcpProtUnitTable_destroy(&StorageTmp->gcpProtUnitTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -17611,10 +25340,9 @@ write_gcpProtUnitRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_gcpRealmRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct gcpRealmTable_data *StorageTmp = NULL;
+	struct gcpRealmTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct gcpRealmTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 14;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -17641,40 +25369,6 @@ write_gcpRealmRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->gcpRealmRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->gcpRealmTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->gcpRealmTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* gcpMsId */
@@ -17722,6 +25416,7 @@ write_gcpRealmRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->gcpRealmTable_rsvs = 1;
 			vp = vars;
 			StorageNew->gcpMsId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -17731,7 +25426,37 @@ write_gcpRealmRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 			vp = vp->next_variable;
 			header_complex_add_data(&gcpRealmTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->gcpRealmRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->gcpRealmTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->gcpRealmTable_old) == NULL)
+				if (StorageTmp->gcpRealmTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->gcpRealmTable_old = gcpRealmTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->gcpRealmTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->gcpRealmTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -17741,78 +25466,127 @@ write_gcpRealmRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = gcpRealmTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_gcpRealmTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->gcpRealmRowStatus;
-			StorageTmp->gcpRealmRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = gcpRealmTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->gcpRealmRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->gcpRealmRowStatus != RS_ACTIVE)
+				if ((ret = can_act_gcpRealmTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
-			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->gcpRealmRowStatus;
-			StorageTmp->gcpRealmRowStatus = set_value;
+			/* check that deactivation is possible */
+			if (StorageTmp->gcpRealmRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_gcpRealmTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
 			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->gcpRealmRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_gcpRealmTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->gcpRealmRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable 
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_gcpRealmTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->gcpRealmRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_gcpRealmTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+				}
+			break;
+		case RS_NOTINSERVICE:
+			/* state change already performed */
+			if (StorageTmp->gcpRealmRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_gcpRealmTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
+			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_gcpRealmTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->gcpRealmRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->gcpRealmRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->gcpRealmRowStatus = set_value;
+			if ((StorageOld = StorageTmp->gcpRealmTable_old) != NULL) {
+				gcpRealmTable_destroy(&StorageTmp->gcpRealmTable_old);
+				StorageTmp->gcpRealmTable_rsvs = 0;
+				StorageTmp->gcpRealmTable_tsts = 0;
+				StorageTmp->gcpRealmTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			gcpRealmTable_destroy(&StorageDel);
-			/* gcpRealmTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_gcpRealmTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->gcpRealmRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_gcpRealmTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->gcpRealmRowStatus = old_value;
+			if (StorageTmp->gcpRealmRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_gcpRealmTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -17826,6 +25600,13 @@ write_gcpRealmRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 				gcpRealmTable_del(StorageNew);
 				gcpRealmTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->gcpRealmTable_old) == NULL)
+				break;
+			if (--StorageTmp->gcpRealmTable_rsvs == 0)
+				gcpRealmTable_destroy(&StorageTmp->gcpRealmTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -17852,10 +25633,9 @@ write_gcpRealmRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_gcpInterfaceRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct gcpInterfaceTable_data *StorageTmp = NULL;
+	struct gcpInterfaceTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct gcpInterfaceTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 14;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -17882,40 +25662,6 @@ write_gcpInterfaceRowStatus(int action, u_char *var_val, u_char var_val_type, si
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->gcpInterfaceRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->gcpInterfaceTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->gcpInterfaceTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* gcpMsId */
@@ -17951,6 +25697,7 @@ write_gcpInterfaceRowStatus(int action, u_char *var_val, u_char var_val_type, si
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->gcpInterfaceTable_rsvs = 1;
 			vp = vars;
 			StorageNew->gcpMsId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -17958,7 +25705,37 @@ write_gcpInterfaceRowStatus(int action, u_char *var_val, u_char var_val_type, si
 			vp = vp->next_variable;
 			header_complex_add_data(&gcpInterfaceTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->gcpInterfaceRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->gcpInterfaceTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->gcpInterfaceTable_old) == NULL)
+				if (StorageTmp->gcpInterfaceTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->gcpInterfaceTable_old = gcpInterfaceTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->gcpInterfaceTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->gcpInterfaceTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -17968,78 +25745,127 @@ write_gcpInterfaceRowStatus(int action, u_char *var_val, u_char var_val_type, si
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = gcpInterfaceTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_gcpInterfaceTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->gcpInterfaceRowStatus;
-			StorageTmp->gcpInterfaceRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = gcpInterfaceTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->gcpInterfaceRowStatus = old_value;
+			if (StorageTmp->gcpInterfaceRowStatus != RS_ACTIVE)
+				if ((ret = can_act_gcpInterfaceTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->gcpInterfaceRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_gcpInterfaceTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->gcpInterfaceRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_gcpInterfaceTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->gcpInterfaceRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_gcpInterfaceTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->gcpInterfaceRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_gcpInterfaceTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->gcpInterfaceRowStatus;
-			StorageTmp->gcpInterfaceRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->gcpInterfaceRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_gcpInterfaceTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+			break;
+			/* deactivate with underlying device */
+			if (deactivate_gcpInterfaceTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->gcpInterfaceRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->gcpInterfaceRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->gcpInterfaceRowStatus = set_value;
+			if ((StorageOld = StorageTmp->gcpInterfaceTable_old) != NULL) {
+				gcpInterfaceTable_destroy(&StorageTmp->gcpInterfaceTable_old);
+				StorageTmp->gcpInterfaceTable_rsvs = 0;
+				StorageTmp->gcpInterfaceTable_tsts = 0;
+				StorageTmp->gcpInterfaceTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			gcpInterfaceTable_destroy(&StorageDel);
-			/* gcpInterfaceTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_gcpInterfaceTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->gcpInterfaceRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_gcpInterfaceTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->gcpInterfaceRowStatus = old_value;
+			if (StorageTmp->gcpInterfaceRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_gcpInterfaceTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -18053,6 +25879,13 @@ write_gcpInterfaceRowStatus(int action, u_char *var_val, u_char var_val_type, si
 				gcpInterfaceTable_del(StorageNew);
 				gcpInterfaceTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->gcpInterfaceTable_old) == NULL)
+				break;
+			if (--StorageTmp->gcpInterfaceTable_rsvs == 0)
+				gcpInterfaceTable_destroy(&StorageTmp->gcpInterfaceTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -18079,10 +25912,9 @@ write_gcpInterfaceRowStatus(int action, u_char *var_val, u_char var_val_type, si
 int
 write_gcpAddressRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct gcpAddressTable_data *StorageTmp = NULL;
+	struct gcpAddressTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct gcpAddressTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 14;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -18109,40 +25941,6 @@ write_gcpAddressRowStatus(int action, u_char *var_val, u_char var_val_type, size
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->gcpAddressRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->gcpAddressTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->gcpAddressTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* gcpMsId */
@@ -18214,6 +26012,7 @@ write_gcpAddressRowStatus(int action, u_char *var_val, u_char var_val_type, size
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->gcpAddressTable_rsvs = 1;
 			vp = vars;
 			StorageNew->gcpMsId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -18227,7 +26026,37 @@ write_gcpAddressRowStatus(int action, u_char *var_val, u_char var_val_type, size
 			vp = vp->next_variable;
 			header_complex_add_data(&gcpAddressTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->gcpAddressRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->gcpAddressTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->gcpAddressTable_old) == NULL)
+				if (StorageTmp->gcpAddressTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->gcpAddressTable_old = gcpAddressTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->gcpAddressTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->gcpAddressTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -18237,78 +26066,127 @@ write_gcpAddressRowStatus(int action, u_char *var_val, u_char var_val_type, size
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = gcpAddressTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_gcpAddressTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->gcpAddressRowStatus;
-			StorageTmp->gcpAddressRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = gcpAddressTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->gcpAddressRowStatus = old_value;
+			if (StorageTmp->gcpAddressRowStatus != RS_ACTIVE)
+				if ((ret = can_act_gcpAddressTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->gcpAddressRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_gcpAddressTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->gcpAddressRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_gcpAddressTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->gcpAddressRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_gcpAddressTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->gcpAddressRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_gcpAddressTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->gcpAddressRowStatus;
-			StorageTmp->gcpAddressRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->gcpAddressRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_gcpAddressTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_gcpAddressTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->gcpAddressRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->gcpAddressRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->gcpAddressRowStatus = set_value;
+			if ((StorageOld = StorageTmp->gcpAddressTable_old) != NULL) {
+				gcpAddressTable_destroy(&StorageTmp->gcpAddressTable_old);
+				StorageTmp->gcpAddressTable_rsvs = 0;
+				StorageTmp->gcpAddressTable_tsts = 0;
+				StorageTmp->gcpAddressTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			gcpAddressTable_destroy(&StorageDel);
-			/* gcpAddressTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_gcpAddressTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->gcpAddressRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_gcpAddressTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->gcpAddressRowStatus = old_value;
+			if (StorageTmp->gcpAddressRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_gcpAddressTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -18322,6 +26200,13 @@ write_gcpAddressRowStatus(int action, u_char *var_val, u_char var_val_type, size
 				gcpAddressTable_del(StorageNew);
 				gcpAddressTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->gcpAddressTable_old) == NULL)
+				break;
+			if (--StorageTmp->gcpAddressTable_rsvs == 0)
+				gcpAddressTable_destroy(&StorageTmp->gcpAddressTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */

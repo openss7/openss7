@@ -63,6 +63,10 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct lapbMIB_data {
+	struct lapbMIB_data *lapbMIB_old;
+	uint lapbMIB_rsvs;
+	uint lapbMIB_tsts;
+	uint lapbMIB_sets;
 	uint lapbMIB_request;
 	long lapbDiscontinuityTime;	/* ReadOnly */
 	long sLPConnectionDefaultInterfaceType;	/* ReadWrite */
@@ -76,8 +80,13 @@ struct lapbMIB_data {
 	long sLPConnectionDefaultT4Timer;	/* ReadWrite */
 };
 struct lAPBDLETable_data {
+	struct lAPBDLETable_data *lAPBDLETable_old;
+	uint lAPBDLETable_rsvs;
+	uint lAPBDLETable_tsts;
+	uint lAPBDLETable_sets;
 	uint lAPBDLETable_request;
 	uint lAPBDLETable_refs;
+	uint lAPBDLETable_id;
 	uint8_t *lAPBDLEcommunicationsEntityId;	/* NoAccess */
 	size_t lAPBDLEcommunicationsEntityIdLen;
 	oid *lAPBDLElocalSapNames;	/* Create */
@@ -101,8 +110,13 @@ struct lAPBDLETable_data {
 	long lAPBDLERowStatus;		/* Create */
 };
 struct dLSAPTable_data {
+	struct dLSAPTable_data *dLSAPTable_old;
+	uint dLSAPTable_rsvs;
+	uint dLSAPTable_tsts;
+	uint dLSAPTable_sets;
 	uint dLSAPTable_request;
 	uint dLSAPTable_refs;
+	uint dLSAPTable_id;
 	uint8_t *lAPBDLEcommunicationsEntityId;	/* NoAccess */
 	size_t lAPBDLEcommunicationsEntityIdLen;
 	uint8_t *dLSAPsapId;		/* NoAccess */
@@ -113,8 +127,13 @@ struct dLSAPTable_data {
 	long dLSAPRowStatus;		/* Create */
 };
 struct sLPPMTable_data {
+	struct sLPPMTable_data *sLPPMTable_old;
+	uint sLPPMTable_rsvs;
+	uint sLPPMTable_tsts;
+	uint sLPPMTable_sets;
 	uint sLPPMTable_request;
 	uint sLPPMTable_refs;
+	uint sLPPMTable_id;
 	uint8_t *lAPBDLEcommunicationsEntityId;	/* NoAccess */
 	size_t lAPBDLEcommunicationsEntityIdLen;
 	uint8_t *sLPPMcoProtocolMachineId;	/* NoAccess */
@@ -124,8 +143,13 @@ struct sLPPMTable_data {
 	long sLPPMRowStatus;		/* Create */
 };
 struct sLPConnectionTable_data {
+	struct sLPConnectionTable_data *sLPConnectionTable_old;
+	uint sLPConnectionTable_rsvs;
+	uint sLPConnectionTable_tsts;
+	uint sLPConnectionTable_sets;
 	uint sLPConnectionTable_request;
 	uint sLPConnectionTable_refs;
+	uint sLPConnectionTable_id;
 	uint8_t *sLPConnectionConnectionId;	/* NoAccess */
 	size_t sLPConnectionConnectionIdLen;
 	oid *sLPConnectionUnderlyingConnectionNames;	/* Create */
@@ -174,8 +198,13 @@ struct sLPConnectionTable_data {
 	long sLPConnectionRowStatus;	/* Create */
 };
 struct sLPConnectionIVMOTable_data {
+	struct sLPConnectionIVMOTable_data *sLPConnectionIVMOTable_old;
+	uint sLPConnectionIVMOTable_rsvs;
+	uint sLPConnectionIVMOTable_tsts;
+	uint sLPConnectionIVMOTable_sets;
 	uint sLPConnectionIVMOTable_request;
 	uint sLPConnectionIVMOTable_refs;
+	uint sLPConnectionIVMOTable_id;
 	uint8_t *sLPConnectionConnectionId;	/* NoAccess */
 	size_t sLPConnectionConnectionIdLen;
 	uint8_t *sLPConnectionIVMOid;	/* ReadOnly */
@@ -282,6 +311,10 @@ void init_lapbMIB(void);
 void deinit_lapbMIB(void);
 int term_lapbMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_lapbMIB;
+struct lapbMIB_data *lapbMIB_create(void);
+struct lapbMIB_data *lapbMIB_duplicate(struct lapbMIB_data *);
+int lapbMIB_destroy(struct lapbMIB_data **);
+int lapbMIB_add(struct lapbMIB_data *);
 void parse_lapbMIB(const char *, char *);
 SNMPCallback store_lapbMIB;
 void refresh_lapbMIB(int);

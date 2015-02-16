@@ -63,6 +63,10 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct rtpswOmMIB_data {
+	struct rtpswOmMIB_data *rtpswOmMIB_old;
+	uint rtpswOmMIB_rsvs;
+	uint rtpswOmMIB_tsts;
+	uint rtpswOmMIB_sets;
 	uint rtpswOmMIB_request;
 	struct counter64 rtpswOmCurrOctetsSent;	/* ReadOnly */
 	struct counter64 rtpswOmCurrOctetsRecv;	/* ReadOnly */
@@ -80,8 +84,13 @@ struct rtpswOmMIB_data {
 	long rtpswForwOm15minValidIntervals;	/* ReadOnly */
 };
 struct rtpswOm5MinHistoryTable_data {
+	struct rtpswOm5MinHistoryTable_data *rtpswOm5MinHistoryTable_old;
+	uint rtpswOm5MinHistoryTable_rsvs;
+	uint rtpswOm5MinHistoryTable_tsts;
+	uint rtpswOm5MinHistoryTable_sets;
 	uint rtpswOm5MinHistoryTable_request;
 	uint rtpswOm5MinHistoryTable_refs;
+	uint rtpswOm5MinHistoryTable_id;
 	long rtpswOm5MinInterval;	/* NoAccess */
 	struct counter64 rtpswOm5MinOctetsSent;	/* ReadOnly */
 	struct counter64 rtpswOm5MinOctetsRecv;	/* ReadOnly */
@@ -91,8 +100,13 @@ struct rtpswOm5MinHistoryTable_data {
 	struct counter64 rtpswOm5MinStunPktsRecv;	/* ReadOnly */
 };
 struct rtpswOm15MinHistoryTable_data {
+	struct rtpswOm15MinHistoryTable_data *rtpswOm15MinHistoryTable_old;
+	uint rtpswOm15MinHistoryTable_rsvs;
+	uint rtpswOm15MinHistoryTable_tsts;
+	uint rtpswOm15MinHistoryTable_sets;
 	uint rtpswOm15MinHistoryTable_request;
 	uint rtpswOm15MinHistoryTable_refs;
+	uint rtpswOm15MinHistoryTable_id;
 	long rtpswOm15MinInterval;	/* NoAccess */
 	struct counter64 rtpswOm15MinOctetsSent;	/* ReadOnly */
 	struct counter64 rtpswOm15MinOctetsRecv;	/* ReadOnly */
@@ -102,8 +116,13 @@ struct rtpswOm15MinHistoryTable_data {
 	struct counter64 rtpswOm15MinStunPktsRecv;	/* ReadOnly */
 };
 struct rtpswInterfaceCurrentTable_data {
+	struct rtpswInterfaceCurrentTable_data *rtpswInterfaceCurrentTable_old;
+	uint rtpswInterfaceCurrentTable_rsvs;
+	uint rtpswInterfaceCurrentTable_tsts;
+	uint rtpswInterfaceCurrentTable_sets;
 	uint rtpswInterfaceCurrentTable_request;
 	uint rtpswInterfaceCurrentTable_refs;
+	uint rtpswInterfaceCurrentTable_id;
 	ulong rtpswInterfaceId;		/* NoAccess */
 	struct counter64 rtpswIfOmOctetsSent;	/* ReadOnly */
 	struct counter64 rtpswIfOmOctetsRecv;	/* ReadOnly */
@@ -115,8 +134,13 @@ struct rtpswInterfaceCurrentTable_data {
 	long rtpswIfOm15minValidIntervals;	/* ReadOnly */
 };
 struct rtpswInterface5MinHistoryTable_data {
+	struct rtpswInterface5MinHistoryTable_data *rtpswInterface5MinHistoryTable_old;
+	uint rtpswInterface5MinHistoryTable_rsvs;
+	uint rtpswInterface5MinHistoryTable_tsts;
+	uint rtpswInterface5MinHistoryTable_sets;
 	uint rtpswInterface5MinHistoryTable_request;
 	uint rtpswInterface5MinHistoryTable_refs;
+	uint rtpswInterface5MinHistoryTable_id;
 	ulong rtpswInterfaceId;		/* NoAccess */
 	long rtpswOm5MinInterval;	/* NoAccess */
 	struct counter64 rtpswIfOm5MinOctetsSent;	/* ReadOnly */
@@ -127,8 +151,13 @@ struct rtpswInterface5MinHistoryTable_data {
 	struct counter64 rtpswIfOm5MinStunPktsRecv;	/* ReadOnly */
 };
 struct rtpswInterface15MinHistoryTable_data {
+	struct rtpswInterface15MinHistoryTable_data *rtpswInterface15MinHistoryTable_old;
+	uint rtpswInterface15MinHistoryTable_rsvs;
+	uint rtpswInterface15MinHistoryTable_tsts;
+	uint rtpswInterface15MinHistoryTable_sets;
 	uint rtpswInterface15MinHistoryTable_request;
 	uint rtpswInterface15MinHistoryTable_refs;
+	uint rtpswInterface15MinHistoryTable_id;
 	ulong rtpswInterfaceId;		/* NoAccess */
 	long rtpswOm15MinInterval;	/* NoAccess */
 	struct counter64 rtpswIfOm15MinOctetsSent;	/* ReadOnly */
@@ -139,8 +168,13 @@ struct rtpswInterface15MinHistoryTable_data {
 	struct counter64 rtpswIfOm15MinStunPktsRecv;	/* ReadOnly */
 };
 struct rtpswIfAddrCurrentTable_data {
+	struct rtpswIfAddrCurrentTable_data *rtpswIfAddrCurrentTable_old;
+	uint rtpswIfAddrCurrentTable_rsvs;
+	uint rtpswIfAddrCurrentTable_tsts;
+	uint rtpswIfAddrCurrentTable_sets;
 	uint rtpswIfAddrCurrentTable_request;
 	uint rtpswIfAddrCurrentTable_refs;
+	uint rtpswIfAddrCurrentTable_id;
 	ulong rtpswIfAddrId;		/* NoAccess */
 	struct counter64 rtpswIfAddrOmOctetsSent;	/* ReadOnly */
 	struct counter64 rtpswIfAddrOmOctetsRecv;	/* ReadOnly */
@@ -152,8 +186,13 @@ struct rtpswIfAddrCurrentTable_data {
 	long rtpswIfAddrOm15minValidIntervals;	/* ReadOnly */
 };
 struct rtpswIfAddr5MinHistoryTable_data {
+	struct rtpswIfAddr5MinHistoryTable_data *rtpswIfAddr5MinHistoryTable_old;
+	uint rtpswIfAddr5MinHistoryTable_rsvs;
+	uint rtpswIfAddr5MinHistoryTable_tsts;
+	uint rtpswIfAddr5MinHistoryTable_sets;
 	uint rtpswIfAddr5MinHistoryTable_request;
 	uint rtpswIfAddr5MinHistoryTable_refs;
+	uint rtpswIfAddr5MinHistoryTable_id;
 	ulong rtpswIfAddrId;		/* NoAccess */
 	long rtpswOm5MinInterval;	/* NoAccess */
 	struct counter64 rtpswIfAddrOm5MinOctetsSent;	/* ReadOnly */
@@ -164,8 +203,13 @@ struct rtpswIfAddr5MinHistoryTable_data {
 	struct counter64 rtpswIfAddrOm5MinStunPktsRecv;	/* ReadOnly */
 };
 struct rtpswIfAddr15MinHistoryTable_data {
+	struct rtpswIfAddr15MinHistoryTable_data *rtpswIfAddr15MinHistoryTable_old;
+	uint rtpswIfAddr15MinHistoryTable_rsvs;
+	uint rtpswIfAddr15MinHistoryTable_tsts;
+	uint rtpswIfAddr15MinHistoryTable_sets;
 	uint rtpswIfAddr15MinHistoryTable_request;
 	uint rtpswIfAddr15MinHistoryTable_refs;
+	uint rtpswIfAddr15MinHistoryTable_id;
 	ulong rtpswIfAddrId;		/* NoAccess */
 	long rtpswOm15MinInterval;	/* NoAccess */
 	struct counter64 rtpswIfAddrOm15MinOctetsSent;	/* ReadOnly */
@@ -176,8 +220,13 @@ struct rtpswIfAddr15MinHistoryTable_data {
 	struct counter64 rtpswIfAddrOm15MinStunPktsRecv;	/* ReadOnly */
 };
 struct rtpswForw5MinHistoryTable_data {
+	struct rtpswForw5MinHistoryTable_data *rtpswForw5MinHistoryTable_old;
+	uint rtpswForw5MinHistoryTable_rsvs;
+	uint rtpswForw5MinHistoryTable_tsts;
+	uint rtpswForw5MinHistoryTable_sets;
 	uint rtpswForw5MinHistoryTable_request;
 	uint rtpswForw5MinHistoryTable_refs;
+	uint rtpswForw5MinHistoryTable_id;
 	long rtpswOm5MinInterval;	/* NoAccess */
 	struct counter64 rtpswForwOm5MinOctetsFor;	/* ReadOnly */
 	struct counter64 rtpswForwOm5MinOctetsRev;	/* ReadOnly */
@@ -185,8 +234,13 @@ struct rtpswForw5MinHistoryTable_data {
 	struct counter64 rtpswForwOm5MinPacketsRev;	/* ReadOnly */
 };
 struct rtpswForw15MinHistoryTable_data {
+	struct rtpswForw15MinHistoryTable_data *rtpswForw15MinHistoryTable_old;
+	uint rtpswForw15MinHistoryTable_rsvs;
+	uint rtpswForw15MinHistoryTable_tsts;
+	uint rtpswForw15MinHistoryTable_sets;
 	uint rtpswForw15MinHistoryTable_request;
 	uint rtpswForw15MinHistoryTable_refs;
+	uint rtpswForw15MinHistoryTable_id;
 	long rtpswOm15MinInterval;	/* NoAccess */
 	struct counter64 rtpswForwOm15MinOctetsFor;	/* ReadOnly */
 	struct counter64 rtpswForwOm15MinOctetsRev;	/* ReadOnly */
@@ -194,8 +248,13 @@ struct rtpswForw15MinHistoryTable_data {
 	struct counter64 rtpswForwOm15MinPacketsRev;	/* ReadOnly */
 };
 struct rtpswOmTermPointCurrentTable_data {
+	struct rtpswOmTermPointCurrentTable_data *rtpswOmTermPointCurrentTable_old;
+	uint rtpswOmTermPointCurrentTable_rsvs;
+	uint rtpswOmTermPointCurrentTable_tsts;
+	uint rtpswOmTermPointCurrentTable_sets;
 	uint rtpswOmTermPointCurrentTable_request;
 	uint rtpswOmTermPointCurrentTable_refs;
+	uint rtpswOmTermPointCurrentTable_id;
 	ulong rtpswTermPointId;		/* NoAccess */
 	long rtpswOmTpMediaAware;	/* ReadOnly */
 	long rtpswOmRtpPacketsSent;	/* ReadOnly */
@@ -211,8 +270,13 @@ struct rtpswOmTermPointCurrentTable_data {
 	long rtpswOmRtpDelay;		/* ReadOnly */
 };
 struct rtpswOmCallCurrentTable_data {
+	struct rtpswOmCallCurrentTable_data *rtpswOmCallCurrentTable_old;
+	uint rtpswOmCallCurrentTable_rsvs;
+	uint rtpswOmCallCurrentTable_tsts;
+	uint rtpswOmCallCurrentTable_sets;
 	uint rtpswOmCallCurrentTable_request;
 	uint rtpswOmCallCurrentTable_refs;
+	uint rtpswOmCallCurrentTable_id;
 	ulong rtpswCallId;		/* NoAccess */
 	uint8_t *rtpswOmCallStartTime;	/* ReadOnly */
 	size_t rtpswOmCallStartTimeLen;
@@ -279,6 +343,10 @@ void init_rtpswOmMIB(void);
 void deinit_rtpswOmMIB(void);
 int term_rtpswOmMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_rtpswOmMIB;
+struct rtpswOmMIB_data *rtpswOmMIB_create(void);
+struct rtpswOmMIB_data *rtpswOmMIB_duplicate(struct rtpswOmMIB_data *);
+int rtpswOmMIB_destroy(struct rtpswOmMIB_data **);
+int rtpswOmMIB_add(struct rtpswOmMIB_data *);
 void parse_rtpswOmMIB(const char *, char *);
 SNMPCallback store_rtpswOmMIB;
 void refresh_rtpswOmMIB(int);

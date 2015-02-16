@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/snmp/strMIB.c
+ @(#) src/snmp/strMIB.c
 
  -----------------------------------------------------------------------------
 
@@ -6816,7 +6816,7 @@ write_strModRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -7130,7 +7130,7 @@ write_strApshRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/snmp/isupMIB.c
+ @(#) src/snmp/isupMIB.c
 
  -----------------------------------------------------------------------------
 
@@ -688,8 +688,38 @@ isupMIB_create(void)
 		/* XXX: fill in default scalar values here into StorageNew */
 
 	}
+      done:
 	DEBUGMSGTL(("isupMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	isupMIB_destroy(&StorageNew);
+	goto done;
+}
+
+/**
+ * @fn struct isupMIB_data *isupMIB_duplicate(struct isupMIB_data *thedata)
+ * @param thedata the mib structure to duplicate
+ * @brief duplicate a mib structure for the mib
+ *
+ * Duplicates the specified mib structure @param thedata and returns a pointer to the newly
+ * allocated mib structure on success, or NULL on failure.
+ */
+struct isupMIB_data *
+isupMIB_duplicate(struct isupMIB_data *thedata)
+{
+	struct isupMIB_data *StorageNew = SNMP_MALLOC_STRUCT(isupMIB_data);
+
+	DEBUGMSGTL(("isupMIB", "isupMIB_duplicate: duplicating mib... "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("isupMIB", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	isupMIB_destroy(&StorageNew);
+	goto done;
 }
 
 /**
@@ -740,7 +770,7 @@ isupMIB_add(struct isupMIB_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for isupMIB entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case isupMIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -792,6 +822,62 @@ store_isupMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	}
 	DEBUGMSGTL(("isupMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int check_isupMIB(struct isupMIB_data *StorageTmp, struct isupMIB_data *StorageOld)
+ * @param StorageTmp the data as updated
+ * @param StorageOld the data previous to update
+ *
+ * This function is used by mibs.  It is used to check, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the ACTION phase.  The COMMIT phase does not ensue unless this check passes.  This function can
+ * return SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before
+ * the varbinds on the mib were applied; the values in StorageTmp are the new values.  The function
+ * is permitted to change the values in StorageTmp to correct them; however, preferences should be
+ * made for setting values that were not in the varbinds.
+ */
+int
+check_isupMIB(struct isupMIB_data *StorageTmp, struct isupMIB_data *StorageOld)
+{
+	/* XXX: provide code to check the scalars for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_isupMIB(struct isupMIB_data *StorageTmp, struct isupMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase)
+ *
+ * This function is used by mibs.  It is used to update, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the COMMIT phase.  The start of the ACTION phase performs a consistency check on the mib before
+ * allowing the request to proceed to the COMMIT phase.  The COMMIT phase then arrives here with
+ * consistency already checked (see check_isupMIB()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied: the values in StorageTmp are the new values.
+ */
+int
+update_isupMIB(struct isupMIB_data *StorageTmp, struct isupMIB_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	isupMIB_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn revert_isupMIB(struct 
+ * @fn void revert_isupMIB(struct isupMIB_data *StorageTmp, struct isupMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase)
+ */
+void
+revert_isupMIB(struct isupMIB_data *StorageTmp, struct isupMIB_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_isupMIB(StorageOld, NULL);
 }
 
 /**
@@ -887,45 +973,70 @@ isupMsTable_create(void)
 	DEBUGMSGTL(("isupMIB", "isupMsTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->isupMsName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupMsNameLen = strlen("");
-		if (memdup((u_char **) &StorageNew->isupMsAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->isupMsAlarmStatusLen = 1;
+		if ((StorageNew->isupMsName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->isupMsNameLen = 0;
+		StorageNew->isupMsName[StorageNew->isupMsNameLen] = 0;
+		if (memdup((u_char **) &StorageNew->isupMsAlarmStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->isupMsAlarmStatusLen = 1;
 		StorageNew->isupMsOperationalState = ISUPMSOPERATIONALSTATE_DISABLED;
 		StorageNew->isupMsUsageState = ISUPMSUSAGESTATE_IDLE;
-		if ((StorageNew->isupMsVendorName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupMsVendorNameLen = strlen("");
-		if ((StorageNew->isupMsUserLabel = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupMsUserLabelLen = strlen("");
-		if ((StorageNew->isupMsVersion = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupMsVersionLen = strlen("");
-		if ((StorageNew->isupMsLocationName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupMsLocationNameLen = strlen("");
+		if ((StorageNew->isupMsVendorName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->isupMsVendorNameLen = 0;
+		StorageNew->isupMsVendorName[StorageNew->isupMsVendorNameLen] = 0;
+		if ((StorageNew->isupMsUserLabel = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->isupMsUserLabelLen = 0;
+		StorageNew->isupMsUserLabel[StorageNew->isupMsUserLabelLen] = 0;
+		if ((StorageNew->isupMsVersion = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->isupMsVersionLen = 0;
+		StorageNew->isupMsVersion[StorageNew->isupMsVersionLen] = 0;
+		if ((StorageNew->isupMsLocationName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->isupMsLocationNameLen = 0;
+		StorageNew->isupMsLocationName[StorageNew->isupMsLocationNameLen] = 0;
 		StorageNew->isupMsPrimaryTimingSource = 0;
-		if ((StorageNew->isupMsPrimaryTimingObject = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->isupMsPrimaryTimingObjectLen = 2;
+		if ((StorageNew->isupMsPrimaryTimingObject = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->isupMsPrimaryTimingObjectLen = 2;
 		StorageNew->isupMsSecondaryTimingSource = 0;
-		if ((StorageNew->isupMsSecondaryTimingObject = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->isupMsSecondaryTimingObjectLen = 2;
-		if ((StorageNew->isupMsAsaProfilePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->isupMsAsaProfilePointerLen = 2;
-		if ((StorageNew->isupMsManagedElementType = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupMsManagedElementTypeLen = strlen("");
-		if ((StorageNew->isupMsModelCode = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupMsModelCodeLen = strlen("");
-		if ((StorageNew->isupMsNetworkElementAliases = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupMsNetworkElementAliasesLen = strlen("");
+		if ((StorageNew->isupMsSecondaryTimingObject = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->isupMsSecondaryTimingObjectLen = 2;
+		if ((StorageNew->isupMsAsaProfilePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->isupMsAsaProfilePointerLen = 2;
+		if ((StorageNew->isupMsManagedElementType = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->isupMsManagedElementTypeLen = 0;
+		StorageNew->isupMsManagedElementType[StorageNew->isupMsManagedElementTypeLen] = 0;
+		if ((StorageNew->isupMsModelCode = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->isupMsModelCodeLen = 0;
+		StorageNew->isupMsModelCode[StorageNew->isupMsModelCodeLen] = 0;
+		if ((StorageNew->isupMsNetworkElementAliases = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->isupMsNetworkElementAliasesLen = 0;
+		StorageNew->isupMsNetworkElementAliases[StorageNew->isupMsNetworkElementAliasesLen] = 0;
 		StorageNew->isupMsRowStatus = 0;
 		StorageNew->isupMsRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("isupMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	isupMsTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct isupMsTable_data *isupMsTable_duplicate(struct isupMsTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -937,6 +1048,67 @@ isupMsTable_duplicate(struct isupMsTable_data *thedata)
 
 	DEBUGMSGTL(("isupMIB", "isupMsTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->isupMsTable_id = thedata->isupMsTable_id;
+		StorageNew->isupMsId = thedata->isupMsId;
+		if (!(StorageNew->isupMsName = malloc(thedata->isupMsNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupMsName, thedata->isupMsName, thedata->isupMsNameLen);
+		StorageNew->isupMsNameLen = thedata->isupMsNameLen;
+		StorageNew->isupMsName[StorageNew->isupMsNameLen] = 0;
+		if (!(StorageNew->isupMsAlarmStatus = malloc(thedata->isupMsAlarmStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupMsAlarmStatus, thedata->isupMsAlarmStatus, thedata->isupMsAlarmStatusLen);
+		StorageNew->isupMsAlarmStatusLen = thedata->isupMsAlarmStatusLen;
+		StorageNew->isupMsAlarmStatus[StorageNew->isupMsAlarmStatusLen] = 0;
+		StorageNew->isupMsOperationalState = thedata->isupMsOperationalState;
+		StorageNew->isupMsUsageState = thedata->isupMsUsageState;
+		if (!(StorageNew->isupMsVendorName = malloc(thedata->isupMsVendorNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupMsVendorName, thedata->isupMsVendorName, thedata->isupMsVendorNameLen);
+		StorageNew->isupMsVendorNameLen = thedata->isupMsVendorNameLen;
+		StorageNew->isupMsVendorName[StorageNew->isupMsVendorNameLen] = 0;
+		if (!(StorageNew->isupMsUserLabel = malloc(thedata->isupMsUserLabelLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupMsUserLabel, thedata->isupMsUserLabel, thedata->isupMsUserLabelLen);
+		StorageNew->isupMsUserLabelLen = thedata->isupMsUserLabelLen;
+		StorageNew->isupMsUserLabel[StorageNew->isupMsUserLabelLen] = 0;
+		if (!(StorageNew->isupMsVersion = malloc(thedata->isupMsVersionLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupMsVersion, thedata->isupMsVersion, thedata->isupMsVersionLen);
+		StorageNew->isupMsVersionLen = thedata->isupMsVersionLen;
+		StorageNew->isupMsVersion[StorageNew->isupMsVersionLen] = 0;
+		if (!(StorageNew->isupMsLocationName = malloc(thedata->isupMsLocationNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupMsLocationName, thedata->isupMsLocationName, thedata->isupMsLocationNameLen);
+		StorageNew->isupMsLocationNameLen = thedata->isupMsLocationNameLen;
+		StorageNew->isupMsLocationName[StorageNew->isupMsLocationNameLen] = 0;
+		StorageNew->isupMsPrimaryTimingSource = thedata->isupMsPrimaryTimingSource;
+		if (!(StorageNew->isupMsPrimaryTimingObject = snmp_duplicate_objid(thedata->isupMsPrimaryTimingObject, thedata->isupMsPrimaryTimingObjectLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->isupMsPrimaryTimingObjectLen = thedata->isupMsPrimaryTimingObjectLen;
+		StorageNew->isupMsSecondaryTimingSource = thedata->isupMsSecondaryTimingSource;
+		if (!(StorageNew->isupMsSecondaryTimingObject = snmp_duplicate_objid(thedata->isupMsSecondaryTimingObject, thedata->isupMsSecondaryTimingObjectLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->isupMsSecondaryTimingObjectLen = thedata->isupMsSecondaryTimingObjectLen;
+		if (!(StorageNew->isupMsAsaProfilePointer = snmp_duplicate_objid(thedata->isupMsAsaProfilePointer, thedata->isupMsAsaProfilePointerLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->isupMsAsaProfilePointerLen = thedata->isupMsAsaProfilePointerLen;
+		if (!(StorageNew->isupMsManagedElementType = malloc(thedata->isupMsManagedElementTypeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupMsManagedElementType, thedata->isupMsManagedElementType, thedata->isupMsManagedElementTypeLen);
+		StorageNew->isupMsManagedElementTypeLen = thedata->isupMsManagedElementTypeLen;
+		StorageNew->isupMsManagedElementType[StorageNew->isupMsManagedElementTypeLen] = 0;
+		if (!(StorageNew->isupMsModelCode = malloc(thedata->isupMsModelCodeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupMsModelCode, thedata->isupMsModelCode, thedata->isupMsModelCodeLen);
+		StorageNew->isupMsModelCodeLen = thedata->isupMsModelCodeLen;
+		StorageNew->isupMsModelCode[StorageNew->isupMsModelCodeLen] = 0;
+		if (!(StorageNew->isupMsNetworkElementAliases = malloc(thedata->isupMsNetworkElementAliasesLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupMsNetworkElementAliases, thedata->isupMsNetworkElementAliases, thedata->isupMsNetworkElementAliasesLen);
+		StorageNew->isupMsNetworkElementAliasesLen = thedata->isupMsNetworkElementAliasesLen;
+		StorageNew->isupMsNetworkElementAliases[StorageNew->isupMsNetworkElementAliasesLen] = 0;
+		StorageNew->isupMsRowStatus = thedata->isupMsRowStatus;
 	}
       done:
 	DEBUGMSGTL(("isupMIB", "done.\n"));
@@ -1054,7 +1226,7 @@ isupMsTable_del(struct isupMsTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for isupMsTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case isupMsTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1222,34 +1394,45 @@ isupPgTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->isupPgOperState = 0;
-		if (memdup((u_char **) &StorageNew->isupPgAvailStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->isupPgAvailStatusLen = 2;
+		if (memdup((u_char **) &StorageNew->isupPgAvailStatus, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->isupPgAvailStatusLen = 2;
 		StorageNew->isupPgType = 0;
 		StorageNew->isupPgRevertive = 0;
-		if ((StorageNew->isupPgSupportedByObjectList = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->isupPgSupportedByObjectListLen = 2;
+		if ((StorageNew->isupPgSupportedByObjectList = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->isupPgSupportedByObjectListLen = 2;
 		StorageNew->isupPgWaitToRestoreTime = 0;
 		StorageNew->isupPgSettingWindowTime = 0;
 		StorageNew->isupPgReleasingWindowTime = 0;
 		StorageNew->isupPgHitsCount = 0;
 		StorageNew->isupPgSwitchType = 0;
-		if ((StorageNew->isupPgProtectedUnits = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupPgProtectedUnitsLen = strlen("");
-		if ((StorageNew->isupPgProtectingUnits = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupPgProtectingUnitsLen = strlen("");
+		if ((StorageNew->isupPgProtectedUnits = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->isupPgProtectedUnitsLen = 0;
+		StorageNew->isupPgProtectedUnits[StorageNew->isupPgProtectedUnitsLen] = 0;
+		if ((StorageNew->isupPgProtectingUnits = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->isupPgProtectingUnitsLen = 0;
+		StorageNew->isupPgProtectingUnits[StorageNew->isupPgProtectingUnitsLen] = 0;
 		StorageNew->isupPgInvokeProtection = 0;
 		StorageNew->isupPgReleaseProtection = 0;
 		StorageNew->isupPgRowStatus = 0;
 		StorageNew->isupPgRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("isupMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	isupPgTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct isupPgTable_data *isupPgTable_duplicate(struct isupPgTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1261,6 +1444,37 @@ isupPgTable_duplicate(struct isupPgTable_data *thedata)
 
 	DEBUGMSGTL(("isupMIB", "isupPgTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->isupPgTable_id = thedata->isupPgTable_id;
+		StorageNew->isupPgId = thedata->isupPgId;
+		StorageNew->isupPgOperState = thedata->isupPgOperState;
+		if (!(StorageNew->isupPgAvailStatus = malloc(thedata->isupPgAvailStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupPgAvailStatus, thedata->isupPgAvailStatus, thedata->isupPgAvailStatusLen);
+		StorageNew->isupPgAvailStatusLen = thedata->isupPgAvailStatusLen;
+		StorageNew->isupPgAvailStatus[StorageNew->isupPgAvailStatusLen] = 0;
+		StorageNew->isupPgType = thedata->isupPgType;
+		StorageNew->isupPgRevertive = thedata->isupPgRevertive;
+		if (!(StorageNew->isupPgSupportedByObjectList = snmp_duplicate_objid(thedata->isupPgSupportedByObjectList, thedata->isupPgSupportedByObjectListLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->isupPgSupportedByObjectListLen = thedata->isupPgSupportedByObjectListLen;
+		StorageNew->isupPgWaitToRestoreTime = thedata->isupPgWaitToRestoreTime;
+		StorageNew->isupPgSettingWindowTime = thedata->isupPgSettingWindowTime;
+		StorageNew->isupPgReleasingWindowTime = thedata->isupPgReleasingWindowTime;
+		StorageNew->isupPgHitsCount = thedata->isupPgHitsCount;
+		StorageNew->isupPgSwitchType = thedata->isupPgSwitchType;
+		if (!(StorageNew->isupPgProtectedUnits = malloc(thedata->isupPgProtectedUnitsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupPgProtectedUnits, thedata->isupPgProtectedUnits, thedata->isupPgProtectedUnitsLen);
+		StorageNew->isupPgProtectedUnitsLen = thedata->isupPgProtectedUnitsLen;
+		StorageNew->isupPgProtectedUnits[StorageNew->isupPgProtectedUnitsLen] = 0;
+		if (!(StorageNew->isupPgProtectingUnits = malloc(thedata->isupPgProtectingUnitsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupPgProtectingUnits, thedata->isupPgProtectingUnits, thedata->isupPgProtectingUnitsLen);
+		StorageNew->isupPgProtectingUnitsLen = thedata->isupPgProtectingUnitsLen;
+		StorageNew->isupPgProtectingUnits[StorageNew->isupPgProtectingUnitsLen] = 0;
+		StorageNew->isupPgInvokeProtection = thedata->isupPgInvokeProtection;
+		StorageNew->isupPgReleaseProtection = thedata->isupPgReleaseProtection;
+		StorageNew->isupPgRowStatus = thedata->isupPgRowStatus;
 	}
       done:
 	DEBUGMSGTL(("isupMIB", "done.\n"));
@@ -1362,7 +1576,7 @@ isupPgTable_del(struct isupPgTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for isupPgTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case isupPgTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1487,12 +1701,15 @@ isupPuTable_create(void)
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->isupPgId = 0;
 		StorageNew->isupPuProtecting = 0;
-		if ((StorageNew->isupPuReliableResourcePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->isupPuReliableResourcePointerLen = 2;
-		if ((StorageNew->isupPuUnreliableResourcePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->isupPuUnreliableResourcePointerLen = 2;
-		if (memdup((u_char **) &StorageNew->isupPuProtectionStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->isupPuProtectionStatusLen = 2;
+		if ((StorageNew->isupPuReliableResourcePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->isupPuReliableResourcePointerLen = 2;
+		if ((StorageNew->isupPuUnreliableResourcePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->isupPuUnreliableResourcePointerLen = 2;
+		if (memdup((u_char **) &StorageNew->isupPuProtectionStatus, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->isupPuProtectionStatusLen = 2;
 		StorageNew->isupPuSwitchStatus = 0;
 		StorageNew->isupPuFromProtectionUnitNumber = 0;
 		StorageNew->isupPuToProtectionUnitNumber = 0;
@@ -1502,14 +1719,19 @@ isupPuTable_create(void)
 		StorageNew->isupPuRowStatus = 0;
 		StorageNew->isupPuRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("isupMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	isupPuTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct isupPuTable_data *isupPuTable_duplicate(struct isupPuTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1521,6 +1743,28 @@ isupPuTable_duplicate(struct isupPuTable_data *thedata)
 
 	DEBUGMSGTL(("isupMIB", "isupPuTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->isupPuTable_id = thedata->isupPuTable_id;
+		StorageNew->isupPgId = thedata->isupPgId;
+		StorageNew->isupPuId = thedata->isupPuId;
+		StorageNew->isupPuProtecting = thedata->isupPuProtecting;
+		if (!(StorageNew->isupPuReliableResourcePointer = snmp_duplicate_objid(thedata->isupPuReliableResourcePointer, thedata->isupPuReliableResourcePointerLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->isupPuReliableResourcePointerLen = thedata->isupPuReliableResourcePointerLen;
+		if (!(StorageNew->isupPuUnreliableResourcePointer = snmp_duplicate_objid(thedata->isupPuUnreliableResourcePointer, thedata->isupPuUnreliableResourcePointerLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->isupPuUnreliableResourcePointerLen = thedata->isupPuUnreliableResourcePointerLen;
+		if (!(StorageNew->isupPuProtectionStatus = malloc(thedata->isupPuProtectionStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupPuProtectionStatus, thedata->isupPuProtectionStatus, thedata->isupPuProtectionStatusLen);
+		StorageNew->isupPuProtectionStatusLen = thedata->isupPuProtectionStatusLen;
+		StorageNew->isupPuProtectionStatus[StorageNew->isupPuProtectionStatusLen] = 0;
+		StorageNew->isupPuSwitchStatus = thedata->isupPuSwitchStatus;
+		StorageNew->isupPuFromProtectionUnitNumber = thedata->isupPuFromProtectionUnitNumber;
+		StorageNew->isupPuToProtectionUnitNumber = thedata->isupPuToProtectionUnitNumber;
+		StorageNew->isupPuAutoSwitchReason = thedata->isupPuAutoSwitchReason;
+		StorageNew->isupPuLockoutReleaseFailed = thedata->isupPuLockoutReleaseFailed;
+		StorageNew->isupPuPriority = thedata->isupPuPriority;
+		StorageNew->isupPuRowStatus = thedata->isupPuRowStatus;
 	}
       done:
 	DEBUGMSGTL(("isupMIB", "done.\n"));
@@ -1622,7 +1866,7 @@ isupPuTable_del(struct isupPuTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for isupPuTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case isupPuTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1736,25 +1980,34 @@ isupLgTable_create(void)
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->isupLgOperationalState = ISUPLGOPERATIONALSTATE_DISABLED;
 		StorageNew->isupLgAdministrativeState = 0;
-		if ((StorageNew->isupLgSnServiceProvider = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->isupLgSnServiceProviderLen = 2;
-		if ((StorageNew->isupLgSnSap = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->isupLgSnSapLen = 2;
-		if (memdup((u_char **) &StorageNew->isupLgOperationalProtocols, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->isupLgOperationalProtocolsLen = 1;
-		if (memdup((u_char **) &StorageNew->isupLgOperationalSubsets, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->isupLgOperationalSubsetsLen = 1;
+		if ((StorageNew->isupLgSnServiceProvider = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->isupLgSnServiceProviderLen = 2;
+		if ((StorageNew->isupLgSnSap = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->isupLgSnSapLen = 2;
+		if (memdup((u_char **) &StorageNew->isupLgOperationalProtocols, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->isupLgOperationalProtocolsLen = 1;
+		if (memdup((u_char **) &StorageNew->isupLgOperationalSubsets, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->isupLgOperationalSubsetsLen = 1;
 		StorageNew->isupLgRowStatus = 0;
 		StorageNew->isupLgRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("isupMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	isupLgTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct isupLgTable_data *isupLgTable_duplicate(struct isupLgTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1766,6 +2019,27 @@ isupLgTable_duplicate(struct isupLgTable_data *thedata)
 
 	DEBUGMSGTL(("isupMIB", "isupLgTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->isupLgTable_id = thedata->isupLgTable_id;
+		StorageNew->isupLgId = thedata->isupLgId;
+		StorageNew->isupLgOperationalState = thedata->isupLgOperationalState;
+		StorageNew->isupLgAdministrativeState = thedata->isupLgAdministrativeState;
+		if (!(StorageNew->isupLgSnServiceProvider = snmp_duplicate_objid(thedata->isupLgSnServiceProvider, thedata->isupLgSnServiceProviderLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->isupLgSnServiceProviderLen = thedata->isupLgSnServiceProviderLen;
+		if (!(StorageNew->isupLgSnSap = snmp_duplicate_objid(thedata->isupLgSnSap, thedata->isupLgSnSapLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->isupLgSnSapLen = thedata->isupLgSnSapLen;
+		if (!(StorageNew->isupLgOperationalProtocols = malloc(thedata->isupLgOperationalProtocolsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupLgOperationalProtocols, thedata->isupLgOperationalProtocols, thedata->isupLgOperationalProtocolsLen);
+		StorageNew->isupLgOperationalProtocolsLen = thedata->isupLgOperationalProtocolsLen;
+		StorageNew->isupLgOperationalProtocols[StorageNew->isupLgOperationalProtocolsLen] = 0;
+		if (!(StorageNew->isupLgOperationalSubsets = malloc(thedata->isupLgOperationalSubsetsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupLgOperationalSubsets, thedata->isupLgOperationalSubsets, thedata->isupLgOperationalSubsetsLen);
+		StorageNew->isupLgOperationalSubsetsLen = thedata->isupLgOperationalSubsetsLen;
+		StorageNew->isupLgOperationalSubsets[StorageNew->isupLgOperationalSubsetsLen] = 0;
+		StorageNew->isupLgRowStatus = thedata->isupLgRowStatus;
 	}
       done:
 	DEBUGMSGTL(("isupMIB", "done.\n"));
@@ -1867,7 +2141,7 @@ isupLgTable_del(struct isupLgTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for isupLgTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case isupLgTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1976,31 +2250,43 @@ isupMtpTable_create(void)
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->isupMsId = 0;
 		StorageNew->isupSpId = 0;
-		if ((StorageNew->isupMtpAddress = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupMtpAddressLen = strlen("");
+		if ((StorageNew->isupMtpAddress = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->isupMtpAddressLen = 0;
+		StorageNew->isupMtpAddress[StorageNew->isupMtpAddressLen] = 0;
 		StorageNew->isupMtpUserPart = 0;
 		StorageNew->isupMtpUserPartStatus = 0;
-		if ((StorageNew->isupMtpUserEntityNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->isupMtpUserEntityNamesLen = 2;
-		if ((StorageNew->isupMtpProviderEntityNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->isupMtpProviderEntityNamesLen = 2;
+		if ((StorageNew->isupMtpUserEntityNames = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->isupMtpUserEntityNamesLen = 2;
+		if ((StorageNew->isupMtpProviderEntityNames = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->isupMtpProviderEntityNamesLen = 2;
 		StorageNew->isupMtpUsageState = 0;
-		if ((StorageNew->isupMtpAsaProfilePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->isupMtpAsaProfilePointerLen = 2;
-		if ((StorageNew->isupMtpName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupMtpNameLen = strlen("");
+		if ((StorageNew->isupMtpAsaProfilePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->isupMtpAsaProfilePointerLen = 2;
+		if ((StorageNew->isupMtpName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->isupMtpNameLen = 0;
+		StorageNew->isupMtpName[StorageNew->isupMtpNameLen] = 0;
 		StorageNew->isupMtpLongMessageSupported = 0;
 		StorageNew->isupMtpRowStatus = 0;
 		StorageNew->isupMtpRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("isupMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	isupMtpTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct isupMtpTable_data *isupMtpTable_duplicate(struct isupMtpTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2012,6 +2298,34 @@ isupMtpTable_duplicate(struct isupMtpTable_data *thedata)
 
 	DEBUGMSGTL(("isupMIB", "isupMtpTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->isupMtpTable_id = thedata->isupMtpTable_id;
+		StorageNew->isupMsId = thedata->isupMsId;
+		StorageNew->isupSpId = thedata->isupSpId;
+		StorageNew->isupMtpId = thedata->isupMtpId;
+		if (!(StorageNew->isupMtpAddress = malloc(thedata->isupMtpAddressLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupMtpAddress, thedata->isupMtpAddress, thedata->isupMtpAddressLen);
+		StorageNew->isupMtpAddressLen = thedata->isupMtpAddressLen;
+		StorageNew->isupMtpAddress[StorageNew->isupMtpAddressLen] = 0;
+		StorageNew->isupMtpUserPart = thedata->isupMtpUserPart;
+		StorageNew->isupMtpUserPartStatus = thedata->isupMtpUserPartStatus;
+		if (!(StorageNew->isupMtpUserEntityNames = snmp_duplicate_objid(thedata->isupMtpUserEntityNames, thedata->isupMtpUserEntityNamesLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->isupMtpUserEntityNamesLen = thedata->isupMtpUserEntityNamesLen;
+		if (!(StorageNew->isupMtpProviderEntityNames = snmp_duplicate_objid(thedata->isupMtpProviderEntityNames, thedata->isupMtpProviderEntityNamesLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->isupMtpProviderEntityNamesLen = thedata->isupMtpProviderEntityNamesLen;
+		StorageNew->isupMtpUsageState = thedata->isupMtpUsageState;
+		if (!(StorageNew->isupMtpAsaProfilePointer = snmp_duplicate_objid(thedata->isupMtpAsaProfilePointer, thedata->isupMtpAsaProfilePointerLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->isupMtpAsaProfilePointerLen = thedata->isupMtpAsaProfilePointerLen;
+		if (!(StorageNew->isupMtpName = malloc(thedata->isupMtpNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupMtpName, thedata->isupMtpName, thedata->isupMtpNameLen);
+		StorageNew->isupMtpNameLen = thedata->isupMtpNameLen;
+		StorageNew->isupMtpName[StorageNew->isupMtpNameLen] = 0;
+		StorageNew->isupMtpLongMessageSupported = thedata->isupMtpLongMessageSupported;
+		StorageNew->isupMtpRowStatus = thedata->isupMtpRowStatus;
 	}
       done:
 	DEBUGMSGTL(("isupMIB", "done.\n"));
@@ -2119,7 +2433,7 @@ isupMtpTable_del(struct isupMtpTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for isupMtpTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case isupMtpTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2243,30 +2557,41 @@ isupNaTable_create(void)
 		/* XXX: fill in default row values here into StorageNew */
 		{
 			static oid tmpoid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 0, 1, 4, 1, 1 };
-			if ((StorageNew->isupNaProtocolVariant = snmp_duplicate_objid(tmpoid, 14)))
-				StorageNew->isupNaProtocolVariantLen = 14;
+			if ((StorageNew->isupNaProtocolVariant = snmp_duplicate_objid(tmpoid, 14)) == NULL)
+				goto nomem;
+			StorageNew->isupNaProtocolVariantLen = 14;
 		}
 		StorageNew->isupNaProtocolYear = ISUPNAPROTOCOLYEAR_YCURRENT;
-		if (memdup((u_char **) &StorageNew->isupNaProtocolOptions, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->isupNaProtocolOptionsLen = 1;
-		if (memdup((u_char **) &StorageNew->isupNaPointCodeFormat, (u_char *) "\x03\x08\x03", 3) == SNMPERR_SUCCESS)
-			StorageNew->isupNaPointCodeFormatLen = 3;
+		if (memdup((u_char **) &StorageNew->isupNaProtocolOptions, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->isupNaProtocolOptionsLen = 1;
+		if (memdup((u_char **) &StorageNew->isupNaPointCodeFormat, (u_char *) "\x03\x08\x03", 3) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->isupNaPointCodeFormatLen = 3;
 		StorageNew->isupNaSlsLength = ISUPNASLSLENGTH_SLS4BITS;
-		if ((StorageNew->isupNaSpDefault = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupNaSpDefaultLen = strlen("");
-		if ((StorageNew->isupNaName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupNaNameLen = strlen("");
+		if ((StorageNew->isupNaSpDefault = (uint8_t *) strdup("")) == NULL)
+			goto nomem;
+		StorageNew->isupNaSpDefaultLen = strlen("");
+		if ((StorageNew->isupNaName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->isupNaNameLen = 0;
+		StorageNew->isupNaName[StorageNew->isupNaNameLen] = 0;
 		StorageNew->isupNaRowStatus = 0;
 		StorageNew->isupNaRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("isupMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	isupNaTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct isupNaTable_data *isupNaTable_duplicate(struct isupNaTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2278,6 +2603,34 @@ isupNaTable_duplicate(struct isupNaTable_data *thedata)
 
 	DEBUGMSGTL(("isupMIB", "isupNaTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->isupNaTable_id = thedata->isupNaTable_id;
+		StorageNew->isupNaId = thedata->isupNaId;
+		if (!(StorageNew->isupNaProtocolVariant = snmp_duplicate_objid(thedata->isupNaProtocolVariant, thedata->isupNaProtocolVariantLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->isupNaProtocolVariantLen = thedata->isupNaProtocolVariantLen;
+		StorageNew->isupNaProtocolYear = thedata->isupNaProtocolYear;
+		if (!(StorageNew->isupNaProtocolOptions = malloc(thedata->isupNaProtocolOptionsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupNaProtocolOptions, thedata->isupNaProtocolOptions, thedata->isupNaProtocolOptionsLen);
+		StorageNew->isupNaProtocolOptionsLen = thedata->isupNaProtocolOptionsLen;
+		StorageNew->isupNaProtocolOptions[StorageNew->isupNaProtocolOptionsLen] = 0;
+		if (!(StorageNew->isupNaPointCodeFormat = malloc(thedata->isupNaPointCodeFormatLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupNaPointCodeFormat, thedata->isupNaPointCodeFormat, thedata->isupNaPointCodeFormatLen);
+		StorageNew->isupNaPointCodeFormatLen = thedata->isupNaPointCodeFormatLen;
+		StorageNew->isupNaPointCodeFormat[StorageNew->isupNaPointCodeFormatLen] = 0;
+		StorageNew->isupNaSlsLength = thedata->isupNaSlsLength;
+		if (!(StorageNew->isupNaSpDefault = malloc(thedata->isupNaSpDefaultLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupNaSpDefault, thedata->isupNaSpDefault, thedata->isupNaSpDefaultLen);
+		StorageNew->isupNaSpDefaultLen = thedata->isupNaSpDefaultLen;
+		StorageNew->isupNaSpDefault[StorageNew->isupNaSpDefaultLen] = 0;
+		if (!(StorageNew->isupNaName = malloc(thedata->isupNaNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupNaName, thedata->isupNaName, thedata->isupNaNameLen);
+		StorageNew->isupNaNameLen = thedata->isupNaNameLen;
+		StorageNew->isupNaName[StorageNew->isupNaNameLen] = 0;
+		StorageNew->isupNaRowStatus = thedata->isupNaRowStatus;
 	}
       done:
 	DEBUGMSGTL(("isupMIB", "done.\n"));
@@ -2381,7 +2734,7 @@ isupNaTable_del(struct isupNaTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for isupNaTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case isupNaTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2496,42 +2849,57 @@ isupSpTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->isupMsId = 0;
-		if (memdup((u_char **) &StorageNew->isupSpPointCode, (u_char *) "\x00\x00\x00\x00", 4) == SNMPERR_SUCCESS)
-			StorageNew->isupSpPointCodeLen = 4;
+		if (memdup((u_char **) &StorageNew->isupSpPointCode, (u_char *) "\x00\x00\x00\x00", 4) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->isupSpPointCodeLen = 4;
 		StorageNew->isupSpType = ISUPSPTYPE_ENDOFFICE;
-		if (memdup((u_char **) &StorageNew->isupSpProceduralStatus, (u_char *) "\x80", 1) == SNMPERR_SUCCESS)
-			StorageNew->isupSpProceduralStatusLen = 1;
-		if (memdup((u_char **) &StorageNew->isupSpAvailabilityStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->isupSpAvailabilityStatusLen = 2;
-		if ((StorageNew->isupSpVersion = (uint8_t *) strdup("ITU-T Q.764 1999")) != NULL)
-			StorageNew->isupSpVersionLen = strlen("ITU-T Q.764 1999");
-		if ((StorageNew->isupSpName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupSpNameLen = strlen("");
-		if ((StorageNew->isupSpNaPointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->isupSpNaPointerLen = 2;
-		if (memdup((u_char **) &StorageNew->isupSpOptions, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->isupSpOptionsLen = 1;
-		if (memdup((u_char **) &StorageNew->isupSpAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->isupSpAlarmStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->isupSpProceduralStatus, (u_char *) "\x80", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->isupSpProceduralStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->isupSpAvailabilityStatus, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->isupSpAvailabilityStatusLen = 2;
+		if ((StorageNew->isupSpVersion = (uint8_t *) strdup("ITU-T Q.764 1999")) == NULL)
+			goto nomem;
+		StorageNew->isupSpVersionLen = strlen("ITU-T Q.764 1999");
+		if ((StorageNew->isupSpName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->isupSpNameLen = 0;
+		StorageNew->isupSpName[StorageNew->isupSpNameLen] = 0;
+		if ((StorageNew->isupSpNaPointer = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->isupSpNaPointerLen = 2;
+		if (memdup((u_char **) &StorageNew->isupSpOptions, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->isupSpOptionsLen = 1;
+		if (memdup((u_char **) &StorageNew->isupSpAlarmStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->isupSpAlarmStatusLen = 1;
 		StorageNew->isupSpOperationalState = ISUPSPOPERATIONALSTATE_DISABLED;
 		StorageNew->isupSpTotalRemoteSAPs = 0;
 		StorageNew->isupSpAdministrativeState = ISUPSPADMINISTRATIVESTATE_LOCKED;
-		if (memdup((u_char **) &StorageNew->isupSpSupportedProtocols, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->isupSpSupportedProtocolsLen = 1;
+		if (memdup((u_char **) &StorageNew->isupSpSupportedProtocols, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->isupSpSupportedProtocolsLen = 1;
 		StorageNew->isupSpOperationalSystemType = ISUPSPOPERATIONALSYSTEMTYPE_ES;
 		StorageNew->isupSpActivate = 0;
 		StorageNew->isupSpDeactivate = 0;
 		StorageNew->isupSpRowStatus = 0;
 		StorageNew->isupSpRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("isupMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	isupSpTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct isupSpTable_data *isupSpTable_duplicate(struct isupSpTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2543,6 +2911,60 @@ isupSpTable_duplicate(struct isupSpTable_data *thedata)
 
 	DEBUGMSGTL(("isupMIB", "isupSpTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->isupSpTable_id = thedata->isupSpTable_id;
+		StorageNew->isupMsId = thedata->isupMsId;
+		StorageNew->isupSpId = thedata->isupSpId;
+		if (!(StorageNew->isupSpPointCode = malloc(thedata->isupSpPointCodeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupSpPointCode, thedata->isupSpPointCode, thedata->isupSpPointCodeLen);
+		StorageNew->isupSpPointCodeLen = thedata->isupSpPointCodeLen;
+		StorageNew->isupSpPointCode[StorageNew->isupSpPointCodeLen] = 0;
+		StorageNew->isupSpType = thedata->isupSpType;
+		if (!(StorageNew->isupSpProceduralStatus = malloc(thedata->isupSpProceduralStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupSpProceduralStatus, thedata->isupSpProceduralStatus, thedata->isupSpProceduralStatusLen);
+		StorageNew->isupSpProceduralStatusLen = thedata->isupSpProceduralStatusLen;
+		StorageNew->isupSpProceduralStatus[StorageNew->isupSpProceduralStatusLen] = 0;
+		if (!(StorageNew->isupSpAvailabilityStatus = malloc(thedata->isupSpAvailabilityStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupSpAvailabilityStatus, thedata->isupSpAvailabilityStatus, thedata->isupSpAvailabilityStatusLen);
+		StorageNew->isupSpAvailabilityStatusLen = thedata->isupSpAvailabilityStatusLen;
+		StorageNew->isupSpAvailabilityStatus[StorageNew->isupSpAvailabilityStatusLen] = 0;
+		if (!(StorageNew->isupSpVersion = malloc(thedata->isupSpVersionLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupSpVersion, thedata->isupSpVersion, thedata->isupSpVersionLen);
+		StorageNew->isupSpVersionLen = thedata->isupSpVersionLen;
+		StorageNew->isupSpVersion[StorageNew->isupSpVersionLen] = 0;
+		if (!(StorageNew->isupSpName = malloc(thedata->isupSpNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupSpName, thedata->isupSpName, thedata->isupSpNameLen);
+		StorageNew->isupSpNameLen = thedata->isupSpNameLen;
+		StorageNew->isupSpName[StorageNew->isupSpNameLen] = 0;
+		if (!(StorageNew->isupSpNaPointer = snmp_duplicate_objid(thedata->isupSpNaPointer, thedata->isupSpNaPointerLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->isupSpNaPointerLen = thedata->isupSpNaPointerLen;
+		if (!(StorageNew->isupSpOptions = malloc(thedata->isupSpOptionsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupSpOptions, thedata->isupSpOptions, thedata->isupSpOptionsLen);
+		StorageNew->isupSpOptionsLen = thedata->isupSpOptionsLen;
+		StorageNew->isupSpOptions[StorageNew->isupSpOptionsLen] = 0;
+		if (!(StorageNew->isupSpAlarmStatus = malloc(thedata->isupSpAlarmStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupSpAlarmStatus, thedata->isupSpAlarmStatus, thedata->isupSpAlarmStatusLen);
+		StorageNew->isupSpAlarmStatusLen = thedata->isupSpAlarmStatusLen;
+		StorageNew->isupSpAlarmStatus[StorageNew->isupSpAlarmStatusLen] = 0;
+		StorageNew->isupSpOperationalState = thedata->isupSpOperationalState;
+		StorageNew->isupSpTotalRemoteSAPs = thedata->isupSpTotalRemoteSAPs;
+		StorageNew->isupSpAdministrativeState = thedata->isupSpAdministrativeState;
+		if (!(StorageNew->isupSpSupportedProtocols = malloc(thedata->isupSpSupportedProtocolsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupSpSupportedProtocols, thedata->isupSpSupportedProtocols, thedata->isupSpSupportedProtocolsLen);
+		StorageNew->isupSpSupportedProtocolsLen = thedata->isupSpSupportedProtocolsLen;
+		StorageNew->isupSpSupportedProtocols[StorageNew->isupSpSupportedProtocolsLen] = 0;
+		StorageNew->isupSpOperationalSystemType = thedata->isupSpOperationalSystemType;
+		StorageNew->isupSpActivate = thedata->isupSpActivate;
+		StorageNew->isupSpDeactivate = thedata->isupSpDeactivate;
+		StorageNew->isupSpRowStatus = thedata->isupSpRowStatus;
 	}
       done:
 	DEBUGMSGTL(("isupMIB", "done.\n"));
@@ -2656,7 +3078,7 @@ isupSpTable_del(struct isupSpTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for isupSpTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case isupSpTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2812,40 +3234,57 @@ isupSrTable_create(void)
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->isupMsId = 0;
 		StorageNew->isupSpId = 0;
-		if (memdup((u_char **) &StorageNew->isupSrDest, (u_char *) "\x00\x00\x00\x00", 4) == SNMPERR_SUCCESS)
-			StorageNew->isupSrDestLen = 4;
-		if (memdup((u_char **) &StorageNew->isupSrOptions, (u_char *) "\x20", 1) == SNMPERR_SUCCESS)
-			StorageNew->isupSrOptionsLen = 1;
+		if (memdup((u_char **) &StorageNew->isupSrDest, (u_char *) "\x00\x00\x00\x00", 4) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->isupSrDestLen = 4;
+		if (memdup((u_char **) &StorageNew->isupSrOptions, (u_char *) "\x20", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->isupSrOptionsLen = 1;
 		StorageNew->isupSrSlsAssignment = ISUPSRSLSASSIGNMENT_CIC;
 		StorageNew->isupSrAdminState = ISUPSRADMINSTATE_LOCKED;
 		StorageNew->isupSrOpState = ISUPSROPSTATE_DISABLED;
-		if ((StorageNew->isupSrAsaProfilePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->isupSrAsaProfilePointerLen = 2;
+		if ((StorageNew->isupSrAsaProfilePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->isupSrAsaProfilePointerLen = 2;
 		StorageNew->isupSrCongestedState = 0;
 		StorageNew->isupSrCongestionLevel = ISUPSRCONGESTIONLEVEL_NONE;
-		if ((StorageNew->isupSrLoadsharingInformation = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupSrLoadsharingInformationLen = strlen("");
-		if ((StorageNew->isupSrLoadsharingObject = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->isupSrLoadsharingObjectLen = 2;
-		if ((StorageNew->isupSrRemoteExchangeLabel = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupSrRemoteExchangeLabelLen = strlen("");
-		if ((StorageNew->isupSrName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupSrNameLen = strlen("");
-		if ((StorageNew->isupSrProfile = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupSrProfileLen = strlen("");
-		if (memdup((u_char **) &StorageNew->isupSrAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->isupSrAlarmStatusLen = 1;
+		if ((StorageNew->isupSrLoadsharingInformation = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->isupSrLoadsharingInformationLen = 0;
+		StorageNew->isupSrLoadsharingInformation[StorageNew->isupSrLoadsharingInformationLen] = 0;
+		if ((StorageNew->isupSrLoadsharingObject = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->isupSrLoadsharingObjectLen = 2;
+		if ((StorageNew->isupSrRemoteExchangeLabel = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->isupSrRemoteExchangeLabelLen = 0;
+		StorageNew->isupSrRemoteExchangeLabel[StorageNew->isupSrRemoteExchangeLabelLen] = 0;
+		if ((StorageNew->isupSrName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->isupSrNameLen = 0;
+		StorageNew->isupSrName[StorageNew->isupSrNameLen] = 0;
+		if ((StorageNew->isupSrProfile = (uint8_t *) strdup("")) == NULL)
+			goto nomem;
+		StorageNew->isupSrProfileLen = strlen("");
+		if (memdup((u_char **) &StorageNew->isupSrAlarmStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->isupSrAlarmStatusLen = 1;
 		StorageNew->isupSrRowStatus = 0;
 		StorageNew->isupSrRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("isupMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	isupSrTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct isupSrTable_data *isupSrTable_duplicate(struct isupSrTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2857,6 +3296,57 @@ isupSrTable_duplicate(struct isupSrTable_data *thedata)
 
 	DEBUGMSGTL(("isupMIB", "isupSrTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->isupSrTable_id = thedata->isupSrTable_id;
+		StorageNew->isupMsId = thedata->isupMsId;
+		StorageNew->isupSpId = thedata->isupSpId;
+		StorageNew->isupSrId = thedata->isupSrId;
+		if (!(StorageNew->isupSrDest = malloc(thedata->isupSrDestLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupSrDest, thedata->isupSrDest, thedata->isupSrDestLen);
+		StorageNew->isupSrDestLen = thedata->isupSrDestLen;
+		StorageNew->isupSrDest[StorageNew->isupSrDestLen] = 0;
+		if (!(StorageNew->isupSrOptions = malloc(thedata->isupSrOptionsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupSrOptions, thedata->isupSrOptions, thedata->isupSrOptionsLen);
+		StorageNew->isupSrOptionsLen = thedata->isupSrOptionsLen;
+		StorageNew->isupSrOptions[StorageNew->isupSrOptionsLen] = 0;
+		StorageNew->isupSrSlsAssignment = thedata->isupSrSlsAssignment;
+		StorageNew->isupSrAdminState = thedata->isupSrAdminState;
+		StorageNew->isupSrOpState = thedata->isupSrOpState;
+		if (!(StorageNew->isupSrAsaProfilePointer = snmp_duplicate_objid(thedata->isupSrAsaProfilePointer, thedata->isupSrAsaProfilePointerLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->isupSrAsaProfilePointerLen = thedata->isupSrAsaProfilePointerLen;
+		StorageNew->isupSrCongestedState = thedata->isupSrCongestedState;
+		StorageNew->isupSrCongestionLevel = thedata->isupSrCongestionLevel;
+		if (!(StorageNew->isupSrLoadsharingInformation = malloc(thedata->isupSrLoadsharingInformationLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupSrLoadsharingInformation, thedata->isupSrLoadsharingInformation, thedata->isupSrLoadsharingInformationLen);
+		StorageNew->isupSrLoadsharingInformationLen = thedata->isupSrLoadsharingInformationLen;
+		StorageNew->isupSrLoadsharingInformation[StorageNew->isupSrLoadsharingInformationLen] = 0;
+		if (!(StorageNew->isupSrLoadsharingObject = snmp_duplicate_objid(thedata->isupSrLoadsharingObject, thedata->isupSrLoadsharingObjectLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->isupSrLoadsharingObjectLen = thedata->isupSrLoadsharingObjectLen;
+		if (!(StorageNew->isupSrRemoteExchangeLabel = malloc(thedata->isupSrRemoteExchangeLabelLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupSrRemoteExchangeLabel, thedata->isupSrRemoteExchangeLabel, thedata->isupSrRemoteExchangeLabelLen);
+		StorageNew->isupSrRemoteExchangeLabelLen = thedata->isupSrRemoteExchangeLabelLen;
+		StorageNew->isupSrRemoteExchangeLabel[StorageNew->isupSrRemoteExchangeLabelLen] = 0;
+		if (!(StorageNew->isupSrName = malloc(thedata->isupSrNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupSrName, thedata->isupSrName, thedata->isupSrNameLen);
+		StorageNew->isupSrNameLen = thedata->isupSrNameLen;
+		StorageNew->isupSrName[StorageNew->isupSrNameLen] = 0;
+		if (!(StorageNew->isupSrProfile = malloc(thedata->isupSrProfileLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupSrProfile, thedata->isupSrProfile, thedata->isupSrProfileLen);
+		StorageNew->isupSrProfileLen = thedata->isupSrProfileLen;
+		StorageNew->isupSrProfile[StorageNew->isupSrProfileLen] = 0;
+		if (!(StorageNew->isupSrAlarmStatus = malloc(thedata->isupSrAlarmStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupSrAlarmStatus, thedata->isupSrAlarmStatus, thedata->isupSrAlarmStatusLen);
+		StorageNew->isupSrAlarmStatusLen = thedata->isupSrAlarmStatusLen;
+		StorageNew->isupSrAlarmStatus[StorageNew->isupSrAlarmStatusLen] = 0;
+		StorageNew->isupSrRowStatus = thedata->isupSrRowStatus;
 	}
       done:
 	DEBUGMSGTL(("isupMIB", "done.\n"));
@@ -2972,7 +3462,7 @@ isupSrTable_del(struct isupSrTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for isupSrTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case isupSrTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3124,35 +3614,52 @@ isupRtTable_create(void)
 	DEBUGMSGTL(("isupMIB", "isupRtTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->isupRtTrunkGroupList = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupRtTrunkGroupListLen = strlen("");
+		if ((StorageNew->isupRtTrunkGroupList = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->isupRtTrunkGroupListLen = 0;
+		StorageNew->isupRtTrunkGroupList[StorageNew->isupRtTrunkGroupListLen] = 0;
 		StorageNew->isupRtUsedAlgorithm = ISUPRTUSEDALGORITHM_SEQUENTIAL;
-		if ((StorageNew->isupRtSelection = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupRtSelectionLen = strlen("");
-		if ((StorageNew->isupRtProportionList = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupRtProportionListLen = strlen("");
-		if ((StorageNew->isupRtPossibilitiesInList = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupRtPossibilitiesInListLen = strlen("");
-		if ((StorageNew->isupRtUserLabel = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupRtUserLabelLen = strlen("");
-		if (memdup((u_char **) &StorageNew->isupRtProcStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->isupRtProcStatusLen = 1;
-		if (memdup((u_char **) &StorageNew->isupRtControlStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->isupRtControlStatusLen = 1;
+		if ((StorageNew->isupRtSelection = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->isupRtSelectionLen = 0;
+		StorageNew->isupRtSelection[StorageNew->isupRtSelectionLen] = 0;
+		if ((StorageNew->isupRtProportionList = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->isupRtProportionListLen = 0;
+		StorageNew->isupRtProportionList[StorageNew->isupRtProportionListLen] = 0;
+		if ((StorageNew->isupRtPossibilitiesInList = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->isupRtPossibilitiesInListLen = 0;
+		StorageNew->isupRtPossibilitiesInList[StorageNew->isupRtPossibilitiesInListLen] = 0;
+		if ((StorageNew->isupRtUserLabel = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->isupRtUserLabelLen = 0;
+		StorageNew->isupRtUserLabel[StorageNew->isupRtUserLabelLen] = 0;
+		if (memdup((u_char **) &StorageNew->isupRtProcStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->isupRtProcStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->isupRtControlStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->isupRtControlStatusLen = 1;
 		StorageNew->isupRtAdminState = 0;
 		StorageNew->isupRtOperState = 0;
 		StorageNew->isupRtUsageState = ISUPRTUSAGESTATE_IDLE;
 		StorageNew->isupRtRowStatus = 0;
 		StorageNew->isupRtRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("isupMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	isupRtTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct isupRtTable_data *isupRtTable_duplicate(struct isupRtTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3164,6 +3671,48 @@ isupRtTable_duplicate(struct isupRtTable_data *thedata)
 
 	DEBUGMSGTL(("isupMIB", "isupRtTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->isupRtTable_id = thedata->isupRtTable_id;
+		StorageNew->isupRtId = thedata->isupRtId;
+		if (!(StorageNew->isupRtTrunkGroupList = malloc(thedata->isupRtTrunkGroupListLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupRtTrunkGroupList, thedata->isupRtTrunkGroupList, thedata->isupRtTrunkGroupListLen);
+		StorageNew->isupRtTrunkGroupListLen = thedata->isupRtTrunkGroupListLen;
+		StorageNew->isupRtTrunkGroupList[StorageNew->isupRtTrunkGroupListLen] = 0;
+		StorageNew->isupRtUsedAlgorithm = thedata->isupRtUsedAlgorithm;
+		if (!(StorageNew->isupRtSelection = malloc(thedata->isupRtSelectionLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupRtSelection, thedata->isupRtSelection, thedata->isupRtSelectionLen);
+		StorageNew->isupRtSelectionLen = thedata->isupRtSelectionLen;
+		StorageNew->isupRtSelection[StorageNew->isupRtSelectionLen] = 0;
+		if (!(StorageNew->isupRtProportionList = malloc(thedata->isupRtProportionListLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupRtProportionList, thedata->isupRtProportionList, thedata->isupRtProportionListLen);
+		StorageNew->isupRtProportionListLen = thedata->isupRtProportionListLen;
+		StorageNew->isupRtProportionList[StorageNew->isupRtProportionListLen] = 0;
+		if (!(StorageNew->isupRtPossibilitiesInList = malloc(thedata->isupRtPossibilitiesInListLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupRtPossibilitiesInList, thedata->isupRtPossibilitiesInList, thedata->isupRtPossibilitiesInListLen);
+		StorageNew->isupRtPossibilitiesInListLen = thedata->isupRtPossibilitiesInListLen;
+		StorageNew->isupRtPossibilitiesInList[StorageNew->isupRtPossibilitiesInListLen] = 0;
+		if (!(StorageNew->isupRtUserLabel = malloc(thedata->isupRtUserLabelLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupRtUserLabel, thedata->isupRtUserLabel, thedata->isupRtUserLabelLen);
+		StorageNew->isupRtUserLabelLen = thedata->isupRtUserLabelLen;
+		StorageNew->isupRtUserLabel[StorageNew->isupRtUserLabelLen] = 0;
+		if (!(StorageNew->isupRtProcStatus = malloc(thedata->isupRtProcStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupRtProcStatus, thedata->isupRtProcStatus, thedata->isupRtProcStatusLen);
+		StorageNew->isupRtProcStatusLen = thedata->isupRtProcStatusLen;
+		StorageNew->isupRtProcStatus[StorageNew->isupRtProcStatusLen] = 0;
+		if (!(StorageNew->isupRtControlStatus = malloc(thedata->isupRtControlStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupRtControlStatus, thedata->isupRtControlStatus, thedata->isupRtControlStatusLen);
+		StorageNew->isupRtControlStatusLen = thedata->isupRtControlStatusLen;
+		StorageNew->isupRtControlStatus[StorageNew->isupRtControlStatusLen] = 0;
+		StorageNew->isupRtAdminState = thedata->isupRtAdminState;
+		StorageNew->isupRtOperState = thedata->isupRtOperState;
+		StorageNew->isupRtUsageState = thedata->isupRtUsageState;
+		StorageNew->isupRtRowStatus = thedata->isupRtRowStatus;
 	}
       done:
 	DEBUGMSGTL(("isupMIB", "done.\n"));
@@ -3271,7 +3820,7 @@ isupRtTable_del(struct isupRtTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for isupRtTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case isupRtTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3406,19 +3955,26 @@ isupRtTgSelectionTable_create(void)
 		StorageNew->isupRtId = 0;
 		StorageNew->isupRtTgSelectionOrdinal = 0;
 		StorageNew->isupRtTgSelectionProportion = 0;
-		if ((StorageNew->isupRtTgSelectionList = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupRtTgSelectionListLen = strlen("");
+		if ((StorageNew->isupRtTgSelectionList = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->isupRtTgSelectionListLen = 0;
+		StorageNew->isupRtTgSelectionList[StorageNew->isupRtTgSelectionListLen] = 0;
 		StorageNew->isupRtTgSelectionRowStatus = 0;
 		StorageNew->isupRtTgSelectionRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("isupMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	isupRtTgSelectionTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct isupRtTgSelectionTable_data *isupRtTgSelectionTable_duplicate(struct isupRtTgSelectionTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3430,6 +3986,17 @@ isupRtTgSelectionTable_duplicate(struct isupRtTgSelectionTable_data *thedata)
 
 	DEBUGMSGTL(("isupMIB", "isupRtTgSelectionTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->isupRtTgSelectionTable_id = thedata->isupRtTgSelectionTable_id;
+		StorageNew->isupRtId = thedata->isupRtId;
+		StorageNew->isupRtTgSelectionIndex = thedata->isupRtTgSelectionIndex;
+		StorageNew->isupRtTgSelectionOrdinal = thedata->isupRtTgSelectionOrdinal;
+		StorageNew->isupRtTgSelectionProportion = thedata->isupRtTgSelectionProportion;
+		if (!(StorageNew->isupRtTgSelectionList = malloc(thedata->isupRtTgSelectionListLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupRtTgSelectionList, thedata->isupRtTgSelectionList, thedata->isupRtTgSelectionListLen);
+		StorageNew->isupRtTgSelectionListLen = thedata->isupRtTgSelectionListLen;
+		StorageNew->isupRtTgSelectionList[StorageNew->isupRtTgSelectionListLen] = 0;
+		StorageNew->isupRtTgSelectionRowStatus = thedata->isupRtTgSelectionRowStatus;
 	}
       done:
 	DEBUGMSGTL(("isupMIB", "done.\n"));
@@ -3527,7 +4094,7 @@ isupRtTgSelectionTable_del(struct isupRtTgSelectionTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for isupRtTgSelectionTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case isupRtTgSelectionTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3616,15 +4183,20 @@ isupTgTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->isupTgNumberOfCircuits = 0;
-		if ((StorageNew->isupTgLabelOfFarEndExchange = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupTgLabelOfFarEndExchangeLen = strlen("");
+		if ((StorageNew->isupTgLabelOfFarEndExchange = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->isupTgLabelOfFarEndExchangeLen = 0;
+		StorageNew->isupTgLabelOfFarEndExchange[StorageNew->isupTgLabelOfFarEndExchangeLen] = 0;
 		StorageNew->isupTgSignallingCapabilities = 0;
 		StorageNew->isupTgInformationTransferCapabilities = ISUPTGINFORMATIONTRANSFERCAPABILITIES_DIGITALUNRESTRICTED64;
 		StorageNew->isupTgCircuitDirectionality = ISUPTGCIRCUITDIRECTIONALITY_TWOWAY;
-		if (memdup((u_char **) &StorageNew->isupTgTransmissionCharacteristics, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->isupTgTransmissionCharacteristicsLen = 1;
-		if ((StorageNew->isupTgUserLabel = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupTgUserLabelLen = strlen("");
+		if (memdup((u_char **) &StorageNew->isupTgTransmissionCharacteristics, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->isupTgTransmissionCharacteristicsLen = 1;
+		if ((StorageNew->isupTgUserLabel = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->isupTgUserLabelLen = 0;
+		StorageNew->isupTgUserLabel[StorageNew->isupTgUserLabelLen] = 0;
 		StorageNew->isupTgAdminState = ISUPTGADMINSTATE_LOCKED;
 		StorageNew->isupTgAssocSignRouteSetNePart = 0;
 		StorageNew->isupTgBoundaryCrossing = ISUPTGBOUNDARYCROSSING_NATIONAL;
@@ -3638,19 +4210,25 @@ isupTgTable_create(void)
 		StorageNew->isupTgContCheckRatio = 0;
 		StorageNew->isupTgPg = 0;
 		StorageNew->isupTgStandbyStatus = 0;
-		if (memdup((u_char **) &StorageNew->isupTgAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->isupTgAlarmStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->isupTgAlarmStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->isupTgAlarmStatusLen = 1;
 		StorageNew->isupTgRowStatus = 0;
 		StorageNew->isupTgRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("isupMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	isupTgTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct isupTgTable_data *isupTgTable_duplicate(struct isupTgTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3662,6 +4240,46 @@ isupTgTable_duplicate(struct isupTgTable_data *thedata)
 
 	DEBUGMSGTL(("isupMIB", "isupTgTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->isupTgTable_id = thedata->isupTgTable_id;
+		StorageNew->isupTgId = thedata->isupTgId;
+		StorageNew->isupTgNumberOfCircuits = thedata->isupTgNumberOfCircuits;
+		if (!(StorageNew->isupTgLabelOfFarEndExchange = malloc(thedata->isupTgLabelOfFarEndExchangeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupTgLabelOfFarEndExchange, thedata->isupTgLabelOfFarEndExchange, thedata->isupTgLabelOfFarEndExchangeLen);
+		StorageNew->isupTgLabelOfFarEndExchangeLen = thedata->isupTgLabelOfFarEndExchangeLen;
+		StorageNew->isupTgLabelOfFarEndExchange[StorageNew->isupTgLabelOfFarEndExchangeLen] = 0;
+		StorageNew->isupTgSignallingCapabilities = thedata->isupTgSignallingCapabilities;
+		StorageNew->isupTgInformationTransferCapabilities = thedata->isupTgInformationTransferCapabilities;
+		StorageNew->isupTgCircuitDirectionality = thedata->isupTgCircuitDirectionality;
+		if (!(StorageNew->isupTgTransmissionCharacteristics = malloc(thedata->isupTgTransmissionCharacteristicsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupTgTransmissionCharacteristics, thedata->isupTgTransmissionCharacteristics, thedata->isupTgTransmissionCharacteristicsLen);
+		StorageNew->isupTgTransmissionCharacteristicsLen = thedata->isupTgTransmissionCharacteristicsLen;
+		StorageNew->isupTgTransmissionCharacteristics[StorageNew->isupTgTransmissionCharacteristicsLen] = 0;
+		if (!(StorageNew->isupTgUserLabel = malloc(thedata->isupTgUserLabelLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupTgUserLabel, thedata->isupTgUserLabel, thedata->isupTgUserLabelLen);
+		StorageNew->isupTgUserLabelLen = thedata->isupTgUserLabelLen;
+		StorageNew->isupTgUserLabel[StorageNew->isupTgUserLabelLen] = 0;
+		StorageNew->isupTgAdminState = thedata->isupTgAdminState;
+		StorageNew->isupTgAssocSignRouteSetNePart = thedata->isupTgAssocSignRouteSetNePart;
+		StorageNew->isupTgBoundaryCrossing = thedata->isupTgBoundaryCrossing;
+		StorageNew->isupTgSearchMethod = thedata->isupTgSearchMethod;
+		StorageNew->isupTgPrefTrafficRedirect = thedata->isupTgPrefTrafficRedirect;
+		StorageNew->isupTgSuppressOwnCac = thedata->isupTgSuppressOwnCac;
+		StorageNew->isupTgCarrierType = thedata->isupTgCarrierType;
+		StorageNew->isupTgDoubleSeizureControl = thedata->isupTgDoubleSeizureControl;
+		StorageNew->isupTgAlarmCarrier = thedata->isupTgAlarmCarrier;
+		StorageNew->isupTgContCheck = thedata->isupTgContCheck;
+		StorageNew->isupTgContCheckRatio = thedata->isupTgContCheckRatio;
+		StorageNew->isupTgPg = thedata->isupTgPg;
+		StorageNew->isupTgStandbyStatus = thedata->isupTgStandbyStatus;
+		if (!(StorageNew->isupTgAlarmStatus = malloc(thedata->isupTgAlarmStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupTgAlarmStatus, thedata->isupTgAlarmStatus, thedata->isupTgAlarmStatusLen);
+		StorageNew->isupTgAlarmStatusLen = thedata->isupTgAlarmStatusLen;
+		StorageNew->isupTgAlarmStatus[StorageNew->isupTgAlarmStatusLen] = 0;
+		StorageNew->isupTgRowStatus = thedata->isupTgRowStatus;
 	}
       done:
 	DEBUGMSGTL(("isupMIB", "done.\n"));
@@ -3763,7 +4381,7 @@ isupTgTable_del(struct isupTgTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for isupTgTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case isupTgTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3902,11 +4520,13 @@ isupCgTable_create(void)
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->isupCgCIC = 0;
 		StorageNew->isupCgOperationalState = 0;
-		if (memdup((u_char **) &StorageNew->isupCgAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->isupCgAlarmStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->isupCgAlarmStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->isupCgAlarmStatusLen = 1;
 		StorageNew->isupCgRangeType = ISUPCGRANGETYPE_EXPLICIT;
-		if (memdup((u_char **) &StorageNew->isupCgRangeAndStatus, (u_char *) "\x00\x00\x00\x00", 4) == SNMPERR_SUCCESS)
-			StorageNew->isupCgRangeAndStatusLen = 4;
+		if (memdup((u_char **) &StorageNew->isupCgRangeAndStatus, (u_char *) "\x00\x00\x00\x00", 4) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->isupCgRangeAndStatusLen = 4;
 		StorageNew->isupCgCarrierType = 0;
 		StorageNew->isupCgAlarmCarrier = ISUPCGALARMCARRIER_HARDWARE;
 		StorageNew->isupCgContCheck = 0;
@@ -3916,14 +4536,19 @@ isupCgTable_create(void)
 		StorageNew->isupCgRowStatus = 0;
 		StorageNew->isupCgRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("isupMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	isupCgTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct isupCgTable_data *isupCgTable_duplicate(struct isupCgTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3935,6 +4560,28 @@ isupCgTable_duplicate(struct isupCgTable_data *thedata)
 
 	DEBUGMSGTL(("isupMIB", "isupCgTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->isupCgTable_id = thedata->isupCgTable_id;
+		StorageNew->isupCgId = thedata->isupCgId;
+		StorageNew->isupCgCIC = thedata->isupCgCIC;
+		StorageNew->isupCgOperationalState = thedata->isupCgOperationalState;
+		if (!(StorageNew->isupCgAlarmStatus = malloc(thedata->isupCgAlarmStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupCgAlarmStatus, thedata->isupCgAlarmStatus, thedata->isupCgAlarmStatusLen);
+		StorageNew->isupCgAlarmStatusLen = thedata->isupCgAlarmStatusLen;
+		StorageNew->isupCgAlarmStatus[StorageNew->isupCgAlarmStatusLen] = 0;
+		StorageNew->isupCgRangeType = thedata->isupCgRangeType;
+		if (!(StorageNew->isupCgRangeAndStatus = malloc(thedata->isupCgRangeAndStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupCgRangeAndStatus, thedata->isupCgRangeAndStatus, thedata->isupCgRangeAndStatusLen);
+		StorageNew->isupCgRangeAndStatusLen = thedata->isupCgRangeAndStatusLen;
+		StorageNew->isupCgRangeAndStatus[StorageNew->isupCgRangeAndStatusLen] = 0;
+		StorageNew->isupCgCarrierType = thedata->isupCgCarrierType;
+		StorageNew->isupCgAlarmCarrier = thedata->isupCgAlarmCarrier;
+		StorageNew->isupCgContCheck = thedata->isupCgContCheck;
+		StorageNew->isupCgContCheckRatio = thedata->isupCgContCheckRatio;
+		StorageNew->isupCgPg = thedata->isupCgPg;
+		StorageNew->isupCgStandbyStatus = thedata->isupCgStandbyStatus;
+		StorageNew->isupCgRowStatus = thedata->isupCgRowStatus;
 	}
       done:
 	DEBUGMSGTL(("isupMIB", "done.\n"));
@@ -4032,7 +4679,7 @@ isupCgTable_del(struct isupCgTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for isupCgTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case isupCgTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -4143,23 +4790,31 @@ isupCtTable_create(void)
 		StorageNew->isupCtTg = 0;
 		StorageNew->isupCtAdminState = ISUPCTADMINSTATE_LOCKED;
 		StorageNew->isupCtUsageState = ISUPCTUSAGESTATE_IDLE;
-		if ((StorageNew->isupCtCtpbInstance = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->isupCtCtpbInstanceLen = 2;
+		if ((StorageNew->isupCtCtpbInstance = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->isupCtCtpbInstanceLen = 2;
 		StorageNew->isupCtCircuitNumber = 0;
-		if ((StorageNew->isupCtOfficeEquip = (uint8_t *) strdup("")) != NULL)
-			StorageNew->isupCtOfficeEquipLen = strlen("");
+		if ((StorageNew->isupCtOfficeEquip = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->isupCtOfficeEquipLen = 0;
+		StorageNew->isupCtOfficeEquip[StorageNew->isupCtOfficeEquipLen] = 0;
 		StorageNew->isupCtCIC = 0;
 		StorageNew->isupCtRowStatus = 0;
 		StorageNew->isupCtRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("isupMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	isupCtTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct isupCtTable_data *isupCtTable_duplicate(struct isupCtTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -4171,6 +4826,23 @@ isupCtTable_duplicate(struct isupCtTable_data *thedata)
 
 	DEBUGMSGTL(("isupMIB", "isupCtTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->isupCtTable_id = thedata->isupCtTable_id;
+		StorageNew->isupCtId = thedata->isupCtId;
+		StorageNew->isupCtCg = thedata->isupCtCg;
+		StorageNew->isupCtTg = thedata->isupCtTg;
+		StorageNew->isupCtAdminState = thedata->isupCtAdminState;
+		StorageNew->isupCtUsageState = thedata->isupCtUsageState;
+		if (!(StorageNew->isupCtCtpbInstance = snmp_duplicate_objid(thedata->isupCtCtpbInstance, thedata->isupCtCtpbInstanceLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->isupCtCtpbInstanceLen = thedata->isupCtCtpbInstanceLen;
+		StorageNew->isupCtCircuitNumber = thedata->isupCtCircuitNumber;
+		if (!(StorageNew->isupCtOfficeEquip = malloc(thedata->isupCtOfficeEquipLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->isupCtOfficeEquip, thedata->isupCtOfficeEquip, thedata->isupCtOfficeEquipLen);
+		StorageNew->isupCtOfficeEquipLen = thedata->isupCtOfficeEquipLen;
+		StorageNew->isupCtOfficeEquip[StorageNew->isupCtOfficeEquipLen] = 0;
+		StorageNew->isupCtCIC = thedata->isupCtCIC;
+		StorageNew->isupCtRowStatus = thedata->isupCtRowStatus;
 	}
       done:
 	DEBUGMSGTL(("isupMIB", "done.\n"));
@@ -4268,7 +4940,7 @@ isupCtTable_del(struct isupCtTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for isupCtTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case isupCtTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -4351,6 +5023,506 @@ store_isupCtTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	}
 	DEBUGMSGTL(("isupMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int activate_isupMsTable_row(struct isupMsTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_isupMsTable_row(struct isupMsTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_isupMsTable_row(struct isupMsTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_isupMsTable_row(struct isupMsTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_isupPgTable_row(struct isupPgTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_isupPgTable_row(struct isupPgTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_isupPgTable_row(struct isupPgTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_isupPgTable_row(struct isupPgTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_isupPuTable_row(struct isupPuTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_isupPuTable_row(struct isupPuTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_isupPuTable_row(struct isupPuTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_isupPuTable_row(struct isupPuTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_isupLgTable_row(struct isupLgTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_isupLgTable_row(struct isupLgTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_isupLgTable_row(struct isupLgTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_isupLgTable_row(struct isupLgTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_isupMtpTable_row(struct isupMtpTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_isupMtpTable_row(struct isupMtpTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_isupMtpTable_row(struct isupMtpTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_isupMtpTable_row(struct isupMtpTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_isupNaTable_row(struct isupNaTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_isupNaTable_row(struct isupNaTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_isupNaTable_row(struct isupNaTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_isupNaTable_row(struct isupNaTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_isupSpTable_row(struct isupSpTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_isupSpTable_row(struct isupSpTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_isupSpTable_row(struct isupSpTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_isupSpTable_row(struct isupSpTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_isupSrTable_row(struct isupSrTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_isupSrTable_row(struct isupSrTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_isupSrTable_row(struct isupSrTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_isupSrTable_row(struct isupSrTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_isupRtTable_row(struct isupRtTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_isupRtTable_row(struct isupRtTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_isupRtTable_row(struct isupRtTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_isupRtTable_row(struct isupRtTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_isupRtTgSelectionTable_row(struct isupRtTgSelectionTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_isupRtTgSelectionTable_row(struct isupRtTgSelectionTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_isupRtTgSelectionTable_row(struct isupRtTgSelectionTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_isupRtTgSelectionTable_row(struct isupRtTgSelectionTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_isupTgTable_row(struct isupTgTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_isupTgTable_row(struct isupTgTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_isupTgTable_row(struct isupTgTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_isupTgTable_row(struct isupTgTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_isupCgTable_row(struct isupCgTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_isupCgTable_row(struct isupCgTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_isupCgTable_row(struct isupCgTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_isupCgTable_row(struct isupCgTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_isupCtTable_row(struct isupCtTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_isupCtTable_row(struct isupCtTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_isupCtTable_row(struct isupCtTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_isupCtTable_row(struct isupCtTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int check_isupMsTable_row(struct isupMsTable_data *StorageTmp, struct isupMsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_isupMsTable_row(struct isupMsTable_data *StorageTmp, struct isupMsTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_isupMsTable_row(struct isupMsTable_data *StorageTmp, struct isupMsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_isupMsTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_isupMsTable_row(struct isupMsTable_data *StorageTmp, struct isupMsTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	isupMsTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_isupMsTable_row(struct isupMsTable_data *StorageTmp, struct isupMsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_isupMsTable_row(struct isupMsTable_data *StorageTmp, struct isupMsTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_isupMsTable_row(StorageOld, NULL);
 }
 
 /**
@@ -4534,6 +5706,64 @@ var_isupMsTable(struct variable *vp, oid * name, size_t *length, int exact, size
 }
 
 /**
+ * @fn int check_isupPgTable_row(struct isupPgTable_data *StorageTmp, struct isupPgTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_isupPgTable_row(struct isupPgTable_data *StorageTmp, struct isupPgTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_isupPgTable_row(struct isupPgTable_data *StorageTmp, struct isupPgTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_isupPgTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_isupPgTable_row(struct isupPgTable_data *StorageTmp, struct isupPgTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	isupPgTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_isupPgTable_row(struct isupPgTable_data *StorageTmp, struct isupPgTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_isupPgTable_row(struct isupPgTable_data *StorageTmp, struct isupPgTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_isupPgTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_isupPgTable_row(struct isupPgTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -4707,6 +5937,64 @@ var_isupPgTable(struct variable *vp, oid * name, size_t *length, int exact, size
 }
 
 /**
+ * @fn int check_isupPuTable_row(struct isupPuTable_data *StorageTmp, struct isupPuTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_isupPuTable_row(struct isupPuTable_data *StorageTmp, struct isupPuTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_isupPuTable_row(struct isupPuTable_data *StorageTmp, struct isupPuTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_isupPuTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_isupPuTable_row(struct isupPuTable_data *StorageTmp, struct isupPuTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	isupPuTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_isupPuTable_row(struct isupPuTable_data *StorageTmp, struct isupPuTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_isupPuTable_row(struct isupPuTable_data *StorageTmp, struct isupPuTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_isupPuTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_isupPuTable_row(struct isupPuTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -4855,6 +6143,64 @@ var_isupPuTable(struct variable *vp, oid * name, size_t *length, int exact, size
 }
 
 /**
+ * @fn int check_isupLgTable_row(struct isupLgTable_data *StorageTmp, struct isupLgTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_isupLgTable_row(struct isupLgTable_data *StorageTmp, struct isupLgTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_isupLgTable_row(struct isupLgTable_data *StorageTmp, struct isupLgTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_isupLgTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_isupLgTable_row(struct isupLgTable_data *StorageTmp, struct isupLgTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	isupLgTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_isupLgTable_row(struct isupLgTable_data *StorageTmp, struct isupLgTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_isupLgTable_row(struct isupLgTable_data *StorageTmp, struct isupLgTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_isupLgTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_isupLgTable_row(struct isupLgTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -4971,6 +6317,64 @@ var_isupLgTable(struct variable *vp, oid * name, size_t *length, int exact, size
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_isupMtpTable_row(struct isupMtpTable_data *StorageTmp, struct isupMtpTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_isupMtpTable_row(struct isupMtpTable_data *StorageTmp, struct isupMtpTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_isupMtpTable_row(struct isupMtpTable_data *StorageTmp, struct isupMtpTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_isupMtpTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_isupMtpTable_row(struct isupMtpTable_data *StorageTmp, struct isupMtpTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	isupMtpTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_isupMtpTable_row(struct isupMtpTable_data *StorageTmp, struct isupMtpTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_isupMtpTable_row(struct isupMtpTable_data *StorageTmp, struct isupMtpTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_isupMtpTable_row(StorageOld, NULL);
 }
 
 /**
@@ -5112,6 +6516,64 @@ var_isupMtpTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 }
 
 /**
+ * @fn int check_isupNaTable_row(struct isupNaTable_data *StorageTmp, struct isupNaTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_isupNaTable_row(struct isupNaTable_data *StorageTmp, struct isupNaTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_isupNaTable_row(struct isupNaTable_data *StorageTmp, struct isupNaTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_isupNaTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_isupNaTable_row(struct isupNaTable_data *StorageTmp, struct isupNaTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	isupNaTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_isupNaTable_row(struct isupNaTable_data *StorageTmp, struct isupNaTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_isupNaTable_row(struct isupNaTable_data *StorageTmp, struct isupNaTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_isupNaTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_isupNaTable_row(struct isupNaTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -5236,6 +6698,64 @@ var_isupNaTable(struct variable *vp, oid * name, size_t *length, int exact, size
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_isupSpTable_row(struct isupSpTable_data *StorageTmp, struct isupSpTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_isupSpTable_row(struct isupSpTable_data *StorageTmp, struct isupSpTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_isupSpTable_row(struct isupSpTable_data *StorageTmp, struct isupSpTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_isupSpTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_isupSpTable_row(struct isupSpTable_data *StorageTmp, struct isupSpTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	isupSpTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_isupSpTable_row(struct isupSpTable_data *StorageTmp, struct isupSpTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_isupSpTable_row(struct isupSpTable_data *StorageTmp, struct isupSpTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_isupSpTable_row(StorageOld, NULL);
 }
 
 /**
@@ -5424,6 +6944,64 @@ var_isupSpTable(struct variable *vp, oid * name, size_t *length, int exact, size
 }
 
 /**
+ * @fn int check_isupSrTable_row(struct isupSrTable_data *StorageTmp, struct isupSrTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_isupSrTable_row(struct isupSrTable_data *StorageTmp, struct isupSrTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_isupSrTable_row(struct isupSrTable_data *StorageTmp, struct isupSrTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_isupSrTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_isupSrTable_row(struct isupSrTable_data *StorageTmp, struct isupSrTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	isupSrTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_isupSrTable_row(struct isupSrTable_data *StorageTmp, struct isupSrTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_isupSrTable_row(struct isupSrTable_data *StorageTmp, struct isupSrTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_isupSrTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_isupSrTable_row(struct isupSrTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -5600,6 +7178,64 @@ var_isupSrTable(struct variable *vp, oid * name, size_t *length, int exact, size
 }
 
 /**
+ * @fn int check_isupRtTable_row(struct isupRtTable_data *StorageTmp, struct isupRtTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_isupRtTable_row(struct isupRtTable_data *StorageTmp, struct isupRtTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_isupRtTable_row(struct isupRtTable_data *StorageTmp, struct isupRtTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_isupRtTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_isupRtTable_row(struct isupRtTable_data *StorageTmp, struct isupRtTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	isupRtTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_isupRtTable_row(struct isupRtTable_data *StorageTmp, struct isupRtTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_isupRtTable_row(struct isupRtTable_data *StorageTmp, struct isupRtTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_isupRtTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_isupRtTable_row(struct isupRtTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -5750,6 +7386,64 @@ var_isupRtTable(struct variable *vp, oid * name, size_t *length, int exact, size
 }
 
 /**
+ * @fn int check_isupRtTgSelectionTable_row(struct isupRtTgSelectionTable_data *StorageTmp, struct isupRtTgSelectionTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_isupRtTgSelectionTable_row(struct isupRtTgSelectionTable_data *StorageTmp, struct isupRtTgSelectionTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_isupRtTgSelectionTable_row(struct isupRtTgSelectionTable_data *StorageTmp, struct isupRtTgSelectionTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_isupRtTgSelectionTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_isupRtTgSelectionTable_row(struct isupRtTgSelectionTable_data *StorageTmp, struct isupRtTgSelectionTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	isupRtTgSelectionTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_isupRtTgSelectionTable_row(struct isupRtTgSelectionTable_data *StorageTmp, struct isupRtTgSelectionTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_isupRtTgSelectionTable_row(struct isupRtTgSelectionTable_data *StorageTmp, struct isupRtTgSelectionTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_isupRtTgSelectionTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_isupRtTgSelectionTable_row(struct isupRtTgSelectionTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -5844,6 +7538,64 @@ var_isupRtTgSelectionTable(struct variable *vp, oid * name, size_t *length, int 
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_isupTgTable_row(struct isupTgTable_data *StorageTmp, struct isupTgTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_isupTgTable_row(struct isupTgTable_data *StorageTmp, struct isupTgTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_isupTgTable_row(struct isupTgTable_data *StorageTmp, struct isupTgTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_isupTgTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_isupTgTable_row(struct isupTgTable_data *StorageTmp, struct isupTgTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	isupTgTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_isupTgTable_row(struct isupTgTable_data *StorageTmp, struct isupTgTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_isupTgTable_row(struct isupTgTable_data *StorageTmp, struct isupTgTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_isupTgTable_row(StorageOld, NULL);
 }
 
 /**
@@ -6067,6 +7819,64 @@ var_isupTgTable(struct variable *vp, oid * name, size_t *length, int exact, size
 }
 
 /**
+ * @fn int check_isupCgTable_row(struct isupCgTable_data *StorageTmp, struct isupCgTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_isupCgTable_row(struct isupCgTable_data *StorageTmp, struct isupCgTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_isupCgTable_row(struct isupCgTable_data *StorageTmp, struct isupCgTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_isupCgTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_isupCgTable_row(struct isupCgTable_data *StorageTmp, struct isupCgTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	isupCgTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_isupCgTable_row(struct isupCgTable_data *StorageTmp, struct isupCgTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_isupCgTable_row(struct isupCgTable_data *StorageTmp, struct isupCgTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_isupCgTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_isupCgTable_row(struct isupCgTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -6218,6 +8028,64 @@ var_isupCgTable(struct variable *vp, oid * name, size_t *length, int exact, size
 }
 
 /**
+ * @fn int check_isupCtTable_row(struct isupCtTable_data *StorageTmp, struct isupCtTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_isupCtTable_row(struct isupCtTable_data *StorageTmp, struct isupCtTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_isupCtTable_row(struct isupCtTable_data *StorageTmp, struct isupCtTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_isupCtTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_isupCtTable_row(struct isupCtTable_data *StorageTmp, struct isupCtTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	isupCtTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_isupCtTable_row(struct isupCtTable_data *StorageTmp, struct isupCtTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_isupCtTable_row(struct isupCtTable_data *StorageTmp, struct isupCtTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_isupCtTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_isupCtTable_row(struct isupCtTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -6364,17 +8232,17 @@ var_isupCtTable(struct variable *vp, oid * name, size_t *length, int exact, size
 int
 write_isupMsName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupMsTable_data *StorageTmp = NULL;
+	struct isupMsTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupMsName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupMsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupMsRowStatus) {
@@ -6397,33 +8265,73 @@ write_isupMsName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupMsName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupMsTable_old) == NULL)
+			if (StorageTmp->isupMsTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupMsTable_old = isupMsTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupMsTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupMsName);
+		StorageTmp->isupMsName = string;
+		StorageTmp->isupMsNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupMsTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupMsTable_tsts == 0)
+				if ((ret = check_isupMsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupMsTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupMsName for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupMsName;
-		old_length = StorageTmp->isupMsNameLen;
-		StorageTmp->isupMsName = string;
-		StorageTmp->isupMsNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupMsTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupMsTable_sets == 0)
+				if ((ret = update_isupMsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupMsTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupMsTable_old) != NULL) {
+			isupMsTable_destroy(&StorageTmp->isupMsTable_old);
+			StorageTmp->isupMsTable_rsvs = 0;
+			StorageTmp->isupMsTable_tsts = 0;
+			StorageTmp->isupMsTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupMsName = old_value;
-		StorageTmp->isupMsNameLen = old_length;
+		if ((StorageOld = StorageTmp->isupMsTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupMsTable_sets == 0)
+			revert_isupMsTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupMsTable_old) == NULL)
+			break;
+		if (StorageOld->isupMsName != NULL) {
+			SNMP_FREE(StorageTmp->isupMsName);
+			StorageTmp->isupMsName = StorageOld->isupMsName;
+			StorageTmp->isupMsNameLen = StorageOld->isupMsNameLen;
+			StorageOld->isupMsName = NULL;
+			StorageOld->isupMsNameLen = 0;
+		}
+		if (--StorageTmp->isupMsTable_rsvs == 0)
+			isupMsTable_destroy(&StorageTmp->isupMsTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6443,17 +8351,17 @@ write_isupMsName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 int
 write_isupMsAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupMsTable_data *StorageTmp = NULL;
+	struct isupMsTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupMsAlarmStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupMsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupMsRowStatus) {
@@ -6483,33 +8391,73 @@ write_isupMsAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupMsTable_old) == NULL)
+			if (StorageTmp->isupMsTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupMsTable_old = isupMsTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupMsTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupMsAlarmStatus);
+		StorageTmp->isupMsAlarmStatus = string;
+		StorageTmp->isupMsAlarmStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupMsTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupMsTable_tsts == 0)
+				if ((ret = check_isupMsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupMsTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupMsAlarmStatus for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupMsAlarmStatus;
-		old_length = StorageTmp->isupMsAlarmStatusLen;
-		StorageTmp->isupMsAlarmStatus = string;
-		StorageTmp->isupMsAlarmStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupMsTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupMsTable_sets == 0)
+				if ((ret = update_isupMsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupMsTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupMsTable_old) != NULL) {
+			isupMsTable_destroy(&StorageTmp->isupMsTable_old);
+			StorageTmp->isupMsTable_rsvs = 0;
+			StorageTmp->isupMsTable_tsts = 0;
+			StorageTmp->isupMsTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupMsAlarmStatus = old_value;
-		StorageTmp->isupMsAlarmStatusLen = old_length;
+		if ((StorageOld = StorageTmp->isupMsTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupMsTable_sets == 0)
+			revert_isupMsTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupMsTable_old) == NULL)
+			break;
+		if (StorageOld->isupMsAlarmStatus != NULL) {
+			SNMP_FREE(StorageTmp->isupMsAlarmStatus);
+			StorageTmp->isupMsAlarmStatus = StorageOld->isupMsAlarmStatus;
+			StorageTmp->isupMsAlarmStatusLen = StorageOld->isupMsAlarmStatusLen;
+			StorageOld->isupMsAlarmStatus = NULL;
+			StorageOld->isupMsAlarmStatusLen = 0;
+		}
+		if (--StorageTmp->isupMsTable_rsvs == 0)
+			isupMsTable_destroy(&StorageTmp->isupMsTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6529,17 +8477,17 @@ write_isupMsAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_isupMsUserLabel(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupMsTable_data *StorageTmp = NULL;
+	struct isupMsTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupMsUserLabel entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupMsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupMsRowStatus) {
@@ -6562,33 +8510,73 @@ write_isupMsUserLabel(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupMsUserLabel: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupMsTable_old) == NULL)
+			if (StorageTmp->isupMsTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupMsTable_old = isupMsTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupMsTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupMsUserLabel);
+		StorageTmp->isupMsUserLabel = string;
+		StorageTmp->isupMsUserLabelLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupMsTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupMsTable_tsts == 0)
+				if ((ret = check_isupMsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupMsTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupMsUserLabel for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupMsUserLabel;
-		old_length = StorageTmp->isupMsUserLabelLen;
-		StorageTmp->isupMsUserLabel = string;
-		StorageTmp->isupMsUserLabelLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupMsTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupMsTable_sets == 0)
+				if ((ret = update_isupMsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupMsTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupMsTable_old) != NULL) {
+			isupMsTable_destroy(&StorageTmp->isupMsTable_old);
+			StorageTmp->isupMsTable_rsvs = 0;
+			StorageTmp->isupMsTable_tsts = 0;
+			StorageTmp->isupMsTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupMsUserLabel = old_value;
-		StorageTmp->isupMsUserLabelLen = old_length;
+		if ((StorageOld = StorageTmp->isupMsTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupMsTable_sets == 0)
+			revert_isupMsTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupMsTable_old) == NULL)
+			break;
+		if (StorageOld->isupMsUserLabel != NULL) {
+			SNMP_FREE(StorageTmp->isupMsUserLabel);
+			StorageTmp->isupMsUserLabel = StorageOld->isupMsUserLabel;
+			StorageTmp->isupMsUserLabelLen = StorageOld->isupMsUserLabelLen;
+			StorageOld->isupMsUserLabel = NULL;
+			StorageOld->isupMsUserLabelLen = 0;
+		}
+		if (--StorageTmp->isupMsTable_rsvs == 0)
+			isupMsTable_destroy(&StorageTmp->isupMsTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6608,17 +8596,17 @@ write_isupMsUserLabel(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_isupMsLocationName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupMsTable_data *StorageTmp = NULL;
+	struct isupMsTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupMsLocationName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupMsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupMsRowStatus) {
@@ -6641,33 +8629,73 @@ write_isupMsLocationName(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupMsLocationName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupMsTable_old) == NULL)
+			if (StorageTmp->isupMsTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupMsTable_old = isupMsTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupMsTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupMsLocationName);
+		StorageTmp->isupMsLocationName = string;
+		StorageTmp->isupMsLocationNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupMsTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupMsTable_tsts == 0)
+				if ((ret = check_isupMsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupMsTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupMsLocationName for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupMsLocationName;
-		old_length = StorageTmp->isupMsLocationNameLen;
-		StorageTmp->isupMsLocationName = string;
-		StorageTmp->isupMsLocationNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupMsTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupMsTable_sets == 0)
+				if ((ret = update_isupMsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupMsTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupMsTable_old) != NULL) {
+			isupMsTable_destroy(&StorageTmp->isupMsTable_old);
+			StorageTmp->isupMsTable_rsvs = 0;
+			StorageTmp->isupMsTable_tsts = 0;
+			StorageTmp->isupMsTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupMsLocationName = old_value;
-		StorageTmp->isupMsLocationNameLen = old_length;
+		if ((StorageOld = StorageTmp->isupMsTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupMsTable_sets == 0)
+			revert_isupMsTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupMsTable_old) == NULL)
+			break;
+		if (StorageOld->isupMsLocationName != NULL) {
+			SNMP_FREE(StorageTmp->isupMsLocationName);
+			StorageTmp->isupMsLocationName = StorageOld->isupMsLocationName;
+			StorageTmp->isupMsLocationNameLen = StorageOld->isupMsLocationNameLen;
+			StorageOld->isupMsLocationName = NULL;
+			StorageOld->isupMsLocationNameLen = 0;
+		}
+		if (--StorageTmp->isupMsTable_rsvs == 0)
+			isupMsTable_destroy(&StorageTmp->isupMsTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6687,17 +8715,17 @@ write_isupMsLocationName(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_isupMsAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct isupMsTable_data *StorageTmp = NULL;
+	struct isupMsTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupMsAsaProfilePointer entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupMsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupMsRowStatus) {
@@ -6720,31 +8748,71 @@ write_isupMsAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, 
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value zeroDotZero */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupMsTable_old) == NULL)
+			if (StorageTmp->isupMsTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupMsTable_old = isupMsTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupMsTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->isupMsAsaProfilePointer);
+		StorageTmp->isupMsAsaProfilePointer = objid;
+		StorageTmp->isupMsAsaProfilePointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupMsTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupMsTable_tsts == 0)
+				if ((ret = check_isupMsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupMsTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupMsAsaProfilePointer for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupMsAsaProfilePointer;
-		old_length = StorageTmp->isupMsAsaProfilePointerLen;
-		StorageTmp->isupMsAsaProfilePointer = objid;
-		StorageTmp->isupMsAsaProfilePointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupMsTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupMsTable_sets == 0)
+				if ((ret = update_isupMsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupMsTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupMsTable_old) != NULL) {
+			isupMsTable_destroy(&StorageTmp->isupMsTable_old);
+			StorageTmp->isupMsTable_rsvs = 0;
+			StorageTmp->isupMsTable_tsts = 0;
+			StorageTmp->isupMsTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupMsAsaProfilePointer = old_value;
-		StorageTmp->isupMsAsaProfilePointerLen = old_length;
+		if ((StorageOld = StorageTmp->isupMsTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupMsTable_sets == 0)
+			revert_isupMsTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->isupMsTable_old) == NULL)
+			break;
+		if (StorageOld->isupMsAsaProfilePointer != NULL) {
+			SNMP_FREE(StorageTmp->isupMsAsaProfilePointer);
+			StorageTmp->isupMsAsaProfilePointer = StorageOld->isupMsAsaProfilePointer;
+			StorageTmp->isupMsAsaProfilePointerLen = StorageOld->isupMsAsaProfilePointerLen;
+			StorageOld->isupMsAsaProfilePointer = NULL;
+			StorageOld->isupMsAsaProfilePointerLen = 0;
+		}
+		if (--StorageTmp->isupMsTable_rsvs == 0)
+			isupMsTable_destroy(&StorageTmp->isupMsTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6764,17 +8832,17 @@ write_isupMsAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, 
 int
 write_isupMsNetworkElementAliases(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupMsTable_data *StorageTmp = NULL;
+	struct isupMsTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupMsNetworkElementAliases entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupMsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupMsRowStatus) {
@@ -6797,33 +8865,73 @@ write_isupMsNetworkElementAliases(int action, u_char *var_val, u_char var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupMsNetworkElementAliases: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupMsTable_old) == NULL)
+			if (StorageTmp->isupMsTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupMsTable_old = isupMsTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupMsTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupMsNetworkElementAliases);
+		StorageTmp->isupMsNetworkElementAliases = string;
+		StorageTmp->isupMsNetworkElementAliasesLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupMsTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupMsTable_tsts == 0)
+				if ((ret = check_isupMsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupMsTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupMsNetworkElementAliases for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupMsNetworkElementAliases;
-		old_length = StorageTmp->isupMsNetworkElementAliasesLen;
-		StorageTmp->isupMsNetworkElementAliases = string;
-		StorageTmp->isupMsNetworkElementAliasesLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupMsTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupMsTable_sets == 0)
+				if ((ret = update_isupMsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupMsTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupMsTable_old) != NULL) {
+			isupMsTable_destroy(&StorageTmp->isupMsTable_old);
+			StorageTmp->isupMsTable_rsvs = 0;
+			StorageTmp->isupMsTable_tsts = 0;
+			StorageTmp->isupMsTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupMsNetworkElementAliases = old_value;
-		StorageTmp->isupMsNetworkElementAliasesLen = old_length;
+		if ((StorageOld = StorageTmp->isupMsTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupMsTable_sets == 0)
+			revert_isupMsTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupMsTable_old) == NULL)
+			break;
+		if (StorageOld->isupMsNetworkElementAliases != NULL) {
+			SNMP_FREE(StorageTmp->isupMsNetworkElementAliases);
+			StorageTmp->isupMsNetworkElementAliases = StorageOld->isupMsNetworkElementAliases;
+			StorageTmp->isupMsNetworkElementAliasesLen = StorageOld->isupMsNetworkElementAliasesLen;
+			StorageOld->isupMsNetworkElementAliases = NULL;
+			StorageOld->isupMsNetworkElementAliasesLen = 0;
+		}
+		if (--StorageTmp->isupMsTable_rsvs == 0)
+			isupMsTable_destroy(&StorageTmp->isupMsTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6843,12 +8951,14 @@ write_isupMsNetworkElementAliases(int action, u_char *var_val, u_char var_val_ty
 int
 write_isupPgType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupPgTable_data *StorageTmp = NULL;
+	struct isupPgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupPgType entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupPgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6881,22 +8991,61 @@ write_isupPgType(int action, u_char *var_val, u_char var_val_type, size_t var_va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupPgType: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			if (StorageTmp->isupPgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupPgTable_old = isupPgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupPgTable_rsvs++;
+		StorageTmp->isupPgType = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupPgTable_tsts == 0)
+				if ((ret = check_isupPgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupPgType for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupPgType;
-		StorageTmp->isupPgType = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupPgTable_sets == 0)
+				if ((ret = update_isupPgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			isupPgTable_destroy(&StorageTmp->isupPgTable_old);
+			StorageTmp->isupPgTable_rsvs = 0;
+			StorageTmp->isupPgTable_tsts = 0;
+			StorageTmp->isupPgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupPgType = old_value;
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupPgTable_sets == 0)
+			revert_isupPgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			break;
+		StorageTmp->isupPgType = StorageOld->isupPgType;
+		if (--StorageTmp->isupPgTable_rsvs == 0)
+			isupPgTable_destroy(&StorageTmp->isupPgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6916,12 +9065,14 @@ write_isupPgType(int action, u_char *var_val, u_char var_val_type, size_t var_va
 int
 write_isupPgRevertive(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupPgTable_data *StorageTmp = NULL;
+	struct isupPgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupPgRevertive entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupPgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6954,22 +9105,61 @@ write_isupPgRevertive(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupPgRevertive: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			if (StorageTmp->isupPgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupPgTable_old = isupPgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupPgTable_rsvs++;
+		StorageTmp->isupPgRevertive = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupPgTable_tsts == 0)
+				if ((ret = check_isupPgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupPgRevertive for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupPgRevertive;
-		StorageTmp->isupPgRevertive = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupPgTable_sets == 0)
+				if ((ret = update_isupPgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			isupPgTable_destroy(&StorageTmp->isupPgTable_old);
+			StorageTmp->isupPgTable_rsvs = 0;
+			StorageTmp->isupPgTable_tsts = 0;
+			StorageTmp->isupPgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupPgRevertive = old_value;
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupPgTable_sets == 0)
+			revert_isupPgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			break;
+		StorageTmp->isupPgRevertive = StorageOld->isupPgRevertive;
+		if (--StorageTmp->isupPgTable_rsvs == 0)
+			isupPgTable_destroy(&StorageTmp->isupPgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6989,17 +9179,17 @@ write_isupPgRevertive(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_isupPgSupportedByObjectList(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct isupPgTable_data *StorageTmp = NULL;
+	struct isupPgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupPgSupportedByObjectList entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupPgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupPgRowStatus) {
@@ -7021,31 +9211,71 @@ write_isupPgSupportedByObjectList(int action, u_char *var_val, u_char var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupPgSupportedByObjectList: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			if (StorageTmp->isupPgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupPgTable_old = isupPgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupPgTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->isupPgSupportedByObjectList);
+		StorageTmp->isupPgSupportedByObjectList = objid;
+		StorageTmp->isupPgSupportedByObjectListLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupPgTable_tsts == 0)
+				if ((ret = check_isupPgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupPgSupportedByObjectList for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupPgSupportedByObjectList;
-		old_length = StorageTmp->isupPgSupportedByObjectListLen;
-		StorageTmp->isupPgSupportedByObjectList = objid;
-		StorageTmp->isupPgSupportedByObjectListLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupPgTable_sets == 0)
+				if ((ret = update_isupPgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			isupPgTable_destroy(&StorageTmp->isupPgTable_old);
+			StorageTmp->isupPgTable_rsvs = 0;
+			StorageTmp->isupPgTable_tsts = 0;
+			StorageTmp->isupPgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupPgSupportedByObjectList = old_value;
-		StorageTmp->isupPgSupportedByObjectListLen = old_length;
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupPgTable_sets == 0)
+			revert_isupPgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			break;
+		if (StorageOld->isupPgSupportedByObjectList != NULL) {
+			SNMP_FREE(StorageTmp->isupPgSupportedByObjectList);
+			StorageTmp->isupPgSupportedByObjectList = StorageOld->isupPgSupportedByObjectList;
+			StorageTmp->isupPgSupportedByObjectListLen = StorageOld->isupPgSupportedByObjectListLen;
+			StorageOld->isupPgSupportedByObjectList = NULL;
+			StorageOld->isupPgSupportedByObjectListLen = 0;
+		}
+		if (--StorageTmp->isupPgTable_rsvs == 0)
+			isupPgTable_destroy(&StorageTmp->isupPgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7065,12 +9295,14 @@ write_isupPgSupportedByObjectList(int action, u_char *var_val, u_char var_val_ty
 int
 write_isupPgWaitToRestoreTime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupPgTable_data *StorageTmp = NULL;
+	struct isupPgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupPgWaitToRestoreTime entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupPgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7100,22 +9332,61 @@ write_isupPgWaitToRestoreTime(int action, u_char *var_val, u_char var_val_type, 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupPgWaitToRestoreTime: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			if (StorageTmp->isupPgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupPgTable_old = isupPgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupPgTable_rsvs++;
+		StorageTmp->isupPgWaitToRestoreTime = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupPgTable_tsts == 0)
+				if ((ret = check_isupPgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupPgWaitToRestoreTime for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupPgWaitToRestoreTime;
-		StorageTmp->isupPgWaitToRestoreTime = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupPgTable_sets == 0)
+				if ((ret = update_isupPgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			isupPgTable_destroy(&StorageTmp->isupPgTable_old);
+			StorageTmp->isupPgTable_rsvs = 0;
+			StorageTmp->isupPgTable_tsts = 0;
+			StorageTmp->isupPgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupPgWaitToRestoreTime = old_value;
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupPgTable_sets == 0)
+			revert_isupPgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			break;
+		StorageTmp->isupPgWaitToRestoreTime = StorageOld->isupPgWaitToRestoreTime;
+		if (--StorageTmp->isupPgTable_rsvs == 0)
+			isupPgTable_destroy(&StorageTmp->isupPgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7135,12 +9406,14 @@ write_isupPgWaitToRestoreTime(int action, u_char *var_val, u_char var_val_type, 
 int
 write_isupPgSettingWindowTime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupPgTable_data *StorageTmp = NULL;
+	struct isupPgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupPgSettingWindowTime entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupPgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7170,22 +9443,61 @@ write_isupPgSettingWindowTime(int action, u_char *var_val, u_char var_val_type, 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupPgSettingWindowTime: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			if (StorageTmp->isupPgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupPgTable_old = isupPgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupPgTable_rsvs++;
+		StorageTmp->isupPgSettingWindowTime = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupPgTable_tsts == 0)
+				if ((ret = check_isupPgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupPgSettingWindowTime for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupPgSettingWindowTime;
-		StorageTmp->isupPgSettingWindowTime = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupPgTable_sets == 0)
+				if ((ret = update_isupPgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			isupPgTable_destroy(&StorageTmp->isupPgTable_old);
+			StorageTmp->isupPgTable_rsvs = 0;
+			StorageTmp->isupPgTable_tsts = 0;
+			StorageTmp->isupPgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupPgSettingWindowTime = old_value;
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupPgTable_sets == 0)
+			revert_isupPgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			break;
+		StorageTmp->isupPgSettingWindowTime = StorageOld->isupPgSettingWindowTime;
+		if (--StorageTmp->isupPgTable_rsvs == 0)
+			isupPgTable_destroy(&StorageTmp->isupPgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7205,12 +9517,14 @@ write_isupPgSettingWindowTime(int action, u_char *var_val, u_char var_val_type, 
 int
 write_isupPgReleasingWindowTime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupPgTable_data *StorageTmp = NULL;
+	struct isupPgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupPgReleasingWindowTime entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupPgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7240,22 +9554,61 @@ write_isupPgReleasingWindowTime(int action, u_char *var_val, u_char var_val_type
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupPgReleasingWindowTime: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			if (StorageTmp->isupPgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupPgTable_old = isupPgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupPgTable_rsvs++;
+		StorageTmp->isupPgReleasingWindowTime = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupPgTable_tsts == 0)
+				if ((ret = check_isupPgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupPgReleasingWindowTime for you to use, and you have just been asked to do something with it.  Note that anything done 
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupPgReleasingWindowTime;
-		StorageTmp->isupPgReleasingWindowTime = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupPgTable_sets == 0)
+				if ((ret = update_isupPgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			isupPgTable_destroy(&StorageTmp->isupPgTable_old);
+			StorageTmp->isupPgTable_rsvs = 0;
+			StorageTmp->isupPgTable_tsts = 0;
+			StorageTmp->isupPgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupPgReleasingWindowTime = old_value;
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupPgTable_sets == 0)
+			revert_isupPgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			break;
+		StorageTmp->isupPgReleasingWindowTime = StorageOld->isupPgReleasingWindowTime;
+		if (--StorageTmp->isupPgTable_rsvs == 0)
+			isupPgTable_destroy(&StorageTmp->isupPgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7275,12 +9628,14 @@ write_isupPgReleasingWindowTime(int action, u_char *var_val, u_char var_val_type
 int
 write_isupPgSwitchType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupPgTable_data *StorageTmp = NULL;
+	struct isupPgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupPgSwitchType entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupPgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7314,22 +9669,61 @@ write_isupPgSwitchType(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupPgSwitchType: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			if (StorageTmp->isupPgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupPgTable_old = isupPgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupPgTable_rsvs++;
+		StorageTmp->isupPgSwitchType = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupPgTable_tsts == 0)
+				if ((ret = check_isupPgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupPgSwitchType for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupPgSwitchType;
-		StorageTmp->isupPgSwitchType = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupPgTable_sets == 0)
+				if ((ret = update_isupPgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			isupPgTable_destroy(&StorageTmp->isupPgTable_old);
+			StorageTmp->isupPgTable_rsvs = 0;
+			StorageTmp->isupPgTable_tsts = 0;
+			StorageTmp->isupPgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupPgSwitchType = old_value;
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupPgTable_sets == 0)
+			revert_isupPgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			break;
+		StorageTmp->isupPgSwitchType = StorageOld->isupPgSwitchType;
+		if (--StorageTmp->isupPgTable_rsvs == 0)
+			isupPgTable_destroy(&StorageTmp->isupPgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7349,17 +9743,17 @@ write_isupPgSwitchType(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_isupPgProtectedUnits(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupPgTable_data *StorageTmp = NULL;
+	struct isupPgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupPgProtectedUnits entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupPgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupPgRowStatus) {
@@ -7382,33 +9776,73 @@ write_isupPgProtectedUnits(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupPgProtectedUnits: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			if (StorageTmp->isupPgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupPgTable_old = isupPgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupPgTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupPgProtectedUnits);
+		StorageTmp->isupPgProtectedUnits = string;
+		StorageTmp->isupPgProtectedUnitsLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupPgTable_tsts == 0)
+				if ((ret = check_isupPgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupPgProtectedUnits for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupPgProtectedUnits;
-		old_length = StorageTmp->isupPgProtectedUnitsLen;
-		StorageTmp->isupPgProtectedUnits = string;
-		StorageTmp->isupPgProtectedUnitsLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupPgTable_sets == 0)
+				if ((ret = update_isupPgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			isupPgTable_destroy(&StorageTmp->isupPgTable_old);
+			StorageTmp->isupPgTable_rsvs = 0;
+			StorageTmp->isupPgTable_tsts = 0;
+			StorageTmp->isupPgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupPgProtectedUnits = old_value;
-		StorageTmp->isupPgProtectedUnitsLen = old_length;
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupPgTable_sets == 0)
+			revert_isupPgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			break;
+		if (StorageOld->isupPgProtectedUnits != NULL) {
+			SNMP_FREE(StorageTmp->isupPgProtectedUnits);
+			StorageTmp->isupPgProtectedUnits = StorageOld->isupPgProtectedUnits;
+			StorageTmp->isupPgProtectedUnitsLen = StorageOld->isupPgProtectedUnitsLen;
+			StorageOld->isupPgProtectedUnits = NULL;
+			StorageOld->isupPgProtectedUnitsLen = 0;
+		}
+		if (--StorageTmp->isupPgTable_rsvs == 0)
+			isupPgTable_destroy(&StorageTmp->isupPgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7428,17 +9862,17 @@ write_isupPgProtectedUnits(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_isupPgProtectingUnits(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupPgTable_data *StorageTmp = NULL;
+	struct isupPgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupPgProtectingUnits entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupPgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupPgRowStatus) {
@@ -7461,33 +9895,73 @@ write_isupPgProtectingUnits(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupPgProtectingUnits: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			if (StorageTmp->isupPgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupPgTable_old = isupPgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupPgTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupPgProtectingUnits);
+		StorageTmp->isupPgProtectingUnits = string;
+		StorageTmp->isupPgProtectingUnitsLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupPgTable_tsts == 0)
+				if ((ret = check_isupPgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupPgProtectingUnits for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupPgProtectingUnits;
-		old_length = StorageTmp->isupPgProtectingUnitsLen;
-		StorageTmp->isupPgProtectingUnits = string;
-		StorageTmp->isupPgProtectingUnitsLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupPgTable_sets == 0)
+				if ((ret = update_isupPgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			isupPgTable_destroy(&StorageTmp->isupPgTable_old);
+			StorageTmp->isupPgTable_rsvs = 0;
+			StorageTmp->isupPgTable_tsts = 0;
+			StorageTmp->isupPgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupPgProtectingUnits = old_value;
-		StorageTmp->isupPgProtectingUnitsLen = old_length;
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupPgTable_sets == 0)
+			revert_isupPgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			break;
+		if (StorageOld->isupPgProtectingUnits != NULL) {
+			SNMP_FREE(StorageTmp->isupPgProtectingUnits);
+			StorageTmp->isupPgProtectingUnits = StorageOld->isupPgProtectingUnits;
+			StorageTmp->isupPgProtectingUnitsLen = StorageOld->isupPgProtectingUnitsLen;
+			StorageOld->isupPgProtectingUnits = NULL;
+			StorageOld->isupPgProtectingUnitsLen = 0;
+		}
+		if (--StorageTmp->isupPgTable_rsvs == 0)
+			isupPgTable_destroy(&StorageTmp->isupPgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7507,12 +9981,14 @@ write_isupPgProtectingUnits(int action, u_char *var_val, u_char var_val_type, si
 int
 write_isupPgInvokeProtection(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupPgTable_data *StorageTmp = NULL;
+	struct isupPgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupPgInvokeProtection entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupPgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7548,22 +10024,61 @@ write_isupPgInvokeProtection(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupPgInvokeProtection: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			if (StorageTmp->isupPgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupPgTable_old = isupPgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupPgTable_rsvs++;
+		StorageTmp->isupPgInvokeProtection = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupPgTable_tsts == 0)
+				if ((ret = check_isupPgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupPgInvokeProtection for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupPgInvokeProtection;
-		StorageTmp->isupPgInvokeProtection = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupPgTable_sets == 0)
+				if ((ret = update_isupPgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			isupPgTable_destroy(&StorageTmp->isupPgTable_old);
+			StorageTmp->isupPgTable_rsvs = 0;
+			StorageTmp->isupPgTable_tsts = 0;
+			StorageTmp->isupPgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupPgInvokeProtection = old_value;
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupPgTable_sets == 0)
+			revert_isupPgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			break;
+		StorageTmp->isupPgInvokeProtection = StorageOld->isupPgInvokeProtection;
+		if (--StorageTmp->isupPgTable_rsvs == 0)
+			isupPgTable_destroy(&StorageTmp->isupPgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7583,12 +10098,14 @@ write_isupPgInvokeProtection(int action, u_char *var_val, u_char var_val_type, s
 int
 write_isupPgReleaseProtection(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupPgTable_data *StorageTmp = NULL;
+	struct isupPgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupPgReleaseProtection entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupPgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7624,22 +10141,61 @@ write_isupPgReleaseProtection(int action, u_char *var_val, u_char var_val_type, 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupPgReleaseProtection: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			if (StorageTmp->isupPgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupPgTable_old = isupPgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupPgTable_rsvs++;
+		StorageTmp->isupPgReleaseProtection = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupPgTable_tsts == 0)
+				if ((ret = check_isupPgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupPgReleaseProtection for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupPgReleaseProtection;
-		StorageTmp->isupPgReleaseProtection = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupPgTable_sets == 0)
+				if ((ret = update_isupPgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+			isupPgTable_destroy(&StorageTmp->isupPgTable_old);
+			StorageTmp->isupPgTable_rsvs = 0;
+			StorageTmp->isupPgTable_tsts = 0;
+			StorageTmp->isupPgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupPgReleaseProtection = old_value;
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupPgTable_sets == 0)
+			revert_isupPgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+			break;
+		StorageTmp->isupPgReleaseProtection = StorageOld->isupPgReleaseProtection;
+		if (--StorageTmp->isupPgTable_rsvs == 0)
+			isupPgTable_destroy(&StorageTmp->isupPgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7659,12 +10215,14 @@ write_isupPgReleaseProtection(int action, u_char *var_val, u_char var_val_type, 
 int
 write_isupPuProtecting(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupPuTable_data *StorageTmp = NULL;
+	struct isupPuTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupPuProtecting entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupPuTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7697,22 +10255,61 @@ write_isupPuProtecting(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupPuProtecting: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			if (StorageTmp->isupPuTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupPuTable_old = isupPuTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupPuTable_rsvs++;
+		StorageTmp->isupPuProtecting = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupPuTable_tsts == 0)
+				if ((ret = check_isupPuTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPuTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupPuProtecting for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupPuProtecting;
-		StorageTmp->isupPuProtecting = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupPuTable_sets == 0)
+				if ((ret = update_isupPuTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPuTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			isupPuTable_destroy(&StorageTmp->isupPuTable_old);
+			StorageTmp->isupPuTable_rsvs = 0;
+			StorageTmp->isupPuTable_tsts = 0;
+			StorageTmp->isupPuTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupPuProtecting = old_value;
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupPuTable_sets == 0)
+			revert_isupPuTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			break;
+		StorageTmp->isupPuProtecting = StorageOld->isupPuProtecting;
+		if (--StorageTmp->isupPuTable_rsvs == 0)
+			isupPuTable_destroy(&StorageTmp->isupPuTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7732,17 +10329,17 @@ write_isupPuProtecting(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_isupPuReliableResourcePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct isupPuTable_data *StorageTmp = NULL;
+	struct isupPuTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupPuReliableResourcePointer entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupPuTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupPuRowStatus) {
@@ -7764,31 +10361,71 @@ write_isupPuReliableResourcePointer(int action, u_char *var_val, u_char var_val_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupPuReliableResourcePointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			if (StorageTmp->isupPuTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupPuTable_old = isupPuTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupPuTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->isupPuReliableResourcePointer);
+		StorageTmp->isupPuReliableResourcePointer = objid;
+		StorageTmp->isupPuReliableResourcePointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupPuTable_tsts == 0)
+				if ((ret = check_isupPuTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPuTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupPuReliableResourcePointer for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupPuReliableResourcePointer;
-		old_length = StorageTmp->isupPuReliableResourcePointerLen;
-		StorageTmp->isupPuReliableResourcePointer = objid;
-		StorageTmp->isupPuReliableResourcePointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupPuTable_sets == 0)
+				if ((ret = update_isupPuTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPuTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			isupPuTable_destroy(&StorageTmp->isupPuTable_old);
+			StorageTmp->isupPuTable_rsvs = 0;
+			StorageTmp->isupPuTable_tsts = 0;
+			StorageTmp->isupPuTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupPuReliableResourcePointer = old_value;
-		StorageTmp->isupPuReliableResourcePointerLen = old_length;
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupPuTable_sets == 0)
+			revert_isupPuTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			break;
+		if (StorageOld->isupPuReliableResourcePointer != NULL) {
+			SNMP_FREE(StorageTmp->isupPuReliableResourcePointer);
+			StorageTmp->isupPuReliableResourcePointer = StorageOld->isupPuReliableResourcePointer;
+			StorageTmp->isupPuReliableResourcePointerLen = StorageOld->isupPuReliableResourcePointerLen;
+			StorageOld->isupPuReliableResourcePointer = NULL;
+			StorageOld->isupPuReliableResourcePointerLen = 0;
+		}
+		if (--StorageTmp->isupPuTable_rsvs == 0)
+			isupPuTable_destroy(&StorageTmp->isupPuTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7808,17 +10445,17 @@ write_isupPuReliableResourcePointer(int action, u_char *var_val, u_char var_val_
 int
 write_isupPuUnreliableResourcePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct isupPuTable_data *StorageTmp = NULL;
+	struct isupPuTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupPuUnreliableResourcePointer entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupPuTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupPuRowStatus) {
@@ -7840,31 +10477,71 @@ write_isupPuUnreliableResourcePointer(int action, u_char *var_val, u_char var_va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupPuUnreliableResourcePointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			if (StorageTmp->isupPuTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupPuTable_old = isupPuTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupPuTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->isupPuUnreliableResourcePointer);
+		StorageTmp->isupPuUnreliableResourcePointer = objid;
+		StorageTmp->isupPuUnreliableResourcePointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupPuTable_tsts == 0)
+				if ((ret = check_isupPuTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPuTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupPuUnreliableResourcePointer for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupPuUnreliableResourcePointer;
-		old_length = StorageTmp->isupPuUnreliableResourcePointerLen;
-		StorageTmp->isupPuUnreliableResourcePointer = objid;
-		StorageTmp->isupPuUnreliableResourcePointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupPuTable_sets == 0)
+				if ((ret = update_isupPuTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPuTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			isupPuTable_destroy(&StorageTmp->isupPuTable_old);
+			StorageTmp->isupPuTable_rsvs = 0;
+			StorageTmp->isupPuTable_tsts = 0;
+			StorageTmp->isupPuTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupPuUnreliableResourcePointer = old_value;
-		StorageTmp->isupPuUnreliableResourcePointerLen = old_length;
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupPuTable_sets == 0)
+			revert_isupPuTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			break;
+		if (StorageOld->isupPuUnreliableResourcePointer != NULL) {
+			SNMP_FREE(StorageTmp->isupPuUnreliableResourcePointer);
+			StorageTmp->isupPuUnreliableResourcePointer = StorageOld->isupPuUnreliableResourcePointer;
+			StorageTmp->isupPuUnreliableResourcePointerLen = StorageOld->isupPuUnreliableResourcePointerLen;
+			StorageOld->isupPuUnreliableResourcePointer = NULL;
+			StorageOld->isupPuUnreliableResourcePointerLen = 0;
+		}
+		if (--StorageTmp->isupPuTable_rsvs == 0)
+			isupPuTable_destroy(&StorageTmp->isupPuTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7884,17 +10561,17 @@ write_isupPuUnreliableResourcePointer(int action, u_char *var_val, u_char var_va
 int
 write_isupPuProtectionStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupPuTable_data *StorageTmp = NULL;
+	struct isupPuTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupPuProtectionStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupPuTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupPuRowStatus) {
@@ -7924,33 +10601,73 @@ write_isupPuProtectionStatus(int action, u_char *var_val, u_char var_val_type, s
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			if (StorageTmp->isupPuTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupPuTable_old = isupPuTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupPuTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupPuProtectionStatus);
+		StorageTmp->isupPuProtectionStatus = string;
+		StorageTmp->isupPuProtectionStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupPuTable_tsts == 0)
+				if ((ret = check_isupPuTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPuTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupPuProtectionStatus for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupPuProtectionStatus;
-		old_length = StorageTmp->isupPuProtectionStatusLen;
-		StorageTmp->isupPuProtectionStatus = string;
-		StorageTmp->isupPuProtectionStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupPuTable_sets == 0)
+				if ((ret = update_isupPuTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPuTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			isupPuTable_destroy(&StorageTmp->isupPuTable_old);
+			StorageTmp->isupPuTable_rsvs = 0;
+			StorageTmp->isupPuTable_tsts = 0;
+			StorageTmp->isupPuTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupPuProtectionStatus = old_value;
-		StorageTmp->isupPuProtectionStatusLen = old_length;
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupPuTable_sets == 0)
+			revert_isupPuTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			break;
+		if (StorageOld->isupPuProtectionStatus != NULL) {
+			SNMP_FREE(StorageTmp->isupPuProtectionStatus);
+			StorageTmp->isupPuProtectionStatus = StorageOld->isupPuProtectionStatus;
+			StorageTmp->isupPuProtectionStatusLen = StorageOld->isupPuProtectionStatusLen;
+			StorageOld->isupPuProtectionStatus = NULL;
+			StorageOld->isupPuProtectionStatusLen = 0;
+		}
+		if (--StorageTmp->isupPuTable_rsvs == 0)
+			isupPuTable_destroy(&StorageTmp->isupPuTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7970,12 +10687,14 @@ write_isupPuProtectionStatus(int action, u_char *var_val, u_char var_val_type, s
 int
 write_isupPuSwitchStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupPuTable_data *StorageTmp = NULL;
+	struct isupPuTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupPuSwitchStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupPuTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8009,22 +10728,61 @@ write_isupPuSwitchStatus(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupPuSwitchStatus: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			if (StorageTmp->isupPuTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupPuTable_old = isupPuTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupPuTable_rsvs++;
+		StorageTmp->isupPuSwitchStatus = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupPuTable_tsts == 0)
+				if ((ret = check_isupPuTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPuTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupPuSwitchStatus for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupPuSwitchStatus;
-		StorageTmp->isupPuSwitchStatus = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupPuTable_sets == 0)
+				if ((ret = update_isupPuTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPuTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			isupPuTable_destroy(&StorageTmp->isupPuTable_old);
+			StorageTmp->isupPuTable_rsvs = 0;
+			StorageTmp->isupPuTable_tsts = 0;
+			StorageTmp->isupPuTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupPuSwitchStatus = old_value;
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupPuTable_sets == 0)
+			revert_isupPuTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			break;
+		StorageTmp->isupPuSwitchStatus = StorageOld->isupPuSwitchStatus;
+		if (--StorageTmp->isupPuTable_rsvs == 0)
+			isupPuTable_destroy(&StorageTmp->isupPuTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8044,12 +10802,14 @@ write_isupPuSwitchStatus(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_isupPuFromProtectionUnitNumber(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct isupPuTable_data *StorageTmp = NULL;
+	struct isupPuTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupPuFromProtectionUnitNumber entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupPuTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8074,22 +10834,61 @@ write_isupPuFromProtectionUnitNumber(int action, u_char *var_val, u_char var_val
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupPuFromProtectionUnitNumber: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			if (StorageTmp->isupPuTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupPuTable_old = isupPuTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupPuTable_rsvs++;
+		StorageTmp->isupPuFromProtectionUnitNumber = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupPuTable_tsts == 0)
+				if ((ret = check_isupPuTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPuTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupPuFromProtectionUnitNumber for you to use, and you have just been asked to do something with it.  Note that anything 
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupPuFromProtectionUnitNumber;
-		StorageTmp->isupPuFromProtectionUnitNumber = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupPuTable_sets == 0)
+				if ((ret = update_isupPuTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPuTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			isupPuTable_destroy(&StorageTmp->isupPuTable_old);
+			StorageTmp->isupPuTable_rsvs = 0;
+			StorageTmp->isupPuTable_tsts = 0;
+			StorageTmp->isupPuTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupPuFromProtectionUnitNumber = old_value;
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupPuTable_sets == 0)
+			revert_isupPuTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			break;
+		StorageTmp->isupPuFromProtectionUnitNumber = StorageOld->isupPuFromProtectionUnitNumber;
+		if (--StorageTmp->isupPuTable_rsvs == 0)
+			isupPuTable_destroy(&StorageTmp->isupPuTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8109,12 +10908,14 @@ write_isupPuFromProtectionUnitNumber(int action, u_char *var_val, u_char var_val
 int
 write_isupPuToProtectionUnitNumber(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct isupPuTable_data *StorageTmp = NULL;
+	struct isupPuTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupPuToProtectionUnitNumber entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupPuTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8139,22 +10940,61 @@ write_isupPuToProtectionUnitNumber(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupPuToProtectionUnitNumber: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			if (StorageTmp->isupPuTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupPuTable_old = isupPuTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupPuTable_rsvs++;
+		StorageTmp->isupPuToProtectionUnitNumber = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupPuTable_tsts == 0)
+				if ((ret = check_isupPuTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPuTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupPuToProtectionUnitNumber for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupPuToProtectionUnitNumber;
-		StorageTmp->isupPuToProtectionUnitNumber = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupPuTable_sets == 0)
+				if ((ret = update_isupPuTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPuTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			isupPuTable_destroy(&StorageTmp->isupPuTable_old);
+			StorageTmp->isupPuTable_rsvs = 0;
+			StorageTmp->isupPuTable_tsts = 0;
+			StorageTmp->isupPuTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupPuToProtectionUnitNumber = old_value;
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupPuTable_sets == 0)
+			revert_isupPuTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			break;
+		StorageTmp->isupPuToProtectionUnitNumber = StorageOld->isupPuToProtectionUnitNumber;
+		if (--StorageTmp->isupPuTable_rsvs == 0)
+			isupPuTable_destroy(&StorageTmp->isupPuTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8174,12 +11014,14 @@ write_isupPuToProtectionUnitNumber(int action, u_char *var_val, u_char var_val_t
 int
 write_isupPuAutoSwitchReason(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupPuTable_data *StorageTmp = NULL;
+	struct isupPuTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupPuAutoSwitchReason entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupPuTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8213,22 +11055,61 @@ write_isupPuAutoSwitchReason(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupPuAutoSwitchReason: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			if (StorageTmp->isupPuTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupPuTable_old = isupPuTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupPuTable_rsvs++;
+		StorageTmp->isupPuAutoSwitchReason = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupPuTable_tsts == 0)
+				if ((ret = check_isupPuTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPuTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupPuAutoSwitchReason for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupPuAutoSwitchReason;
-		StorageTmp->isupPuAutoSwitchReason = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupPuTable_sets == 0)
+				if ((ret = update_isupPuTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPuTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			isupPuTable_destroy(&StorageTmp->isupPuTable_old);
+			StorageTmp->isupPuTable_rsvs = 0;
+			StorageTmp->isupPuTable_tsts = 0;
+			StorageTmp->isupPuTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupPuAutoSwitchReason = old_value;
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupPuTable_sets == 0)
+			revert_isupPuTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			break;
+		StorageTmp->isupPuAutoSwitchReason = StorageOld->isupPuAutoSwitchReason;
+		if (--StorageTmp->isupPuTable_rsvs == 0)
+			isupPuTable_destroy(&StorageTmp->isupPuTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8248,12 +11129,14 @@ write_isupPuAutoSwitchReason(int action, u_char *var_val, u_char var_val_type, s
 int
 write_isupPuLockoutReleaseFailed(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupPuTable_data *StorageTmp = NULL;
+	struct isupPuTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupPuLockoutReleaseFailed entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupPuTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8286,22 +11169,61 @@ write_isupPuLockoutReleaseFailed(int action, u_char *var_val, u_char var_val_typ
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupPuLockoutReleaseFailed: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			if (StorageTmp->isupPuTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupPuTable_old = isupPuTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupPuTable_rsvs++;
+		StorageTmp->isupPuLockoutReleaseFailed = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupPuTable_tsts == 0)
+				if ((ret = check_isupPuTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPuTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupPuLockoutReleaseFailed for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupPuLockoutReleaseFailed;
-		StorageTmp->isupPuLockoutReleaseFailed = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupPuTable_sets == 0)
+				if ((ret = update_isupPuTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPuTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			isupPuTable_destroy(&StorageTmp->isupPuTable_old);
+			StorageTmp->isupPuTable_rsvs = 0;
+			StorageTmp->isupPuTable_tsts = 0;
+			StorageTmp->isupPuTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupPuLockoutReleaseFailed = old_value;
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupPuTable_sets == 0)
+			revert_isupPuTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			break;
+		StorageTmp->isupPuLockoutReleaseFailed = StorageOld->isupPuLockoutReleaseFailed;
+		if (--StorageTmp->isupPuTable_rsvs == 0)
+			isupPuTable_destroy(&StorageTmp->isupPuTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8321,12 +11243,14 @@ write_isupPuLockoutReleaseFailed(int action, u_char *var_val, u_char var_val_typ
 int
 write_isupPuPriority(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct isupPuTable_data *StorageTmp = NULL;
+	struct isupPuTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupPuPriority entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupPuTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8351,22 +11275,61 @@ write_isupPuPriority(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupPuPriority: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			if (StorageTmp->isupPuTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupPuTable_old = isupPuTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupPuTable_rsvs++;
+		StorageTmp->isupPuPriority = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupPuTable_tsts == 0)
+				if ((ret = check_isupPuTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPuTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupPuPriority for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupPuPriority;
-		StorageTmp->isupPuPriority = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupPuTable_sets == 0)
+				if ((ret = update_isupPuTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupPuTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+			isupPuTable_destroy(&StorageTmp->isupPuTable_old);
+			StorageTmp->isupPuTable_rsvs = 0;
+			StorageTmp->isupPuTable_tsts = 0;
+			StorageTmp->isupPuTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupPuPriority = old_value;
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupPuTable_sets == 0)
+			revert_isupPuTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+			break;
+		StorageTmp->isupPuPriority = StorageOld->isupPuPriority;
+		if (--StorageTmp->isupPuTable_rsvs == 0)
+			isupPuTable_destroy(&StorageTmp->isupPuTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8386,12 +11349,14 @@ write_isupPuPriority(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_isupLgAdministrativeState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupLgTable_data *StorageTmp = NULL;
+	struct isupLgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupLgAdministrativeState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupLgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8425,22 +11390,61 @@ write_isupLgAdministrativeState(int action, u_char *var_val, u_char var_val_type
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupLgAdministrativeState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupLgTable_old) == NULL)
+			if (StorageTmp->isupLgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupLgTable_old = isupLgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupLgTable_rsvs++;
+		StorageTmp->isupLgAdministrativeState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupLgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupLgTable_tsts == 0)
+				if ((ret = check_isupLgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupLgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupLgAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything done 
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupLgAdministrativeState;
-		StorageTmp->isupLgAdministrativeState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupLgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupLgTable_sets == 0)
+				if ((ret = update_isupLgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupLgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupLgTable_old) != NULL) {
+			isupLgTable_destroy(&StorageTmp->isupLgTable_old);
+			StorageTmp->isupLgTable_rsvs = 0;
+			StorageTmp->isupLgTable_tsts = 0;
+			StorageTmp->isupLgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupLgAdministrativeState = old_value;
+		if ((StorageOld = StorageTmp->isupLgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupLgTable_sets == 0)
+			revert_isupLgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupLgTable_old) == NULL)
+			break;
+		StorageTmp->isupLgAdministrativeState = StorageOld->isupLgAdministrativeState;
+		if (--StorageTmp->isupLgTable_rsvs == 0)
+			isupLgTable_destroy(&StorageTmp->isupLgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8460,17 +11464,17 @@ write_isupLgAdministrativeState(int action, u_char *var_val, u_char var_val_type
 int
 write_isupLgSnServiceProvider(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct isupLgTable_data *StorageTmp = NULL;
+	struct isupLgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupLgSnServiceProvider entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupLgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupLgRowStatus) {
@@ -8492,31 +11496,71 @@ write_isupLgSnServiceProvider(int action, u_char *var_val, u_char var_val_type, 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupLgSnServiceProvider: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupLgTable_old) == NULL)
+			if (StorageTmp->isupLgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupLgTable_old = isupLgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupLgTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->isupLgSnServiceProvider);
+		StorageTmp->isupLgSnServiceProvider = objid;
+		StorageTmp->isupLgSnServiceProviderLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupLgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupLgTable_tsts == 0)
+				if ((ret = check_isupLgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupLgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupLgSnServiceProvider for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupLgSnServiceProvider;
-		old_length = StorageTmp->isupLgSnServiceProviderLen;
-		StorageTmp->isupLgSnServiceProvider = objid;
-		StorageTmp->isupLgSnServiceProviderLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupLgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupLgTable_sets == 0)
+				if ((ret = update_isupLgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupLgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupLgTable_old) != NULL) {
+			isupLgTable_destroy(&StorageTmp->isupLgTable_old);
+			StorageTmp->isupLgTable_rsvs = 0;
+			StorageTmp->isupLgTable_tsts = 0;
+			StorageTmp->isupLgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupLgSnServiceProvider = old_value;
-		StorageTmp->isupLgSnServiceProviderLen = old_length;
+		if ((StorageOld = StorageTmp->isupLgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupLgTable_sets == 0)
+			revert_isupLgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->isupLgTable_old) == NULL)
+			break;
+		if (StorageOld->isupLgSnServiceProvider != NULL) {
+			SNMP_FREE(StorageTmp->isupLgSnServiceProvider);
+			StorageTmp->isupLgSnServiceProvider = StorageOld->isupLgSnServiceProvider;
+			StorageTmp->isupLgSnServiceProviderLen = StorageOld->isupLgSnServiceProviderLen;
+			StorageOld->isupLgSnServiceProvider = NULL;
+			StorageOld->isupLgSnServiceProviderLen = 0;
+		}
+		if (--StorageTmp->isupLgTable_rsvs == 0)
+			isupLgTable_destroy(&StorageTmp->isupLgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8536,17 +11580,17 @@ write_isupLgSnServiceProvider(int action, u_char *var_val, u_char var_val_type, 
 int
 write_isupLgSnSap(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct isupLgTable_data *StorageTmp = NULL;
+	struct isupLgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupLgSnSap entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupLgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupLgRowStatus) {
@@ -8568,31 +11612,71 @@ write_isupLgSnSap(int action, u_char *var_val, u_char var_val_type, size_t var_v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupLgSnSap: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupLgTable_old) == NULL)
+			if (StorageTmp->isupLgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupLgTable_old = isupLgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupLgTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->isupLgSnSap);
+		StorageTmp->isupLgSnSap = objid;
+		StorageTmp->isupLgSnSapLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupLgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupLgTable_tsts == 0)
+				if ((ret = check_isupLgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupLgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupLgSnSap for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupLgSnSap;
-		old_length = StorageTmp->isupLgSnSapLen;
-		StorageTmp->isupLgSnSap = objid;
-		StorageTmp->isupLgSnSapLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupLgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupLgTable_sets == 0)
+				if ((ret = update_isupLgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupLgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupLgTable_old) != NULL) {
+			isupLgTable_destroy(&StorageTmp->isupLgTable_old);
+			StorageTmp->isupLgTable_rsvs = 0;
+			StorageTmp->isupLgTable_tsts = 0;
+			StorageTmp->isupLgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupLgSnSap = old_value;
-		StorageTmp->isupLgSnSapLen = old_length;
+		if ((StorageOld = StorageTmp->isupLgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupLgTable_sets == 0)
+			revert_isupLgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->isupLgTable_old) == NULL)
+			break;
+		if (StorageOld->isupLgSnSap != NULL) {
+			SNMP_FREE(StorageTmp->isupLgSnSap);
+			StorageTmp->isupLgSnSap = StorageOld->isupLgSnSap;
+			StorageTmp->isupLgSnSapLen = StorageOld->isupLgSnSapLen;
+			StorageOld->isupLgSnSap = NULL;
+			StorageOld->isupLgSnSapLen = 0;
+		}
+		if (--StorageTmp->isupLgTable_rsvs == 0)
+			isupLgTable_destroy(&StorageTmp->isupLgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8612,17 +11696,17 @@ write_isupLgSnSap(int action, u_char *var_val, u_char var_val_type, size_t var_v
 int
 write_isupLgOperationalProtocols(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupLgTable_data *StorageTmp = NULL;
+	struct isupLgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupLgOperationalProtocols entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupLgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupLgRowStatus) {
@@ -8652,33 +11736,73 @@ write_isupLgOperationalProtocols(int action, u_char *var_val, u_char var_val_typ
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupLgTable_old) == NULL)
+			if (StorageTmp->isupLgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupLgTable_old = isupLgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupLgTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupLgOperationalProtocols);
+		StorageTmp->isupLgOperationalProtocols = string;
+		StorageTmp->isupLgOperationalProtocolsLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupLgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupLgTable_tsts == 0)
+				if ((ret = check_isupLgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupLgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupLgOperationalProtocols for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupLgOperationalProtocols;
-		old_length = StorageTmp->isupLgOperationalProtocolsLen;
-		StorageTmp->isupLgOperationalProtocols = string;
-		StorageTmp->isupLgOperationalProtocolsLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupLgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupLgTable_sets == 0)
+				if ((ret = update_isupLgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupLgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupLgTable_old) != NULL) {
+			isupLgTable_destroy(&StorageTmp->isupLgTable_old);
+			StorageTmp->isupLgTable_rsvs = 0;
+			StorageTmp->isupLgTable_tsts = 0;
+			StorageTmp->isupLgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupLgOperationalProtocols = old_value;
-		StorageTmp->isupLgOperationalProtocolsLen = old_length;
+		if ((StorageOld = StorageTmp->isupLgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupLgTable_sets == 0)
+			revert_isupLgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupLgTable_old) == NULL)
+			break;
+		if (StorageOld->isupLgOperationalProtocols != NULL) {
+			SNMP_FREE(StorageTmp->isupLgOperationalProtocols);
+			StorageTmp->isupLgOperationalProtocols = StorageOld->isupLgOperationalProtocols;
+			StorageTmp->isupLgOperationalProtocolsLen = StorageOld->isupLgOperationalProtocolsLen;
+			StorageOld->isupLgOperationalProtocols = NULL;
+			StorageOld->isupLgOperationalProtocolsLen = 0;
+		}
+		if (--StorageTmp->isupLgTable_rsvs == 0)
+			isupLgTable_destroy(&StorageTmp->isupLgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8698,17 +11822,17 @@ write_isupLgOperationalProtocols(int action, u_char *var_val, u_char var_val_typ
 int
 write_isupLgOperationalSubsets(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupLgTable_data *StorageTmp = NULL;
+	struct isupLgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupLgOperationalSubsets entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupLgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupLgRowStatus) {
@@ -8738,33 +11862,73 @@ write_isupLgOperationalSubsets(int action, u_char *var_val, u_char var_val_type,
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupLgTable_old) == NULL)
+			if (StorageTmp->isupLgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupLgTable_old = isupLgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupLgTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupLgOperationalSubsets);
+		StorageTmp->isupLgOperationalSubsets = string;
+		StorageTmp->isupLgOperationalSubsetsLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupLgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupLgTable_tsts == 0)
+				if ((ret = check_isupLgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupLgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupLgOperationalSubsets for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupLgOperationalSubsets;
-		old_length = StorageTmp->isupLgOperationalSubsetsLen;
-		StorageTmp->isupLgOperationalSubsets = string;
-		StorageTmp->isupLgOperationalSubsetsLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupLgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupLgTable_sets == 0)
+				if ((ret = update_isupLgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupLgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupLgTable_old) != NULL) {
+			isupLgTable_destroy(&StorageTmp->isupLgTable_old);
+			StorageTmp->isupLgTable_rsvs = 0;
+			StorageTmp->isupLgTable_tsts = 0;
+			StorageTmp->isupLgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupLgOperationalSubsets = old_value;
-		StorageTmp->isupLgOperationalSubsetsLen = old_length;
+		if ((StorageOld = StorageTmp->isupLgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupLgTable_sets == 0)
+			revert_isupLgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupLgTable_old) == NULL)
+			break;
+		if (StorageOld->isupLgOperationalSubsets != NULL) {
+			SNMP_FREE(StorageTmp->isupLgOperationalSubsets);
+			StorageTmp->isupLgOperationalSubsets = StorageOld->isupLgOperationalSubsets;
+			StorageTmp->isupLgOperationalSubsetsLen = StorageOld->isupLgOperationalSubsetsLen;
+			StorageOld->isupLgOperationalSubsets = NULL;
+			StorageOld->isupLgOperationalSubsetsLen = 0;
+		}
+		if (--StorageTmp->isupLgTable_rsvs == 0)
+			isupLgTable_destroy(&StorageTmp->isupLgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8784,12 +11948,14 @@ write_isupLgOperationalSubsets(int action, u_char *var_val, u_char var_val_type,
 int
 write_isupMtpUserPart(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupMtpTable_data *StorageTmp = NULL;
+	struct isupMtpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupMtpUserPart entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupMtpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8836,22 +12002,61 @@ write_isupMtpUserPart(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupMtpUserPart: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupMtpTable_old) == NULL)
+			if (StorageTmp->isupMtpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupMtpTable_old = isupMtpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupMtpTable_rsvs++;
+		StorageTmp->isupMtpUserPart = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupMtpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupMtpTable_tsts == 0)
+				if ((ret = check_isupMtpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupMtpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupMtpUserPart for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupMtpUserPart;
-		StorageTmp->isupMtpUserPart = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupMtpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupMtpTable_sets == 0)
+				if ((ret = update_isupMtpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupMtpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupMtpTable_old) != NULL) {
+			isupMtpTable_destroy(&StorageTmp->isupMtpTable_old);
+			StorageTmp->isupMtpTable_rsvs = 0;
+			StorageTmp->isupMtpTable_tsts = 0;
+			StorageTmp->isupMtpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupMtpUserPart = old_value;
+		if ((StorageOld = StorageTmp->isupMtpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupMtpTable_sets == 0)
+			revert_isupMtpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupMtpTable_old) == NULL)
+			break;
+		StorageTmp->isupMtpUserPart = StorageOld->isupMtpUserPart;
+		if (--StorageTmp->isupMtpTable_rsvs == 0)
+			isupMtpTable_destroy(&StorageTmp->isupMtpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8871,12 +12076,14 @@ write_isupMtpUserPart(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_isupMtpUserPartStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupMtpTable_data *StorageTmp = NULL;
+	struct isupMtpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupMtpUserPartStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupMtpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8910,22 +12117,61 @@ write_isupMtpUserPartStatus(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupMtpUserPartStatus: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupMtpTable_old) == NULL)
+			if (StorageTmp->isupMtpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupMtpTable_old = isupMtpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupMtpTable_rsvs++;
+		StorageTmp->isupMtpUserPartStatus = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupMtpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupMtpTable_tsts == 0)
+				if ((ret = check_isupMtpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupMtpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupMtpUserPartStatus for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupMtpUserPartStatus;
-		StorageTmp->isupMtpUserPartStatus = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupMtpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupMtpTable_sets == 0)
+				if ((ret = update_isupMtpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupMtpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupMtpTable_old) != NULL) {
+			isupMtpTable_destroy(&StorageTmp->isupMtpTable_old);
+			StorageTmp->isupMtpTable_rsvs = 0;
+			StorageTmp->isupMtpTable_tsts = 0;
+			StorageTmp->isupMtpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupMtpUserPartStatus = old_value;
+		if ((StorageOld = StorageTmp->isupMtpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupMtpTable_sets == 0)
+			revert_isupMtpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupMtpTable_old) == NULL)
+			break;
+		StorageTmp->isupMtpUserPartStatus = StorageOld->isupMtpUserPartStatus;
+		if (--StorageTmp->isupMtpTable_rsvs == 0)
+			isupMtpTable_destroy(&StorageTmp->isupMtpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8945,17 +12191,17 @@ write_isupMtpUserPartStatus(int action, u_char *var_val, u_char var_val_type, si
 int
 write_isupMtpProviderEntityNames(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct isupMtpTable_data *StorageTmp = NULL;
+	struct isupMtpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupMtpProviderEntityNames entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupMtpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupMtpRowStatus) {
@@ -8977,31 +12223,71 @@ write_isupMtpProviderEntityNames(int action, u_char *var_val, u_char var_val_typ
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupMtpProviderEntityNames: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupMtpTable_old) == NULL)
+			if (StorageTmp->isupMtpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupMtpTable_old = isupMtpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupMtpTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->isupMtpProviderEntityNames);
+		StorageTmp->isupMtpProviderEntityNames = objid;
+		StorageTmp->isupMtpProviderEntityNamesLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupMtpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupMtpTable_tsts == 0)
+				if ((ret = check_isupMtpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupMtpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupMtpProviderEntityNames for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupMtpProviderEntityNames;
-		old_length = StorageTmp->isupMtpProviderEntityNamesLen;
-		StorageTmp->isupMtpProviderEntityNames = objid;
-		StorageTmp->isupMtpProviderEntityNamesLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupMtpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupMtpTable_sets == 0)
+				if ((ret = update_isupMtpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupMtpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupMtpTable_old) != NULL) {
+			isupMtpTable_destroy(&StorageTmp->isupMtpTable_old);
+			StorageTmp->isupMtpTable_rsvs = 0;
+			StorageTmp->isupMtpTable_tsts = 0;
+			StorageTmp->isupMtpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupMtpProviderEntityNames = old_value;
-		StorageTmp->isupMtpProviderEntityNamesLen = old_length;
+		if ((StorageOld = StorageTmp->isupMtpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupMtpTable_sets == 0)
+			revert_isupMtpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->isupMtpTable_old) == NULL)
+			break;
+		if (StorageOld->isupMtpProviderEntityNames != NULL) {
+			SNMP_FREE(StorageTmp->isupMtpProviderEntityNames);
+			StorageTmp->isupMtpProviderEntityNames = StorageOld->isupMtpProviderEntityNames;
+			StorageTmp->isupMtpProviderEntityNamesLen = StorageOld->isupMtpProviderEntityNamesLen;
+			StorageOld->isupMtpProviderEntityNames = NULL;
+			StorageOld->isupMtpProviderEntityNamesLen = 0;
+		}
+		if (--StorageTmp->isupMtpTable_rsvs == 0)
+			isupMtpTable_destroy(&StorageTmp->isupMtpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9021,17 +12307,17 @@ write_isupMtpProviderEntityNames(int action, u_char *var_val, u_char var_val_typ
 int
 write_isupMtpAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct isupMtpTable_data *StorageTmp = NULL;
+	struct isupMtpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupMtpAsaProfilePointer entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupMtpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupMtpRowStatus) {
@@ -9054,31 +12340,71 @@ write_isupMtpAsaProfilePointer(int action, u_char *var_val, u_char var_val_type,
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value zeroDotZero */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupMtpTable_old) == NULL)
+			if (StorageTmp->isupMtpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupMtpTable_old = isupMtpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupMtpTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->isupMtpAsaProfilePointer);
+		StorageTmp->isupMtpAsaProfilePointer = objid;
+		StorageTmp->isupMtpAsaProfilePointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupMtpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupMtpTable_tsts == 0)
+				if ((ret = check_isupMtpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupMtpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupMtpAsaProfilePointer for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupMtpAsaProfilePointer;
-		old_length = StorageTmp->isupMtpAsaProfilePointerLen;
-		StorageTmp->isupMtpAsaProfilePointer = objid;
-		StorageTmp->isupMtpAsaProfilePointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupMtpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupMtpTable_sets == 0)
+				if ((ret = update_isupMtpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupMtpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupMtpTable_old) != NULL) {
+			isupMtpTable_destroy(&StorageTmp->isupMtpTable_old);
+			StorageTmp->isupMtpTable_rsvs = 0;
+			StorageTmp->isupMtpTable_tsts = 0;
+			StorageTmp->isupMtpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupMtpAsaProfilePointer = old_value;
-		StorageTmp->isupMtpAsaProfilePointerLen = old_length;
+		if ((StorageOld = StorageTmp->isupMtpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupMtpTable_sets == 0)
+			revert_isupMtpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->isupMtpTable_old) == NULL)
+			break;
+		if (StorageOld->isupMtpAsaProfilePointer != NULL) {
+			SNMP_FREE(StorageTmp->isupMtpAsaProfilePointer);
+			StorageTmp->isupMtpAsaProfilePointer = StorageOld->isupMtpAsaProfilePointer;
+			StorageTmp->isupMtpAsaProfilePointerLen = StorageOld->isupMtpAsaProfilePointerLen;
+			StorageOld->isupMtpAsaProfilePointer = NULL;
+			StorageOld->isupMtpAsaProfilePointerLen = 0;
+		}
+		if (--StorageTmp->isupMtpTable_rsvs == 0)
+			isupMtpTable_destroy(&StorageTmp->isupMtpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9098,17 +12424,17 @@ write_isupMtpAsaProfilePointer(int action, u_char *var_val, u_char var_val_type,
 int
 write_isupMtpName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupMtpTable_data *StorageTmp = NULL;
+	struct isupMtpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupMtpName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupMtpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupMtpRowStatus) {
@@ -9131,33 +12457,73 @@ write_isupMtpName(int action, u_char *var_val, u_char var_val_type, size_t var_v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupMtpName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupMtpTable_old) == NULL)
+			if (StorageTmp->isupMtpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupMtpTable_old = isupMtpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupMtpTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupMtpName);
+		StorageTmp->isupMtpName = string;
+		StorageTmp->isupMtpNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupMtpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupMtpTable_tsts == 0)
+				if ((ret = check_isupMtpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupMtpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupMtpName for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupMtpName;
-		old_length = StorageTmp->isupMtpNameLen;
-		StorageTmp->isupMtpName = string;
-		StorageTmp->isupMtpNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupMtpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupMtpTable_sets == 0)
+				if ((ret = update_isupMtpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupMtpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupMtpTable_old) != NULL) {
+			isupMtpTable_destroy(&StorageTmp->isupMtpTable_old);
+			StorageTmp->isupMtpTable_rsvs = 0;
+			StorageTmp->isupMtpTable_tsts = 0;
+			StorageTmp->isupMtpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupMtpName = old_value;
-		StorageTmp->isupMtpNameLen = old_length;
+		if ((StorageOld = StorageTmp->isupMtpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupMtpTable_sets == 0)
+			revert_isupMtpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupMtpTable_old) == NULL)
+			break;
+		if (StorageOld->isupMtpName != NULL) {
+			SNMP_FREE(StorageTmp->isupMtpName);
+			StorageTmp->isupMtpName = StorageOld->isupMtpName;
+			StorageTmp->isupMtpNameLen = StorageOld->isupMtpNameLen;
+			StorageOld->isupMtpName = NULL;
+			StorageOld->isupMtpNameLen = 0;
+		}
+		if (--StorageTmp->isupMtpTable_rsvs == 0)
+			isupMtpTable_destroy(&StorageTmp->isupMtpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9177,12 +12543,14 @@ write_isupMtpName(int action, u_char *var_val, u_char var_val_type, size_t var_v
 int
 write_isupMtpLongMessageSupported(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupMtpTable_data *StorageTmp = NULL;
+	struct isupMtpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupMtpLongMessageSupported entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupMtpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9215,22 +12583,61 @@ write_isupMtpLongMessageSupported(int action, u_char *var_val, u_char var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupMtpLongMessageSupported: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupMtpTable_old) == NULL)
+			if (StorageTmp->isupMtpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupMtpTable_old = isupMtpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupMtpTable_rsvs++;
+		StorageTmp->isupMtpLongMessageSupported = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupMtpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupMtpTable_tsts == 0)
+				if ((ret = check_isupMtpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupMtpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupMtpLongMessageSupported for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupMtpLongMessageSupported;
-		StorageTmp->isupMtpLongMessageSupported = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupMtpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupMtpTable_sets == 0)
+				if ((ret = update_isupMtpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupMtpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupMtpTable_old) != NULL) {
+			isupMtpTable_destroy(&StorageTmp->isupMtpTable_old);
+			StorageTmp->isupMtpTable_rsvs = 0;
+			StorageTmp->isupMtpTable_tsts = 0;
+			StorageTmp->isupMtpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupMtpLongMessageSupported = old_value;
+		if ((StorageOld = StorageTmp->isupMtpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupMtpTable_sets == 0)
+			revert_isupMtpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupMtpTable_old) == NULL)
+			break;
+		StorageTmp->isupMtpLongMessageSupported = StorageOld->isupMtpLongMessageSupported;
+		if (--StorageTmp->isupMtpTable_rsvs == 0)
+			isupMtpTable_destroy(&StorageTmp->isupMtpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9250,17 +12657,17 @@ write_isupMtpLongMessageSupported(int action, u_char *var_val, u_char var_val_ty
 int
 write_isupNaProtocolVariant(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct isupNaTable_data *StorageTmp = NULL;
+	struct isupNaTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupNaProtocolVariant entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupNaTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupNaRowStatus) {
@@ -9283,31 +12690,71 @@ write_isupNaProtocolVariant(int action, u_char *var_val, u_char var_val_type, si
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value ss7ProtocolItut */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupNaTable_old) == NULL)
+			if (StorageTmp->isupNaTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupNaTable_old = isupNaTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupNaTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->isupNaProtocolVariant);
+		StorageTmp->isupNaProtocolVariant = objid;
+		StorageTmp->isupNaProtocolVariantLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupNaTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupNaTable_tsts == 0)
+				if ((ret = check_isupNaTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupNaTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupNaProtocolVariant for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupNaProtocolVariant;
-		old_length = StorageTmp->isupNaProtocolVariantLen;
-		StorageTmp->isupNaProtocolVariant = objid;
-		StorageTmp->isupNaProtocolVariantLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupNaTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupNaTable_sets == 0)
+				if ((ret = update_isupNaTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupNaTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupNaTable_old) != NULL) {
+			isupNaTable_destroy(&StorageTmp->isupNaTable_old);
+			StorageTmp->isupNaTable_rsvs = 0;
+			StorageTmp->isupNaTable_tsts = 0;
+			StorageTmp->isupNaTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupNaProtocolVariant = old_value;
-		StorageTmp->isupNaProtocolVariantLen = old_length;
+		if ((StorageOld = StorageTmp->isupNaTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupNaTable_sets == 0)
+			revert_isupNaTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->isupNaTable_old) == NULL)
+			break;
+		if (StorageOld->isupNaProtocolVariant != NULL) {
+			SNMP_FREE(StorageTmp->isupNaProtocolVariant);
+			StorageTmp->isupNaProtocolVariant = StorageOld->isupNaProtocolVariant;
+			StorageTmp->isupNaProtocolVariantLen = StorageOld->isupNaProtocolVariantLen;
+			StorageOld->isupNaProtocolVariant = NULL;
+			StorageOld->isupNaProtocolVariantLen = 0;
+		}
+		if (--StorageTmp->isupNaTable_rsvs == 0)
+			isupNaTable_destroy(&StorageTmp->isupNaTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9327,12 +12774,14 @@ write_isupNaProtocolVariant(int action, u_char *var_val, u_char var_val_type, si
 int
 write_isupNaProtocolYear(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupNaTable_data *StorageTmp = NULL;
+	struct isupNaTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupNaProtocolYear entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupNaTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9373,22 +12822,61 @@ write_isupNaProtocolYear(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupNaProtocolYear: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupNaTable_old) == NULL)
+			if (StorageTmp->isupNaTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupNaTable_old = isupNaTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupNaTable_rsvs++;
+		StorageTmp->isupNaProtocolYear = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupNaTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupNaTable_tsts == 0)
+				if ((ret = check_isupNaTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupNaTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupNaProtocolYear for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupNaProtocolYear;
-		StorageTmp->isupNaProtocolYear = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupNaTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupNaTable_sets == 0)
+				if ((ret = update_isupNaTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupNaTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupNaTable_old) != NULL) {
+			isupNaTable_destroy(&StorageTmp->isupNaTable_old);
+			StorageTmp->isupNaTable_rsvs = 0;
+			StorageTmp->isupNaTable_tsts = 0;
+			StorageTmp->isupNaTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupNaProtocolYear = old_value;
+		if ((StorageOld = StorageTmp->isupNaTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupNaTable_sets == 0)
+			revert_isupNaTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupNaTable_old) == NULL)
+			break;
+		StorageTmp->isupNaProtocolYear = StorageOld->isupNaProtocolYear;
+		if (--StorageTmp->isupNaTable_rsvs == 0)
+			isupNaTable_destroy(&StorageTmp->isupNaTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9408,17 +12896,17 @@ write_isupNaProtocolYear(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_isupNaProtocolOptions(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupNaTable_data *StorageTmp = NULL;
+	struct isupNaTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupNaProtocolOptions entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupNaTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupNaRowStatus) {
@@ -9448,33 +12936,73 @@ write_isupNaProtocolOptions(int action, u_char *var_val, u_char var_val_type, si
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupNaTable_old) == NULL)
+			if (StorageTmp->isupNaTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupNaTable_old = isupNaTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupNaTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupNaProtocolOptions);
+		StorageTmp->isupNaProtocolOptions = string;
+		StorageTmp->isupNaProtocolOptionsLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupNaTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupNaTable_tsts == 0)
+				if ((ret = check_isupNaTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupNaTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupNaProtocolOptions for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupNaProtocolOptions;
-		old_length = StorageTmp->isupNaProtocolOptionsLen;
-		StorageTmp->isupNaProtocolOptions = string;
-		StorageTmp->isupNaProtocolOptionsLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupNaTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupNaTable_sets == 0)
+				if ((ret = update_isupNaTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupNaTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupNaTable_old) != NULL) {
+			isupNaTable_destroy(&StorageTmp->isupNaTable_old);
+			StorageTmp->isupNaTable_rsvs = 0;
+			StorageTmp->isupNaTable_tsts = 0;
+			StorageTmp->isupNaTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupNaProtocolOptions = old_value;
-		StorageTmp->isupNaProtocolOptionsLen = old_length;
+		if ((StorageOld = StorageTmp->isupNaTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupNaTable_sets == 0)
+			revert_isupNaTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupNaTable_old) == NULL)
+			break;
+		if (StorageOld->isupNaProtocolOptions != NULL) {
+			SNMP_FREE(StorageTmp->isupNaProtocolOptions);
+			StorageTmp->isupNaProtocolOptions = StorageOld->isupNaProtocolOptions;
+			StorageTmp->isupNaProtocolOptionsLen = StorageOld->isupNaProtocolOptionsLen;
+			StorageOld->isupNaProtocolOptions = NULL;
+			StorageOld->isupNaProtocolOptionsLen = 0;
+		}
+		if (--StorageTmp->isupNaTable_rsvs == 0)
+			isupNaTable_destroy(&StorageTmp->isupNaTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9494,17 +13022,17 @@ write_isupNaProtocolOptions(int action, u_char *var_val, u_char var_val_type, si
 int
 write_isupNaPointCodeFormat(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupNaTable_data *StorageTmp = NULL;
+	struct isupNaTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupNaPointCodeFormat entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupNaTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupNaRowStatus) {
@@ -9528,33 +13056,73 @@ write_isupNaPointCodeFormat(int action, u_char *var_val, u_char var_val_type, si
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value \"\x03\x08\x03\" */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupNaTable_old) == NULL)
+			if (StorageTmp->isupNaTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupNaTable_old = isupNaTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupNaTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupNaPointCodeFormat);
+		StorageTmp->isupNaPointCodeFormat = string;
+		StorageTmp->isupNaPointCodeFormatLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupNaTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupNaTable_tsts == 0)
+				if ((ret = check_isupNaTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupNaTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupNaPointCodeFormat for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupNaPointCodeFormat;
-		old_length = StorageTmp->isupNaPointCodeFormatLen;
-		StorageTmp->isupNaPointCodeFormat = string;
-		StorageTmp->isupNaPointCodeFormatLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupNaTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupNaTable_sets == 0)
+				if ((ret = update_isupNaTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupNaTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupNaTable_old) != NULL) {
+			isupNaTable_destroy(&StorageTmp->isupNaTable_old);
+			StorageTmp->isupNaTable_rsvs = 0;
+			StorageTmp->isupNaTable_tsts = 0;
+			StorageTmp->isupNaTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupNaPointCodeFormat = old_value;
-		StorageTmp->isupNaPointCodeFormatLen = old_length;
+		if ((StorageOld = StorageTmp->isupNaTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupNaTable_sets == 0)
+			revert_isupNaTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupNaTable_old) == NULL)
+			break;
+		if (StorageOld->isupNaPointCodeFormat != NULL) {
+			SNMP_FREE(StorageTmp->isupNaPointCodeFormat);
+			StorageTmp->isupNaPointCodeFormat = StorageOld->isupNaPointCodeFormat;
+			StorageTmp->isupNaPointCodeFormatLen = StorageOld->isupNaPointCodeFormatLen;
+			StorageOld->isupNaPointCodeFormat = NULL;
+			StorageOld->isupNaPointCodeFormatLen = 0;
+		}
+		if (--StorageTmp->isupNaTable_rsvs == 0)
+			isupNaTable_destroy(&StorageTmp->isupNaTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9574,12 +13142,14 @@ write_isupNaPointCodeFormat(int action, u_char *var_val, u_char var_val_type, si
 int
 write_isupNaSlsLength(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupNaTable_data *StorageTmp = NULL;
+	struct isupNaTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupNaSlsLength entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupNaTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9614,22 +13184,61 @@ write_isupNaSlsLength(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupNaSlsLength: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupNaTable_old) == NULL)
+			if (StorageTmp->isupNaTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupNaTable_old = isupNaTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupNaTable_rsvs++;
+		StorageTmp->isupNaSlsLength = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupNaTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupNaTable_tsts == 0)
+				if ((ret = check_isupNaTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupNaTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupNaSlsLength for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupNaSlsLength;
-		StorageTmp->isupNaSlsLength = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupNaTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupNaTable_sets == 0)
+				if ((ret = update_isupNaTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupNaTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupNaTable_old) != NULL) {
+			isupNaTable_destroy(&StorageTmp->isupNaTable_old);
+			StorageTmp->isupNaTable_rsvs = 0;
+			StorageTmp->isupNaTable_tsts = 0;
+			StorageTmp->isupNaTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupNaSlsLength = old_value;
+		if ((StorageOld = StorageTmp->isupNaTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupNaTable_sets == 0)
+			revert_isupNaTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupNaTable_old) == NULL)
+			break;
+		StorageTmp->isupNaSlsLength = StorageOld->isupNaSlsLength;
+		if (--StorageTmp->isupNaTable_rsvs == 0)
+			isupNaTable_destroy(&StorageTmp->isupNaTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9649,17 +13258,17 @@ write_isupNaSlsLength(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_isupNaSpDefault(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupNaTable_data *StorageTmp = NULL;
+	struct isupNaTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupNaSpDefault entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupNaTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupNaRowStatus) {
@@ -9683,33 +13292,73 @@ write_isupNaSpDefault(int action, u_char *var_val, u_char var_val_type, size_t v
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value \"\" */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupNaTable_old) == NULL)
+			if (StorageTmp->isupNaTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupNaTable_old = isupNaTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupNaTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupNaSpDefault);
+		StorageTmp->isupNaSpDefault = string;
+		StorageTmp->isupNaSpDefaultLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupNaTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupNaTable_tsts == 0)
+				if ((ret = check_isupNaTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupNaTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupNaSpDefault for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupNaSpDefault;
-		old_length = StorageTmp->isupNaSpDefaultLen;
-		StorageTmp->isupNaSpDefault = string;
-		StorageTmp->isupNaSpDefaultLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupNaTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupNaTable_sets == 0)
+				if ((ret = update_isupNaTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupNaTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupNaTable_old) != NULL) {
+			isupNaTable_destroy(&StorageTmp->isupNaTable_old);
+			StorageTmp->isupNaTable_rsvs = 0;
+			StorageTmp->isupNaTable_tsts = 0;
+			StorageTmp->isupNaTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupNaSpDefault = old_value;
-		StorageTmp->isupNaSpDefaultLen = old_length;
+		if ((StorageOld = StorageTmp->isupNaTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupNaTable_sets == 0)
+			revert_isupNaTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupNaTable_old) == NULL)
+			break;
+		if (StorageOld->isupNaSpDefault != NULL) {
+			SNMP_FREE(StorageTmp->isupNaSpDefault);
+			StorageTmp->isupNaSpDefault = StorageOld->isupNaSpDefault;
+			StorageTmp->isupNaSpDefaultLen = StorageOld->isupNaSpDefaultLen;
+			StorageOld->isupNaSpDefault = NULL;
+			StorageOld->isupNaSpDefaultLen = 0;
+		}
+		if (--StorageTmp->isupNaTable_rsvs == 0)
+			isupNaTable_destroy(&StorageTmp->isupNaTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9729,17 +13378,17 @@ write_isupNaSpDefault(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_isupNaName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupNaTable_data *StorageTmp = NULL;
+	struct isupNaTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupNaName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupNaTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupNaRowStatus) {
@@ -9762,33 +13411,73 @@ write_isupNaName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupNaName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupNaTable_old) == NULL)
+			if (StorageTmp->isupNaTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupNaTable_old = isupNaTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupNaTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupNaName);
+		StorageTmp->isupNaName = string;
+		StorageTmp->isupNaNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupNaTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupNaTable_tsts == 0)
+				if ((ret = check_isupNaTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupNaTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupNaName for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupNaName;
-		old_length = StorageTmp->isupNaNameLen;
-		StorageTmp->isupNaName = string;
-		StorageTmp->isupNaNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupNaTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupNaTable_sets == 0)
+				if ((ret = update_isupNaTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupNaTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupNaTable_old) != NULL) {
+			isupNaTable_destroy(&StorageTmp->isupNaTable_old);
+			StorageTmp->isupNaTable_rsvs = 0;
+			StorageTmp->isupNaTable_tsts = 0;
+			StorageTmp->isupNaTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupNaName = old_value;
-		StorageTmp->isupNaNameLen = old_length;
+		if ((StorageOld = StorageTmp->isupNaTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupNaTable_sets == 0)
+			revert_isupNaTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupNaTable_old) == NULL)
+			break;
+		if (StorageOld->isupNaName != NULL) {
+			SNMP_FREE(StorageTmp->isupNaName);
+			StorageTmp->isupNaName = StorageOld->isupNaName;
+			StorageTmp->isupNaNameLen = StorageOld->isupNaNameLen;
+			StorageOld->isupNaName = NULL;
+			StorageOld->isupNaNameLen = 0;
+		}
+		if (--StorageTmp->isupNaTable_rsvs == 0)
+			isupNaTable_destroy(&StorageTmp->isupNaTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9808,17 +13497,17 @@ write_isupNaName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 int
 write_isupSpPointCode(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupSpTable_data *StorageTmp = NULL;
+	struct isupSpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupSpPointCode entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupSpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupSpRowStatus) {
@@ -9842,33 +13531,73 @@ write_isupSpPointCode(int action, u_char *var_val, u_char var_val_type, size_t v
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value \"\x00\x00\x00\x00\" */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			if (StorageTmp->isupSpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupSpTable_old = isupSpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupSpTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupSpPointCode);
+		StorageTmp->isupSpPointCode = string;
+		StorageTmp->isupSpPointCodeLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupSpTable_tsts == 0)
+				if ((ret = check_isupSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupSpPointCode for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupSpPointCode;
-		old_length = StorageTmp->isupSpPointCodeLen;
-		StorageTmp->isupSpPointCode = string;
-		StorageTmp->isupSpPointCodeLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupSpTable_sets == 0)
+				if ((ret = update_isupSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			isupSpTable_destroy(&StorageTmp->isupSpTable_old);
+			StorageTmp->isupSpTable_rsvs = 0;
+			StorageTmp->isupSpTable_tsts = 0;
+			StorageTmp->isupSpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupSpPointCode = old_value;
-		StorageTmp->isupSpPointCodeLen = old_length;
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupSpTable_sets == 0)
+			revert_isupSpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			break;
+		if (StorageOld->isupSpPointCode != NULL) {
+			SNMP_FREE(StorageTmp->isupSpPointCode);
+			StorageTmp->isupSpPointCode = StorageOld->isupSpPointCode;
+			StorageTmp->isupSpPointCodeLen = StorageOld->isupSpPointCodeLen;
+			StorageOld->isupSpPointCode = NULL;
+			StorageOld->isupSpPointCodeLen = 0;
+		}
+		if (--StorageTmp->isupSpTable_rsvs == 0)
+			isupSpTable_destroy(&StorageTmp->isupSpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9888,12 +13617,14 @@ write_isupSpPointCode(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_isupSpType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupSpTable_data *StorageTmp = NULL;
+	struct isupSpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupSpType entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupSpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9932,22 +13663,61 @@ write_isupSpType(int action, u_char *var_val, u_char var_val_type, size_t var_va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupSpType: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			if (StorageTmp->isupSpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupSpTable_old = isupSpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupSpTable_rsvs++;
+		StorageTmp->isupSpType = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupSpTable_tsts == 0)
+				if ((ret = check_isupSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupSpType for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupSpType;
-		StorageTmp->isupSpType = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupSpTable_sets == 0)
+				if ((ret = update_isupSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			isupSpTable_destroy(&StorageTmp->isupSpTable_old);
+			StorageTmp->isupSpTable_rsvs = 0;
+			StorageTmp->isupSpTable_tsts = 0;
+			StorageTmp->isupSpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupSpType = old_value;
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupSpTable_sets == 0)
+			revert_isupSpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			break;
+		StorageTmp->isupSpType = StorageOld->isupSpType;
+		if (--StorageTmp->isupSpTable_rsvs == 0)
+			isupSpTable_destroy(&StorageTmp->isupSpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9967,17 +13737,17 @@ write_isupSpType(int action, u_char *var_val, u_char var_val_type, size_t var_va
 int
 write_isupSpVersion(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupSpTable_data *StorageTmp = NULL;
+	struct isupSpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupSpVersion entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupSpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupSpRowStatus) {
@@ -10000,33 +13770,73 @@ write_isupSpVersion(int action, u_char *var_val, u_char var_val_type, size_t var
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value \"ITU-T Q.764 1999\" */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			if (StorageTmp->isupSpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupSpTable_old = isupSpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupSpTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupSpVersion);
+		StorageTmp->isupSpVersion = string;
+		StorageTmp->isupSpVersionLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupSpTable_tsts == 0)
+				if ((ret = check_isupSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupSpVersion for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupSpVersion;
-		old_length = StorageTmp->isupSpVersionLen;
-		StorageTmp->isupSpVersion = string;
-		StorageTmp->isupSpVersionLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupSpTable_sets == 0)
+				if ((ret = update_isupSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			isupSpTable_destroy(&StorageTmp->isupSpTable_old);
+			StorageTmp->isupSpTable_rsvs = 0;
+			StorageTmp->isupSpTable_tsts = 0;
+			StorageTmp->isupSpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupSpVersion = old_value;
-		StorageTmp->isupSpVersionLen = old_length;
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupSpTable_sets == 0)
+			revert_isupSpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			break;
+		if (StorageOld->isupSpVersion != NULL) {
+			SNMP_FREE(StorageTmp->isupSpVersion);
+			StorageTmp->isupSpVersion = StorageOld->isupSpVersion;
+			StorageTmp->isupSpVersionLen = StorageOld->isupSpVersionLen;
+			StorageOld->isupSpVersion = NULL;
+			StorageOld->isupSpVersionLen = 0;
+		}
+		if (--StorageTmp->isupSpTable_rsvs == 0)
+			isupSpTable_destroy(&StorageTmp->isupSpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10046,17 +13856,17 @@ write_isupSpVersion(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_isupSpName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupSpTable_data *StorageTmp = NULL;
+	struct isupSpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupSpName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupSpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupSpRowStatus) {
@@ -10079,33 +13889,73 @@ write_isupSpName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupSpName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			if (StorageTmp->isupSpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupSpTable_old = isupSpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupSpTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupSpName);
+		StorageTmp->isupSpName = string;
+		StorageTmp->isupSpNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupSpTable_tsts == 0)
+				if ((ret = check_isupSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupSpName for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupSpName;
-		old_length = StorageTmp->isupSpNameLen;
-		StorageTmp->isupSpName = string;
-		StorageTmp->isupSpNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupSpTable_sets == 0)
+				if ((ret = update_isupSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			isupSpTable_destroy(&StorageTmp->isupSpTable_old);
+			StorageTmp->isupSpTable_rsvs = 0;
+			StorageTmp->isupSpTable_tsts = 0;
+			StorageTmp->isupSpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupSpName = old_value;
-		StorageTmp->isupSpNameLen = old_length;
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupSpTable_sets == 0)
+			revert_isupSpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			break;
+		if (StorageOld->isupSpName != NULL) {
+			SNMP_FREE(StorageTmp->isupSpName);
+			StorageTmp->isupSpName = StorageOld->isupSpName;
+			StorageTmp->isupSpNameLen = StorageOld->isupSpNameLen;
+			StorageOld->isupSpName = NULL;
+			StorageOld->isupSpNameLen = 0;
+		}
+		if (--StorageTmp->isupSpTable_rsvs == 0)
+			isupSpTable_destroy(&StorageTmp->isupSpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10125,17 +13975,17 @@ write_isupSpName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 int
 write_isupSpNaPointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct isupSpTable_data *StorageTmp = NULL;
+	struct isupSpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupSpNaPointer entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupSpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupSpRowStatus) {
@@ -10157,31 +14007,71 @@ write_isupSpNaPointer(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupSpNaPointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			if (StorageTmp->isupSpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupSpTable_old = isupSpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupSpTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->isupSpNaPointer);
+		StorageTmp->isupSpNaPointer = objid;
+		StorageTmp->isupSpNaPointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupSpTable_tsts == 0)
+				if ((ret = check_isupSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupSpNaPointer for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupSpNaPointer;
-		old_length = StorageTmp->isupSpNaPointerLen;
-		StorageTmp->isupSpNaPointer = objid;
-		StorageTmp->isupSpNaPointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupSpTable_sets == 0)
+				if ((ret = update_isupSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			isupSpTable_destroy(&StorageTmp->isupSpTable_old);
+			StorageTmp->isupSpTable_rsvs = 0;
+			StorageTmp->isupSpTable_tsts = 0;
+			StorageTmp->isupSpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupSpNaPointer = old_value;
-		StorageTmp->isupSpNaPointerLen = old_length;
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupSpTable_sets == 0)
+			revert_isupSpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			break;
+		if (StorageOld->isupSpNaPointer != NULL) {
+			SNMP_FREE(StorageTmp->isupSpNaPointer);
+			StorageTmp->isupSpNaPointer = StorageOld->isupSpNaPointer;
+			StorageTmp->isupSpNaPointerLen = StorageOld->isupSpNaPointerLen;
+			StorageOld->isupSpNaPointer = NULL;
+			StorageOld->isupSpNaPointerLen = 0;
+		}
+		if (--StorageTmp->isupSpTable_rsvs == 0)
+			isupSpTable_destroy(&StorageTmp->isupSpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10201,17 +14091,17 @@ write_isupSpNaPointer(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_isupSpOptions(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupSpTable_data *StorageTmp = NULL;
+	struct isupSpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupSpOptions entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupSpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupSpRowStatus) {
@@ -10241,33 +14131,73 @@ write_isupSpOptions(int action, u_char *var_val, u_char var_val_type, size_t var
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			if (StorageTmp->isupSpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupSpTable_old = isupSpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupSpTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupSpOptions);
+		StorageTmp->isupSpOptions = string;
+		StorageTmp->isupSpOptionsLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupSpTable_tsts == 0)
+				if ((ret = check_isupSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupSpOptions for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupSpOptions;
-		old_length = StorageTmp->isupSpOptionsLen;
-		StorageTmp->isupSpOptions = string;
-		StorageTmp->isupSpOptionsLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupSpTable_sets == 0)
+				if ((ret = update_isupSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			isupSpTable_destroy(&StorageTmp->isupSpTable_old);
+			StorageTmp->isupSpTable_rsvs = 0;
+			StorageTmp->isupSpTable_tsts = 0;
+			StorageTmp->isupSpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupSpOptions = old_value;
-		StorageTmp->isupSpOptionsLen = old_length;
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupSpTable_sets == 0)
+			revert_isupSpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			break;
+		if (StorageOld->isupSpOptions != NULL) {
+			SNMP_FREE(StorageTmp->isupSpOptions);
+			StorageTmp->isupSpOptions = StorageOld->isupSpOptions;
+			StorageTmp->isupSpOptionsLen = StorageOld->isupSpOptionsLen;
+			StorageOld->isupSpOptions = NULL;
+			StorageOld->isupSpOptionsLen = 0;
+		}
+		if (--StorageTmp->isupSpTable_rsvs == 0)
+			isupSpTable_destroy(&StorageTmp->isupSpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10287,17 +14217,17 @@ write_isupSpOptions(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_isupSpAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupSpTable_data *StorageTmp = NULL;
+	struct isupSpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupSpAlarmStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupSpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupSpRowStatus) {
@@ -10327,33 +14257,73 @@ write_isupSpAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			if (StorageTmp->isupSpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupSpTable_old = isupSpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupSpTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupSpAlarmStatus);
+		StorageTmp->isupSpAlarmStatus = string;
+		StorageTmp->isupSpAlarmStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupSpTable_tsts == 0)
+				if ((ret = check_isupSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupSpAlarmStatus for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupSpAlarmStatus;
-		old_length = StorageTmp->isupSpAlarmStatusLen;
-		StorageTmp->isupSpAlarmStatus = string;
-		StorageTmp->isupSpAlarmStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupSpTable_sets == 0)
+				if ((ret = update_isupSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			isupSpTable_destroy(&StorageTmp->isupSpTable_old);
+			StorageTmp->isupSpTable_rsvs = 0;
+			StorageTmp->isupSpTable_tsts = 0;
+			StorageTmp->isupSpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupSpAlarmStatus = old_value;
-		StorageTmp->isupSpAlarmStatusLen = old_length;
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupSpTable_sets == 0)
+			revert_isupSpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			break;
+		if (StorageOld->isupSpAlarmStatus != NULL) {
+			SNMP_FREE(StorageTmp->isupSpAlarmStatus);
+			StorageTmp->isupSpAlarmStatus = StorageOld->isupSpAlarmStatus;
+			StorageTmp->isupSpAlarmStatusLen = StorageOld->isupSpAlarmStatusLen;
+			StorageOld->isupSpAlarmStatus = NULL;
+			StorageOld->isupSpAlarmStatusLen = 0;
+		}
+		if (--StorageTmp->isupSpTable_rsvs == 0)
+			isupSpTable_destroy(&StorageTmp->isupSpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10373,12 +14343,14 @@ write_isupSpAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_isupSpAdministrativeState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupSpTable_data *StorageTmp = NULL;
+	struct isupSpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupSpAdministrativeState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupSpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10413,22 +14385,61 @@ write_isupSpAdministrativeState(int action, u_char *var_val, u_char var_val_type
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupSpAdministrativeState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			if (StorageTmp->isupSpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupSpTable_old = isupSpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupSpTable_rsvs++;
+		StorageTmp->isupSpAdministrativeState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupSpTable_tsts == 0)
+				if ((ret = check_isupSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupSpAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything done 
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupSpAdministrativeState;
-		StorageTmp->isupSpAdministrativeState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupSpTable_sets == 0)
+				if ((ret = update_isupSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			isupSpTable_destroy(&StorageTmp->isupSpTable_old);
+			StorageTmp->isupSpTable_rsvs = 0;
+			StorageTmp->isupSpTable_tsts = 0;
+			StorageTmp->isupSpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupSpAdministrativeState = old_value;
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupSpTable_sets == 0)
+			revert_isupSpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			break;
+		StorageTmp->isupSpAdministrativeState = StorageOld->isupSpAdministrativeState;
+		if (--StorageTmp->isupSpTable_rsvs == 0)
+			isupSpTable_destroy(&StorageTmp->isupSpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10448,17 +14459,17 @@ write_isupSpAdministrativeState(int action, u_char *var_val, u_char var_val_type
 int
 write_isupSpSupportedProtocols(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupSpTable_data *StorageTmp = NULL;
+	struct isupSpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupSpSupportedProtocols entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupSpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupSpRowStatus) {
@@ -10488,33 +14499,73 @@ write_isupSpSupportedProtocols(int action, u_char *var_val, u_char var_val_type,
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			if (StorageTmp->isupSpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupSpTable_old = isupSpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupSpTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupSpSupportedProtocols);
+		StorageTmp->isupSpSupportedProtocols = string;
+		StorageTmp->isupSpSupportedProtocolsLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupSpTable_tsts == 0)
+				if ((ret = check_isupSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupSpSupportedProtocols for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupSpSupportedProtocols;
-		old_length = StorageTmp->isupSpSupportedProtocolsLen;
-		StorageTmp->isupSpSupportedProtocols = string;
-		StorageTmp->isupSpSupportedProtocolsLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupSpTable_sets == 0)
+				if ((ret = update_isupSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			isupSpTable_destroy(&StorageTmp->isupSpTable_old);
+			StorageTmp->isupSpTable_rsvs = 0;
+			StorageTmp->isupSpTable_tsts = 0;
+			StorageTmp->isupSpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupSpSupportedProtocols = old_value;
-		StorageTmp->isupSpSupportedProtocolsLen = old_length;
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupSpTable_sets == 0)
+			revert_isupSpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			break;
+		if (StorageOld->isupSpSupportedProtocols != NULL) {
+			SNMP_FREE(StorageTmp->isupSpSupportedProtocols);
+			StorageTmp->isupSpSupportedProtocols = StorageOld->isupSpSupportedProtocols;
+			StorageTmp->isupSpSupportedProtocolsLen = StorageOld->isupSpSupportedProtocolsLen;
+			StorageOld->isupSpSupportedProtocols = NULL;
+			StorageOld->isupSpSupportedProtocolsLen = 0;
+		}
+		if (--StorageTmp->isupSpTable_rsvs == 0)
+			isupSpTable_destroy(&StorageTmp->isupSpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10534,12 +14585,14 @@ write_isupSpSupportedProtocols(int action, u_char *var_val, u_char var_val_type,
 int
 write_isupSpActivate(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupSpTable_data *StorageTmp = NULL;
+	struct isupSpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupSpActivate entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupSpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10575,22 +14628,61 @@ write_isupSpActivate(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupSpActivate: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			if (StorageTmp->isupSpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupSpTable_old = isupSpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupSpTable_rsvs++;
+		StorageTmp->isupSpActivate = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupSpTable_tsts == 0)
+				if ((ret = check_isupSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupSpActivate for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupSpActivate;
-		StorageTmp->isupSpActivate = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupSpTable_sets == 0)
+				if ((ret = update_isupSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			isupSpTable_destroy(&StorageTmp->isupSpTable_old);
+			StorageTmp->isupSpTable_rsvs = 0;
+			StorageTmp->isupSpTable_tsts = 0;
+			StorageTmp->isupSpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupSpActivate = old_value;
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupSpTable_sets == 0)
+			revert_isupSpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			break;
+		StorageTmp->isupSpActivate = StorageOld->isupSpActivate;
+		if (--StorageTmp->isupSpTable_rsvs == 0)
+			isupSpTable_destroy(&StorageTmp->isupSpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10610,12 +14702,14 @@ write_isupSpActivate(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_isupSpDeactivate(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupSpTable_data *StorageTmp = NULL;
+	struct isupSpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupSpDeactivate entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupSpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10651,22 +14745,61 @@ write_isupSpDeactivate(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupSpDeactivate: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			if (StorageTmp->isupSpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupSpTable_old = isupSpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupSpTable_rsvs++;
+		StorageTmp->isupSpDeactivate = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupSpTable_tsts == 0)
+				if ((ret = check_isupSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupSpDeactivate for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupSpDeactivate;
-		StorageTmp->isupSpDeactivate = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupSpTable_sets == 0)
+				if ((ret = update_isupSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+			isupSpTable_destroy(&StorageTmp->isupSpTable_old);
+			StorageTmp->isupSpTable_rsvs = 0;
+			StorageTmp->isupSpTable_tsts = 0;
+			StorageTmp->isupSpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupSpDeactivate = old_value;
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupSpTable_sets == 0)
+			revert_isupSpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+			break;
+		StorageTmp->isupSpDeactivate = StorageOld->isupSpDeactivate;
+		if (--StorageTmp->isupSpTable_rsvs == 0)
+			isupSpTable_destroy(&StorageTmp->isupSpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10686,17 +14819,17 @@ write_isupSpDeactivate(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_isupSrDest(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupSrTable_data *StorageTmp = NULL;
+	struct isupSrTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupSrDest entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupSrTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupSrRowStatus) {
@@ -10720,33 +14853,73 @@ write_isupSrDest(int action, u_char *var_val, u_char var_val_type, size_t var_va
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value \"\x00\x00\x00\x00\" */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			if (StorageTmp->isupSrTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupSrTable_old = isupSrTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupSrTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupSrDest);
+		StorageTmp->isupSrDest = string;
+		StorageTmp->isupSrDestLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupSrTable_tsts == 0)
+				if ((ret = check_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupSrDest for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupSrDest;
-		old_length = StorageTmp->isupSrDestLen;
-		StorageTmp->isupSrDest = string;
-		StorageTmp->isupSrDestLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupSrTable_sets == 0)
+				if ((ret = update_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
+			StorageTmp->isupSrTable_rsvs = 0;
+			StorageTmp->isupSrTable_tsts = 0;
+			StorageTmp->isupSrTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupSrDest = old_value;
-		StorageTmp->isupSrDestLen = old_length;
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupSrTable_sets == 0)
+			revert_isupSrTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		if (StorageOld->isupSrDest != NULL) {
+			SNMP_FREE(StorageTmp->isupSrDest);
+			StorageTmp->isupSrDest = StorageOld->isupSrDest;
+			StorageTmp->isupSrDestLen = StorageOld->isupSrDestLen;
+			StorageOld->isupSrDest = NULL;
+			StorageOld->isupSrDestLen = 0;
+		}
+		if (--StorageTmp->isupSrTable_rsvs == 0)
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10766,17 +14939,17 @@ write_isupSrDest(int action, u_char *var_val, u_char var_val_type, size_t var_va
 int
 write_isupSrOptions(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupSrTable_data *StorageTmp = NULL;
+	struct isupSrTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupSrOptions entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupSrTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupSrRowStatus) {
@@ -10807,33 +14980,73 @@ write_isupSrOptions(int action, u_char *var_val, u_char var_val_type, size_t var
 			}
 		}
 		/* Note: default value { srSecurity } */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			if (StorageTmp->isupSrTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupSrTable_old = isupSrTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupSrTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupSrOptions);
+		StorageTmp->isupSrOptions = string;
+		StorageTmp->isupSrOptionsLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupSrTable_tsts == 0)
+				if ((ret = check_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupSrOptions for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupSrOptions;
-		old_length = StorageTmp->isupSrOptionsLen;
-		StorageTmp->isupSrOptions = string;
-		StorageTmp->isupSrOptionsLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupSrTable_sets == 0)
+				if ((ret = update_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
+			StorageTmp->isupSrTable_rsvs = 0;
+			StorageTmp->isupSrTable_tsts = 0;
+			StorageTmp->isupSrTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupSrOptions = old_value;
-		StorageTmp->isupSrOptionsLen = old_length;
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupSrTable_sets == 0)
+			revert_isupSrTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		if (StorageOld->isupSrOptions != NULL) {
+			SNMP_FREE(StorageTmp->isupSrOptions);
+			StorageTmp->isupSrOptions = StorageOld->isupSrOptions;
+			StorageTmp->isupSrOptionsLen = StorageOld->isupSrOptionsLen;
+			StorageOld->isupSrOptions = NULL;
+			StorageOld->isupSrOptionsLen = 0;
+		}
+		if (--StorageTmp->isupSrTable_rsvs == 0)
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10853,12 +15066,14 @@ write_isupSrOptions(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_isupSrSlsAssignment(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupSrTable_data *StorageTmp = NULL;
+	struct isupSrTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupSrSlsAssignment entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupSrTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10893,22 +15108,61 @@ write_isupSrSlsAssignment(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupSrSlsAssignment: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			if (StorageTmp->isupSrTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupSrTable_old = isupSrTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupSrTable_rsvs++;
+		StorageTmp->isupSrSlsAssignment = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupSrTable_tsts == 0)
+				if ((ret = check_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupSrSlsAssignment for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupSrSlsAssignment;
-		StorageTmp->isupSrSlsAssignment = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupSrTable_sets == 0)
+				if ((ret = update_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
+			StorageTmp->isupSrTable_rsvs = 0;
+			StorageTmp->isupSrTable_tsts = 0;
+			StorageTmp->isupSrTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupSrSlsAssignment = old_value;
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupSrTable_sets == 0)
+			revert_isupSrTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		StorageTmp->isupSrSlsAssignment = StorageOld->isupSrSlsAssignment;
+		if (--StorageTmp->isupSrTable_rsvs == 0)
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10928,12 +15182,14 @@ write_isupSrSlsAssignment(int action, u_char *var_val, u_char var_val_type, size
 int
 write_isupSrAdminState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupSrTable_data *StorageTmp = NULL;
+	struct isupSrTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupSrAdminState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupSrTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10968,22 +15224,61 @@ write_isupSrAdminState(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupSrAdminState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			if (StorageTmp->isupSrTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupSrTable_old = isupSrTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupSrTable_rsvs++;
+		StorageTmp->isupSrAdminState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupSrTable_tsts == 0)
+				if ((ret = check_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupSrAdminState for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupSrAdminState;
-		StorageTmp->isupSrAdminState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupSrTable_sets == 0)
+				if ((ret = update_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
+			StorageTmp->isupSrTable_rsvs = 0;
+			StorageTmp->isupSrTable_tsts = 0;
+			StorageTmp->isupSrTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupSrAdminState = old_value;
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupSrTable_sets == 0)
+			revert_isupSrTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		StorageTmp->isupSrAdminState = StorageOld->isupSrAdminState;
+		if (--StorageTmp->isupSrTable_rsvs == 0)
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11003,12 +15298,14 @@ write_isupSrAdminState(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_isupSrOpState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupSrTable_data *StorageTmp = NULL;
+	struct isupSrTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupSrOpState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupSrTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -11042,22 +15339,61 @@ write_isupSrOpState(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupSrOpState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			if (StorageTmp->isupSrTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupSrTable_old = isupSrTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupSrTable_rsvs++;
+		StorageTmp->isupSrOpState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupSrTable_tsts == 0)
+				if ((ret = check_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupSrOpState for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupSrOpState;
-		StorageTmp->isupSrOpState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupSrTable_sets == 0)
+				if ((ret = update_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
+			StorageTmp->isupSrTable_rsvs = 0;
+			StorageTmp->isupSrTable_tsts = 0;
+			StorageTmp->isupSrTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupSrOpState = old_value;
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupSrTable_sets == 0)
+			revert_isupSrTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		StorageTmp->isupSrOpState = StorageOld->isupSrOpState;
+		if (--StorageTmp->isupSrTable_rsvs == 0)
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11077,17 +15413,17 @@ write_isupSrOpState(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_isupSrAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct isupSrTable_data *StorageTmp = NULL;
+	struct isupSrTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupSrAsaProfilePointer entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupSrTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupSrRowStatus) {
@@ -11110,31 +15446,71 @@ write_isupSrAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, 
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value zeroDotZero */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			if (StorageTmp->isupSrTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupSrTable_old = isupSrTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupSrTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->isupSrAsaProfilePointer);
+		StorageTmp->isupSrAsaProfilePointer = objid;
+		StorageTmp->isupSrAsaProfilePointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupSrTable_tsts == 0)
+				if ((ret = check_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupSrAsaProfilePointer for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupSrAsaProfilePointer;
-		old_length = StorageTmp->isupSrAsaProfilePointerLen;
-		StorageTmp->isupSrAsaProfilePointer = objid;
-		StorageTmp->isupSrAsaProfilePointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupSrTable_sets == 0)
+				if ((ret = update_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
+			StorageTmp->isupSrTable_rsvs = 0;
+			StorageTmp->isupSrTable_tsts = 0;
+			StorageTmp->isupSrTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupSrAsaProfilePointer = old_value;
-		StorageTmp->isupSrAsaProfilePointerLen = old_length;
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupSrTable_sets == 0)
+			revert_isupSrTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		if (StorageOld->isupSrAsaProfilePointer != NULL) {
+			SNMP_FREE(StorageTmp->isupSrAsaProfilePointer);
+			StorageTmp->isupSrAsaProfilePointer = StorageOld->isupSrAsaProfilePointer;
+			StorageTmp->isupSrAsaProfilePointerLen = StorageOld->isupSrAsaProfilePointerLen;
+			StorageOld->isupSrAsaProfilePointer = NULL;
+			StorageOld->isupSrAsaProfilePointerLen = 0;
+		}
+		if (--StorageTmp->isupSrTable_rsvs == 0)
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11154,12 +15530,14 @@ write_isupSrAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, 
 int
 write_isupSrCongestedState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupSrTable_data *StorageTmp = NULL;
+	struct isupSrTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupSrCongestedState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupSrTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -11192,22 +15570,61 @@ write_isupSrCongestedState(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupSrCongestedState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			if (StorageTmp->isupSrTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupSrTable_old = isupSrTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupSrTable_rsvs++;
+		StorageTmp->isupSrCongestedState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupSrTable_tsts == 0)
+				if ((ret = check_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupSrCongestedState for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupSrCongestedState;
-		StorageTmp->isupSrCongestedState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupSrTable_sets == 0)
+				if ((ret = update_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
+			StorageTmp->isupSrTable_rsvs = 0;
+			StorageTmp->isupSrTable_tsts = 0;
+			StorageTmp->isupSrTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupSrCongestedState = old_value;
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupSrTable_sets == 0)
+			revert_isupSrTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		StorageTmp->isupSrCongestedState = StorageOld->isupSrCongestedState;
+		if (--StorageTmp->isupSrTable_rsvs == 0)
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11227,12 +15644,14 @@ write_isupSrCongestedState(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_isupSrCongestionLevel(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupSrTable_data *StorageTmp = NULL;
+	struct isupSrTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupSrCongestionLevel entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupSrTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -11268,22 +15687,61 @@ write_isupSrCongestionLevel(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupSrCongestionLevel: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			if (StorageTmp->isupSrTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupSrTable_old = isupSrTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupSrTable_rsvs++;
+		StorageTmp->isupSrCongestionLevel = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupSrTable_tsts == 0)
+				if ((ret = check_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupSrCongestionLevel for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupSrCongestionLevel;
-		StorageTmp->isupSrCongestionLevel = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupSrTable_sets == 0)
+				if ((ret = update_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
+			StorageTmp->isupSrTable_rsvs = 0;
+			StorageTmp->isupSrTable_tsts = 0;
+			StorageTmp->isupSrTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupSrCongestionLevel = old_value;
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupSrTable_sets == 0)
+			revert_isupSrTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		StorageTmp->isupSrCongestionLevel = StorageOld->isupSrCongestionLevel;
+		if (--StorageTmp->isupSrTable_rsvs == 0)
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11303,17 +15761,17 @@ write_isupSrCongestionLevel(int action, u_char *var_val, u_char var_val_type, si
 int
 write_isupSrLoadsharingInformation(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupSrTable_data *StorageTmp = NULL;
+	struct isupSrTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupSrLoadsharingInformation entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupSrTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupSrRowStatus) {
@@ -11335,33 +15793,73 @@ write_isupSrLoadsharingInformation(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupSrLoadsharingInformation: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			if (StorageTmp->isupSrTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupSrTable_old = isupSrTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupSrTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupSrLoadsharingInformation);
+		StorageTmp->isupSrLoadsharingInformation = string;
+		StorageTmp->isupSrLoadsharingInformationLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupSrTable_tsts == 0)
+				if ((ret = check_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupSrLoadsharingInformation for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupSrLoadsharingInformation;
-		old_length = StorageTmp->isupSrLoadsharingInformationLen;
-		StorageTmp->isupSrLoadsharingInformation = string;
-		StorageTmp->isupSrLoadsharingInformationLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupSrTable_sets == 0)
+				if ((ret = update_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
+			StorageTmp->isupSrTable_rsvs = 0;
+			StorageTmp->isupSrTable_tsts = 0;
+			StorageTmp->isupSrTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupSrLoadsharingInformation = old_value;
-		StorageTmp->isupSrLoadsharingInformationLen = old_length;
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupSrTable_sets == 0)
+			revert_isupSrTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		if (StorageOld->isupSrLoadsharingInformation != NULL) {
+			SNMP_FREE(StorageTmp->isupSrLoadsharingInformation);
+			StorageTmp->isupSrLoadsharingInformation = StorageOld->isupSrLoadsharingInformation;
+			StorageTmp->isupSrLoadsharingInformationLen = StorageOld->isupSrLoadsharingInformationLen;
+			StorageOld->isupSrLoadsharingInformation = NULL;
+			StorageOld->isupSrLoadsharingInformationLen = 0;
+		}
+		if (--StorageTmp->isupSrTable_rsvs == 0)
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11381,17 +15879,17 @@ write_isupSrLoadsharingInformation(int action, u_char *var_val, u_char var_val_t
 int
 write_isupSrLoadsharingObject(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct isupSrTable_data *StorageTmp = NULL;
+	struct isupSrTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupSrLoadsharingObject entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupSrTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupSrRowStatus) {
@@ -11414,31 +15912,71 @@ write_isupSrLoadsharingObject(int action, u_char *var_val, u_char var_val_type, 
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value zeroDotZero */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			if (StorageTmp->isupSrTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupSrTable_old = isupSrTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupSrTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->isupSrLoadsharingObject);
+		StorageTmp->isupSrLoadsharingObject = objid;
+		StorageTmp->isupSrLoadsharingObjectLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupSrTable_tsts == 0)
+				if ((ret = check_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupSrLoadsharingObject for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupSrLoadsharingObject;
-		old_length = StorageTmp->isupSrLoadsharingObjectLen;
-		StorageTmp->isupSrLoadsharingObject = objid;
-		StorageTmp->isupSrLoadsharingObjectLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupSrTable_sets == 0)
+				if ((ret = update_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
+			StorageTmp->isupSrTable_rsvs = 0;
+			StorageTmp->isupSrTable_tsts = 0;
+			StorageTmp->isupSrTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupSrLoadsharingObject = old_value;
-		StorageTmp->isupSrLoadsharingObjectLen = old_length;
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupSrTable_sets == 0)
+			revert_isupSrTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		if (StorageOld->isupSrLoadsharingObject != NULL) {
+			SNMP_FREE(StorageTmp->isupSrLoadsharingObject);
+			StorageTmp->isupSrLoadsharingObject = StorageOld->isupSrLoadsharingObject;
+			StorageTmp->isupSrLoadsharingObjectLen = StorageOld->isupSrLoadsharingObjectLen;
+			StorageOld->isupSrLoadsharingObject = NULL;
+			StorageOld->isupSrLoadsharingObjectLen = 0;
+		}
+		if (--StorageTmp->isupSrTable_rsvs == 0)
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11458,17 +15996,17 @@ write_isupSrLoadsharingObject(int action, u_char *var_val, u_char var_val_type, 
 int
 write_isupSrRemoteExchangeLabel(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupSrTable_data *StorageTmp = NULL;
+	struct isupSrTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupSrRemoteExchangeLabel entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupSrTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupSrRowStatus) {
@@ -11491,33 +16029,73 @@ write_isupSrRemoteExchangeLabel(int action, u_char *var_val, u_char var_val_type
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupSrRemoteExchangeLabel: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			if (StorageTmp->isupSrTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupSrTable_old = isupSrTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupSrTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupSrRemoteExchangeLabel);
+		StorageTmp->isupSrRemoteExchangeLabel = string;
+		StorageTmp->isupSrRemoteExchangeLabelLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupSrTable_tsts == 0)
+				if ((ret = check_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupSrRemoteExchangeLabel for you to use, and you have just been asked to do something with it.  Note that anything done 
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupSrRemoteExchangeLabel;
-		old_length = StorageTmp->isupSrRemoteExchangeLabelLen;
-		StorageTmp->isupSrRemoteExchangeLabel = string;
-		StorageTmp->isupSrRemoteExchangeLabelLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupSrTable_sets == 0)
+				if ((ret = update_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
+			StorageTmp->isupSrTable_rsvs = 0;
+			StorageTmp->isupSrTable_tsts = 0;
+			StorageTmp->isupSrTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupSrRemoteExchangeLabel = old_value;
-		StorageTmp->isupSrRemoteExchangeLabelLen = old_length;
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupSrTable_sets == 0)
+			revert_isupSrTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		if (StorageOld->isupSrRemoteExchangeLabel != NULL) {
+			SNMP_FREE(StorageTmp->isupSrRemoteExchangeLabel);
+			StorageTmp->isupSrRemoteExchangeLabel = StorageOld->isupSrRemoteExchangeLabel;
+			StorageTmp->isupSrRemoteExchangeLabelLen = StorageOld->isupSrRemoteExchangeLabelLen;
+			StorageOld->isupSrRemoteExchangeLabel = NULL;
+			StorageOld->isupSrRemoteExchangeLabelLen = 0;
+		}
+		if (--StorageTmp->isupSrTable_rsvs == 0)
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11537,17 +16115,17 @@ write_isupSrRemoteExchangeLabel(int action, u_char *var_val, u_char var_val_type
 int
 write_isupSrName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupSrTable_data *StorageTmp = NULL;
+	struct isupSrTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupSrName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupSrTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupSrRowStatus) {
@@ -11570,33 +16148,73 @@ write_isupSrName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupSrName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			if (StorageTmp->isupSrTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupSrTable_old = isupSrTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupSrTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupSrName);
+		StorageTmp->isupSrName = string;
+		StorageTmp->isupSrNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupSrTable_tsts == 0)
+				if ((ret = check_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupSrName for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupSrName;
-		old_length = StorageTmp->isupSrNameLen;
-		StorageTmp->isupSrName = string;
-		StorageTmp->isupSrNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupSrTable_sets == 0)
+				if ((ret = update_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
+			StorageTmp->isupSrTable_rsvs = 0;
+			StorageTmp->isupSrTable_tsts = 0;
+			StorageTmp->isupSrTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupSrName = old_value;
-		StorageTmp->isupSrNameLen = old_length;
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupSrTable_sets == 0)
+			revert_isupSrTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		if (StorageOld->isupSrName != NULL) {
+			SNMP_FREE(StorageTmp->isupSrName);
+			StorageTmp->isupSrName = StorageOld->isupSrName;
+			StorageTmp->isupSrNameLen = StorageOld->isupSrNameLen;
+			StorageOld->isupSrName = NULL;
+			StorageOld->isupSrNameLen = 0;
+		}
+		if (--StorageTmp->isupSrTable_rsvs == 0)
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11616,17 +16234,17 @@ write_isupSrName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 int
 write_isupSrProfile(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupSrTable_data *StorageTmp = NULL;
+	struct isupSrTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupSrProfile entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupSrTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupSrRowStatus) {
@@ -11650,33 +16268,73 @@ write_isupSrProfile(int action, u_char *var_val, u_char var_val_type, size_t var
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value \"\" */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			if (StorageTmp->isupSrTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupSrTable_old = isupSrTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupSrTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupSrProfile);
+		StorageTmp->isupSrProfile = string;
+		StorageTmp->isupSrProfileLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupSrTable_tsts == 0)
+				if ((ret = check_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupSrProfile for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupSrProfile;
-		old_length = StorageTmp->isupSrProfileLen;
-		StorageTmp->isupSrProfile = string;
-		StorageTmp->isupSrProfileLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupSrTable_sets == 0)
+				if ((ret = update_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
+			StorageTmp->isupSrTable_rsvs = 0;
+			StorageTmp->isupSrTable_tsts = 0;
+			StorageTmp->isupSrTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupSrProfile = old_value;
-		StorageTmp->isupSrProfileLen = old_length;
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupSrTable_sets == 0)
+			revert_isupSrTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		if (StorageOld->isupSrProfile != NULL) {
+			SNMP_FREE(StorageTmp->isupSrProfile);
+			StorageTmp->isupSrProfile = StorageOld->isupSrProfile;
+			StorageTmp->isupSrProfileLen = StorageOld->isupSrProfileLen;
+			StorageOld->isupSrProfile = NULL;
+			StorageOld->isupSrProfileLen = 0;
+		}
+		if (--StorageTmp->isupSrTable_rsvs == 0)
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11696,17 +16354,17 @@ write_isupSrProfile(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_isupSrAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupSrTable_data *StorageTmp = NULL;
+	struct isupSrTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupSrAlarmStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupSrTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupSrRowStatus) {
@@ -11736,33 +16394,73 @@ write_isupSrAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			if (StorageTmp->isupSrTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupSrTable_old = isupSrTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupSrTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupSrAlarmStatus);
+		StorageTmp->isupSrAlarmStatus = string;
+		StorageTmp->isupSrAlarmStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupSrTable_tsts == 0)
+				if ((ret = check_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupSrAlarmStatus for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupSrAlarmStatus;
-		old_length = StorageTmp->isupSrAlarmStatusLen;
-		StorageTmp->isupSrAlarmStatus = string;
-		StorageTmp->isupSrAlarmStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupSrTable_sets == 0)
+				if ((ret = update_isupSrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupSrTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
+			StorageTmp->isupSrTable_rsvs = 0;
+			StorageTmp->isupSrTable_tsts = 0;
+			StorageTmp->isupSrTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupSrAlarmStatus = old_value;
-		StorageTmp->isupSrAlarmStatusLen = old_length;
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupSrTable_sets == 0)
+			revert_isupSrTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+			break;
+		if (StorageOld->isupSrAlarmStatus != NULL) {
+			SNMP_FREE(StorageTmp->isupSrAlarmStatus);
+			StorageTmp->isupSrAlarmStatus = StorageOld->isupSrAlarmStatus;
+			StorageTmp->isupSrAlarmStatusLen = StorageOld->isupSrAlarmStatusLen;
+			StorageOld->isupSrAlarmStatus = NULL;
+			StorageOld->isupSrAlarmStatusLen = 0;
+		}
+		if (--StorageTmp->isupSrTable_rsvs == 0)
+			isupSrTable_destroy(&StorageTmp->isupSrTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11782,12 +16480,14 @@ write_isupSrAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_isupRtUsedAlgorithm(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupRtTable_data *StorageTmp = NULL;
+	struct isupRtTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupRtUsedAlgorithm entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupRtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -11822,22 +16522,61 @@ write_isupRtUsedAlgorithm(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupRtUsedAlgorithm: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupRtTable_old) == NULL)
+			if (StorageTmp->isupRtTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupRtTable_old = isupRtTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupRtTable_rsvs++;
+		StorageTmp->isupRtUsedAlgorithm = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupRtTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupRtTable_tsts == 0)
+				if ((ret = check_isupRtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupRtTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupRtUsedAlgorithm for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupRtUsedAlgorithm;
-		StorageTmp->isupRtUsedAlgorithm = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupRtTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupRtTable_sets == 0)
+				if ((ret = update_isupRtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupRtTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupRtTable_old) != NULL) {
+			isupRtTable_destroy(&StorageTmp->isupRtTable_old);
+			StorageTmp->isupRtTable_rsvs = 0;
+			StorageTmp->isupRtTable_tsts = 0;
+			StorageTmp->isupRtTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupRtUsedAlgorithm = old_value;
+		if ((StorageOld = StorageTmp->isupRtTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupRtTable_sets == 0)
+			revert_isupRtTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupRtTable_old) == NULL)
+			break;
+		StorageTmp->isupRtUsedAlgorithm = StorageOld->isupRtUsedAlgorithm;
+		if (--StorageTmp->isupRtTable_rsvs == 0)
+			isupRtTable_destroy(&StorageTmp->isupRtTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11857,17 +16596,17 @@ write_isupRtUsedAlgorithm(int action, u_char *var_val, u_char var_val_type, size
 int
 write_isupRtSelection(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupRtTable_data *StorageTmp = NULL;
+	struct isupRtTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupRtSelection entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupRtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupRtRowStatus) {
@@ -11890,33 +16629,73 @@ write_isupRtSelection(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupRtSelection: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupRtTable_old) == NULL)
+			if (StorageTmp->isupRtTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupRtTable_old = isupRtTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupRtTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupRtSelection);
+		StorageTmp->isupRtSelection = string;
+		StorageTmp->isupRtSelectionLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupRtTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupRtTable_tsts == 0)
+				if ((ret = check_isupRtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupRtTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupRtSelection for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupRtSelection;
-		old_length = StorageTmp->isupRtSelectionLen;
-		StorageTmp->isupRtSelection = string;
-		StorageTmp->isupRtSelectionLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupRtTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupRtTable_sets == 0)
+				if ((ret = update_isupRtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupRtTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupRtTable_old) != NULL) {
+			isupRtTable_destroy(&StorageTmp->isupRtTable_old);
+			StorageTmp->isupRtTable_rsvs = 0;
+			StorageTmp->isupRtTable_tsts = 0;
+			StorageTmp->isupRtTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupRtSelection = old_value;
-		StorageTmp->isupRtSelectionLen = old_length;
+		if ((StorageOld = StorageTmp->isupRtTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupRtTable_sets == 0)
+			revert_isupRtTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupRtTable_old) == NULL)
+			break;
+		if (StorageOld->isupRtSelection != NULL) {
+			SNMP_FREE(StorageTmp->isupRtSelection);
+			StorageTmp->isupRtSelection = StorageOld->isupRtSelection;
+			StorageTmp->isupRtSelectionLen = StorageOld->isupRtSelectionLen;
+			StorageOld->isupRtSelection = NULL;
+			StorageOld->isupRtSelectionLen = 0;
+		}
+		if (--StorageTmp->isupRtTable_rsvs == 0)
+			isupRtTable_destroy(&StorageTmp->isupRtTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11936,17 +16715,17 @@ write_isupRtSelection(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_isupRtProportionList(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupRtTable_data *StorageTmp = NULL;
+	struct isupRtTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupRtProportionList entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupRtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupRtRowStatus) {
@@ -11968,33 +16747,73 @@ write_isupRtProportionList(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupRtProportionList: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupRtTable_old) == NULL)
+			if (StorageTmp->isupRtTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupRtTable_old = isupRtTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupRtTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupRtProportionList);
+		StorageTmp->isupRtProportionList = string;
+		StorageTmp->isupRtProportionListLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupRtTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupRtTable_tsts == 0)
+				if ((ret = check_isupRtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupRtTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupRtProportionList for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupRtProportionList;
-		old_length = StorageTmp->isupRtProportionListLen;
-		StorageTmp->isupRtProportionList = string;
-		StorageTmp->isupRtProportionListLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupRtTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupRtTable_sets == 0)
+				if ((ret = update_isupRtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupRtTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupRtTable_old) != NULL) {
+			isupRtTable_destroy(&StorageTmp->isupRtTable_old);
+			StorageTmp->isupRtTable_rsvs = 0;
+			StorageTmp->isupRtTable_tsts = 0;
+			StorageTmp->isupRtTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupRtProportionList = old_value;
-		StorageTmp->isupRtProportionListLen = old_length;
+		if ((StorageOld = StorageTmp->isupRtTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupRtTable_sets == 0)
+			revert_isupRtTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupRtTable_old) == NULL)
+			break;
+		if (StorageOld->isupRtProportionList != NULL) {
+			SNMP_FREE(StorageTmp->isupRtProportionList);
+			StorageTmp->isupRtProportionList = StorageOld->isupRtProportionList;
+			StorageTmp->isupRtProportionListLen = StorageOld->isupRtProportionListLen;
+			StorageOld->isupRtProportionList = NULL;
+			StorageOld->isupRtProportionListLen = 0;
+		}
+		if (--StorageTmp->isupRtTable_rsvs == 0)
+			isupRtTable_destroy(&StorageTmp->isupRtTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12014,17 +16833,17 @@ write_isupRtProportionList(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_isupRtUserLabel(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupRtTable_data *StorageTmp = NULL;
+	struct isupRtTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupRtUserLabel entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupRtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupRtRowStatus) {
@@ -12047,33 +16866,73 @@ write_isupRtUserLabel(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupRtUserLabel: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupRtTable_old) == NULL)
+			if (StorageTmp->isupRtTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupRtTable_old = isupRtTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupRtTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupRtUserLabel);
+		StorageTmp->isupRtUserLabel = string;
+		StorageTmp->isupRtUserLabelLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupRtTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupRtTable_tsts == 0)
+				if ((ret = check_isupRtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupRtTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupRtUserLabel for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupRtUserLabel;
-		old_length = StorageTmp->isupRtUserLabelLen;
-		StorageTmp->isupRtUserLabel = string;
-		StorageTmp->isupRtUserLabelLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupRtTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupRtTable_sets == 0)
+				if ((ret = update_isupRtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupRtTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupRtTable_old) != NULL) {
+			isupRtTable_destroy(&StorageTmp->isupRtTable_old);
+			StorageTmp->isupRtTable_rsvs = 0;
+			StorageTmp->isupRtTable_tsts = 0;
+			StorageTmp->isupRtTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupRtUserLabel = old_value;
-		StorageTmp->isupRtUserLabelLen = old_length;
+		if ((StorageOld = StorageTmp->isupRtTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupRtTable_sets == 0)
+			revert_isupRtTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupRtTable_old) == NULL)
+			break;
+		if (StorageOld->isupRtUserLabel != NULL) {
+			SNMP_FREE(StorageTmp->isupRtUserLabel);
+			StorageTmp->isupRtUserLabel = StorageOld->isupRtUserLabel;
+			StorageTmp->isupRtUserLabelLen = StorageOld->isupRtUserLabelLen;
+			StorageOld->isupRtUserLabel = NULL;
+			StorageOld->isupRtUserLabelLen = 0;
+		}
+		if (--StorageTmp->isupRtTable_rsvs == 0)
+			isupRtTable_destroy(&StorageTmp->isupRtTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12093,17 +16952,17 @@ write_isupRtUserLabel(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_isupRtControlStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupRtTable_data *StorageTmp = NULL;
+	struct isupRtTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupRtControlStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupRtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupRtRowStatus) {
@@ -12133,33 +16992,73 @@ write_isupRtControlStatus(int action, u_char *var_val, u_char var_val_type, size
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupRtTable_old) == NULL)
+			if (StorageTmp->isupRtTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupRtTable_old = isupRtTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupRtTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupRtControlStatus);
+		StorageTmp->isupRtControlStatus = string;
+		StorageTmp->isupRtControlStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupRtTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupRtTable_tsts == 0)
+				if ((ret = check_isupRtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupRtTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupRtControlStatus for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupRtControlStatus;
-		old_length = StorageTmp->isupRtControlStatusLen;
-		StorageTmp->isupRtControlStatus = string;
-		StorageTmp->isupRtControlStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupRtTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupRtTable_sets == 0)
+				if ((ret = update_isupRtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupRtTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupRtTable_old) != NULL) {
+			isupRtTable_destroy(&StorageTmp->isupRtTable_old);
+			StorageTmp->isupRtTable_rsvs = 0;
+			StorageTmp->isupRtTable_tsts = 0;
+			StorageTmp->isupRtTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupRtControlStatus = old_value;
-		StorageTmp->isupRtControlStatusLen = old_length;
+		if ((StorageOld = StorageTmp->isupRtTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupRtTable_sets == 0)
+			revert_isupRtTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupRtTable_old) == NULL)
+			break;
+		if (StorageOld->isupRtControlStatus != NULL) {
+			SNMP_FREE(StorageTmp->isupRtControlStatus);
+			StorageTmp->isupRtControlStatus = StorageOld->isupRtControlStatus;
+			StorageTmp->isupRtControlStatusLen = StorageOld->isupRtControlStatusLen;
+			StorageOld->isupRtControlStatus = NULL;
+			StorageOld->isupRtControlStatusLen = 0;
+		}
+		if (--StorageTmp->isupRtTable_rsvs == 0)
+			isupRtTable_destroy(&StorageTmp->isupRtTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12179,12 +17078,14 @@ write_isupRtControlStatus(int action, u_char *var_val, u_char var_val_type, size
 int
 write_isupRtAdminState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupRtTable_data *StorageTmp = NULL;
+	struct isupRtTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupRtAdminState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupRtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -12218,22 +17119,61 @@ write_isupRtAdminState(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupRtAdminState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupRtTable_old) == NULL)
+			if (StorageTmp->isupRtTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupRtTable_old = isupRtTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupRtTable_rsvs++;
+		StorageTmp->isupRtAdminState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupRtTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupRtTable_tsts == 0)
+				if ((ret = check_isupRtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupRtTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupRtAdminState for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupRtAdminState;
-		StorageTmp->isupRtAdminState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupRtTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupRtTable_sets == 0)
+				if ((ret = update_isupRtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupRtTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupRtTable_old) != NULL) {
+			isupRtTable_destroy(&StorageTmp->isupRtTable_old);
+			StorageTmp->isupRtTable_rsvs = 0;
+			StorageTmp->isupRtTable_tsts = 0;
+			StorageTmp->isupRtTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupRtAdminState = old_value;
+		if ((StorageOld = StorageTmp->isupRtTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupRtTable_sets == 0)
+			revert_isupRtTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupRtTable_old) == NULL)
+			break;
+		StorageTmp->isupRtAdminState = StorageOld->isupRtAdminState;
+		if (--StorageTmp->isupRtTable_rsvs == 0)
+			isupRtTable_destroy(&StorageTmp->isupRtTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12253,17 +17193,17 @@ write_isupRtAdminState(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_isupRtTgSelectionList(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupRtTgSelectionTable_data *StorageTmp = NULL;
+	struct isupRtTgSelectionTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupRtTgSelectionList entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupRtTgSelectionTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupRtTgSelectionRowStatus) {
@@ -12286,33 +17226,73 @@ write_isupRtTgSelectionList(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupRtTgSelectionList: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupRtTgSelectionTable_old) == NULL)
+			if (StorageTmp->isupRtTgSelectionTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupRtTgSelectionTable_old = isupRtTgSelectionTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupRtTgSelectionTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupRtTgSelectionList);
+		StorageTmp->isupRtTgSelectionList = string;
+		StorageTmp->isupRtTgSelectionListLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupRtTgSelectionTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupRtTgSelectionTable_tsts == 0)
+				if ((ret = check_isupRtTgSelectionTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupRtTgSelectionTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupRtTgSelectionList for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupRtTgSelectionList;
-		old_length = StorageTmp->isupRtTgSelectionListLen;
-		StorageTmp->isupRtTgSelectionList = string;
-		StorageTmp->isupRtTgSelectionListLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupRtTgSelectionTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupRtTgSelectionTable_sets == 0)
+				if ((ret = update_isupRtTgSelectionTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupRtTgSelectionTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupRtTgSelectionTable_old) != NULL) {
+			isupRtTgSelectionTable_destroy(&StorageTmp->isupRtTgSelectionTable_old);
+			StorageTmp->isupRtTgSelectionTable_rsvs = 0;
+			StorageTmp->isupRtTgSelectionTable_tsts = 0;
+			StorageTmp->isupRtTgSelectionTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupRtTgSelectionList = old_value;
-		StorageTmp->isupRtTgSelectionListLen = old_length;
+		if ((StorageOld = StorageTmp->isupRtTgSelectionTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupRtTgSelectionTable_sets == 0)
+			revert_isupRtTgSelectionTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupRtTgSelectionTable_old) == NULL)
+			break;
+		if (StorageOld->isupRtTgSelectionList != NULL) {
+			SNMP_FREE(StorageTmp->isupRtTgSelectionList);
+			StorageTmp->isupRtTgSelectionList = StorageOld->isupRtTgSelectionList;
+			StorageTmp->isupRtTgSelectionListLen = StorageOld->isupRtTgSelectionListLen;
+			StorageOld->isupRtTgSelectionList = NULL;
+			StorageOld->isupRtTgSelectionListLen = 0;
+		}
+		if (--StorageTmp->isupRtTgSelectionTable_rsvs == 0)
+			isupRtTgSelectionTable_destroy(&StorageTmp->isupRtTgSelectionTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12332,17 +17312,17 @@ write_isupRtTgSelectionList(int action, u_char *var_val, u_char var_val_type, si
 int
 write_isupTgLabelOfFarEndExchange(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupTgTable_data *StorageTmp = NULL;
+	struct isupTgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupTgLabelOfFarEndExchange entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupTgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupTgRowStatus) {
@@ -12365,33 +17345,73 @@ write_isupTgLabelOfFarEndExchange(int action, u_char *var_val, u_char var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupTgLabelOfFarEndExchange: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			if (StorageTmp->isupTgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupTgTable_old = isupTgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupTgTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupTgLabelOfFarEndExchange);
+		StorageTmp->isupTgLabelOfFarEndExchange = string;
+		StorageTmp->isupTgLabelOfFarEndExchangeLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupTgTable_tsts == 0)
+				if ((ret = check_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupTgLabelOfFarEndExchange for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupTgLabelOfFarEndExchange;
-		old_length = StorageTmp->isupTgLabelOfFarEndExchangeLen;
-		StorageTmp->isupTgLabelOfFarEndExchange = string;
-		StorageTmp->isupTgLabelOfFarEndExchangeLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupTgTable_sets == 0)
+				if ((ret = update_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
+			StorageTmp->isupTgTable_rsvs = 0;
+			StorageTmp->isupTgTable_tsts = 0;
+			StorageTmp->isupTgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupTgLabelOfFarEndExchange = old_value;
-		StorageTmp->isupTgLabelOfFarEndExchangeLen = old_length;
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupTgTable_sets == 0)
+			revert_isupTgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		if (StorageOld->isupTgLabelOfFarEndExchange != NULL) {
+			SNMP_FREE(StorageTmp->isupTgLabelOfFarEndExchange);
+			StorageTmp->isupTgLabelOfFarEndExchange = StorageOld->isupTgLabelOfFarEndExchange;
+			StorageTmp->isupTgLabelOfFarEndExchangeLen = StorageOld->isupTgLabelOfFarEndExchangeLen;
+			StorageOld->isupTgLabelOfFarEndExchange = NULL;
+			StorageOld->isupTgLabelOfFarEndExchangeLen = 0;
+		}
+		if (--StorageTmp->isupTgTable_rsvs == 0)
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12411,12 +17431,14 @@ write_isupTgLabelOfFarEndExchange(int action, u_char *var_val, u_char var_val_ty
 int
 write_isupTgInformationTransferCapabilities(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupTgTable_data *StorageTmp = NULL;
+	struct isupTgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupTgInformationTransferCapabilities entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupTgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -12454,22 +17476,61 @@ write_isupTgInformationTransferCapabilities(int action, u_char *var_val, u_char 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupTgInformationTransferCapabilities: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			if (StorageTmp->isupTgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupTgTable_old = isupTgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupTgTable_rsvs++;
+		StorageTmp->isupTgInformationTransferCapabilities = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupTgTable_tsts == 0)
+				if ((ret = check_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupTgInformationTransferCapabilities for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupTgInformationTransferCapabilities;
-		StorageTmp->isupTgInformationTransferCapabilities = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupTgTable_sets == 0)
+				if ((ret = update_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
+			StorageTmp->isupTgTable_rsvs = 0;
+			StorageTmp->isupTgTable_tsts = 0;
+			StorageTmp->isupTgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupTgInformationTransferCapabilities = old_value;
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupTgTable_sets == 0)
+			revert_isupTgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		StorageTmp->isupTgInformationTransferCapabilities = StorageOld->isupTgInformationTransferCapabilities;
+		if (--StorageTmp->isupTgTable_rsvs == 0)
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12489,12 +17550,14 @@ write_isupTgInformationTransferCapabilities(int action, u_char *var_val, u_char 
 int
 write_isupTgCircuitDirectionality(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupTgTable_data *StorageTmp = NULL;
+	struct isupTgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupTgCircuitDirectionality entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupTgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -12529,22 +17592,61 @@ write_isupTgCircuitDirectionality(int action, u_char *var_val, u_char var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupTgCircuitDirectionality: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			if (StorageTmp->isupTgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupTgTable_old = isupTgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupTgTable_rsvs++;
+		StorageTmp->isupTgCircuitDirectionality = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupTgTable_tsts == 0)
+				if ((ret = check_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupTgCircuitDirectionality for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupTgCircuitDirectionality;
-		StorageTmp->isupTgCircuitDirectionality = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupTgTable_sets == 0)
+				if ((ret = update_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
+			StorageTmp->isupTgTable_rsvs = 0;
+			StorageTmp->isupTgTable_tsts = 0;
+			StorageTmp->isupTgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupTgCircuitDirectionality = old_value;
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupTgTable_sets == 0)
+			revert_isupTgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		StorageTmp->isupTgCircuitDirectionality = StorageOld->isupTgCircuitDirectionality;
+		if (--StorageTmp->isupTgTable_rsvs == 0)
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12564,17 +17666,17 @@ write_isupTgCircuitDirectionality(int action, u_char *var_val, u_char var_val_ty
 int
 write_isupTgTransmissionCharacteristics(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupTgTable_data *StorageTmp = NULL;
+	struct isupTgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupTgTransmissionCharacteristics entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupTgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupTgRowStatus) {
@@ -12604,33 +17706,73 @@ write_isupTgTransmissionCharacteristics(int action, u_char *var_val, u_char var_
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			if (StorageTmp->isupTgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupTgTable_old = isupTgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupTgTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupTgTransmissionCharacteristics);
+		StorageTmp->isupTgTransmissionCharacteristics = string;
+		StorageTmp->isupTgTransmissionCharacteristicsLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupTgTable_tsts == 0)
+				if ((ret = check_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupTgTransmissionCharacteristics for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupTgTransmissionCharacteristics;
-		old_length = StorageTmp->isupTgTransmissionCharacteristicsLen;
-		StorageTmp->isupTgTransmissionCharacteristics = string;
-		StorageTmp->isupTgTransmissionCharacteristicsLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupTgTable_sets == 0)
+				if ((ret = update_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
+			StorageTmp->isupTgTable_rsvs = 0;
+			StorageTmp->isupTgTable_tsts = 0;
+			StorageTmp->isupTgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupTgTransmissionCharacteristics = old_value;
-		StorageTmp->isupTgTransmissionCharacteristicsLen = old_length;
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupTgTable_sets == 0)
+			revert_isupTgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		if (StorageOld->isupTgTransmissionCharacteristics != NULL) {
+			SNMP_FREE(StorageTmp->isupTgTransmissionCharacteristics);
+			StorageTmp->isupTgTransmissionCharacteristics = StorageOld->isupTgTransmissionCharacteristics;
+			StorageTmp->isupTgTransmissionCharacteristicsLen = StorageOld->isupTgTransmissionCharacteristicsLen;
+			StorageOld->isupTgTransmissionCharacteristics = NULL;
+			StorageOld->isupTgTransmissionCharacteristicsLen = 0;
+		}
+		if (--StorageTmp->isupTgTable_rsvs == 0)
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12650,17 +17792,17 @@ write_isupTgTransmissionCharacteristics(int action, u_char *var_val, u_char var_
 int
 write_isupTgUserLabel(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupTgTable_data *StorageTmp = NULL;
+	struct isupTgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupTgUserLabel entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupTgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupTgRowStatus) {
@@ -12683,33 +17825,73 @@ write_isupTgUserLabel(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupTgUserLabel: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			if (StorageTmp->isupTgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupTgTable_old = isupTgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupTgTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupTgUserLabel);
+		StorageTmp->isupTgUserLabel = string;
+		StorageTmp->isupTgUserLabelLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupTgTable_tsts == 0)
+				if ((ret = check_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupTgUserLabel for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupTgUserLabel;
-		old_length = StorageTmp->isupTgUserLabelLen;
-		StorageTmp->isupTgUserLabel = string;
-		StorageTmp->isupTgUserLabelLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupTgTable_sets == 0)
+				if ((ret = update_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
+			StorageTmp->isupTgTable_rsvs = 0;
+			StorageTmp->isupTgTable_tsts = 0;
+			StorageTmp->isupTgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupTgUserLabel = old_value;
-		StorageTmp->isupTgUserLabelLen = old_length;
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupTgTable_sets == 0)
+			revert_isupTgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		if (StorageOld->isupTgUserLabel != NULL) {
+			SNMP_FREE(StorageTmp->isupTgUserLabel);
+			StorageTmp->isupTgUserLabel = StorageOld->isupTgUserLabel;
+			StorageTmp->isupTgUserLabelLen = StorageOld->isupTgUserLabelLen;
+			StorageOld->isupTgUserLabel = NULL;
+			StorageOld->isupTgUserLabelLen = 0;
+		}
+		if (--StorageTmp->isupTgTable_rsvs == 0)
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12729,12 +17911,14 @@ write_isupTgUserLabel(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_isupTgAdminState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupTgTable_data *StorageTmp = NULL;
+	struct isupTgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupTgAdminState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupTgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -12769,22 +17953,61 @@ write_isupTgAdminState(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupTgAdminState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			if (StorageTmp->isupTgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupTgTable_old = isupTgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupTgTable_rsvs++;
+		StorageTmp->isupTgAdminState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupTgTable_tsts == 0)
+				if ((ret = check_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupTgAdminState for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupTgAdminState;
-		StorageTmp->isupTgAdminState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupTgTable_sets == 0)
+				if ((ret = update_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
+			StorageTmp->isupTgTable_rsvs = 0;
+			StorageTmp->isupTgTable_tsts = 0;
+			StorageTmp->isupTgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupTgAdminState = old_value;
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupTgTable_sets == 0)
+			revert_isupTgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		StorageTmp->isupTgAdminState = StorageOld->isupTgAdminState;
+		if (--StorageTmp->isupTgTable_rsvs == 0)
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12804,12 +18027,14 @@ write_isupTgAdminState(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_isupTgAssocSignRouteSetNePart(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct isupTgTable_data *StorageTmp = NULL;
+	struct isupTgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupTgAssocSignRouteSetNePart entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupTgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -12834,22 +18059,61 @@ write_isupTgAssocSignRouteSetNePart(int action, u_char *var_val, u_char var_val_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupTgAssocSignRouteSetNePart: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			if (StorageTmp->isupTgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupTgTable_old = isupTgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupTgTable_rsvs++;
+		StorageTmp->isupTgAssocSignRouteSetNePart = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupTgTable_tsts == 0)
+				if ((ret = check_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupTgAssocSignRouteSetNePart for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupTgAssocSignRouteSetNePart;
-		StorageTmp->isupTgAssocSignRouteSetNePart = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupTgTable_sets == 0)
+				if ((ret = update_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
+			StorageTmp->isupTgTable_rsvs = 0;
+			StorageTmp->isupTgTable_tsts = 0;
+			StorageTmp->isupTgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupTgAssocSignRouteSetNePart = old_value;
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupTgTable_sets == 0)
+			revert_isupTgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		StorageTmp->isupTgAssocSignRouteSetNePart = StorageOld->isupTgAssocSignRouteSetNePart;
+		if (--StorageTmp->isupTgTable_rsvs == 0)
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12869,12 +18133,14 @@ write_isupTgAssocSignRouteSetNePart(int action, u_char *var_val, u_char var_val_
 int
 write_isupTgBoundaryCrossing(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupTgTable_data *StorageTmp = NULL;
+	struct isupTgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupTgBoundaryCrossing entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupTgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -12908,22 +18174,61 @@ write_isupTgBoundaryCrossing(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupTgBoundaryCrossing: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			if (StorageTmp->isupTgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupTgTable_old = isupTgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupTgTable_rsvs++;
+		StorageTmp->isupTgBoundaryCrossing = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupTgTable_tsts == 0)
+				if ((ret = check_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupTgBoundaryCrossing for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupTgBoundaryCrossing;
-		StorageTmp->isupTgBoundaryCrossing = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupTgTable_sets == 0)
+				if ((ret = update_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
+			StorageTmp->isupTgTable_rsvs = 0;
+			StorageTmp->isupTgTable_tsts = 0;
+			StorageTmp->isupTgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupTgBoundaryCrossing = old_value;
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupTgTable_sets == 0)
+			revert_isupTgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		StorageTmp->isupTgBoundaryCrossing = StorageOld->isupTgBoundaryCrossing;
+		if (--StorageTmp->isupTgTable_rsvs == 0)
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12943,12 +18248,14 @@ write_isupTgBoundaryCrossing(int action, u_char *var_val, u_char var_val_type, s
 int
 write_isupTgSearchMethod(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupTgTable_data *StorageTmp = NULL;
+	struct isupTgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupTgSearchMethod entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupTgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -12992,22 +18299,61 @@ write_isupTgSearchMethod(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupTgSearchMethod: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			if (StorageTmp->isupTgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupTgTable_old = isupTgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupTgTable_rsvs++;
+		StorageTmp->isupTgSearchMethod = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupTgTable_tsts == 0)
+				if ((ret = check_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupTgSearchMethod for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupTgSearchMethod;
-		StorageTmp->isupTgSearchMethod = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupTgTable_sets == 0)
+				if ((ret = update_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
+			StorageTmp->isupTgTable_rsvs = 0;
+			StorageTmp->isupTgTable_tsts = 0;
+			StorageTmp->isupTgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupTgSearchMethod = old_value;
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupTgTable_sets == 0)
+			revert_isupTgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		StorageTmp->isupTgSearchMethod = StorageOld->isupTgSearchMethod;
+		if (--StorageTmp->isupTgTable_rsvs == 0)
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13027,12 +18373,14 @@ write_isupTgSearchMethod(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_isupTgPrefTrafficRedirect(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupTgTable_data *StorageTmp = NULL;
+	struct isupTgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupTgPrefTrafficRedirect entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupTgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -13066,22 +18414,61 @@ write_isupTgPrefTrafficRedirect(int action, u_char *var_val, u_char var_val_type
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupTgPrefTrafficRedirect: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			if (StorageTmp->isupTgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupTgTable_old = isupTgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupTgTable_rsvs++;
+		StorageTmp->isupTgPrefTrafficRedirect = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupTgTable_tsts == 0)
+				if ((ret = check_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupTgPrefTrafficRedirect for you to use, and you have just been asked to do something with it.  Note that anything done 
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupTgPrefTrafficRedirect;
-		StorageTmp->isupTgPrefTrafficRedirect = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupTgTable_sets == 0)
+				if ((ret = update_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
+			StorageTmp->isupTgTable_rsvs = 0;
+			StorageTmp->isupTgTable_tsts = 0;
+			StorageTmp->isupTgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupTgPrefTrafficRedirect = old_value;
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupTgTable_sets == 0)
+			revert_isupTgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		StorageTmp->isupTgPrefTrafficRedirect = StorageOld->isupTgPrefTrafficRedirect;
+		if (--StorageTmp->isupTgTable_rsvs == 0)
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13101,12 +18488,14 @@ write_isupTgPrefTrafficRedirect(int action, u_char *var_val, u_char var_val_type
 int
 write_isupTgSuppressOwnCac(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupTgTable_data *StorageTmp = NULL;
+	struct isupTgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupTgSuppressOwnCac entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupTgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -13139,22 +18528,61 @@ write_isupTgSuppressOwnCac(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupTgSuppressOwnCac: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			if (StorageTmp->isupTgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupTgTable_old = isupTgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupTgTable_rsvs++;
+		StorageTmp->isupTgSuppressOwnCac = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupTgTable_tsts == 0)
+				if ((ret = check_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupTgSuppressOwnCac for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupTgSuppressOwnCac;
-		StorageTmp->isupTgSuppressOwnCac = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupTgTable_sets == 0)
+				if ((ret = update_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
+			StorageTmp->isupTgTable_rsvs = 0;
+			StorageTmp->isupTgTable_tsts = 0;
+			StorageTmp->isupTgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupTgSuppressOwnCac = old_value;
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupTgTable_sets == 0)
+			revert_isupTgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		StorageTmp->isupTgSuppressOwnCac = StorageOld->isupTgSuppressOwnCac;
+		if (--StorageTmp->isupTgTable_rsvs == 0)
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13174,12 +18602,14 @@ write_isupTgSuppressOwnCac(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_isupTgCarrierType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupTgTable_data *StorageTmp = NULL;
+	struct isupTgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupTgCarrierType entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupTgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -13215,22 +18645,61 @@ write_isupTgCarrierType(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupTgCarrierType: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			if (StorageTmp->isupTgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupTgTable_old = isupTgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupTgTable_rsvs++;
+		StorageTmp->isupTgCarrierType = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupTgTable_tsts == 0)
+				if ((ret = check_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupTgCarrierType for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupTgCarrierType;
-		StorageTmp->isupTgCarrierType = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupTgTable_sets == 0)
+				if ((ret = update_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
+			StorageTmp->isupTgTable_rsvs = 0;
+			StorageTmp->isupTgTable_tsts = 0;
+			StorageTmp->isupTgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupTgCarrierType = old_value;
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupTgTable_sets == 0)
+			revert_isupTgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		StorageTmp->isupTgCarrierType = StorageOld->isupTgCarrierType;
+		if (--StorageTmp->isupTgTable_rsvs == 0)
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13250,12 +18719,14 @@ write_isupTgCarrierType(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_isupTgAlarmCarrier(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupTgTable_data *StorageTmp = NULL;
+	struct isupTgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupTgAlarmCarrier entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupTgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -13290,22 +18761,61 @@ write_isupTgAlarmCarrier(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupTgAlarmCarrier: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			if (StorageTmp->isupTgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupTgTable_old = isupTgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupTgTable_rsvs++;
+		StorageTmp->isupTgAlarmCarrier = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupTgTable_tsts == 0)
+				if ((ret = check_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupTgAlarmCarrier for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupTgAlarmCarrier;
-		StorageTmp->isupTgAlarmCarrier = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupTgTable_sets == 0)
+				if ((ret = update_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
+			StorageTmp->isupTgTable_rsvs = 0;
+			StorageTmp->isupTgTable_tsts = 0;
+			StorageTmp->isupTgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupTgAlarmCarrier = old_value;
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupTgTable_sets == 0)
+			revert_isupTgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		StorageTmp->isupTgAlarmCarrier = StorageOld->isupTgAlarmCarrier;
+		if (--StorageTmp->isupTgTable_rsvs == 0)
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13325,12 +18835,14 @@ write_isupTgAlarmCarrier(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_isupTgContCheck(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupTgTable_data *StorageTmp = NULL;
+	struct isupTgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupTgContCheck entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupTgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -13365,22 +18877,61 @@ write_isupTgContCheck(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupTgContCheck: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			if (StorageTmp->isupTgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupTgTable_old = isupTgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupTgTable_rsvs++;
+		StorageTmp->isupTgContCheck = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupTgTable_tsts == 0)
+				if ((ret = check_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupTgContCheck for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupTgContCheck;
-		StorageTmp->isupTgContCheck = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupTgTable_sets == 0)
+				if ((ret = update_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
+			StorageTmp->isupTgTable_rsvs = 0;
+			StorageTmp->isupTgTable_tsts = 0;
+			StorageTmp->isupTgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupTgContCheck = old_value;
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupTgTable_sets == 0)
+			revert_isupTgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		StorageTmp->isupTgContCheck = StorageOld->isupTgContCheck;
+		if (--StorageTmp->isupTgTable_rsvs == 0)
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13400,12 +18951,14 @@ write_isupTgContCheck(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_isupTgContCheckRatio(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct isupTgTable_data *StorageTmp = NULL;
+	struct isupTgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupTgContCheckRatio entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupTgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -13435,22 +18988,61 @@ write_isupTgContCheckRatio(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupTgContCheckRatio: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			if (StorageTmp->isupTgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupTgTable_old = isupTgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupTgTable_rsvs++;
+		StorageTmp->isupTgContCheckRatio = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupTgTable_tsts == 0)
+				if ((ret = check_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupTgContCheckRatio for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupTgContCheckRatio;
-		StorageTmp->isupTgContCheckRatio = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupTgTable_sets == 0)
+				if ((ret = update_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
+			StorageTmp->isupTgTable_rsvs = 0;
+			StorageTmp->isupTgTable_tsts = 0;
+			StorageTmp->isupTgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupTgContCheckRatio = old_value;
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupTgTable_sets == 0)
+			revert_isupTgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		StorageTmp->isupTgContCheckRatio = StorageOld->isupTgContCheckRatio;
+		if (--StorageTmp->isupTgTable_rsvs == 0)
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13470,17 +19062,17 @@ write_isupTgContCheckRatio(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_isupTgAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupTgTable_data *StorageTmp = NULL;
+	struct isupTgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupTgAlarmStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupTgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupTgRowStatus) {
@@ -13510,33 +19102,73 @@ write_isupTgAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			if (StorageTmp->isupTgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupTgTable_old = isupTgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupTgTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupTgAlarmStatus);
+		StorageTmp->isupTgAlarmStatus = string;
+		StorageTmp->isupTgAlarmStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupTgTable_tsts == 0)
+				if ((ret = check_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupTgAlarmStatus for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupTgAlarmStatus;
-		old_length = StorageTmp->isupTgAlarmStatusLen;
-		StorageTmp->isupTgAlarmStatus = string;
-		StorageTmp->isupTgAlarmStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupTgTable_sets == 0)
+				if ((ret = update_isupTgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupTgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
+			StorageTmp->isupTgTable_rsvs = 0;
+			StorageTmp->isupTgTable_tsts = 0;
+			StorageTmp->isupTgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupTgAlarmStatus = old_value;
-		StorageTmp->isupTgAlarmStatusLen = old_length;
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupTgTable_sets == 0)
+			revert_isupTgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+			break;
+		if (StorageOld->isupTgAlarmStatus != NULL) {
+			SNMP_FREE(StorageTmp->isupTgAlarmStatus);
+			StorageTmp->isupTgAlarmStatus = StorageOld->isupTgAlarmStatus;
+			StorageTmp->isupTgAlarmStatusLen = StorageOld->isupTgAlarmStatusLen;
+			StorageOld->isupTgAlarmStatus = NULL;
+			StorageOld->isupTgAlarmStatusLen = 0;
+		}
+		if (--StorageTmp->isupTgTable_rsvs == 0)
+			isupTgTable_destroy(&StorageTmp->isupTgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13556,12 +19188,14 @@ write_isupTgAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_isupCgCIC(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupCgTable_data *StorageTmp = NULL;
+	struct isupCgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupCgCIC entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupCgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -13591,22 +19225,61 @@ write_isupCgCIC(int action, u_char *var_val, u_char var_val_type, size_t var_val
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupCgCIC: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupCgTable_old) == NULL)
+			if (StorageTmp->isupCgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupCgTable_old = isupCgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupCgTable_rsvs++;
+		StorageTmp->isupCgCIC = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupCgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupCgTable_tsts == 0)
+				if ((ret = check_isupCgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupCgCIC for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupCgCIC;
-		StorageTmp->isupCgCIC = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupCgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupCgTable_sets == 0)
+				if ((ret = update_isupCgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupCgTable_old) != NULL) {
+			isupCgTable_destroy(&StorageTmp->isupCgTable_old);
+			StorageTmp->isupCgTable_rsvs = 0;
+			StorageTmp->isupCgTable_tsts = 0;
+			StorageTmp->isupCgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupCgCIC = old_value;
+		if ((StorageOld = StorageTmp->isupCgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupCgTable_sets == 0)
+			revert_isupCgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupCgTable_old) == NULL)
+			break;
+		StorageTmp->isupCgCIC = StorageOld->isupCgCIC;
+		if (--StorageTmp->isupCgTable_rsvs == 0)
+			isupCgTable_destroy(&StorageTmp->isupCgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13626,17 +19299,17 @@ write_isupCgCIC(int action, u_char *var_val, u_char var_val_type, size_t var_val
 int
 write_isupCgAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupCgTable_data *StorageTmp = NULL;
+	struct isupCgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupCgAlarmStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupCgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupCgRowStatus) {
@@ -13666,33 +19339,73 @@ write_isupCgAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupCgTable_old) == NULL)
+			if (StorageTmp->isupCgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupCgTable_old = isupCgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupCgTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupCgAlarmStatus);
+		StorageTmp->isupCgAlarmStatus = string;
+		StorageTmp->isupCgAlarmStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupCgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupCgTable_tsts == 0)
+				if ((ret = check_isupCgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupCgAlarmStatus for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupCgAlarmStatus;
-		old_length = StorageTmp->isupCgAlarmStatusLen;
-		StorageTmp->isupCgAlarmStatus = string;
-		StorageTmp->isupCgAlarmStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupCgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupCgTable_sets == 0)
+				if ((ret = update_isupCgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupCgTable_old) != NULL) {
+			isupCgTable_destroy(&StorageTmp->isupCgTable_old);
+			StorageTmp->isupCgTable_rsvs = 0;
+			StorageTmp->isupCgTable_tsts = 0;
+			StorageTmp->isupCgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupCgAlarmStatus = old_value;
-		StorageTmp->isupCgAlarmStatusLen = old_length;
+		if ((StorageOld = StorageTmp->isupCgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupCgTable_sets == 0)
+			revert_isupCgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupCgTable_old) == NULL)
+			break;
+		if (StorageOld->isupCgAlarmStatus != NULL) {
+			SNMP_FREE(StorageTmp->isupCgAlarmStatus);
+			StorageTmp->isupCgAlarmStatus = StorageOld->isupCgAlarmStatus;
+			StorageTmp->isupCgAlarmStatusLen = StorageOld->isupCgAlarmStatusLen;
+			StorageOld->isupCgAlarmStatus = NULL;
+			StorageOld->isupCgAlarmStatusLen = 0;
+		}
+		if (--StorageTmp->isupCgTable_rsvs == 0)
+			isupCgTable_destroy(&StorageTmp->isupCgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13712,12 +19425,14 @@ write_isupCgAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_isupCgRangeType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupCgTable_data *StorageTmp = NULL;
+	struct isupCgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupCgRangeType entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupCgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -13751,22 +19466,61 @@ write_isupCgRangeType(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupCgRangeType: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupCgTable_old) == NULL)
+			if (StorageTmp->isupCgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupCgTable_old = isupCgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupCgTable_rsvs++;
+		StorageTmp->isupCgRangeType = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupCgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupCgTable_tsts == 0)
+				if ((ret = check_isupCgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupCgRangeType for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupCgRangeType;
-		StorageTmp->isupCgRangeType = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupCgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupCgTable_sets == 0)
+				if ((ret = update_isupCgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupCgTable_old) != NULL) {
+			isupCgTable_destroy(&StorageTmp->isupCgTable_old);
+			StorageTmp->isupCgTable_rsvs = 0;
+			StorageTmp->isupCgTable_tsts = 0;
+			StorageTmp->isupCgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupCgRangeType = old_value;
+		if ((StorageOld = StorageTmp->isupCgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupCgTable_sets == 0)
+			revert_isupCgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupCgTable_old) == NULL)
+			break;
+		StorageTmp->isupCgRangeType = StorageOld->isupCgRangeType;
+		if (--StorageTmp->isupCgTable_rsvs == 0)
+			isupCgTable_destroy(&StorageTmp->isupCgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13786,12 +19540,14 @@ write_isupCgRangeType(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_isupCgAlarmCarrier(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupCgTable_data *StorageTmp = NULL;
+	struct isupCgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupCgAlarmCarrier entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupCgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -13827,22 +19583,61 @@ write_isupCgAlarmCarrier(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupCgAlarmCarrier: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupCgTable_old) == NULL)
+			if (StorageTmp->isupCgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupCgTable_old = isupCgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupCgTable_rsvs++;
+		StorageTmp->isupCgAlarmCarrier = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupCgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupCgTable_tsts == 0)
+				if ((ret = check_isupCgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupCgAlarmCarrier for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupCgAlarmCarrier;
-		StorageTmp->isupCgAlarmCarrier = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupCgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupCgTable_sets == 0)
+				if ((ret = update_isupCgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupCgTable_old) != NULL) {
+			isupCgTable_destroy(&StorageTmp->isupCgTable_old);
+			StorageTmp->isupCgTable_rsvs = 0;
+			StorageTmp->isupCgTable_tsts = 0;
+			StorageTmp->isupCgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupCgAlarmCarrier = old_value;
+		if ((StorageOld = StorageTmp->isupCgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupCgTable_sets == 0)
+			revert_isupCgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupCgTable_old) == NULL)
+			break;
+		StorageTmp->isupCgAlarmCarrier = StorageOld->isupCgAlarmCarrier;
+		if (--StorageTmp->isupCgTable_rsvs == 0)
+			isupCgTable_destroy(&StorageTmp->isupCgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13862,12 +19657,14 @@ write_isupCgAlarmCarrier(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_isupCgContCheck(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupCgTable_data *StorageTmp = NULL;
+	struct isupCgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupCgContCheck entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupCgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -13902,22 +19699,61 @@ write_isupCgContCheck(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupCgContCheck: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupCgTable_old) == NULL)
+			if (StorageTmp->isupCgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupCgTable_old = isupCgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupCgTable_rsvs++;
+		StorageTmp->isupCgContCheck = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupCgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupCgTable_tsts == 0)
+				if ((ret = check_isupCgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupCgContCheck for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupCgContCheck;
-		StorageTmp->isupCgContCheck = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupCgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupCgTable_sets == 0)
+				if ((ret = update_isupCgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupCgTable_old) != NULL) {
+			isupCgTable_destroy(&StorageTmp->isupCgTable_old);
+			StorageTmp->isupCgTable_rsvs = 0;
+			StorageTmp->isupCgTable_tsts = 0;
+			StorageTmp->isupCgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupCgContCheck = old_value;
+		if ((StorageOld = StorageTmp->isupCgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupCgTable_sets == 0)
+			revert_isupCgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupCgTable_old) == NULL)
+			break;
+		StorageTmp->isupCgContCheck = StorageOld->isupCgContCheck;
+		if (--StorageTmp->isupCgTable_rsvs == 0)
+			isupCgTable_destroy(&StorageTmp->isupCgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -13937,12 +19773,14 @@ write_isupCgContCheck(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_isupCgContCheckRatio(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct isupCgTable_data *StorageTmp = NULL;
+	struct isupCgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupCgContCheckRatio entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupCgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -13972,22 +19810,61 @@ write_isupCgContCheckRatio(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupCgContCheckRatio: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupCgTable_old) == NULL)
+			if (StorageTmp->isupCgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupCgTable_old = isupCgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupCgTable_rsvs++;
+		StorageTmp->isupCgContCheckRatio = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupCgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupCgTable_tsts == 0)
+				if ((ret = check_isupCgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupCgContCheckRatio for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupCgContCheckRatio;
-		StorageTmp->isupCgContCheckRatio = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupCgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupCgTable_sets == 0)
+				if ((ret = update_isupCgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupCgTable_old) != NULL) {
+			isupCgTable_destroy(&StorageTmp->isupCgTable_old);
+			StorageTmp->isupCgTable_rsvs = 0;
+			StorageTmp->isupCgTable_tsts = 0;
+			StorageTmp->isupCgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupCgContCheckRatio = old_value;
+		if ((StorageOld = StorageTmp->isupCgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupCgTable_sets == 0)
+			revert_isupCgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupCgTable_old) == NULL)
+			break;
+		StorageTmp->isupCgContCheckRatio = StorageOld->isupCgContCheckRatio;
+		if (--StorageTmp->isupCgTable_rsvs == 0)
+			isupCgTable_destroy(&StorageTmp->isupCgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14007,12 +19884,14 @@ write_isupCgContCheckRatio(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_isupCgPg(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct isupCgTable_data *StorageTmp = NULL;
+	struct isupCgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupCgPg entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupCgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -14037,22 +19916,61 @@ write_isupCgPg(int action, u_char *var_val, u_char var_val_type, size_t var_val_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupCgPg: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupCgTable_old) == NULL)
+			if (StorageTmp->isupCgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupCgTable_old = isupCgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupCgTable_rsvs++;
+		StorageTmp->isupCgPg = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupCgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupCgTable_tsts == 0)
+				if ((ret = check_isupCgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupCgPg for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupCgPg;
-		StorageTmp->isupCgPg = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupCgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupCgTable_sets == 0)
+				if ((ret = update_isupCgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupCgTable_old) != NULL) {
+			isupCgTable_destroy(&StorageTmp->isupCgTable_old);
+			StorageTmp->isupCgTable_rsvs = 0;
+			StorageTmp->isupCgTable_tsts = 0;
+			StorageTmp->isupCgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupCgPg = old_value;
+		if ((StorageOld = StorageTmp->isupCgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupCgTable_sets == 0)
+			revert_isupCgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupCgTable_old) == NULL)
+			break;
+		StorageTmp->isupCgPg = StorageOld->isupCgPg;
+		if (--StorageTmp->isupCgTable_rsvs == 0)
+			isupCgTable_destroy(&StorageTmp->isupCgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14072,12 +19990,14 @@ write_isupCgPg(int action, u_char *var_val, u_char var_val_type, size_t var_val_
 int
 write_isupCtCg(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct isupCtTable_data *StorageTmp = NULL;
+	struct isupCtTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupCtCg entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupCtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -14103,22 +20023,61 @@ write_isupCtCg(int action, u_char *var_val, u_char var_val_type, size_t var_val_
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 0 */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupCtTable_old) == NULL)
+			if (StorageTmp->isupCtTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupCtTable_old = isupCtTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupCtTable_rsvs++;
+		StorageTmp->isupCtCg = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupCtTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupCtTable_tsts == 0)
+				if ((ret = check_isupCtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCtTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupCtCg for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupCtCg;
-		StorageTmp->isupCtCg = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupCtTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupCtTable_sets == 0)
+				if ((ret = update_isupCtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCtTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupCtTable_old) != NULL) {
+			isupCtTable_destroy(&StorageTmp->isupCtTable_old);
+			StorageTmp->isupCtTable_rsvs = 0;
+			StorageTmp->isupCtTable_tsts = 0;
+			StorageTmp->isupCtTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupCtCg = old_value;
+		if ((StorageOld = StorageTmp->isupCtTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupCtTable_sets == 0)
+			revert_isupCtTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupCtTable_old) == NULL)
+			break;
+		StorageTmp->isupCtCg = StorageOld->isupCtCg;
+		if (--StorageTmp->isupCtTable_rsvs == 0)
+			isupCtTable_destroy(&StorageTmp->isupCtTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14138,12 +20097,14 @@ write_isupCtCg(int action, u_char *var_val, u_char var_val_type, size_t var_val_
 int
 write_isupCtTg(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct isupCtTable_data *StorageTmp = NULL;
+	struct isupCtTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupCtTg entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupCtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -14168,22 +20129,61 @@ write_isupCtTg(int action, u_char *var_val, u_char var_val_type, size_t var_val_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupCtTg: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupCtTable_old) == NULL)
+			if (StorageTmp->isupCtTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupCtTable_old = isupCtTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupCtTable_rsvs++;
+		StorageTmp->isupCtTg = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupCtTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupCtTable_tsts == 0)
+				if ((ret = check_isupCtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCtTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupCtTg for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupCtTg;
-		StorageTmp->isupCtTg = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupCtTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupCtTable_sets == 0)
+				if ((ret = update_isupCtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCtTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupCtTable_old) != NULL) {
+			isupCtTable_destroy(&StorageTmp->isupCtTable_old);
+			StorageTmp->isupCtTable_rsvs = 0;
+			StorageTmp->isupCtTable_tsts = 0;
+			StorageTmp->isupCtTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupCtTg = old_value;
+		if ((StorageOld = StorageTmp->isupCtTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupCtTable_sets == 0)
+			revert_isupCtTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupCtTable_old) == NULL)
+			break;
+		StorageTmp->isupCtTg = StorageOld->isupCtTg;
+		if (--StorageTmp->isupCtTable_rsvs == 0)
+			isupCtTable_destroy(&StorageTmp->isupCtTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14203,12 +20203,14 @@ write_isupCtTg(int action, u_char *var_val, u_char var_val_type, size_t var_val_
 int
 write_isupCtAdminState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupCtTable_data *StorageTmp = NULL;
+	struct isupCtTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupCtAdminState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupCtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -14243,22 +20245,61 @@ write_isupCtAdminState(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupCtAdminState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupCtTable_old) == NULL)
+			if (StorageTmp->isupCtTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupCtTable_old = isupCtTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupCtTable_rsvs++;
+		StorageTmp->isupCtAdminState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupCtTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupCtTable_tsts == 0)
+				if ((ret = check_isupCtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCtTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupCtAdminState for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupCtAdminState;
-		StorageTmp->isupCtAdminState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupCtTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupCtTable_sets == 0)
+				if ((ret = update_isupCtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCtTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupCtTable_old) != NULL) {
+			isupCtTable_destroy(&StorageTmp->isupCtTable_old);
+			StorageTmp->isupCtTable_rsvs = 0;
+			StorageTmp->isupCtTable_tsts = 0;
+			StorageTmp->isupCtTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupCtAdminState = old_value;
+		if ((StorageOld = StorageTmp->isupCtTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupCtTable_sets == 0)
+			revert_isupCtTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupCtTable_old) == NULL)
+			break;
+		StorageTmp->isupCtAdminState = StorageOld->isupCtAdminState;
+		if (--StorageTmp->isupCtTable_rsvs == 0)
+			isupCtTable_destroy(&StorageTmp->isupCtTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14278,17 +20319,17 @@ write_isupCtAdminState(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_isupCtCtpbInstance(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct isupCtTable_data *StorageTmp = NULL;
+	struct isupCtTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupCtCtpbInstance entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupCtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupCtRowStatus) {
@@ -14311,31 +20352,71 @@ write_isupCtCtpbInstance(int action, u_char *var_val, u_char var_val_type, size_
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value zeroDotZero */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupCtTable_old) == NULL)
+			if (StorageTmp->isupCtTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupCtTable_old = isupCtTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupCtTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->isupCtCtpbInstance);
+		StorageTmp->isupCtCtpbInstance = objid;
+		StorageTmp->isupCtCtpbInstanceLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupCtTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupCtTable_tsts == 0)
+				if ((ret = check_isupCtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCtTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupCtCtpbInstance for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupCtCtpbInstance;
-		old_length = StorageTmp->isupCtCtpbInstanceLen;
-		StorageTmp->isupCtCtpbInstance = objid;
-		StorageTmp->isupCtCtpbInstanceLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupCtTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupCtTable_sets == 0)
+				if ((ret = update_isupCtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCtTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupCtTable_old) != NULL) {
+			isupCtTable_destroy(&StorageTmp->isupCtTable_old);
+			StorageTmp->isupCtTable_rsvs = 0;
+			StorageTmp->isupCtTable_tsts = 0;
+			StorageTmp->isupCtTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupCtCtpbInstance = old_value;
-		StorageTmp->isupCtCtpbInstanceLen = old_length;
+		if ((StorageOld = StorageTmp->isupCtTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupCtTable_sets == 0)
+			revert_isupCtTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->isupCtTable_old) == NULL)
+			break;
+		if (StorageOld->isupCtCtpbInstance != NULL) {
+			SNMP_FREE(StorageTmp->isupCtCtpbInstance);
+			StorageTmp->isupCtCtpbInstance = StorageOld->isupCtCtpbInstance;
+			StorageTmp->isupCtCtpbInstanceLen = StorageOld->isupCtCtpbInstanceLen;
+			StorageOld->isupCtCtpbInstance = NULL;
+			StorageOld->isupCtCtpbInstanceLen = 0;
+		}
+		if (--StorageTmp->isupCtTable_rsvs == 0)
+			isupCtTable_destroy(&StorageTmp->isupCtTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14355,12 +20436,14 @@ write_isupCtCtpbInstance(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_isupCtCircuitNumber(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct isupCtTable_data *StorageTmp = NULL;
+	struct isupCtTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupCtCircuitNumber entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupCtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -14386,22 +20469,61 @@ write_isupCtCircuitNumber(int action, u_char *var_val, u_char var_val_type, size
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 0 */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupCtTable_old) == NULL)
+			if (StorageTmp->isupCtTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupCtTable_old = isupCtTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupCtTable_rsvs++;
+		StorageTmp->isupCtCircuitNumber = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupCtTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupCtTable_tsts == 0)
+				if ((ret = check_isupCtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCtTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupCtCircuitNumber for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupCtCircuitNumber;
-		StorageTmp->isupCtCircuitNumber = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupCtTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupCtTable_sets == 0)
+				if ((ret = update_isupCtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCtTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupCtTable_old) != NULL) {
+			isupCtTable_destroy(&StorageTmp->isupCtTable_old);
+			StorageTmp->isupCtTable_rsvs = 0;
+			StorageTmp->isupCtTable_tsts = 0;
+			StorageTmp->isupCtTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupCtCircuitNumber = old_value;
+		if ((StorageOld = StorageTmp->isupCtTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupCtTable_sets == 0)
+			revert_isupCtTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupCtTable_old) == NULL)
+			break;
+		StorageTmp->isupCtCircuitNumber = StorageOld->isupCtCircuitNumber;
+		if (--StorageTmp->isupCtTable_rsvs == 0)
+			isupCtTable_destroy(&StorageTmp->isupCtTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14421,17 +20543,17 @@ write_isupCtCircuitNumber(int action, u_char *var_val, u_char var_val_type, size
 int
 write_isupCtOfficeEquip(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct isupCtTable_data *StorageTmp = NULL;
+	struct isupCtTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupCtOfficeEquip entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupCtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->isupCtRowStatus) {
@@ -14454,33 +20576,73 @@ write_isupCtOfficeEquip(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupCtOfficeEquip: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupCtTable_old) == NULL)
+			if (StorageTmp->isupCtTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupCtTable_old = isupCtTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupCtTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->isupCtOfficeEquip);
+		StorageTmp->isupCtOfficeEquip = string;
+		StorageTmp->isupCtOfficeEquipLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupCtTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupCtTable_tsts == 0)
+				if ((ret = check_isupCtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCtTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupCtOfficeEquip for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupCtOfficeEquip;
-		old_length = StorageTmp->isupCtOfficeEquipLen;
-		StorageTmp->isupCtOfficeEquip = string;
-		StorageTmp->isupCtOfficeEquipLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupCtTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupCtTable_sets == 0)
+				if ((ret = update_isupCtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCtTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupCtTable_old) != NULL) {
+			isupCtTable_destroy(&StorageTmp->isupCtTable_old);
+			StorageTmp->isupCtTable_rsvs = 0;
+			StorageTmp->isupCtTable_tsts = 0;
+			StorageTmp->isupCtTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupCtOfficeEquip = old_value;
-		StorageTmp->isupCtOfficeEquipLen = old_length;
+		if ((StorageOld = StorageTmp->isupCtTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupCtTable_sets == 0)
+			revert_isupCtTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->isupCtTable_old) == NULL)
+			break;
+		if (StorageOld->isupCtOfficeEquip != NULL) {
+			SNMP_FREE(StorageTmp->isupCtOfficeEquip);
+			StorageTmp->isupCtOfficeEquip = StorageOld->isupCtOfficeEquip;
+			StorageTmp->isupCtOfficeEquipLen = StorageOld->isupCtOfficeEquipLen;
+			StorageOld->isupCtOfficeEquip = NULL;
+			StorageOld->isupCtOfficeEquipLen = 0;
+		}
+		if (--StorageTmp->isupCtTable_rsvs == 0)
+			isupCtTable_destroy(&StorageTmp->isupCtTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -14500,12 +20662,14 @@ write_isupCtOfficeEquip(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_isupCtCIC(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct isupCtTable_data *StorageTmp = NULL;
+	struct isupCtTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("isupMIB", "write_isupCtCIC entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(isupCtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -14535,259 +20699,506 @@ write_isupCtCIC(int action, u_char *var_val, u_char var_val_type, size_t var_val
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to isupCtCIC: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->isupCtTable_old) == NULL)
+			if (StorageTmp->isupCtTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->isupCtTable_old = isupCtTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->isupCtTable_rsvs++;
+		StorageTmp->isupCtCIC = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->isupCtTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->isupCtTable_tsts == 0)
+				if ((ret = check_isupCtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCtTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->isupCtCIC for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->isupCtCIC;
-		StorageTmp->isupCtCIC = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->isupCtTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->isupCtTable_sets == 0)
+				if ((ret = update_isupCtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->isupCtTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->isupCtTable_old) != NULL) {
+			isupCtTable_destroy(&StorageTmp->isupCtTable_old);
+			StorageTmp->isupCtTable_rsvs = 0;
+			StorageTmp->isupCtTable_tsts = 0;
+			StorageTmp->isupCtTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->isupCtCIC = old_value;
+		if ((StorageOld = StorageTmp->isupCtTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->isupCtTable_sets == 0)
+			revert_isupCtTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->isupCtTable_old) == NULL)
+			break;
+		StorageTmp->isupCtCIC = StorageOld->isupCtCIC;
+		if (--StorageTmp->isupCtTable_rsvs == 0)
+			isupCtTable_destroy(&StorageTmp->isupCtTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int isupMsTable_consistent(struct isupMsTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_isupMsTable_row(struct isupMsTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the isupMsTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-isupMsTable_consistent(struct isupMsTable_data *thedata)
+can_act_isupMsTable_row(struct isupMsTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int isupPgTable_consistent(struct isupPgTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_isupMsTable_row(struct isupMsTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the isupPgTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-isupPgTable_consistent(struct isupPgTable_data *thedata)
+can_deact_isupMsTable_row(struct isupMsTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int isupPuTable_consistent(struct isupPuTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_isupPgTable_row(struct isupPgTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the isupPuTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-isupPuTable_consistent(struct isupPuTable_data *thedata)
+can_act_isupPgTable_row(struct isupPgTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int isupLgTable_consistent(struct isupLgTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_isupPgTable_row(struct isupPgTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the isupLgTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-isupLgTable_consistent(struct isupLgTable_data *thedata)
+can_deact_isupPgTable_row(struct isupPgTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int isupMtpTable_consistent(struct isupMtpTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_isupPuTable_row(struct isupPuTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the isupMtpTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-isupMtpTable_consistent(struct isupMtpTable_data *thedata)
+can_act_isupPuTable_row(struct isupPuTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int isupNaTable_consistent(struct isupNaTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_isupPuTable_row(struct isupPuTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the isupNaTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-isupNaTable_consistent(struct isupNaTable_data *thedata)
+can_deact_isupPuTable_row(struct isupPuTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int isupSpTable_consistent(struct isupSpTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_isupLgTable_row(struct isupLgTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the isupSpTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-isupSpTable_consistent(struct isupSpTable_data *thedata)
+can_act_isupLgTable_row(struct isupLgTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int isupSrTable_consistent(struct isupSrTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_isupLgTable_row(struct isupLgTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the isupSrTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-isupSrTable_consistent(struct isupSrTable_data *thedata)
+can_deact_isupLgTable_row(struct isupLgTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int isupRtTable_consistent(struct isupRtTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_isupMtpTable_row(struct isupMtpTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the isupRtTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-isupRtTable_consistent(struct isupRtTable_data *thedata)
+can_act_isupMtpTable_row(struct isupMtpTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int isupRtTgSelectionTable_consistent(struct isupRtTgSelectionTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_isupMtpTable_row(struct isupMtpTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the isupRtTgSelectionTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-isupRtTgSelectionTable_consistent(struct isupRtTgSelectionTable_data *thedata)
+can_deact_isupMtpTable_row(struct isupMtpTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int isupTgTable_consistent(struct isupTgTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_isupNaTable_row(struct isupNaTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the isupTgTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-isupTgTable_consistent(struct isupTgTable_data *thedata)
+can_act_isupNaTable_row(struct isupNaTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int isupCgTable_consistent(struct isupCgTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_isupNaTable_row(struct isupNaTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the isupCgTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-isupCgTable_consistent(struct isupCgTable_data *thedata)
+can_deact_isupNaTable_row(struct isupNaTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int isupCtTable_consistent(struct isupCtTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_isupSpTable_row(struct isupSpTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the isupCtTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-isupCtTable_consistent(struct isupCtTable_data *thedata)
+can_act_isupSpTable_row(struct isupSpTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_isupSpTable_row(struct isupSpTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_isupSpTable_row(struct isupSpTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_isupSrTable_row(struct isupSrTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_isupSrTable_row(struct isupSrTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_isupSrTable_row(struct isupSrTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_isupSrTable_row(struct isupSrTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_isupRtTable_row(struct isupRtTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_isupRtTable_row(struct isupRtTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_isupRtTable_row(struct isupRtTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_isupRtTable_row(struct isupRtTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_isupRtTgSelectionTable_row(struct isupRtTgSelectionTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_isupRtTgSelectionTable_row(struct isupRtTgSelectionTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_isupRtTgSelectionTable_row(struct isupRtTgSelectionTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_isupRtTgSelectionTable_row(struct isupRtTgSelectionTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_isupTgTable_row(struct isupTgTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_isupTgTable_row(struct isupTgTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_isupTgTable_row(struct isupTgTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_isupTgTable_row(struct isupTgTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_isupCgTable_row(struct isupCgTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_isupCgTable_row(struct isupCgTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_isupCgTable_row(struct isupCgTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_isupCgTable_row(struct isupCgTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_isupCtTable_row(struct isupCtTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_isupCtTable_row(struct isupCtTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_isupCtTable_row(struct isupCtTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_isupCtTable_row(struct isupCtTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
@@ -14804,10 +21215,9 @@ isupCtTable_consistent(struct isupCtTable_data *thedata)
 int
 write_isupMsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct isupMsTable_data *StorageTmp = NULL;
+	struct isupMsTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct isupMsTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 16;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -14834,40 +21244,6 @@ write_isupMsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->isupMsRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->isupMsTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->isupMsTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* isupMsId */
@@ -14891,12 +21267,43 @@ write_isupMsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->isupMsTable_rsvs = 1;
 			vp = vars;
 			StorageNew->isupMsId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&isupMsTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->isupMsRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->isupMsTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->isupMsTable_old) == NULL)
+				if (StorageTmp->isupMsTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->isupMsTable_old = isupMsTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->isupMsTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->isupMsTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -14906,78 +21313,127 @@ write_isupMsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = isupMsTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_isupMsTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->isupMsRowStatus;
-			StorageTmp->isupMsRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = isupMsTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->isupMsRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->isupMsRowStatus != RS_ACTIVE)
+				if ((ret = can_act_isupMsTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->isupMsRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_isupMsTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->isupMsRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_isupMsTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->isupMsRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_isupMsTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->isupMsRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_isupMsTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->isupMsRowStatus;
-			StorageTmp->isupMsRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->isupMsRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_isupMsTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_isupMsTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->isupMsRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->isupMsRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->isupMsRowStatus = set_value;
+			if ((StorageOld = StorageTmp->isupMsTable_old) != NULL) {
+				isupMsTable_destroy(&StorageTmp->isupMsTable_old);
+				StorageTmp->isupMsTable_rsvs = 0;
+				StorageTmp->isupMsTable_tsts = 0;
+				StorageTmp->isupMsTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			isupMsTable_destroy(&StorageDel);
-			/* isupMsTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_isupMsTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->isupMsRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_isupMsTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->isupMsRowStatus = old_value;
+			if (StorageTmp->isupMsRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_isupMsTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -14991,6 +21447,13 @@ write_isupMsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				isupMsTable_del(StorageNew);
 				isupMsTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->isupMsTable_old) == NULL)
+				break;
+			if (--StorageTmp->isupMsTable_rsvs == 0)
+				isupMsTable_destroy(&StorageTmp->isupMsTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -15017,10 +21480,9 @@ write_isupMsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_isupPgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct isupPgTable_data *StorageTmp = NULL;
+	struct isupPgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct isupPgTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 16;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -15047,40 +21509,6 @@ write_isupPgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->isupPgRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->isupPgTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->isupPgTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* isupPgId */
@@ -15104,12 +21532,43 @@ write_isupPgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->isupPgTable_rsvs = 1;
 			vp = vars;
 			StorageNew->isupPgId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&isupPgTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->isupPgRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->isupPgTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+				if (StorageTmp->isupPgTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->isupPgTable_old = isupPgTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->isupPgTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->isupPgTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -15119,78 +21578,127 @@ write_isupPgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = isupPgTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_isupPgTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->isupPgRowStatus;
-			StorageTmp->isupPgRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = isupPgTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->isupPgRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->isupPgRowStatus != RS_ACTIVE)
+				if ((ret = can_act_isupPgTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->isupPgRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_isupPgTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->isupPgRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_isupPgTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->isupPgRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_isupPgTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->isupPgRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_isupPgTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->isupPgRowStatus;
-			StorageTmp->isupPgRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->isupPgRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_isupPgTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_isupPgTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->isupPgRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->isupPgRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->isupPgRowStatus = set_value;
+			if ((StorageOld = StorageTmp->isupPgTable_old) != NULL) {
+				isupPgTable_destroy(&StorageTmp->isupPgTable_old);
+				StorageTmp->isupPgTable_rsvs = 0;
+				StorageTmp->isupPgTable_tsts = 0;
+				StorageTmp->isupPgTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			isupPgTable_destroy(&StorageDel);
-			/* isupPgTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_isupPgTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->isupPgRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_isupPgTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->isupPgRowStatus = old_value;
+			if (StorageTmp->isupPgRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_isupPgTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -15204,6 +21712,13 @@ write_isupPgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				isupPgTable_del(StorageNew);
 				isupPgTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->isupPgTable_old) == NULL)
+				break;
+			if (--StorageTmp->isupPgTable_rsvs == 0)
+				isupPgTable_destroy(&StorageTmp->isupPgTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -15230,10 +21745,9 @@ write_isupPgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_isupPuRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct isupPuTable_data *StorageTmp = NULL;
+	struct isupPuTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct isupPuTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 16;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -15260,40 +21774,6 @@ write_isupPuRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->isupPuRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->isupPuTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->isupPuTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* isupPgId */
@@ -15335,6 +21815,7 @@ write_isupPuRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->isupPuTable_rsvs = 1;
 			vp = vars;
 			StorageNew->isupPgId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -15342,7 +21823,37 @@ write_isupPuRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			vp = vp->next_variable;
 			header_complex_add_data(&isupPuTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->isupPuRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->isupPuTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+				if (StorageTmp->isupPuTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->isupPuTable_old = isupPuTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->isupPuTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->isupPuTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -15352,78 +21863,127 @@ write_isupPuRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = isupPuTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_isupPuTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->isupPuRowStatus;
-			StorageTmp->isupPuRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = isupPuTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->isupPuRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->isupPuRowStatus != RS_ACTIVE)
+				if ((ret = can_act_isupPuTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->isupPuRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_isupPuTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->isupPuRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_isupPuTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->isupPuRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_isupPuTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->isupPuRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_isupPuTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->isupPuRowStatus;
-			StorageTmp->isupPuRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->isupPuRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_isupPuTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_isupPuTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->isupPuRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->isupPuRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->isupPuRowStatus = set_value;
+			if ((StorageOld = StorageTmp->isupPuTable_old) != NULL) {
+				isupPuTable_destroy(&StorageTmp->isupPuTable_old);
+				StorageTmp->isupPuTable_rsvs = 0;
+				StorageTmp->isupPuTable_tsts = 0;
+				StorageTmp->isupPuTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			isupPuTable_destroy(&StorageDel);
-			/* isupPuTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_isupPuTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->isupPuRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_isupPuTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->isupPuRowStatus = old_value;
+			if (StorageTmp->isupPuRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_isupPuTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -15437,6 +21997,13 @@ write_isupPuRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				isupPuTable_del(StorageNew);
 				isupPuTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->isupPuTable_old) == NULL)
+				break;
+			if (--StorageTmp->isupPuTable_rsvs == 0)
+				isupPuTable_destroy(&StorageTmp->isupPuTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -15463,10 +22030,9 @@ write_isupPuRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_isupLgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct isupLgTable_data *StorageTmp = NULL;
+	struct isupLgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct isupLgTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 16;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -15493,40 +22059,6 @@ write_isupLgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->isupLgRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->isupLgTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->isupLgTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* isupLgId */
@@ -15550,12 +22082,43 @@ write_isupLgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->isupLgTable_rsvs = 1;
 			vp = vars;
 			StorageNew->isupLgId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&isupLgTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->isupLgRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->isupLgTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->isupLgTable_old) == NULL)
+				if (StorageTmp->isupLgTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->isupLgTable_old = isupLgTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->isupLgTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->isupLgTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -15565,78 +22128,127 @@ write_isupLgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = isupLgTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_isupLgTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->isupLgRowStatus;
-			StorageTmp->isupLgRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = isupLgTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->isupLgRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->isupLgRowStatus != RS_ACTIVE)
+				if ((ret = can_act_isupLgTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->isupLgRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_isupLgTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->isupLgRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_isupLgTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->isupLgRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_isupLgTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->isupLgRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_isupLgTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->isupLgRowStatus;
-			StorageTmp->isupLgRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->isupLgRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_isupLgTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_isupLgTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->isupLgRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->isupLgRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->isupLgRowStatus = set_value;
+			if ((StorageOld = StorageTmp->isupLgTable_old) != NULL) {
+				isupLgTable_destroy(&StorageTmp->isupLgTable_old);
+				StorageTmp->isupLgTable_rsvs = 0;
+				StorageTmp->isupLgTable_tsts = 0;
+				StorageTmp->isupLgTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			isupLgTable_destroy(&StorageDel);
-			/* isupLgTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_isupLgTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->isupLgRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_isupLgTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->isupLgRowStatus = old_value;
+			if (StorageTmp->isupLgRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_isupLgTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -15650,6 +22262,13 @@ write_isupLgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				isupLgTable_del(StorageNew);
 				isupLgTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->isupLgTable_old) == NULL)
+				break;
+			if (--StorageTmp->isupLgTable_rsvs == 0)
+				isupLgTable_destroy(&StorageTmp->isupLgTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -15676,10 +22295,9 @@ write_isupLgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_isupMtpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct isupMtpTable_data *StorageTmp = NULL;
+	struct isupMtpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct isupMtpTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 16;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -15706,40 +22324,6 @@ write_isupMtpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->isupMtpRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->isupMtpTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->isupMtpTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* isupMsId */
@@ -15787,6 +22371,7 @@ write_isupMtpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->isupMtpTable_rsvs = 1;
 			vp = vars;
 			StorageNew->isupMsId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -15796,7 +22381,37 @@ write_isupMtpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 			vp = vp->next_variable;
 			header_complex_add_data(&isupMtpTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->isupMtpRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->isupMtpTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->isupMtpTable_old) == NULL)
+				if (StorageTmp->isupMtpTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->isupMtpTable_old = isupMtpTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->isupMtpTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->isupMtpTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -15806,78 +22421,127 @@ write_isupMtpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = isupMtpTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_isupMtpTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->isupMtpRowStatus;
-			StorageTmp->isupMtpRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = isupMtpTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->isupMtpRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->isupMtpRowStatus != RS_ACTIVE)
+				if ((ret = can_act_isupMtpTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->isupMtpRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_isupMtpTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->isupMtpRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_isupMtpTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->isupMtpRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_isupMtpTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->isupMtpRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_isupMtpTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->isupMtpRowStatus;
-			StorageTmp->isupMtpRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->isupMtpRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_isupMtpTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_isupMtpTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->isupMtpRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->isupMtpRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->isupMtpRowStatus = set_value;
+			if ((StorageOld = StorageTmp->isupMtpTable_old) != NULL) {
+				isupMtpTable_destroy(&StorageTmp->isupMtpTable_old);
+				StorageTmp->isupMtpTable_rsvs = 0;
+				StorageTmp->isupMtpTable_tsts = 0;
+				StorageTmp->isupMtpTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			isupMtpTable_destroy(&StorageDel);
-			/* isupMtpTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_isupMtpTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->isupMtpRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_isupMtpTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->isupMtpRowStatus = old_value;
+			if (StorageTmp->isupMtpRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_isupMtpTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -15891,6 +22555,13 @@ write_isupMtpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				isupMtpTable_del(StorageNew);
 				isupMtpTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->isupMtpTable_old) == NULL)
+				break;
+			if (--StorageTmp->isupMtpTable_rsvs == 0)
+				isupMtpTable_destroy(&StorageTmp->isupMtpTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -15917,10 +22588,9 @@ write_isupMtpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_isupNaRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct isupNaTable_data *StorageTmp = NULL;
+	struct isupNaTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct isupNaTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 16;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -15947,40 +22617,6 @@ write_isupNaRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->isupNaRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->isupNaTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->isupNaTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* isupNaId */
@@ -16010,12 +22646,43 @@ write_isupNaRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->isupNaTable_rsvs = 1;
 			vp = vars;
 			StorageNew->isupNaId = (long) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&isupNaTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->isupNaRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->isupNaTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->isupNaTable_old) == NULL)
+				if (StorageTmp->isupNaTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->isupNaTable_old = isupNaTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->isupNaTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->isupNaTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -16025,78 +22692,127 @@ write_isupNaRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = isupNaTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_isupNaTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->isupNaRowStatus;
-			StorageTmp->isupNaRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = isupNaTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->isupNaRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->isupNaRowStatus != RS_ACTIVE)
+				if ((ret = can_act_isupNaTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->isupNaRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_isupNaTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->isupNaRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_isupNaTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->isupNaRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_isupNaTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->isupNaRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_isupNaTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->isupNaRowStatus;
-			StorageTmp->isupNaRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->isupNaRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_isupNaTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_isupNaTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->isupNaRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->isupNaRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->isupNaRowStatus = set_value;
+			if ((StorageOld = StorageTmp->isupNaTable_old) != NULL) {
+				isupNaTable_destroy(&StorageTmp->isupNaTable_old);
+				StorageTmp->isupNaTable_rsvs = 0;
+				StorageTmp->isupNaTable_tsts = 0;
+				StorageTmp->isupNaTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			isupNaTable_destroy(&StorageDel);
-			/* isupNaTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_isupNaTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->isupNaRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_isupNaTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->isupNaRowStatus = old_value;
+			if (StorageTmp->isupNaRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_isupNaTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -16110,6 +22826,13 @@ write_isupNaRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				isupNaTable_del(StorageNew);
 				isupNaTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->isupNaTable_old) == NULL)
+				break;
+			if (--StorageTmp->isupNaTable_rsvs == 0)
+				isupNaTable_destroy(&StorageTmp->isupNaTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -16136,10 +22859,9 @@ write_isupNaRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_isupSpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct isupSpTable_data *StorageTmp = NULL;
+	struct isupSpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct isupSpTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 16;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -16166,40 +22888,6 @@ write_isupSpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->isupSpRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->isupSpTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->isupSpTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* isupMsId */
@@ -16235,6 +22923,7 @@ write_isupSpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->isupSpTable_rsvs = 1;
 			vp = vars;
 			StorageNew->isupMsId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -16242,7 +22931,37 @@ write_isupSpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			vp = vp->next_variable;
 			header_complex_add_data(&isupSpTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->isupSpRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->isupSpTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+				if (StorageTmp->isupSpTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->isupSpTable_old = isupSpTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->isupSpTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->isupSpTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -16252,78 +22971,127 @@ write_isupSpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = isupSpTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_isupSpTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->isupSpRowStatus;
-			StorageTmp->isupSpRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = isupSpTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->isupSpRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->isupSpRowStatus != RS_ACTIVE)
+				if ((ret = can_act_isupSpTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->isupSpRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_isupSpTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->isupSpRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_isupSpTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->isupSpRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_isupSpTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->isupSpRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_isupSpTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->isupSpRowStatus;
-			StorageTmp->isupSpRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->isupSpRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_isupSpTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_isupSpTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->isupSpRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->isupSpRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->isupSpRowStatus = set_value;
+			if ((StorageOld = StorageTmp->isupSpTable_old) != NULL) {
+				isupSpTable_destroy(&StorageTmp->isupSpTable_old);
+				StorageTmp->isupSpTable_rsvs = 0;
+				StorageTmp->isupSpTable_tsts = 0;
+				StorageTmp->isupSpTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			isupSpTable_destroy(&StorageDel);
-			/* isupSpTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_isupSpTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->isupSpRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_isupSpTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->isupSpRowStatus = old_value;
+			if (StorageTmp->isupSpRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_isupSpTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -16337,6 +23105,13 @@ write_isupSpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				isupSpTable_del(StorageNew);
 				isupSpTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->isupSpTable_old) == NULL)
+				break;
+			if (--StorageTmp->isupSpTable_rsvs == 0)
+				isupSpTable_destroy(&StorageTmp->isupSpTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -16363,10 +23138,9 @@ write_isupSpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_isupSrRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct isupSrTable_data *StorageTmp = NULL;
+	struct isupSrTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct isupSrTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 16;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -16393,40 +23167,6 @@ write_isupSrRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->isupSrRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->isupSrTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->isupSrTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* isupMsId */
@@ -16474,6 +23214,7 @@ write_isupSrRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->isupSrTable_rsvs = 1;
 			vp = vars;
 			StorageNew->isupMsId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -16483,7 +23224,37 @@ write_isupSrRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			vp = vp->next_variable;
 			header_complex_add_data(&isupSrTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->isupSrRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->isupSrTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+				if (StorageTmp->isupSrTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->isupSrTable_old = isupSrTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->isupSrTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->isupSrTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -16493,78 +23264,127 @@ write_isupSrRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = isupSrTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_isupSrTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->isupSrRowStatus;
-			StorageTmp->isupSrRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = isupSrTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->isupSrRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->isupSrRowStatus != RS_ACTIVE)
+				if ((ret = can_act_isupSrTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->isupSrRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_isupSrTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->isupSrRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_isupSrTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->isupSrRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_isupSrTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->isupSrRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_isupSrTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->isupSrRowStatus;
-			StorageTmp->isupSrRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->isupSrRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_isupSrTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_isupSrTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->isupSrRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->isupSrRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->isupSrRowStatus = set_value;
+			if ((StorageOld = StorageTmp->isupSrTable_old) != NULL) {
+				isupSrTable_destroy(&StorageTmp->isupSrTable_old);
+				StorageTmp->isupSrTable_rsvs = 0;
+				StorageTmp->isupSrTable_tsts = 0;
+				StorageTmp->isupSrTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			isupSrTable_destroy(&StorageDel);
-			/* isupSrTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_isupSrTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->isupSrRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_isupSrTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->isupSrRowStatus = old_value;
+			if (StorageTmp->isupSrRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_isupSrTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -16578,6 +23398,13 @@ write_isupSrRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				isupSrTable_del(StorageNew);
 				isupSrTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->isupSrTable_old) == NULL)
+				break;
+			if (--StorageTmp->isupSrTable_rsvs == 0)
+				isupSrTable_destroy(&StorageTmp->isupSrTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -16604,10 +23431,9 @@ write_isupSrRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_isupRtRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct isupRtTable_data *StorageTmp = NULL;
+	struct isupRtTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct isupRtTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 16;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -16634,40 +23460,6 @@ write_isupRtRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->isupRtRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->isupRtTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->isupRtTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* isupRtId */
@@ -16691,12 +23483,43 @@ write_isupRtRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->isupRtTable_rsvs = 1;
 			vp = vars;
 			StorageNew->isupRtId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&isupRtTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->isupRtRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->isupRtTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->isupRtTable_old) == NULL)
+				if (StorageTmp->isupRtTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->isupRtTable_old = isupRtTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->isupRtTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->isupRtTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -16706,78 +23529,127 @@ write_isupRtRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = isupRtTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_isupRtTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->isupRtRowStatus;
-			StorageTmp->isupRtRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = isupRtTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->isupRtRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->isupRtRowStatus != RS_ACTIVE)
+				if ((ret = can_act_isupRtTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->isupRtRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_isupRtTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->isupRtRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_isupRtTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->isupRtRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_isupRtTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->isupRtRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_isupRtTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->isupRtRowStatus;
-			StorageTmp->isupRtRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->isupRtRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_isupRtTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_isupRtTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->isupRtRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->isupRtRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->isupRtRowStatus = set_value;
+			if ((StorageOld = StorageTmp->isupRtTable_old) != NULL) {
+				isupRtTable_destroy(&StorageTmp->isupRtTable_old);
+				StorageTmp->isupRtTable_rsvs = 0;
+				StorageTmp->isupRtTable_tsts = 0;
+				StorageTmp->isupRtTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			isupRtTable_destroy(&StorageDel);
-			/* isupRtTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_isupRtTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->isupRtRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_isupRtTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->isupRtRowStatus = old_value;
+			if (StorageTmp->isupRtRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_isupRtTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -16791,6 +23663,13 @@ write_isupRtRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				isupRtTable_del(StorageNew);
 				isupRtTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->isupRtTable_old) == NULL)
+				break;
+			if (--StorageTmp->isupRtTable_rsvs == 0)
+				isupRtTable_destroy(&StorageTmp->isupRtTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -16817,10 +23696,9 @@ write_isupRtRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_isupRtTgSelectionRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct isupRtTgSelectionTable_data *StorageTmp = NULL;
+	struct isupRtTgSelectionTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct isupRtTgSelectionTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 16;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -16847,40 +23725,6 @@ write_isupRtTgSelectionRowStatus(int action, u_char *var_val, u_char var_val_typ
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->isupRtTgSelectionRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->isupRtTgSelectionTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->isupRtTgSelectionTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* isupRtId */
@@ -16916,6 +23760,7 @@ write_isupRtTgSelectionRowStatus(int action, u_char *var_val, u_char var_val_typ
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->isupRtTgSelectionTable_rsvs = 1;
 			vp = vars;
 			StorageNew->isupRtId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -16923,7 +23768,37 @@ write_isupRtTgSelectionRowStatus(int action, u_char *var_val, u_char var_val_typ
 			vp = vp->next_variable;
 			header_complex_add_data(&isupRtTgSelectionTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->isupRtTgSelectionRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->isupRtTgSelectionTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->isupRtTgSelectionTable_old) == NULL)
+				if (StorageTmp->isupRtTgSelectionTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->isupRtTgSelectionTable_old = isupRtTgSelectionTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->isupRtTgSelectionTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->isupRtTgSelectionTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -16933,78 +23808,127 @@ write_isupRtTgSelectionRowStatus(int action, u_char *var_val, u_char var_val_typ
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = isupRtTgSelectionTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_isupRtTgSelectionTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->isupRtTgSelectionRowStatus;
-			StorageTmp->isupRtTgSelectionRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = isupRtTgSelectionTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->isupRtTgSelectionRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->isupRtTgSelectionRowStatus != RS_ACTIVE)
+				if ((ret = can_act_isupRtTgSelectionTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->isupRtTgSelectionRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_isupRtTgSelectionTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->isupRtTgSelectionRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_isupRtTgSelectionTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->isupRtTgSelectionRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_isupRtTgSelectionTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->isupRtTgSelectionRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_isupRtTgSelectionTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->isupRtTgSelectionRowStatus;
-			StorageTmp->isupRtTgSelectionRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->isupRtTgSelectionRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_isupRtTgSelectionTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_isupRtTgSelectionTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->isupRtTgSelectionRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->isupRtTgSelectionRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->isupRtTgSelectionRowStatus = set_value;
+			if ((StorageOld = StorageTmp->isupRtTgSelectionTable_old) != NULL) {
+				isupRtTgSelectionTable_destroy(&StorageTmp->isupRtTgSelectionTable_old);
+				StorageTmp->isupRtTgSelectionTable_rsvs = 0;
+				StorageTmp->isupRtTgSelectionTable_tsts = 0;
+				StorageTmp->isupRtTgSelectionTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			isupRtTgSelectionTable_destroy(&StorageDel);
-			/* isupRtTgSelectionTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_isupRtTgSelectionTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->isupRtTgSelectionRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_isupRtTgSelectionTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->isupRtTgSelectionRowStatus = old_value;
+			if (StorageTmp->isupRtTgSelectionRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_isupRtTgSelectionTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -17018,6 +23942,13 @@ write_isupRtTgSelectionRowStatus(int action, u_char *var_val, u_char var_val_typ
 				isupRtTgSelectionTable_del(StorageNew);
 				isupRtTgSelectionTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->isupRtTgSelectionTable_old) == NULL)
+				break;
+			if (--StorageTmp->isupRtTgSelectionTable_rsvs == 0)
+				isupRtTgSelectionTable_destroy(&StorageTmp->isupRtTgSelectionTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -17044,10 +23975,9 @@ write_isupRtTgSelectionRowStatus(int action, u_char *var_val, u_char var_val_typ
 int
 write_isupTgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct isupTgTable_data *StorageTmp = NULL;
+	struct isupTgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct isupTgTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 16;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -17074,40 +24004,6 @@ write_isupTgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->isupTgRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->isupTgTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->isupTgTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* isupTgId */
@@ -17131,12 +24027,43 @@ write_isupTgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->isupTgTable_rsvs = 1;
 			vp = vars;
 			StorageNew->isupTgId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&isupTgTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->isupTgRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->isupTgTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+				if (StorageTmp->isupTgTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->isupTgTable_old = isupTgTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->isupTgTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->isupTgTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -17146,78 +24073,127 @@ write_isupTgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = isupTgTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_isupTgTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->isupTgRowStatus;
-			StorageTmp->isupTgRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = isupTgTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->isupTgRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->isupTgRowStatus != RS_ACTIVE)
+				if ((ret = can_act_isupTgTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->isupTgRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_isupTgTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->isupTgRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_isupTgTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->isupTgRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_isupTgTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->isupTgRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_isupTgTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->isupTgRowStatus;
-			StorageTmp->isupTgRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->isupTgRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_isupTgTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_isupTgTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->isupTgRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->isupTgRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->isupTgRowStatus = set_value;
+			if ((StorageOld = StorageTmp->isupTgTable_old) != NULL) {
+				isupTgTable_destroy(&StorageTmp->isupTgTable_old);
+				StorageTmp->isupTgTable_rsvs = 0;
+				StorageTmp->isupTgTable_tsts = 0;
+				StorageTmp->isupTgTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			isupTgTable_destroy(&StorageDel);
-			/* isupTgTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_isupTgTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->isupTgRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_isupTgTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->isupTgRowStatus = old_value;
+			if (StorageTmp->isupTgRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_isupTgTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -17231,6 +24207,13 @@ write_isupTgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				isupTgTable_del(StorageNew);
 				isupTgTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->isupTgTable_old) == NULL)
+				break;
+			if (--StorageTmp->isupTgTable_rsvs == 0)
+				isupTgTable_destroy(&StorageTmp->isupTgTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -17257,10 +24240,9 @@ write_isupTgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_isupCgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct isupCgTable_data *StorageTmp = NULL;
+	struct isupCgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct isupCgTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 16;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -17287,40 +24269,6 @@ write_isupCgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->isupCgRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->isupCgTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->isupCgTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* isupCgId */
@@ -17344,12 +24292,43 @@ write_isupCgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->isupCgTable_rsvs = 1;
 			vp = vars;
 			StorageNew->isupCgId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&isupCgTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->isupCgRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->isupCgTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->isupCgTable_old) == NULL)
+				if (StorageTmp->isupCgTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->isupCgTable_old = isupCgTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->isupCgTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->isupCgTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -17359,78 +24338,127 @@ write_isupCgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = isupCgTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_isupCgTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->isupCgRowStatus;
-			StorageTmp->isupCgRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = isupCgTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->isupCgRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->isupCgRowStatus != RS_ACTIVE)
+				if ((ret = can_act_isupCgTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->isupCgRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_isupCgTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->isupCgRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_isupCgTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->isupCgRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_isupCgTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->isupCgRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_isupCgTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->isupCgRowStatus;
-			StorageTmp->isupCgRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->isupCgRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_isupCgTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_isupCgTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->isupCgRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->isupCgRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->isupCgRowStatus = set_value;
+			if ((StorageOld = StorageTmp->isupCgTable_old) != NULL) {
+				isupCgTable_destroy(&StorageTmp->isupCgTable_old);
+				StorageTmp->isupCgTable_rsvs = 0;
+				StorageTmp->isupCgTable_tsts = 0;
+				StorageTmp->isupCgTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			isupCgTable_destroy(&StorageDel);
-			/* isupCgTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_isupCgTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->isupCgRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_isupCgTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->isupCgRowStatus = old_value;
+			if (StorageTmp->isupCgRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_isupCgTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -17444,6 +24472,13 @@ write_isupCgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				isupCgTable_del(StorageNew);
 				isupCgTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->isupCgTable_old) == NULL)
+				break;
+			if (--StorageTmp->isupCgTable_rsvs == 0)
+				isupCgTable_destroy(&StorageTmp->isupCgTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -17470,10 +24505,9 @@ write_isupCgRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_isupCtRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct isupCtTable_data *StorageTmp = NULL;
+	struct isupCtTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct isupCtTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 16;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -17500,40 +24534,6 @@ write_isupCtRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->isupCtRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->isupCtTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->isupCtTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* isupCtId */
@@ -17557,12 +24557,43 @@ write_isupCtRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->isupCtTable_rsvs = 1;
 			vp = vars;
 			StorageNew->isupCtId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&isupCtTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->isupCtRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->isupCtTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->isupCtTable_old) == NULL)
+				if (StorageTmp->isupCtTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->isupCtTable_old = isupCtTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->isupCtTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->isupCtTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -17572,78 +24603,127 @@ write_isupCtRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = isupCtTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_isupCtTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->isupCtRowStatus;
-			StorageTmp->isupCtRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = isupCtTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->isupCtRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->isupCtRowStatus != RS_ACTIVE)
+				if ((ret = can_act_isupCtTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->isupCtRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_isupCtTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->isupCtRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_isupCtTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->isupCtRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_isupCtTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->isupCtRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_isupCtTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->isupCtRowStatus;
-			StorageTmp->isupCtRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->isupCtRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_isupCtTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_isupCtTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->isupCtRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->isupCtRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->isupCtRowStatus = set_value;
+			if ((StorageOld = StorageTmp->isupCtTable_old) != NULL) {
+				isupCtTable_destroy(&StorageTmp->isupCtTable_old);
+				StorageTmp->isupCtTable_rsvs = 0;
+				StorageTmp->isupCtTable_tsts = 0;
+				StorageTmp->isupCtTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			isupCtTable_destroy(&StorageDel);
-			/* isupCtTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_isupCtTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->isupCtRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_isupCtTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->isupCtRowStatus = old_value;
+			if (StorageTmp->isupCtRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_isupCtTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -17657,6 +24737,13 @@ write_isupCtRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				isupCtTable_del(StorageNew);
 				isupCtTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->isupCtTable_old) == NULL)
+				break;
+			if (--StorageTmp->isupCtTable_rsvs == 0)
+				isupCtTable_destroy(&StorageTmp->isupCtTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */

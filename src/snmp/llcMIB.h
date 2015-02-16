@@ -63,6 +63,10 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct llcMIB_data {
+	struct llcMIB_data *llcMIB_old;
+	uint llcMIB_rsvs;
+	uint llcMIB_tsts;
+	uint llcMIB_sets;
 	uint llcMIB_request;
 	long llcDiscontinuityTime;	/* ReadOnly */
 	long lLCConnection2DefaultMaximumRetransmissions;	/* ReadWrite */
@@ -81,8 +85,13 @@ struct llcMIB_data {
 	long lLCConnectionlessAckDefaultMaximumRetransmissions;	/* ReadWrite */
 };
 struct mACDLETable_data {
+	struct mACDLETable_data *mACDLETable_old;
+	uint mACDLETable_rsvs;
+	uint mACDLETable_tsts;
+	uint mACDLETable_sets;
 	uint mACDLETable_request;
 	uint mACDLETable_refs;
+	uint mACDLETable_id;
 	uint8_t *mACDLECommunicationsEntityId;	/* NoAccess */
 	size_t mACDLECommunicationsEntityIdLen;
 	oid *mACDLELocalSapNames;	/* Create */
@@ -93,8 +102,13 @@ struct mACDLETable_data {
 	long mACDLERowStatus;		/* Create */
 };
 struct mACTable_data {
+	struct mACTable_data *mACTable_old;
+	uint mACTable_rsvs;
+	uint mACTable_tsts;
+	uint mACTable_sets;
 	uint mACTable_request;
 	uint mACTable_refs;
+	uint mACTable_id;
 	uint8_t *mACDLECommunicationsEntityId;	/* NoAccess */
 	size_t mACDLECommunicationsEntityIdLen;
 	long mACOperationalState;	/* ReadOnly */
@@ -103,8 +117,13 @@ struct mACTable_data {
 	long mACRowStatus;		/* Create */
 };
 struct resourceTypeIdTable_data {
+	struct resourceTypeIdTable_data *resourceTypeIdTable_old;
+	uint resourceTypeIdTable_rsvs;
+	uint resourceTypeIdTable_tsts;
+	uint resourceTypeIdTable_sets;
 	uint resourceTypeIdTable_request;
 	uint resourceTypeIdTable_refs;
+	uint resourceTypeIdTable_id;
 	uint8_t *mACDLECommunicationsEntityId;	/* NoAccess */
 	size_t mACDLECommunicationsEntityIdLen;
 	uint8_t *resourceTypeIdName;	/* ReadOnly */
@@ -119,8 +138,13 @@ struct resourceTypeIdTable_data {
 	size_t resourceInfoManufacturerProductVersionLen;
 };
 struct dLSAPTable_data {
+	struct dLSAPTable_data *dLSAPTable_old;
+	uint dLSAPTable_rsvs;
+	uint dLSAPTable_tsts;
+	uint dLSAPTable_sets;
 	uint dLSAPTable_request;
 	uint dLSAPTable_refs;
+	uint dLSAPTable_id;
 	uint8_t *mACDLECommunicationsEntityId;	/* NoAccess */
 	size_t mACDLECommunicationsEntityIdLen;
 	uint8_t *dLSAPSapId;		/* NoAccess */
@@ -131,8 +155,13 @@ struct dLSAPTable_data {
 	long dLSAPRowStatus;		/* Create */
 };
 struct lLCDLETable_data {
+	struct lLCDLETable_data *lLCDLETable_old;
+	uint lLCDLETable_rsvs;
+	uint lLCDLETable_tsts;
+	uint lLCDLETable_sets;
 	uint lLCDLETable_request;
 	uint lLCDLETable_refs;
+	uint lLCDLETable_id;
 	uint8_t *lLCDLECommunicationsEntityId;	/* NoAccess */
 	size_t lLCDLECommunicationsEntityIdLen;
 	oid *lLCDLELocalSapNames;	/* Create */
@@ -143,8 +172,13 @@ struct lLCDLETable_data {
 	long lLCDLERowStatus;		/* Create */
 };
 struct lLCStationTable_data {
+	struct lLCStationTable_data *lLCStationTable_old;
+	uint lLCStationTable_rsvs;
+	uint lLCStationTable_tsts;
+	uint lLCStationTable_sets;
 	uint lLCStationTable_request;
 	uint lLCStationTable_refs;
+	uint lLCStationTable_id;
 	uint8_t *lLCDLECommunicationsEntityId;	/* NoAccess */
 	size_t lLCDLECommunicationsEntityIdLen;
 	uint8_t *dLSAPSapId;		/* NoAccess */
@@ -176,8 +210,13 @@ struct lLCStationTable_data {
 	long lLCStationType1AcknowledgmentTimerTimeouts;	/* ReadOnly */
 };
 struct lLCSAPTable_data {
+	struct lLCSAPTable_data *lLCSAPTable_old;
+	uint lLCSAPTable_rsvs;
+	uint lLCSAPTable_tsts;
+	uint lLCSAPTable_sets;
 	uint lLCSAPTable_request;
 	uint lLCSAPTable_refs;
+	uint lLCSAPTable_id;
 	uint8_t *lLCDLECommunicationsEntityId;	/* NoAccess */
 	size_t lLCDLECommunicationsEntityIdLen;
 	uint8_t *dLSAPSapId;		/* NoAccess */
@@ -189,8 +228,13 @@ struct lLCSAPTable_data {
 	long lLCSAPRDE;			/* ReadOnly */
 };
 struct rDESetupTable_data {
+	struct rDESetupTable_data *rDESetupTable_old;
+	uint rDESetupTable_rsvs;
+	uint rDESetupTable_tsts;
+	uint rDESetupTable_sets;
 	uint rDESetupTable_request;
 	uint rDESetupTable_refs;
+	uint rDESetupTable_id;
 	uint8_t *lLCDLECommunicationsEntityId;	/* NoAccess */
 	size_t lLCDLECommunicationsEntityIdLen;
 	uint8_t *dLSAPSapId;		/* NoAccess */
@@ -207,8 +251,13 @@ struct rDESetupTable_data {
 	long rDESetupResetOnTestEnabled;	/* ReadWrite */
 };
 struct rDEPairTable_data {
+	struct rDEPairTable_data *rDEPairTable_old;
+	uint rDEPairTable_rsvs;
+	uint rDEPairTable_tsts;
+	uint rDEPairTable_sets;
 	uint rDEPairTable_request;
 	uint rDEPairTable_refs;
+	uint rDEPairTable_id;
 	uint8_t *lLCDLECommunicationsEntityId;	/* NoAccess */
 	size_t lLCDLECommunicationsEntityIdLen;
 	uint8_t *dLSAPSapId;		/* NoAccess */
@@ -224,8 +273,13 @@ struct rDEPairTable_data {
 	long rDEPairQueryCounter;	/* ReadOnly */
 };
 struct lLCCLPMTable_data {
+	struct lLCCLPMTable_data *lLCCLPMTable_old;
+	uint lLCCLPMTable_rsvs;
+	uint lLCCLPMTable_tsts;
+	uint lLCCLPMTable_sets;
 	uint lLCCLPMTable_request;
 	uint lLCCLPMTable_refs;
+	uint lLCCLPMTable_id;
 	uint8_t *lLCCLPMClProtocolMachineId;	/* NoAccess */
 	size_t lLCCLPMClProtocolMachineIdLen;
 	long lLCCLPMOperationalState;	/* ReadOnly */
@@ -233,8 +287,13 @@ struct lLCCLPMTable_data {
 	long lLCCLPMRowStatus;		/* Create */
 };
 struct lLCConnectionLessTable_data {
+	struct lLCConnectionLessTable_data *lLCConnectionLessTable_old;
+	uint lLCConnectionLessTable_rsvs;
+	uint lLCConnectionLessTable_tsts;
+	uint lLCConnectionLessTable_sets;
 	uint lLCConnectionLessTable_request;
 	uint lLCConnectionLessTable_refs;
+	uint lLCConnectionLessTable_id;
 	uint8_t *lLCCLPMClProtocolMachineId;	/* NoAccess */
 	size_t lLCCLPMClProtocolMachineIdLen;
 	uint8_t *lLCCLPMClProtocolMachineId;	/* NoAccess */
@@ -256,16 +315,26 @@ struct lLCConnectionLessTable_data {
 	long lLCConnectionlessXIDSentResponse;	/* ReadOnly */
 };
 struct lLCCOPMTable_data {
+	struct lLCCOPMTable_data *lLCCOPMTable_old;
+	uint lLCCOPMTable_rsvs;
+	uint lLCCOPMTable_tsts;
+	uint lLCCOPMTable_sets;
 	uint lLCCOPMTable_request;
 	uint lLCCOPMTable_refs;
+	uint lLCCOPMTable_id;
 	uint8_t *lLCCOPMCoProtocolMachineId;	/* NoAccess */
 	size_t lLCCOPMCoProtocolMachineIdLen;
 	long lLCCOPMOperationalState;	/* ReadOnly */
 	long lLCCOPMRowStatus;		/* Create */
 };
 struct lLCConnection2Table_data {
+	struct lLCConnection2Table_data *lLCConnection2Table_old;
+	uint lLCConnection2Table_rsvs;
+	uint lLCConnection2Table_tsts;
+	uint lLCConnection2Table_sets;
 	uint lLCConnection2Table_request;
 	uint lLCConnection2Table_refs;
+	uint lLCConnection2Table_id;
 	uint8_t *lLCCOPMCoProtocolMachineId;	/* NoAccess */
 	size_t lLCCOPMCoProtocolMachineIdLen;
 	uint8_t *lLCCOPMCoProtocolMachineId;	/* NoAccess */
@@ -324,8 +393,13 @@ struct lLCConnection2Table_data {
 	size_t lLCConnection2AlarmStatusLen;
 };
 struct lLCConnection2IVMOTable_data {
+	struct lLCConnection2IVMOTable_data *lLCConnection2IVMOTable_old;
+	uint lLCConnection2IVMOTable_rsvs;
+	uint lLCConnection2IVMOTable_tsts;
+	uint lLCConnection2IVMOTable_sets;
 	uint lLCConnection2IVMOTable_request;
 	uint lLCConnection2IVMOTable_refs;
+	uint lLCConnection2IVMOTable_id;
 	uint8_t *lLCConnection2IVMOName;	/* NoAccess */
 	size_t lLCConnection2IVMONameLen;
 	ulong lLCConnection2IVMOMaximumRetransmissions;	/* ReadWrite */
@@ -342,8 +416,13 @@ struct lLCConnection2IVMOTable_data {
 	long lLCConnection2IVMOOptionalTolerationIPDUs;	/* ReadWrite */
 };
 struct lLCConnectionlessAckTable_data {
+	struct lLCConnectionlessAckTable_data *lLCConnectionlessAckTable_old;
+	uint lLCConnectionlessAckTable_rsvs;
+	uint lLCConnectionlessAckTable_tsts;
+	uint lLCConnectionlessAckTable_sets;
 	uint lLCConnectionlessAckTable_request;
 	uint lLCConnectionlessAckTable_refs;
+	uint lLCConnectionlessAckTable_id;
 	uint8_t *lLCCOPMCoProtocolMachineId;	/* NoAccess */
 	size_t lLCCOPMCoProtocolMachineIdLen;
 	uint8_t *lLCCOPMCoProtocolMachineId;	/* NoAccess */
@@ -387,8 +466,13 @@ struct lLCConnectionlessAckTable_data {
 	long lLCConnectionlessAckViolation;	/* ReadOnly */
 };
 struct lLCConnectionlessAckIVMOTable_data {
+	struct lLCConnectionlessAckIVMOTable_data *lLCConnectionlessAckIVMOTable_old;
+	uint lLCConnectionlessAckIVMOTable_rsvs;
+	uint lLCConnectionlessAckIVMOTable_tsts;
+	uint lLCConnectionlessAckIVMOTable_sets;
 	uint lLCConnectionlessAckIVMOTable_request;
 	uint lLCConnectionlessAckIVMOTable_refs;
+	uint lLCConnectionlessAckIVMOTable_id;
 	uint8_t *lLCConnectionlessAckIVMOName;	/* NoAccess */
 	size_t lLCConnectionlessAckIVMONameLen;
 	long lLCConnectionlessAckIVMOMaximumLLCInformationFieldSize;	/* Create */
@@ -562,6 +646,10 @@ void init_llcMIB(void);
 void deinit_llcMIB(void);
 int term_llcMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_llcMIB;
+struct llcMIB_data *llcMIB_create(void);
+struct llcMIB_data *llcMIB_duplicate(struct llcMIB_data *);
+int llcMIB_destroy(struct llcMIB_data **);
+int llcMIB_add(struct llcMIB_data *);
 void parse_llcMIB(const char *, char *);
 SNMPCallback store_llcMIB;
 void refresh_llcMIB(int);

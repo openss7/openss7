@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/snmp/strExtMIB.c
+ @(#) src/snmp/strExtMIB.c
 
  -----------------------------------------------------------------------------
 
@@ -3460,7 +3460,7 @@ write_strExtStrlogRecordRowStatus(int action, u_char *var_val, u_char var_val_ty
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -3725,7 +3725,7 @@ write_strExtTraceRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */

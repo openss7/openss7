@@ -63,6 +63,10 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct m2uaMIB_data {
+	struct m2uaMIB_data *m2uaMIB_old;
+	uint m2uaMIB_rsvs;
+	uint m2uaMIB_tsts;
+	uint m2uaMIB_sets;
 	uint m2uaMIB_request;
 	ulong m2uaAsNextIndex;		/* ReadOnly */
 	ulong m2uaIfNextIndex;		/* ReadOnly */
@@ -70,8 +74,13 @@ struct m2uaMIB_data {
 	ulong m2uaSgNextIndex;		/* ReadOnly */
 };
 struct m2uaAsTable_data {
+	struct m2uaAsTable_data *m2uaAsTable_old;
+	uint m2uaAsTable_rsvs;
+	uint m2uaAsTable_tsts;
+	uint m2uaAsTable_sets;
 	uint m2uaAsTable_request;
 	uint m2uaAsTable_refs;
+	uint m2uaAsTable_id;
 	ulong m2uaAsIndex;		/* NoAccess */
 	uint8_t *m2uaAsName;		/* Create */
 	size_t m2uaAsNameLen;
@@ -83,8 +92,13 @@ struct m2uaAsTable_data {
 	long m2uaAsStatus;		/* Create */
 };
 struct m2uaIfTable_data {
+	struct m2uaIfTable_data *m2uaIfTable_old;
+	uint m2uaIfTable_rsvs;
+	uint m2uaIfTable_tsts;
+	uint m2uaIfTable_sets;
 	uint m2uaIfTable_request;
 	uint m2uaIfTable_refs;
+	uint m2uaIfTable_id;
 	ulong m2uaIfIndex;		/* NoAccess */
 	uint8_t *m2uaIfName;		/* Create */
 	size_t m2uaIfNameLen;
@@ -105,15 +119,25 @@ struct m2uaIfTable_data {
 	long m2uaIfRowStatus;		/* Create */
 };
 struct m2uaAsIfTable_data {
+	struct m2uaAsIfTable_data *m2uaAsIfTable_old;
+	uint m2uaAsIfTable_rsvs;
+	uint m2uaAsIfTable_tsts;
+	uint m2uaAsIfTable_sets;
 	uint m2uaAsIfTable_request;
 	uint m2uaAsIfTable_refs;
+	uint m2uaAsIfTable_id;
 	ulong m2uaAsIndex;		/* NoAccess */
 	ulong m2uaIfIndex;		/* NoAccess */
 	long m2uaAsIfStatus;		/* Create */
 };
 struct m2uaAspTable_data {
+	struct m2uaAspTable_data *m2uaAspTable_old;
+	uint m2uaAspTable_rsvs;
+	uint m2uaAspTable_tsts;
+	uint m2uaAspTable_sets;
 	uint m2uaAspTable_request;
 	uint m2uaAspTable_refs;
+	uint m2uaAspTable_id;
 	ulong m2uaAspIndex;		/* NoAccess */
 	uint8_t *m2uaAspName;		/* ReadOnly */
 	size_t m2uaAspNameLen;
@@ -127,8 +151,13 @@ struct m2uaAspTable_data {
 	long m2uaAspRowStatus;		/* Create */
 };
 struct m2uaAspSgTable_data {
+	struct m2uaAspSgTable_data *m2uaAspSgTable_old;
+	uint m2uaAspSgTable_rsvs;
+	uint m2uaAspSgTable_tsts;
+	uint m2uaAspSgTable_sets;
 	uint m2uaAspSgTable_request;
 	uint m2uaAspSgTable_refs;
+	uint m2uaAspSgTable_id;
 	ulong m2uaAspIndex;		/* NoAccess */
 	ulong m2uaSgIndex;		/* NoAccess */
 	ulong m2uaAspSgAspId;		/* ReadWrite */
@@ -137,16 +166,26 @@ struct m2uaAspSgTable_data {
 	long m2uaAspSgAdministrativeState;	/* ReadWrite */
 };
 struct m2uaSgTable_data {
+	struct m2uaSgTable_data *m2uaSgTable_old;
+	uint m2uaSgTable_rsvs;
+	uint m2uaSgTable_tsts;
+	uint m2uaSgTable_sets;
 	uint m2uaSgTable_request;
 	uint m2uaSgTable_refs;
+	uint m2uaSgTable_id;
 	ulong m2uaSgIndex;		/* NoAccess */
 	uint8_t *m2uaSgName;		/* Create */
 	size_t m2uaSgNameLen;
 	long m2uaSgRowStatus;		/* Create */
 };
 struct m2uaSgAspTable_data {
+	struct m2uaSgAspTable_data *m2uaSgAspTable_old;
+	uint m2uaSgAspTable_rsvs;
+	uint m2uaSgAspTable_tsts;
+	uint m2uaSgAspTable_sets;
 	uint m2uaSgAspTable_request;
 	uint m2uaSgAspTable_refs;
+	uint m2uaSgAspTable_id;
 	ulong m2uaSgIndex;		/* NoAccess */
 	ulong m2uaAspIndex;		/* NoAccess */
 	ulong m2uaSgAspId;		/* ReadWrite */
@@ -156,8 +195,13 @@ struct m2uaSgAspTable_data {
 	long m2uaSgAspOperationalState;	/* ReadOnly */
 };
 struct m2uaSgAspAsTable_data {
+	struct m2uaSgAspAsTable_data *m2uaSgAspAsTable_old;
+	uint m2uaSgAspAsTable_rsvs;
+	uint m2uaSgAspAsTable_tsts;
+	uint m2uaSgAspAsTable_sets;
 	uint m2uaSgAspAsTable_request;
 	uint m2uaSgAspAsTable_refs;
+	uint m2uaSgAspAsTable_id;
 	ulong m2uaSgIndex;		/* NoAccess */
 	ulong m2uaAspIndex;		/* NoAccess */
 	ulong m2uaAsIndex;		/* NoAccess */
@@ -167,8 +211,13 @@ struct m2uaSgAspAsTable_data {
 	long m2uaSgAspAsOperationalState;	/* ReadOnly */
 };
 struct m2uaSgAsTable_data {
+	struct m2uaSgAsTable_data *m2uaSgAsTable_old;
+	uint m2uaSgAsTable_rsvs;
+	uint m2uaSgAsTable_tsts;
+	uint m2uaSgAsTable_sets;
 	uint m2uaSgAsTable_request;
 	uint m2uaSgAsTable_refs;
+	uint m2uaSgAsTable_id;
 	ulong m2uaSgIndex;		/* NoAccess */
 	ulong m2uaAsIndex;		/* NoAccess */
 	oid *m2uaSgAsTrafficMode;	/* Create */
@@ -331,6 +380,10 @@ void init_m2uaMIB(void);
 void deinit_m2uaMIB(void);
 int term_m2uaMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_m2uaMIB;
+struct m2uaMIB_data *m2uaMIB_create(void);
+struct m2uaMIB_data *m2uaMIB_duplicate(struct m2uaMIB_data *);
+int m2uaMIB_destroy(struct m2uaMIB_data **);
+int m2uaMIB_add(struct m2uaMIB_data *);
 void parse_m2uaMIB(const char *, char *);
 SNMPCallback store_m2uaMIB;
 void refresh_m2uaMIB(int);

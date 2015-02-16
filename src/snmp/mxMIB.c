@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/snmp/mxMIB.c
+ @(#) src/snmp/mxMIB.c
 
  -----------------------------------------------------------------------------
 
@@ -17064,7 +17064,7 @@ write_mxSyncRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -17331,7 +17331,7 @@ write_mxDrivRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -17618,7 +17618,7 @@ write_mxCardStatus(int action, u_char *var_val, u_char var_val_type, size_t var_
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -17925,7 +17925,7 @@ write_mxSpanRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -18252,7 +18252,7 @@ write_mxXconRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */

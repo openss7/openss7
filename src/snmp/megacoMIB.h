@@ -63,18 +63,32 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct megacoMIB_data {
+	struct megacoMIB_data *megacoMIB_old;
+	uint megacoMIB_rsvs;
+	uint megacoMIB_tsts;
+	uint megacoMIB_sets;
 	uint megacoMIB_request;
 };
 struct medGwyLinkIdTable_data {
+	struct medGwyLinkIdTable_data *medGwyLinkIdTable_old;
+	uint medGwyLinkIdTable_rsvs;
+	uint medGwyLinkIdTable_tsts;
+	uint medGwyLinkIdTable_sets;
 	uint medGwyLinkIdTable_request;
 	uint medGwyLinkIdTable_refs;
-	ulong medGwyGatewayId;		/* NoAccess */
+	uint medGwyLinkIdTable_id;
+	ulong medGwyGatewayId;		/* Notify */
 	long medGwyNextLinkId;		/* ReadWrite */
 };
 struct medGwyGatewayConfigTable_data {
+	struct medGwyGatewayConfigTable_data *medGwyGatewayConfigTable_old;
+	uint medGwyGatewayConfigTable_rsvs;
+	uint medGwyGatewayConfigTable_tsts;
+	uint medGwyGatewayConfigTable_sets;
 	uint medGwyGatewayConfigTable_request;
 	uint medGwyGatewayConfigTable_refs;
-	ulong medGwyGatewayId;		/* NoAccess */
+	uint medGwyGatewayConfigTable_id;
+	ulong medGwyGatewayId;		/* Notify */
 	ulong medGwyGatewayLinkId;	/* NoAccess */
 	uint8_t *medGwyGatewayLinkName;	/* Create */
 	size_t medGwyGatewayLinkNameLen;
@@ -91,11 +105,16 @@ struct medGwyGatewayConfigTable_data {
 	long medGwyGatewayRowStatus;	/* Create */
 };
 struct medGwyGatewayControllerTable_data {
+	struct medGwyGatewayControllerTable_data *medGwyGatewayControllerTable_old;
+	uint medGwyGatewayControllerTable_rsvs;
+	uint medGwyGatewayControllerTable_tsts;
+	uint medGwyGatewayControllerTable_sets;
 	uint medGwyGatewayControllerTable_request;
 	uint medGwyGatewayControllerTable_refs;
-	ulong medGwyGatewayId;		/* NoAccess */
+	uint medGwyGatewayControllerTable_id;
+	ulong medGwyGatewayId;		/* Notify */
 	ulong medGwyGatewayLinkId;	/* NoAccess */
-	ulong medGwyGatewayControllerId;	/* NoAccess */
+	ulong medGwyGatewayControllerId;	/* Notify */
 	uint8_t *medGwyGatewayControllerIPAddress;	/* Create */
 	size_t medGwyGatewayControllerIPAddressLen;
 	long medGwyGatewayControllerPort;	/* Create */
@@ -103,9 +122,14 @@ struct medGwyGatewayControllerTable_data {
 	long medGwyGatewayControllerOperStatus;	/* ReadOnly */
 };
 struct medGwyGatewayStatsTable_data {
+	struct medGwyGatewayStatsTable_data *medGwyGatewayStatsTable_old;
+	uint medGwyGatewayStatsTable_rsvs;
+	uint medGwyGatewayStatsTable_tsts;
+	uint medGwyGatewayStatsTable_sets;
 	uint medGwyGatewayStatsTable_request;
 	uint medGwyGatewayStatsTable_refs;
-	ulong medGwyGatewayId;		/* NoAccess */
+	uint medGwyGatewayStatsTable_id;
+	ulong medGwyGatewayId;		/* Notify */
 	ulong medGwyGatewayLinkId;	/* NoAccess */
 	ulong medGwyGatewayNumInMessages;	/* ReadOnly */
 	ulong medGwyGatewayNumInOctets;	/* ReadOnly */
@@ -121,16 +145,26 @@ struct medGwyGatewayStatsTable_data {
 	long medGwyGatewayLastStatisticsReset;	/* ReadOnly */
 };
 struct medGwyTermIdTable_data {
+	struct medGwyTermIdTable_data *medGwyTermIdTable_old;
+	uint medGwyTermIdTable_rsvs;
+	uint medGwyTermIdTable_tsts;
+	uint medGwyTermIdTable_sets;
 	uint medGwyTermIdTable_request;
 	uint medGwyTermIdTable_refs;
-	ulong medGwyGatewayId;		/* NoAccess */
+	uint medGwyTermIdTable_id;
+	ulong medGwyGatewayId;		/* Notify */
 	long medGwyNextTerminationId;	/* ReadWrite */
 };
 struct medGwyTerminationsTable_data {
+	struct medGwyTerminationsTable_data *medGwyTerminationsTable_old;
+	uint medGwyTerminationsTable_rsvs;
+	uint medGwyTerminationsTable_tsts;
+	uint medGwyTerminationsTable_sets;
 	uint medGwyTerminationsTable_request;
 	uint medGwyTerminationsTable_refs;
-	ulong medGwyGatewayId;		/* NoAccess */
-	ulong medGwyTerminationId;	/* NoAccess */
+	uint medGwyTerminationsTable_id;
+	ulong medGwyGatewayId;		/* Notify */
+	ulong medGwyTerminationId;	/* Notify */
 	uint8_t *medGwyTerminationName;	/* Create */
 	size_t medGwyTerminationNameLen;
 	long medGwyTerminationAdminStatus;	/* Create */
@@ -140,9 +174,14 @@ struct medGwyTerminationsTable_data {
 	long medGwyTerminationRowStatus;	/* Create */
 };
 struct medGwyPropertyProfileTable_data {
+	struct medGwyPropertyProfileTable_data *medGwyPropertyProfileTable_old;
+	uint medGwyPropertyProfileTable_rsvs;
+	uint medGwyPropertyProfileTable_tsts;
+	uint medGwyPropertyProfileTable_sets;
 	uint medGwyPropertyProfileTable_request;
 	uint medGwyPropertyProfileTable_refs;
-	ulong medGwyGatewayId;		/* NoAccess */
+	uint medGwyPropertyProfileTable_id;
+	ulong medGwyGatewayId;		/* Notify */
 	ulong medGwyPropertyProfileId;	/* NoAccess */
 	ulong medGwyPropertyProfileIndex;	/* NoAccess */
 	oid *medGwyPropertyProfileProperty;	/* Create */
@@ -251,6 +290,10 @@ void init_megacoMIB(void);
 void deinit_megacoMIB(void);
 int term_megacoMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_megacoMIB;
+struct megacoMIB_data *megacoMIB_create(void);
+struct megacoMIB_data *megacoMIB_duplicate(struct megacoMIB_data *);
+int megacoMIB_destroy(struct megacoMIB_data **);
+int megacoMIB_add(struct megacoMIB_data *);
 void parse_megacoMIB(const char *, char *);
 SNMPCallback store_megacoMIB;
 void refresh_megacoMIB(int);

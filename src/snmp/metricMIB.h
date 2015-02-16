@@ -63,11 +63,20 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct metricMIB_data {
+	struct metricMIB_data *metricMIB_old;
+	uint metricMIB_rsvs;
+	uint metricMIB_tsts;
+	uint metricMIB_sets;
 	uint metricMIB_request;
 };
 struct scannerTable_data {
+	struct scannerTable_data *scannerTable_old;
+	uint scannerTable_rsvs;
+	uint scannerTable_tsts;
+	uint scannerTable_sets;
 	uint scannerTable_request;
 	uint scannerTable_refs;
+	uint scannerTable_id;
 	uint8_t *scannerId;		/* NoAccess */
 	size_t scannerIdLen;
 	long scannerAdministrativeState;	/* Create */
@@ -93,8 +102,13 @@ struct scannerTable_data {
 	long scannerRowStatus;		/* Create */
 };
 struct monitorMetricTable_data {
+	struct monitorMetricTable_data *monitorMetricTable_old;
+	uint monitorMetricTable_rsvs;
+	uint monitorMetricTable_tsts;
+	uint monitorMetricTable_sets;
 	uint monitorMetricTable_request;
 	uint monitorMetricTable_refs;
+	uint monitorMetricTable_id;
 	uint8_t *scannerId;		/* NoAccess */
 	size_t scannerIdLen;
 	oid *observedObjectInstance;	/* Create */
@@ -125,8 +139,13 @@ struct monitorMetricTable_data {
 	long monitorMetricRowStatus;	/* Create */
 };
 struct meanMonitorTable_data {
+	struct meanMonitorTable_data *meanMonitorTable_old;
+	uint meanMonitorTable_rsvs;
+	uint meanMonitorTable_tsts;
+	uint meanMonitorTable_sets;
 	uint meanMonitorTable_request;
 	uint meanMonitorTable_refs;
+	uint meanMonitorTable_id;
 	uint8_t *scannerId;		/* NoAccess */
 	size_t scannerIdLen;
 	long estimateOfMean;		/* ReadOnly */
@@ -142,23 +161,38 @@ struct meanMonitorTable_data {
 	long meanMonitorRowStatus;	/* Create */
 };
 struct algorithmIndicatingMeanMonitorTable_data {
+	struct algorithmIndicatingMeanMonitorTable_data *algorithmIndicatingMeanMonitorTable_old;
+	uint algorithmIndicatingMeanMonitorTable_rsvs;
+	uint algorithmIndicatingMeanMonitorTable_tsts;
+	uint algorithmIndicatingMeanMonitorTable_sets;
 	uint algorithmIndicatingMeanMonitorTable_request;
 	uint algorithmIndicatingMeanMonitorTable_refs;
+	uint algorithmIndicatingMeanMonitorTable_id;
 	uint8_t *scannerId;		/* NoAccess */
 	size_t scannerIdLen;
 	oid *algorithmIdentifier;	/* ReadOnly */
 	size_t algorithmIdentifierLen;
 };
 struct movingAverageMeanMonitorTable_data {
+	struct movingAverageMeanMonitorTable_data *movingAverageMeanMonitorTable_old;
+	uint movingAverageMeanMonitorTable_rsvs;
+	uint movingAverageMeanMonitorTable_tsts;
+	uint movingAverageMeanMonitorTable_sets;
 	uint movingAverageMeanMonitorTable_request;
 	uint movingAverageMeanMonitorTable_refs;
+	uint movingAverageMeanMonitorTable_id;
 	uint8_t *scannerId;		/* NoAccess */
 	size_t scannerIdLen;
 	long movingAverageMeanMonitorRowStatus;	/* Create */
 };
 struct meanAndPercentileMonitorTable_data {
+	struct meanAndPercentileMonitorTable_data *meanAndPercentileMonitorTable_old;
+	uint meanAndPercentileMonitorTable_rsvs;
+	uint meanAndPercentileMonitorTable_tsts;
+	uint meanAndPercentileMonitorTable_sets;
 	uint meanAndPercentileMonitorTable_request;
 	uint meanAndPercentileMonitorTable_refs;
+	uint meanAndPercentileMonitorTable_id;
 	uint8_t *scannerId;		/* NoAccess */
 	size_t scannerIdLen;
 	long percentileSecondMovingTimePeriod;	/* Create */
@@ -172,8 +206,13 @@ struct meanAndPercentileMonitorTable_data {
 	long meanAndPercentileMonitorRowStatus;	/* Create */
 };
 struct meanAndVarianceMonitorTable_data {
+	struct meanAndVarianceMonitorTable_data *meanAndVarianceMonitorTable_old;
+	uint meanAndVarianceMonitorTable_rsvs;
+	uint meanAndVarianceMonitorTable_tsts;
+	uint meanAndVarianceMonitorTable_sets;
 	uint meanAndVarianceMonitorTable_request;
 	uint meanAndVarianceMonitorTable_refs;
+	uint meanAndVarianceMonitorTable_id;
 	uint8_t *scannerId;		/* NoAccess */
 	size_t scannerIdLen;
 	long varianceSecondMovingTimePeriod;	/* Create */
@@ -181,8 +220,13 @@ struct meanAndVarianceMonitorTable_data {
 	long meanAndVarianceMonitorRowStatus;	/* Create */
 };
 struct meanAndMinMaxMonitorTable_data {
+	struct meanAndMinMaxMonitorTable_data *meanAndMinMaxMonitorTable_old;
+	uint meanAndMinMaxMonitorTable_rsvs;
+	uint meanAndMinMaxMonitorTable_tsts;
+	uint meanAndMinMaxMonitorTable_sets;
 	uint meanAndMinMaxMonitorTable_request;
 	uint meanAndMinMaxMonitorTable_refs;
+	uint meanAndMinMaxMonitorTable_id;
 	uint8_t *scannerId;		/* NoAccess */
 	size_t scannerIdLen;
 	long estimateOfLargest;		/* ReadOnly */
@@ -309,6 +353,10 @@ void init_metricMIB(void);
 void deinit_metricMIB(void);
 int term_metricMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_metricMIB;
+struct metricMIB_data *metricMIB_create(void);
+struct metricMIB_data *metricMIB_duplicate(struct metricMIB_data *);
+int metricMIB_destroy(struct metricMIB_data **);
+int metricMIB_add(struct metricMIB_data *);
 void parse_metricMIB(const char *, char *);
 SNMPCallback store_metricMIB;
 void refresh_metricMIB(int);

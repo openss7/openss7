@@ -63,17 +63,31 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct cdr2MIB_data {
+	struct cdr2MIB_data *cdr2MIB_old;
+	uint cdr2MIB_rsvs;
+	uint cdr2MIB_tsts;
+	uint cdr2MIB_sets;
 	uint cdr2MIB_request;
 };
 struct callDetailDataTable_data {
+	struct callDetailDataTable_data *callDetailDataTable_old;
+	uint callDetailDataTable_rsvs;
+	uint callDetailDataTable_tsts;
+	uint callDetailDataTable_sets;
 	uint callDetailDataTable_request;
 	uint callDetailDataTable_refs;
+	uint callDetailDataTable_id;
 	uint8_t *callDetailDataId;	/* ReadOnly */
 	size_t callDetailDataIdLen;
 };
 struct simpleUsageMeteringControlTable_data {
+	struct simpleUsageMeteringControlTable_data *simpleUsageMeteringControlTable_old;
+	uint simpleUsageMeteringControlTable_rsvs;
+	uint simpleUsageMeteringControlTable_tsts;
+	uint simpleUsageMeteringControlTable_sets;
 	uint simpleUsageMeteringControlTable_request;
 	uint simpleUsageMeteringControlTable_refs;
+	uint simpleUsageMeteringControlTable_id;
 	uint8_t *controlObjectId;	/* NoAccess */
 	size_t controlObjectIdLen;
 	uint8_t *creationTriggerList;	/* Create */
@@ -81,8 +95,13 @@ struct simpleUsageMeteringControlTable_data {
 	long simpleUsageMeteringControlEntryStatus;	/* Create */
 };
 struct configurableSimpleUsageMeteringControlTable_data {
+	struct configurableSimpleUsageMeteringControlTable_data *configurableSimpleUsageMeteringControlTable_old;
+	uint configurableSimpleUsageMeteringControlTable_rsvs;
+	uint configurableSimpleUsageMeteringControlTable_tsts;
+	uint configurableSimpleUsageMeteringControlTable_sets;
 	uint configurableSimpleUsageMeteringControlTable_request;
 	uint configurableSimpleUsageMeteringControlTable_refs;
+	uint configurableSimpleUsageMeteringControlTable_id;
 	uint8_t *controlObjectId;	/* NoAccess */
 	size_t controlObjectIdLen;
 	long samplingRate;		/* Create */
@@ -91,8 +110,13 @@ struct configurableSimpleUsageMeteringControlTable_data {
 	long configurationRowStatus;	/* Create */
 };
 struct blockGeneratingLogTable_data {
+	struct blockGeneratingLogTable_data *blockGeneratingLogTable_old;
+	uint blockGeneratingLogTable_rsvs;
+	uint blockGeneratingLogTable_tsts;
+	uint blockGeneratingLogTable_sets;
 	uint blockGeneratingLogTable_request;
 	uint blockGeneratingLogTable_refs;
+	uint blockGeneratingLogTable_id;
 	uint8_t *logId;			/* NoAccess */
 	size_t logIdLen;
 	long blockGeneratingLogMaxBlockSize;	/* Create */
@@ -101,8 +125,13 @@ struct blockGeneratingLogTable_data {
 	long blockGeneratingLogRowStatus;	/* Create */
 };
 struct fileGeneratingLogTable_data {
+	struct fileGeneratingLogTable_data *fileGeneratingLogTable_old;
+	uint fileGeneratingLogTable_rsvs;
+	uint fileGeneratingLogTable_tsts;
+	uint fileGeneratingLogTable_sets;
 	uint fileGeneratingLogTable_request;
 	uint fileGeneratingLogTable_refs;
+	uint fileGeneratingLogTable_id;
 	uint8_t *logId;			/* NoAccess */
 	size_t logIdLen;
 	uint8_t *timesOfDay;		/* Create */
@@ -112,8 +141,13 @@ struct fileGeneratingLogTable_data {
 	long fileGeneratingLogEntryStatus;	/* Create */
 };
 struct callDetailLogRecordTable_data {
+	struct callDetailLogRecordTable_data *callDetailLogRecordTable_old;
+	uint callDetailLogRecordTable_rsvs;
+	uint callDetailLogRecordTable_tsts;
+	uint callDetailLogRecordTable_sets;
 	uint callDetailLogRecordTable_request;
 	uint callDetailLogRecordTable_refs;
+	uint callDetailLogRecordTable_id;
 	uint8_t *logId;			/* NoAccess */
 	size_t logIdLen;
 	uint8_t *logRecordId;		/* NoAccess */
@@ -233,8 +267,13 @@ struct callDetailLogRecordTable_data {
 	size_t oPCLen;
 };
 struct configurableSimpleUsageMeteringControlR2Table_data {
+	struct configurableSimpleUsageMeteringControlR2Table_data *configurableSimpleUsageMeteringControlR2Table_old;
+	uint configurableSimpleUsageMeteringControlR2Table_rsvs;
+	uint configurableSimpleUsageMeteringControlR2Table_tsts;
+	uint configurableSimpleUsageMeteringControlR2Table_sets;
 	uint configurableSimpleUsageMeteringControlR2Table_request;
 	uint configurableSimpleUsageMeteringControlR2Table_refs;
+	uint configurableSimpleUsageMeteringControlR2Table_id;
 	uint8_t *controlObjectId;	/* NoAccess */
 	size_t controlObjectIdLen;
 	uint8_t *configurationR2Mask;	/* Create */
@@ -242,15 +281,25 @@ struct configurableSimpleUsageMeteringControlR2Table_data {
 	long configurationR2Status;	/* Create */
 };
 struct blockGeneratingLogR2Table_data {
+	struct blockGeneratingLogR2Table_data *blockGeneratingLogR2Table_old;
+	uint blockGeneratingLogR2Table_rsvs;
+	uint blockGeneratingLogR2Table_tsts;
+	uint blockGeneratingLogR2Table_sets;
 	uint blockGeneratingLogR2Table_request;
 	uint blockGeneratingLogR2Table_refs;
+	uint blockGeneratingLogR2Table_id;
 	uint8_t *logId;			/* NoAccess */
 	size_t logIdLen;
 	long blockGeneratingLogVersion;	/* ReadWrite */
 };
 struct callDetailLogRecordR2Table_data {
+	struct callDetailLogRecordR2Table_data *callDetailLogRecordR2Table_old;
+	uint callDetailLogRecordR2Table_rsvs;
+	uint callDetailLogRecordR2Table_tsts;
+	uint callDetailLogRecordR2Table_sets;
 	uint callDetailLogRecordR2Table_request;
 	uint callDetailLogRecordR2Table_refs;
+	uint callDetailLogRecordR2Table_id;
 	uint8_t *logId;			/* NoAccess */
 	size_t logIdLen;
 	uint8_t *logRecordId;		/* NoAccess */
@@ -636,6 +685,10 @@ void init_cdr2MIB(void);
 void deinit_cdr2MIB(void);
 int term_cdr2MIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_cdr2MIB;
+struct cdr2MIB_data *cdr2MIB_create(void);
+struct cdr2MIB_data *cdr2MIB_duplicate(struct cdr2MIB_data *);
+int cdr2MIB_destroy(struct cdr2MIB_data **);
+int cdr2MIB_add(struct cdr2MIB_data *);
 void parse_cdr2MIB(const char *, char *);
 SNMPCallback store_cdr2MIB;
 void refresh_cdr2MIB(int);

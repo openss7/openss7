@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/snmp/ds1.c
+ @(#) src/snmp/ds1.c
 
  -----------------------------------------------------------------------------
 
@@ -186,177 +186,177 @@ static oid snmpTrapOID_oid[11] = { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 };
  */
 struct variable4 ds1_variables[] = {
 	/* magic number, variable type, ro/rw, callback fn, L, oidsuffix */
-#define   DSX1IFINDEX           1
+#define   DSX1IFINDEX           2
 	{(u_char) DSX1IFINDEX, ASN_INTEGER, RONLY, var_dsx1ConfigTable, 3, {6, 1, 2}},
-#define   DSX1TIMEELAPSED       2
+#define   DSX1TIMEELAPSED       3
 	{(u_char) DSX1TIMEELAPSED, ASN_INTEGER, RONLY, var_dsx1ConfigTable, 3, {6, 1, 3}},
-#define   DSX1VALIDINTERVALS    3
+#define   DSX1VALIDINTERVALS    4
 	{(u_char) DSX1VALIDINTERVALS, ASN_INTEGER, RONLY, var_dsx1ConfigTable, 3, {6, 1, 4}},
-#define   DSX1LINETYPE          4
+#define   DSX1LINETYPE          5
 	{(u_char) DSX1LINETYPE, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 5}},
-#define   DSX1LINECODING        5
+#define   DSX1LINECODING        6
 	{(u_char) DSX1LINECODING, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 6}},
-#define   DSX1SENDCODE          6
+#define   DSX1SENDCODE          7
 	{(u_char) DSX1SENDCODE, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 7}},
-#define   DSX1CIRCUITIDENTIFIER  7
+#define   DSX1CIRCUITIDENTIFIER  8
 	{(u_char) DSX1CIRCUITIDENTIFIER, ASN_OCTET_STR, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 8}},
-#define   DSX1LOOPBACKCONFIG    8
+#define   DSX1LOOPBACKCONFIG    9
 	{(u_char) DSX1LOOPBACKCONFIG, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 9}},
-#define   DSX1LINESTATUS        9
+#define   DSX1LINESTATUS        10
 	{(u_char) DSX1LINESTATUS, ASN_INTEGER, RONLY, var_dsx1ConfigTable, 3, {6, 1, 10}},
-#define   DSX1SIGNALMODE        10
+#define   DSX1SIGNALMODE        11
 	{(u_char) DSX1SIGNALMODE, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 11}},
-#define   DSX1TRANSMITCLOCKSOURCE  11
+#define   DSX1TRANSMITCLOCKSOURCE  12
 	{(u_char) DSX1TRANSMITCLOCKSOURCE, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 12}},
-#define   DSX1FDL               12
+#define   DSX1FDL               13
 	{(u_char) DSX1FDL, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 13}},
-#define   DSX1INVALIDINTERVALS  13
+#define   DSX1INVALIDINTERVALS  14
 	{(u_char) DSX1INVALIDINTERVALS, ASN_INTEGER, RONLY, var_dsx1ConfigTable, 3, {6, 1, 14}},
-#define   DSX1LINELENGTH        14
+#define   DSX1LINELENGTH        15
 	{(u_char) DSX1LINELENGTH, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 15}},
-#define   DSX1LINESTATUSLASTCHANGE  15
+#define   DSX1LINESTATUSLASTCHANGE  16
 	{(u_char) DSX1LINESTATUSLASTCHANGE, ASN_TIMETICKS, RONLY, var_dsx1ConfigTable, 3, {6, 1, 16}},
-#define   DSX1LINESTATUSCHANGETRAPENABLE  16
+#define   DSX1LINESTATUSCHANGETRAPENABLE  17
 	{(u_char) DSX1LINESTATUSCHANGETRAPENABLE, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 17}},
-#define   DSX1LOOPBACKSTATUS    17
+#define   DSX1LOOPBACKSTATUS    18
 	{(u_char) DSX1LOOPBACKSTATUS, ASN_INTEGER, RONLY, var_dsx1ConfigTable, 3, {6, 1, 18}},
-#define   DSX1DS1CHANNELNUMBER  18
+#define   DSX1DS1CHANNELNUMBER  19
 	{(u_char) DSX1DS1CHANNELNUMBER, ASN_INTEGER, RONLY, var_dsx1ConfigTable, 3, {6, 1, 19}},
-#define   DSX1CHANNELIZATION    19
+#define   DSX1CHANNELIZATION    20
 	{(u_char) DSX1CHANNELIZATION, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 20}},
-#define   DSX1LINEMODE          20
+#define   DSX1LINEMODE          21
 	{(u_char) DSX1LINEMODE, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 21}},
-#define   DSX1LINEBUILDOUT      21
+#define   DSX1LINEBUILDOUT      22
 	{(u_char) DSX1LINEBUILDOUT, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 22}},
-#define   DSX1LINEIMPEDANCE     22
+#define   DSX1LINEIMPEDANCE     23
 	{(u_char) DSX1LINEIMPEDANCE, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 23}},
-#define   DSX1CURRENTESS        23
+#define   DSX1CURRENTESS        25
 	{(u_char) DSX1CURRENTESS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 2}},
-#define   DSX1CURRENTSESS       24
+#define   DSX1CURRENTSESS       26
 	{(u_char) DSX1CURRENTSESS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 3}},
-#define   DSX1CURRENTSEFSS      25
+#define   DSX1CURRENTSEFSS      27
 	{(u_char) DSX1CURRENTSEFSS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 4}},
-#define   DSX1CURRENTUASS       26
+#define   DSX1CURRENTUASS       28
 	{(u_char) DSX1CURRENTUASS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 5}},
-#define   DSX1CURRENTCSSS       27
+#define   DSX1CURRENTCSSS       29
 	{(u_char) DSX1CURRENTCSSS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 6}},
-#define   DSX1CURRENTPCVS       28
+#define   DSX1CURRENTPCVS       30
 	{(u_char) DSX1CURRENTPCVS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 7}},
-#define   DSX1CURRENTLESS       29
+#define   DSX1CURRENTLESS       31
 	{(u_char) DSX1CURRENTLESS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 8}},
-#define   DSX1CURRENTBESS       30
+#define   DSX1CURRENTBESS       32
 	{(u_char) DSX1CURRENTBESS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 9}},
-#define   DSX1CURRENTDMS        31
+#define   DSX1CURRENTDMS        33
 	{(u_char) DSX1CURRENTDMS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 10}},
-#define   DSX1CURRENTLCVS       32
+#define   DSX1CURRENTLCVS       34
 	{(u_char) DSX1CURRENTLCVS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 11}},
-#define   DSX1INTERVALESS       33
+#define   DSX1INTERVALESS       37
 	{(u_char) DSX1INTERVALESS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 3}},
-#define   DSX1INTERVALSESS      34
+#define   DSX1INTERVALSESS      38
 	{(u_char) DSX1INTERVALSESS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 4}},
-#define   DSX1INTERVALSEFSS     35
+#define   DSX1INTERVALSEFSS     39
 	{(u_char) DSX1INTERVALSEFSS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 5}},
-#define   DSX1INTERVALUASS      36
+#define   DSX1INTERVALUASS      40
 	{(u_char) DSX1INTERVALUASS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 6}},
-#define   DSX1INTERVALCSSS      37
+#define   DSX1INTERVALCSSS      41
 	{(u_char) DSX1INTERVALCSSS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 7}},
-#define   DSX1INTERVALPCVS      38
+#define   DSX1INTERVALPCVS      42
 	{(u_char) DSX1INTERVALPCVS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 8}},
-#define   DSX1INTERVALLESS      39
+#define   DSX1INTERVALLESS      43
 	{(u_char) DSX1INTERVALLESS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 9}},
-#define   DSX1INTERVALBESS      40
+#define   DSX1INTERVALBESS      44
 	{(u_char) DSX1INTERVALBESS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 10}},
-#define   DSX1INTERVALDMS       41
+#define   DSX1INTERVALDMS       45
 	{(u_char) DSX1INTERVALDMS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 11}},
-#define   DSX1INTERVALLCVS      42
+#define   DSX1INTERVALLCVS      46
 	{(u_char) DSX1INTERVALLCVS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 12}},
-#define   DSX1INTERVALVALIDDATA  43
+#define   DSX1INTERVALVALIDDATA  47
 	{(u_char) DSX1INTERVALVALIDDATA, ASN_INTEGER, RONLY, var_dsx1IntervalTable, 3, {8, 1, 13}},
-#define   DSX1TOTALESS          44
+#define   DSX1TOTALESS          49
 	{(u_char) DSX1TOTALESS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 2}},
-#define   DSX1TOTALSESS         45
+#define   DSX1TOTALSESS         50
 	{(u_char) DSX1TOTALSESS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 3}},
-#define   DSX1TOTALSEFSS        46
+#define   DSX1TOTALSEFSS        51
 	{(u_char) DSX1TOTALSEFSS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 4}},
-#define   DSX1TOTALUASS         47
+#define   DSX1TOTALUASS         52
 	{(u_char) DSX1TOTALUASS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 5}},
-#define   DSX1TOTALCSSS         48
+#define   DSX1TOTALCSSS         53
 	{(u_char) DSX1TOTALCSSS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 6}},
-#define   DSX1TOTALPCVS         49
+#define   DSX1TOTALPCVS         54
 	{(u_char) DSX1TOTALPCVS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 7}},
-#define   DSX1TOTALLESS         50
+#define   DSX1TOTALLESS         55
 	{(u_char) DSX1TOTALLESS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 8}},
-#define   DSX1TOTALBESS         51
+#define   DSX1TOTALBESS         56
 	{(u_char) DSX1TOTALBESS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 9}},
-#define   DSX1TOTALDMS          52
+#define   DSX1TOTALDMS          57
 	{(u_char) DSX1TOTALDMS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 10}},
-#define   DSX1TOTALLCVS         53
+#define   DSX1TOTALLCVS         58
 	{(u_char) DSX1TOTALLCVS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 11}},
-#define   DSX1FARENDTIMEELAPSED  54
+#define   DSX1FARENDTIMEELAPSED  60
 	{(u_char) DSX1FARENDTIMEELAPSED, ASN_INTEGER, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 2}},
-#define   DSX1FARENDVALIDINTERVALS  55
+#define   DSX1FARENDVALIDINTERVALS  61
 	{(u_char) DSX1FARENDVALIDINTERVALS, ASN_INTEGER, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 3}},
-#define   DSX1FARENDCURRENTESS  56
+#define   DSX1FARENDCURRENTESS  62
 	{(u_char) DSX1FARENDCURRENTESS, ASN_GAUGE, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 4}},
-#define   DSX1FARENDCURRENTSESS  57
+#define   DSX1FARENDCURRENTSESS  63
 	{(u_char) DSX1FARENDCURRENTSESS, ASN_GAUGE, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 5}},
-#define   DSX1FARENDCURRENTSEFSS  58
+#define   DSX1FARENDCURRENTSEFSS  64
 	{(u_char) DSX1FARENDCURRENTSEFSS, ASN_GAUGE, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 6}},
-#define   DSX1FARENDCURRENTUASS  59
+#define   DSX1FARENDCURRENTUASS  65
 	{(u_char) DSX1FARENDCURRENTUASS, ASN_GAUGE, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 7}},
-#define   DSX1FARENDCURRENTCSSS  60
+#define   DSX1FARENDCURRENTCSSS  66
 	{(u_char) DSX1FARENDCURRENTCSSS, ASN_GAUGE, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 8}},
-#define   DSX1FARENDCURRENTLESS  61
+#define   DSX1FARENDCURRENTLESS  67
 	{(u_char) DSX1FARENDCURRENTLESS, ASN_GAUGE, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 9}},
-#define   DSX1FARENDCURRENTPCVS  62
+#define   DSX1FARENDCURRENTPCVS  68
 	{(u_char) DSX1FARENDCURRENTPCVS, ASN_GAUGE, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 10}},
-#define   DSX1FARENDCURRENTBESS  63
+#define   DSX1FARENDCURRENTBESS  69
 	{(u_char) DSX1FARENDCURRENTBESS, ASN_GAUGE, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 11}},
-#define   DSX1FARENDCURRENTDMS  64
+#define   DSX1FARENDCURRENTDMS  70
 	{(u_char) DSX1FARENDCURRENTDMS, ASN_GAUGE, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 12}},
-#define   DSX1FARENDINVALIDINTERVALS  65
+#define   DSX1FARENDINVALIDINTERVALS  71
 	{(u_char) DSX1FARENDINVALIDINTERVALS, ASN_INTEGER, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 13}},
-#define   DSX1FARENDINTERVALESS  66
+#define   DSX1FARENDINTERVALESS  74
 	{(u_char) DSX1FARENDINTERVALESS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 3}},
-#define   DSX1FARENDINTERVALSESS  67
+#define   DSX1FARENDINTERVALSESS  75
 	{(u_char) DSX1FARENDINTERVALSESS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 4}},
-#define   DSX1FARENDINTERVALSEFSS  68
+#define   DSX1FARENDINTERVALSEFSS  76
 	{(u_char) DSX1FARENDINTERVALSEFSS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 5}},
-#define   DSX1FARENDINTERVALUASS  69
+#define   DSX1FARENDINTERVALUASS  77
 	{(u_char) DSX1FARENDINTERVALUASS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 6}},
-#define   DSX1FARENDINTERVALCSSS  70
+#define   DSX1FARENDINTERVALCSSS  78
 	{(u_char) DSX1FARENDINTERVALCSSS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 7}},
-#define   DSX1FARENDINTERVALLESS  71
+#define   DSX1FARENDINTERVALLESS  79
 	{(u_char) DSX1FARENDINTERVALLESS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 8}},
-#define   DSX1FARENDINTERVALPCVS  72
+#define   DSX1FARENDINTERVALPCVS  80
 	{(u_char) DSX1FARENDINTERVALPCVS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 9}},
-#define   DSX1FARENDINTERVALBESS  73
+#define   DSX1FARENDINTERVALBESS  81
 	{(u_char) DSX1FARENDINTERVALBESS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 10}},
-#define   DSX1FARENDINTERVALDMS  74
+#define   DSX1FARENDINTERVALDMS  82
 	{(u_char) DSX1FARENDINTERVALDMS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 11}},
-#define   DSX1FARENDINTERVALVALIDDATA  75
+#define   DSX1FARENDINTERVALVALIDDATA  83
 	{(u_char) DSX1FARENDINTERVALVALIDDATA, ASN_INTEGER, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 12}},
-#define   DSX1FARENDTOTALESS    76
+#define   DSX1FARENDTOTALESS    85
 	{(u_char) DSX1FARENDTOTALESS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 2}},
-#define   DSX1FARENDTOTALSESS   77
+#define   DSX1FARENDTOTALSESS   86
 	{(u_char) DSX1FARENDTOTALSESS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 3}},
-#define   DSX1FARENDTOTALSEFSS  78
+#define   DSX1FARENDTOTALSEFSS  87
 	{(u_char) DSX1FARENDTOTALSEFSS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 4}},
-#define   DSX1FARENDTOTALUASS   79
+#define   DSX1FARENDTOTALUASS   88
 	{(u_char) DSX1FARENDTOTALUASS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 5}},
-#define   DSX1FARENDTOTALCSSS   80
+#define   DSX1FARENDTOTALCSSS   89
 	{(u_char) DSX1FARENDTOTALCSSS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 6}},
-#define   DSX1FARENDTOTALLESS   81
+#define   DSX1FARENDTOTALLESS   90
 	{(u_char) DSX1FARENDTOTALLESS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 7}},
-#define   DSX1FARENDTOTALPCVS   82
+#define   DSX1FARENDTOTALPCVS   91
 	{(u_char) DSX1FARENDTOTALPCVS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 8}},
-#define   DSX1FARENDTOTALBESS   83
+#define   DSX1FARENDTOTALBESS   92
 	{(u_char) DSX1FARENDTOTALBESS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 9}},
-#define   DSX1FARENDTOTALDMS    84
+#define   DSX1FARENDTOTALDMS    93
 	{(u_char) DSX1FARENDTOTALDMS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 10}},
-#define   DSX1FRACIFINDEX       85
+#define   DSX1FRACIFINDEX       96
 	{(u_char) DSX1FRACIFINDEX, ASN_INTEGER, RWRITE, var_dsx1FracTable, 3, {13, 1, 3}},
-#define   DSX1CHANMAPPEDIFINDEX  88
+#define   DSX1CHANMAPPEDIFINDEX  99
 	{(u_char) DSX1CHANMAPPEDIFINDEX, ASN_INTEGER, RONLY, var_dsx1ChanMappingTable, 3, {16, 1, 1}},
 };
 
@@ -510,8 +510,13 @@ ds1_create(void)
 		/* XXX: fill in default scalar values here into StorageNew */
 
 	}
+      done:
 	DEBUGMSGTL(("ds1", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	ds1_destroy(&StorageNew);
+	goto done;
 }
 
 /**
@@ -840,6 +845,7 @@ dsx1ConfigTable_duplicate(struct dsx1ConfigTable_data *thedata)
 
 	DEBUGMSGTL(("ds1", "dsx1ConfigTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->dsx1ConfigTable_id = thedata->dsx1ConfigTable_id;
 		StorageNew->dsx1LineIndex = thedata->dsx1LineIndex;
 		StorageNew->dsx1IfIndex = thedata->dsx1IfIndex;
 		StorageNew->dsx1TimeElapsed = thedata->dsx1TimeElapsed;
@@ -1119,6 +1125,7 @@ dsx1CurrentTable_duplicate(struct dsx1CurrentTable_data *thedata)
 
 	DEBUGMSGTL(("ds1", "dsx1CurrentTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->dsx1CurrentTable_id = thedata->dsx1CurrentTable_id;
 		StorageNew->dsx1CurrentIndex = thedata->dsx1CurrentIndex;
 		StorageNew->dsx1CurrentESs = thedata->dsx1CurrentESs;
 		StorageNew->dsx1CurrentSESs = thedata->dsx1CurrentSESs;
@@ -1352,6 +1359,7 @@ dsx1IntervalTable_duplicate(struct dsx1IntervalTable_data *thedata)
 
 	DEBUGMSGTL(("ds1", "dsx1IntervalTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->dsx1IntervalTable_id = thedata->dsx1IntervalTable_id;
 		StorageNew->dsx1IntervalIndex = thedata->dsx1IntervalIndex;
 		StorageNew->dsx1IntervalNumber = thedata->dsx1IntervalNumber;
 		StorageNew->dsx1IntervalESs = thedata->dsx1IntervalESs;
@@ -1592,6 +1600,7 @@ dsx1TotalTable_duplicate(struct dsx1TotalTable_data *thedata)
 
 	DEBUGMSGTL(("ds1", "dsx1TotalTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->dsx1TotalTable_id = thedata->dsx1TotalTable_id;
 		StorageNew->dsx1TotalIndex = thedata->dsx1TotalIndex;
 		StorageNew->dsx1TotalESs = thedata->dsx1TotalESs;
 		StorageNew->dsx1TotalSESs = thedata->dsx1TotalSESs;
@@ -1826,6 +1835,7 @@ dsx1FarEndCurrentTable_duplicate(struct dsx1FarEndCurrentTable_data *thedata)
 
 	DEBUGMSGTL(("ds1", "dsx1FarEndCurrentTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->dsx1FarEndCurrentTable_id = thedata->dsx1FarEndCurrentTable_id;
 		StorageNew->dsx1FarEndCurrentIndex = thedata->dsx1FarEndCurrentIndex;
 		StorageNew->dsx1FarEndTimeElapsed = thedata->dsx1FarEndTimeElapsed;
 		StorageNew->dsx1FarEndValidIntervals = thedata->dsx1FarEndValidIntervals;
@@ -2064,6 +2074,7 @@ dsx1FarEndIntervalTable_duplicate(struct dsx1FarEndIntervalTable_data *thedata)
 
 	DEBUGMSGTL(("ds1", "dsx1FarEndIntervalTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->dsx1FarEndIntervalTable_id = thedata->dsx1FarEndIntervalTable_id;
 		StorageNew->dsx1FarEndIntervalIndex = thedata->dsx1FarEndIntervalIndex;
 		StorageNew->dsx1FarEndIntervalNumber = thedata->dsx1FarEndIntervalNumber;
 		StorageNew->dsx1FarEndIntervalESs = thedata->dsx1FarEndIntervalESs;
@@ -2300,6 +2311,7 @@ dsx1FarEndTotalTable_duplicate(struct dsx1FarEndTotalTable_data *thedata)
 
 	DEBUGMSGTL(("ds1", "dsx1FarEndTotalTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->dsx1FarEndTotalTable_id = thedata->dsx1FarEndTotalTable_id;
 		StorageNew->dsx1FarEndTotalIndex = thedata->dsx1FarEndTotalIndex;
 		StorageNew->dsx1FarEndTotalESs = thedata->dsx1FarEndTotalESs;
 		StorageNew->dsx1FarEndTotalSESs = thedata->dsx1FarEndTotalSESs;
@@ -2520,6 +2532,7 @@ dsx1FracTable_duplicate(struct dsx1FracTable_data *thedata)
 
 	DEBUGMSGTL(("ds1", "dsx1FracTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->dsx1FracTable_id = thedata->dsx1FracTable_id;
 		StorageNew->dsx1FracIndex = thedata->dsx1FracIndex;
 		StorageNew->dsx1FracNumber = thedata->dsx1FracNumber;
 		StorageNew->dsx1FracIfIndex = thedata->dsx1FracIfIndex;
@@ -2723,6 +2736,7 @@ dsx1ChanMappingTable_duplicate(struct dsx1ChanMappingTable_data *thedata)
 
 	DEBUGMSGTL(("ds1", "dsx1ChanMappingTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->dsx1ChanMappingTable_id = thedata->dsx1ChanMappingTable_id;
 		StorageNew->ifIndex = thedata->ifIndex;
 		StorageNew->dsx1Ds1ChannelNumber = thedata->dsx1Ds1ChannelNumber;
 		StorageNew->dsx1ChanMappedIfIndex = thedata->dsx1ChanMappedIfIndex;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/snmp/rtpswMIB.c
+ @(#) src/snmp/rtpswMIB.c
 
  -----------------------------------------------------------------------------
 
@@ -385,8 +385,38 @@ rtpswMIB_create(void)
 		/* XXX: fill in default scalar values here into StorageNew */
 
 	}
+      done:
 	DEBUGMSGTL(("rtpswMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	rtpswMIB_destroy(&StorageNew);
+	goto done;
+}
+
+/**
+ * @fn struct rtpswMIB_data *rtpswMIB_duplicate(struct rtpswMIB_data *thedata)
+ * @param thedata the mib structure to duplicate
+ * @brief duplicate a mib structure for the mib
+ *
+ * Duplicates the specified mib structure @param thedata and returns a pointer to the newly
+ * allocated mib structure on success, or NULL on failure.
+ */
+struct rtpswMIB_data *
+rtpswMIB_duplicate(struct rtpswMIB_data *thedata)
+{
+	struct rtpswMIB_data *StorageNew = SNMP_MALLOC_STRUCT(rtpswMIB_data);
+
+	DEBUGMSGTL(("rtpswMIB", "rtpswMIB_duplicate: duplicating mib... "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("rtpswMIB", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	rtpswMIB_destroy(&StorageNew);
+	goto done;
 }
 
 /**
@@ -437,7 +467,7 @@ rtpswMIB_add(struct rtpswMIB_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for rtpswMIB entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case rtpswMIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -489,6 +519,62 @@ store_rtpswMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	}
 	DEBUGMSGTL(("rtpswMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int check_rtpswMIB(struct rtpswMIB_data *StorageTmp, struct rtpswMIB_data *StorageOld)
+ * @param StorageTmp the data as updated
+ * @param StorageOld the data previous to update
+ *
+ * This function is used by mibs.  It is used to check, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the ACTION phase.  The COMMIT phase does not ensue unless this check passes.  This function can
+ * return SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before
+ * the varbinds on the mib were applied; the values in StorageTmp are the new values.  The function
+ * is permitted to change the values in StorageTmp to correct them; however, preferences should be
+ * made for setting values that were not in the varbinds.
+ */
+int
+check_rtpswMIB(struct rtpswMIB_data *StorageTmp, struct rtpswMIB_data *StorageOld)
+{
+	/* XXX: provide code to check the scalars for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_rtpswMIB(struct rtpswMIB_data *StorageTmp, struct rtpswMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase)
+ *
+ * This function is used by mibs.  It is used to update, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the COMMIT phase.  The start of the ACTION phase performs a consistency check on the mib before
+ * allowing the request to proceed to the COMMIT phase.  The COMMIT phase then arrives here with
+ * consistency already checked (see check_rtpswMIB()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied: the values in StorageTmp are the new values.
+ */
+int
+update_rtpswMIB(struct rtpswMIB_data *StorageTmp, struct rtpswMIB_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	rtpswMIB_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn revert_rtpswMIB(struct 
+ * @fn void revert_rtpswMIB(struct rtpswMIB_data *StorageTmp, struct rtpswMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase)
+ */
+void
+revert_rtpswMIB(struct rtpswMIB_data *StorageTmp, struct rtpswMIB_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_rtpswMIB(StorageOld, NULL);
 }
 
 /**
@@ -585,25 +671,33 @@ rtpswInterfaceTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->rtpswInterfaceIndex = 0;
-		if ((StorageNew->rtpswInterfaceName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->rtpswInterfaceNameLen = strlen("");
+		if ((StorageNew->rtpswInterfaceName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->rtpswInterfaceNameLen = 0;
+		StorageNew->rtpswInterfaceName[StorageNew->rtpswInterfaceNameLen] = 0;
 		StorageNew->rptswInterfaceAdminState = RPTSWINTERFACEADMINSTATE_LOCKED;
 		StorageNew->rtpswInterfaceOperState = 0;
-		if (memdup((u_char **) &StorageNew->rtpswInterfaceProcStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->rtpswInterfaceProcStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->rtpswInterfaceProcStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->rtpswInterfaceProcStatusLen = 1;
 		StorageNew->rtpswInterfacePg = 0;
 		StorageNew->rtpswInterfaceStandbyStatus = 0;
 		StorageNew->rtpswInterfaceRowStatus = 0;
 		StorageNew->rtpswInterfaceRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("rtpswMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	rtpswInterfaceTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct rtpswInterfaceTable_data *rtpswInterfaceTable_duplicate(struct rtpswInterfaceTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -615,6 +709,24 @@ rtpswInterfaceTable_duplicate(struct rtpswInterfaceTable_data *thedata)
 
 	DEBUGMSGTL(("rtpswMIB", "rtpswInterfaceTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->rtpswInterfaceTable_id = thedata->rtpswInterfaceTable_id;
+		StorageNew->rtpswInterfaceId = thedata->rtpswInterfaceId;
+		StorageNew->rtpswInterfaceIndex = thedata->rtpswInterfaceIndex;
+		if (!(StorageNew->rtpswInterfaceName = malloc(thedata->rtpswInterfaceNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->rtpswInterfaceName, thedata->rtpswInterfaceName, thedata->rtpswInterfaceNameLen);
+		StorageNew->rtpswInterfaceNameLen = thedata->rtpswInterfaceNameLen;
+		StorageNew->rtpswInterfaceName[StorageNew->rtpswInterfaceNameLen] = 0;
+		StorageNew->rptswInterfaceAdminState = thedata->rptswInterfaceAdminState;
+		StorageNew->rtpswInterfaceOperState = thedata->rtpswInterfaceOperState;
+		if (!(StorageNew->rtpswInterfaceProcStatus = malloc(thedata->rtpswInterfaceProcStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->rtpswInterfaceProcStatus, thedata->rtpswInterfaceProcStatus, thedata->rtpswInterfaceProcStatusLen);
+		StorageNew->rtpswInterfaceProcStatusLen = thedata->rtpswInterfaceProcStatusLen;
+		StorageNew->rtpswInterfaceProcStatus[StorageNew->rtpswInterfaceProcStatusLen] = 0;
+		StorageNew->rtpswInterfacePg = thedata->rtpswInterfacePg;
+		StorageNew->rtpswInterfaceStandbyStatus = thedata->rtpswInterfaceStandbyStatus;
+		StorageNew->rtpswInterfaceRowStatus = thedata->rtpswInterfaceRowStatus;
 	}
       done:
 	DEBUGMSGTL(("rtpswMIB", "done.\n"));
@@ -712,7 +824,7 @@ rtpswInterfaceTable_del(struct rtpswInterfaceTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for rtpswInterfaceTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case rtpswInterfaceTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -812,28 +924,37 @@ rtpswIfAddrTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->rtpswIfIndex = 0;
-		if ((StorageNew->rtpswIfName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->rtpswIfNameLen = strlen("");
-		if (memdup((u_char **) &StorageNew->rtpswIfPortRange, (u_char *) "\x80\x00\xff\xff", 4) == SNMPERR_SUCCESS)
-			StorageNew->rtpswIfPortRangeLen = 4;
+		if ((StorageNew->rtpswIfName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->rtpswIfNameLen = 0;
+		StorageNew->rtpswIfName[StorageNew->rtpswIfNameLen] = 0;
+		if (memdup((u_char **) &StorageNew->rtpswIfPortRange, (u_char *) "\x80\x00\xff\xff", 4) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->rtpswIfPortRangeLen = 4;
 		StorageNew->rtpswIfAddrGuardTime = 500;
 		StorageNew->rtpswIfAddrAdminState = 0;
 		StorageNew->rtpswIfAddrOperState = 0;
-		if (memdup((u_char **) &StorageNew->rtpswIfAddrProcStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->rtpswIfAddrProcStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->rtpswIfAddrProcStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->rtpswIfAddrProcStatusLen = 1;
 		StorageNew->rtpswIfAddrPg = 0;
 		StorageNew->rtpswIfAddrStandbyStatus = 0;
 		StorageNew->rtpswIfAddrRowStatus = 0;
 		StorageNew->rtpswIfAddrRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("rtpswMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	rtpswIfAddrTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct rtpswIfAddrTable_data *rtpswIfAddrTable_duplicate(struct rtpswIfAddrTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -845,6 +966,30 @@ rtpswIfAddrTable_duplicate(struct rtpswIfAddrTable_data *thedata)
 
 	DEBUGMSGTL(("rtpswMIB", "rtpswIfAddrTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->rtpswIfAddrTable_id = thedata->rtpswIfAddrTable_id;
+		StorageNew->rtpswIfAddrId = thedata->rtpswIfAddrId;
+		StorageNew->rtpswIfIndex = thedata->rtpswIfIndex;
+		if (!(StorageNew->rtpswIfName = malloc(thedata->rtpswIfNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->rtpswIfName, thedata->rtpswIfName, thedata->rtpswIfNameLen);
+		StorageNew->rtpswIfNameLen = thedata->rtpswIfNameLen;
+		StorageNew->rtpswIfName[StorageNew->rtpswIfNameLen] = 0;
+		if (!(StorageNew->rtpswIfPortRange = malloc(thedata->rtpswIfPortRangeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->rtpswIfPortRange, thedata->rtpswIfPortRange, thedata->rtpswIfPortRangeLen);
+		StorageNew->rtpswIfPortRangeLen = thedata->rtpswIfPortRangeLen;
+		StorageNew->rtpswIfPortRange[StorageNew->rtpswIfPortRangeLen] = 0;
+		StorageNew->rtpswIfAddrGuardTime = thedata->rtpswIfAddrGuardTime;
+		StorageNew->rtpswIfAddrAdminState = thedata->rtpswIfAddrAdminState;
+		StorageNew->rtpswIfAddrOperState = thedata->rtpswIfAddrOperState;
+		if (!(StorageNew->rtpswIfAddrProcStatus = malloc(thedata->rtpswIfAddrProcStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->rtpswIfAddrProcStatus, thedata->rtpswIfAddrProcStatus, thedata->rtpswIfAddrProcStatusLen);
+		StorageNew->rtpswIfAddrProcStatusLen = thedata->rtpswIfAddrProcStatusLen;
+		StorageNew->rtpswIfAddrProcStatus[StorageNew->rtpswIfAddrProcStatusLen] = 0;
+		StorageNew->rtpswIfAddrPg = thedata->rtpswIfAddrPg;
+		StorageNew->rtpswIfAddrStandbyStatus = thedata->rtpswIfAddrStandbyStatus;
+		StorageNew->rtpswIfAddrRowStatus = thedata->rtpswIfAddrRowStatus;
 	}
       done:
 	DEBUGMSGTL(("rtpswMIB", "done.\n"));
@@ -944,7 +1089,7 @@ rtpswIfAddrTable_del(struct rtpswIfAddrTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for rtpswIfAddrTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case rtpswIfAddrTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1054,24 +1199,33 @@ rtpswTermPointTable_create(void)
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->rtpswTermPointState = 0;
 		StorageNew->rtpswTermPointType = 0;
-		if ((StorageNew->rtpswTermPointLocalAddress = (uint8_t *) strdup("")) != NULL)
-			StorageNew->rtpswTermPointLocalAddressLen = strlen("");
-		if ((StorageNew->rtpswTermPointRemoteAddress = (uint8_t *) strdup("")) != NULL)
-			StorageNew->rtpswTermPointRemoteAddressLen = strlen("");
+		if ((StorageNew->rtpswTermPointLocalAddress = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->rtpswTermPointLocalAddressLen = 0;
+		StorageNew->rtpswTermPointLocalAddress[StorageNew->rtpswTermPointLocalAddressLen] = 0;
+		if ((StorageNew->rtpswTermPointRemoteAddress = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->rtpswTermPointRemoteAddressLen = 0;
+		StorageNew->rtpswTermPointRemoteAddress[StorageNew->rtpswTermPointRemoteAddressLen] = 0;
 		StorageNew->rtpswTermPointOperState = 0;
 		StorageNew->rtpswTermPointUsageState = 0;
-		if (memdup((u_char **) &StorageNew->rtpswTermPointProcStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->rtpswTermPointProcStatusLen = 1;
-
+		if (memdup((u_char **) &StorageNew->rtpswTermPointProcStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->rtpswTermPointProcStatusLen = 1;
 	}
+      done:
 	DEBUGMSGTL(("rtpswMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	rtpswTermPointTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct rtpswTermPointTable_data *rtpswTermPointTable_duplicate(struct rtpswTermPointTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1083,6 +1237,27 @@ rtpswTermPointTable_duplicate(struct rtpswTermPointTable_data *thedata)
 
 	DEBUGMSGTL(("rtpswMIB", "rtpswTermPointTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->rtpswTermPointTable_id = thedata->rtpswTermPointTable_id;
+		StorageNew->rtpswTermPointId = thedata->rtpswTermPointId;
+		StorageNew->rtpswTermPointState = thedata->rtpswTermPointState;
+		StorageNew->rtpswTermPointType = thedata->rtpswTermPointType;
+		if (!(StorageNew->rtpswTermPointLocalAddress = malloc(thedata->rtpswTermPointLocalAddressLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->rtpswTermPointLocalAddress, thedata->rtpswTermPointLocalAddress, thedata->rtpswTermPointLocalAddressLen);
+		StorageNew->rtpswTermPointLocalAddressLen = thedata->rtpswTermPointLocalAddressLen;
+		StorageNew->rtpswTermPointLocalAddress[StorageNew->rtpswTermPointLocalAddressLen] = 0;
+		if (!(StorageNew->rtpswTermPointRemoteAddress = malloc(thedata->rtpswTermPointRemoteAddressLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->rtpswTermPointRemoteAddress, thedata->rtpswTermPointRemoteAddress, thedata->rtpswTermPointRemoteAddressLen);
+		StorageNew->rtpswTermPointRemoteAddressLen = thedata->rtpswTermPointRemoteAddressLen;
+		StorageNew->rtpswTermPointRemoteAddress[StorageNew->rtpswTermPointRemoteAddressLen] = 0;
+		StorageNew->rtpswTermPointOperState = thedata->rtpswTermPointOperState;
+		StorageNew->rtpswTermPointUsageState = thedata->rtpswTermPointUsageState;
+		if (!(StorageNew->rtpswTermPointProcStatus = malloc(thedata->rtpswTermPointProcStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->rtpswTermPointProcStatus, thedata->rtpswTermPointProcStatus, thedata->rtpswTermPointProcStatusLen);
+		StorageNew->rtpswTermPointProcStatusLen = thedata->rtpswTermPointProcStatusLen;
+		StorageNew->rtpswTermPointProcStatus[StorageNew->rtpswTermPointProcStatusLen] = 0;
 	}
       done:
 	DEBUGMSGTL(("rtpswMIB", "done.\n"));
@@ -1182,7 +1357,7 @@ rtpswTermPointTable_del(struct rtpswTermPointTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for rtpswTermPointTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case rtpswTermPointTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1285,16 +1460,20 @@ rtpswTermPointRevTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->rtpswTermPointTableIndex = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("rtpswMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	rtpswTermPointRevTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct rtpswTermPointRevTable_data *rtpswTermPointRevTable_duplicate(struct rtpswTermPointRevTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1306,6 +1485,14 @@ rtpswTermPointRevTable_duplicate(struct rtpswTermPointRevTable_data *thedata)
 
 	DEBUGMSGTL(("rtpswMIB", "rtpswTermPointRevTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->rtpswTermPointRevTable_id = thedata->rtpswTermPointRevTable_id;
+		StorageNew->rtpswTermPointRevType = thedata->rtpswTermPointRevType;
+		if (!(StorageNew->rtpswTermPointRevAddr = malloc(thedata->rtpswTermPointRevAddrLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->rtpswTermPointRevAddr, thedata->rtpswTermPointRevAddr, thedata->rtpswTermPointRevAddrLen);
+		StorageNew->rtpswTermPointRevAddrLen = thedata->rtpswTermPointRevAddrLen;
+		StorageNew->rtpswTermPointRevAddr[StorageNew->rtpswTermPointRevAddrLen] = 0;
+		StorageNew->rtpswTermPointTableIndex = thedata->rtpswTermPointTableIndex;
 	}
       done:
 	DEBUGMSGTL(("rtpswMIB", "done.\n"));
@@ -1403,7 +1590,7 @@ rtpswTermPointRevTable_del(struct rtpswTermPointRevTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for rtpswTermPointRevTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case rtpswTermPointRevTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1486,22 +1673,31 @@ rtpswForwTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->rtpswForwTpType = 0;
-		if ((StorageNew->rtpswForwTpCalling = (uint8_t *) strdup("")) != NULL)
-			StorageNew->rtpswForwTpCallingLen = strlen("");
-		if ((StorageNew->rtpswForwTpCalled = (uint8_t *) strdup("")) != NULL)
-			StorageNew->rtpswForwTpCalledLen = strlen("");
-		if (memdup((u_char **) &StorageNew->rtpswForwState, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->rtpswForwStateLen = 1;
-
+		if ((StorageNew->rtpswForwTpCalling = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->rtpswForwTpCallingLen = 0;
+		StorageNew->rtpswForwTpCalling[StorageNew->rtpswForwTpCallingLen] = 0;
+		if ((StorageNew->rtpswForwTpCalled = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->rtpswForwTpCalledLen = 0;
+		StorageNew->rtpswForwTpCalled[StorageNew->rtpswForwTpCalledLen] = 0;
+		if (memdup((u_char **) &StorageNew->rtpswForwState, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->rtpswForwStateLen = 1;
 	}
+      done:
 	DEBUGMSGTL(("rtpswMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	rtpswForwTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct rtpswForwTable_data *rtpswForwTable_duplicate(struct rtpswForwTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1513,6 +1709,24 @@ rtpswForwTable_duplicate(struct rtpswForwTable_data *thedata)
 
 	DEBUGMSGTL(("rtpswMIB", "rtpswForwTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->rtpswForwTable_id = thedata->rtpswForwTable_id;
+		StorageNew->rtpswForwId = thedata->rtpswForwId;
+		StorageNew->rtpswForwTpType = thedata->rtpswForwTpType;
+		if (!(StorageNew->rtpswForwTpCalling = malloc(thedata->rtpswForwTpCallingLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->rtpswForwTpCalling, thedata->rtpswForwTpCalling, thedata->rtpswForwTpCallingLen);
+		StorageNew->rtpswForwTpCallingLen = thedata->rtpswForwTpCallingLen;
+		StorageNew->rtpswForwTpCalling[StorageNew->rtpswForwTpCallingLen] = 0;
+		if (!(StorageNew->rtpswForwTpCalled = malloc(thedata->rtpswForwTpCalledLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->rtpswForwTpCalled, thedata->rtpswForwTpCalled, thedata->rtpswForwTpCalledLen);
+		StorageNew->rtpswForwTpCalledLen = thedata->rtpswForwTpCalledLen;
+		StorageNew->rtpswForwTpCalled[StorageNew->rtpswForwTpCalledLen] = 0;
+		if (!(StorageNew->rtpswForwState = malloc(thedata->rtpswForwStateLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->rtpswForwState, thedata->rtpswForwState, thedata->rtpswForwStateLen);
+		StorageNew->rtpswForwStateLen = thedata->rtpswForwStateLen;
+		StorageNew->rtpswForwState[StorageNew->rtpswForwStateLen] = 0;
 	}
       done:
 	DEBUGMSGTL(("rtpswMIB", "done.\n"));
@@ -1612,7 +1826,7 @@ rtpswForwTable_del(struct rtpswForwTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for rtpswForwTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case rtpswForwTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1711,16 +1925,20 @@ rtpswForwRevTable_create(void)
 		StorageNew->rtpswTermPointId = 0;
 		StorageNew->rtpswTermPointId = 0;
 		StorageNew->rtpswForwTableIndex = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("rtpswMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	rtpswForwRevTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct rtpswForwRevTable_data *rtpswForwRevTable_duplicate(struct rtpswForwRevTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1732,6 +1950,10 @@ rtpswForwRevTable_duplicate(struct rtpswForwRevTable_data *thedata)
 
 	DEBUGMSGTL(("rtpswMIB", "rtpswForwRevTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->rtpswForwRevTable_id = thedata->rtpswForwRevTable_id;
+		StorageNew->rtpswTermPointId = thedata->rtpswTermPointId;
+		StorageNew->rtpswTermPointId = thedata->rtpswTermPointId;
+		StorageNew->rtpswForwTableIndex = thedata->rtpswForwTableIndex;
 	}
       done:
 	DEBUGMSGTL(("rtpswMIB", "done.\n"));
@@ -1827,7 +2049,7 @@ rtpswForwRevTable_del(struct rtpswForwRevTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for rtpswForwRevTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case rtpswForwRevTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1905,27 +2127,40 @@ rtpswCallTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->rtpswCallTpCallingType = 0;
-		if ((StorageNew->rtpswCallTpRemoteCalling = (uint8_t *) strdup("")) != NULL)
-			StorageNew->rtpswCallTpRemoteCallingLen = strlen("");
-		if ((StorageNew->rtpswCallTpLocalCalling = (uint8_t *) strdup("")) != NULL)
-			StorageNew->rtpswCallTpLocalCallingLen = strlen("");
+		if ((StorageNew->rtpswCallTpRemoteCalling = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->rtpswCallTpRemoteCallingLen = 0;
+		StorageNew->rtpswCallTpRemoteCalling[StorageNew->rtpswCallTpRemoteCallingLen] = 0;
+		if ((StorageNew->rtpswCallTpLocalCalling = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->rtpswCallTpLocalCallingLen = 0;
+		StorageNew->rtpswCallTpLocalCalling[StorageNew->rtpswCallTpLocalCallingLen] = 0;
 		StorageNew->rtpswCallTpCalledType = 0;
-		if ((StorageNew->rtpswCallTpLocalCalled = (uint8_t *) strdup("")) != NULL)
-			StorageNew->rtpswCallTpLocalCalledLen = strlen("");
-		if ((StorageNew->rtpswCallTpRemoteCalled = (uint8_t *) strdup("")) != NULL)
-			StorageNew->rtpswCallTpRemoteCalledLen = strlen("");
-		if (memdup((u_char **) &StorageNew->rtpswCallState, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->rtpswCallStateLen = 1;
-
+		if ((StorageNew->rtpswCallTpLocalCalled = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->rtpswCallTpLocalCalledLen = 0;
+		StorageNew->rtpswCallTpLocalCalled[StorageNew->rtpswCallTpLocalCalledLen] = 0;
+		if ((StorageNew->rtpswCallTpRemoteCalled = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->rtpswCallTpRemoteCalledLen = 0;
+		StorageNew->rtpswCallTpRemoteCalled[StorageNew->rtpswCallTpRemoteCalledLen] = 0;
+		if (memdup((u_char **) &StorageNew->rtpswCallState, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->rtpswCallStateLen = 1;
 	}
+      done:
 	DEBUGMSGTL(("rtpswMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	rtpswCallTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct rtpswCallTable_data *rtpswCallTable_duplicate(struct rtpswCallTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1937,6 +2172,35 @@ rtpswCallTable_duplicate(struct rtpswCallTable_data *thedata)
 
 	DEBUGMSGTL(("rtpswMIB", "rtpswCallTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->rtpswCallTable_id = thedata->rtpswCallTable_id;
+		StorageNew->rtpswCallId = thedata->rtpswCallId;
+		StorageNew->rtpswCallTpCallingType = thedata->rtpswCallTpCallingType;
+		if (!(StorageNew->rtpswCallTpRemoteCalling = malloc(thedata->rtpswCallTpRemoteCallingLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->rtpswCallTpRemoteCalling, thedata->rtpswCallTpRemoteCalling, thedata->rtpswCallTpRemoteCallingLen);
+		StorageNew->rtpswCallTpRemoteCallingLen = thedata->rtpswCallTpRemoteCallingLen;
+		StorageNew->rtpswCallTpRemoteCalling[StorageNew->rtpswCallTpRemoteCallingLen] = 0;
+		if (!(StorageNew->rtpswCallTpLocalCalling = malloc(thedata->rtpswCallTpLocalCallingLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->rtpswCallTpLocalCalling, thedata->rtpswCallTpLocalCalling, thedata->rtpswCallTpLocalCallingLen);
+		StorageNew->rtpswCallTpLocalCallingLen = thedata->rtpswCallTpLocalCallingLen;
+		StorageNew->rtpswCallTpLocalCalling[StorageNew->rtpswCallTpLocalCallingLen] = 0;
+		StorageNew->rtpswCallTpCalledType = thedata->rtpswCallTpCalledType;
+		if (!(StorageNew->rtpswCallTpLocalCalled = malloc(thedata->rtpswCallTpLocalCalledLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->rtpswCallTpLocalCalled, thedata->rtpswCallTpLocalCalled, thedata->rtpswCallTpLocalCalledLen);
+		StorageNew->rtpswCallTpLocalCalledLen = thedata->rtpswCallTpLocalCalledLen;
+		StorageNew->rtpswCallTpLocalCalled[StorageNew->rtpswCallTpLocalCalledLen] = 0;
+		if (!(StorageNew->rtpswCallTpRemoteCalled = malloc(thedata->rtpswCallTpRemoteCalledLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->rtpswCallTpRemoteCalled, thedata->rtpswCallTpRemoteCalled, thedata->rtpswCallTpRemoteCalledLen);
+		StorageNew->rtpswCallTpRemoteCalledLen = thedata->rtpswCallTpRemoteCalledLen;
+		StorageNew->rtpswCallTpRemoteCalled[StorageNew->rtpswCallTpRemoteCalledLen] = 0;
+		if (!(StorageNew->rtpswCallState = malloc(thedata->rtpswCallStateLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->rtpswCallState, thedata->rtpswCallState, thedata->rtpswCallStateLen);
+		StorageNew->rtpswCallStateLen = thedata->rtpswCallStateLen;
+		StorageNew->rtpswCallState[StorageNew->rtpswCallStateLen] = 0;
 	}
       done:
 	DEBUGMSGTL(("rtpswMIB", "done.\n"));
@@ -2040,7 +2304,7 @@ rtpswCallTable_del(struct rtpswCallTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for rtpswCallTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case rtpswCallTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2134,6 +2398,132 @@ store_rtpswCallTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	}
 	DEBUGMSGTL(("rtpswMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int activate_rtpswInterfaceTable_row(struct rtpswInterfaceTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_rtpswInterfaceTable_row(struct rtpswInterfaceTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_rtpswInterfaceTable_row(struct rtpswInterfaceTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_rtpswInterfaceTable_row(struct rtpswInterfaceTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_rtpswIfAddrTable_row(struct rtpswIfAddrTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_rtpswIfAddrTable_row(struct rtpswIfAddrTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_rtpswIfAddrTable_row(struct rtpswIfAddrTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_rtpswIfAddrTable_row(struct rtpswIfAddrTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int check_rtpswInterfaceTable_row(struct rtpswInterfaceTable_data *StorageTmp, struct rtpswInterfaceTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_rtpswInterfaceTable_row(struct rtpswInterfaceTable_data *StorageTmp, struct rtpswInterfaceTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_rtpswInterfaceTable_row(struct rtpswInterfaceTable_data *StorageTmp, struct rtpswInterfaceTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_rtpswInterfaceTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_rtpswInterfaceTable_row(struct rtpswInterfaceTable_data *StorageTmp, struct rtpswInterfaceTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	rtpswInterfaceTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_rtpswInterfaceTable_row(struct rtpswInterfaceTable_data *StorageTmp, struct rtpswInterfaceTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_rtpswInterfaceTable_row(struct rtpswInterfaceTable_data *StorageTmp, struct rtpswInterfaceTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_rtpswInterfaceTable_row(StorageOld, NULL);
 }
 
 /**
@@ -2257,6 +2647,64 @@ var_rtpswInterfaceTable(struct variable *vp, oid * name, size_t *length, int exa
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_rtpswIfAddrTable_row(struct rtpswIfAddrTable_data *StorageTmp, struct rtpswIfAddrTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_rtpswIfAddrTable_row(struct rtpswIfAddrTable_data *StorageTmp, struct rtpswIfAddrTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_rtpswIfAddrTable_row(struct rtpswIfAddrTable_data *StorageTmp, struct rtpswIfAddrTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_rtpswIfAddrTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_rtpswIfAddrTable_row(struct rtpswIfAddrTable_data *StorageTmp, struct rtpswIfAddrTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	rtpswIfAddrTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_rtpswIfAddrTable_row(struct rtpswIfAddrTable_data *StorageTmp, struct rtpswIfAddrTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_rtpswIfAddrTable_row(struct rtpswIfAddrTable_data *StorageTmp, struct rtpswIfAddrTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_rtpswIfAddrTable_row(StorageOld, NULL);
 }
 
 /**
@@ -2395,6 +2843,64 @@ var_rtpswIfAddrTable(struct variable *vp, oid * name, size_t *length, int exact,
 }
 
 /**
+ * @fn int check_rtpswTermPointTable_row(struct rtpswTermPointTable_data *StorageTmp, struct rtpswTermPointTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_rtpswTermPointTable_row(struct rtpswTermPointTable_data *StorageTmp, struct rtpswTermPointTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_rtpswTermPointTable_row(struct rtpswTermPointTable_data *StorageTmp, struct rtpswTermPointTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_rtpswTermPointTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_rtpswTermPointTable_row(struct rtpswTermPointTable_data *StorageTmp, struct rtpswTermPointTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	rtpswTermPointTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_rtpswTermPointTable_row(struct rtpswTermPointTable_data *StorageTmp, struct rtpswTermPointTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_rtpswTermPointTable_row(struct rtpswTermPointTable_data *StorageTmp, struct rtpswTermPointTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_rtpswTermPointTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_rtpswTermPointTable_row(struct rtpswTermPointTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -2508,6 +3014,64 @@ var_rtpswTermPointTable(struct variable *vp, oid * name, size_t *length, int exa
 }
 
 /**
+ * @fn int check_rtpswTermPointRevTable_row(struct rtpswTermPointRevTable_data *StorageTmp, struct rtpswTermPointRevTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_rtpswTermPointRevTable_row(struct rtpswTermPointRevTable_data *StorageTmp, struct rtpswTermPointRevTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_rtpswTermPointRevTable_row(struct rtpswTermPointRevTable_data *StorageTmp, struct rtpswTermPointRevTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_rtpswTermPointRevTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_rtpswTermPointRevTable_row(struct rtpswTermPointRevTable_data *StorageTmp, struct rtpswTermPointRevTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	rtpswTermPointRevTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_rtpswTermPointRevTable_row(struct rtpswTermPointRevTable_data *StorageTmp, struct rtpswTermPointRevTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_rtpswTermPointRevTable_row(struct rtpswTermPointRevTable_data *StorageTmp, struct rtpswTermPointRevTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_rtpswTermPointRevTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_rtpswTermPointRevTable_row(struct rtpswTermPointRevTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -2582,6 +3146,64 @@ var_rtpswTermPointRevTable(struct variable *vp, oid * name, size_t *length, int 
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_rtpswForwTable_row(struct rtpswForwTable_data *StorageTmp, struct rtpswForwTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_rtpswForwTable_row(struct rtpswForwTable_data *StorageTmp, struct rtpswForwTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_rtpswForwTable_row(struct rtpswForwTable_data *StorageTmp, struct rtpswForwTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_rtpswForwTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_rtpswForwTable_row(struct rtpswForwTable_data *StorageTmp, struct rtpswForwTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	rtpswForwTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_rtpswForwTable_row(struct rtpswForwTable_data *StorageTmp, struct rtpswForwTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_rtpswForwTable_row(struct rtpswForwTable_data *StorageTmp, struct rtpswForwTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_rtpswForwTable_row(StorageOld, NULL);
 }
 
 /**
@@ -2680,6 +3302,64 @@ var_rtpswForwTable(struct variable *vp, oid * name, size_t *length, int exact, s
 }
 
 /**
+ * @fn int check_rtpswForwRevTable_row(struct rtpswForwRevTable_data *StorageTmp, struct rtpswForwRevTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_rtpswForwRevTable_row(struct rtpswForwRevTable_data *StorageTmp, struct rtpswForwRevTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_rtpswForwRevTable_row(struct rtpswForwRevTable_data *StorageTmp, struct rtpswForwRevTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_rtpswForwRevTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_rtpswForwRevTable_row(struct rtpswForwRevTable_data *StorageTmp, struct rtpswForwRevTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	rtpswForwRevTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_rtpswForwRevTable_row(struct rtpswForwRevTable_data *StorageTmp, struct rtpswForwRevTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_rtpswForwRevTable_row(struct rtpswForwRevTable_data *StorageTmp, struct rtpswForwRevTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_rtpswForwRevTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_rtpswForwRevTable_row(struct rtpswForwRevTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -2754,6 +3434,64 @@ var_rtpswForwRevTable(struct variable *vp, oid * name, size_t *length, int exact
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_rtpswCallTable_row(struct rtpswCallTable_data *StorageTmp, struct rtpswCallTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_rtpswCallTable_row(struct rtpswCallTable_data *StorageTmp, struct rtpswCallTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_rtpswCallTable_row(struct rtpswCallTable_data *StorageTmp, struct rtpswCallTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_rtpswCallTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_rtpswCallTable_row(struct rtpswCallTable_data *StorageTmp, struct rtpswCallTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	rtpswCallTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_rtpswCallTable_row(struct rtpswCallTable_data *StorageTmp, struct rtpswCallTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_rtpswCallTable_row(struct rtpswCallTable_data *StorageTmp, struct rtpswCallTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_rtpswCallTable_row(StorageOld, NULL);
 }
 
 /**
@@ -2883,12 +3621,14 @@ var_rtpswCallTable(struct variable *vp, oid * name, size_t *length, int exact, s
 int
 write_rtpswInterfaceIndex(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct rtpswInterfaceTable_data *StorageTmp = NULL;
+	struct rtpswInterfaceTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("rtpswMIB", "write_rtpswInterfaceIndex entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(rtpswInterfaceTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -2913,22 +3653,61 @@ write_rtpswInterfaceIndex(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to rtpswInterfaceIndex: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->rtpswInterfaceTable_old) == NULL)
+			if (StorageTmp->rtpswInterfaceTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->rtpswInterfaceTable_old = rtpswInterfaceTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->rtpswInterfaceTable_rsvs++;
+		StorageTmp->rtpswInterfaceIndex = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->rtpswInterfaceTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->rtpswInterfaceTable_tsts == 0)
+				if ((ret = check_rtpswInterfaceTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->rtpswInterfaceTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->rtpswInterfaceIndex for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->rtpswInterfaceIndex;
-		StorageTmp->rtpswInterfaceIndex = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->rtpswInterfaceTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->rtpswInterfaceTable_sets == 0)
+				if ((ret = update_rtpswInterfaceTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->rtpswInterfaceTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->rtpswInterfaceTable_old) != NULL) {
+			rtpswInterfaceTable_destroy(&StorageTmp->rtpswInterfaceTable_old);
+			StorageTmp->rtpswInterfaceTable_rsvs = 0;
+			StorageTmp->rtpswInterfaceTable_tsts = 0;
+			StorageTmp->rtpswInterfaceTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->rtpswInterfaceIndex = old_value;
+		if ((StorageOld = StorageTmp->rtpswInterfaceTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->rtpswInterfaceTable_sets == 0)
+			revert_rtpswInterfaceTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->rtpswInterfaceTable_old) == NULL)
+			break;
+		StorageTmp->rtpswInterfaceIndex = StorageOld->rtpswInterfaceIndex;
+		if (--StorageTmp->rtpswInterfaceTable_rsvs == 0)
+			rtpswInterfaceTable_destroy(&StorageTmp->rtpswInterfaceTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2948,17 +3727,17 @@ write_rtpswInterfaceIndex(int action, u_char *var_val, u_char var_val_type, size
 int
 write_rtpswInterfaceName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct rtpswInterfaceTable_data *StorageTmp = NULL;
+	struct rtpswInterfaceTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("rtpswMIB", "write_rtpswInterfaceName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(rtpswInterfaceTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->rtpswInterfaceRowStatus) {
@@ -2981,33 +3760,73 @@ write_rtpswInterfaceName(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to rtpswInterfaceName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->rtpswInterfaceTable_old) == NULL)
+			if (StorageTmp->rtpswInterfaceTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->rtpswInterfaceTable_old = rtpswInterfaceTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->rtpswInterfaceTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->rtpswInterfaceName);
+		StorageTmp->rtpswInterfaceName = string;
+		StorageTmp->rtpswInterfaceNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->rtpswInterfaceTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->rtpswInterfaceTable_tsts == 0)
+				if ((ret = check_rtpswInterfaceTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->rtpswInterfaceTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->rtpswInterfaceName for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->rtpswInterfaceName;
-		old_length = StorageTmp->rtpswInterfaceNameLen;
-		StorageTmp->rtpswInterfaceName = string;
-		StorageTmp->rtpswInterfaceNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->rtpswInterfaceTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->rtpswInterfaceTable_sets == 0)
+				if ((ret = update_rtpswInterfaceTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->rtpswInterfaceTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->rtpswInterfaceTable_old) != NULL) {
+			rtpswInterfaceTable_destroy(&StorageTmp->rtpswInterfaceTable_old);
+			StorageTmp->rtpswInterfaceTable_rsvs = 0;
+			StorageTmp->rtpswInterfaceTable_tsts = 0;
+			StorageTmp->rtpswInterfaceTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->rtpswInterfaceName = old_value;
-		StorageTmp->rtpswInterfaceNameLen = old_length;
+		if ((StorageOld = StorageTmp->rtpswInterfaceTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->rtpswInterfaceTable_sets == 0)
+			revert_rtpswInterfaceTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->rtpswInterfaceTable_old) == NULL)
+			break;
+		if (StorageOld->rtpswInterfaceName != NULL) {
+			SNMP_FREE(StorageTmp->rtpswInterfaceName);
+			StorageTmp->rtpswInterfaceName = StorageOld->rtpswInterfaceName;
+			StorageTmp->rtpswInterfaceNameLen = StorageOld->rtpswInterfaceNameLen;
+			StorageOld->rtpswInterfaceName = NULL;
+			StorageOld->rtpswInterfaceNameLen = 0;
+		}
+		if (--StorageTmp->rtpswInterfaceTable_rsvs == 0)
+			rtpswInterfaceTable_destroy(&StorageTmp->rtpswInterfaceTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3027,12 +3846,14 @@ write_rtpswInterfaceName(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_rptswInterfaceAdminState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct rtpswInterfaceTable_data *StorageTmp = NULL;
+	struct rtpswInterfaceTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("rtpswMIB", "write_rptswInterfaceAdminState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(rtpswInterfaceTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3067,22 +3888,61 @@ write_rptswInterfaceAdminState(int action, u_char *var_val, u_char var_val_type,
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to rptswInterfaceAdminState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->rtpswInterfaceTable_old) == NULL)
+			if (StorageTmp->rtpswInterfaceTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->rtpswInterfaceTable_old = rtpswInterfaceTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->rtpswInterfaceTable_rsvs++;
+		StorageTmp->rptswInterfaceAdminState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->rtpswInterfaceTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->rtpswInterfaceTable_tsts == 0)
+				if ((ret = check_rtpswInterfaceTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->rtpswInterfaceTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->rptswInterfaceAdminState for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->rptswInterfaceAdminState;
-		StorageTmp->rptswInterfaceAdminState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->rtpswInterfaceTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->rtpswInterfaceTable_sets == 0)
+				if ((ret = update_rtpswInterfaceTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->rtpswInterfaceTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->rtpswInterfaceTable_old) != NULL) {
+			rtpswInterfaceTable_destroy(&StorageTmp->rtpswInterfaceTable_old);
+			StorageTmp->rtpswInterfaceTable_rsvs = 0;
+			StorageTmp->rtpswInterfaceTable_tsts = 0;
+			StorageTmp->rtpswInterfaceTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->rptswInterfaceAdminState = old_value;
+		if ((StorageOld = StorageTmp->rtpswInterfaceTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->rtpswInterfaceTable_sets == 0)
+			revert_rtpswInterfaceTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->rtpswInterfaceTable_old) == NULL)
+			break;
+		StorageTmp->rptswInterfaceAdminState = StorageOld->rptswInterfaceAdminState;
+		if (--StorageTmp->rtpswInterfaceTable_rsvs == 0)
+			rtpswInterfaceTable_destroy(&StorageTmp->rtpswInterfaceTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3102,17 +3962,17 @@ write_rptswInterfaceAdminState(int action, u_char *var_val, u_char var_val_type,
 int
 write_rtpswIfPortRange(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct rtpswIfAddrTable_data *StorageTmp = NULL;
+	struct rtpswIfAddrTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("rtpswMIB", "write_rtpswIfPortRange entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(rtpswIfAddrTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->rtpswIfAddrRowStatus) {
@@ -3138,33 +3998,73 @@ write_rtpswIfPortRange(int action, u_char *var_val, u_char var_val_type, size_t 
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value \"\x80\x00\xff\xff\" */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->rtpswIfAddrTable_old) == NULL)
+			if (StorageTmp->rtpswIfAddrTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->rtpswIfAddrTable_old = rtpswIfAddrTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->rtpswIfAddrTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->rtpswIfPortRange);
+		StorageTmp->rtpswIfPortRange = string;
+		StorageTmp->rtpswIfPortRangeLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->rtpswIfAddrTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->rtpswIfAddrTable_tsts == 0)
+				if ((ret = check_rtpswIfAddrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->rtpswIfAddrTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->rtpswIfPortRange for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->rtpswIfPortRange;
-		old_length = StorageTmp->rtpswIfPortRangeLen;
-		StorageTmp->rtpswIfPortRange = string;
-		StorageTmp->rtpswIfPortRangeLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->rtpswIfAddrTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->rtpswIfAddrTable_sets == 0)
+				if ((ret = update_rtpswIfAddrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->rtpswIfAddrTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->rtpswIfAddrTable_old) != NULL) {
+			rtpswIfAddrTable_destroy(&StorageTmp->rtpswIfAddrTable_old);
+			StorageTmp->rtpswIfAddrTable_rsvs = 0;
+			StorageTmp->rtpswIfAddrTable_tsts = 0;
+			StorageTmp->rtpswIfAddrTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->rtpswIfPortRange = old_value;
-		StorageTmp->rtpswIfPortRangeLen = old_length;
+		if ((StorageOld = StorageTmp->rtpswIfAddrTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->rtpswIfAddrTable_sets == 0)
+			revert_rtpswIfAddrTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->rtpswIfAddrTable_old) == NULL)
+			break;
+		if (StorageOld->rtpswIfPortRange != NULL) {
+			SNMP_FREE(StorageTmp->rtpswIfPortRange);
+			StorageTmp->rtpswIfPortRange = StorageOld->rtpswIfPortRange;
+			StorageTmp->rtpswIfPortRangeLen = StorageOld->rtpswIfPortRangeLen;
+			StorageOld->rtpswIfPortRange = NULL;
+			StorageOld->rtpswIfPortRangeLen = 0;
+		}
+		if (--StorageTmp->rtpswIfAddrTable_rsvs == 0)
+			rtpswIfAddrTable_destroy(&StorageTmp->rtpswIfAddrTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3184,12 +4084,14 @@ write_rtpswIfPortRange(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_rtpswIfAddrGuardTime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct rtpswIfAddrTable_data *StorageTmp = NULL;
+	struct rtpswIfAddrTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("rtpswMIB", "write_rtpswIfAddrGuardTime entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(rtpswIfAddrTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3220,22 +4122,61 @@ write_rtpswIfAddrGuardTime(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to rtpswIfAddrGuardTime: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->rtpswIfAddrTable_old) == NULL)
+			if (StorageTmp->rtpswIfAddrTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->rtpswIfAddrTable_old = rtpswIfAddrTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->rtpswIfAddrTable_rsvs++;
+		StorageTmp->rtpswIfAddrGuardTime = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->rtpswIfAddrTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->rtpswIfAddrTable_tsts == 0)
+				if ((ret = check_rtpswIfAddrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->rtpswIfAddrTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->rtpswIfAddrGuardTime for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->rtpswIfAddrGuardTime;
-		StorageTmp->rtpswIfAddrGuardTime = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->rtpswIfAddrTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->rtpswIfAddrTable_sets == 0)
+				if ((ret = update_rtpswIfAddrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->rtpswIfAddrTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->rtpswIfAddrTable_old) != NULL) {
+			rtpswIfAddrTable_destroy(&StorageTmp->rtpswIfAddrTable_old);
+			StorageTmp->rtpswIfAddrTable_rsvs = 0;
+			StorageTmp->rtpswIfAddrTable_tsts = 0;
+			StorageTmp->rtpswIfAddrTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->rtpswIfAddrGuardTime = old_value;
+		if ((StorageOld = StorageTmp->rtpswIfAddrTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->rtpswIfAddrTable_sets == 0)
+			revert_rtpswIfAddrTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->rtpswIfAddrTable_old) == NULL)
+			break;
+		StorageTmp->rtpswIfAddrGuardTime = StorageOld->rtpswIfAddrGuardTime;
+		if (--StorageTmp->rtpswIfAddrTable_rsvs == 0)
+			rtpswIfAddrTable_destroy(&StorageTmp->rtpswIfAddrTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3255,12 +4196,14 @@ write_rtpswIfAddrGuardTime(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_rtpswIfAddrAdminState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct rtpswIfAddrTable_data *StorageTmp = NULL;
+	struct rtpswIfAddrTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("rtpswMIB", "write_rtpswIfAddrAdminState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(rtpswIfAddrTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3294,151 +4237,132 @@ write_rtpswIfAddrAdminState(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to rtpswIfAddrAdminState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->rtpswIfAddrTable_old) == NULL)
+			if (StorageTmp->rtpswIfAddrTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->rtpswIfAddrTable_old = rtpswIfAddrTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->rtpswIfAddrTable_rsvs++;
+		StorageTmp->rtpswIfAddrAdminState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->rtpswIfAddrTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->rtpswIfAddrTable_tsts == 0)
+				if ((ret = check_rtpswIfAddrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->rtpswIfAddrTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->rtpswIfAddrAdminState for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->rtpswIfAddrAdminState;
-		StorageTmp->rtpswIfAddrAdminState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->rtpswIfAddrTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->rtpswIfAddrTable_sets == 0)
+				if ((ret = update_rtpswIfAddrTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->rtpswIfAddrTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->rtpswIfAddrTable_old) != NULL) {
+			rtpswIfAddrTable_destroy(&StorageTmp->rtpswIfAddrTable_old);
+			StorageTmp->rtpswIfAddrTable_rsvs = 0;
+			StorageTmp->rtpswIfAddrTable_tsts = 0;
+			StorageTmp->rtpswIfAddrTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->rtpswIfAddrAdminState = old_value;
+		if ((StorageOld = StorageTmp->rtpswIfAddrTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->rtpswIfAddrTable_sets == 0)
+			revert_rtpswIfAddrTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->rtpswIfAddrTable_old) == NULL)
+			break;
+		StorageTmp->rtpswIfAddrAdminState = StorageOld->rtpswIfAddrAdminState;
+		if (--StorageTmp->rtpswIfAddrTable_rsvs == 0)
+			rtpswIfAddrTable_destroy(&StorageTmp->rtpswIfAddrTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int rtpswInterfaceTable_consistent(struct rtpswInterfaceTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_rtpswInterfaceTable_row(struct rtpswInterfaceTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the rtpswInterfaceTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-rtpswInterfaceTable_consistent(struct rtpswInterfaceTable_data *thedata)
+can_act_rtpswInterfaceTable_row(struct rtpswInterfaceTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int rtpswIfAddrTable_consistent(struct rtpswIfAddrTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_rtpswInterfaceTable_row(struct rtpswInterfaceTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the rtpswIfAddrTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-rtpswIfAddrTable_consistent(struct rtpswIfAddrTable_data *thedata)
+can_deact_rtpswInterfaceTable_row(struct rtpswInterfaceTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int rtpswTermPointTable_consistent(struct rtpswTermPointTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_rtpswIfAddrTable_row(struct rtpswIfAddrTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the rtpswTermPointTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-rtpswTermPointTable_consistent(struct rtpswTermPointTable_data *thedata)
+can_act_rtpswIfAddrTable_row(struct rtpswIfAddrTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int rtpswTermPointRevTable_consistent(struct rtpswTermPointRevTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_rtpswIfAddrTable_row(struct rtpswIfAddrTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the rtpswTermPointRevTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-rtpswTermPointRevTable_consistent(struct rtpswTermPointRevTable_data *thedata)
+can_deact_rtpswIfAddrTable_row(struct rtpswIfAddrTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int rtpswForwTable_consistent(struct rtpswForwTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the rtpswForwTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-rtpswForwTable_consistent(struct rtpswForwTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int rtpswForwRevTable_consistent(struct rtpswForwRevTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the rtpswForwRevTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-rtpswForwRevTable_consistent(struct rtpswForwRevTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int rtpswCallTable_consistent(struct rtpswCallTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the rtpswCallTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-rtpswCallTable_consistent(struct rtpswCallTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
@@ -3455,10 +4379,9 @@ rtpswCallTable_consistent(struct rtpswCallTable_data *thedata)
 int
 write_rtpswInterfaceRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct rtpswInterfaceTable_data *StorageTmp = NULL;
+	struct rtpswInterfaceTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct rtpswInterfaceTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 14;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -3485,40 +4408,6 @@ write_rtpswInterfaceRowStatus(int action, u_char *var_val, u_char var_val_type, 
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->rtpswInterfaceRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->rtpswInterfaceTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->rtpswInterfaceTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* rtpswInterfaceId */
@@ -3542,12 +4431,43 @@ write_rtpswInterfaceRowStatus(int action, u_char *var_val, u_char var_val_type, 
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->rtpswInterfaceTable_rsvs = 1;
 			vp = vars;
 			StorageNew->rtpswInterfaceId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&rtpswInterfaceTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->rtpswInterfaceRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->rtpswInterfaceTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->rtpswInterfaceTable_old) == NULL)
+				if (StorageTmp->rtpswInterfaceTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->rtpswInterfaceTable_old = rtpswInterfaceTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->rtpswInterfaceTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->rtpswInterfaceTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -3557,78 +4477,127 @@ write_rtpswInterfaceRowStatus(int action, u_char *var_val, u_char var_val_type, 
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = rtpswInterfaceTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_rtpswInterfaceTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->rtpswInterfaceRowStatus;
-			StorageTmp->rtpswInterfaceRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = rtpswInterfaceTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->rtpswInterfaceRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->rtpswInterfaceRowStatus != RS_ACTIVE)
+				if ((ret = can_act_rtpswInterfaceTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->rtpswInterfaceRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_rtpswInterfaceTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->rtpswInterfaceRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_rtpswInterfaceTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->rtpswInterfaceRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_rtpswInterfaceTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->rtpswInterfaceRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_rtpswInterfaceTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->rtpswInterfaceRowStatus;
-			StorageTmp->rtpswInterfaceRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->rtpswInterfaceRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_rtpswInterfaceTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_rtpswInterfaceTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->rtpswInterfaceRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->rtpswInterfaceRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->rtpswInterfaceRowStatus = set_value;
+			if ((StorageOld = StorageTmp->rtpswInterfaceTable_old) != NULL) {
+				rtpswInterfaceTable_destroy(&StorageTmp->rtpswInterfaceTable_old);
+				StorageTmp->rtpswInterfaceTable_rsvs = 0;
+				StorageTmp->rtpswInterfaceTable_tsts = 0;
+				StorageTmp->rtpswInterfaceTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			rtpswInterfaceTable_destroy(&StorageDel);
-			/* rtpswInterfaceTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_rtpswInterfaceTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->rtpswInterfaceRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_rtpswInterfaceTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->rtpswInterfaceRowStatus = old_value;
+			if (StorageTmp->rtpswInterfaceRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_rtpswInterfaceTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -3642,6 +4611,13 @@ write_rtpswInterfaceRowStatus(int action, u_char *var_val, u_char var_val_type, 
 				rtpswInterfaceTable_del(StorageNew);
 				rtpswInterfaceTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->rtpswInterfaceTable_old) == NULL)
+				break;
+			if (--StorageTmp->rtpswInterfaceTable_rsvs == 0)
+				rtpswInterfaceTable_destroy(&StorageTmp->rtpswInterfaceTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -3668,10 +4644,9 @@ write_rtpswInterfaceRowStatus(int action, u_char *var_val, u_char var_val_type, 
 int
 write_rtpswIfAddrRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct rtpswIfAddrTable_data *StorageTmp = NULL;
+	struct rtpswIfAddrTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct rtpswIfAddrTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 14;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -3698,40 +4673,6 @@ write_rtpswIfAddrRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->rtpswIfAddrRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->rtpswIfAddrTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->rtpswIfAddrTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* rtpswIfAddrId */
@@ -3755,12 +4696,43 @@ write_rtpswIfAddrRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->rtpswIfAddrTable_rsvs = 1;
 			vp = vars;
 			StorageNew->rtpswIfAddrId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&rtpswIfAddrTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->rtpswIfAddrRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->rtpswIfAddrTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->rtpswIfAddrTable_old) == NULL)
+				if (StorageTmp->rtpswIfAddrTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->rtpswIfAddrTable_old = rtpswIfAddrTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->rtpswIfAddrTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->rtpswIfAddrTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -3770,78 +4742,127 @@ write_rtpswIfAddrRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = rtpswIfAddrTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_rtpswIfAddrTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->rtpswIfAddrRowStatus;
-			StorageTmp->rtpswIfAddrRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = rtpswIfAddrTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->rtpswIfAddrRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->rtpswIfAddrRowStatus != RS_ACTIVE)
+				if ((ret = can_act_rtpswIfAddrTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->rtpswIfAddrRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_rtpswIfAddrTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->rtpswIfAddrRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_rtpswIfAddrTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->rtpswIfAddrRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_rtpswIfAddrTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->rtpswIfAddrRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_rtpswIfAddrTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->rtpswIfAddrRowStatus;
-			StorageTmp->rtpswIfAddrRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->rtpswIfAddrRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_rtpswIfAddrTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_rtpswIfAddrTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->rtpswIfAddrRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->rtpswIfAddrRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->rtpswIfAddrRowStatus = set_value;
+			if ((StorageOld = StorageTmp->rtpswIfAddrTable_old) != NULL) {
+				rtpswIfAddrTable_destroy(&StorageTmp->rtpswIfAddrTable_old);
+				StorageTmp->rtpswIfAddrTable_rsvs = 0;
+				StorageTmp->rtpswIfAddrTable_tsts = 0;
+				StorageTmp->rtpswIfAddrTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			rtpswIfAddrTable_destroy(&StorageDel);
-			/* rtpswIfAddrTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_rtpswIfAddrTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->rtpswIfAddrRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_rtpswIfAddrTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->rtpswIfAddrRowStatus = old_value;
+			if (StorageTmp->rtpswIfAddrRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_rtpswIfAddrTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -3855,6 +4876,13 @@ write_rtpswIfAddrRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				rtpswIfAddrTable_del(StorageNew);
 				rtpswIfAddrTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->rtpswIfAddrTable_old) == NULL)
+				break;
+			if (--StorageTmp->rtpswIfAddrTable_rsvs == 0)
+				rtpswIfAddrTable_destroy(&StorageTmp->rtpswIfAddrTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */

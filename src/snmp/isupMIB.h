@@ -63,11 +63,20 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct isupMIB_data {
+	struct isupMIB_data *isupMIB_old;
+	uint isupMIB_rsvs;
+	uint isupMIB_tsts;
+	uint isupMIB_sets;
 	uint isupMIB_request;
 };
 struct isupMsTable_data {
+	struct isupMsTable_data *isupMsTable_old;
+	uint isupMsTable_rsvs;
+	uint isupMsTable_tsts;
+	uint isupMsTable_sets;
 	uint isupMsTable_request;
 	uint isupMsTable_refs;
+	uint isupMsTable_id;
 	ulong isupMsId;			/* NoAccess */
 	uint8_t *isupMsName;		/* Create */
 	size_t isupMsNameLen;
@@ -100,8 +109,13 @@ struct isupMsTable_data {
 	long isupMsRowStatus;		/* Create */
 };
 struct isupPgTable_data {
+	struct isupPgTable_data *isupPgTable_old;
+	uint isupPgTable_rsvs;
+	uint isupPgTable_tsts;
+	uint isupPgTable_sets;
 	uint isupPgTable_request;
 	uint isupPgTable_refs;
+	uint isupPgTable_id;
 	ulong isupPgId;			/* NoAccess */
 	long isupPgOperState;		/* ReadOnly */
 	uint8_t *isupPgAvailStatus;	/* ReadOnly */
@@ -124,8 +138,13 @@ struct isupPgTable_data {
 	long isupPgRowStatus;		/* Create */
 };
 struct isupPuTable_data {
+	struct isupPuTable_data *isupPuTable_old;
+	uint isupPuTable_rsvs;
+	uint isupPuTable_tsts;
+	uint isupPuTable_sets;
 	uint isupPuTable_request;
 	uint isupPuTable_refs;
+	uint isupPuTable_id;
 	ulong isupPgId;			/* NoAccess */
 	ulong isupPuId;			/* NoAccess */
 	long isupPuProtecting;		/* Create */
@@ -144,8 +163,13 @@ struct isupPuTable_data {
 	long isupPuRowStatus;		/* Create */
 };
 struct isupLgTable_data {
+	struct isupLgTable_data *isupLgTable_old;
+	uint isupLgTable_rsvs;
+	uint isupLgTable_tsts;
+	uint isupLgTable_sets;
 	uint isupLgTable_request;
 	uint isupLgTable_refs;
+	uint isupLgTable_id;
 	ulong isupLgId;			/* NoAccess */
 	long isupLgOperationalState;	/* ReadOnly */
 	long isupLgAdministrativeState;	/* Create */
@@ -160,8 +184,13 @@ struct isupLgTable_data {
 	long isupLgRowStatus;		/* Create */
 };
 struct isupMtpTable_data {
+	struct isupMtpTable_data *isupMtpTable_old;
+	uint isupMtpTable_rsvs;
+	uint isupMtpTable_tsts;
+	uint isupMtpTable_sets;
 	uint isupMtpTable_request;
 	uint isupMtpTable_refs;
+	uint isupMtpTable_id;
 	ulong isupMsId;			/* NoAccess */
 	ulong isupSpId;			/* NoAccess */
 	ulong isupMtpId;		/* NoAccess */
@@ -182,8 +211,13 @@ struct isupMtpTable_data {
 	long isupMtpRowStatus;		/* Create */
 };
 struct isupNaTable_data {
+	struct isupNaTable_data *isupNaTable_old;
+	uint isupNaTable_rsvs;
+	uint isupNaTable_tsts;
+	uint isupNaTable_sets;
 	uint isupNaTable_request;
 	uint isupNaTable_refs;
+	uint isupNaTable_id;
 	long isupNaId;			/* NoAccess */
 	oid *isupNaProtocolVariant;	/* Create */
 	size_t isupNaProtocolVariantLen;
@@ -200,8 +234,13 @@ struct isupNaTable_data {
 	long isupNaRowStatus;		/* Create */
 };
 struct isupSpTable_data {
+	struct isupSpTable_data *isupSpTable_old;
+	uint isupSpTable_rsvs;
+	uint isupSpTable_tsts;
+	uint isupSpTable_sets;
 	uint isupSpTable_request;
 	uint isupSpTable_refs;
+	uint isupSpTable_id;
 	ulong isupMsId;			/* NoAccess */
 	ulong isupSpId;			/* NoAccess */
 	uint8_t *isupSpPointCode;	/* Create */
@@ -232,8 +271,13 @@ struct isupSpTable_data {
 	long isupSpRowStatus;		/* Create */
 };
 struct isupSrTable_data {
+	struct isupSrTable_data *isupSrTable_old;
+	uint isupSrTable_rsvs;
+	uint isupSrTable_tsts;
+	uint isupSrTable_sets;
 	uint isupSrTable_request;
 	uint isupSrTable_refs;
+	uint isupSrTable_id;
 	ulong isupMsId;			/* NoAccess */
 	ulong isupSpId;			/* NoAccess */
 	ulong isupSrId;			/* NoAccess */
@@ -263,8 +307,13 @@ struct isupSrTable_data {
 	long isupSrRowStatus;		/* Create */
 };
 struct isupRtTable_data {
+	struct isupRtTable_data *isupRtTable_old;
+	uint isupRtTable_rsvs;
+	uint isupRtTable_tsts;
+	uint isupRtTable_sets;
 	uint isupRtTable_request;
 	uint isupRtTable_refs;
+	uint isupRtTable_id;
 	ulong isupRtId;			/* NoAccess */
 	uint8_t *isupRtTrunkGroupList;	/* ReadOnly */
 	size_t isupRtTrunkGroupListLen;
@@ -287,8 +336,13 @@ struct isupRtTable_data {
 	long isupRtRowStatus;		/* Create */
 };
 struct isupRtTgSelectionTable_data {
+	struct isupRtTgSelectionTable_data *isupRtTgSelectionTable_old;
+	uint isupRtTgSelectionTable_rsvs;
+	uint isupRtTgSelectionTable_tsts;
+	uint isupRtTgSelectionTable_sets;
 	uint isupRtTgSelectionTable_request;
 	uint isupRtTgSelectionTable_refs;
+	uint isupRtTgSelectionTable_id;
 	ulong isupRtId;			/* NoAccess */
 	ulong isupRtTgSelectionIndex;	/* NoAccess */
 	ulong isupRtTgSelectionOrdinal;	/* ReadOnly */
@@ -298,8 +352,13 @@ struct isupRtTgSelectionTable_data {
 	long isupRtTgSelectionRowStatus;	/* Create */
 };
 struct isupTgTable_data {
+	struct isupTgTable_data *isupTgTable_old;
+	uint isupTgTable_rsvs;
+	uint isupTgTable_tsts;
+	uint isupTgTable_sets;
 	uint isupTgTable_request;
 	uint isupTgTable_refs;
+	uint isupTgTable_id;
 	ulong isupTgId;			/* NoAccess */
 	ulong isupTgNumberOfCircuits;	/* ReadOnly */
 	uint8_t *isupTgLabelOfFarEndExchange;	/* Create */
@@ -329,8 +388,13 @@ struct isupTgTable_data {
 	long isupTgRowStatus;		/* Create */
 };
 struct isupCgTable_data {
+	struct isupCgTable_data *isupCgTable_old;
+	uint isupCgTable_rsvs;
+	uint isupCgTable_tsts;
+	uint isupCgTable_sets;
 	uint isupCgTable_request;
 	uint isupCgTable_refs;
+	uint isupCgTable_id;
 	ulong isupCgId;			/* NoAccess */
 	long isupCgCIC;			/* Create */
 	long isupCgOperationalState;	/* ReadOnly */
@@ -348,8 +412,13 @@ struct isupCgTable_data {
 	long isupCgRowStatus;		/* Create */
 };
 struct isupCtTable_data {
+	struct isupCtTable_data *isupCtTable_old;
+	uint isupCtTable_rsvs;
+	uint isupCtTable_tsts;
+	uint isupCtTable_sets;
 	uint isupCtTable_request;
 	uint isupCtTable_refs;
+	uint isupCtTable_id;
 	ulong isupCtId;			/* NoAccess */
 	ulong isupCtCg;			/* Create */
 	ulong isupCtTg;			/* Create */
@@ -787,6 +856,10 @@ void init_isupMIB(void);
 void deinit_isupMIB(void);
 int term_isupMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_isupMIB;
+struct isupMIB_data *isupMIB_create(void);
+struct isupMIB_data *isupMIB_duplicate(struct isupMIB_data *);
+int isupMIB_destroy(struct isupMIB_data **);
+int isupMIB_add(struct isupMIB_data *);
 void parse_isupMIB(const char *, char *);
 SNMPCallback store_isupMIB;
 void refresh_isupMIB(int);

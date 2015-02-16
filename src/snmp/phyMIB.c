@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/snmp/phyMIB.c
+ @(#) src/snmp/phyMIB.c
 
  -----------------------------------------------------------------------------
 
@@ -109,7 +109,7 @@ int header_generic(struct variable *, oid *, size_t *, int, size_t *, WriteMetho
 #include <getopt.h>
 #endif
 #include "phyMIB.h"
-#undef MASTER
+#define MASTER 1
 #define MY_FACILITY(__pri)	(LOG_DAEMON|(__pri))
 #if defined MODULE
 #if defined MASTER
@@ -349,8 +349,13 @@ phyMIB_create(void)
 		/* XXX: fill in default scalar values here into StorageNew */
 
 	}
+      done:
 	DEBUGMSGTL(("phyMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	phyMIB_destroy(&StorageNew);
+	goto done;
 }
 
 /**
@@ -661,6 +666,12 @@ physicalEntityTable_duplicate(struct physicalEntityTable_data *thedata)
 
 	DEBUGMSGTL(("phyMIB", "physicalEntityTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->physicalEntityTable_id = thedata->physicalEntityTable_id;
+		if (!(StorageNew->physicalEntityId = malloc(thedata->physicalEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->physicalEntityId, thedata->physicalEntityId, thedata->physicalEntityIdLen);
+		StorageNew->physicalEntityIdLen = thedata->physicalEntityIdLen;
+		StorageNew->physicalEntityId[StorageNew->physicalEntityIdLen] = 0;
 		if (!(StorageNew->physicalEntityLocalSapNames = snmp_duplicate_objid(thedata->physicalEntityLocalSapNames, thedata->physicalEntityLocalSapNamesLen / sizeof(oid))))
 			goto destroy;
 		StorageNew->physicalEntityLocalSapNamesLen = thedata->physicalEntityLocalSapNamesLen;
@@ -896,6 +907,17 @@ physicalSAPTable_duplicate(struct physicalSAPTable_data *thedata)
 
 	DEBUGMSGTL(("phyMIB", "physicalSAPTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->physicalSAPTable_id = thedata->physicalSAPTable_id;
+		if (!(StorageNew->physicalEntityId = malloc(thedata->physicalEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->physicalEntityId, thedata->physicalEntityId, thedata->physicalEntityIdLen);
+		StorageNew->physicalEntityIdLen = thedata->physicalEntityIdLen;
+		StorageNew->physicalEntityId[StorageNew->physicalEntityIdLen] = 0;
+		if (!(StorageNew->physicalSAPsapId = malloc(thedata->physicalSAPsapIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->physicalSAPsapId, thedata->physicalSAPsapId, thedata->physicalSAPsapIdLen);
+		StorageNew->physicalSAPsapIdLen = thedata->physicalSAPsapIdLen;
+		StorageNew->physicalSAPsapId[StorageNew->physicalSAPsapIdLen] = 0;
 		StorageNew->physicalSAPsap1Address = thedata->physicalSAPsap1Address;
 		if (!(StorageNew->physicalSAPuserEntityNames = snmp_duplicate_objid(thedata->physicalSAPuserEntityNames, thedata->physicalSAPuserEntityNamesLen / sizeof(oid))))
 			goto destroy;
@@ -1160,6 +1182,17 @@ dataCircuitTable_duplicate(struct dataCircuitTable_data *thedata)
 
 	DEBUGMSGTL(("phyMIB", "dataCircuitTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->dataCircuitTable_id = thedata->dataCircuitTable_id;
+		if (!(StorageNew->physicalEntityId = malloc(thedata->physicalEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->physicalEntityId, thedata->physicalEntityId, thedata->physicalEntityIdLen);
+		StorageNew->physicalEntityIdLen = thedata->physicalEntityIdLen;
+		StorageNew->physicalEntityId[StorageNew->physicalEntityIdLen] = 0;
+		if (!(StorageNew->dataCircuitCoProtocolMachineId = malloc(thedata->dataCircuitCoProtocolMachineIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->dataCircuitCoProtocolMachineId, thedata->dataCircuitCoProtocolMachineId, thedata->dataCircuitCoProtocolMachineIdLen);
+		StorageNew->dataCircuitCoProtocolMachineIdLen = thedata->dataCircuitCoProtocolMachineIdLen;
+		StorageNew->dataCircuitCoProtocolMachineId[StorageNew->dataCircuitCoProtocolMachineIdLen] = 0;
 		StorageNew->dataCircuitOperationalState = thedata->dataCircuitOperationalState;
 		StorageNew->dataCircuitBitErrorsReceived = thedata->dataCircuitBitErrorsReceived;
 		StorageNew->dataCircuitBitErrorsTransmitted = thedata->dataCircuitBitErrorsTransmitted;
@@ -1495,6 +1528,22 @@ physicalConnectionTable_duplicate(struct physicalConnectionTable_data *thedata)
 
 	DEBUGMSGTL(("phyMIB", "physicalConnectionTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->physicalConnectionTable_id = thedata->physicalConnectionTable_id;
+		if (!(StorageNew->physicalEntityId = malloc(thedata->physicalEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->physicalEntityId, thedata->physicalEntityId, thedata->physicalEntityIdLen);
+		StorageNew->physicalEntityIdLen = thedata->physicalEntityIdLen;
+		StorageNew->physicalEntityId[StorageNew->physicalEntityIdLen] = 0;
+		if (!(StorageNew->dataCircuitCoProtocolMachineId = malloc(thedata->dataCircuitCoProtocolMachineIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->dataCircuitCoProtocolMachineId, thedata->dataCircuitCoProtocolMachineId, thedata->dataCircuitCoProtocolMachineIdLen);
+		StorageNew->dataCircuitCoProtocolMachineIdLen = thedata->dataCircuitCoProtocolMachineIdLen;
+		StorageNew->dataCircuitCoProtocolMachineId[StorageNew->dataCircuitCoProtocolMachineIdLen] = 0;
+		if (!(StorageNew->physicalConnectionId = malloc(thedata->physicalConnectionIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->physicalConnectionId, thedata->physicalConnectionId, thedata->physicalConnectionIdLen);
+		StorageNew->physicalConnectionIdLen = thedata->physicalConnectionIdLen;
+		StorageNew->physicalConnectionId[StorageNew->physicalConnectionIdLen] = 0;
 		if (!
 		    (StorageNew->physicalConnectionUnderlyingConnectionNames =
 		     snmp_duplicate_objid(thedata->physicalConnectionUnderlyingConnectionNames, thedata->physicalConnectionUnderlyingConnectionNamesLen / sizeof(oid))))
@@ -3023,7 +3072,7 @@ write_physicalSAPRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -3306,7 +3355,7 @@ write_dataCircuitRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -3605,7 +3654,7 @@ write_physicalConnectionRowStatus(int action, u_char *var_val, u_char var_val_ty
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */

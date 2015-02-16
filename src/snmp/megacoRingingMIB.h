@@ -63,12 +63,21 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct megacoRingingMIB_data {
+	struct megacoRingingMIB_data *megacoRingingMIB_old;
+	uint megacoRingingMIB_rsvs;
+	uint megacoRingingMIB_tsts;
+	uint megacoRingingMIB_sets;
 	uint megacoRingingMIB_request;
 	long mgcoRingingCadenceNextGroupId;	/* ReadWrite */
 };
 struct mgcoRingingPatternTable_data {
+	struct mgcoRingingPatternTable_data *mgcoRingingPatternTable_old;
+	uint mgcoRingingPatternTable_rsvs;
+	uint mgcoRingingPatternTable_tsts;
+	uint mgcoRingingPatternTable_sets;
 	uint mgcoRingingPatternTable_request;
 	uint mgcoRingingPatternTable_refs;
+	uint mgcoRingingPatternTable_id;
 	ulong mgcoRingingPatternId;	/* NoAccess */
 	ulong mgcoRingingCadenceGroupId;	/* Create */
 	uint8_t *mgcoRingingPatternName;	/* Create */
@@ -76,8 +85,13 @@ struct mgcoRingingPatternTable_data {
 	long mgcoRingingPatternRowStatus;	/* Create */
 };
 struct mgcoRingingCadenceGroupTable_data {
+	struct mgcoRingingCadenceGroupTable_data *mgcoRingingCadenceGroupTable_old;
+	uint mgcoRingingCadenceGroupTable_rsvs;
+	uint mgcoRingingCadenceGroupTable_tsts;
+	uint mgcoRingingCadenceGroupTable_sets;
 	uint mgcoRingingCadenceGroupTable_request;
 	uint mgcoRingingCadenceGroupTable_refs;
+	uint mgcoRingingCadenceGroupTable_id;
 	ulong mgcoRingingCadenceGroupId;	/* Create */
 	ulong mgcoRingingCadenceGroupIndex;	/* NoAccess */
 	uint8_t *mgcoRingingCadenceGroupName;	/* Create */
@@ -117,6 +131,10 @@ void init_megacoRingingMIB(void);
 void deinit_megacoRingingMIB(void);
 int term_megacoRingingMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_megacoRingingMIB;
+struct megacoRingingMIB_data *megacoRingingMIB_create(void);
+struct megacoRingingMIB_data *megacoRingingMIB_duplicate(struct megacoRingingMIB_data *);
+int megacoRingingMIB_destroy(struct megacoRingingMIB_data **);
+int megacoRingingMIB_add(struct megacoRingingMIB_data *);
 void parse_megacoRingingMIB(const char *, char *);
 SNMPCallback store_megacoRingingMIB;
 void refresh_megacoRingingMIB(int);

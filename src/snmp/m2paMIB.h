@@ -63,6 +63,10 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct m2paMIB_data {
+	struct m2paMIB_data *m2paMIB_old;
+	uint m2paMIB_rsvs;
+	uint m2paMIB_tsts;
+	uint m2paMIB_sets;
 	uint m2paMIB_request;
 	long m2paDefaultSctpNoDelay;	/* ReadWrite */
 	ulong m2paDefaultSctpMaxseg;	/* ReadWrite */
@@ -81,8 +85,13 @@ struct m2paMIB_data {
 	long m2paDefaultSctpLifetime;	/* ReadWrite */
 };
 struct m2paProtocolProfileTable_data {
+	struct m2paProtocolProfileTable_data *m2paProtocolProfileTable_old;
+	uint m2paProtocolProfileTable_rsvs;
+	uint m2paProtocolProfileTable_tsts;
+	uint m2paProtocolProfileTable_sets;
 	uint m2paProtocolProfileTable_request;
 	uint m2paProtocolProfileTable_refs;
+	uint m2paProtocolProfileTable_id;
 	uint8_t *m2paProtocolProfileId;	/* NoAccess */
 	size_t m2paProtocolProfileIdLen;
 	ulong m2paN1;			/* Create */
@@ -216,6 +225,10 @@ void init_m2paMIB(void);
 void deinit_m2paMIB(void);
 int term_m2paMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_m2paMIB;
+struct m2paMIB_data *m2paMIB_create(void);
+struct m2paMIB_data *m2paMIB_duplicate(struct m2paMIB_data *);
+int m2paMIB_destroy(struct m2paMIB_data **);
+int m2paMIB_add(struct m2paMIB_data *);
 void parse_m2paMIB(const char *, char *);
 SNMPCallback store_m2paMIB;
 void refresh_m2paMIB(int);

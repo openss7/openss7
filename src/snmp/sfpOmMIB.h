@@ -63,6 +63,10 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct sfpOmMIB_data {
+	struct sfpOmMIB_data *sfpOmMIB_old;
+	uint sfpOmMIB_rsvs;
+	uint sfpOmMIB_tsts;
+	uint sfpOmMIB_sets;
 	uint sfpOmMIB_request;
 	oid *sfpOm5MinActivate;		/* ReadWrite */
 	size_t sfpOm5MinActivateLen;
@@ -79,8 +83,13 @@ struct sfpOmMIB_data {
 	long sfpOmPollingInterval;	/* ReadWrite */
 };
 struct sfpOmActualTable_data {
+	struct sfpOmActualTable_data *sfpOmActualTable_old;
+	uint sfpOmActualTable_rsvs;
+	uint sfpOmActualTable_tsts;
+	uint sfpOmActualTable_sets;
 	uint sfpOmActualTable_request;
 	uint sfpOmActualTable_refs;
+	uint sfpOmActualTable_id;
 	ulong sfpModuleId;		/* NoAccess */
 	long sfpOmTemp;			/* ReadOnly */
 	long sfpOmVolt;			/* ReadOnly */
@@ -89,8 +98,13 @@ struct sfpOmActualTable_data {
 	long sfpOmRxPower;		/* ReadOnly */
 };
 struct sfpOmCurrentTable_data {
+	struct sfpOmCurrentTable_data *sfpOmCurrentTable_old;
+	uint sfpOmCurrentTable_rsvs;
+	uint sfpOmCurrentTable_tsts;
+	uint sfpOmCurrentTable_sets;
 	uint sfpOmCurrentTable_request;
 	uint sfpOmCurrentTable_refs;
+	uint sfpOmCurrentTable_id;
 	ulong sfpModuleId;		/* NoAccess */
 	long sfpOmTempMarkHi;		/* ReadOnly */
 	long sfpOmTempMarkLo;		/* ReadOnly */
@@ -106,8 +120,13 @@ struct sfpOmCurrentTable_data {
 	long sfpOm15MinValidIntervals;	/* ReadOnly */
 };
 struct sfpOm5MinHistoryTable_data {
+	struct sfpOm5MinHistoryTable_data *sfpOm5MinHistoryTable_old;
+	uint sfpOm5MinHistoryTable_rsvs;
+	uint sfpOm5MinHistoryTable_tsts;
+	uint sfpOm5MinHistoryTable_sets;
 	uint sfpOm5MinHistoryTable_request;
 	uint sfpOm5MinHistoryTable_refs;
+	uint sfpOm5MinHistoryTable_id;
 	ulong sfpModuleId;		/* NoAccess */
 	long sfpOmInterval;		/* NoAccess */
 	long sfpOm5MinTempMarkHi;	/* ReadOnly */
@@ -122,8 +141,13 @@ struct sfpOm5MinHistoryTable_data {
 	long sfpOm5MinRxPowerMarkLo;	/* ReadOnly */
 };
 struct sfpOm15MinHistoryTable_data {
+	struct sfpOm15MinHistoryTable_data *sfpOm15MinHistoryTable_old;
+	uint sfpOm15MinHistoryTable_rsvs;
+	uint sfpOm15MinHistoryTable_tsts;
+	uint sfpOm15MinHistoryTable_sets;
 	uint sfpOm15MinHistoryTable_request;
 	uint sfpOm15MinHistoryTable_refs;
+	uint sfpOm15MinHistoryTable_id;
 	ulong sfpModuleId;		/* NoAccess */
 	long sfpOmInterval;		/* NoAccess */
 	long sfpOm15MinTempMarkHi;	/* ReadOnly */
@@ -174,6 +198,10 @@ void init_sfpOmMIB(void);
 void deinit_sfpOmMIB(void);
 int term_sfpOmMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_sfpOmMIB;
+struct sfpOmMIB_data *sfpOmMIB_create(void);
+struct sfpOmMIB_data *sfpOmMIB_duplicate(struct sfpOmMIB_data *);
+int sfpOmMIB_destroy(struct sfpOmMIB_data **);
+int sfpOmMIB_add(struct sfpOmMIB_data *);
 void parse_sfpOmMIB(const char *, char *);
 SNMPCallback store_sfpOmMIB;
 void refresh_sfpOmMIB(int);

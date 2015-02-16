@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/snmp/smiMIB.c
+ @(#) src/snmp/smiMIB.c
 
  -----------------------------------------------------------------------------
 
@@ -748,8 +748,38 @@ smiMIB_create(void)
 		/* XXX: fill in default scalar values here into StorageNew */
 
 	}
+      done:
 	DEBUGMSGTL(("smiMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	smiMIB_destroy(&StorageNew);
+	goto done;
+}
+
+/**
+ * @fn struct smiMIB_data *smiMIB_duplicate(struct smiMIB_data *thedata)
+ * @param thedata the mib structure to duplicate
+ * @brief duplicate a mib structure for the mib
+ *
+ * Duplicates the specified mib structure @param thedata and returns a pointer to the newly
+ * allocated mib structure on success, or NULL on failure.
+ */
+struct smiMIB_data *
+smiMIB_duplicate(struct smiMIB_data *thedata)
+{
+	struct smiMIB_data *StorageNew = SNMP_MALLOC_STRUCT(smiMIB_data);
+
+	DEBUGMSGTL(("smiMIB", "smiMIB_duplicate: duplicating mib... "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("smiMIB", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	smiMIB_destroy(&StorageNew);
+	goto done;
 }
 
 /**
@@ -800,7 +830,7 @@ smiMIB_add(struct smiMIB_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for smiMIB entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case smiMIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -852,6 +882,62 @@ store_smiMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	}
 	DEBUGMSGTL(("smiMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int check_smiMIB(struct smiMIB_data *StorageTmp, struct smiMIB_data *StorageOld)
+ * @param StorageTmp the data as updated
+ * @param StorageOld the data previous to update
+ *
+ * This function is used by mibs.  It is used to check, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the ACTION phase.  The COMMIT phase does not ensue unless this check passes.  This function can
+ * return SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before
+ * the varbinds on the mib were applied; the values in StorageTmp are the new values.  The function
+ * is permitted to change the values in StorageTmp to correct them; however, preferences should be
+ * made for setting values that were not in the varbinds.
+ */
+int
+check_smiMIB(struct smiMIB_data *StorageTmp, struct smiMIB_data *StorageOld)
+{
+	/* XXX: provide code to check the scalars for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_smiMIB(struct smiMIB_data *StorageTmp, struct smiMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase)
+ *
+ * This function is used by mibs.  It is used to update, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the COMMIT phase.  The start of the ACTION phase performs a consistency check on the mib before
+ * allowing the request to proceed to the COMMIT phase.  The COMMIT phase then arrives here with
+ * consistency already checked (see check_smiMIB()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied: the values in StorageTmp are the new values.
+ */
+int
+update_smiMIB(struct smiMIB_data *StorageTmp, struct smiMIB_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	smiMIB_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn revert_smiMIB(struct 
+ * @fn void revert_smiMIB(struct smiMIB_data *StorageTmp, struct smiMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase)
+ */
+void
+revert_smiMIB(struct smiMIB_data *StorageTmp, struct smiMIB_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_smiMIB(StorageOld, NULL);
 }
 
 /**
@@ -947,31 +1033,44 @@ discriminatorTable_create(void)
 	DEBUGMSGTL(("smiMIB", "discriminatorTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->discriminatorConstruct = (uint8_t *) strdup("")) != NULL)
-			StorageNew->discriminatorConstructLen = strlen("");
+		if ((StorageNew->discriminatorConstruct = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->discriminatorConstructLen = 0;
+		StorageNew->discriminatorConstruct[StorageNew->discriminatorConstructLen] = 0;
 		StorageNew->discriminatorAdministrativeState = 0;
 		StorageNew->discriminatorOperationalState = 0;
-		if (memdup((u_char **) &StorageNew->discriminatorAvailabilityStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->discriminatorAvailabilityStatusLen = 2;
+		if (memdup((u_char **) &StorageNew->discriminatorAvailabilityStatus, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->discriminatorAvailabilityStatusLen = 2;
 		StorageNew->discriminatorStartTime = 0;
 		StorageNew->discriminatorStopTime = 0;
-		if ((StorageNew->discriminatorIntervalsOfDay = (uint8_t *) strdup("")) != NULL)
-			StorageNew->discriminatorIntervalsOfDayLen = strlen("");
-		if ((StorageNew->discriminatorWeekMask = (uint8_t *) strdup("")) != NULL)
-			StorageNew->discriminatorWeekMaskLen = strlen("");
-		if ((StorageNew->discriminatorSchedulerName = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->discriminatorSchedulerNameLen = 2;
+		if ((StorageNew->discriminatorIntervalsOfDay = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->discriminatorIntervalsOfDayLen = 0;
+		StorageNew->discriminatorIntervalsOfDay[StorageNew->discriminatorIntervalsOfDayLen] = 0;
+		if ((StorageNew->discriminatorWeekMask = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->discriminatorWeekMaskLen = 0;
+		StorageNew->discriminatorWeekMask[StorageNew->discriminatorWeekMaskLen] = 0;
+		if ((StorageNew->discriminatorSchedulerName = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->discriminatorSchedulerNameLen = 2;
 		StorageNew->discriminatorEntryStatus = 0;
 		StorageNew->discriminatorEntryStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("smiMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	discriminatorTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct discriminatorTable_data *discriminatorTable_duplicate(struct discriminatorTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -983,6 +1082,40 @@ discriminatorTable_duplicate(struct discriminatorTable_data *thedata)
 
 	DEBUGMSGTL(("smiMIB", "discriminatorTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->discriminatorTable_id = thedata->discriminatorTable_id;
+		if (!(StorageNew->discriminatorId = malloc(thedata->discriminatorIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->discriminatorId, thedata->discriminatorId, thedata->discriminatorIdLen);
+		StorageNew->discriminatorIdLen = thedata->discriminatorIdLen;
+		StorageNew->discriminatorId[StorageNew->discriminatorIdLen] = 0;
+		if (!(StorageNew->discriminatorConstruct = malloc(thedata->discriminatorConstructLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->discriminatorConstruct, thedata->discriminatorConstruct, thedata->discriminatorConstructLen);
+		StorageNew->discriminatorConstructLen = thedata->discriminatorConstructLen;
+		StorageNew->discriminatorConstruct[StorageNew->discriminatorConstructLen] = 0;
+		StorageNew->discriminatorAdministrativeState = thedata->discriminatorAdministrativeState;
+		StorageNew->discriminatorOperationalState = thedata->discriminatorOperationalState;
+		if (!(StorageNew->discriminatorAvailabilityStatus = malloc(thedata->discriminatorAvailabilityStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->discriminatorAvailabilityStatus, thedata->discriminatorAvailabilityStatus, thedata->discriminatorAvailabilityStatusLen);
+		StorageNew->discriminatorAvailabilityStatusLen = thedata->discriminatorAvailabilityStatusLen;
+		StorageNew->discriminatorAvailabilityStatus[StorageNew->discriminatorAvailabilityStatusLen] = 0;
+		StorageNew->discriminatorStartTime = thedata->discriminatorStartTime;
+		StorageNew->discriminatorStopTime = thedata->discriminatorStopTime;
+		if (!(StorageNew->discriminatorIntervalsOfDay = malloc(thedata->discriminatorIntervalsOfDayLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->discriminatorIntervalsOfDay, thedata->discriminatorIntervalsOfDay, thedata->discriminatorIntervalsOfDayLen);
+		StorageNew->discriminatorIntervalsOfDayLen = thedata->discriminatorIntervalsOfDayLen;
+		StorageNew->discriminatorIntervalsOfDay[StorageNew->discriminatorIntervalsOfDayLen] = 0;
+		if (!(StorageNew->discriminatorWeekMask = malloc(thedata->discriminatorWeekMaskLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->discriminatorWeekMask, thedata->discriminatorWeekMask, thedata->discriminatorWeekMaskLen);
+		StorageNew->discriminatorWeekMaskLen = thedata->discriminatorWeekMaskLen;
+		StorageNew->discriminatorWeekMask[StorageNew->discriminatorWeekMaskLen] = 0;
+		if (!(StorageNew->discriminatorSchedulerName = snmp_duplicate_objid(thedata->discriminatorSchedulerName, thedata->discriminatorSchedulerNameLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->discriminatorSchedulerNameLen = thedata->discriminatorSchedulerNameLen;
+		StorageNew->discriminatorEntryStatus = thedata->discriminatorEntryStatus;
 	}
       done:
 	DEBUGMSGTL(("smiMIB", "done.\n"));
@@ -1088,7 +1221,7 @@ discriminatorTable_del(struct discriminatorTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for discriminatorTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case discriminatorTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1211,26 +1344,39 @@ eventForwardingDiscriminatorTable_create(void)
 	DEBUGMSGTL(("smiMIB", "eventForwardingDiscriminatorTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->discriminatorId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->discriminatorIdLen = strlen("");
-		if ((StorageNew->destination = (uint8_t *) strdup("")) != NULL)
-			StorageNew->destinationLen = strlen("");
-		if ((StorageNew->activeDestination = (uint8_t *) strdup("")) != NULL)
-			StorageNew->activeDestinationLen = strlen("");
-		if ((StorageNew->backUpDestinationList = (uint8_t *) strdup("")) != NULL)
-			StorageNew->backUpDestinationListLen = strlen("");
+		if ((StorageNew->discriminatorId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->discriminatorIdLen = 0;
+		StorageNew->discriminatorId[StorageNew->discriminatorIdLen] = 0;
+		if ((StorageNew->destination = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->destinationLen = 0;
+		StorageNew->destination[StorageNew->destinationLen] = 0;
+		if ((StorageNew->activeDestination = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->activeDestinationLen = 0;
+		StorageNew->activeDestination[StorageNew->activeDestinationLen] = 0;
+		if ((StorageNew->backUpDestinationList = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->backUpDestinationListLen = 0;
+		StorageNew->backUpDestinationList[StorageNew->backUpDestinationListLen] = 0;
 		StorageNew->confirmedMode = 0;
 		StorageNew->eventForwardingDiscriminatorEntryStatus = 0;
 		StorageNew->eventForwardingDiscriminatorEntryStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("smiMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	eventForwardingDiscriminatorTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct eventForwardingDiscriminatorTable_data *eventForwardingDiscriminatorTable_duplicate(struct eventForwardingDiscriminatorTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1242,6 +1388,29 @@ eventForwardingDiscriminatorTable_duplicate(struct eventForwardingDiscriminatorT
 
 	DEBUGMSGTL(("smiMIB", "eventForwardingDiscriminatorTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->eventForwardingDiscriminatorTable_id = thedata->eventForwardingDiscriminatorTable_id;
+		if (!(StorageNew->discriminatorId = malloc(thedata->discriminatorIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->discriminatorId, thedata->discriminatorId, thedata->discriminatorIdLen);
+		StorageNew->discriminatorIdLen = thedata->discriminatorIdLen;
+		StorageNew->discriminatorId[StorageNew->discriminatorIdLen] = 0;
+		if (!(StorageNew->destination = malloc(thedata->destinationLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->destination, thedata->destination, thedata->destinationLen);
+		StorageNew->destinationLen = thedata->destinationLen;
+		StorageNew->destination[StorageNew->destinationLen] = 0;
+		if (!(StorageNew->activeDestination = malloc(thedata->activeDestinationLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->activeDestination, thedata->activeDestination, thedata->activeDestinationLen);
+		StorageNew->activeDestinationLen = thedata->activeDestinationLen;
+		StorageNew->activeDestination[StorageNew->activeDestinationLen] = 0;
+		if (!(StorageNew->backUpDestinationList = malloc(thedata->backUpDestinationListLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->backUpDestinationList, thedata->backUpDestinationList, thedata->backUpDestinationListLen);
+		StorageNew->backUpDestinationListLen = thedata->backUpDestinationListLen;
+		StorageNew->backUpDestinationList[StorageNew->backUpDestinationListLen] = 0;
+		StorageNew->confirmedMode = thedata->confirmedMode;
+		StorageNew->eventForwardingDiscriminatorEntryStatus = thedata->eventForwardingDiscriminatorEntryStatus;
 	}
       done:
 	DEBUGMSGTL(("smiMIB", "done.\n"));
@@ -1343,7 +1512,7 @@ eventForwardingDiscriminatorTable_del(struct eventForwardingDiscriminatorTable_d
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for eventForwardingDiscriminatorTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case eventForwardingDiscriminatorTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1446,37 +1615,48 @@ logTable_create(void)
 	DEBUGMSGTL(("smiMIB", "logTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->logDiscriminatorConstruct = (uint8_t *) strdup("")) != NULL)
-			StorageNew->logDiscriminatorConstructLen = strlen("");
+		if ((StorageNew->logDiscriminatorConstruct = (uint8_t *) strdup("")) == NULL)
+			goto nomem;
+		StorageNew->logDiscriminatorConstructLen = strlen("");
 		StorageNew->logAdministrativeState = LOGADMINISTRATIVESTATE_UNLOCKED;
 		StorageNew->logOperationalState = 0;
-		if (memdup((u_char **) &StorageNew->logAvailabilityStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->logAvailabilityStatusLen = 2;
+		if (memdup((u_char **) &StorageNew->logAvailabilityStatus, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->logAvailabilityStatusLen = 2;
 		StorageNew->logFullAction = LOGFULLACTION_WRAP;
 		StorageNew->maxLogSize = 0;
 		StorageNew->currentLogSize = 0;
 		StorageNew->numberOfRecords = 0;
-		if (memdup((u_char **) &StorageNew->capacityAlarmThreshold, (u_char *) "\x64", 1) == SNMPERR_SUCCESS)
-			StorageNew->capacityAlarmThresholdLen = 1;
+		if (memdup((u_char **) &StorageNew->capacityAlarmThreshold, (u_char *) "\x64", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->capacityAlarmThresholdLen = 1;
 		StorageNew->logStartTime = 0;
 		StorageNew->logStopTime = 6983120;
-		if (memdup((u_char **) &StorageNew->logIntervalsOfDay, (u_char *) "\x00\x00\x17\x3B", 4) == SNMPERR_SUCCESS)
-			StorageNew->logIntervalsOfDayLen = 4;
-		if (memdup((u_char **) &StorageNew->logWeekMask, (u_char *) "\x7F\x01\x00\x00\x17\x3B", 6) == SNMPERR_SUCCESS)
-			StorageNew->logWeekMaskLen = 6;
-		if ((StorageNew->logSchedulerName = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->logSchedulerNameLen = 2;
+		if (memdup((u_char **) &StorageNew->logIntervalsOfDay, (u_char *) "\x00\x00\x17\x3B", 4) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->logIntervalsOfDayLen = 4;
+		if (memdup((u_char **) &StorageNew->logWeekMask, (u_char *) "\x7F\x01\x00\x00\x17\x3B", 6) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->logWeekMaskLen = 6;
+		if ((StorageNew->logSchedulerName = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->logSchedulerNameLen = 2;
 		StorageNew->logEntryStatus = 0;
 		StorageNew->logEntryStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("smiMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	logTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct logTable_data *logTable_duplicate(struct logTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1488,6 +1668,49 @@ logTable_duplicate(struct logTable_data *thedata)
 
 	DEBUGMSGTL(("smiMIB", "logTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->logTable_id = thedata->logTable_id;
+		if (!(StorageNew->logId = malloc(thedata->logIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logId, thedata->logId, thedata->logIdLen);
+		StorageNew->logIdLen = thedata->logIdLen;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		if (!(StorageNew->logDiscriminatorConstruct = malloc(thedata->logDiscriminatorConstructLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logDiscriminatorConstruct, thedata->logDiscriminatorConstruct, thedata->logDiscriminatorConstructLen);
+		StorageNew->logDiscriminatorConstructLen = thedata->logDiscriminatorConstructLen;
+		StorageNew->logDiscriminatorConstruct[StorageNew->logDiscriminatorConstructLen] = 0;
+		StorageNew->logAdministrativeState = thedata->logAdministrativeState;
+		StorageNew->logOperationalState = thedata->logOperationalState;
+		if (!(StorageNew->logAvailabilityStatus = malloc(thedata->logAvailabilityStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logAvailabilityStatus, thedata->logAvailabilityStatus, thedata->logAvailabilityStatusLen);
+		StorageNew->logAvailabilityStatusLen = thedata->logAvailabilityStatusLen;
+		StorageNew->logAvailabilityStatus[StorageNew->logAvailabilityStatusLen] = 0;
+		StorageNew->logFullAction = thedata->logFullAction;
+		StorageNew->maxLogSize = thedata->maxLogSize;
+		StorageNew->currentLogSize = thedata->currentLogSize;
+		StorageNew->numberOfRecords = thedata->numberOfRecords;
+		if (!(StorageNew->capacityAlarmThreshold = malloc(thedata->capacityAlarmThresholdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->capacityAlarmThreshold, thedata->capacityAlarmThreshold, thedata->capacityAlarmThresholdLen);
+		StorageNew->capacityAlarmThresholdLen = thedata->capacityAlarmThresholdLen;
+		StorageNew->capacityAlarmThreshold[StorageNew->capacityAlarmThresholdLen] = 0;
+		StorageNew->logStartTime = thedata->logStartTime;
+		StorageNew->logStopTime = thedata->logStopTime;
+		if (!(StorageNew->logIntervalsOfDay = malloc(thedata->logIntervalsOfDayLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logIntervalsOfDay, thedata->logIntervalsOfDay, thedata->logIntervalsOfDayLen);
+		StorageNew->logIntervalsOfDayLen = thedata->logIntervalsOfDayLen;
+		StorageNew->logIntervalsOfDay[StorageNew->logIntervalsOfDayLen] = 0;
+		if (!(StorageNew->logWeekMask = malloc(thedata->logWeekMaskLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logWeekMask, thedata->logWeekMask, thedata->logWeekMaskLen);
+		StorageNew->logWeekMaskLen = thedata->logWeekMaskLen;
+		StorageNew->logWeekMask[StorageNew->logWeekMaskLen] = 0;
+		if (!(StorageNew->logSchedulerName = snmp_duplicate_objid(thedata->logSchedulerName, thedata->logSchedulerNameLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->logSchedulerNameLen = thedata->logSchedulerNameLen;
+		StorageNew->logEntryStatus = thedata->logEntryStatus;
 	}
       done:
 	DEBUGMSGTL(("smiMIB", "done.\n"));
@@ -1595,7 +1818,7 @@ logTable_del(struct logTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for logTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case logTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1733,20 +1956,27 @@ logRecordTable_create(void)
 	DEBUGMSGTL(("smiMIB", "logRecordTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->logId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->logIdLen = strlen("");
+		if ((StorageNew->logId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->logIdLen = 0;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
 		StorageNew->loggingTime = 0;
 		StorageNew->logRecordEntryStatus = 0;
 		StorageNew->logRecordEntryStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("smiMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	logRecordTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct logRecordTable_data *logRecordTable_duplicate(struct logRecordTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1758,6 +1988,19 @@ logRecordTable_duplicate(struct logRecordTable_data *thedata)
 
 	DEBUGMSGTL(("smiMIB", "logRecordTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->logRecordTable_id = thedata->logRecordTable_id;
+		if (!(StorageNew->logId = malloc(thedata->logIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logId, thedata->logId, thedata->logIdLen);
+		StorageNew->logIdLen = thedata->logIdLen;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		if (!(StorageNew->logRecordId = malloc(thedata->logRecordIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logRecordId, thedata->logRecordId, thedata->logRecordIdLen);
+		StorageNew->logRecordIdLen = thedata->logRecordIdLen;
+		StorageNew->logRecordId[StorageNew->logRecordIdLen] = 0;
+		StorageNew->loggingTime = thedata->loggingTime;
+		StorageNew->logRecordEntryStatus = thedata->logRecordEntryStatus;
 	}
       done:
 	DEBUGMSGTL(("smiMIB", "done.\n"));
@@ -1857,7 +2100,7 @@ logRecordTable_del(struct logRecordTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for logRecordTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case logRecordTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1946,34 +2189,51 @@ eventLogRecordTable_create(void)
 	DEBUGMSGTL(("smiMIB", "eventLogRecordTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->logId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->logIdLen = strlen("");
-		if ((StorageNew->logRecordId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->logRecordIdLen = strlen("");
-		if ((StorageNew->managedObjectClass = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->managedObjectClassLen = 2;
-		if ((StorageNew->managedObjectInstance = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->managedObjectInstanceLen = 2;
-		if ((StorageNew->eventType = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->eventTypeLen = 2;
+		if ((StorageNew->logId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->logIdLen = 0;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		if ((StorageNew->logRecordId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->logRecordIdLen = 0;
+		StorageNew->logRecordId[StorageNew->logRecordIdLen] = 0;
+		if ((StorageNew->managedObjectClass = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->managedObjectClassLen = 2;
+		if ((StorageNew->managedObjectInstance = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->managedObjectInstanceLen = 2;
+		if ((StorageNew->eventType = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->eventTypeLen = 2;
 		StorageNew->eventTimes = 0;
 		StorageNew->eventNotificationIdentifier = 0;
-		if ((StorageNew->eventCorrelatedNotifications = (uint8_t *) strdup("")) != NULL)
-			StorageNew->eventCorrelatedNotificationsLen = strlen("");
-		if ((StorageNew->eventAdditionalText = (uint8_t *) strdup("")) != NULL)
-			StorageNew->eventAdditionalTextLen = strlen("");
-		if ((StorageNew->eventAdditionalInformation = (uint8_t *) strdup("")) != NULL)
-			StorageNew->eventAdditionalInformationLen = strlen("");
-
+		if ((StorageNew->eventCorrelatedNotifications = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->eventCorrelatedNotificationsLen = 0;
+		StorageNew->eventCorrelatedNotifications[StorageNew->eventCorrelatedNotificationsLen] = 0;
+		if ((StorageNew->eventAdditionalText = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->eventAdditionalTextLen = 0;
+		StorageNew->eventAdditionalText[StorageNew->eventAdditionalTextLen] = 0;
+		if ((StorageNew->eventAdditionalInformation = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->eventAdditionalInformationLen = 0;
+		StorageNew->eventAdditionalInformation[StorageNew->eventAdditionalInformationLen] = 0;
 	}
+      done:
 	DEBUGMSGTL(("smiMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	eventLogRecordTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct eventLogRecordTable_data *eventLogRecordTable_duplicate(struct eventLogRecordTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1985,6 +2245,43 @@ eventLogRecordTable_duplicate(struct eventLogRecordTable_data *thedata)
 
 	DEBUGMSGTL(("smiMIB", "eventLogRecordTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->eventLogRecordTable_id = thedata->eventLogRecordTable_id;
+		if (!(StorageNew->logId = malloc(thedata->logIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logId, thedata->logId, thedata->logIdLen);
+		StorageNew->logIdLen = thedata->logIdLen;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		if (!(StorageNew->logRecordId = malloc(thedata->logRecordIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logRecordId, thedata->logRecordId, thedata->logRecordIdLen);
+		StorageNew->logRecordIdLen = thedata->logRecordIdLen;
+		StorageNew->logRecordId[StorageNew->logRecordIdLen] = 0;
+		if (!(StorageNew->managedObjectClass = snmp_duplicate_objid(thedata->managedObjectClass, thedata->managedObjectClassLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->managedObjectClassLen = thedata->managedObjectClassLen;
+		if (!(StorageNew->managedObjectInstance = snmp_duplicate_objid(thedata->managedObjectInstance, thedata->managedObjectInstanceLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->managedObjectInstanceLen = thedata->managedObjectInstanceLen;
+		if (!(StorageNew->eventType = snmp_duplicate_objid(thedata->eventType, thedata->eventTypeLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->eventTypeLen = thedata->eventTypeLen;
+		StorageNew->eventTimes = thedata->eventTimes;
+		StorageNew->eventNotificationIdentifier = thedata->eventNotificationIdentifier;
+		if (!(StorageNew->eventCorrelatedNotifications = malloc(thedata->eventCorrelatedNotificationsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->eventCorrelatedNotifications, thedata->eventCorrelatedNotifications, thedata->eventCorrelatedNotificationsLen);
+		StorageNew->eventCorrelatedNotificationsLen = thedata->eventCorrelatedNotificationsLen;
+		StorageNew->eventCorrelatedNotifications[StorageNew->eventCorrelatedNotificationsLen] = 0;
+		if (!(StorageNew->eventAdditionalText = malloc(thedata->eventAdditionalTextLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->eventAdditionalText, thedata->eventAdditionalText, thedata->eventAdditionalTextLen);
+		StorageNew->eventAdditionalTextLen = thedata->eventAdditionalTextLen;
+		StorageNew->eventAdditionalText[StorageNew->eventAdditionalTextLen] = 0;
+		if (!(StorageNew->eventAdditionalInformation = malloc(thedata->eventAdditionalInformationLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->eventAdditionalInformation, thedata->eventAdditionalInformation, thedata->eventAdditionalInformationLen);
+		StorageNew->eventAdditionalInformationLen = thedata->eventAdditionalInformationLen;
+		StorageNew->eventAdditionalInformation[StorageNew->eventAdditionalInformationLen] = 0;
 	}
       done:
 	DEBUGMSGTL(("smiMIB", "done.\n"));
@@ -2096,7 +2393,7 @@ eventLogRecordTable_del(struct eventLogRecordTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for eventLogRecordTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case eventLogRecordTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2227,37 +2524,52 @@ alarmRecordTable_create(void)
 	DEBUGMSGTL(("smiMIB", "alarmRecordTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->logId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->logIdLen = strlen("");
-		if ((StorageNew->logRecordId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->logRecordIdLen = strlen("");
-		if ((StorageNew->alarmRecordProbableCause = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->alarmRecordProbableCauseLen = 2;
+		if ((StorageNew->logId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->logIdLen = 0;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		if ((StorageNew->logRecordId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->logRecordIdLen = 0;
+		StorageNew->logRecordId[StorageNew->logRecordIdLen] = 0;
+		if ((StorageNew->alarmRecordProbableCause = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->alarmRecordProbableCauseLen = 2;
 		StorageNew->alarmRecordPerceivedSeverity = 0;
-		if ((StorageNew->alarmRecordSpecificProblems = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->alarmRecordSpecificProblemsLen = 2;
+		if ((StorageNew->alarmRecordSpecificProblems = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->alarmRecordSpecificProblemsLen = 2;
 		StorageNew->alarmRecordBackedUpStatus = ALARMRECORDBACKEDUPSTATUS_NONE;
-		if ((StorageNew->alarmRecordBackUpObject = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->alarmRecordBackUpObjectLen = 2;
+		if ((StorageNew->alarmRecordBackUpObject = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->alarmRecordBackUpObjectLen = 2;
 		StorageNew->alarmRecordTrendIndication = ALARMRECORDTRENDINDICATION_NOCHANGE;
-		if ((StorageNew->alarmRecordThresholdInfo = (uint8_t *) strdup("")) != NULL)
-			StorageNew->alarmRecordThresholdInfoLen = strlen("");
-		if ((StorageNew->alarmRecordStateChangeDefinition = (uint8_t *) strdup("")) != NULL)
-			StorageNew->alarmRecordStateChangeDefinitionLen = strlen("");
-		if ((StorageNew->alarmRecordMonitoredAttributes = (uint8_t *) strdup("")) != NULL)
-			StorageNew->alarmRecordMonitoredAttributesLen = strlen("");
-		if ((StorageNew->alarmRecordProposedRepairActions = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->alarmRecordProposedRepairActionsLen = 2;
-
+		if ((StorageNew->alarmRecordThresholdInfo = (uint8_t *) strdup("")) == NULL)
+			goto nomem;
+		StorageNew->alarmRecordThresholdInfoLen = strlen("");
+		if ((StorageNew->alarmRecordStateChangeDefinition = (uint8_t *) strdup("")) == NULL)
+			goto nomem;
+		StorageNew->alarmRecordStateChangeDefinitionLen = strlen("");
+		if ((StorageNew->alarmRecordMonitoredAttributes = (uint8_t *) strdup("")) == NULL)
+			goto nomem;
+		StorageNew->alarmRecordMonitoredAttributesLen = strlen("");
+		if ((StorageNew->alarmRecordProposedRepairActions = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->alarmRecordProposedRepairActionsLen = 2;
 	}
+      done:
 	DEBUGMSGTL(("smiMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	alarmRecordTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct alarmRecordTable_data *alarmRecordTable_duplicate(struct alarmRecordTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2269,6 +2581,47 @@ alarmRecordTable_duplicate(struct alarmRecordTable_data *thedata)
 
 	DEBUGMSGTL(("smiMIB", "alarmRecordTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->alarmRecordTable_id = thedata->alarmRecordTable_id;
+		if (!(StorageNew->logId = malloc(thedata->logIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logId, thedata->logId, thedata->logIdLen);
+		StorageNew->logIdLen = thedata->logIdLen;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		if (!(StorageNew->logRecordId = malloc(thedata->logRecordIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logRecordId, thedata->logRecordId, thedata->logRecordIdLen);
+		StorageNew->logRecordIdLen = thedata->logRecordIdLen;
+		StorageNew->logRecordId[StorageNew->logRecordIdLen] = 0;
+		if (!(StorageNew->alarmRecordProbableCause = snmp_duplicate_objid(thedata->alarmRecordProbableCause, thedata->alarmRecordProbableCauseLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->alarmRecordProbableCauseLen = thedata->alarmRecordProbableCauseLen;
+		StorageNew->alarmRecordPerceivedSeverity = thedata->alarmRecordPerceivedSeverity;
+		if (!(StorageNew->alarmRecordSpecificProblems = snmp_duplicate_objid(thedata->alarmRecordSpecificProblems, thedata->alarmRecordSpecificProblemsLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->alarmRecordSpecificProblemsLen = thedata->alarmRecordSpecificProblemsLen;
+		StorageNew->alarmRecordBackedUpStatus = thedata->alarmRecordBackedUpStatus;
+		if (!(StorageNew->alarmRecordBackUpObject = snmp_duplicate_objid(thedata->alarmRecordBackUpObject, thedata->alarmRecordBackUpObjectLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->alarmRecordBackUpObjectLen = thedata->alarmRecordBackUpObjectLen;
+		StorageNew->alarmRecordTrendIndication = thedata->alarmRecordTrendIndication;
+		if (!(StorageNew->alarmRecordThresholdInfo = malloc(thedata->alarmRecordThresholdInfoLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->alarmRecordThresholdInfo, thedata->alarmRecordThresholdInfo, thedata->alarmRecordThresholdInfoLen);
+		StorageNew->alarmRecordThresholdInfoLen = thedata->alarmRecordThresholdInfoLen;
+		StorageNew->alarmRecordThresholdInfo[StorageNew->alarmRecordThresholdInfoLen] = 0;
+		if (!(StorageNew->alarmRecordStateChangeDefinition = malloc(thedata->alarmRecordStateChangeDefinitionLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->alarmRecordStateChangeDefinition, thedata->alarmRecordStateChangeDefinition, thedata->alarmRecordStateChangeDefinitionLen);
+		StorageNew->alarmRecordStateChangeDefinitionLen = thedata->alarmRecordStateChangeDefinitionLen;
+		StorageNew->alarmRecordStateChangeDefinition[StorageNew->alarmRecordStateChangeDefinitionLen] = 0;
+		if (!(StorageNew->alarmRecordMonitoredAttributes = malloc(thedata->alarmRecordMonitoredAttributesLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->alarmRecordMonitoredAttributes, thedata->alarmRecordMonitoredAttributes, thedata->alarmRecordMonitoredAttributesLen);
+		StorageNew->alarmRecordMonitoredAttributesLen = thedata->alarmRecordMonitoredAttributesLen;
+		StorageNew->alarmRecordMonitoredAttributes[StorageNew->alarmRecordMonitoredAttributesLen] = 0;
+		if (!(StorageNew->alarmRecordProposedRepairActions = snmp_duplicate_objid(thedata->alarmRecordProposedRepairActions, thedata->alarmRecordProposedRepairActionsLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->alarmRecordProposedRepairActionsLen = thedata->alarmRecordProposedRepairActionsLen;
 	}
       done:
 	DEBUGMSGTL(("smiMIB", "done.\n"));
@@ -2382,7 +2735,7 @@ alarmRecordTable_del(struct alarmRecordTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for alarmRecordTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case alarmRecordTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2522,25 +2875,36 @@ attributeValueChangeRecordTable_create(void)
 	DEBUGMSGTL(("smiMIB", "attributeValueChangeRecordTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->logId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->logIdLen = strlen("");
-		if ((StorageNew->logRecordId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->logRecordIdLen = strlen("");
-		if ((StorageNew->attributeValueChangeRecordDefinition = (uint8_t *) strdup("")) != NULL)
-			StorageNew->attributeValueChangeRecordDefinitionLen = strlen("");
+		if ((StorageNew->logId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->logIdLen = 0;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		if ((StorageNew->logRecordId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->logRecordIdLen = 0;
+		StorageNew->logRecordId[StorageNew->logRecordIdLen] = 0;
+		if ((StorageNew->attributeValueChangeRecordDefinition = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->attributeValueChangeRecordDefinitionLen = 0;
+		StorageNew->attributeValueChangeRecordDefinition[StorageNew->attributeValueChangeRecordDefinitionLen] = 0;
 		StorageNew->attributeValueChangeSourceIndicator = 0;
-		if ((StorageNew->attributeValueChangeAttributeIdentifierList = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->attributeValueChangeAttributeIdentifierListLen = 2;
-
+		if ((StorageNew->attributeValueChangeAttributeIdentifierList = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->attributeValueChangeAttributeIdentifierListLen = 2;
 	}
+      done:
 	DEBUGMSGTL(("smiMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	attributeValueChangeRecordTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct attributeValueChangeRecordTable_data *attributeValueChangeRecordTable_duplicate(struct attributeValueChangeRecordTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2552,6 +2916,28 @@ attributeValueChangeRecordTable_duplicate(struct attributeValueChangeRecordTable
 
 	DEBUGMSGTL(("smiMIB", "attributeValueChangeRecordTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->attributeValueChangeRecordTable_id = thedata->attributeValueChangeRecordTable_id;
+		if (!(StorageNew->logId = malloc(thedata->logIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logId, thedata->logId, thedata->logIdLen);
+		StorageNew->logIdLen = thedata->logIdLen;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		if (!(StorageNew->logRecordId = malloc(thedata->logRecordIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logRecordId, thedata->logRecordId, thedata->logRecordIdLen);
+		StorageNew->logRecordIdLen = thedata->logRecordIdLen;
+		StorageNew->logRecordId[StorageNew->logRecordIdLen] = 0;
+		if (!(StorageNew->attributeValueChangeRecordDefinition = malloc(thedata->attributeValueChangeRecordDefinitionLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->attributeValueChangeRecordDefinition, thedata->attributeValueChangeRecordDefinition, thedata->attributeValueChangeRecordDefinitionLen);
+		StorageNew->attributeValueChangeRecordDefinitionLen = thedata->attributeValueChangeRecordDefinitionLen;
+		StorageNew->attributeValueChangeRecordDefinition[StorageNew->attributeValueChangeRecordDefinitionLen] = 0;
+		StorageNew->attributeValueChangeSourceIndicator = thedata->attributeValueChangeSourceIndicator;
+		if (!
+		    (StorageNew->attributeValueChangeAttributeIdentifierList =
+		     snmp_duplicate_objid(thedata->attributeValueChangeAttributeIdentifierList, thedata->attributeValueChangeAttributeIdentifierListLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->attributeValueChangeAttributeIdentifierListLen = thedata->attributeValueChangeAttributeIdentifierListLen;
 	}
       done:
 	DEBUGMSGTL(("smiMIB", "done.\n"));
@@ -2655,7 +3041,7 @@ attributeValueChangeRecordTable_del(struct attributeValueChangeRecordTable_data 
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for attributeValueChangeRecordTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case attributeValueChangeRecordTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2756,23 +3142,32 @@ objectCreationRecordTable_create(void)
 	DEBUGMSGTL(("smiMIB", "objectCreationRecordTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->logId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->logIdLen = strlen("");
-		if ((StorageNew->logRecordId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->logRecordIdLen = strlen("");
+		if ((StorageNew->logId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->logIdLen = 0;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		if ((StorageNew->logRecordId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->logRecordIdLen = 0;
+		StorageNew->logRecordId[StorageNew->logRecordIdLen] = 0;
 		StorageNew->objectCreationSourceIndicator = 0;
-		if ((StorageNew->objectCreationAttributeIdentifierList = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->objectCreationAttributeIdentifierListLen = 2;
-
+		if ((StorageNew->objectCreationAttributeIdentifierList = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->objectCreationAttributeIdentifierListLen = 2;
 	}
+      done:
 	DEBUGMSGTL(("smiMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	objectCreationRecordTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct objectCreationRecordTable_data *objectCreationRecordTable_duplicate(struct objectCreationRecordTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2784,6 +3179,23 @@ objectCreationRecordTable_duplicate(struct objectCreationRecordTable_data *theda
 
 	DEBUGMSGTL(("smiMIB", "objectCreationRecordTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->objectCreationRecordTable_id = thedata->objectCreationRecordTable_id;
+		if (!(StorageNew->logId = malloc(thedata->logIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logId, thedata->logId, thedata->logIdLen);
+		StorageNew->logIdLen = thedata->logIdLen;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		if (!(StorageNew->logRecordId = malloc(thedata->logRecordIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logRecordId, thedata->logRecordId, thedata->logRecordIdLen);
+		StorageNew->logRecordIdLen = thedata->logRecordIdLen;
+		StorageNew->logRecordId[StorageNew->logRecordIdLen] = 0;
+		StorageNew->objectCreationSourceIndicator = thedata->objectCreationSourceIndicator;
+		if (!
+		    (StorageNew->objectCreationAttributeIdentifierList =
+		     snmp_duplicate_objid(thedata->objectCreationAttributeIdentifierList, thedata->objectCreationAttributeIdentifierListLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->objectCreationAttributeIdentifierListLen = thedata->objectCreationAttributeIdentifierListLen;
 	}
       done:
 	DEBUGMSGTL(("smiMIB", "done.\n"));
@@ -2885,7 +3297,7 @@ objectCreationRecordTable_del(struct objectCreationRecordTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for objectCreationRecordTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case objectCreationRecordTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2979,23 +3391,32 @@ objectDeletionRecordTable_create(void)
 	DEBUGMSGTL(("smiMIB", "objectDeletionRecordTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->logId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->logIdLen = strlen("");
-		if ((StorageNew->logRecordId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->logRecordIdLen = strlen("");
+		if ((StorageNew->logId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->logIdLen = 0;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		if ((StorageNew->logRecordId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->logRecordIdLen = 0;
+		StorageNew->logRecordId[StorageNew->logRecordIdLen] = 0;
 		StorageNew->objectDeletionSourceIndicator = 0;
-		if ((StorageNew->objectDeletionAttributeIdentifierList = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->objectDeletionAttributeIdentifierListLen = 2;
-
+		if ((StorageNew->objectDeletionAttributeIdentifierList = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->objectDeletionAttributeIdentifierListLen = 2;
 	}
+      done:
 	DEBUGMSGTL(("smiMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	objectDeletionRecordTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct objectDeletionRecordTable_data *objectDeletionRecordTable_duplicate(struct objectDeletionRecordTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3007,6 +3428,23 @@ objectDeletionRecordTable_duplicate(struct objectDeletionRecordTable_data *theda
 
 	DEBUGMSGTL(("smiMIB", "objectDeletionRecordTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->objectDeletionRecordTable_id = thedata->objectDeletionRecordTable_id;
+		if (!(StorageNew->logId = malloc(thedata->logIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logId, thedata->logId, thedata->logIdLen);
+		StorageNew->logIdLen = thedata->logIdLen;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		if (!(StorageNew->logRecordId = malloc(thedata->logRecordIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logRecordId, thedata->logRecordId, thedata->logRecordIdLen);
+		StorageNew->logRecordIdLen = thedata->logRecordIdLen;
+		StorageNew->logRecordId[StorageNew->logRecordIdLen] = 0;
+		StorageNew->objectDeletionSourceIndicator = thedata->objectDeletionSourceIndicator;
+		if (!
+		    (StorageNew->objectDeletionAttributeIdentifierList =
+		     snmp_duplicate_objid(thedata->objectDeletionAttributeIdentifierList, thedata->objectDeletionAttributeIdentifierListLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->objectDeletionAttributeIdentifierListLen = thedata->objectDeletionAttributeIdentifierListLen;
 	}
       done:
 	DEBUGMSGTL(("smiMIB", "done.\n"));
@@ -3108,7 +3546,7 @@ objectDeletionRecordTable_del(struct objectDeletionRecordTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for objectDeletionRecordTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case objectDeletionRecordTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3202,25 +3640,36 @@ relationshipChangeRecordTable_create(void)
 	DEBUGMSGTL(("smiMIB", "relationshipChangeRecordTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->logId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->logIdLen = strlen("");
-		if ((StorageNew->logRecordId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->logRecordIdLen = strlen("");
-		if ((StorageNew->relationshipChangeRecordDefinition = (uint8_t *) strdup("")) != NULL)
-			StorageNew->relationshipChangeRecordDefinitionLen = strlen("");
+		if ((StorageNew->logId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->logIdLen = 0;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		if ((StorageNew->logRecordId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->logRecordIdLen = 0;
+		StorageNew->logRecordId[StorageNew->logRecordIdLen] = 0;
+		if ((StorageNew->relationshipChangeRecordDefinition = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->relationshipChangeRecordDefinitionLen = 0;
+		StorageNew->relationshipChangeRecordDefinition[StorageNew->relationshipChangeRecordDefinitionLen] = 0;
 		StorageNew->relationshipChangeSourceIndicator = 0;
-		if ((StorageNew->relationshipChangeAttributeIdentifierList = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->relationshipChangeAttributeIdentifierListLen = 2;
-
+		if ((StorageNew->relationshipChangeAttributeIdentifierList = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->relationshipChangeAttributeIdentifierListLen = 2;
 	}
+      done:
 	DEBUGMSGTL(("smiMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	relationshipChangeRecordTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct relationshipChangeRecordTable_data *relationshipChangeRecordTable_duplicate(struct relationshipChangeRecordTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3232,6 +3681,28 @@ relationshipChangeRecordTable_duplicate(struct relationshipChangeRecordTable_dat
 
 	DEBUGMSGTL(("smiMIB", "relationshipChangeRecordTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->relationshipChangeRecordTable_id = thedata->relationshipChangeRecordTable_id;
+		if (!(StorageNew->logId = malloc(thedata->logIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logId, thedata->logId, thedata->logIdLen);
+		StorageNew->logIdLen = thedata->logIdLen;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		if (!(StorageNew->logRecordId = malloc(thedata->logRecordIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logRecordId, thedata->logRecordId, thedata->logRecordIdLen);
+		StorageNew->logRecordIdLen = thedata->logRecordIdLen;
+		StorageNew->logRecordId[StorageNew->logRecordIdLen] = 0;
+		if (!(StorageNew->relationshipChangeRecordDefinition = malloc(thedata->relationshipChangeRecordDefinitionLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->relationshipChangeRecordDefinition, thedata->relationshipChangeRecordDefinition, thedata->relationshipChangeRecordDefinitionLen);
+		StorageNew->relationshipChangeRecordDefinitionLen = thedata->relationshipChangeRecordDefinitionLen;
+		StorageNew->relationshipChangeRecordDefinition[StorageNew->relationshipChangeRecordDefinitionLen] = 0;
+		StorageNew->relationshipChangeSourceIndicator = thedata->relationshipChangeSourceIndicator;
+		if (!
+		    (StorageNew->relationshipChangeAttributeIdentifierList =
+		     snmp_duplicate_objid(thedata->relationshipChangeAttributeIdentifierList, thedata->relationshipChangeAttributeIdentifierListLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->relationshipChangeAttributeIdentifierListLen = thedata->relationshipChangeAttributeIdentifierListLen;
 	}
       done:
 	DEBUGMSGTL(("smiMIB", "done.\n"));
@@ -3335,7 +3806,7 @@ relationshipChangeRecordTable_del(struct relationshipChangeRecordTable_data *the
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for relationshipChangeRecordTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case relationshipChangeRecordTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3436,29 +3907,43 @@ securityAlarmReportRecordTable_create(void)
 	DEBUGMSGTL(("smiMIB", "securityAlarmReportRecordTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->logId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->logIdLen = strlen("");
-		if ((StorageNew->logRecordId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->logRecordIdLen = strlen("");
-		if ((StorageNew->securityAlarmRecordCause = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->securityAlarmRecordCauseLen = 2;
+		if ((StorageNew->logId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->logIdLen = 0;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		if ((StorageNew->logRecordId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->logRecordIdLen = 0;
+		StorageNew->logRecordId[StorageNew->logRecordIdLen] = 0;
+		if ((StorageNew->securityAlarmRecordCause = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->securityAlarmRecordCauseLen = 2;
 		StorageNew->securityAlarmRecordSeverity = 0;
-		if ((StorageNew->securityAlarmRecordDetector = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->securityAlarmRecordDetectorLen = 2;
-		if ((StorageNew->securityServiceUser = (uint8_t *) strdup("")) != NULL)
-			StorageNew->securityServiceUserLen = strlen("");
-		if ((StorageNew->securityServiceProvider = (uint8_t *) strdup("")) != NULL)
-			StorageNew->securityServiceProviderLen = strlen("");
-
+		if ((StorageNew->securityAlarmRecordDetector = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->securityAlarmRecordDetectorLen = 2;
+		if ((StorageNew->securityServiceUser = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->securityServiceUserLen = 0;
+		StorageNew->securityServiceUser[StorageNew->securityServiceUserLen] = 0;
+		if ((StorageNew->securityServiceProvider = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->securityServiceProviderLen = 0;
+		StorageNew->securityServiceProvider[StorageNew->securityServiceProviderLen] = 0;
 	}
+      done:
 	DEBUGMSGTL(("smiMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	securityAlarmReportRecordTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct securityAlarmReportRecordTable_data *securityAlarmReportRecordTable_duplicate(struct securityAlarmReportRecordTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3470,6 +3955,34 @@ securityAlarmReportRecordTable_duplicate(struct securityAlarmReportRecordTable_d
 
 	DEBUGMSGTL(("smiMIB", "securityAlarmReportRecordTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->securityAlarmReportRecordTable_id = thedata->securityAlarmReportRecordTable_id;
+		if (!(StorageNew->logId = malloc(thedata->logIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logId, thedata->logId, thedata->logIdLen);
+		StorageNew->logIdLen = thedata->logIdLen;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		if (!(StorageNew->logRecordId = malloc(thedata->logRecordIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logRecordId, thedata->logRecordId, thedata->logRecordIdLen);
+		StorageNew->logRecordIdLen = thedata->logRecordIdLen;
+		StorageNew->logRecordId[StorageNew->logRecordIdLen] = 0;
+		if (!(StorageNew->securityAlarmRecordCause = snmp_duplicate_objid(thedata->securityAlarmRecordCause, thedata->securityAlarmRecordCauseLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->securityAlarmRecordCauseLen = thedata->securityAlarmRecordCauseLen;
+		StorageNew->securityAlarmRecordSeverity = thedata->securityAlarmRecordSeverity;
+		if (!(StorageNew->securityAlarmRecordDetector = snmp_duplicate_objid(thedata->securityAlarmRecordDetector, thedata->securityAlarmRecordDetectorLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->securityAlarmRecordDetectorLen = thedata->securityAlarmRecordDetectorLen;
+		if (!(StorageNew->securityServiceUser = malloc(thedata->securityServiceUserLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->securityServiceUser, thedata->securityServiceUser, thedata->securityServiceUserLen);
+		StorageNew->securityServiceUserLen = thedata->securityServiceUserLen;
+		StorageNew->securityServiceUser[StorageNew->securityServiceUserLen] = 0;
+		if (!(StorageNew->securityServiceProvider = malloc(thedata->securityServiceProviderLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->securityServiceProvider, thedata->securityServiceProvider, thedata->securityServiceProviderLen);
+		StorageNew->securityServiceProviderLen = thedata->securityServiceProviderLen;
+		StorageNew->securityServiceProvider[StorageNew->securityServiceProviderLen] = 0;
 	}
       done:
 	DEBUGMSGTL(("smiMIB", "done.\n"));
@@ -3577,7 +4090,7 @@ securityAlarmReportRecordTable_del(struct securityAlarmReportRecordTable_data *t
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for securityAlarmReportRecordTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case securityAlarmReportRecordTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3692,25 +4205,36 @@ stateChangeRecordTable_create(void)
 	DEBUGMSGTL(("smiMIB", "stateChangeRecordTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->logId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->logIdLen = strlen("");
-		if ((StorageNew->logRecordId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->logRecordIdLen = strlen("");
-		if ((StorageNew->stateChangeRecordDefinition = (uint8_t *) strdup("")) != NULL)
-			StorageNew->stateChangeRecordDefinitionLen = strlen("");
+		if ((StorageNew->logId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->logIdLen = 0;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		if ((StorageNew->logRecordId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->logRecordIdLen = 0;
+		StorageNew->logRecordId[StorageNew->logRecordIdLen] = 0;
+		if ((StorageNew->stateChangeRecordDefinition = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->stateChangeRecordDefinitionLen = 0;
+		StorageNew->stateChangeRecordDefinition[StorageNew->stateChangeRecordDefinitionLen] = 0;
 		StorageNew->stateChangeSourceIndicator = 0;
-		if ((StorageNew->stateChangeAttributeIdentifierList = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->stateChangeAttributeIdentifierListLen = 2;
-
+		if ((StorageNew->stateChangeAttributeIdentifierList = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->stateChangeAttributeIdentifierListLen = 2;
 	}
+      done:
 	DEBUGMSGTL(("smiMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	stateChangeRecordTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct stateChangeRecordTable_data *stateChangeRecordTable_duplicate(struct stateChangeRecordTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3722,6 +4246,26 @@ stateChangeRecordTable_duplicate(struct stateChangeRecordTable_data *thedata)
 
 	DEBUGMSGTL(("smiMIB", "stateChangeRecordTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->stateChangeRecordTable_id = thedata->stateChangeRecordTable_id;
+		if (!(StorageNew->logId = malloc(thedata->logIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logId, thedata->logId, thedata->logIdLen);
+		StorageNew->logIdLen = thedata->logIdLen;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		if (!(StorageNew->logRecordId = malloc(thedata->logRecordIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logRecordId, thedata->logRecordId, thedata->logRecordIdLen);
+		StorageNew->logRecordIdLen = thedata->logRecordIdLen;
+		StorageNew->logRecordId[StorageNew->logRecordIdLen] = 0;
+		if (!(StorageNew->stateChangeRecordDefinition = malloc(thedata->stateChangeRecordDefinitionLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->stateChangeRecordDefinition, thedata->stateChangeRecordDefinition, thedata->stateChangeRecordDefinitionLen);
+		StorageNew->stateChangeRecordDefinitionLen = thedata->stateChangeRecordDefinitionLen;
+		StorageNew->stateChangeRecordDefinition[StorageNew->stateChangeRecordDefinitionLen] = 0;
+		StorageNew->stateChangeSourceIndicator = thedata->stateChangeSourceIndicator;
+		if (!(StorageNew->stateChangeAttributeIdentifierList = snmp_duplicate_objid(thedata->stateChangeAttributeIdentifierList, thedata->stateChangeAttributeIdentifierListLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->stateChangeAttributeIdentifierListLen = thedata->stateChangeAttributeIdentifierListLen;
 	}
       done:
 	DEBUGMSGTL(("smiMIB", "done.\n"));
@@ -3825,7 +4369,7 @@ stateChangeRecordTable_del(struct stateChangeRecordTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for stateChangeRecordTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case stateChangeRecordTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3908,6 +4452,200 @@ store_stateChangeRecordTable(int majorID, int minorID, void *serverarg, void *cl
 	}
 	DEBUGMSGTL(("smiMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int activate_discriminatorTable_row(struct discriminatorTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_discriminatorTable_row(struct discriminatorTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_discriminatorTable_row(struct discriminatorTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_discriminatorTable_row(struct discriminatorTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_eventForwardingDiscriminatorTable_row(struct eventForwardingDiscriminatorTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_eventForwardingDiscriminatorTable_row(struct eventForwardingDiscriminatorTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_eventForwardingDiscriminatorTable_row(struct eventForwardingDiscriminatorTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_eventForwardingDiscriminatorTable_row(struct eventForwardingDiscriminatorTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_logTable_row(struct logTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_logTable_row(struct logTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_logTable_row(struct logTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_logTable_row(struct logTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_logRecordTable_row(struct logRecordTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_logRecordTable_row(struct logRecordTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_logRecordTable_row(struct logRecordTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_logRecordTable_row(struct logRecordTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int check_discriminatorTable_row(struct discriminatorTable_data *StorageTmp, struct discriminatorTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_discriminatorTable_row(struct discriminatorTable_data *StorageTmp, struct discriminatorTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_discriminatorTable_row(struct discriminatorTable_data *StorageTmp, struct discriminatorTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_discriminatorTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_discriminatorTable_row(struct discriminatorTable_data *StorageTmp, struct discriminatorTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	discriminatorTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_discriminatorTable_row(struct discriminatorTable_data *StorageTmp, struct discriminatorTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_discriminatorTable_row(struct discriminatorTable_data *StorageTmp, struct discriminatorTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_discriminatorTable_row(StorageOld, NULL);
 }
 
 /**
@@ -4050,6 +4788,64 @@ var_discriminatorTable(struct variable *vp, oid * name, size_t *length, int exac
 }
 
 /**
+ * @fn int check_eventForwardingDiscriminatorTable_row(struct eventForwardingDiscriminatorTable_data *StorageTmp, struct eventForwardingDiscriminatorTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_eventForwardingDiscriminatorTable_row(struct eventForwardingDiscriminatorTable_data *StorageTmp, struct eventForwardingDiscriminatorTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_eventForwardingDiscriminatorTable_row(struct eventForwardingDiscriminatorTable_data *StorageTmp, struct eventForwardingDiscriminatorTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_eventForwardingDiscriminatorTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_eventForwardingDiscriminatorTable_row(struct eventForwardingDiscriminatorTable_data *StorageTmp, struct eventForwardingDiscriminatorTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	eventForwardingDiscriminatorTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_eventForwardingDiscriminatorTable_row(struct eventForwardingDiscriminatorTable_data *StorageTmp, struct eventForwardingDiscriminatorTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_eventForwardingDiscriminatorTable_row(struct eventForwardingDiscriminatorTable_data *StorageTmp, struct eventForwardingDiscriminatorTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_eventForwardingDiscriminatorTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_eventForwardingDiscriminatorTable_row(struct eventForwardingDiscriminatorTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -4153,6 +4949,64 @@ var_eventForwardingDiscriminatorTable(struct variable *vp, oid * name, size_t *l
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_logTable_row(struct logTable_data *StorageTmp, struct logTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_logTable_row(struct logTable_data *StorageTmp, struct logTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_logTable_row(struct logTable_data *StorageTmp, struct logTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_logTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_logTable_row(struct logTable_data *StorageTmp, struct logTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	logTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_logTable_row(struct logTable_data *StorageTmp, struct logTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_logTable_row(struct logTable_data *StorageTmp, struct logTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_logTable_row(StorageOld, NULL);
 }
 
 /**
@@ -4329,6 +5183,64 @@ var_logTable(struct variable *vp, oid * name, size_t *length, int exact, size_t 
 }
 
 /**
+ * @fn int check_logRecordTable_row(struct logRecordTable_data *StorageTmp, struct logRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_logRecordTable_row(struct logRecordTable_data *StorageTmp, struct logRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_logRecordTable_row(struct logRecordTable_data *StorageTmp, struct logRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_logRecordTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_logRecordTable_row(struct logRecordTable_data *StorageTmp, struct logRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	logRecordTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_logRecordTable_row(struct logRecordTable_data *StorageTmp, struct logRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_logRecordTable_row(struct logRecordTable_data *StorageTmp, struct logRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_logRecordTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_logRecordTable_row(struct logRecordTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -4410,6 +5322,64 @@ var_logRecordTable(struct variable *vp, oid * name, size_t *length, int exact, s
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_eventLogRecordTable_row(struct eventLogRecordTable_data *StorageTmp, struct eventLogRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_eventLogRecordTable_row(struct eventLogRecordTable_data *StorageTmp, struct eventLogRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_eventLogRecordTable_row(struct eventLogRecordTable_data *StorageTmp, struct eventLogRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_eventLogRecordTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_eventLogRecordTable_row(struct eventLogRecordTable_data *StorageTmp, struct eventLogRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	eventLogRecordTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_eventLogRecordTable_row(struct eventLogRecordTable_data *StorageTmp, struct eventLogRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_eventLogRecordTable_row(struct eventLogRecordTable_data *StorageTmp, struct eventLogRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_eventLogRecordTable_row(StorageOld, NULL);
 }
 
 /**
@@ -4529,6 +5499,64 @@ var_eventLogRecordTable(struct variable *vp, oid * name, size_t *length, int exa
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_alarmRecordTable_row(struct alarmRecordTable_data *StorageTmp, struct alarmRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_alarmRecordTable_row(struct alarmRecordTable_data *StorageTmp, struct alarmRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_alarmRecordTable_row(struct alarmRecordTable_data *StorageTmp, struct alarmRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_alarmRecordTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_alarmRecordTable_row(struct alarmRecordTable_data *StorageTmp, struct alarmRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	alarmRecordTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_alarmRecordTable_row(struct alarmRecordTable_data *StorageTmp, struct alarmRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_alarmRecordTable_row(struct alarmRecordTable_data *StorageTmp, struct alarmRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_alarmRecordTable_row(StorageOld, NULL);
 }
 
 /**
@@ -4663,6 +5691,64 @@ var_alarmRecordTable(struct variable *vp, oid * name, size_t *length, int exact,
 }
 
 /**
+ * @fn int check_attributeValueChangeRecordTable_row(struct attributeValueChangeRecordTable_data *StorageTmp, struct attributeValueChangeRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_attributeValueChangeRecordTable_row(struct attributeValueChangeRecordTable_data *StorageTmp, struct attributeValueChangeRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_attributeValueChangeRecordTable_row(struct attributeValueChangeRecordTable_data *StorageTmp, struct attributeValueChangeRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_attributeValueChangeRecordTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_attributeValueChangeRecordTable_row(struct attributeValueChangeRecordTable_data *StorageTmp, struct attributeValueChangeRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	attributeValueChangeRecordTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_attributeValueChangeRecordTable_row(struct attributeValueChangeRecordTable_data *StorageTmp, struct attributeValueChangeRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_attributeValueChangeRecordTable_row(struct attributeValueChangeRecordTable_data *StorageTmp, struct attributeValueChangeRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_attributeValueChangeRecordTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_attributeValueChangeRecordTable_row(struct attributeValueChangeRecordTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -4752,6 +5838,64 @@ var_attributeValueChangeRecordTable(struct variable *vp, oid * name, size_t *len
 }
 
 /**
+ * @fn int check_objectCreationRecordTable_row(struct objectCreationRecordTable_data *StorageTmp, struct objectCreationRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_objectCreationRecordTable_row(struct objectCreationRecordTable_data *StorageTmp, struct objectCreationRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_objectCreationRecordTable_row(struct objectCreationRecordTable_data *StorageTmp, struct objectCreationRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_objectCreationRecordTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_objectCreationRecordTable_row(struct objectCreationRecordTable_data *StorageTmp, struct objectCreationRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	objectCreationRecordTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_objectCreationRecordTable_row(struct objectCreationRecordTable_data *StorageTmp, struct objectCreationRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_objectCreationRecordTable_row(struct objectCreationRecordTable_data *StorageTmp, struct objectCreationRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_objectCreationRecordTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_objectCreationRecordTable_row(struct objectCreationRecordTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -4835,6 +5979,64 @@ var_objectCreationRecordTable(struct variable *vp, oid * name, size_t *length, i
 }
 
 /**
+ * @fn int check_objectDeletionRecordTable_row(struct objectDeletionRecordTable_data *StorageTmp, struct objectDeletionRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_objectDeletionRecordTable_row(struct objectDeletionRecordTable_data *StorageTmp, struct objectDeletionRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_objectDeletionRecordTable_row(struct objectDeletionRecordTable_data *StorageTmp, struct objectDeletionRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_objectDeletionRecordTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_objectDeletionRecordTable_row(struct objectDeletionRecordTable_data *StorageTmp, struct objectDeletionRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	objectDeletionRecordTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_objectDeletionRecordTable_row(struct objectDeletionRecordTable_data *StorageTmp, struct objectDeletionRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_objectDeletionRecordTable_row(struct objectDeletionRecordTable_data *StorageTmp, struct objectDeletionRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_objectDeletionRecordTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_objectDeletionRecordTable_row(struct objectDeletionRecordTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -4915,6 +6117,64 @@ var_objectDeletionRecordTable(struct variable *vp, oid * name, size_t *length, i
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_relationshipChangeRecordTable_row(struct relationshipChangeRecordTable_data *StorageTmp, struct relationshipChangeRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_relationshipChangeRecordTable_row(struct relationshipChangeRecordTable_data *StorageTmp, struct relationshipChangeRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_relationshipChangeRecordTable_row(struct relationshipChangeRecordTable_data *StorageTmp, struct relationshipChangeRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_relationshipChangeRecordTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_relationshipChangeRecordTable_row(struct relationshipChangeRecordTable_data *StorageTmp, struct relationshipChangeRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	relationshipChangeRecordTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_relationshipChangeRecordTable_row(struct relationshipChangeRecordTable_data *StorageTmp, struct relationshipChangeRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_relationshipChangeRecordTable_row(struct relationshipChangeRecordTable_data *StorageTmp, struct relationshipChangeRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_relationshipChangeRecordTable_row(StorageOld, NULL);
 }
 
 /**
@@ -5004,6 +6264,64 @@ var_relationshipChangeRecordTable(struct variable *vp, oid * name, size_t *lengt
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_securityAlarmReportRecordTable_row(struct securityAlarmReportRecordTable_data *StorageTmp, struct securityAlarmReportRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_securityAlarmReportRecordTable_row(struct securityAlarmReportRecordTable_data *StorageTmp, struct securityAlarmReportRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_securityAlarmReportRecordTable_row(struct securityAlarmReportRecordTable_data *StorageTmp, struct securityAlarmReportRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_securityAlarmReportRecordTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_securityAlarmReportRecordTable_row(struct securityAlarmReportRecordTable_data *StorageTmp, struct securityAlarmReportRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	securityAlarmReportRecordTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_securityAlarmReportRecordTable_row(struct securityAlarmReportRecordTable_data *StorageTmp, struct securityAlarmReportRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_securityAlarmReportRecordTable_row(struct securityAlarmReportRecordTable_data *StorageTmp, struct securityAlarmReportRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_securityAlarmReportRecordTable_row(StorageOld, NULL);
 }
 
 /**
@@ -5105,6 +6423,64 @@ var_securityAlarmReportRecordTable(struct variable *vp, oid * name, size_t *leng
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_stateChangeRecordTable_row(struct stateChangeRecordTable_data *StorageTmp, struct stateChangeRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_stateChangeRecordTable_row(struct stateChangeRecordTable_data *StorageTmp, struct stateChangeRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_stateChangeRecordTable_row(struct stateChangeRecordTable_data *StorageTmp, struct stateChangeRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_stateChangeRecordTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_stateChangeRecordTable_row(struct stateChangeRecordTable_data *StorageTmp, struct stateChangeRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	stateChangeRecordTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_stateChangeRecordTable_row(struct stateChangeRecordTable_data *StorageTmp, struct stateChangeRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_stateChangeRecordTable_row(struct stateChangeRecordTable_data *StorageTmp, struct stateChangeRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_stateChangeRecordTable_row(StorageOld, NULL);
 }
 
 /**
@@ -5210,17 +6586,17 @@ var_stateChangeRecordTable(struct variable *vp, oid * name, size_t *length, int 
 int
 write_discriminatorConstruct(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct discriminatorTable_data *StorageTmp = NULL;
+	struct discriminatorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("smiMIB", "write_discriminatorConstruct entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(discriminatorTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->discriminatorEntryStatus) {
@@ -5242,33 +6618,73 @@ write_discriminatorConstruct(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to discriminatorConstruct: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) == NULL)
+			if (StorageTmp->discriminatorTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->discriminatorTable_old = discriminatorTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->discriminatorTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->discriminatorConstruct);
+		StorageTmp->discriminatorConstruct = string;
+		StorageTmp->discriminatorConstructLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->discriminatorTable_tsts == 0)
+				if ((ret = check_discriminatorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->discriminatorTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->discriminatorConstruct for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->discriminatorConstruct;
-		old_length = StorageTmp->discriminatorConstructLen;
-		StorageTmp->discriminatorConstruct = string;
-		StorageTmp->discriminatorConstructLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->discriminatorTable_sets == 0)
+				if ((ret = update_discriminatorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->discriminatorTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) != NULL) {
+			discriminatorTable_destroy(&StorageTmp->discriminatorTable_old);
+			StorageTmp->discriminatorTable_rsvs = 0;
+			StorageTmp->discriminatorTable_tsts = 0;
+			StorageTmp->discriminatorTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->discriminatorConstruct = old_value;
-		StorageTmp->discriminatorConstructLen = old_length;
+		if ((StorageOld = StorageTmp->discriminatorTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->discriminatorTable_sets == 0)
+			revert_discriminatorTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->discriminatorTable_old) == NULL)
+			break;
+		if (StorageOld->discriminatorConstruct != NULL) {
+			SNMP_FREE(StorageTmp->discriminatorConstruct);
+			StorageTmp->discriminatorConstruct = StorageOld->discriminatorConstruct;
+			StorageTmp->discriminatorConstructLen = StorageOld->discriminatorConstructLen;
+			StorageOld->discriminatorConstruct = NULL;
+			StorageOld->discriminatorConstructLen = 0;
+		}
+		if (--StorageTmp->discriminatorTable_rsvs == 0)
+			discriminatorTable_destroy(&StorageTmp->discriminatorTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5288,12 +6704,14 @@ write_discriminatorConstruct(int action, u_char *var_val, u_char var_val_type, s
 int
 write_discriminatorAdministrativeState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct discriminatorTable_data *StorageTmp = NULL;
+	struct discriminatorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("smiMIB", "write_discriminatorAdministrativeState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(discriminatorTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5327,22 +6745,61 @@ write_discriminatorAdministrativeState(int action, u_char *var_val, u_char var_v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to discriminatorAdministrativeState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) == NULL)
+			if (StorageTmp->discriminatorTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->discriminatorTable_old = discriminatorTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->discriminatorTable_rsvs++;
+		StorageTmp->discriminatorAdministrativeState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->discriminatorTable_tsts == 0)
+				if ((ret = check_discriminatorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->discriminatorTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->discriminatorAdministrativeState for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->discriminatorAdministrativeState;
-		StorageTmp->discriminatorAdministrativeState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->discriminatorTable_sets == 0)
+				if ((ret = update_discriminatorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->discriminatorTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) != NULL) {
+			discriminatorTable_destroy(&StorageTmp->discriminatorTable_old);
+			StorageTmp->discriminatorTable_rsvs = 0;
+			StorageTmp->discriminatorTable_tsts = 0;
+			StorageTmp->discriminatorTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->discriminatorAdministrativeState = old_value;
+		if ((StorageOld = StorageTmp->discriminatorTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->discriminatorTable_sets == 0)
+			revert_discriminatorTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) == NULL)
+			break;
+		StorageTmp->discriminatorAdministrativeState = StorageOld->discriminatorAdministrativeState;
+		if (--StorageTmp->discriminatorTable_rsvs == 0)
+			discriminatorTable_destroy(&StorageTmp->discriminatorTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5362,12 +6819,14 @@ write_discriminatorAdministrativeState(int action, u_char *var_val, u_char var_v
 int
 write_discriminatorStartTime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct discriminatorTable_data *StorageTmp = NULL;
+	struct discriminatorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("smiMIB", "write_discriminatorStartTime entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(discriminatorTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5392,22 +6851,61 @@ write_discriminatorStartTime(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to discriminatorStartTime: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) == NULL)
+			if (StorageTmp->discriminatorTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->discriminatorTable_old = discriminatorTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->discriminatorTable_rsvs++;
+		StorageTmp->discriminatorStartTime = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->discriminatorTable_tsts == 0)
+				if ((ret = check_discriminatorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->discriminatorTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->discriminatorStartTime for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->discriminatorStartTime;
-		StorageTmp->discriminatorStartTime = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->discriminatorTable_sets == 0)
+				if ((ret = update_discriminatorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->discriminatorTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) != NULL) {
+			discriminatorTable_destroy(&StorageTmp->discriminatorTable_old);
+			StorageTmp->discriminatorTable_rsvs = 0;
+			StorageTmp->discriminatorTable_tsts = 0;
+			StorageTmp->discriminatorTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->discriminatorStartTime = old_value;
+		if ((StorageOld = StorageTmp->discriminatorTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->discriminatorTable_sets == 0)
+			revert_discriminatorTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) == NULL)
+			break;
+		StorageTmp->discriminatorStartTime = StorageOld->discriminatorStartTime;
+		if (--StorageTmp->discriminatorTable_rsvs == 0)
+			discriminatorTable_destroy(&StorageTmp->discriminatorTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5427,12 +6925,14 @@ write_discriminatorStartTime(int action, u_char *var_val, u_char var_val_type, s
 int
 write_discriminatorStopTime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct discriminatorTable_data *StorageTmp = NULL;
+	struct discriminatorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("smiMIB", "write_discriminatorStopTime entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(discriminatorTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5457,22 +6957,61 @@ write_discriminatorStopTime(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to discriminatorStopTime: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) == NULL)
+			if (StorageTmp->discriminatorTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->discriminatorTable_old = discriminatorTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->discriminatorTable_rsvs++;
+		StorageTmp->discriminatorStopTime = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->discriminatorTable_tsts == 0)
+				if ((ret = check_discriminatorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->discriminatorTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->discriminatorStopTime for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->discriminatorStopTime;
-		StorageTmp->discriminatorStopTime = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->discriminatorTable_sets == 0)
+				if ((ret = update_discriminatorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->discriminatorTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) != NULL) {
+			discriminatorTable_destroy(&StorageTmp->discriminatorTable_old);
+			StorageTmp->discriminatorTable_rsvs = 0;
+			StorageTmp->discriminatorTable_tsts = 0;
+			StorageTmp->discriminatorTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->discriminatorStopTime = old_value;
+		if ((StorageOld = StorageTmp->discriminatorTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->discriminatorTable_sets == 0)
+			revert_discriminatorTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) == NULL)
+			break;
+		StorageTmp->discriminatorStopTime = StorageOld->discriminatorStopTime;
+		if (--StorageTmp->discriminatorTable_rsvs == 0)
+			discriminatorTable_destroy(&StorageTmp->discriminatorTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5492,17 +7031,17 @@ write_discriminatorStopTime(int action, u_char *var_val, u_char var_val_type, si
 int
 write_discriminatorIntervalsOfDay(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct discriminatorTable_data *StorageTmp = NULL;
+	struct discriminatorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("smiMIB", "write_discriminatorIntervalsOfDay entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(discriminatorTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->discriminatorEntryStatus) {
@@ -5524,33 +7063,73 @@ write_discriminatorIntervalsOfDay(int action, u_char *var_val, u_char var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to discriminatorIntervalsOfDay: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) == NULL)
+			if (StorageTmp->discriminatorTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->discriminatorTable_old = discriminatorTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->discriminatorTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->discriminatorIntervalsOfDay);
+		StorageTmp->discriminatorIntervalsOfDay = string;
+		StorageTmp->discriminatorIntervalsOfDayLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->discriminatorTable_tsts == 0)
+				if ((ret = check_discriminatorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->discriminatorTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->discriminatorIntervalsOfDay for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->discriminatorIntervalsOfDay;
-		old_length = StorageTmp->discriminatorIntervalsOfDayLen;
-		StorageTmp->discriminatorIntervalsOfDay = string;
-		StorageTmp->discriminatorIntervalsOfDayLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->discriminatorTable_sets == 0)
+				if ((ret = update_discriminatorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->discriminatorTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) != NULL) {
+			discriminatorTable_destroy(&StorageTmp->discriminatorTable_old);
+			StorageTmp->discriminatorTable_rsvs = 0;
+			StorageTmp->discriminatorTable_tsts = 0;
+			StorageTmp->discriminatorTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->discriminatorIntervalsOfDay = old_value;
-		StorageTmp->discriminatorIntervalsOfDayLen = old_length;
+		if ((StorageOld = StorageTmp->discriminatorTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->discriminatorTable_sets == 0)
+			revert_discriminatorTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->discriminatorTable_old) == NULL)
+			break;
+		if (StorageOld->discriminatorIntervalsOfDay != NULL) {
+			SNMP_FREE(StorageTmp->discriminatorIntervalsOfDay);
+			StorageTmp->discriminatorIntervalsOfDay = StorageOld->discriminatorIntervalsOfDay;
+			StorageTmp->discriminatorIntervalsOfDayLen = StorageOld->discriminatorIntervalsOfDayLen;
+			StorageOld->discriminatorIntervalsOfDay = NULL;
+			StorageOld->discriminatorIntervalsOfDayLen = 0;
+		}
+		if (--StorageTmp->discriminatorTable_rsvs == 0)
+			discriminatorTable_destroy(&StorageTmp->discriminatorTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5570,17 +7149,17 @@ write_discriminatorIntervalsOfDay(int action, u_char *var_val, u_char var_val_ty
 int
 write_discriminatorWeekMask(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct discriminatorTable_data *StorageTmp = NULL;
+	struct discriminatorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("smiMIB", "write_discriminatorWeekMask entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(discriminatorTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->discriminatorEntryStatus) {
@@ -5602,33 +7181,73 @@ write_discriminatorWeekMask(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to discriminatorWeekMask: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) == NULL)
+			if (StorageTmp->discriminatorTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->discriminatorTable_old = discriminatorTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->discriminatorTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->discriminatorWeekMask);
+		StorageTmp->discriminatorWeekMask = string;
+		StorageTmp->discriminatorWeekMaskLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->discriminatorTable_tsts == 0)
+				if ((ret = check_discriminatorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->discriminatorTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->discriminatorWeekMask for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->discriminatorWeekMask;
-		old_length = StorageTmp->discriminatorWeekMaskLen;
-		StorageTmp->discriminatorWeekMask = string;
-		StorageTmp->discriminatorWeekMaskLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->discriminatorTable_sets == 0)
+				if ((ret = update_discriminatorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->discriminatorTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) != NULL) {
+			discriminatorTable_destroy(&StorageTmp->discriminatorTable_old);
+			StorageTmp->discriminatorTable_rsvs = 0;
+			StorageTmp->discriminatorTable_tsts = 0;
+			StorageTmp->discriminatorTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->discriminatorWeekMask = old_value;
-		StorageTmp->discriminatorWeekMaskLen = old_length;
+		if ((StorageOld = StorageTmp->discriminatorTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->discriminatorTable_sets == 0)
+			revert_discriminatorTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->discriminatorTable_old) == NULL)
+			break;
+		if (StorageOld->discriminatorWeekMask != NULL) {
+			SNMP_FREE(StorageTmp->discriminatorWeekMask);
+			StorageTmp->discriminatorWeekMask = StorageOld->discriminatorWeekMask;
+			StorageTmp->discriminatorWeekMaskLen = StorageOld->discriminatorWeekMaskLen;
+			StorageOld->discriminatorWeekMask = NULL;
+			StorageOld->discriminatorWeekMaskLen = 0;
+		}
+		if (--StorageTmp->discriminatorTable_rsvs == 0)
+			discriminatorTable_destroy(&StorageTmp->discriminatorTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5648,17 +7267,17 @@ write_discriminatorWeekMask(int action, u_char *var_val, u_char var_val_type, si
 int
 write_discriminatorSchedulerName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct discriminatorTable_data *StorageTmp = NULL;
+	struct discriminatorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("smiMIB", "write_discriminatorSchedulerName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(discriminatorTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->discriminatorEntryStatus) {
@@ -5680,31 +7299,71 @@ write_discriminatorSchedulerName(int action, u_char *var_val, u_char var_val_typ
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to discriminatorSchedulerName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) == NULL)
+			if (StorageTmp->discriminatorTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->discriminatorTable_old = discriminatorTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->discriminatorTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->discriminatorSchedulerName);
+		StorageTmp->discriminatorSchedulerName = objid;
+		StorageTmp->discriminatorSchedulerNameLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->discriminatorTable_tsts == 0)
+				if ((ret = check_discriminatorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->discriminatorTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->discriminatorSchedulerName for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->discriminatorSchedulerName;
-		old_length = StorageTmp->discriminatorSchedulerNameLen;
-		StorageTmp->discriminatorSchedulerName = objid;
-		StorageTmp->discriminatorSchedulerNameLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->discriminatorTable_sets == 0)
+				if ((ret = update_discriminatorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->discriminatorTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->discriminatorTable_old) != NULL) {
+			discriminatorTable_destroy(&StorageTmp->discriminatorTable_old);
+			StorageTmp->discriminatorTable_rsvs = 0;
+			StorageTmp->discriminatorTable_tsts = 0;
+			StorageTmp->discriminatorTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->discriminatorSchedulerName = old_value;
-		StorageTmp->discriminatorSchedulerNameLen = old_length;
+		if ((StorageOld = StorageTmp->discriminatorTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->discriminatorTable_sets == 0)
+			revert_discriminatorTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->discriminatorTable_old) == NULL)
+			break;
+		if (StorageOld->discriminatorSchedulerName != NULL) {
+			SNMP_FREE(StorageTmp->discriminatorSchedulerName);
+			StorageTmp->discriminatorSchedulerName = StorageOld->discriminatorSchedulerName;
+			StorageTmp->discriminatorSchedulerNameLen = StorageOld->discriminatorSchedulerNameLen;
+			StorageOld->discriminatorSchedulerName = NULL;
+			StorageOld->discriminatorSchedulerNameLen = 0;
+		}
+		if (--StorageTmp->discriminatorTable_rsvs == 0)
+			discriminatorTable_destroy(&StorageTmp->discriminatorTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5724,17 +7383,17 @@ write_discriminatorSchedulerName(int action, u_char *var_val, u_char var_val_typ
 int
 write_destination(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct eventForwardingDiscriminatorTable_data *StorageTmp = NULL;
+	struct eventForwardingDiscriminatorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("smiMIB", "write_destination entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(eventForwardingDiscriminatorTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->eventForwardingDiscriminatorEntryStatus) {
@@ -5756,33 +7415,73 @@ write_destination(int action, u_char *var_val, u_char var_val_type, size_t var_v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to destination: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old) == NULL)
+			if (StorageTmp->eventForwardingDiscriminatorTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old = eventForwardingDiscriminatorTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->eventForwardingDiscriminatorTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->destination);
+		StorageTmp->destination = string;
+		StorageTmp->destinationLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->eventForwardingDiscriminatorTable_tsts == 0)
+				if ((ret = check_eventForwardingDiscriminatorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->eventForwardingDiscriminatorTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->destination for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->destination;
-		old_length = StorageTmp->destinationLen;
-		StorageTmp->destination = string;
-		StorageTmp->destinationLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->eventForwardingDiscriminatorTable_sets == 0)
+				if ((ret = update_eventForwardingDiscriminatorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->eventForwardingDiscriminatorTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old) != NULL) {
+			eventForwardingDiscriminatorTable_destroy(&StorageTmp->eventForwardingDiscriminatorTable_old);
+			StorageTmp->eventForwardingDiscriminatorTable_rsvs = 0;
+			StorageTmp->eventForwardingDiscriminatorTable_tsts = 0;
+			StorageTmp->eventForwardingDiscriminatorTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->destination = old_value;
-		StorageTmp->destinationLen = old_length;
+		if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->eventForwardingDiscriminatorTable_sets == 0)
+			revert_eventForwardingDiscriminatorTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old) == NULL)
+			break;
+		if (StorageOld->destination != NULL) {
+			SNMP_FREE(StorageTmp->destination);
+			StorageTmp->destination = StorageOld->destination;
+			StorageTmp->destinationLen = StorageOld->destinationLen;
+			StorageOld->destination = NULL;
+			StorageOld->destinationLen = 0;
+		}
+		if (--StorageTmp->eventForwardingDiscriminatorTable_rsvs == 0)
+			eventForwardingDiscriminatorTable_destroy(&StorageTmp->eventForwardingDiscriminatorTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5802,17 +7501,17 @@ write_destination(int action, u_char *var_val, u_char var_val_type, size_t var_v
 int
 write_activeDestination(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct eventForwardingDiscriminatorTable_data *StorageTmp = NULL;
+	struct eventForwardingDiscriminatorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("smiMIB", "write_activeDestination entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(eventForwardingDiscriminatorTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->eventForwardingDiscriminatorEntryStatus) {
@@ -5834,33 +7533,73 @@ write_activeDestination(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to activeDestination: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old) == NULL)
+			if (StorageTmp->eventForwardingDiscriminatorTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old = eventForwardingDiscriminatorTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->eventForwardingDiscriminatorTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->activeDestination);
+		StorageTmp->activeDestination = string;
+		StorageTmp->activeDestinationLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->eventForwardingDiscriminatorTable_tsts == 0)
+				if ((ret = check_eventForwardingDiscriminatorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->eventForwardingDiscriminatorTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->activeDestination for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->activeDestination;
-		old_length = StorageTmp->activeDestinationLen;
-		StorageTmp->activeDestination = string;
-		StorageTmp->activeDestinationLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->eventForwardingDiscriminatorTable_sets == 0)
+				if ((ret = update_eventForwardingDiscriminatorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->eventForwardingDiscriminatorTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old) != NULL) {
+			eventForwardingDiscriminatorTable_destroy(&StorageTmp->eventForwardingDiscriminatorTable_old);
+			StorageTmp->eventForwardingDiscriminatorTable_rsvs = 0;
+			StorageTmp->eventForwardingDiscriminatorTable_tsts = 0;
+			StorageTmp->eventForwardingDiscriminatorTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->activeDestination = old_value;
-		StorageTmp->activeDestinationLen = old_length;
+		if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->eventForwardingDiscriminatorTable_sets == 0)
+			revert_eventForwardingDiscriminatorTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old) == NULL)
+			break;
+		if (StorageOld->activeDestination != NULL) {
+			SNMP_FREE(StorageTmp->activeDestination);
+			StorageTmp->activeDestination = StorageOld->activeDestination;
+			StorageTmp->activeDestinationLen = StorageOld->activeDestinationLen;
+			StorageOld->activeDestination = NULL;
+			StorageOld->activeDestinationLen = 0;
+		}
+		if (--StorageTmp->eventForwardingDiscriminatorTable_rsvs == 0)
+			eventForwardingDiscriminatorTable_destroy(&StorageTmp->eventForwardingDiscriminatorTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5880,17 +7619,17 @@ write_activeDestination(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_backUpDestinationList(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct eventForwardingDiscriminatorTable_data *StorageTmp = NULL;
+	struct eventForwardingDiscriminatorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("smiMIB", "write_backUpDestinationList entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(eventForwardingDiscriminatorTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->eventForwardingDiscriminatorEntryStatus) {
@@ -5912,33 +7651,73 @@ write_backUpDestinationList(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to backUpDestinationList: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old) == NULL)
+			if (StorageTmp->eventForwardingDiscriminatorTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old = eventForwardingDiscriminatorTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->eventForwardingDiscriminatorTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->backUpDestinationList);
+		StorageTmp->backUpDestinationList = string;
+		StorageTmp->backUpDestinationListLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->eventForwardingDiscriminatorTable_tsts == 0)
+				if ((ret = check_eventForwardingDiscriminatorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->eventForwardingDiscriminatorTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->backUpDestinationList for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->backUpDestinationList;
-		old_length = StorageTmp->backUpDestinationListLen;
-		StorageTmp->backUpDestinationList = string;
-		StorageTmp->backUpDestinationListLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->eventForwardingDiscriminatorTable_sets == 0)
+				if ((ret = update_eventForwardingDiscriminatorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->eventForwardingDiscriminatorTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old) != NULL) {
+			eventForwardingDiscriminatorTable_destroy(&StorageTmp->eventForwardingDiscriminatorTable_old);
+			StorageTmp->eventForwardingDiscriminatorTable_rsvs = 0;
+			StorageTmp->eventForwardingDiscriminatorTable_tsts = 0;
+			StorageTmp->eventForwardingDiscriminatorTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->backUpDestinationList = old_value;
-		StorageTmp->backUpDestinationListLen = old_length;
+		if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->eventForwardingDiscriminatorTable_sets == 0)
+			revert_eventForwardingDiscriminatorTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old) == NULL)
+			break;
+		if (StorageOld->backUpDestinationList != NULL) {
+			SNMP_FREE(StorageTmp->backUpDestinationList);
+			StorageTmp->backUpDestinationList = StorageOld->backUpDestinationList;
+			StorageTmp->backUpDestinationListLen = StorageOld->backUpDestinationListLen;
+			StorageOld->backUpDestinationList = NULL;
+			StorageOld->backUpDestinationListLen = 0;
+		}
+		if (--StorageTmp->eventForwardingDiscriminatorTable_rsvs == 0)
+			eventForwardingDiscriminatorTable_destroy(&StorageTmp->eventForwardingDiscriminatorTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5958,12 +7737,14 @@ write_backUpDestinationList(int action, u_char *var_val, u_char var_val_type, si
 int
 write_confirmedMode(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct eventForwardingDiscriminatorTable_data *StorageTmp = NULL;
+	struct eventForwardingDiscriminatorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("smiMIB", "write_confirmedMode entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(eventForwardingDiscriminatorTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5996,22 +7777,61 @@ write_confirmedMode(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to confirmedMode: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old) == NULL)
+			if (StorageTmp->eventForwardingDiscriminatorTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old = eventForwardingDiscriminatorTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->eventForwardingDiscriminatorTable_rsvs++;
+		StorageTmp->confirmedMode = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->eventForwardingDiscriminatorTable_tsts == 0)
+				if ((ret = check_eventForwardingDiscriminatorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->eventForwardingDiscriminatorTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->confirmedMode for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->confirmedMode;
-		StorageTmp->confirmedMode = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->eventForwardingDiscriminatorTable_sets == 0)
+				if ((ret = update_eventForwardingDiscriminatorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->eventForwardingDiscriminatorTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old) != NULL) {
+			eventForwardingDiscriminatorTable_destroy(&StorageTmp->eventForwardingDiscriminatorTable_old);
+			StorageTmp->eventForwardingDiscriminatorTable_rsvs = 0;
+			StorageTmp->eventForwardingDiscriminatorTable_tsts = 0;
+			StorageTmp->eventForwardingDiscriminatorTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->confirmedMode = old_value;
+		if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->eventForwardingDiscriminatorTable_sets == 0)
+			revert_eventForwardingDiscriminatorTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old) == NULL)
+			break;
+		StorageTmp->confirmedMode = StorageOld->confirmedMode;
+		if (--StorageTmp->eventForwardingDiscriminatorTable_rsvs == 0)
+			eventForwardingDiscriminatorTable_destroy(&StorageTmp->eventForwardingDiscriminatorTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6031,17 +7851,17 @@ write_confirmedMode(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_logDiscriminatorConstruct(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct logTable_data *StorageTmp = NULL;
+	struct logTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("smiMIB", "write_logDiscriminatorConstruct entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(logTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->logEntryStatus) {
@@ -6064,33 +7884,73 @@ write_logDiscriminatorConstruct(int action, u_char *var_val, u_char var_val_type
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value \"\" */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			if (StorageTmp->logTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->logTable_old = logTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->logTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->logDiscriminatorConstruct);
+		StorageTmp->logDiscriminatorConstruct = string;
+		StorageTmp->logDiscriminatorConstructLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->logTable_tsts == 0)
+				if ((ret = check_logTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->logTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->logDiscriminatorConstruct for you to use, and you have just been asked to do something with it.  Note that anything done 
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->logDiscriminatorConstruct;
-		old_length = StorageTmp->logDiscriminatorConstructLen;
-		StorageTmp->logDiscriminatorConstruct = string;
-		StorageTmp->logDiscriminatorConstructLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->logTable_sets == 0)
+				if ((ret = update_logTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->logTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			logTable_destroy(&StorageTmp->logTable_old);
+			StorageTmp->logTable_rsvs = 0;
+			StorageTmp->logTable_tsts = 0;
+			StorageTmp->logTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->logDiscriminatorConstruct = old_value;
-		StorageTmp->logDiscriminatorConstructLen = old_length;
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->logTable_sets == 0)
+			revert_logTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			break;
+		if (StorageOld->logDiscriminatorConstruct != NULL) {
+			SNMP_FREE(StorageTmp->logDiscriminatorConstruct);
+			StorageTmp->logDiscriminatorConstruct = StorageOld->logDiscriminatorConstruct;
+			StorageTmp->logDiscriminatorConstructLen = StorageOld->logDiscriminatorConstructLen;
+			StorageOld->logDiscriminatorConstruct = NULL;
+			StorageOld->logDiscriminatorConstructLen = 0;
+		}
+		if (--StorageTmp->logTable_rsvs == 0)
+			logTable_destroy(&StorageTmp->logTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6110,12 +7970,14 @@ write_logDiscriminatorConstruct(int action, u_char *var_val, u_char var_val_type
 int
 write_logAdministrativeState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct logTable_data *StorageTmp = NULL;
+	struct logTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("smiMIB", "write_logAdministrativeState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(logTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6150,22 +8012,61 @@ write_logAdministrativeState(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to logAdministrativeState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			if (StorageTmp->logTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->logTable_old = logTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->logTable_rsvs++;
+		StorageTmp->logAdministrativeState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->logTable_tsts == 0)
+				if ((ret = check_logTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->logTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->logAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->logAdministrativeState;
-		StorageTmp->logAdministrativeState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->logTable_sets == 0)
+				if ((ret = update_logTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->logTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			logTable_destroy(&StorageTmp->logTable_old);
+			StorageTmp->logTable_rsvs = 0;
+			StorageTmp->logTable_tsts = 0;
+			StorageTmp->logTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->logAdministrativeState = old_value;
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->logTable_sets == 0)
+			revert_logTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			break;
+		StorageTmp->logAdministrativeState = StorageOld->logAdministrativeState;
+		if (--StorageTmp->logTable_rsvs == 0)
+			logTable_destroy(&StorageTmp->logTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6185,17 +8086,17 @@ write_logAdministrativeState(int action, u_char *var_val, u_char var_val_type, s
 int
 write_logAvailabilityStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct logTable_data *StorageTmp = NULL;
+	struct logTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("smiMIB", "write_logAvailabilityStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(logTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->logEntryStatus) {
@@ -6225,33 +8126,73 @@ write_logAvailabilityStatus(int action, u_char *var_val, u_char var_val_type, si
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			if (StorageTmp->logTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->logTable_old = logTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->logTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->logAvailabilityStatus);
+		StorageTmp->logAvailabilityStatus = string;
+		StorageTmp->logAvailabilityStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->logTable_tsts == 0)
+				if ((ret = check_logTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->logTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->logAvailabilityStatus for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->logAvailabilityStatus;
-		old_length = StorageTmp->logAvailabilityStatusLen;
-		StorageTmp->logAvailabilityStatus = string;
-		StorageTmp->logAvailabilityStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->logTable_sets == 0)
+				if ((ret = update_logTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->logTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			logTable_destroy(&StorageTmp->logTable_old);
+			StorageTmp->logTable_rsvs = 0;
+			StorageTmp->logTable_tsts = 0;
+			StorageTmp->logTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->logAvailabilityStatus = old_value;
-		StorageTmp->logAvailabilityStatusLen = old_length;
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->logTable_sets == 0)
+			revert_logTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			break;
+		if (StorageOld->logAvailabilityStatus != NULL) {
+			SNMP_FREE(StorageTmp->logAvailabilityStatus);
+			StorageTmp->logAvailabilityStatus = StorageOld->logAvailabilityStatus;
+			StorageTmp->logAvailabilityStatusLen = StorageOld->logAvailabilityStatusLen;
+			StorageOld->logAvailabilityStatus = NULL;
+			StorageOld->logAvailabilityStatusLen = 0;
+		}
+		if (--StorageTmp->logTable_rsvs == 0)
+			logTable_destroy(&StorageTmp->logTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6271,12 +8212,14 @@ write_logAvailabilityStatus(int action, u_char *var_val, u_char var_val_type, si
 int
 write_logFullAction(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct logTable_data *StorageTmp = NULL;
+	struct logTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("smiMIB", "write_logFullAction entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(logTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6310,22 +8253,61 @@ write_logFullAction(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to logFullAction: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			if (StorageTmp->logTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->logTable_old = logTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->logTable_rsvs++;
+		StorageTmp->logFullAction = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->logTable_tsts == 0)
+				if ((ret = check_logTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->logTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->logFullAction for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->logFullAction;
-		StorageTmp->logFullAction = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->logTable_sets == 0)
+				if ((ret = update_logTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->logTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			logTable_destroy(&StorageTmp->logTable_old);
+			StorageTmp->logTable_rsvs = 0;
+			StorageTmp->logTable_tsts = 0;
+			StorageTmp->logTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->logFullAction = old_value;
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->logTable_sets == 0)
+			revert_logTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			break;
+		StorageTmp->logFullAction = StorageOld->logFullAction;
+		if (--StorageTmp->logTable_rsvs == 0)
+			logTable_destroy(&StorageTmp->logTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6345,12 +8327,14 @@ write_logFullAction(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_maxLogSize(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct logTable_data *StorageTmp = NULL;
+	struct logTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("smiMIB", "write_maxLogSize entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(logTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6376,22 +8360,61 @@ write_maxLogSize(int action, u_char *var_val, u_char var_val_type, size_t var_va
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 0 */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			if (StorageTmp->logTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->logTable_old = logTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->logTable_rsvs++;
+		StorageTmp->maxLogSize = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->logTable_tsts == 0)
+				if ((ret = check_logTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->logTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->maxLogSize for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->maxLogSize;
-		StorageTmp->maxLogSize = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->logTable_sets == 0)
+				if ((ret = update_logTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->logTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			logTable_destroy(&StorageTmp->logTable_old);
+			StorageTmp->logTable_rsvs = 0;
+			StorageTmp->logTable_tsts = 0;
+			StorageTmp->logTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->maxLogSize = old_value;
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->logTable_sets == 0)
+			revert_logTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			break;
+		StorageTmp->maxLogSize = StorageOld->maxLogSize;
+		if (--StorageTmp->logTable_rsvs == 0)
+			logTable_destroy(&StorageTmp->logTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6411,17 +8434,17 @@ write_maxLogSize(int action, u_char *var_val, u_char var_val_type, size_t var_va
 int
 write_capacityAlarmThreshold(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct logTable_data *StorageTmp = NULL;
+	struct logTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("smiMIB", "write_capacityAlarmThreshold entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(logTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->logEntryStatus) {
@@ -6444,33 +8467,73 @@ write_capacityAlarmThreshold(int action, u_char *var_val, u_char var_val_type, s
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value \"\x64\" */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			if (StorageTmp->logTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->logTable_old = logTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->logTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->capacityAlarmThreshold);
+		StorageTmp->capacityAlarmThreshold = string;
+		StorageTmp->capacityAlarmThresholdLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->logTable_tsts == 0)
+				if ((ret = check_logTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->logTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->capacityAlarmThreshold for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->capacityAlarmThreshold;
-		old_length = StorageTmp->capacityAlarmThresholdLen;
-		StorageTmp->capacityAlarmThreshold = string;
-		StorageTmp->capacityAlarmThresholdLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->logTable_sets == 0)
+				if ((ret = update_logTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->logTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			logTable_destroy(&StorageTmp->logTable_old);
+			StorageTmp->logTable_rsvs = 0;
+			StorageTmp->logTable_tsts = 0;
+			StorageTmp->logTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->capacityAlarmThreshold = old_value;
-		StorageTmp->capacityAlarmThresholdLen = old_length;
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->logTable_sets == 0)
+			revert_logTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			break;
+		if (StorageOld->capacityAlarmThreshold != NULL) {
+			SNMP_FREE(StorageTmp->capacityAlarmThreshold);
+			StorageTmp->capacityAlarmThreshold = StorageOld->capacityAlarmThreshold;
+			StorageTmp->capacityAlarmThresholdLen = StorageOld->capacityAlarmThresholdLen;
+			StorageOld->capacityAlarmThreshold = NULL;
+			StorageOld->capacityAlarmThresholdLen = 0;
+		}
+		if (--StorageTmp->logTable_rsvs == 0)
+			logTable_destroy(&StorageTmp->logTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6490,12 +8553,14 @@ write_capacityAlarmThreshold(int action, u_char *var_val, u_char var_val_type, s
 int
 write_logStartTime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct logTable_data *StorageTmp = NULL;
+	struct logTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("smiMIB", "write_logStartTime entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(logTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6520,22 +8585,61 @@ write_logStartTime(int action, u_char *var_val, u_char var_val_type, size_t var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to logStartTime: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			if (StorageTmp->logTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->logTable_old = logTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->logTable_rsvs++;
+		StorageTmp->logStartTime = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->logTable_tsts == 0)
+				if ((ret = check_logTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->logTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->logStartTime for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->logStartTime;
-		StorageTmp->logStartTime = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->logTable_sets == 0)
+				if ((ret = update_logTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->logTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			logTable_destroy(&StorageTmp->logTable_old);
+			StorageTmp->logTable_rsvs = 0;
+			StorageTmp->logTable_tsts = 0;
+			StorageTmp->logTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->logStartTime = old_value;
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->logTable_sets == 0)
+			revert_logTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			break;
+		StorageTmp->logStartTime = StorageOld->logStartTime;
+		if (--StorageTmp->logTable_rsvs == 0)
+			logTable_destroy(&StorageTmp->logTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6555,12 +8659,14 @@ write_logStartTime(int action, u_char *var_val, u_char var_val_type, size_t var_
 int
 write_logStopTime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct logTable_data *StorageTmp = NULL;
+	struct logTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("smiMIB", "write_logStopTime entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(logTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6586,22 +8692,61 @@ write_logStopTime(int action, u_char *var_val, u_char var_val_type, size_t var_v
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 6983120 */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			if (StorageTmp->logTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->logTable_old = logTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->logTable_rsvs++;
+		StorageTmp->logStopTime = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->logTable_tsts == 0)
+				if ((ret = check_logTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->logTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->logStopTime for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->logStopTime;
-		StorageTmp->logStopTime = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->logTable_sets == 0)
+				if ((ret = update_logTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->logTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			logTable_destroy(&StorageTmp->logTable_old);
+			StorageTmp->logTable_rsvs = 0;
+			StorageTmp->logTable_tsts = 0;
+			StorageTmp->logTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->logStopTime = old_value;
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->logTable_sets == 0)
+			revert_logTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			break;
+		StorageTmp->logStopTime = StorageOld->logStopTime;
+		if (--StorageTmp->logTable_rsvs == 0)
+			logTable_destroy(&StorageTmp->logTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6621,17 +8766,17 @@ write_logStopTime(int action, u_char *var_val, u_char var_val_type, size_t var_v
 int
 write_logIntervalsOfDay(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct logTable_data *StorageTmp = NULL;
+	struct logTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("smiMIB", "write_logIntervalsOfDay entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(logTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->logEntryStatus) {
@@ -6654,33 +8799,73 @@ write_logIntervalsOfDay(int action, u_char *var_val, u_char var_val_type, size_t
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value \"\x00\x00\x17\x3B\" */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			if (StorageTmp->logTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->logTable_old = logTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->logTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->logIntervalsOfDay);
+		StorageTmp->logIntervalsOfDay = string;
+		StorageTmp->logIntervalsOfDayLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->logTable_tsts == 0)
+				if ((ret = check_logTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->logTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->logIntervalsOfDay for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->logIntervalsOfDay;
-		old_length = StorageTmp->logIntervalsOfDayLen;
-		StorageTmp->logIntervalsOfDay = string;
-		StorageTmp->logIntervalsOfDayLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->logTable_sets == 0)
+				if ((ret = update_logTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->logTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			logTable_destroy(&StorageTmp->logTable_old);
+			StorageTmp->logTable_rsvs = 0;
+			StorageTmp->logTable_tsts = 0;
+			StorageTmp->logTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->logIntervalsOfDay = old_value;
-		StorageTmp->logIntervalsOfDayLen = old_length;
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->logTable_sets == 0)
+			revert_logTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			break;
+		if (StorageOld->logIntervalsOfDay != NULL) {
+			SNMP_FREE(StorageTmp->logIntervalsOfDay);
+			StorageTmp->logIntervalsOfDay = StorageOld->logIntervalsOfDay;
+			StorageTmp->logIntervalsOfDayLen = StorageOld->logIntervalsOfDayLen;
+			StorageOld->logIntervalsOfDay = NULL;
+			StorageOld->logIntervalsOfDayLen = 0;
+		}
+		if (--StorageTmp->logTable_rsvs == 0)
+			logTable_destroy(&StorageTmp->logTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6700,17 +8885,17 @@ write_logIntervalsOfDay(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_logWeekMask(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct logTable_data *StorageTmp = NULL;
+	struct logTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("smiMIB", "write_logWeekMask entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(logTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->logEntryStatus) {
@@ -6733,33 +8918,73 @@ write_logWeekMask(int action, u_char *var_val, u_char var_val_type, size_t var_v
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value \"\x7F\x01\x00\x00\x17\x3B\" */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			if (StorageTmp->logTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->logTable_old = logTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->logTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->logWeekMask);
+		StorageTmp->logWeekMask = string;
+		StorageTmp->logWeekMaskLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->logTable_tsts == 0)
+				if ((ret = check_logTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->logTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->logWeekMask for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->logWeekMask;
-		old_length = StorageTmp->logWeekMaskLen;
-		StorageTmp->logWeekMask = string;
-		StorageTmp->logWeekMaskLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->logTable_sets == 0)
+				if ((ret = update_logTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->logTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			logTable_destroy(&StorageTmp->logTable_old);
+			StorageTmp->logTable_rsvs = 0;
+			StorageTmp->logTable_tsts = 0;
+			StorageTmp->logTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->logWeekMask = old_value;
-		StorageTmp->logWeekMaskLen = old_length;
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->logTable_sets == 0)
+			revert_logTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			break;
+		if (StorageOld->logWeekMask != NULL) {
+			SNMP_FREE(StorageTmp->logWeekMask);
+			StorageTmp->logWeekMask = StorageOld->logWeekMask;
+			StorageTmp->logWeekMaskLen = StorageOld->logWeekMaskLen;
+			StorageOld->logWeekMask = NULL;
+			StorageOld->logWeekMaskLen = 0;
+		}
+		if (--StorageTmp->logTable_rsvs == 0)
+			logTable_destroy(&StorageTmp->logTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6779,17 +9004,17 @@ write_logWeekMask(int action, u_char *var_val, u_char var_val_type, size_t var_v
 int
 write_logSchedulerName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct logTable_data *StorageTmp = NULL;
+	struct logTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("smiMIB", "write_logSchedulerName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(logTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->logEntryStatus) {
@@ -6812,250 +9037,210 @@ write_logSchedulerName(int action, u_char *var_val, u_char var_val_type, size_t 
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value zeroDotZero */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			if (StorageTmp->logTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->logTable_old = logTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->logTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->logSchedulerName);
+		StorageTmp->logSchedulerName = objid;
+		StorageTmp->logSchedulerNameLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->logTable_tsts == 0)
+				if ((ret = check_logTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->logTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->logSchedulerName for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->logSchedulerName;
-		old_length = StorageTmp->logSchedulerNameLen;
-		StorageTmp->logSchedulerName = objid;
-		StorageTmp->logSchedulerNameLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->logTable_sets == 0)
+				if ((ret = update_logTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->logTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+			logTable_destroy(&StorageTmp->logTable_old);
+			StorageTmp->logTable_rsvs = 0;
+			StorageTmp->logTable_tsts = 0;
+			StorageTmp->logTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->logSchedulerName = old_value;
-		StorageTmp->logSchedulerNameLen = old_length;
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->logTable_sets == 0)
+			revert_logTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->logTable_old) == NULL)
+			break;
+		if (StorageOld->logSchedulerName != NULL) {
+			SNMP_FREE(StorageTmp->logSchedulerName);
+			StorageTmp->logSchedulerName = StorageOld->logSchedulerName;
+			StorageTmp->logSchedulerNameLen = StorageOld->logSchedulerNameLen;
+			StorageOld->logSchedulerName = NULL;
+			StorageOld->logSchedulerNameLen = 0;
+		}
+		if (--StorageTmp->logTable_rsvs == 0)
+			logTable_destroy(&StorageTmp->logTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int discriminatorTable_consistent(struct discriminatorTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_discriminatorTable_row(struct discriminatorTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the discriminatorTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-discriminatorTable_consistent(struct discriminatorTable_data *thedata)
+can_act_discriminatorTable_row(struct discriminatorTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int eventForwardingDiscriminatorTable_consistent(struct eventForwardingDiscriminatorTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_discriminatorTable_row(struct discriminatorTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the eventForwardingDiscriminatorTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-eventForwardingDiscriminatorTable_consistent(struct eventForwardingDiscriminatorTable_data *thedata)
+can_deact_discriminatorTable_row(struct discriminatorTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int logTable_consistent(struct logTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_eventForwardingDiscriminatorTable_row(struct eventForwardingDiscriminatorTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the logTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-logTable_consistent(struct logTable_data *thedata)
+can_act_eventForwardingDiscriminatorTable_row(struct eventForwardingDiscriminatorTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int logRecordTable_consistent(struct logRecordTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_eventForwardingDiscriminatorTable_row(struct eventForwardingDiscriminatorTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the logRecordTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-logRecordTable_consistent(struct logRecordTable_data *thedata)
+can_deact_eventForwardingDiscriminatorTable_row(struct eventForwardingDiscriminatorTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int eventLogRecordTable_consistent(struct eventLogRecordTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_logTable_row(struct logTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the eventLogRecordTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-eventLogRecordTable_consistent(struct eventLogRecordTable_data *thedata)
+can_act_logTable_row(struct logTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int alarmRecordTable_consistent(struct alarmRecordTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_logTable_row(struct logTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the alarmRecordTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-alarmRecordTable_consistent(struct alarmRecordTable_data *thedata)
+can_deact_logTable_row(struct logTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int attributeValueChangeRecordTable_consistent(struct attributeValueChangeRecordTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_logRecordTable_row(struct logRecordTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the attributeValueChangeRecordTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-attributeValueChangeRecordTable_consistent(struct attributeValueChangeRecordTable_data *thedata)
+can_act_logRecordTable_row(struct logRecordTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int objectCreationRecordTable_consistent(struct objectCreationRecordTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_logRecordTable_row(struct logRecordTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the objectCreationRecordTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-objectCreationRecordTable_consistent(struct objectCreationRecordTable_data *thedata)
+can_deact_logRecordTable_row(struct logRecordTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int objectDeletionRecordTable_consistent(struct objectDeletionRecordTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the objectDeletionRecordTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-objectDeletionRecordTable_consistent(struct objectDeletionRecordTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int relationshipChangeRecordTable_consistent(struct relationshipChangeRecordTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the relationshipChangeRecordTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-relationshipChangeRecordTable_consistent(struct relationshipChangeRecordTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int securityAlarmReportRecordTable_consistent(struct securityAlarmReportRecordTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the securityAlarmReportRecordTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-securityAlarmReportRecordTable_consistent(struct securityAlarmReportRecordTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int stateChangeRecordTable_consistent(struct stateChangeRecordTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the stateChangeRecordTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-stateChangeRecordTable_consistent(struct stateChangeRecordTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
@@ -7072,10 +9257,9 @@ stateChangeRecordTable_consistent(struct stateChangeRecordTable_data *thedata)
 int
 write_discriminatorEntryStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct discriminatorTable_data *StorageTmp = NULL;
+	struct discriminatorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct discriminatorTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -7102,40 +9286,6 @@ write_discriminatorEntryStatus(int action, u_char *var_val, u_char var_val_type,
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->discriminatorEntryStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->discriminatorTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->discriminatorTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* discriminatorId */
@@ -7160,13 +9310,44 @@ write_discriminatorEntryStatus(int action, u_char *var_val, u_char var_val_type,
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->discriminatorTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->discriminatorId, vp->val.string, vp->val_len);
 			StorageNew->discriminatorIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&discriminatorTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->discriminatorEntryStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->discriminatorTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->discriminatorTable_old) == NULL)
+				if (StorageTmp->discriminatorTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->discriminatorTable_old = discriminatorTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->discriminatorTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->discriminatorTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -7176,78 +9357,127 @@ write_discriminatorEntryStatus(int action, u_char *var_val, u_char var_val_type,
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = discriminatorTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_discriminatorTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->discriminatorEntryStatus;
-			StorageTmp->discriminatorEntryStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = discriminatorTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->discriminatorEntryStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->discriminatorEntryStatus != RS_ACTIVE)
+				if ((ret = can_act_discriminatorTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->discriminatorEntryStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_discriminatorTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->discriminatorEntryStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_discriminatorTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->discriminatorEntryStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_discriminatorTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->discriminatorEntryStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_discriminatorTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->discriminatorEntryStatus;
-			StorageTmp->discriminatorEntryStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->discriminatorEntryStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_discriminatorTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_discriminatorTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->discriminatorEntryStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->discriminatorEntryStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->discriminatorEntryStatus = set_value;
+			if ((StorageOld = StorageTmp->discriminatorTable_old) != NULL) {
+				discriminatorTable_destroy(&StorageTmp->discriminatorTable_old);
+				StorageTmp->discriminatorTable_rsvs = 0;
+				StorageTmp->discriminatorTable_tsts = 0;
+				StorageTmp->discriminatorTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			discriminatorTable_destroy(&StorageDel);
-			/* discriminatorTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_discriminatorTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->discriminatorEntryStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_discriminatorTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->discriminatorEntryStatus = old_value;
+			if (StorageTmp->discriminatorEntryStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_discriminatorTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -7261,6 +9491,13 @@ write_discriminatorEntryStatus(int action, u_char *var_val, u_char var_val_type,
 				discriminatorTable_del(StorageNew);
 				discriminatorTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->discriminatorTable_old) == NULL)
+				break;
+			if (--StorageTmp->discriminatorTable_rsvs == 0)
+				discriminatorTable_destroy(&StorageTmp->discriminatorTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -7287,10 +9524,9 @@ write_discriminatorEntryStatus(int action, u_char *var_val, u_char var_val_type,
 int
 write_eventForwardingDiscriminatorEntryStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct eventForwardingDiscriminatorTable_data *StorageTmp = NULL;
+	struct eventForwardingDiscriminatorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct eventForwardingDiscriminatorTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -7317,40 +9553,6 @@ write_eventForwardingDiscriminatorEntryStatus(int action, u_char *var_val, u_cha
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->eventForwardingDiscriminatorEntryStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->eventForwardingDiscriminatorTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->eventForwardingDiscriminatorTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* discriminatorId */
@@ -7375,13 +9577,44 @@ write_eventForwardingDiscriminatorEntryStatus(int action, u_char *var_val, u_cha
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->eventForwardingDiscriminatorTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->discriminatorId, vp->val.string, vp->val_len);
 			StorageNew->discriminatorIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&eventForwardingDiscriminatorTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->eventForwardingDiscriminatorEntryStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->eventForwardingDiscriminatorTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old) == NULL)
+				if (StorageTmp->eventForwardingDiscriminatorTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old = eventForwardingDiscriminatorTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->eventForwardingDiscriminatorTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->eventForwardingDiscriminatorTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -7391,78 +9624,127 @@ write_eventForwardingDiscriminatorEntryStatus(int action, u_char *var_val, u_cha
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = eventForwardingDiscriminatorTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_eventForwardingDiscriminatorTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->eventForwardingDiscriminatorEntryStatus;
-			StorageTmp->eventForwardingDiscriminatorEntryStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = eventForwardingDiscriminatorTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->eventForwardingDiscriminatorEntryStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->eventForwardingDiscriminatorEntryStatus != RS_ACTIVE)
+				if ((ret = can_act_eventForwardingDiscriminatorTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->eventForwardingDiscriminatorEntryStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_eventForwardingDiscriminatorTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->eventForwardingDiscriminatorEntryStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_eventForwardingDiscriminatorTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->eventForwardingDiscriminatorEntryStatus for you to use, and you have just been asked to do something with it.  Note that anything done
+		   here must be reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_eventForwardingDiscriminatorTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->eventForwardingDiscriminatorEntryStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_eventForwardingDiscriminatorTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->eventForwardingDiscriminatorEntryStatus;
-			StorageTmp->eventForwardingDiscriminatorEntryStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->eventForwardingDiscriminatorEntryStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_eventForwardingDiscriminatorTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_eventForwardingDiscriminatorTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->eventForwardingDiscriminatorEntryStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->eventForwardingDiscriminatorEntryStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->eventForwardingDiscriminatorEntryStatus = set_value;
+			if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old) != NULL) {
+				eventForwardingDiscriminatorTable_destroy(&StorageTmp->eventForwardingDiscriminatorTable_old);
+				StorageTmp->eventForwardingDiscriminatorTable_rsvs = 0;
+				StorageTmp->eventForwardingDiscriminatorTable_tsts = 0;
+				StorageTmp->eventForwardingDiscriminatorTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			eventForwardingDiscriminatorTable_destroy(&StorageDel);
-			/* eventForwardingDiscriminatorTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_eventForwardingDiscriminatorTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->eventForwardingDiscriminatorEntryStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_eventForwardingDiscriminatorTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->eventForwardingDiscriminatorEntryStatus = old_value;
+			if (StorageTmp->eventForwardingDiscriminatorEntryStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_eventForwardingDiscriminatorTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -7476,6 +9758,13 @@ write_eventForwardingDiscriminatorEntryStatus(int action, u_char *var_val, u_cha
 				eventForwardingDiscriminatorTable_del(StorageNew);
 				eventForwardingDiscriminatorTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->eventForwardingDiscriminatorTable_old) == NULL)
+				break;
+			if (--StorageTmp->eventForwardingDiscriminatorTable_rsvs == 0)
+				eventForwardingDiscriminatorTable_destroy(&StorageTmp->eventForwardingDiscriminatorTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -7502,10 +9791,9 @@ write_eventForwardingDiscriminatorEntryStatus(int action, u_char *var_val, u_cha
 int
 write_logEntryStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct logTable_data *StorageTmp = NULL;
+	struct logTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct logTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -7532,40 +9820,6 @@ write_logEntryStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->logEntryStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->logTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->logTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* logId */
@@ -7590,13 +9844,44 @@ write_logEntryStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->logTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->logId, vp->val.string, vp->val_len);
 			StorageNew->logIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&logTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->logEntryStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->logTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->logTable_old) == NULL)
+				if (StorageTmp->logTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->logTable_old = logTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->logTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->logTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -7606,78 +9891,127 @@ write_logEntryStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = logTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_logTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->logEntryStatus;
-			StorageTmp->logEntryStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = logTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->logEntryStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->logEntryStatus != RS_ACTIVE)
+				if ((ret = can_act_logTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->logEntryStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_logTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->logEntryStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_logTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->logEntryStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in 
+		   the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_logTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->logEntryStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_logTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->logEntryStatus;
-			StorageTmp->logEntryStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->logEntryStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_logTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_logTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->logEntryStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->logEntryStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->logEntryStatus = set_value;
+			if ((StorageOld = StorageTmp->logTable_old) != NULL) {
+				logTable_destroy(&StorageTmp->logTable_old);
+				StorageTmp->logTable_rsvs = 0;
+				StorageTmp->logTable_tsts = 0;
+				StorageTmp->logTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			logTable_destroy(&StorageDel);
-			/* logTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_logTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->logEntryStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_logTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->logEntryStatus = old_value;
+			if (StorageTmp->logEntryStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_logTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -7691,6 +10025,13 @@ write_logEntryStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 				logTable_del(StorageNew);
 				logTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->logTable_old) == NULL)
+				break;
+			if (--StorageTmp->logTable_rsvs == 0)
+				logTable_destroy(&StorageTmp->logTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -7717,10 +10058,9 @@ write_logEntryStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_logRecordEntryStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct logRecordTable_data *StorageTmp = NULL;
+	struct logRecordTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct logRecordTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -7747,40 +10087,6 @@ write_logRecordEntryStatus(int action, u_char *var_val, u_char var_val_type, siz
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->logRecordEntryStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->logRecordTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->logRecordTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* logId */
@@ -7818,6 +10124,7 @@ write_logRecordEntryStatus(int action, u_char *var_val, u_char var_val_type, siz
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->logRecordTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->logId, vp->val.string, vp->val_len);
 			StorageNew->logIdLen = vp->val_len;
@@ -7827,7 +10134,37 @@ write_logRecordEntryStatus(int action, u_char *var_val, u_char var_val_type, siz
 			vp = vp->next_variable;
 			header_complex_add_data(&logRecordTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->logRecordEntryStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->logRecordTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->logRecordTable_old) == NULL)
+				if (StorageTmp->logRecordTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->logRecordTable_old = logRecordTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->logRecordTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->logRecordTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -7837,78 +10174,127 @@ write_logRecordEntryStatus(int action, u_char *var_val, u_char var_val_type, siz
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = logRecordTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_logRecordTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->logRecordEntryStatus;
-			StorageTmp->logRecordEntryStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = logRecordTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->logRecordEntryStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->logRecordEntryStatus != RS_ACTIVE)
+				if ((ret = can_act_logRecordTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->logRecordEntryStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_logRecordTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->logRecordEntryStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_logRecordTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->logRecordEntryStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_logRecordTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->logRecordEntryStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_logRecordTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->logRecordEntryStatus;
-			StorageTmp->logRecordEntryStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->logRecordEntryStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_logRecordTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_logRecordTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->logRecordEntryStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->logRecordEntryStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->logRecordEntryStatus = set_value;
+			if ((StorageOld = StorageTmp->logRecordTable_old) != NULL) {
+				logRecordTable_destroy(&StorageTmp->logRecordTable_old);
+				StorageTmp->logRecordTable_rsvs = 0;
+				StorageTmp->logRecordTable_tsts = 0;
+				StorageTmp->logRecordTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			logRecordTable_destroy(&StorageDel);
-			/* logRecordTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_logRecordTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->logRecordEntryStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_logRecordTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->logRecordEntryStatus = old_value;
+			if (StorageTmp->logRecordEntryStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_logRecordTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -7922,6 +10308,13 @@ write_logRecordEntryStatus(int action, u_char *var_val, u_char var_val_type, siz
 				logRecordTable_del(StorageNew);
 				logRecordTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->logRecordTable_old) == NULL)
+				break;
+			if (--StorageTmp->logRecordTable_rsvs == 0)
+				logRecordTable_destroy(&StorageTmp->logRecordTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */

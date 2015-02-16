@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/snmp/mtpMIB.c
+ @(#) src/snmp/mtpMIB.c
 
  -----------------------------------------------------------------------------
 
@@ -60282,7 +60282,7 @@ write_mtpSapRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -60553,7 +60553,7 @@ write_mtpNaRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -60818,7 +60818,7 @@ write_mtpMsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -61085,7 +61085,7 @@ write_mtpSpProfileRowStatus(int action, u_char *var_val, u_char var_val_type, si
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -61364,7 +61364,7 @@ write_mtpSpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -61657,7 +61657,7 @@ write_mtpL3RowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -61950,7 +61950,7 @@ write_mtpGsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -62257,7 +62257,7 @@ write_mtpGsLineRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -62578,7 +62578,7 @@ write_mtpGsLineContentRowStatus(int action, u_char *var_val, u_char var_val_type
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -62845,7 +62845,7 @@ write_mtpRsProfileRowStatus(int action, u_char *var_val, u_char var_val_type, si
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -63138,7 +63138,7 @@ write_mtpRsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -63405,7 +63405,7 @@ write_mtpRtProfileRowStatus(int action, u_char *var_val, u_char var_val_type, si
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -63712,7 +63712,7 @@ write_mtpRtRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -63979,7 +63979,7 @@ write_mtpLsProfileRowStatus(int action, u_char *var_val, u_char var_val_type, si
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -64272,7 +64272,7 @@ write_mtpLsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -64539,7 +64539,7 @@ write_mtpSlL3ProfileRowStatus(int action, u_char *var_val, u_char var_val_type, 
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -64832,7 +64832,7 @@ write_mtpSlL2ProfileRowStatus(int action, u_char *var_val, u_char var_val_type, 
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -65145,7 +65145,7 @@ write_mtpSlRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -65472,7 +65472,7 @@ write_mtpSlSdlListRowStatus(int action, u_char *var_val, u_char var_val_type, si
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -65799,7 +65799,7 @@ write_mtpSlSdtListRowStatus(int action, u_char *var_val, u_char var_val_type, si
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -66066,7 +66066,7 @@ write_mtpNbRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -66333,7 +66333,7 @@ write_mtpSaalRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -66600,7 +66600,7 @@ write_mtpM2paRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -66879,7 +66879,7 @@ write_mtpSdtRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -67174,7 +67174,7 @@ write_mtpSdlRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -67441,7 +67441,7 @@ write_mtpSctpProfileRowStatus(int action, u_char *var_val, u_char var_val_type, 
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -67706,7 +67706,7 @@ write_mtpSctpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -67985,7 +67985,7 @@ write_mtpSctpLocalRowStatus(int action, u_char *var_val, u_char var_val_type, si
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -68264,7 +68264,7 @@ write_mtpSctpRemoteRowStatus(int action, u_char *var_val, u_char var_val_type, s
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -68529,7 +68529,7 @@ write_mtpM2uaAspRowStatus(int action, u_char *var_val, u_char var_val_type, size
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -68808,7 +68808,7 @@ write_mtpM2uaAsRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -69073,7 +69073,7 @@ write_mtpM3uaAspRowStatus(int action, u_char *var_val, u_char var_val_type, size
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -69352,7 +69352,7 @@ write_mtpM3uaAsRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */

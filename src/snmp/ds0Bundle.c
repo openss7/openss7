@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/snmp/ds0Bundle.c
+ @(#) src/snmp/ds0Bundle.c
 
  -----------------------------------------------------------------------------
 
@@ -1954,7 +1954,7 @@ write_dsx0BondRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -2225,7 +2225,7 @@ write_dsx0BundleRowStatus(int action, u_char *var_val, u_char var_val_type, size
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/snmp/sccpMIB.c
+ @(#) src/snmp/sccpMIB.c
 
  -----------------------------------------------------------------------------
 
@@ -24058,7 +24058,7 @@ write_sccpNetworkEntityRowStatus(int action, u_char *var_val, u_char var_val_typ
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -24353,7 +24353,7 @@ write_sccpLocalSapNamesRowStatus(int action, u_char *var_val, u_char var_val_typ
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -24648,7 +24648,7 @@ write_sccpAccessPointRowStatus(int action, u_char *var_val, u_char var_val_type,
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -24943,7 +24943,7 @@ write_sccpLinkageRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -25238,7 +25238,7 @@ write_sccpMtpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -25519,7 +25519,7 @@ write_sccpSclcRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -25800,7 +25800,7 @@ write_sccpScocRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -26081,7 +26081,7 @@ write_sccpScrcRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -26378,7 +26378,7 @@ write_sccpEntitySetRowStatus(int action, u_char *var_val, u_char var_val_type, s
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -26691,7 +26691,7 @@ write_sccpEntitySetSapRowStatus(int action, u_char *var_val, u_char var_val_type
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -26988,7 +26988,7 @@ write_sccpConcernedAreaRowStatus(int action, u_char *var_val, u_char var_val_typ
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -27301,7 +27301,7 @@ write_sccpRemoteSCCPRowStatus(int action, u_char *var_val, u_char var_val_type, 
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -27598,7 +27598,7 @@ write_sccpGtConversionRuleRowStatus(int action, u_char *var_val, u_char var_val_
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -27911,7 +27911,7 @@ write_sccpAddressInfoRowStatus(int action, u_char *var_val, u_char var_val_type,
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -28208,7 +28208,7 @@ write_sccpGtTranslatorRowStatus(int action, u_char *var_val, u_char var_val_type
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -28521,7 +28521,7 @@ write_sccpGtRuleRowStatus(int action, u_char *var_val, u_char var_val_type, size
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -28818,7 +28818,7 @@ write_sccpSrvtRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */

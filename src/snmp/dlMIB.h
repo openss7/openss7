@@ -63,6 +63,10 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct dlMIB_data {
+	struct dlMIB_data *dlMIB_old;
+	uint dlMIB_rsvs;
+	uint dlMIB_tsts;
+	uint dlMIB_sets;
 	uint dlMIB_request;
 	long llcDiscontinuityTime;	/* ReadOnly */
 	long sLPConnectionDefaultInterfaceType;	/* ReadWrite */
@@ -90,8 +94,13 @@ struct dlMIB_data {
 	long lLCConnectionlessAckDefaultMaximumRetransmissions;	/* ReadWrite */
 };
 struct communicationsEntityTable_data {
+	struct communicationsEntityTable_data *communicationsEntityTable_old;
+	uint communicationsEntityTable_rsvs;
+	uint communicationsEntityTable_tsts;
+	uint communicationsEntityTable_sets;
 	uint communicationsEntityTable_request;
 	uint communicationsEntityTable_refs;
+	uint communicationsEntityTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	oid *communicationsEntityLocalSapNames;	/* ReadOnly */
@@ -99,8 +108,13 @@ struct communicationsEntityTable_data {
 	long communicationsEntityOperationalState;	/* ReadOnly */
 };
 struct sap1Table_data {
+	struct sap1Table_data *sap1Table_old;
+	uint sap1Table_rsvs;
+	uint sap1Table_tsts;
+	uint sap1Table_sets;
 	uint sap1Table_request;
 	uint sap1Table_refs;
+	uint sap1Table_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *sapId;			/* NoAccess */
@@ -110,8 +124,13 @@ struct sap1Table_data {
 	size_t sap1UserEntityNamesLen;
 };
 struct sap2Table_data {
+	struct sap2Table_data *sap2Table_old;
+	uint sap2Table_rsvs;
+	uint sap2Table_tsts;
+	uint sap2Table_sets;
 	uint sap2Table_request;
 	uint sap2Table_refs;
+	uint sap2Table_id;
 	uint8_t *sapId;			/* NoAccess */
 	size_t sapIdLen;
 	uint8_t *sap2Address;		/* ReadOnly */
@@ -122,8 +141,13 @@ struct sap2Table_data {
 	size_t sap2ProviderEntityNamesLen;
 };
 struct clProtocolMachineTable_data {
+	struct clProtocolMachineTable_data *clProtocolMachineTable_old;
+	uint clProtocolMachineTable_rsvs;
+	uint clProtocolMachineTable_tsts;
+	uint clProtocolMachineTable_sets;
 	uint clProtocolMachineTable_request;
 	uint clProtocolMachineTable_refs;
+	uint clProtocolMachineTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *clProtocolMachineId;	/* NoAccess */
@@ -132,8 +156,13 @@ struct clProtocolMachineTable_data {
 	long clProtocolMachineTotalRemoteSAPs;	/* ReadOnly */
 };
 struct coProtocolMachineTable_data {
+	struct coProtocolMachineTable_data *coProtocolMachineTable_old;
+	uint coProtocolMachineTable_rsvs;
+	uint coProtocolMachineTable_tsts;
+	uint coProtocolMachineTable_sets;
 	uint coProtocolMachineTable_request;
 	uint coProtocolMachineTable_refs;
+	uint coProtocolMachineTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *coProtocolMachineId;	/* NoAccess */
@@ -141,8 +170,13 @@ struct coProtocolMachineTable_data {
 	long coProtocolMachineOperationalState;	/* ReadOnly */
 };
 struct singlePeerConnectionTable_data {
+	struct singlePeerConnectionTable_data *singlePeerConnectionTable_old;
+	uint singlePeerConnectionTable_rsvs;
+	uint singlePeerConnectionTable_tsts;
+	uint singlePeerConnectionTable_sets;
 	uint singlePeerConnectionTable_request;
 	uint singlePeerConnectionTable_refs;
+	uint singlePeerConnectionTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *coProtocolMachineId;	/* NoAccess */
@@ -155,16 +189,26 @@ struct singlePeerConnectionTable_data {
 	size_t suppportedConnectionNamesLen;
 };
 struct physicalEntityTable_data {
+	struct physicalEntityTable_data *physicalEntityTable_old;
+	uint physicalEntityTable_rsvs;
+	uint physicalEntityTable_tsts;
+	uint physicalEntityTable_sets;
 	uint physicalEntityTable_request;
 	uint physicalEntityTable_refs;
+	uint physicalEntityTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	oid *physicalEntityPhysicalEntityTitles;	/* ReadWrite */
 	size_t physicalEntityPhysicalEntityTitlesLen;
 };
 struct physicalSAPTable_data {
+	struct physicalSAPTable_data *physicalSAPTable_old;
+	uint physicalSAPTable_rsvs;
+	uint physicalSAPTable_tsts;
+	uint physicalSAPTable_sets;
 	uint physicalSAPTable_request;
 	uint physicalSAPTable_refs;
+	uint physicalSAPTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *sapId;			/* NoAccess */
@@ -172,8 +216,13 @@ struct physicalSAPTable_data {
 	long physicalSAPRowStatus;	/* Create */
 };
 struct dataCircuitTable_data {
+	struct dataCircuitTable_data *dataCircuitTable_old;
+	uint dataCircuitTable_rsvs;
+	uint dataCircuitTable_tsts;
+	uint dataCircuitTable_sets;
 	uint dataCircuitTable_request;
 	uint dataCircuitTable_refs;
+	uint dataCircuitTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *coProtocolMachineId;	/* NoAccess */
@@ -198,8 +247,13 @@ struct dataCircuitTable_data {
 	long dataCircuitRowStatus;	/* Create */
 };
 struct physicalConnectionTable_data {
+	struct physicalConnectionTable_data *physicalConnectionTable_old;
+	uint physicalConnectionTable_rsvs;
+	uint physicalConnectionTable_tsts;
+	uint physicalConnectionTable_sets;
 	uint physicalConnectionTable_request;
 	uint physicalConnectionTable_refs;
+	uint physicalConnectionTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *coProtocolMachineId;	/* NoAccess */
@@ -212,8 +266,13 @@ struct physicalConnectionTable_data {
 	long physicalConnectionRowStatus;	/* Create */
 };
 struct datalinkEntityTable_data {
+	struct datalinkEntityTable_data *datalinkEntityTable_old;
+	uint datalinkEntityTable_rsvs;
+	uint datalinkEntityTable_tsts;
+	uint datalinkEntityTable_sets;
 	uint datalinkEntityTable_request;
 	uint datalinkEntityTable_refs;
+	uint datalinkEntityTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	oid *datalinkEntityProviderEntityNames;	/* Create */
@@ -221,8 +280,13 @@ struct datalinkEntityTable_data {
 	long datalinkEntityRowStatus;	/* Create */
 };
 struct dLSAPTable_data {
+	struct dLSAPTable_data *dLSAPTable_old;
+	uint dLSAPTable_rsvs;
+	uint dLSAPTable_tsts;
+	uint dLSAPTable_sets;
 	uint dLSAPTable_request;
 	uint dLSAPTable_refs;
+	uint dLSAPTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *sapId;			/* NoAccess */
@@ -230,8 +294,13 @@ struct dLSAPTable_data {
 	long dLSAPRowStatus;		/* Create */
 };
 struct lAPBDLETable_data {
+	struct lAPBDLETable_data *lAPBDLETable_old;
+	uint lAPBDLETable_rsvs;
+	uint lAPBDLETable_tsts;
+	uint lAPBDLETable_sets;
 	uint lAPBDLETable_request;
 	uint lAPBDLETable_refs;
+	uint lAPBDLETable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	long lAPBDLEmT1Timer;		/* Create */
@@ -250,8 +319,13 @@ struct lAPBDLETable_data {
 	long lAPBDLERowStatus;		/* Create */
 };
 struct sLPPMTable_data {
+	struct sLPPMTable_data *sLPPMTable_old;
+	uint sLPPMTable_rsvs;
+	uint sLPPMTable_tsts;
+	uint sLPPMTable_sets;
 	uint sLPPMTable_request;
 	uint sLPPMTable_refs;
+	uint sLPPMTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *coProtocolMachineId;	/* NoAccess */
@@ -260,8 +334,13 @@ struct sLPPMTable_data {
 	long sLPPMRowStatus;		/* Create */
 };
 struct sLPConnectionTable_data {
+	struct sLPConnectionTable_data *sLPConnectionTable_old;
+	uint sLPConnectionTable_rsvs;
+	uint sLPConnectionTable_tsts;
+	uint sLPConnectionTable_sets;
 	uint sLPConnectionTable_request;
 	uint sLPConnectionTable_refs;
+	uint sLPConnectionTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *coProtocolMachineId;	/* NoAccess */
@@ -310,15 +389,14 @@ struct sLPConnectionTable_data {
 	long sLPConnectionRowStatus;	/* Create */
 };
 struct sLPConnectionIVMOTable_data {
+	struct sLPConnectionIVMOTable_data *sLPConnectionIVMOTable_old;
+	uint sLPConnectionIVMOTable_rsvs;
+	uint sLPConnectionIVMOTable_tsts;
+	uint sLPConnectionIVMOTable_sets;
 	uint sLPConnectionIVMOTable_request;
 	uint sLPConnectionIVMOTable_refs;
-	uint8_t *communicationsEntityId;	/* NoAccess */
-	size_t communicationsEntityIdLen;
-	uint8_t *coProtocolMachineId;	/* NoAccess */
-	size_t coProtocolMachineIdLen;
-	uint8_t *connectionId;		/* NoAccess */
-	size_t connectionIdLen;
-	uint8_t *sLPConnectionIVMOid;	/* ReadOnly */
+	uint sLPConnectionIVMOTable_id;
+	uint8_t *sLPConnectionIVMOid;	/* NoAccess */
 	size_t sLPConnectionIVMOidLen;
 	long sLPConnectionIVMOinterfaceType;	/* Create */
 	long sLPConnectionIVMOk;	/* Create */
@@ -332,15 +410,25 @@ struct sLPConnectionIVMOTable_data {
 	long sLPConnectionIVMORowStatus;	/* Create */
 };
 struct mACDLETable_data {
+	struct mACDLETable_data *mACDLETable_old;
+	uint mACDLETable_rsvs;
+	uint mACDLETable_tsts;
+	uint mACDLETable_sets;
 	uint mACDLETable_request;
 	uint mACDLETable_refs;
+	uint mACDLETable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	long mACDLERowStatus;		/* Create */
 };
 struct mACTable_data {
+	struct mACTable_data *mACTable_old;
+	uint mACTable_rsvs;
+	uint mACTable_tsts;
+	uint mACTable_sets;
 	uint mACTable_request;
 	uint mACTable_refs;
+	uint mACTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	long mACOperationalState;	/* ReadOnly */
@@ -349,15 +437,25 @@ struct mACTable_data {
 	long mACRowStatus;		/* Create */
 };
 struct lLCDLETable_data {
+	struct lLCDLETable_data *lLCDLETable_old;
+	uint lLCDLETable_rsvs;
+	uint lLCDLETable_tsts;
+	uint lLCDLETable_sets;
 	uint lLCDLETable_request;
 	uint lLCDLETable_refs;
+	uint lLCDLETable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	long lLCDLERowStatus;		/* Create */
 };
 struct lLCCLPMTable_data {
+	struct lLCCLPMTable_data *lLCCLPMTable_old;
+	uint lLCCLPMTable_rsvs;
+	uint lLCCLPMTable_tsts;
+	uint lLCCLPMTable_sets;
 	uint lLCCLPMTable_request;
 	uint lLCCLPMTable_refs;
+	uint lLCCLPMTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *clProtocolMachineId;	/* NoAccess */
@@ -365,8 +463,13 @@ struct lLCCLPMTable_data {
 	long lLCCLPMRowStatus;		/* Create */
 };
 struct lLCCOPMTable_data {
+	struct lLCCOPMTable_data *lLCCOPMTable_old;
+	uint lLCCOPMTable_rsvs;
+	uint lLCCOPMTable_tsts;
+	uint lLCCOPMTable_sets;
 	uint lLCCOPMTable_request;
 	uint lLCCOPMTable_refs;
+	uint lLCCOPMTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *coProtocolMachineId;	/* NoAccess */
@@ -374,8 +477,13 @@ struct lLCCOPMTable_data {
 	long lLCCOPMRowStatus;		/* Create */
 };
 struct resourceTypeIdTable_data {
+	struct resourceTypeIdTable_data *resourceTypeIdTable_old;
+	uint resourceTypeIdTable_rsvs;
+	uint resourceTypeIdTable_tsts;
+	uint resourceTypeIdTable_sets;
 	uint resourceTypeIdTable_request;
 	uint resourceTypeIdTable_refs;
+	uint resourceTypeIdTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *resourceTypeIdName;	/* ReadOnly */
@@ -390,8 +498,13 @@ struct resourceTypeIdTable_data {
 	size_t resourceInfoManufacturerProductVersionLen;
 };
 struct lLCStationTable_data {
+	struct lLCStationTable_data *lLCStationTable_old;
+	uint lLCStationTable_rsvs;
+	uint lLCStationTable_tsts;
+	uint lLCStationTable_sets;
 	uint lLCStationTable_request;
 	uint lLCStationTable_refs;
+	uint lLCStationTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *sapId;			/* NoAccess */
@@ -423,8 +536,13 @@ struct lLCStationTable_data {
 	long lLCStationType1AcknowledgmentTimerTimeouts;	/* ReadOnly */
 };
 struct lLCSAPTable_data {
+	struct lLCSAPTable_data *lLCSAPTable_old;
+	uint lLCSAPTable_rsvs;
+	uint lLCSAPTable_tsts;
+	uint lLCSAPTable_sets;
 	uint lLCSAPTable_request;
 	uint lLCSAPTable_refs;
+	uint lLCSAPTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *sapId;			/* NoAccess */
@@ -436,8 +554,13 @@ struct lLCSAPTable_data {
 	long lLCSAPRDE;			/* ReadOnly */
 };
 struct rDESetupTable_data {
+	struct rDESetupTable_data *rDESetupTable_old;
+	uint rDESetupTable_rsvs;
+	uint rDESetupTable_tsts;
+	uint rDESetupTable_sets;
 	uint rDESetupTable_request;
 	uint rDESetupTable_refs;
+	uint rDESetupTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *sapId;			/* NoAccess */
@@ -454,8 +577,13 @@ struct rDESetupTable_data {
 	long rDESetupResetOnTestEnabled;	/* ReadWrite */
 };
 struct rDEPairTable_data {
+	struct rDEPairTable_data *rDEPairTable_old;
+	uint rDEPairTable_rsvs;
+	uint rDEPairTable_tsts;
+	uint rDEPairTable_sets;
 	uint rDEPairTable_request;
 	uint rDEPairTable_refs;
+	uint rDEPairTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *sapId;			/* NoAccess */
@@ -471,8 +599,13 @@ struct rDEPairTable_data {
 	long rDEPairQueryCounter;	/* ReadOnly */
 };
 struct lLCConnectionLessTable_data {
+	struct lLCConnectionLessTable_data *lLCConnectionLessTable_old;
+	uint lLCConnectionLessTable_rsvs;
+	uint lLCConnectionLessTable_tsts;
+	uint lLCConnectionLessTable_sets;
 	uint lLCConnectionLessTable_request;
 	uint lLCConnectionLessTable_refs;
+	uint lLCConnectionLessTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *clProtocolMachineId;	/* NoAccess */
@@ -496,8 +629,13 @@ struct lLCConnectionLessTable_data {
 	long lLCConnectionlessXIDSentResponse;	/* ReadOnly */
 };
 struct lLCConnection2Table_data {
+	struct lLCConnection2Table_data *lLCConnection2Table_old;
+	uint lLCConnection2Table_rsvs;
+	uint lLCConnection2Table_tsts;
+	uint lLCConnection2Table_sets;
 	uint lLCConnection2Table_request;
 	uint lLCConnection2Table_refs;
+	uint lLCConnection2Table_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *coProtocolMachineId;	/* NoAccess */
@@ -558,14 +696,13 @@ struct lLCConnection2Table_data {
 	size_t lLCConnection2AlarmStatusLen;
 };
 struct lLCConnection2IVMOTable_data {
+	struct lLCConnection2IVMOTable_data *lLCConnection2IVMOTable_old;
+	uint lLCConnection2IVMOTable_rsvs;
+	uint lLCConnection2IVMOTable_tsts;
+	uint lLCConnection2IVMOTable_sets;
 	uint lLCConnection2IVMOTable_request;
 	uint lLCConnection2IVMOTable_refs;
-	uint8_t *communicationsEntityId;	/* NoAccess */
-	size_t communicationsEntityIdLen;
-	uint8_t *coProtocolMachineId;	/* NoAccess */
-	size_t coProtocolMachineIdLen;
-	uint8_t *connectionId;		/* NoAccess */
-	size_t connectionIdLen;
+	uint lLCConnection2IVMOTable_id;
 	uint8_t *lLCConnection2IVMOName;	/* NoAccess */
 	size_t lLCConnection2IVMONameLen;
 	ulong lLCConnection2IVMOMaximumRetransmissions;	/* ReadWrite */
@@ -581,8 +718,13 @@ struct lLCConnection2IVMOTable_data {
 	long lLCConnection2IVMOOptionalTolerationIPDUs;	/* ReadWrite */
 };
 struct lLCConnectionlessAckTable_data {
+	struct lLCConnectionlessAckTable_data *lLCConnectionlessAckTable_old;
+	uint lLCConnectionlessAckTable_rsvs;
+	uint lLCConnectionlessAckTable_tsts;
+	uint lLCConnectionlessAckTable_sets;
 	uint lLCConnectionlessAckTable_request;
 	uint lLCConnectionlessAckTable_refs;
+	uint lLCConnectionlessAckTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *coProtocolMachineId;	/* NoAccess */
@@ -628,8 +770,13 @@ struct lLCConnectionlessAckTable_data {
 	long lLCConnectionlessAckViolation;	/* ReadOnly */
 };
 struct lLCConnectionlessAckIVMOTable_data {
+	struct lLCConnectionlessAckIVMOTable_data *lLCConnectionlessAckIVMOTable_old;
+	uint lLCConnectionlessAckIVMOTable_rsvs;
+	uint lLCConnectionlessAckIVMOTable_tsts;
+	uint lLCConnectionlessAckIVMOTable_sets;
 	uint lLCConnectionlessAckIVMOTable_request;
 	uint lLCConnectionlessAckIVMOTable_refs;
+	uint lLCConnectionlessAckIVMOTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *coProtocolMachineId;	/* NoAccess */
@@ -641,8 +788,13 @@ struct lLCConnectionlessAckIVMOTable_data {
 	long lLCConnectionlessAckIVMORowStatus;	/* Create */
 };
 struct networkEntityTable_data {
+	struct networkEntityTable_data *networkEntityTable_old;
+	uint networkEntityTable_rsvs;
+	uint networkEntityTable_tsts;
+	uint networkEntityTable_sets;
 	uint networkEntityTable_request;
 	uint networkEntityTable_refs;
+	uint networkEntityTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *networkEntityTitles;	/* Create */
@@ -652,15 +804,25 @@ struct networkEntityTable_data {
 	long networkEntityRowStatus;	/* Create */
 };
 struct nSAPTable_data {
+	struct nSAPTable_data *nSAPTable_old;
+	uint nSAPTable_rsvs;
+	uint nSAPTable_tsts;
+	uint nSAPTable_sets;
 	uint nSAPTable_request;
 	uint nSAPTable_refs;
+	uint nSAPTable_id;
 	uint8_t *sapId;			/* NoAccess */
 	size_t sapIdLen;
 	long nSAPRowStatus;		/* Create */
 };
 struct cLNSTable_data {
+	struct cLNSTable_data *cLNSTable_old;
+	uint cLNSTable_rsvs;
+	uint cLNSTable_tsts;
+	uint cLNSTable_sets;
 	uint cLNSTable_request;
 	uint cLNSTable_refs;
+	uint cLNSTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *clProtocolMachineId;	/* NoAccess */
@@ -683,8 +845,13 @@ struct cLNSTable_data {
 	long cLNSRowStatus;		/* Create */
 };
 struct cLNSISISTable_data {
+	struct cLNSISISTable_data *cLNSISISTable_old;
+	uint cLNSISISTable_rsvs;
+	uint cLNSISISTable_tsts;
+	uint cLNSISISTable_sets;
 	uint cLNSISISTable_request;
 	uint cLNSISISTable_refs;
+	uint cLNSISISTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *clProtocolMachineId;	/* NoAccess */
@@ -729,8 +896,13 @@ struct cLNSISISTable_data {
 	long cLNSISISRowStatus;		/* Create */
 };
 struct cLNSISISLevel2Table_data {
+	struct cLNSISISLevel2Table_data *cLNSISISLevel2Table_old;
+	uint cLNSISISLevel2Table_rsvs;
+	uint cLNSISISLevel2Table_tsts;
+	uint cLNSISISLevel2Table_sets;
 	uint cLNSISISLevel2Table_request;
 	uint cLNSISISLevel2Table_refs;
+	uint cLNSISISLevel2Table_id;
 	uint8_t *coProtocolMachineId;	/* NoAccess */
 	size_t coProtocolMachineIdLen;
 	long cLNSISISLevel2maximumVirtualAdjacencies;	/* ReadOnly */
@@ -749,8 +921,13 @@ struct cLNSISISLevel2Table_data {
 	long cLNSISISLevel2RowStatus;	/* Create */
 };
 struct linkageTable_data {
+	struct linkageTable_data *linkageTable_old;
+	uint linkageTable_rsvs;
+	uint linkageTable_tsts;
+	uint linkageTable_sets;
 	uint linkageTable_request;
 	uint linkageTable_refs;
+	uint linkageTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *protocolMachineId;	/* NoAccess */
@@ -819,7 +996,7 @@ struct linkageTable_data {
 	long linkageISISrejectedAdjacencies;	/* ReadOnly */
 	long linkageISISiSISControlPDUsSent;	/* ReadOnly */
 	long linkageISISiSISControlPDUsReceived;	/* ReadOnly */
-	long linkageISISiDFieldLenthMismatches;	/* ReadOnly */
+	long linkageISISiDFieldLengthMismatches;	/* ReadOnly */
 	long linkageISISmaximumAreaAddressesMismatches;	/* ReadOnly */
 	uint8_t *linkageISIScircuitTransmitPassword;	/* ReadOnly */
 	size_t linkageISIScircuitTransmitPasswordLen;
@@ -862,12 +1039,17 @@ struct linkageTable_data {
 	size_t linkageISISl2CircuitIDLen;
 	uint8_t *linkageISISl2DesignatedIntermediateSystem;	/* ReadOnly */
 	size_t linkageISISl2DesignatedIntermediateSystemLen;
-	long linkageISISlanL2DesignatedIntermediteSystemChanges;	/* ReadOnly */
+	long linkageISISlanL2DesignatedIntermediateSystemChanges;	/* ReadOnly */
 	long linkageRowStatus;		/* Create */
 };
 struct cONSTable_data {
+	struct cONSTable_data *cONSTable_old;
+	uint cONSTable_rsvs;
+	uint cONSTable_tsts;
+	uint cONSTable_sets;
 	uint cONSTable_request;
 	uint cONSTable_refs;
+	uint cONSTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *coProtocolMachineId;	/* NoAccess */
@@ -878,8 +1060,13 @@ struct cONSTable_data {
 	long cONSRowStatus;		/* Create */
 };
 struct networkConnectionTable_data {
+	struct networkConnectionTable_data *networkConnectionTable_old;
+	uint networkConnectionTable_rsvs;
+	uint networkConnectionTable_tsts;
+	uint networkConnectionTable_sets;
 	uint networkConnectionTable_request;
 	uint networkConnectionTable_refs;
+	uint networkConnectionTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *coProtocolMachineId;	/* NoAccess */
@@ -893,8 +1080,13 @@ struct networkConnectionTable_data {
 	long networkConnectionRowStatus;	/* Create */
 };
 struct x25PLETable_data {
+	struct x25PLETable_data *x25PLETable_old;
+	uint x25PLETable_rsvs;
+	uint x25PLETable_tsts;
+	uint x25PLETable_sets;
 	uint x25PLETable_request;
 	uint x25PLETable_refs;
+	uint x25PLETable_id;
 	uint8_t *x25PLEId;		/* NoAccess */
 	size_t x25PLEIdLen;
 	long x25PLEoperationalState;	/* ReadOnly */
@@ -991,8 +1183,13 @@ struct x25PLETable_data {
 	long x25PLERowStatus;		/* Create */
 };
 struct x25PLE_DTETable_data {
+	struct x25PLE_DTETable_data *x25PLE_DTETable_old;
+	uint x25PLE_DTETable_rsvs;
+	uint x25PLE_DTETable_tsts;
+	uint x25PLE_DTETable_sets;
 	uint x25PLE_DTETable_request;
 	uint x25PLE_DTETable_refs;
+	uint x25PLE_DTETable_id;
 	uint8_t *x25PLEId;		/* NoAccess */
 	size_t x25PLEIdLen;
 	long x25PLE_DTEcallDeflectionSubscription;	/* ReadOnly */
@@ -1054,8 +1251,13 @@ struct x25PLE_DTETable_data {
 	long x25PLE_DTEregistrationPermitted;	/* ReadOnly */
 };
 struct x25PLE_DCETable_data {
+	struct x25PLE_DCETable_data *x25PLE_DCETable_old;
+	uint x25PLE_DCETable_rsvs;
+	uint x25PLE_DCETable_tsts;
+	uint x25PLE_DCETable_sets;
 	uint x25PLE_DCETable_request;
 	uint x25PLE_DCETable_refs;
+	uint x25PLE_DCETable_id;
 	uint8_t *x25PLEId;		/* NoAccess */
 	size_t x25PLEIdLen;
 	long x25PLE_DCEcallAttempts;	/* ReadOnly */
@@ -1115,8 +1317,13 @@ struct x25PLE_DCETable_data {
 	size_t x25PLE_DCErestartIndicationLen;
 };
 struct x25PLEIVMOTable_data {
+	struct x25PLEIVMOTable_data *x25PLEIVMOTable_old;
+	uint x25PLEIVMOTable_rsvs;
+	uint x25PLEIVMOTable_tsts;
+	uint x25PLEIVMOTable_sets;
 	uint x25PLEIVMOTable_request;
 	uint x25PLEIVMOTable_refs;
+	uint x25PLEIVMOTable_id;
 	uint8_t *x25PLEIVMOId;		/* NoAccess */
 	size_t x25PLEIVMOIdLen;
 	uint8_t *x25PLEIVMOlocalDTEAddress;	/* ReadOnly */
@@ -1165,8 +1372,13 @@ struct x25PLEIVMOTable_data {
 	long x25PLEIVMORowStatus;	/* Create */
 };
 struct x25PLEIVMO_DTETable_data {
+	struct x25PLEIVMO_DTETable_data *x25PLEIVMO_DTETable_old;
+	uint x25PLEIVMO_DTETable_rsvs;
+	uint x25PLEIVMO_DTETable_tsts;
+	uint x25PLEIVMO_DTETable_sets;
 	uint x25PLEIVMO_DTETable_request;
 	uint x25PLEIVMO_DTETable_refs;
+	uint x25PLEIVMO_DTETable_id;
 	uint8_t *x25PLEIVMOId;		/* NoAccess */
 	size_t x25PLEIVMOIdLen;
 	long x25PLEIVMO_DTEcallDeflectionSubscription;	/* ReadOnly */
@@ -1233,15 +1445,25 @@ struct x25PLEIVMO_DTETable_data {
 	long x25PLEIVMO_DTERowStatus;	/* Create */
 };
 struct x25PLEIVMO_DCETable_data {
+	struct x25PLEIVMO_DCETable_data *x25PLEIVMO_DCETable_old;
+	uint x25PLEIVMO_DCETable_rsvs;
+	uint x25PLEIVMO_DCETable_tsts;
+	uint x25PLEIVMO_DCETable_sets;
 	uint x25PLEIVMO_DCETable_request;
 	uint x25PLEIVMO_DCETable_refs;
+	uint x25PLEIVMO_DCETable_id;
 	uint8_t *x25PLEIVMOId;		/* NoAccess */
 	size_t x25PLEIVMOIdLen;
 	long x25PLEIVMO_DCERowStatus;	/* Create */
 };
 struct virtualCallTable_data {
+	struct virtualCallTable_data *virtualCallTable_old;
+	uint virtualCallTable_rsvs;
+	uint virtualCallTable_tsts;
+	uint virtualCallTable_sets;
 	uint virtualCallTable_request;
 	uint virtualCallTable_refs;
+	uint virtualCallTable_id;
 	uint8_t *virtualCallId;		/* NoAccess */
 	size_t virtualCallIdLen;
 	uint8_t *virtualCallChannel;	/* ReadOnly */
@@ -1274,8 +1496,13 @@ struct virtualCallTable_data {
 	size_t virtualCallInterruptTimerExpiriesLen;
 };
 struct virtualCircuitTable_data {
+	struct virtualCircuitTable_data *virtualCircuitTable_old;
+	uint virtualCircuitTable_rsvs;
+	uint virtualCircuitTable_tsts;
+	uint virtualCircuitTable_sets;
 	uint virtualCircuitTable_request;
 	uint virtualCircuitTable_refs;
+	uint virtualCircuitTable_id;
 	uint8_t *virtualCircuitId;	/* NoAccess */
 	size_t virtualCircuitIdLen;
 	uint8_t *virtualCircuitLogicalChannel;	/* ReadOnly */
@@ -1288,8 +1515,13 @@ struct virtualCircuitTable_data {
 	size_t virtualCircuitWindowSizesLen;
 };
 struct virtualCircuit_DTETable_data {
+	struct virtualCircuit_DTETable_data *virtualCircuit_DTETable_old;
+	uint virtualCircuit_DTETable_rsvs;
+	uint virtualCircuit_DTETable_tsts;
+	uint virtualCircuit_DTETable_sets;
 	uint virtualCircuit_DTETable_request;
 	uint virtualCircuit_DTETable_refs;
+	uint virtualCircuit_DTETable_id;
 	uint8_t *virtualCircuitId;	/* NoAccess */
 	size_t virtualCircuitIdLen;
 	long virtualCircuit_DTEoctetsSentCounter;	/* ReadOnly */
@@ -1305,8 +1537,13 @@ struct virtualCircuit_DTETable_data {
 	long virtualCircuit_DTEresetTimeouts;	/* ReadOnly */
 };
 struct virtualCircuit_DCETable_data {
+	struct virtualCircuit_DCETable_data *virtualCircuit_DCETable_old;
+	uint virtualCircuit_DCETable_rsvs;
+	uint virtualCircuit_DCETable_tsts;
+	uint virtualCircuit_DCETable_sets;
 	uint virtualCircuit_DCETable_request;
 	uint virtualCircuit_DCETable_refs;
+	uint virtualCircuit_DCETable_id;
 	uint8_t *virtualCircuitId;	/* NoAccess */
 	size_t virtualCircuitIdLen;
 	long virtualCircuit_DCEdataPacketsReceived;	/* ReadOnly */
@@ -1325,8 +1562,13 @@ struct virtualCircuit_DCETable_data {
 	long virtualCircuit_DCEx25SegmentsSent;	/* ReadOnly */
 };
 struct permanentVirtualCircuitTable_data {
+	struct permanentVirtualCircuitTable_data *permanentVirtualCircuitTable_old;
+	uint permanentVirtualCircuitTable_rsvs;
+	uint permanentVirtualCircuitTable_tsts;
+	uint permanentVirtualCircuitTable_sets;
 	uint permanentVirtualCircuitTable_request;
 	uint permanentVirtualCircuitTable_refs;
+	uint permanentVirtualCircuitTable_id;
 	uint8_t *x25PLEId;		/* NoAccess */
 	size_t x25PLEIdLen;
 	uint8_t *virtualCallId;		/* NoAccess */
@@ -1336,8 +1578,13 @@ struct permanentVirtualCircuitTable_data {
 	long permanentVirtualCircuitRowStatus;	/* Create */
 };
 struct permanentVirtualCircuit_DTETable_data {
+	struct permanentVirtualCircuit_DTETable_data *permanentVirtualCircuit_DTETable_old;
+	uint permanentVirtualCircuit_DTETable_rsvs;
+	uint permanentVirtualCircuit_DTETable_tsts;
+	uint permanentVirtualCircuit_DTETable_sets;
 	uint permanentVirtualCircuit_DTETable_request;
 	uint permanentVirtualCircuit_DTETable_refs;
+	uint permanentVirtualCircuit_DTETable_id;
 	uint8_t *x25PLEId;		/* NoAccess */
 	size_t x25PLEIdLen;
 	uint8_t *virtualCircuitId;	/* NoAccess */
@@ -1353,8 +1600,13 @@ struct permanentVirtualCircuit_DTETable_data {
 	long permanentVirtualCircuit_DTERowStatus;	/* Create */
 };
 struct permanentVirtualCircuit_DCETable_data {
+	struct permanentVirtualCircuit_DCETable_data *permanentVirtualCircuit_DCETable_old;
+	uint permanentVirtualCircuit_DCETable_rsvs;
+	uint permanentVirtualCircuit_DCETable_tsts;
+	uint permanentVirtualCircuit_DCETable_sets;
 	uint permanentVirtualCircuit_DCETable_request;
 	uint permanentVirtualCircuit_DCETable_refs;
+	uint permanentVirtualCircuit_DCETable_id;
 	uint8_t *x25PLEId;		/* NoAccess */
 	size_t x25PLEIdLen;
 	uint8_t *virtualCircuitId;	/* NoAccess */
@@ -1377,8 +1629,13 @@ struct permanentVirtualCircuit_DCETable_data {
 	long permanentVirtualCircuit_DCERowStatus;	/* Create */
 };
 struct virtualCallIVMOTable_data {
+	struct virtualCallIVMOTable_data *virtualCallIVMOTable_old;
+	uint virtualCallIVMOTable_rsvs;
+	uint virtualCallIVMOTable_tsts;
+	uint virtualCallIVMOTable_sets;
 	uint virtualCallIVMOTable_request;
 	uint virtualCallIVMOTable_refs;
+	uint virtualCallIVMOTable_id;
 	uint8_t *x25PLEId;		/* NoAccess */
 	size_t x25PLEIdLen;
 	uint8_t *virtualCallIVMOId;	/* NoAccess */
@@ -1386,59 +1643,45 @@ struct virtualCallIVMOTable_data {
 	long virtualCallIVMOfastSelect;	/* ReadOnly */
 	uint8_t *virtualCallIVMOpacketSizes;	/* ReadOnly */
 	size_t virtualCallIVMOpacketSizesLen;
-	uint8_t *virtualCallIVMOreverseCharging;	/* ReadOnly */
-	size_t virtualCallIVMOreverseChargingLen;
+	long virtualCallIVMOreverseCharging;	/* Create */
 	uint8_t *virtualCallIVMOthroughputClasses;	/* ReadOnly */
 	size_t virtualCallIVMOthroughputClassesLen;
 	uint8_t *virtualCallIVMOwindowSizes;	/* ReadOnly */
 	size_t virtualCallIVMOwindowSizesLen;
-	uint8_t *virtualCallIVMOproposedPacketSize;	/* ReadOnly */
-	size_t virtualCallIVMOproposedPacketSizeLen;
-	uint8_t *virtualCallIVMOproposedWindowSize;	/* ReadOnly */
-	size_t virtualCallIVMOproposedWindowSizeLen;
-	uint8_t *virtualCallIVMOacceptReverseCharging;	/* ReadOnly */
-	size_t virtualCallIVMOacceptReverseChargingLen;
-	uint8_t *virtualCallIVMOproposeReverseCharging;	/* ReadOnly */
-	size_t virtualCallIVMOproposeReverseChargingLen;
-	uint8_t *virtualCallIVMOcallTime;	/* ReadOnly */
-	size_t virtualCallIVMOcallTimeLen;
-	uint8_t *virtualCallIVMOresetTime;	/* ReadOnly */
-	size_t virtualCallIVMOresetTimeLen;
-	uint8_t *virtualCallIVMOclearTime;	/* ReadOnly */
-	size_t virtualCallIVMOclearTimeLen;
-	uint8_t *virtualCallIVMOinterruptTime;	/* ReadOnly */
-	size_t virtualCallIVMOinterruptTimeLen;
-	uint8_t *virtualCallIVMOresetCount;	/* ReadOnly */
-	size_t virtualCallIVMOresetCountLen;
-	uint8_t *virtualCallIVMOclearCount;	/* ReadOnly */
-	size_t virtualCallIVMOclearCountLen;
-	uint8_t *virtualCallIVMOwindowTime;	/* ReadOnly */
-	size_t virtualCallIVMOwindowTimeLen;
-	uint8_t *virtualCallIVMOdataRetransmissionTime;	/* ReadOnly */
-	size_t virtualCallIVMOdataRetransmissionTimeLen;
-	uint8_t *virtualCallIVMOdataRetransmissionCount;	/* ReadOnly */
-	size_t virtualCallIVMOdataRetransmissionCountLen;
-	uint8_t *virtualCallIVMOrejectTime;	/* ReadOnly */
-	size_t virtualCallIVMOrejectTimeLen;
-	uint8_t *virtualCallIVMOrejectCount;	/* ReadOnly */
-	size_t virtualCallIVMOrejectCountLen;
+	long virtualCallIVMOproposedPacketSize;	/* ReadOnly */
+	long virtualCallIVMOproposedWindowSize;	/* ReadOnly */
+	long virtualCallIVMOacceptReverseCharging;	/* ReadOnly */
+	long virtualCallIVMOproposeReverseCharging;	/* ReadOnly */
+	long virtualCallIVMOcallTime;	/* ReadOnly */
+	long virtualCallIVMOresetTime;	/* ReadOnly */
+	long virtualCallIVMOclearTime;	/* ReadOnly */
+	long virtualCallIVMOinterruptTime;	/* ReadOnly */
+	long virtualCallIVMOresetCount;	/* ReadOnly */
+	long virtualCallIVMOclearCount;	/* ReadOnly */
+	long virtualCallIVMOwindowTime;	/* ReadOnly */
+	long virtualCallIVMOdataRetransmissionTime;	/* ReadOnly */
+	long virtualCallIVMOdataRetransmissionCount;	/* ReadOnly */
+	long virtualCallIVMOrejectTime;	/* ReadOnly */
+	long virtualCallIVMOrejectCount;	/* ReadOnly */
 	long virtualCallIVMORowStatus;	/* Create */
 };
 struct switchedVirtualCallTable_data {
+	struct switchedVirtualCallTable_data *switchedVirtualCallTable_old;
+	uint switchedVirtualCallTable_rsvs;
+	uint switchedVirtualCallTable_tsts;
+	uint switchedVirtualCallTable_sets;
 	uint switchedVirtualCallTable_request;
 	uint switchedVirtualCallTable_refs;
+	uint switchedVirtualCallTable_id;
 	uint8_t *x25PLEId;		/* NoAccess */
 	size_t x25PLEIdLen;
 	uint8_t *virtualCallId;		/* NoAccess */
 	size_t virtualCallIdLen;
-	uint8_t *switchedVirtualCalldirection;	/* ReadOnly */
-	size_t switchedVirtualCalldirectionLen;
+	long switchedVirtualCalldirection;	/* ReadOnly */
 	uint8_t *switchedVirtualCallremoteDTEAddress;	/* ReadOnly */
 	size_t switchedVirtualCallremoteDTEAddressLen;
-	uint8_t *switchedVirtualCallthroughputClass;	/* ReadOnly */
-	size_t switchedVirtualCallthroughputClassLen;
-	uint8_t *switchedVirtualCallredirectReason;	/* ReadOnly */
-	size_t switchedVirtualCallredirectReasonLen;
+	long switchedVirtualCallthroughputClass;	/* ReadOnly */
+	long switchedVirtualCallredirectReason;	/* ReadOnly */
 	uint8_t *switchedVirtualCalloriginallyCalledAddress;	/* ReadOnly */
 	size_t switchedVirtualCalloriginallyCalledAddressLen;
 	uint8_t *switchedVirtualCallcallingAddressExtension;	/* ReadOnly */
@@ -1448,8 +1691,13 @@ struct switchedVirtualCallTable_data {
 	long switchedVirtualCallRowStatus;	/* Create */
 };
 struct virtualCall_DTETable_data {
+	struct virtualCall_DTETable_data *virtualCall_DTETable_old;
+	uint virtualCall_DTETable_rsvs;
+	uint virtualCall_DTETable_tsts;
+	uint virtualCall_DTETable_sets;
 	uint virtualCall_DTETable_request;
 	uint virtualCall_DTETable_refs;
+	uint virtualCall_DTETable_id;
 	uint8_t *x25PLEId;		/* NoAccess */
 	size_t x25PLEIdLen;
 	uint8_t *virtualCircuitId;	/* NoAccess */
@@ -1458,54 +1706,52 @@ struct virtualCall_DTETable_data {
 	size_t virtualCall_DTEcallingAddressExtensionLen;
 	uint8_t *virtualCall_DTEcalledAddressExtension;	/* ReadOnly */
 	size_t virtualCall_DTEcalledAddressExtensionLen;
-	uint8_t *virtualCall_DTEdirection;	/* ReadOnly */
-	size_t virtualCall_DTEdirectionLen;
+	long virtualCall_DTEdirection;	/* ReadOnly */
 	long virtualCall_DTEfastSelect;	/* ReadOnly */
 	uint8_t *virtualCall_DTEoriginallyCalledAddress;	/* ReadOnly */
 	size_t virtualCall_DTEoriginallyCalledAddressLen;
-	uint8_t *virtualCall_DTEredirectReason;	/* ReadOnly */
-	size_t virtualCall_DTEredirectReasonLen;
+	long virtualCall_DTEredirectReason;	/* ReadOnly */
 	uint8_t *virtualCall_DTEremoteDTEAddress;	/* ReadOnly */
 	size_t virtualCall_DTEremoteDTEAddressLen;
-	uint8_t *virtualCall_DTEreverseCharging;	/* ReadOnly */
-	size_t virtualCall_DTEreverseChargingLen;
+	long virtualCall_DTEreverseCharging;	/* ReadOnly */
 	long virtualCall_DTERowStatus;	/* Create */
 };
 struct virtualCall_DCETable_data {
+	struct virtualCall_DCETable_data *virtualCall_DCETable_old;
+	uint virtualCall_DCETable_rsvs;
+	uint virtualCall_DCETable_tsts;
+	uint virtualCall_DCETable_sets;
 	uint virtualCall_DCETable_request;
 	uint virtualCall_DCETable_refs;
+	uint virtualCall_DCETable_id;
 	uint8_t *x25PLEId;		/* NoAccess */
 	size_t x25PLEIdLen;
 	uint8_t *virtualCircuitId;	/* NoAccess */
 	size_t virtualCircuitIdLen;
-	uint8_t *virtualCall_DCEchargingDirection;	/* ReadOnly */
-	size_t virtualCall_DCEchargingDirectionLen;
-	uint8_t *virtualCall_DCEcUGSelection;	/* ReadOnly */
-	size_t virtualCall_DCEcUGSelectionLen;
-	uint8_t *virtualCall_DCEdirection;	/* ReadOnly */
-	size_t virtualCall_DCEdirectionLen;
+	long virtualCall_DCEchargingDirection;	/* ReadOnly */
+	long virtualCall_DCEcUGSelection;	/* ReadOnly */
+	long virtualCall_DCEdirection;	/* ReadOnly */
 	long virtualCall_DCEfastSelect;	/* ReadOnly */
 	uint8_t *virtualCall_DCEremoteDTEAddress;	/* ReadOnly */
 	size_t virtualCall_DCEremoteDTEAddressLen;
-	uint8_t *virtualCall_DCEtransitDelaySelectionAndIndication;	/* ReadOnly */
-	size_t virtualCall_DCEtransitDelaySelectionAndIndicationLen;
-	uint8_t *virtualCall_DCEbilateralCUGSelection;	/* ReadOnly */
-	size_t virtualCall_DCEbilateralCUGSelectionLen;
+	long virtualCall_DCEtransitDelaySelectionAndIndication;	/* ReadOnly */
+	long virtualCall_DCEbilateralCUGSelection;	/* ReadOnly */
 	long virtualCall_DCEcallRedirectionDeflectionNotification;	/* ReadOnly */
 	long virtualCall_DCEcalledLineAddressModifiedNotification;	/* ReadOnly */
-	uint8_t *virtualCall_DCEcUGWithOutgoingAccessSelection;	/* ReadOnly */
-	size_t virtualCall_DCEcUGWithOutgoingAccessSelectionLen;
-	uint8_t *virtualCall_DCEnUISelection;	/* ReadOnly */
-	size_t virtualCall_DCEnUISelectionLen;
-	uint8_t *virtualCall_DCEreverseCharging;	/* ReadOnly */
-	size_t virtualCall_DCEreverseChargingLen;
-	uint8_t *virtualCall_DCErOASelection;	/* ReadOnly */
-	size_t virtualCall_DCErOASelectionLen;
+	long virtualCall_DCEcUGWithOutgoingAccessSelection;	/* ReadOnly */
+	long virtualCall_DCEnUISelection;	/* ReadOnly */
+	long virtualCall_DCEreverseCharging;	/* ReadOnly */
+	long virtualCall_DCErOASelection;	/* ReadOnly */
 	long virtualCall_DCERowStatus;	/* Create */
 };
 struct dSeriesCountsTable_data {
+	struct dSeriesCountsTable_data *dSeriesCountsTable_old;
+	uint dSeriesCountsTable_rsvs;
+	uint dSeriesCountsTable_tsts;
+	uint dSeriesCountsTable_sets;
 	uint dSeriesCountsTable_request;
 	uint dSeriesCountsTable_refs;
+	uint dSeriesCountsTable_id;
 	uint8_t *x25PLEId;		/* NoAccess */
 	size_t x25PLEIdLen;
 	uint8_t *virtualCircuitId;	/* NoAccess */
@@ -1518,8 +1764,13 @@ struct dSeriesCountsTable_data {
 	long dSeriesRowStatus;		/* Create */
 };
 struct adjacencyTable_data {
+	struct adjacencyTable_data *adjacencyTable_old;
+	uint adjacencyTable_rsvs;
+	uint adjacencyTable_tsts;
+	uint adjacencyTable_sets;
 	uint adjacencyTable_request;
 	uint adjacencyTable_refs;
+	uint adjacencyTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *clProtocolMachineId;	/* NoAccess */
@@ -1542,8 +1793,13 @@ struct adjacencyTable_data {
 	long adjacencyRowStatus;	/* Create */
 };
 struct virtualAdjacencyTable_data {
+	struct virtualAdjacencyTable_data *virtualAdjacencyTable_old;
+	uint virtualAdjacencyTable_rsvs;
+	uint virtualAdjacencyTable_tsts;
+	uint virtualAdjacencyTable_sets;
 	uint virtualAdjacencyTable_request;
 	uint virtualAdjacencyTable_refs;
+	uint virtualAdjacencyTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *clProtocolMachineId;	/* NoAccess */
@@ -1553,8 +1809,13 @@ struct virtualAdjacencyTable_data {
 	long virtualAdjacencyMetric;	/* ReadOnly */
 };
 struct destinationTable_data {
+	struct destinationTable_data *destinationTable_old;
+	uint destinationTable_rsvs;
+	uint destinationTable_tsts;
+	uint destinationTable_sets;
 	uint destinationTable_request;
 	uint destinationTable_refs;
+	uint destinationTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *clProtocolMachineId;	/* NoAccess */
@@ -1575,8 +1836,13 @@ struct destinationTable_data {
 	size_t destinationErrorMetricOutputAdjacenciesLen;
 };
 struct destinationSystemTable_data {
+	struct destinationSystemTable_data *destinationSystemTable_old;
+	uint destinationSystemTable_rsvs;
+	uint destinationSystemTable_tsts;
+	uint destinationSystemTable_sets;
 	uint destinationSystemTable_request;
 	uint destinationSystemTable_refs;
+	uint destinationSystemTable_id;
 	uint8_t *communicationsEntityId;	/* NoAccess */
 	size_t communicationsEntityIdLen;
 	uint8_t *clProtocolMachineId;	/* NoAccess */
@@ -1589,14 +1855,24 @@ struct destinationSystemTable_data {
 	size_t destinationSystemAdjacencyLen;
 };
 struct destinationAreaTable_data {
+	struct destinationAreaTable_data *destinationAreaTable_old;
+	uint destinationAreaTable_rsvs;
+	uint destinationAreaTable_tsts;
+	uint destinationAreaTable_sets;
 	uint destinationAreaTable_request;
 	uint destinationAreaTable_refs;
+	uint destinationAreaTable_id;
 	uint8_t *destinationAreaId;	/* ReadOnly */
 	size_t destinationAreaIdLen;
 };
 struct reachableAddressTable_data {
+	struct reachableAddressTable_data *reachableAddressTable_old;
+	uint reachableAddressTable_rsvs;
+	uint reachableAddressTable_tsts;
+	uint reachableAddressTable_sets;
 	uint reachableAddressTable_request;
 	uint reachableAddressTable_refs;
+	uint reachableAddressTable_id;
 	uint8_t *reachableAddressId;	/* NoAccess */
 	size_t reachableAddressIdLen;
 	uint8_t *reachableAddressPrefix;	/* Create */
@@ -1986,21 +2262,66 @@ extern struct header_complex_index *reachableAddressTableStorage;
 #define VIRTUALCALLIVMOFASTSELECT_FASTSELECTWITHRESTRICTEDRESPONSE 2
 #define VIRTUALCALLIVMOFASTSELECT_NOFASTSELECT   3
 
+#define VIRTUALCALLIVMOREVERSECHARGING_TRUE      1
+#define VIRTUALCALLIVMOREVERSECHARGING_FALSE     2
+
+#define VIRTUALCALLIVMOACCEPTREVERSECHARGING_TRUE 1
+#define VIRTUALCALLIVMOACCEPTREVERSECHARGING_FALSE 2
+
+#define VIRTUALCALLIVMOPROPOSEREVERSECHARGING_TRUE 1
+#define VIRTUALCALLIVMOPROPOSEREVERSECHARGING_FALSE 2
+
+#define SWITCHEDVIRTUALCALLDIRECTION_INCOMING    0
+#define SWITCHEDVIRTUALCALLDIRECTION_OUTGOING    1
+
+#define VIRTUALCALL_DTEDIRECTION_INCOMING        0
+#define VIRTUALCALL_DTEDIRECTION_OUTGOING        1
+
 #define VIRTUALCALL_DTEFASTSELECT_NOTSPECIFIED   0
 #define VIRTUALCALL_DTEFASTSELECT_FASTSELECT     1
 #define VIRTUALCALL_DTEFASTSELECT_FASTSELECTWITHRESTRICTEDRESPONSE 2
 #define VIRTUALCALL_DTEFASTSELECT_NOFASTSELECT   3
+
+#define VIRTUALCALL_DTEREVERSECHARGING_TRUE      1
+#define VIRTUALCALL_DTEREVERSECHARGING_FALSE     2
+
+#define VIRTUALCALL_DCECHARGINGDIRECTION_TRUE    1
+#define VIRTUALCALL_DCECHARGINGDIRECTION_FALSE   2
+
+#define VIRTUALCALL_DCECUGSELECTION_TRUE         1
+#define VIRTUALCALL_DCECUGSELECTION_FALSE        2
+
+#define VIRTUALCALL_DCEDIRECTION_INCOMING        0
+#define VIRTUALCALL_DCEDIRECTION_OUTGOING        1
 
 #define VIRTUALCALL_DCEFASTSELECT_NOTSPECIFIED   0
 #define VIRTUALCALL_DCEFASTSELECT_FASTSELECT     1
 #define VIRTUALCALL_DCEFASTSELECT_FASTSELECTWITHRESTRICTEDRESPONSE 2
 #define VIRTUALCALL_DCEFASTSELECT_NOFASTSELECT   3
 
+#define VIRTUALCALL_DCETRANSITDELAYSELECTIONANDINDICATION_TRUE 1
+#define VIRTUALCALL_DCETRANSITDELAYSELECTIONANDINDICATION_FALSE 2
+
+#define VIRTUALCALL_DCEBILATERALCUGSELECTION_TRUE 1
+#define VIRTUALCALL_DCEBILATERALCUGSELECTION_FALSE 2
+
 #define VIRTUALCALL_DCECALLREDIRECTIONDEFLECTIONNOTIFICATION_TRUE 1
 #define VIRTUALCALL_DCECALLREDIRECTIONDEFLECTIONNOTIFICATION_FALSE 2
 
 #define VIRTUALCALL_DCECALLEDLINEADDRESSMODIFIEDNOTIFICATION_TRUE 1
 #define VIRTUALCALL_DCECALLEDLINEADDRESSMODIFIEDNOTIFICATION_FALSE 2
+
+#define VIRTUALCALL_DCECUGWITHOUTGOINGACCESSSELECTION_TRUE 1
+#define VIRTUALCALL_DCECUGWITHOUTGOINGACCESSSELECTION_FALSE 2
+
+#define VIRTUALCALL_DCENUISELECTION_TRUE         1
+#define VIRTUALCALL_DCENUISELECTION_FALSE        2
+
+#define VIRTUALCALL_DCEREVERSECHARGING_TRUE      1
+#define VIRTUALCALL_DCEREVERSECHARGING_FALSE     2
+
+#define VIRTUALCALL_DCEROASELECTION_TRUE         1
+#define VIRTUALCALL_DCEROASELECTION_FALSE        2
 
 #define ADJACENCYSTATE_INITIALIZING              0
 #define ADJACENCYSTATE_UP                        1
@@ -2128,6 +2449,10 @@ void init_dlMIB(void);
 void deinit_dlMIB(void);
 int term_dlMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_dlMIB;
+struct dlMIB_data *dlMIB_create(void);
+struct dlMIB_data *dlMIB_duplicate(struct dlMIB_data *);
+int dlMIB_destroy(struct dlMIB_data **);
+int dlMIB_add(struct dlMIB_data *);
 void parse_dlMIB(const char *, char *);
 SNMPCallback store_dlMIB;
 void refresh_dlMIB(int);
@@ -2830,6 +3155,7 @@ WriteMethod write_x25PLEIVMO_DCERowStatus;
 WriteMethod write_permanentVirtualCircuitRowStatus;
 WriteMethod write_permanentVirtualCircuit_DTERowStatus;
 WriteMethod write_permanentVirtualCircuit_DCERowStatus;
+WriteMethod write_virtualCallIVMOreverseCharging;
 WriteMethod write_virtualCallIVMORowStatus;
 WriteMethod write_switchedVirtualCallRowStatus;
 WriteMethod write_virtualCall_DTERowStatus;

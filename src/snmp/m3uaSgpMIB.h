@@ -63,13 +63,22 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct m3uaSgpMIB_data {
+	struct m3uaSgpMIB_data *m3uaSgpMIB_old;
+	uint m3uaSgpMIB_rsvs;
+	uint m3uaSgpMIB_tsts;
+	uint m3uaSgpMIB_sets;
 	uint m3uaSgpMIB_request;
 	ulong m3uaSgpAgNextIndex;	/* ReadOnly */
 	ulong m3uaSgpNextIndex;		/* ReadOnly */
 };
 struct m3uaSgpAgTable_data {
+	struct m3uaSgpAgTable_data *m3uaSgpAgTable_old;
+	uint m3uaSgpAgTable_rsvs;
+	uint m3uaSgpAgTable_tsts;
+	uint m3uaSgpAgTable_sets;
 	uint m3uaSgpAgTable_request;
 	uint m3uaSgpAgTable_refs;
+	uint m3uaSgpAgTable_id;
 	ulong m3uaSgpAgIndex;		/* NoAccess */
 	uint8_t *m3uaSgpAgName;		/* Create */
 	size_t m3uaSgpAgNameLen;
@@ -86,8 +95,13 @@ struct m3uaSgpAgTable_data {
 	long m3uaSgpAgStatus;		/* Create */
 };
 struct m3uaSgpSgTable_data {
+	struct m3uaSgpSgTable_data *m3uaSgpSgTable_old;
+	uint m3uaSgpSgTable_rsvs;
+	uint m3uaSgpSgTable_tsts;
+	uint m3uaSgpSgTable_sets;
 	uint m3uaSgpSgTable_request;
 	uint m3uaSgpSgTable_refs;
+	uint m3uaSgpSgTable_id;
 	ulong m3uaSgpAgIndex;		/* NoAccess */
 	ulong m3uaSgpSgIndex;		/* NoAccess */
 	uint8_t *m3uaSgpSgName;		/* Create */
@@ -95,8 +109,13 @@ struct m3uaSgpSgTable_data {
 	long m3uaSgpSgStatus;		/* Create */
 };
 struct m3uaSgpAspTable_data {
+	struct m3uaSgpAspTable_data *m3uaSgpAspTable_old;
+	uint m3uaSgpAspTable_rsvs;
+	uint m3uaSgpAspTable_tsts;
+	uint m3uaSgpAspTable_sets;
 	uint m3uaSgpAspTable_request;
 	uint m3uaSgpAspTable_refs;
+	uint m3uaSgpAspTable_id;
 	ulong m3uaSgpAspIndex;		/* NoAccess */
 	uint8_t *m3uaSgpAspName;	/* Create */
 	size_t m3uaSgpAspNameLen;
@@ -115,8 +134,13 @@ struct m3uaSgpAspTable_data {
 	long m3uaSgpAspStatus;		/* Create */
 };
 struct m3uaSgpTable_data {
+	struct m3uaSgpTable_data *m3uaSgpTable_old;
+	uint m3uaSgpTable_rsvs;
+	uint m3uaSgpTable_tsts;
+	uint m3uaSgpTable_sets;
 	uint m3uaSgpTable_request;
 	uint m3uaSgpTable_refs;
+	uint m3uaSgpTable_id;
 	ulong m3uaSgpAgIndex;		/* NoAccess */
 	ulong m3uaSgpSgIndex;		/* NoAccess */
 	ulong m3uaSgpIndex;		/* NoAccess */
@@ -278,6 +302,10 @@ void init_m3uaSgpMIB(void);
 void deinit_m3uaSgpMIB(void);
 int term_m3uaSgpMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_m3uaSgpMIB;
+struct m3uaSgpMIB_data *m3uaSgpMIB_create(void);
+struct m3uaSgpMIB_data *m3uaSgpMIB_duplicate(struct m3uaSgpMIB_data *);
+int m3uaSgpMIB_destroy(struct m3uaSgpMIB_data **);
+int m3uaSgpMIB_add(struct m3uaSgpMIB_data *);
 void parse_m3uaSgpMIB(const char *, char *);
 SNMPCallback store_m3uaSgpMIB;
 void refresh_m3uaSgpMIB(int);

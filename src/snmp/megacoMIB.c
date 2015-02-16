@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/snmp/megacoMIB.c
+ @(#) src/snmp/megacoMIB.c
 
  -----------------------------------------------------------------------------
 
@@ -396,8 +396,38 @@ megacoMIB_create(void)
 		/* XXX: fill in default scalar values here into StorageNew */
 
 	}
+      done:
 	DEBUGMSGTL(("megacoMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	megacoMIB_destroy(&StorageNew);
+	goto done;
+}
+
+/**
+ * @fn struct megacoMIB_data *megacoMIB_duplicate(struct megacoMIB_data *thedata)
+ * @param thedata the mib structure to duplicate
+ * @brief duplicate a mib structure for the mib
+ *
+ * Duplicates the specified mib structure @param thedata and returns a pointer to the newly
+ * allocated mib structure on success, or NULL on failure.
+ */
+struct megacoMIB_data *
+megacoMIB_duplicate(struct megacoMIB_data *thedata)
+{
+	struct megacoMIB_data *StorageNew = SNMP_MALLOC_STRUCT(megacoMIB_data);
+
+	DEBUGMSGTL(("megacoMIB", "megacoMIB_duplicate: duplicating mib... "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("megacoMIB", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	megacoMIB_destroy(&StorageNew);
+	goto done;
 }
 
 /**
@@ -448,7 +478,7 @@ megacoMIB_add(struct megacoMIB_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for megacoMIB entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case megacoMIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -500,6 +530,62 @@ store_megacoMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	}
 	DEBUGMSGTL(("megacoMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int check_megacoMIB(struct megacoMIB_data *StorageTmp, struct megacoMIB_data *StorageOld)
+ * @param StorageTmp the data as updated
+ * @param StorageOld the data previous to update
+ *
+ * This function is used by mibs.  It is used to check, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the ACTION phase.  The COMMIT phase does not ensue unless this check passes.  This function can
+ * return SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before
+ * the varbinds on the mib were applied; the values in StorageTmp are the new values.  The function
+ * is permitted to change the values in StorageTmp to correct them; however, preferences should be
+ * made for setting values that were not in the varbinds.
+ */
+int
+check_megacoMIB(struct megacoMIB_data *StorageTmp, struct megacoMIB_data *StorageOld)
+{
+	/* XXX: provide code to check the scalars for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_megacoMIB(struct megacoMIB_data *StorageTmp, struct megacoMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase)
+ *
+ * This function is used by mibs.  It is used to update, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the COMMIT phase.  The start of the ACTION phase performs a consistency check on the mib before
+ * allowing the request to proceed to the COMMIT phase.  The COMMIT phase then arrives here with
+ * consistency already checked (see check_megacoMIB()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied: the values in StorageTmp are the new values.
+ */
+int
+update_megacoMIB(struct megacoMIB_data *StorageTmp, struct megacoMIB_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	megacoMIB_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn revert_megacoMIB(struct 
+ * @fn void revert_megacoMIB(struct megacoMIB_data *StorageTmp, struct megacoMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase)
+ */
+void
+revert_megacoMIB(struct megacoMIB_data *StorageTmp, struct megacoMIB_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_megacoMIB(StorageOld, NULL);
 }
 
 /**
@@ -597,16 +683,20 @@ medGwyLinkIdTable_create(void)
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->medGwyGatewayId = 0;
 		StorageNew->medGwyNextLinkId = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("megacoMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	medGwyLinkIdTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct medGwyLinkIdTable_data *medGwyLinkIdTable_duplicate(struct medGwyLinkIdTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -618,6 +708,9 @@ medGwyLinkIdTable_duplicate(struct medGwyLinkIdTable_data *thedata)
 
 	DEBUGMSGTL(("megacoMIB", "medGwyLinkIdTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->medGwyLinkIdTable_id = thedata->medGwyLinkIdTable_id;
+		StorageNew->medGwyGatewayId = thedata->medGwyGatewayId;
+		StorageNew->medGwyNextLinkId = thedata->medGwyNextLinkId;
 	}
       done:
 	DEBUGMSGTL(("megacoMIB", "done.\n"));
@@ -711,7 +804,7 @@ medGwyLinkIdTable_del(struct medGwyLinkIdTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for medGwyLinkIdTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case medGwyLinkIdTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -786,8 +879,10 @@ medGwyGatewayConfigTable_create(void)
 	DEBUGMSGTL(("megacoMIB", "medGwyGatewayConfigTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->medGwyGatewayLinkName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->medGwyGatewayLinkNameLen = strlen("");
+		if ((StorageNew->medGwyGatewayLinkName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->medGwyGatewayLinkNameLen = 0;
+		StorageNew->medGwyGatewayLinkName[StorageNew->medGwyGatewayLinkNameLen] = 0;
 		StorageNew->medGwyGatewayIPAddress = (u_char *) "\x00\x00\x00\x00";
 		StorageNew->medGwyGatewayIPAddressLen = 4;
 		StorageNew->medGwyGatewayPort = 2944;
@@ -801,14 +896,19 @@ medGwyGatewayConfigTable_create(void)
 		StorageNew->medGwyGatewayRowStatus = 0;
 		StorageNew->medGwyGatewayRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("megacoMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	medGwyGatewayConfigTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct medGwyGatewayConfigTable_data *medGwyGatewayConfigTable_duplicate(struct medGwyGatewayConfigTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -820,6 +920,28 @@ medGwyGatewayConfigTable_duplicate(struct medGwyGatewayConfigTable_data *thedata
 
 	DEBUGMSGTL(("megacoMIB", "medGwyGatewayConfigTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->medGwyGatewayConfigTable_id = thedata->medGwyGatewayConfigTable_id;
+		StorageNew->medGwyGatewayId = thedata->medGwyGatewayId;
+		StorageNew->medGwyGatewayLinkId = thedata->medGwyGatewayLinkId;
+		if (!(StorageNew->medGwyGatewayLinkName = malloc(thedata->medGwyGatewayLinkNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->medGwyGatewayLinkName, thedata->medGwyGatewayLinkName, thedata->medGwyGatewayLinkNameLen);
+		StorageNew->medGwyGatewayLinkNameLen = thedata->medGwyGatewayLinkNameLen;
+		StorageNew->medGwyGatewayLinkName[StorageNew->medGwyGatewayLinkNameLen] = 0;
+		if (!(StorageNew->medGwyGatewayIPAddress = malloc(thedata->medGwyGatewayIPAddressLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->medGwyGatewayIPAddress, thedata->medGwyGatewayIPAddress, thedata->medGwyGatewayIPAddressLen);
+		StorageNew->medGwyGatewayIPAddressLen = thedata->medGwyGatewayIPAddressLen;
+		StorageNew->medGwyGatewayIPAddress[StorageNew->medGwyGatewayIPAddressLen] = 0;
+		StorageNew->medGwyGatewayPort = thedata->medGwyGatewayPort;
+		StorageNew->medGwyGatewayEncodingScheme = thedata->medGwyGatewayEncodingScheme;
+		StorageNew->medGwyGatewayProtocol = thedata->medGwyGatewayProtocol;
+		StorageNew->medGwyGatewaySignalingTptProtocol = thedata->medGwyGatewaySignalingTptProtocol;
+		StorageNew->medGwyGatewayAdminStatus = thedata->medGwyGatewayAdminStatus;
+		StorageNew->medGwyGatewayOperStatus = thedata->medGwyGatewayOperStatus;
+		StorageNew->medGwyGatewayLastStatusChange = thedata->medGwyGatewayLastStatusChange;
+		StorageNew->medGwyGatewayResetStatistics = thedata->medGwyGatewayResetStatistics;
+		StorageNew->medGwyGatewayRowStatus = thedata->medGwyGatewayRowStatus;
 	}
       done:
 	DEBUGMSGTL(("megacoMIB", "done.\n"));
@@ -917,7 +1039,7 @@ medGwyGatewayConfigTable_del(struct medGwyGatewayConfigTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for medGwyGatewayConfigTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case medGwyGatewayConfigTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1031,16 +1153,20 @@ medGwyGatewayControllerTable_create(void)
 		StorageNew->medGwyGatewayControllerPort = 0;
 		StorageNew->medGwyGatewayControllerAdminStatus = 0;
 		StorageNew->medGwyGatewayControllerOperStatus = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("megacoMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	medGwyGatewayControllerTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct medGwyGatewayControllerTable_data *medGwyGatewayControllerTable_duplicate(struct medGwyGatewayControllerTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1052,6 +1178,18 @@ medGwyGatewayControllerTable_duplicate(struct medGwyGatewayControllerTable_data 
 
 	DEBUGMSGTL(("megacoMIB", "medGwyGatewayControllerTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->medGwyGatewayControllerTable_id = thedata->medGwyGatewayControllerTable_id;
+		StorageNew->medGwyGatewayId = thedata->medGwyGatewayId;
+		StorageNew->medGwyGatewayLinkId = thedata->medGwyGatewayLinkId;
+		StorageNew->medGwyGatewayControllerId = thedata->medGwyGatewayControllerId;
+		if (!(StorageNew->medGwyGatewayControllerIPAddress = malloc(thedata->medGwyGatewayControllerIPAddressLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->medGwyGatewayControllerIPAddress, thedata->medGwyGatewayControllerIPAddress, thedata->medGwyGatewayControllerIPAddressLen);
+		StorageNew->medGwyGatewayControllerIPAddressLen = thedata->medGwyGatewayControllerIPAddressLen;
+		StorageNew->medGwyGatewayControllerIPAddress[StorageNew->medGwyGatewayControllerIPAddressLen] = 0;
+		StorageNew->medGwyGatewayControllerPort = thedata->medGwyGatewayControllerPort;
+		StorageNew->medGwyGatewayControllerAdminStatus = thedata->medGwyGatewayControllerAdminStatus;
+		StorageNew->medGwyGatewayControllerOperStatus = thedata->medGwyGatewayControllerOperStatus;
 	}
       done:
 	DEBUGMSGTL(("megacoMIB", "done.\n"));
@@ -1149,7 +1287,7 @@ medGwyGatewayControllerTable_del(struct medGwyGatewayControllerTable_data *theda
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for medGwyGatewayControllerTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case medGwyGatewayControllerTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1253,16 +1391,20 @@ medGwyGatewayStatsTable_create(void)
 		StorageNew->medGwyGatewayTransportLastEvent = 0;
 		StorageNew->medGwyGatewayTransportLastEventTime = 0;
 		StorageNew->medGwyGatewayLastStatisticsReset = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("megacoMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	medGwyGatewayStatsTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct medGwyGatewayStatsTable_data *medGwyGatewayStatsTable_duplicate(struct medGwyGatewayStatsTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1274,6 +1416,21 @@ medGwyGatewayStatsTable_duplicate(struct medGwyGatewayStatsTable_data *thedata)
 
 	DEBUGMSGTL(("megacoMIB", "medGwyGatewayStatsTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->medGwyGatewayStatsTable_id = thedata->medGwyGatewayStatsTable_id;
+		StorageNew->medGwyGatewayId = thedata->medGwyGatewayId;
+		StorageNew->medGwyGatewayLinkId = thedata->medGwyGatewayLinkId;
+		StorageNew->medGwyGatewayNumInMessages = thedata->medGwyGatewayNumInMessages;
+		StorageNew->medGwyGatewayNumInOctets = thedata->medGwyGatewayNumInOctets;
+		StorageNew->medGwyGatewayNumOutMessages = thedata->medGwyGatewayNumOutMessages;
+		StorageNew->medGwyGatewayNumOutOctets = thedata->medGwyGatewayNumOutOctets;
+		StorageNew->medGwyGatewayNumErrors = thedata->medGwyGatewayNumErrors;
+		StorageNew->medGwyGatewayNumTimerRecovery = thedata->medGwyGatewayNumTimerRecovery;
+		StorageNew->medGwyGatewayTransportNumLosses = thedata->medGwyGatewayTransportNumLosses;
+		StorageNew->medGwyGatewayTransportNumSwitchover = thedata->medGwyGatewayTransportNumSwitchover;
+		StorageNew->medGwyGatewayTransportTotalNumAlarms = thedata->medGwyGatewayTransportTotalNumAlarms;
+		StorageNew->medGwyGatewayTransportLastEvent = thedata->medGwyGatewayTransportLastEvent;
+		StorageNew->medGwyGatewayTransportLastEventTime = thedata->medGwyGatewayTransportLastEventTime;
+		StorageNew->medGwyGatewayLastStatisticsReset = thedata->medGwyGatewayLastStatisticsReset;
 	}
       done:
 	DEBUGMSGTL(("megacoMIB", "done.\n"));
@@ -1369,7 +1526,7 @@ medGwyGatewayStatsTable_del(struct medGwyGatewayStatsTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for medGwyGatewayStatsTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case medGwyGatewayStatsTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1470,16 +1627,20 @@ medGwyTermIdTable_create(void)
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->medGwyGatewayId = 0;
 		StorageNew->medGwyNextTerminationId = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("megacoMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	medGwyTermIdTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct medGwyTermIdTable_data *medGwyTermIdTable_duplicate(struct medGwyTermIdTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1491,6 +1652,9 @@ medGwyTermIdTable_duplicate(struct medGwyTermIdTable_data *thedata)
 
 	DEBUGMSGTL(("megacoMIB", "medGwyTermIdTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->medGwyTermIdTable_id = thedata->medGwyTermIdTable_id;
+		StorageNew->medGwyGatewayId = thedata->medGwyGatewayId;
+		StorageNew->medGwyNextTerminationId = thedata->medGwyNextTerminationId;
 	}
       done:
 	DEBUGMSGTL(("megacoMIB", "done.\n"));
@@ -1584,7 +1748,7 @@ medGwyTermIdTable_del(struct medGwyTermIdTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for medGwyTermIdTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case medGwyTermIdTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1660,8 +1824,10 @@ medGwyTerminationsTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->medGwyGatewayId = 0;
-		if ((StorageNew->medGwyTerminationName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->medGwyTerminationNameLen = strlen("");
+		if ((StorageNew->medGwyTerminationName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->medGwyTerminationNameLen = 0;
+		StorageNew->medGwyTerminationName[StorageNew->medGwyTerminationNameLen] = 0;
 		StorageNew->medGwyTerminationAdminStatus = 0;
 		StorageNew->medGwyTerminationOperStatus = 0;
 		StorageNew->medGwyTerminationInterfaceIdentifier = 0;
@@ -1669,14 +1835,19 @@ medGwyTerminationsTable_create(void)
 		StorageNew->medGwyTerminationRowStatus = 0;
 		StorageNew->medGwyTerminationRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("megacoMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	medGwyTerminationsTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct medGwyTerminationsTable_data *medGwyTerminationsTable_duplicate(struct medGwyTerminationsTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1688,6 +1859,19 @@ medGwyTerminationsTable_duplicate(struct medGwyTerminationsTable_data *thedata)
 
 	DEBUGMSGTL(("megacoMIB", "medGwyTerminationsTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->medGwyTerminationsTable_id = thedata->medGwyTerminationsTable_id;
+		StorageNew->medGwyGatewayId = thedata->medGwyGatewayId;
+		StorageNew->medGwyTerminationId = thedata->medGwyTerminationId;
+		if (!(StorageNew->medGwyTerminationName = malloc(thedata->medGwyTerminationNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->medGwyTerminationName, thedata->medGwyTerminationName, thedata->medGwyTerminationNameLen);
+		StorageNew->medGwyTerminationNameLen = thedata->medGwyTerminationNameLen;
+		StorageNew->medGwyTerminationName[StorageNew->medGwyTerminationNameLen] = 0;
+		StorageNew->medGwyTerminationAdminStatus = thedata->medGwyTerminationAdminStatus;
+		StorageNew->medGwyTerminationOperStatus = thedata->medGwyTerminationOperStatus;
+		StorageNew->medGwyTerminationInterfaceIdentifier = thedata->medGwyTerminationInterfaceIdentifier;
+		StorageNew->medGwyTerminationPropertyProfileId = thedata->medGwyTerminationPropertyProfileId;
+		StorageNew->medGwyTerminationRowStatus = thedata->medGwyTerminationRowStatus;
 	}
       done:
 	DEBUGMSGTL(("megacoMIB", "done.\n"));
@@ -1785,7 +1969,7 @@ medGwyTerminationsTable_del(struct medGwyTerminationsTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for medGwyTerminationsTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case medGwyTerminationsTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1878,19 +2062,25 @@ medGwyPropertyProfileTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->medGwyGatewayId = 0;
-		if ((StorageNew->medGwyPropertyProfileProperty = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->medGwyPropertyProfilePropertyLen = 2;
+		if ((StorageNew->medGwyPropertyProfileProperty = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->medGwyPropertyProfilePropertyLen = 2;
 		StorageNew->medGwyTermPropertyProfileStatus = 0;
 		StorageNew->medGwyTermPropertyProfileStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("megacoMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	medGwyPropertyProfileTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct medGwyPropertyProfileTable_data *medGwyPropertyProfileTable_duplicate(struct medGwyPropertyProfileTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1902,6 +2092,14 @@ medGwyPropertyProfileTable_duplicate(struct medGwyPropertyProfileTable_data *the
 
 	DEBUGMSGTL(("megacoMIB", "medGwyPropertyProfileTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->medGwyPropertyProfileTable_id = thedata->medGwyPropertyProfileTable_id;
+		StorageNew->medGwyGatewayId = thedata->medGwyGatewayId;
+		StorageNew->medGwyPropertyProfileId = thedata->medGwyPropertyProfileId;
+		StorageNew->medGwyPropertyProfileIndex = thedata->medGwyPropertyProfileIndex;
+		if (!(StorageNew->medGwyPropertyProfileProperty = snmp_duplicate_objid(thedata->medGwyPropertyProfileProperty, thedata->medGwyPropertyProfilePropertyLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->medGwyPropertyProfilePropertyLen = thedata->medGwyPropertyProfilePropertyLen;
+		StorageNew->medGwyTermPropertyProfileStatus = thedata->medGwyTermPropertyProfileStatus;
 	}
       done:
 	DEBUGMSGTL(("megacoMIB", "done.\n"));
@@ -2001,7 +2199,7 @@ medGwyPropertyProfileTable_del(struct medGwyPropertyProfileTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for medGwyPropertyProfileTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case medGwyPropertyProfileTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2069,6 +2267,166 @@ store_medGwyPropertyProfileTable(int majorID, int minorID, void *serverarg, void
 	}
 	DEBUGMSGTL(("megacoMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int activate_medGwyGatewayConfigTable_row(struct medGwyGatewayConfigTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_medGwyGatewayConfigTable_row(struct medGwyGatewayConfigTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_medGwyGatewayConfigTable_row(struct medGwyGatewayConfigTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_medGwyGatewayConfigTable_row(struct medGwyGatewayConfigTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_medGwyTerminationsTable_row(struct medGwyTerminationsTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_medGwyTerminationsTable_row(struct medGwyTerminationsTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_medGwyTerminationsTable_row(struct medGwyTerminationsTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_medGwyTerminationsTable_row(struct medGwyTerminationsTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_medGwyPropertyProfileTable_row(struct medGwyPropertyProfileTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_medGwyPropertyProfileTable_row(struct medGwyPropertyProfileTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_medGwyPropertyProfileTable_row(struct medGwyPropertyProfileTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_medGwyPropertyProfileTable_row(struct medGwyPropertyProfileTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int check_medGwyLinkIdTable_row(struct medGwyLinkIdTable_data *StorageTmp, struct medGwyLinkIdTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_medGwyLinkIdTable_row(struct medGwyLinkIdTable_data *StorageTmp, struct medGwyLinkIdTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_medGwyLinkIdTable_row(struct medGwyLinkIdTable_data *StorageTmp, struct medGwyLinkIdTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_medGwyLinkIdTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_medGwyLinkIdTable_row(struct medGwyLinkIdTable_data *StorageTmp, struct medGwyLinkIdTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	medGwyLinkIdTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_medGwyLinkIdTable_row(struct medGwyLinkIdTable_data *StorageTmp, struct medGwyLinkIdTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_medGwyLinkIdTable_row(struct medGwyLinkIdTable_data *StorageTmp, struct medGwyLinkIdTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_medGwyLinkIdTable_row(StorageOld, NULL);
 }
 
 /**
@@ -2147,6 +2505,64 @@ var_medGwyLinkIdTable(struct variable *vp, oid * name, size_t *length, int exact
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_medGwyGatewayConfigTable_row(struct medGwyGatewayConfigTable_data *StorageTmp, struct medGwyGatewayConfigTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_medGwyGatewayConfigTable_row(struct medGwyGatewayConfigTable_data *StorageTmp, struct medGwyGatewayConfigTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_medGwyGatewayConfigTable_row(struct medGwyGatewayConfigTable_data *StorageTmp, struct medGwyGatewayConfigTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_medGwyGatewayConfigTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_medGwyGatewayConfigTable_row(struct medGwyGatewayConfigTable_data *StorageTmp, struct medGwyGatewayConfigTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	medGwyGatewayConfigTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_medGwyGatewayConfigTable_row(struct medGwyGatewayConfigTable_data *StorageTmp, struct medGwyGatewayConfigTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_medGwyGatewayConfigTable_row(struct medGwyGatewayConfigTable_data *StorageTmp, struct medGwyGatewayConfigTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_medGwyGatewayConfigTable_row(StorageOld, NULL);
 }
 
 /**
@@ -2296,6 +2712,64 @@ var_medGwyGatewayConfigTable(struct variable *vp, oid * name, size_t *length, in
 }
 
 /**
+ * @fn int check_medGwyGatewayControllerTable_row(struct medGwyGatewayControllerTable_data *StorageTmp, struct medGwyGatewayControllerTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_medGwyGatewayControllerTable_row(struct medGwyGatewayControllerTable_data *StorageTmp, struct medGwyGatewayControllerTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_medGwyGatewayControllerTable_row(struct medGwyGatewayControllerTable_data *StorageTmp, struct medGwyGatewayControllerTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_medGwyGatewayControllerTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_medGwyGatewayControllerTable_row(struct medGwyGatewayControllerTable_data *StorageTmp, struct medGwyGatewayControllerTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	medGwyGatewayControllerTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_medGwyGatewayControllerTable_row(struct medGwyGatewayControllerTable_data *StorageTmp, struct medGwyGatewayControllerTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_medGwyGatewayControllerTable_row(struct medGwyGatewayControllerTable_data *StorageTmp, struct medGwyGatewayControllerTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_medGwyGatewayControllerTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_medGwyGatewayControllerTable_row(struct medGwyGatewayControllerTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -2391,6 +2865,64 @@ var_medGwyGatewayControllerTable(struct variable *vp, oid * name, size_t *length
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_medGwyGatewayStatsTable_row(struct medGwyGatewayStatsTable_data *StorageTmp, struct medGwyGatewayStatsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_medGwyGatewayStatsTable_row(struct medGwyGatewayStatsTable_data *StorageTmp, struct medGwyGatewayStatsTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_medGwyGatewayStatsTable_row(struct medGwyGatewayStatsTable_data *StorageTmp, struct medGwyGatewayStatsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_medGwyGatewayStatsTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_medGwyGatewayStatsTable_row(struct medGwyGatewayStatsTable_data *StorageTmp, struct medGwyGatewayStatsTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	medGwyGatewayStatsTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_medGwyGatewayStatsTable_row(struct medGwyGatewayStatsTable_data *StorageTmp, struct medGwyGatewayStatsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_medGwyGatewayStatsTable_row(struct medGwyGatewayStatsTable_data *StorageTmp, struct medGwyGatewayStatsTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_medGwyGatewayStatsTable_row(StorageOld, NULL);
 }
 
 /**
@@ -2538,6 +3070,64 @@ var_medGwyGatewayStatsTable(struct variable *vp, oid * name, size_t *length, int
 }
 
 /**
+ * @fn int check_medGwyTermIdTable_row(struct medGwyTermIdTable_data *StorageTmp, struct medGwyTermIdTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_medGwyTermIdTable_row(struct medGwyTermIdTable_data *StorageTmp, struct medGwyTermIdTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_medGwyTermIdTable_row(struct medGwyTermIdTable_data *StorageTmp, struct medGwyTermIdTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_medGwyTermIdTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_medGwyTermIdTable_row(struct medGwyTermIdTable_data *StorageTmp, struct medGwyTermIdTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	medGwyTermIdTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_medGwyTermIdTable_row(struct medGwyTermIdTable_data *StorageTmp, struct medGwyTermIdTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_medGwyTermIdTable_row(struct medGwyTermIdTable_data *StorageTmp, struct medGwyTermIdTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_medGwyTermIdTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_medGwyTermIdTable_row(struct medGwyTermIdTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -2613,6 +3203,64 @@ var_medGwyTermIdTable(struct variable *vp, oid * name, size_t *length, int exact
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_medGwyTerminationsTable_row(struct medGwyTerminationsTable_data *StorageTmp, struct medGwyTerminationsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_medGwyTerminationsTable_row(struct medGwyTerminationsTable_data *StorageTmp, struct medGwyTerminationsTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_medGwyTerminationsTable_row(struct medGwyTerminationsTable_data *StorageTmp, struct medGwyTerminationsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_medGwyTerminationsTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_medGwyTerminationsTable_row(struct medGwyTerminationsTable_data *StorageTmp, struct medGwyTerminationsTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	medGwyTerminationsTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_medGwyTerminationsTable_row(struct medGwyTerminationsTable_data *StorageTmp, struct medGwyTerminationsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_medGwyTerminationsTable_row(struct medGwyTerminationsTable_data *StorageTmp, struct medGwyTerminationsTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_medGwyTerminationsTable_row(StorageOld, NULL);
 }
 
 /**
@@ -2729,6 +3377,64 @@ var_medGwyTerminationsTable(struct variable *vp, oid * name, size_t *length, int
 }
 
 /**
+ * @fn int check_medGwyPropertyProfileTable_row(struct medGwyPropertyProfileTable_data *StorageTmp, struct medGwyPropertyProfileTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_medGwyPropertyProfileTable_row(struct medGwyPropertyProfileTable_data *StorageTmp, struct medGwyPropertyProfileTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_medGwyPropertyProfileTable_row(struct medGwyPropertyProfileTable_data *StorageTmp, struct medGwyPropertyProfileTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_medGwyPropertyProfileTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_medGwyPropertyProfileTable_row(struct medGwyPropertyProfileTable_data *StorageTmp, struct medGwyPropertyProfileTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	medGwyPropertyProfileTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_medGwyPropertyProfileTable_row(struct medGwyPropertyProfileTable_data *StorageTmp, struct medGwyPropertyProfileTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_medGwyPropertyProfileTable_row(struct medGwyPropertyProfileTable_data *StorageTmp, struct medGwyPropertyProfileTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_medGwyPropertyProfileTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_medGwyPropertyProfileTable_row(struct medGwyPropertyProfileTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -2827,12 +3533,14 @@ var_medGwyPropertyProfileTable(struct variable *vp, oid * name, size_t *length, 
 int
 write_medGwyNextLinkId(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct medGwyLinkIdTable_data *StorageTmp = NULL;
+	struct medGwyLinkIdTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoMIB", "write_medGwyNextLinkId entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(medGwyLinkIdTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -2851,20 +3559,59 @@ write_medGwyNextLinkId(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to medGwyNextLinkId: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->medGwyLinkIdTable_old) == NULL)
+			if (StorageTmp->medGwyLinkIdTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->medGwyLinkIdTable_old = medGwyLinkIdTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->medGwyLinkIdTable_rsvs++;
+		StorageTmp->medGwyNextLinkId = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->medGwyLinkIdTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->medGwyLinkIdTable_tsts == 0)
+				if ((ret = check_medGwyLinkIdTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyLinkIdTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->medGwyNextLinkId for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
-		old_value = StorageTmp->medGwyNextLinkId;
-		StorageTmp->medGwyNextLinkId = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->medGwyLinkIdTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->medGwyLinkIdTable_sets == 0)
+				if ((ret = update_medGwyLinkIdTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyLinkIdTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->medGwyLinkIdTable_old) != NULL) {
+			medGwyLinkIdTable_destroy(&StorageTmp->medGwyLinkIdTable_old);
+			StorageTmp->medGwyLinkIdTable_rsvs = 0;
+			StorageTmp->medGwyLinkIdTable_tsts = 0;
+			StorageTmp->medGwyLinkIdTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->medGwyNextLinkId = old_value;
+		if ((StorageOld = StorageTmp->medGwyLinkIdTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->medGwyLinkIdTable_sets == 0)
+			revert_medGwyLinkIdTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->medGwyLinkIdTable_old) == NULL)
+			break;
+		StorageTmp->medGwyNextLinkId = StorageOld->medGwyNextLinkId;
+		if (--StorageTmp->medGwyLinkIdTable_rsvs == 0)
+			medGwyLinkIdTable_destroy(&StorageTmp->medGwyLinkIdTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2884,17 +3631,17 @@ write_medGwyNextLinkId(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_medGwyGatewayLinkName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct medGwyGatewayConfigTable_data *StorageTmp = NULL;
+	struct medGwyGatewayConfigTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoMIB", "write_medGwyGatewayLinkName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(medGwyGatewayConfigTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->medGwyGatewayRowStatus) {
@@ -2917,33 +3664,73 @@ write_medGwyGatewayLinkName(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to medGwyGatewayLinkName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) == NULL)
+			if (StorageTmp->medGwyGatewayConfigTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old = medGwyGatewayConfigTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->medGwyGatewayConfigTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->medGwyGatewayLinkName);
+		StorageTmp->medGwyGatewayLinkName = string;
+		StorageTmp->medGwyGatewayLinkNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->medGwyGatewayConfigTable_tsts == 0)
+				if ((ret = check_medGwyGatewayConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyGatewayConfigTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->medGwyGatewayLinkName for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->medGwyGatewayLinkName;
-		old_length = StorageTmp->medGwyGatewayLinkNameLen;
-		StorageTmp->medGwyGatewayLinkName = string;
-		StorageTmp->medGwyGatewayLinkNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->medGwyGatewayConfigTable_sets == 0)
+				if ((ret = update_medGwyGatewayConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyGatewayConfigTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) != NULL) {
+			medGwyGatewayConfigTable_destroy(&StorageTmp->medGwyGatewayConfigTable_old);
+			StorageTmp->medGwyGatewayConfigTable_rsvs = 0;
+			StorageTmp->medGwyGatewayConfigTable_tsts = 0;
+			StorageTmp->medGwyGatewayConfigTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->medGwyGatewayLinkName = old_value;
-		StorageTmp->medGwyGatewayLinkNameLen = old_length;
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->medGwyGatewayConfigTable_sets == 0)
+			revert_medGwyGatewayConfigTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) == NULL)
+			break;
+		if (StorageOld->medGwyGatewayLinkName != NULL) {
+			SNMP_FREE(StorageTmp->medGwyGatewayLinkName);
+			StorageTmp->medGwyGatewayLinkName = StorageOld->medGwyGatewayLinkName;
+			StorageTmp->medGwyGatewayLinkNameLen = StorageOld->medGwyGatewayLinkNameLen;
+			StorageOld->medGwyGatewayLinkName = NULL;
+			StorageOld->medGwyGatewayLinkNameLen = 0;
+		}
+		if (--StorageTmp->medGwyGatewayConfigTable_rsvs == 0)
+			medGwyGatewayConfigTable_destroy(&StorageTmp->medGwyGatewayConfigTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2963,17 +3750,17 @@ write_medGwyGatewayLinkName(int action, u_char *var_val, u_char var_val_type, si
 int
 write_medGwyGatewayIPAddress(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct medGwyGatewayConfigTable_data *StorageTmp = NULL;
+	struct medGwyGatewayConfigTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoMIB", "write_medGwyGatewayIPAddress entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(medGwyGatewayConfigTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->medGwyGatewayRowStatus) {
@@ -2995,33 +3782,73 @@ write_medGwyGatewayIPAddress(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to medGwyGatewayIPAddress: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) == NULL)
+			if (StorageTmp->medGwyGatewayConfigTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old = medGwyGatewayConfigTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->medGwyGatewayConfigTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->medGwyGatewayIPAddress);
+		StorageTmp->medGwyGatewayIPAddress = string;
+		StorageTmp->medGwyGatewayIPAddressLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->medGwyGatewayConfigTable_tsts == 0)
+				if ((ret = check_medGwyGatewayConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyGatewayConfigTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->medGwyGatewayIPAddress for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->medGwyGatewayIPAddress;
-		old_length = StorageTmp->medGwyGatewayIPAddressLen;
-		StorageTmp->medGwyGatewayIPAddress = string;
-		StorageTmp->medGwyGatewayIPAddressLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->medGwyGatewayConfigTable_sets == 0)
+				if ((ret = update_medGwyGatewayConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyGatewayConfigTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) != NULL) {
+			medGwyGatewayConfigTable_destroy(&StorageTmp->medGwyGatewayConfigTable_old);
+			StorageTmp->medGwyGatewayConfigTable_rsvs = 0;
+			StorageTmp->medGwyGatewayConfigTable_tsts = 0;
+			StorageTmp->medGwyGatewayConfigTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->medGwyGatewayIPAddress = old_value;
-		StorageTmp->medGwyGatewayIPAddressLen = old_length;
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->medGwyGatewayConfigTable_sets == 0)
+			revert_medGwyGatewayConfigTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) == NULL)
+			break;
+		if (StorageOld->medGwyGatewayIPAddress != NULL) {
+			SNMP_FREE(StorageTmp->medGwyGatewayIPAddress);
+			StorageTmp->medGwyGatewayIPAddress = StorageOld->medGwyGatewayIPAddress;
+			StorageTmp->medGwyGatewayIPAddressLen = StorageOld->medGwyGatewayIPAddressLen;
+			StorageOld->medGwyGatewayIPAddress = NULL;
+			StorageOld->medGwyGatewayIPAddressLen = 0;
+		}
+		if (--StorageTmp->medGwyGatewayConfigTable_rsvs == 0)
+			medGwyGatewayConfigTable_destroy(&StorageTmp->medGwyGatewayConfigTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3041,12 +3868,14 @@ write_medGwyGatewayIPAddress(int action, u_char *var_val, u_char var_val_type, s
 int
 write_medGwyGatewayPort(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct medGwyGatewayConfigTable_data *StorageTmp = NULL;
+	struct medGwyGatewayConfigTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoMIB", "write_medGwyGatewayPort entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(medGwyGatewayConfigTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3077,22 +3906,61 @@ write_medGwyGatewayPort(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to medGwyGatewayPort: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) == NULL)
+			if (StorageTmp->medGwyGatewayConfigTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old = medGwyGatewayConfigTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->medGwyGatewayConfigTable_rsvs++;
+		StorageTmp->medGwyGatewayPort = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->medGwyGatewayConfigTable_tsts == 0)
+				if ((ret = check_medGwyGatewayConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyGatewayConfigTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->medGwyGatewayPort for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->medGwyGatewayPort;
-		StorageTmp->medGwyGatewayPort = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->medGwyGatewayConfigTable_sets == 0)
+				if ((ret = update_medGwyGatewayConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyGatewayConfigTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) != NULL) {
+			medGwyGatewayConfigTable_destroy(&StorageTmp->medGwyGatewayConfigTable_old);
+			StorageTmp->medGwyGatewayConfigTable_rsvs = 0;
+			StorageTmp->medGwyGatewayConfigTable_tsts = 0;
+			StorageTmp->medGwyGatewayConfigTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->medGwyGatewayPort = old_value;
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->medGwyGatewayConfigTable_sets == 0)
+			revert_medGwyGatewayConfigTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) == NULL)
+			break;
+		StorageTmp->medGwyGatewayPort = StorageOld->medGwyGatewayPort;
+		if (--StorageTmp->medGwyGatewayConfigTable_rsvs == 0)
+			medGwyGatewayConfigTable_destroy(&StorageTmp->medGwyGatewayConfigTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3112,12 +3980,14 @@ write_medGwyGatewayPort(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_medGwyGatewayEncodingScheme(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct medGwyGatewayConfigTable_data *StorageTmp = NULL;
+	struct medGwyGatewayConfigTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoMIB", "write_medGwyGatewayEncodingScheme entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(medGwyGatewayConfigTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3151,22 +4021,61 @@ write_medGwyGatewayEncodingScheme(int action, u_char *var_val, u_char var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to medGwyGatewayEncodingScheme: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) == NULL)
+			if (StorageTmp->medGwyGatewayConfigTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old = medGwyGatewayConfigTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->medGwyGatewayConfigTable_rsvs++;
+		StorageTmp->medGwyGatewayEncodingScheme = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->medGwyGatewayConfigTable_tsts == 0)
+				if ((ret = check_medGwyGatewayConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyGatewayConfigTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->medGwyGatewayEncodingScheme for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->medGwyGatewayEncodingScheme;
-		StorageTmp->medGwyGatewayEncodingScheme = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->medGwyGatewayConfigTable_sets == 0)
+				if ((ret = update_medGwyGatewayConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyGatewayConfigTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) != NULL) {
+			medGwyGatewayConfigTable_destroy(&StorageTmp->medGwyGatewayConfigTable_old);
+			StorageTmp->medGwyGatewayConfigTable_rsvs = 0;
+			StorageTmp->medGwyGatewayConfigTable_tsts = 0;
+			StorageTmp->medGwyGatewayConfigTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->medGwyGatewayEncodingScheme = old_value;
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->medGwyGatewayConfigTable_sets == 0)
+			revert_medGwyGatewayConfigTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) == NULL)
+			break;
+		StorageTmp->medGwyGatewayEncodingScheme = StorageOld->medGwyGatewayEncodingScheme;
+		if (--StorageTmp->medGwyGatewayConfigTable_rsvs == 0)
+			medGwyGatewayConfigTable_destroy(&StorageTmp->medGwyGatewayConfigTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3186,12 +4095,14 @@ write_medGwyGatewayEncodingScheme(int action, u_char *var_val, u_char var_val_ty
 int
 write_medGwyGatewayProtocol(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct medGwyGatewayConfigTable_data *StorageTmp = NULL;
+	struct medGwyGatewayConfigTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoMIB", "write_medGwyGatewayProtocol entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(medGwyGatewayConfigTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3229,22 +4140,61 @@ write_medGwyGatewayProtocol(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to medGwyGatewayProtocol: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) == NULL)
+			if (StorageTmp->medGwyGatewayConfigTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old = medGwyGatewayConfigTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->medGwyGatewayConfigTable_rsvs++;
+		StorageTmp->medGwyGatewayProtocol = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->medGwyGatewayConfigTable_tsts == 0)
+				if ((ret = check_medGwyGatewayConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyGatewayConfigTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->medGwyGatewayProtocol for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->medGwyGatewayProtocol;
-		StorageTmp->medGwyGatewayProtocol = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->medGwyGatewayConfigTable_sets == 0)
+				if ((ret = update_medGwyGatewayConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyGatewayConfigTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) != NULL) {
+			medGwyGatewayConfigTable_destroy(&StorageTmp->medGwyGatewayConfigTable_old);
+			StorageTmp->medGwyGatewayConfigTable_rsvs = 0;
+			StorageTmp->medGwyGatewayConfigTable_tsts = 0;
+			StorageTmp->medGwyGatewayConfigTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->medGwyGatewayProtocol = old_value;
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->medGwyGatewayConfigTable_sets == 0)
+			revert_medGwyGatewayConfigTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) == NULL)
+			break;
+		StorageTmp->medGwyGatewayProtocol = StorageOld->medGwyGatewayProtocol;
+		if (--StorageTmp->medGwyGatewayConfigTable_rsvs == 0)
+			medGwyGatewayConfigTable_destroy(&StorageTmp->medGwyGatewayConfigTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3264,12 +4214,14 @@ write_medGwyGatewayProtocol(int action, u_char *var_val, u_char var_val_type, si
 int
 write_medGwyGatewaySignalingTptProtocol(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct medGwyGatewayConfigTable_data *StorageTmp = NULL;
+	struct medGwyGatewayConfigTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoMIB", "write_medGwyGatewaySignalingTptProtocol entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(medGwyGatewayConfigTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3304,22 +4256,61 @@ write_medGwyGatewaySignalingTptProtocol(int action, u_char *var_val, u_char var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to medGwyGatewaySignalingTptProtocol: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) == NULL)
+			if (StorageTmp->medGwyGatewayConfigTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old = medGwyGatewayConfigTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->medGwyGatewayConfigTable_rsvs++;
+		StorageTmp->medGwyGatewaySignalingTptProtocol = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->medGwyGatewayConfigTable_tsts == 0)
+				if ((ret = check_medGwyGatewayConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyGatewayConfigTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->medGwyGatewaySignalingTptProtocol for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->medGwyGatewaySignalingTptProtocol;
-		StorageTmp->medGwyGatewaySignalingTptProtocol = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->medGwyGatewayConfigTable_sets == 0)
+				if ((ret = update_medGwyGatewayConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyGatewayConfigTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) != NULL) {
+			medGwyGatewayConfigTable_destroy(&StorageTmp->medGwyGatewayConfigTable_old);
+			StorageTmp->medGwyGatewayConfigTable_rsvs = 0;
+			StorageTmp->medGwyGatewayConfigTable_tsts = 0;
+			StorageTmp->medGwyGatewayConfigTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->medGwyGatewaySignalingTptProtocol = old_value;
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->medGwyGatewayConfigTable_sets == 0)
+			revert_medGwyGatewayConfigTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) == NULL)
+			break;
+		StorageTmp->medGwyGatewaySignalingTptProtocol = StorageOld->medGwyGatewaySignalingTptProtocol;
+		if (--StorageTmp->medGwyGatewayConfigTable_rsvs == 0)
+			medGwyGatewayConfigTable_destroy(&StorageTmp->medGwyGatewayConfigTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3339,12 +4330,14 @@ write_medGwyGatewaySignalingTptProtocol(int action, u_char *var_val, u_char var_
 int
 write_medGwyGatewayAdminStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct medGwyGatewayConfigTable_data *StorageTmp = NULL;
+	struct medGwyGatewayConfigTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoMIB", "write_medGwyGatewayAdminStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(medGwyGatewayConfigTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3378,22 +4371,61 @@ write_medGwyGatewayAdminStatus(int action, u_char *var_val, u_char var_val_type,
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to medGwyGatewayAdminStatus: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) == NULL)
+			if (StorageTmp->medGwyGatewayConfigTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old = medGwyGatewayConfigTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->medGwyGatewayConfigTable_rsvs++;
+		StorageTmp->medGwyGatewayAdminStatus = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->medGwyGatewayConfigTable_tsts == 0)
+				if ((ret = check_medGwyGatewayConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyGatewayConfigTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->medGwyGatewayAdminStatus for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->medGwyGatewayAdminStatus;
-		StorageTmp->medGwyGatewayAdminStatus = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->medGwyGatewayConfigTable_sets == 0)
+				if ((ret = update_medGwyGatewayConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyGatewayConfigTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) != NULL) {
+			medGwyGatewayConfigTable_destroy(&StorageTmp->medGwyGatewayConfigTable_old);
+			StorageTmp->medGwyGatewayConfigTable_rsvs = 0;
+			StorageTmp->medGwyGatewayConfigTable_tsts = 0;
+			StorageTmp->medGwyGatewayConfigTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->medGwyGatewayAdminStatus = old_value;
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->medGwyGatewayConfigTable_sets == 0)
+			revert_medGwyGatewayConfigTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) == NULL)
+			break;
+		StorageTmp->medGwyGatewayAdminStatus = StorageOld->medGwyGatewayAdminStatus;
+		if (--StorageTmp->medGwyGatewayConfigTable_rsvs == 0)
+			medGwyGatewayConfigTable_destroy(&StorageTmp->medGwyGatewayConfigTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3413,12 +4445,14 @@ write_medGwyGatewayAdminStatus(int action, u_char *var_val, u_char var_val_type,
 int
 write_medGwyGatewayResetStatistics(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct medGwyGatewayConfigTable_data *StorageTmp = NULL;
+	struct medGwyGatewayConfigTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoMIB", "write_medGwyGatewayResetStatistics entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(medGwyGatewayConfigTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3452,22 +4486,61 @@ write_medGwyGatewayResetStatistics(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to medGwyGatewayResetStatistics: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) == NULL)
+			if (StorageTmp->medGwyGatewayConfigTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old = medGwyGatewayConfigTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->medGwyGatewayConfigTable_rsvs++;
+		StorageTmp->medGwyGatewayResetStatistics = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->medGwyGatewayConfigTable_tsts == 0)
+				if ((ret = check_medGwyGatewayConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyGatewayConfigTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->medGwyGatewayResetStatistics for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->medGwyGatewayResetStatistics;
-		StorageTmp->medGwyGatewayResetStatistics = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->medGwyGatewayConfigTable_sets == 0)
+				if ((ret = update_medGwyGatewayConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyGatewayConfigTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) != NULL) {
+			medGwyGatewayConfigTable_destroy(&StorageTmp->medGwyGatewayConfigTable_old);
+			StorageTmp->medGwyGatewayConfigTable_rsvs = 0;
+			StorageTmp->medGwyGatewayConfigTable_tsts = 0;
+			StorageTmp->medGwyGatewayConfigTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->medGwyGatewayResetStatistics = old_value;
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->medGwyGatewayConfigTable_sets == 0)
+			revert_medGwyGatewayConfigTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) == NULL)
+			break;
+		StorageTmp->medGwyGatewayResetStatistics = StorageOld->medGwyGatewayResetStatistics;
+		if (--StorageTmp->medGwyGatewayConfigTable_rsvs == 0)
+			medGwyGatewayConfigTable_destroy(&StorageTmp->medGwyGatewayConfigTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3487,19 +4560,19 @@ write_medGwyGatewayResetStatistics(int action, u_char *var_val, u_char var_val_t
 int
 write_medGwyGatewayControllerIPAddress(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct medGwyGatewayControllerTable_data *StorageTmp = NULL;
+	struct medGwyGatewayControllerTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoMIB", "write_medGwyGatewayControllerIPAddress entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(medGwyGatewayControllerTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (var_val_type != ASN_IPADDRESS) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to medGwyGatewayControllerIPAddress not ASN_IPADDRESS\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -3508,31 +4581,71 @@ write_medGwyGatewayControllerIPAddress(int action, u_char *var_val, u_char var_v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to medGwyGatewayControllerIPAddress: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->medGwyGatewayControllerTable_old) == NULL)
+			if (StorageTmp->medGwyGatewayControllerTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->medGwyGatewayControllerTable_old = medGwyGatewayControllerTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->medGwyGatewayControllerTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->medGwyGatewayControllerIPAddress);
+		StorageTmp->medGwyGatewayControllerIPAddress = string;
+		StorageTmp->medGwyGatewayControllerIPAddressLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->medGwyGatewayControllerTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->medGwyGatewayControllerTable_tsts == 0)
+				if ((ret = check_medGwyGatewayControllerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyGatewayControllerTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->medGwyGatewayControllerIPAddress for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		old_value = StorageTmp->medGwyGatewayControllerIPAddress;
-		old_length = StorageTmp->medGwyGatewayControllerIPAddressLen;
-		StorageTmp->medGwyGatewayControllerIPAddress = string;
-		StorageTmp->medGwyGatewayControllerIPAddressLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->medGwyGatewayControllerTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->medGwyGatewayControllerTable_sets == 0)
+				if ((ret = update_medGwyGatewayControllerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyGatewayControllerTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->medGwyGatewayControllerTable_old) != NULL) {
+			medGwyGatewayControllerTable_destroy(&StorageTmp->medGwyGatewayControllerTable_old);
+			StorageTmp->medGwyGatewayControllerTable_rsvs = 0;
+			StorageTmp->medGwyGatewayControllerTable_tsts = 0;
+			StorageTmp->medGwyGatewayControllerTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->medGwyGatewayControllerIPAddress = old_value;
-		StorageTmp->medGwyGatewayControllerIPAddressLen = old_length;
+		if ((StorageOld = StorageTmp->medGwyGatewayControllerTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->medGwyGatewayControllerTable_sets == 0)
+			revert_medGwyGatewayControllerTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->medGwyGatewayControllerTable_old) == NULL)
+			break;
+		if (StorageOld->medGwyGatewayControllerIPAddress != NULL) {
+			SNMP_FREE(StorageTmp->medGwyGatewayControllerIPAddress);
+			StorageTmp->medGwyGatewayControllerIPAddress = StorageOld->medGwyGatewayControllerIPAddress;
+			StorageTmp->medGwyGatewayControllerIPAddressLen = StorageOld->medGwyGatewayControllerIPAddressLen;
+			StorageOld->medGwyGatewayControllerIPAddress = NULL;
+			StorageOld->medGwyGatewayControllerIPAddressLen = 0;
+		}
+		if (--StorageTmp->medGwyGatewayControllerTable_rsvs == 0)
+			medGwyGatewayControllerTable_destroy(&StorageTmp->medGwyGatewayControllerTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3552,12 +4665,14 @@ write_medGwyGatewayControllerIPAddress(int action, u_char *var_val, u_char var_v
 int
 write_medGwyGatewayControllerPort(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct medGwyGatewayControllerTable_data *StorageTmp = NULL;
+	struct medGwyGatewayControllerTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoMIB", "write_medGwyGatewayControllerPort entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(medGwyGatewayControllerTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -3576,20 +4691,59 @@ write_medGwyGatewayControllerPort(int action, u_char *var_val, u_char var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to medGwyGatewayControllerPort: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->medGwyGatewayControllerTable_old) == NULL)
+			if (StorageTmp->medGwyGatewayControllerTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->medGwyGatewayControllerTable_old = medGwyGatewayControllerTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->medGwyGatewayControllerTable_rsvs++;
+		StorageTmp->medGwyGatewayControllerPort = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->medGwyGatewayControllerTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->medGwyGatewayControllerTable_tsts == 0)
+				if ((ret = check_medGwyGatewayControllerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyGatewayControllerTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->medGwyGatewayControllerPort for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
-		old_value = StorageTmp->medGwyGatewayControllerPort;
-		StorageTmp->medGwyGatewayControllerPort = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->medGwyGatewayControllerTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->medGwyGatewayControllerTable_sets == 0)
+				if ((ret = update_medGwyGatewayControllerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyGatewayControllerTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->medGwyGatewayControllerTable_old) != NULL) {
+			medGwyGatewayControllerTable_destroy(&StorageTmp->medGwyGatewayControllerTable_old);
+			StorageTmp->medGwyGatewayControllerTable_rsvs = 0;
+			StorageTmp->medGwyGatewayControllerTable_tsts = 0;
+			StorageTmp->medGwyGatewayControllerTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->medGwyGatewayControllerPort = old_value;
+		if ((StorageOld = StorageTmp->medGwyGatewayControllerTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->medGwyGatewayControllerTable_sets == 0)
+			revert_medGwyGatewayControllerTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->medGwyGatewayControllerTable_old) == NULL)
+			break;
+		StorageTmp->medGwyGatewayControllerPort = StorageOld->medGwyGatewayControllerPort;
+		if (--StorageTmp->medGwyGatewayControllerTable_rsvs == 0)
+			medGwyGatewayControllerTable_destroy(&StorageTmp->medGwyGatewayControllerTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3609,12 +4763,14 @@ write_medGwyGatewayControllerPort(int action, u_char *var_val, u_char var_val_ty
 int
 write_medGwyGatewayControllerAdminStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct medGwyGatewayControllerTable_data *StorageTmp = NULL;
+	struct medGwyGatewayControllerTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoMIB", "write_medGwyGatewayControllerAdminStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(medGwyGatewayControllerTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -3637,20 +4793,59 @@ write_medGwyGatewayControllerAdminStatus(int action, u_char *var_val, u_char var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to medGwyGatewayControllerAdminStatus: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->medGwyGatewayControllerTable_old) == NULL)
+			if (StorageTmp->medGwyGatewayControllerTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->medGwyGatewayControllerTable_old = medGwyGatewayControllerTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->medGwyGatewayControllerTable_rsvs++;
+		StorageTmp->medGwyGatewayControllerAdminStatus = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->medGwyGatewayControllerTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->medGwyGatewayControllerTable_tsts == 0)
+				if ((ret = check_medGwyGatewayControllerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyGatewayControllerTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->medGwyGatewayControllerAdminStatus for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		old_value = StorageTmp->medGwyGatewayControllerAdminStatus;
-		StorageTmp->medGwyGatewayControllerAdminStatus = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->medGwyGatewayControllerTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->medGwyGatewayControllerTable_sets == 0)
+				if ((ret = update_medGwyGatewayControllerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyGatewayControllerTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->medGwyGatewayControllerTable_old) != NULL) {
+			medGwyGatewayControllerTable_destroy(&StorageTmp->medGwyGatewayControllerTable_old);
+			StorageTmp->medGwyGatewayControllerTable_rsvs = 0;
+			StorageTmp->medGwyGatewayControllerTable_tsts = 0;
+			StorageTmp->medGwyGatewayControllerTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->medGwyGatewayControllerAdminStatus = old_value;
+		if ((StorageOld = StorageTmp->medGwyGatewayControllerTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->medGwyGatewayControllerTable_sets == 0)
+			revert_medGwyGatewayControllerTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->medGwyGatewayControllerTable_old) == NULL)
+			break;
+		StorageTmp->medGwyGatewayControllerAdminStatus = StorageOld->medGwyGatewayControllerAdminStatus;
+		if (--StorageTmp->medGwyGatewayControllerTable_rsvs == 0)
+			medGwyGatewayControllerTable_destroy(&StorageTmp->medGwyGatewayControllerTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3670,12 +4865,14 @@ write_medGwyGatewayControllerAdminStatus(int action, u_char *var_val, u_char var
 int
 write_medGwyGatewayTransportLastEventTime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct medGwyGatewayStatsTable_data *StorageTmp = NULL;
+	struct medGwyGatewayStatsTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoMIB", "write_medGwyGatewayTransportLastEventTime entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(medGwyGatewayStatsTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -3689,20 +4886,59 @@ write_medGwyGatewayTransportLastEventTime(int action, u_char *var_val, u_char va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to medGwyGatewayTransportLastEventTime: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->medGwyGatewayStatsTable_old) == NULL)
+			if (StorageTmp->medGwyGatewayStatsTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->medGwyGatewayStatsTable_old = medGwyGatewayStatsTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->medGwyGatewayStatsTable_rsvs++;
+		StorageTmp->medGwyGatewayTransportLastEventTime = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->medGwyGatewayStatsTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->medGwyGatewayStatsTable_tsts == 0)
+				if ((ret = check_medGwyGatewayStatsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyGatewayStatsTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->medGwyGatewayTransportLastEventTime for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
-		old_value = StorageTmp->medGwyGatewayTransportLastEventTime;
-		StorageTmp->medGwyGatewayTransportLastEventTime = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->medGwyGatewayStatsTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->medGwyGatewayStatsTable_sets == 0)
+				if ((ret = update_medGwyGatewayStatsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyGatewayStatsTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->medGwyGatewayStatsTable_old) != NULL) {
+			medGwyGatewayStatsTable_destroy(&StorageTmp->medGwyGatewayStatsTable_old);
+			StorageTmp->medGwyGatewayStatsTable_rsvs = 0;
+			StorageTmp->medGwyGatewayStatsTable_tsts = 0;
+			StorageTmp->medGwyGatewayStatsTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->medGwyGatewayTransportLastEventTime = old_value;
+		if ((StorageOld = StorageTmp->medGwyGatewayStatsTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->medGwyGatewayStatsTable_sets == 0)
+			revert_medGwyGatewayStatsTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->medGwyGatewayStatsTable_old) == NULL)
+			break;
+		StorageTmp->medGwyGatewayTransportLastEventTime = StorageOld->medGwyGatewayTransportLastEventTime;
+		if (--StorageTmp->medGwyGatewayStatsTable_rsvs == 0)
+			medGwyGatewayStatsTable_destroy(&StorageTmp->medGwyGatewayStatsTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3722,12 +4958,14 @@ write_medGwyGatewayTransportLastEventTime(int action, u_char *var_val, u_char va
 int
 write_medGwyNextTerminationId(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct medGwyTermIdTable_data *StorageTmp = NULL;
+	struct medGwyTermIdTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoMIB", "write_medGwyNextTerminationId entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(medGwyTermIdTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -3746,20 +4984,59 @@ write_medGwyNextTerminationId(int action, u_char *var_val, u_char var_val_type, 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to medGwyNextTerminationId: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->medGwyTermIdTable_old) == NULL)
+			if (StorageTmp->medGwyTermIdTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->medGwyTermIdTable_old = medGwyTermIdTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->medGwyTermIdTable_rsvs++;
+		StorageTmp->medGwyNextTerminationId = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->medGwyTermIdTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->medGwyTermIdTable_tsts == 0)
+				if ((ret = check_medGwyTermIdTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyTermIdTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->medGwyNextTerminationId for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
-		old_value = StorageTmp->medGwyNextTerminationId;
-		StorageTmp->medGwyNextTerminationId = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->medGwyTermIdTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->medGwyTermIdTable_sets == 0)
+				if ((ret = update_medGwyTermIdTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyTermIdTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->medGwyTermIdTable_old) != NULL) {
+			medGwyTermIdTable_destroy(&StorageTmp->medGwyTermIdTable_old);
+			StorageTmp->medGwyTermIdTable_rsvs = 0;
+			StorageTmp->medGwyTermIdTable_tsts = 0;
+			StorageTmp->medGwyTermIdTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->medGwyNextTerminationId = old_value;
+		if ((StorageOld = StorageTmp->medGwyTermIdTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->medGwyTermIdTable_sets == 0)
+			revert_medGwyTermIdTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->medGwyTermIdTable_old) == NULL)
+			break;
+		StorageTmp->medGwyNextTerminationId = StorageOld->medGwyNextTerminationId;
+		if (--StorageTmp->medGwyTermIdTable_rsvs == 0)
+			medGwyTermIdTable_destroy(&StorageTmp->medGwyTermIdTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3779,17 +5056,17 @@ write_medGwyNextTerminationId(int action, u_char *var_val, u_char var_val_type, 
 int
 write_medGwyTerminationName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct medGwyTerminationsTable_data *StorageTmp = NULL;
+	struct medGwyTerminationsTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoMIB", "write_medGwyTerminationName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(medGwyTerminationsTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->medGwyTerminationRowStatus) {
@@ -3812,33 +5089,73 @@ write_medGwyTerminationName(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to medGwyTerminationName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) == NULL)
+			if (StorageTmp->medGwyTerminationsTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->medGwyTerminationsTable_old = medGwyTerminationsTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->medGwyTerminationsTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->medGwyTerminationName);
+		StorageTmp->medGwyTerminationName = string;
+		StorageTmp->medGwyTerminationNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->medGwyTerminationsTable_tsts == 0)
+				if ((ret = check_medGwyTerminationsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyTerminationsTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->medGwyTerminationName for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->medGwyTerminationName;
-		old_length = StorageTmp->medGwyTerminationNameLen;
-		StorageTmp->medGwyTerminationName = string;
-		StorageTmp->medGwyTerminationNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->medGwyTerminationsTable_sets == 0)
+				if ((ret = update_medGwyTerminationsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyTerminationsTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) != NULL) {
+			medGwyTerminationsTable_destroy(&StorageTmp->medGwyTerminationsTable_old);
+			StorageTmp->medGwyTerminationsTable_rsvs = 0;
+			StorageTmp->medGwyTerminationsTable_tsts = 0;
+			StorageTmp->medGwyTerminationsTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->medGwyTerminationName = old_value;
-		StorageTmp->medGwyTerminationNameLen = old_length;
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->medGwyTerminationsTable_sets == 0)
+			revert_medGwyTerminationsTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) == NULL)
+			break;
+		if (StorageOld->medGwyTerminationName != NULL) {
+			SNMP_FREE(StorageTmp->medGwyTerminationName);
+			StorageTmp->medGwyTerminationName = StorageOld->medGwyTerminationName;
+			StorageTmp->medGwyTerminationNameLen = StorageOld->medGwyTerminationNameLen;
+			StorageOld->medGwyTerminationName = NULL;
+			StorageOld->medGwyTerminationNameLen = 0;
+		}
+		if (--StorageTmp->medGwyTerminationsTable_rsvs == 0)
+			medGwyTerminationsTable_destroy(&StorageTmp->medGwyTerminationsTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3858,12 +5175,14 @@ write_medGwyTerminationName(int action, u_char *var_val, u_char var_val_type, si
 int
 write_medGwyTerminationAdminStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct medGwyTerminationsTable_data *StorageTmp = NULL;
+	struct medGwyTerminationsTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoMIB", "write_medGwyTerminationAdminStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(medGwyTerminationsTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3897,22 +5216,61 @@ write_medGwyTerminationAdminStatus(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to medGwyTerminationAdminStatus: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) == NULL)
+			if (StorageTmp->medGwyTerminationsTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->medGwyTerminationsTable_old = medGwyTerminationsTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->medGwyTerminationsTable_rsvs++;
+		StorageTmp->medGwyTerminationAdminStatus = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->medGwyTerminationsTable_tsts == 0)
+				if ((ret = check_medGwyTerminationsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyTerminationsTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->medGwyTerminationAdminStatus for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->medGwyTerminationAdminStatus;
-		StorageTmp->medGwyTerminationAdminStatus = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->medGwyTerminationsTable_sets == 0)
+				if ((ret = update_medGwyTerminationsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyTerminationsTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) != NULL) {
+			medGwyTerminationsTable_destroy(&StorageTmp->medGwyTerminationsTable_old);
+			StorageTmp->medGwyTerminationsTable_rsvs = 0;
+			StorageTmp->medGwyTerminationsTable_tsts = 0;
+			StorageTmp->medGwyTerminationsTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->medGwyTerminationAdminStatus = old_value;
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->medGwyTerminationsTable_sets == 0)
+			revert_medGwyTerminationsTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) == NULL)
+			break;
+		StorageTmp->medGwyTerminationAdminStatus = StorageOld->medGwyTerminationAdminStatus;
+		if (--StorageTmp->medGwyTerminationsTable_rsvs == 0)
+			medGwyTerminationsTable_destroy(&StorageTmp->medGwyTerminationsTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3932,12 +5290,14 @@ write_medGwyTerminationAdminStatus(int action, u_char *var_val, u_char var_val_t
 int
 write_medGwyTerminationOperStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct medGwyTerminationsTable_data *StorageTmp = NULL;
+	struct medGwyTerminationsTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoMIB", "write_medGwyTerminationOperStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(medGwyTerminationsTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3971,22 +5331,61 @@ write_medGwyTerminationOperStatus(int action, u_char *var_val, u_char var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to medGwyTerminationOperStatus: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) == NULL)
+			if (StorageTmp->medGwyTerminationsTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->medGwyTerminationsTable_old = medGwyTerminationsTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->medGwyTerminationsTable_rsvs++;
+		StorageTmp->medGwyTerminationOperStatus = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->medGwyTerminationsTable_tsts == 0)
+				if ((ret = check_medGwyTerminationsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyTerminationsTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->medGwyTerminationOperStatus for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->medGwyTerminationOperStatus;
-		StorageTmp->medGwyTerminationOperStatus = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->medGwyTerminationsTable_sets == 0)
+				if ((ret = update_medGwyTerminationsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyTerminationsTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) != NULL) {
+			medGwyTerminationsTable_destroy(&StorageTmp->medGwyTerminationsTable_old);
+			StorageTmp->medGwyTerminationsTable_rsvs = 0;
+			StorageTmp->medGwyTerminationsTable_tsts = 0;
+			StorageTmp->medGwyTerminationsTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->medGwyTerminationOperStatus = old_value;
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->medGwyTerminationsTable_sets == 0)
+			revert_medGwyTerminationsTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) == NULL)
+			break;
+		StorageTmp->medGwyTerminationOperStatus = StorageOld->medGwyTerminationOperStatus;
+		if (--StorageTmp->medGwyTerminationsTable_rsvs == 0)
+			medGwyTerminationsTable_destroy(&StorageTmp->medGwyTerminationsTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4006,12 +5405,14 @@ write_medGwyTerminationOperStatus(int action, u_char *var_val, u_char var_val_ty
 int
 write_medGwyTerminationInterfaceIdentifier(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct medGwyTerminationsTable_data *StorageTmp = NULL;
+	struct medGwyTerminationsTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoMIB", "write_medGwyTerminationInterfaceIdentifier entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(medGwyTerminationsTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -4041,22 +5442,61 @@ write_medGwyTerminationInterfaceIdentifier(int action, u_char *var_val, u_char v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to medGwyTerminationInterfaceIdentifier: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) == NULL)
+			if (StorageTmp->medGwyTerminationsTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->medGwyTerminationsTable_old = medGwyTerminationsTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->medGwyTerminationsTable_rsvs++;
+		StorageTmp->medGwyTerminationInterfaceIdentifier = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->medGwyTerminationsTable_tsts == 0)
+				if ((ret = check_medGwyTerminationsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyTerminationsTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->medGwyTerminationInterfaceIdentifier for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->medGwyTerminationInterfaceIdentifier;
-		StorageTmp->medGwyTerminationInterfaceIdentifier = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->medGwyTerminationsTable_sets == 0)
+				if ((ret = update_medGwyTerminationsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyTerminationsTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) != NULL) {
+			medGwyTerminationsTable_destroy(&StorageTmp->medGwyTerminationsTable_old);
+			StorageTmp->medGwyTerminationsTable_rsvs = 0;
+			StorageTmp->medGwyTerminationsTable_tsts = 0;
+			StorageTmp->medGwyTerminationsTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->medGwyTerminationInterfaceIdentifier = old_value;
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->medGwyTerminationsTable_sets == 0)
+			revert_medGwyTerminationsTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) == NULL)
+			break;
+		StorageTmp->medGwyTerminationInterfaceIdentifier = StorageOld->medGwyTerminationInterfaceIdentifier;
+		if (--StorageTmp->medGwyTerminationsTable_rsvs == 0)
+			medGwyTerminationsTable_destroy(&StorageTmp->medGwyTerminationsTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4076,12 +5516,14 @@ write_medGwyTerminationInterfaceIdentifier(int action, u_char *var_val, u_char v
 int
 write_medGwyTerminationPropertyProfileId(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct medGwyTerminationsTable_data *StorageTmp = NULL;
+	struct medGwyTerminationsTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoMIB", "write_medGwyTerminationPropertyProfileId entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(medGwyTerminationsTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -4111,22 +5553,61 @@ write_medGwyTerminationPropertyProfileId(int action, u_char *var_val, u_char var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to medGwyTerminationPropertyProfileId: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) == NULL)
+			if (StorageTmp->medGwyTerminationsTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->medGwyTerminationsTable_old = medGwyTerminationsTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->medGwyTerminationsTable_rsvs++;
+		StorageTmp->medGwyTerminationPropertyProfileId = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->medGwyTerminationsTable_tsts == 0)
+				if ((ret = check_medGwyTerminationsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyTerminationsTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->medGwyTerminationPropertyProfileId for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->medGwyTerminationPropertyProfileId;
-		StorageTmp->medGwyTerminationPropertyProfileId = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->medGwyTerminationsTable_sets == 0)
+				if ((ret = update_medGwyTerminationsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyTerminationsTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) != NULL) {
+			medGwyTerminationsTable_destroy(&StorageTmp->medGwyTerminationsTable_old);
+			StorageTmp->medGwyTerminationsTable_rsvs = 0;
+			StorageTmp->medGwyTerminationsTable_tsts = 0;
+			StorageTmp->medGwyTerminationsTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->medGwyTerminationPropertyProfileId = old_value;
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->medGwyTerminationsTable_sets == 0)
+			revert_medGwyTerminationsTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) == NULL)
+			break;
+		StorageTmp->medGwyTerminationPropertyProfileId = StorageOld->medGwyTerminationPropertyProfileId;
+		if (--StorageTmp->medGwyTerminationsTable_rsvs == 0)
+			medGwyTerminationsTable_destroy(&StorageTmp->medGwyTerminationsTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4146,17 +5627,17 @@ write_medGwyTerminationPropertyProfileId(int action, u_char *var_val, u_char var
 int
 write_medGwyPropertyProfileProperty(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct medGwyPropertyProfileTable_data *StorageTmp = NULL;
+	struct medGwyPropertyProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoMIB", "write_medGwyPropertyProfileProperty entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(medGwyPropertyProfileTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->medGwyTermPropertyProfileStatus) {
@@ -4178,160 +5659,176 @@ write_medGwyPropertyProfileProperty(int action, u_char *var_val, u_char var_val_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to medGwyPropertyProfileProperty: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->medGwyPropertyProfileTable_old) == NULL)
+			if (StorageTmp->medGwyPropertyProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->medGwyPropertyProfileTable_old = medGwyPropertyProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->medGwyPropertyProfileTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->medGwyPropertyProfileProperty);
+		StorageTmp->medGwyPropertyProfileProperty = objid;
+		StorageTmp->medGwyPropertyProfilePropertyLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->medGwyPropertyProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->medGwyPropertyProfileTable_tsts == 0)
+				if ((ret = check_medGwyPropertyProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyPropertyProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->medGwyPropertyProfileProperty for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->medGwyPropertyProfileProperty;
-		old_length = StorageTmp->medGwyPropertyProfilePropertyLen;
-		StorageTmp->medGwyPropertyProfileProperty = objid;
-		StorageTmp->medGwyPropertyProfilePropertyLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->medGwyPropertyProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->medGwyPropertyProfileTable_sets == 0)
+				if ((ret = update_medGwyPropertyProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->medGwyPropertyProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->medGwyPropertyProfileTable_old) != NULL) {
+			medGwyPropertyProfileTable_destroy(&StorageTmp->medGwyPropertyProfileTable_old);
+			StorageTmp->medGwyPropertyProfileTable_rsvs = 0;
+			StorageTmp->medGwyPropertyProfileTable_tsts = 0;
+			StorageTmp->medGwyPropertyProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->medGwyPropertyProfileProperty = old_value;
-		StorageTmp->medGwyPropertyProfilePropertyLen = old_length;
+		if ((StorageOld = StorageTmp->medGwyPropertyProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->medGwyPropertyProfileTable_sets == 0)
+			revert_medGwyPropertyProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->medGwyPropertyProfileTable_old) == NULL)
+			break;
+		if (StorageOld->medGwyPropertyProfileProperty != NULL) {
+			SNMP_FREE(StorageTmp->medGwyPropertyProfileProperty);
+			StorageTmp->medGwyPropertyProfileProperty = StorageOld->medGwyPropertyProfileProperty;
+			StorageTmp->medGwyPropertyProfilePropertyLen = StorageOld->medGwyPropertyProfilePropertyLen;
+			StorageOld->medGwyPropertyProfileProperty = NULL;
+			StorageOld->medGwyPropertyProfilePropertyLen = 0;
+		}
+		if (--StorageTmp->medGwyPropertyProfileTable_rsvs == 0)
+			medGwyPropertyProfileTable_destroy(&StorageTmp->medGwyPropertyProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int medGwyLinkIdTable_consistent(struct medGwyLinkIdTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_medGwyGatewayConfigTable_row(struct medGwyGatewayConfigTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the medGwyLinkIdTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-medGwyLinkIdTable_consistent(struct medGwyLinkIdTable_data *thedata)
+can_act_medGwyGatewayConfigTable_row(struct medGwyGatewayConfigTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int medGwyGatewayConfigTable_consistent(struct medGwyGatewayConfigTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_medGwyGatewayConfigTable_row(struct medGwyGatewayConfigTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the medGwyGatewayConfigTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-medGwyGatewayConfigTable_consistent(struct medGwyGatewayConfigTable_data *thedata)
+can_deact_medGwyGatewayConfigTable_row(struct medGwyGatewayConfigTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int medGwyGatewayControllerTable_consistent(struct medGwyGatewayControllerTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_medGwyTerminationsTable_row(struct medGwyTerminationsTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the medGwyGatewayControllerTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-medGwyGatewayControllerTable_consistent(struct medGwyGatewayControllerTable_data *thedata)
+can_act_medGwyTerminationsTable_row(struct medGwyTerminationsTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int medGwyGatewayStatsTable_consistent(struct medGwyGatewayStatsTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_medGwyTerminationsTable_row(struct medGwyTerminationsTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the medGwyGatewayStatsTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-medGwyGatewayStatsTable_consistent(struct medGwyGatewayStatsTable_data *thedata)
+can_deact_medGwyTerminationsTable_row(struct medGwyTerminationsTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int medGwyTermIdTable_consistent(struct medGwyTermIdTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_medGwyPropertyProfileTable_row(struct medGwyPropertyProfileTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the medGwyTermIdTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-medGwyTermIdTable_consistent(struct medGwyTermIdTable_data *thedata)
+can_act_medGwyPropertyProfileTable_row(struct medGwyPropertyProfileTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int medGwyTerminationsTable_consistent(struct medGwyTerminationsTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_medGwyPropertyProfileTable_row(struct medGwyPropertyProfileTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the medGwyTerminationsTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-medGwyTerminationsTable_consistent(struct medGwyTerminationsTable_data *thedata)
+can_deact_medGwyPropertyProfileTable_row(struct medGwyPropertyProfileTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int medGwyPropertyProfileTable_consistent(struct medGwyPropertyProfileTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the medGwyPropertyProfileTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-medGwyPropertyProfileTable_consistent(struct medGwyPropertyProfileTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
@@ -4348,10 +5845,9 @@ medGwyPropertyProfileTable_consistent(struct medGwyPropertyProfileTable_data *th
 int
 write_medGwyGatewayRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct medGwyGatewayConfigTable_data *StorageTmp = NULL;
+	struct medGwyGatewayConfigTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct medGwyGatewayConfigTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 12;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -4378,40 +5874,6 @@ write_medGwyGatewayRowStatus(int action, u_char *var_val, u_char var_val_type, s
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->medGwyGatewayRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->medGwyGatewayConfigTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->medGwyGatewayConfigTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* medGwyGatewayId */
@@ -4459,6 +5921,7 @@ write_medGwyGatewayRowStatus(int action, u_char *var_val, u_char var_val_type, s
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->medGwyGatewayConfigTable_rsvs = 1;
 			vp = vars;
 			StorageNew->medGwyGatewayId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -4466,7 +5929,37 @@ write_medGwyGatewayRowStatus(int action, u_char *var_val, u_char var_val_type, s
 			vp = vp->next_variable;
 			header_complex_add_data(&medGwyGatewayConfigTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->medGwyGatewayRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->medGwyGatewayConfigTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) == NULL)
+				if (StorageTmp->medGwyGatewayConfigTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old = medGwyGatewayConfigTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->medGwyGatewayConfigTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->medGwyGatewayConfigTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -4476,78 +5969,127 @@ write_medGwyGatewayRowStatus(int action, u_char *var_val, u_char var_val_type, s
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = medGwyGatewayConfigTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_medGwyGatewayConfigTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->medGwyGatewayRowStatus;
-			StorageTmp->medGwyGatewayRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = medGwyGatewayConfigTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->medGwyGatewayRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->medGwyGatewayRowStatus != RS_ACTIVE)
+				if ((ret = can_act_medGwyGatewayConfigTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->medGwyGatewayRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_medGwyGatewayConfigTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->medGwyGatewayRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_medGwyGatewayConfigTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->medGwyGatewayRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_medGwyGatewayConfigTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->medGwyGatewayRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_medGwyGatewayConfigTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->medGwyGatewayRowStatus;
-			StorageTmp->medGwyGatewayRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->medGwyGatewayRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_medGwyGatewayConfigTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_medGwyGatewayConfigTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->medGwyGatewayRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->medGwyGatewayRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->medGwyGatewayRowStatus = set_value;
+			if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) != NULL) {
+				medGwyGatewayConfigTable_destroy(&StorageTmp->medGwyGatewayConfigTable_old);
+				StorageTmp->medGwyGatewayConfigTable_rsvs = 0;
+				StorageTmp->medGwyGatewayConfigTable_tsts = 0;
+				StorageTmp->medGwyGatewayConfigTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			medGwyGatewayConfigTable_destroy(&StorageDel);
-			/* medGwyGatewayConfigTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_medGwyGatewayConfigTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->medGwyGatewayRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_medGwyGatewayConfigTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->medGwyGatewayRowStatus = old_value;
+			if (StorageTmp->medGwyGatewayRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_medGwyGatewayConfigTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -4561,6 +6103,13 @@ write_medGwyGatewayRowStatus(int action, u_char *var_val, u_char var_val_type, s
 				medGwyGatewayConfigTable_del(StorageNew);
 				medGwyGatewayConfigTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->medGwyGatewayConfigTable_old) == NULL)
+				break;
+			if (--StorageTmp->medGwyGatewayConfigTable_rsvs == 0)
+				medGwyGatewayConfigTable_destroy(&StorageTmp->medGwyGatewayConfigTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -4587,10 +6136,9 @@ write_medGwyGatewayRowStatus(int action, u_char *var_val, u_char var_val_type, s
 int
 write_medGwyTerminationRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct medGwyTerminationsTable_data *StorageTmp = NULL;
+	struct medGwyTerminationsTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct medGwyTerminationsTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 12;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -4617,40 +6165,6 @@ write_medGwyTerminationRowStatus(int action, u_char *var_val, u_char var_val_typ
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->medGwyTerminationRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->medGwyTerminationsTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->medGwyTerminationsTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* medGwyGatewayId */
@@ -4698,6 +6212,7 @@ write_medGwyTerminationRowStatus(int action, u_char *var_val, u_char var_val_typ
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->medGwyTerminationsTable_rsvs = 1;
 			vp = vars;
 			StorageNew->medGwyGatewayId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -4705,7 +6220,37 @@ write_medGwyTerminationRowStatus(int action, u_char *var_val, u_char var_val_typ
 			vp = vp->next_variable;
 			header_complex_add_data(&medGwyTerminationsTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->medGwyTerminationRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->medGwyTerminationsTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) == NULL)
+				if (StorageTmp->medGwyTerminationsTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->medGwyTerminationsTable_old = medGwyTerminationsTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->medGwyTerminationsTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->medGwyTerminationsTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -4715,78 +6260,127 @@ write_medGwyTerminationRowStatus(int action, u_char *var_val, u_char var_val_typ
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = medGwyTerminationsTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_medGwyTerminationsTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->medGwyTerminationRowStatus;
-			StorageTmp->medGwyTerminationRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = medGwyTerminationsTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->medGwyTerminationRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->medGwyTerminationRowStatus != RS_ACTIVE)
+				if ((ret = can_act_medGwyTerminationsTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->medGwyTerminationRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_medGwyTerminationsTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->medGwyTerminationRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_medGwyTerminationsTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->medGwyTerminationRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_medGwyTerminationsTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->medGwyTerminationRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_medGwyTerminationsTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->medGwyTerminationRowStatus;
-			StorageTmp->medGwyTerminationRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->medGwyTerminationRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_medGwyTerminationsTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_medGwyTerminationsTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->medGwyTerminationRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->medGwyTerminationRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->medGwyTerminationRowStatus = set_value;
+			if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) != NULL) {
+				medGwyTerminationsTable_destroy(&StorageTmp->medGwyTerminationsTable_old);
+				StorageTmp->medGwyTerminationsTable_rsvs = 0;
+				StorageTmp->medGwyTerminationsTable_tsts = 0;
+				StorageTmp->medGwyTerminationsTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			medGwyTerminationsTable_destroy(&StorageDel);
-			/* medGwyTerminationsTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_medGwyTerminationsTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->medGwyTerminationRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_medGwyTerminationsTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->medGwyTerminationRowStatus = old_value;
+			if (StorageTmp->medGwyTerminationRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_medGwyTerminationsTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -4800,6 +6394,13 @@ write_medGwyTerminationRowStatus(int action, u_char *var_val, u_char var_val_typ
 				medGwyTerminationsTable_del(StorageNew);
 				medGwyTerminationsTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->medGwyTerminationsTable_old) == NULL)
+				break;
+			if (--StorageTmp->medGwyTerminationsTable_rsvs == 0)
+				medGwyTerminationsTable_destroy(&StorageTmp->medGwyTerminationsTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -4826,10 +6427,9 @@ write_medGwyTerminationRowStatus(int action, u_char *var_val, u_char var_val_typ
 int
 write_medGwyTermPropertyProfileStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct medGwyPropertyProfileTable_data *StorageTmp = NULL;
+	struct medGwyPropertyProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct medGwyPropertyProfileTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 12;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -4856,40 +6456,6 @@ write_medGwyTermPropertyProfileStatus(int action, u_char *var_val, u_char var_va
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->medGwyTermPropertyProfileStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->medGwyPropertyProfileTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->medGwyPropertyProfileTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* medGwyGatewayId */
@@ -4955,6 +6521,7 @@ write_medGwyTermPropertyProfileStatus(int action, u_char *var_val, u_char var_va
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->medGwyPropertyProfileTable_rsvs = 1;
 			vp = vars;
 			StorageNew->medGwyGatewayId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -4964,7 +6531,37 @@ write_medGwyTermPropertyProfileStatus(int action, u_char *var_val, u_char var_va
 			vp = vp->next_variable;
 			header_complex_add_data(&medGwyPropertyProfileTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->medGwyTermPropertyProfileStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->medGwyPropertyProfileTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->medGwyPropertyProfileTable_old) == NULL)
+				if (StorageTmp->medGwyPropertyProfileTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->medGwyPropertyProfileTable_old = medGwyPropertyProfileTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->medGwyPropertyProfileTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->medGwyPropertyProfileTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -4974,78 +6571,127 @@ write_medGwyTermPropertyProfileStatus(int action, u_char *var_val, u_char var_va
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = medGwyPropertyProfileTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_medGwyPropertyProfileTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->medGwyTermPropertyProfileStatus;
-			StorageTmp->medGwyTermPropertyProfileStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = medGwyPropertyProfileTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->medGwyTermPropertyProfileStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->medGwyTermPropertyProfileStatus != RS_ACTIVE)
+				if ((ret = can_act_medGwyPropertyProfileTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->medGwyTermPropertyProfileStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_medGwyPropertyProfileTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->medGwyTermPropertyProfileStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_medGwyPropertyProfileTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->medGwyTermPropertyProfileStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must 
+		   be reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_medGwyPropertyProfileTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->medGwyTermPropertyProfileStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_medGwyPropertyProfileTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->medGwyTermPropertyProfileStatus;
-			StorageTmp->medGwyTermPropertyProfileStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->medGwyTermPropertyProfileStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_medGwyPropertyProfileTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_medGwyPropertyProfileTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->medGwyTermPropertyProfileStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->medGwyTermPropertyProfileStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->medGwyTermPropertyProfileStatus = set_value;
+			if ((StorageOld = StorageTmp->medGwyPropertyProfileTable_old) != NULL) {
+				medGwyPropertyProfileTable_destroy(&StorageTmp->medGwyPropertyProfileTable_old);
+				StorageTmp->medGwyPropertyProfileTable_rsvs = 0;
+				StorageTmp->medGwyPropertyProfileTable_tsts = 0;
+				StorageTmp->medGwyPropertyProfileTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			medGwyPropertyProfileTable_destroy(&StorageDel);
-			/* medGwyPropertyProfileTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_medGwyPropertyProfileTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->medGwyTermPropertyProfileStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_medGwyPropertyProfileTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->medGwyTermPropertyProfileStatus = old_value;
+			if (StorageTmp->medGwyTermPropertyProfileStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_medGwyPropertyProfileTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -5059,6 +6705,13 @@ write_medGwyTermPropertyProfileStatus(int action, u_char *var_val, u_char var_va
 				medGwyPropertyProfileTable_del(StorageNew);
 				medGwyPropertyProfileTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->medGwyPropertyProfileTable_old) == NULL)
+				break;
+			if (--StorageTmp->medGwyPropertyProfileTable_rsvs == 0)
+				medGwyPropertyProfileTable_destroy(&StorageTmp->medGwyPropertyProfileTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */

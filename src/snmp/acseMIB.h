@@ -492,7 +492,7 @@ struct acseLinkageTable_data {
 	uint acseLinkageTable_refs;
 	uint acseLinkageTable_id;
 	ulong mtpMsId;			/* NoAccess */
-	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* Notify */
 	size_t sccpNetworkEntityIdLen;
 	long acseLinkageRowStatus;	/* Create */
 };

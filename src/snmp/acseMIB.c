@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/snmp/acseMIB.c
+ @(#) src/snmp/acseMIB.c
 
  -----------------------------------------------------------------------------
 
@@ -468,8 +468,13 @@ acseMIB_create(void)
 		/* XXX: fill in default scalar values here into StorageNew */
 
 	}
+      done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	acseMIB_destroy(&StorageNew);
+	goto done;
 }
 
 /**
@@ -487,8 +492,6 @@ acseMIB_duplicate(struct acseMIB_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "acseMIB_duplicate: duplicating mib... "));
 	if (StorageNew != NULL) {
-		StorageNew->acseTcUserId = thedata->acseTcUserId;
-		StorageNew->acseApplicationEntityId = thedata->acseApplicationEntityId;
 	}
       done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
@@ -800,6 +803,7 @@ acseTable_duplicate(struct acseTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "acseTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->acseTable_id = thedata->acseTable_id;
 		if (!(StorageNew->subsystemId = malloc(thedata->subsystemIdLen + 1)))
 			goto destroy;
 		memcpy(StorageNew->subsystemId, thedata->subsystemId, thedata->subsystemIdLen);
@@ -1121,6 +1125,7 @@ acseAssociationTable_duplicate(struct acseAssociationTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "acseAssociationTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->acseAssociationTable_id = thedata->acseAssociationTable_id;
 		StorageNew->applicationSubsystemId = thedata->applicationSubsystemId;
 		if (!(StorageNew->apInvocationId = malloc(thedata->apInvocationIdLen + 1)))
 			goto destroy;
@@ -1420,6 +1425,7 @@ apInvocationTable_duplicate(struct apInvocationTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "apInvocationTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->apInvocationTable_id = thedata->apInvocationTable_id;
 		StorageNew->applicationSubsystemId = thedata->applicationSubsystemId;
 		if (!(StorageNew->apInvocationId = malloc(thedata->apInvocationIdLen + 1)))
 			goto destroy;
@@ -1659,6 +1665,7 @@ applicationEntityInvocationTable_duplicate(struct applicationEntityInvocationTab
 
 	DEBUGMSGTL(("acseMIB", "applicationEntityInvocationTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->applicationEntityInvocationTable_id = thedata->applicationEntityInvocationTable_id;
 		StorageNew->applicationSubsystemId = thedata->applicationSubsystemId;
 		if (!(StorageNew->apInvocationId = malloc(thedata->apInvocationIdLen + 1)))
 			goto destroy;
@@ -1921,6 +1928,7 @@ applicationSubsystemTable_duplicate(struct applicationSubsystemTable_data *theda
 
 	DEBUGMSGTL(("acseMIB", "applicationSubsystemTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->applicationSubsystemTable_id = thedata->applicationSubsystemTable_id;
 		if (!(StorageNew->subsystemId = malloc(thedata->subsystemIdLen + 1)))
 			goto destroy;
 		memcpy(StorageNew->subsystemId, thedata->subsystemId, thedata->subsystemIdLen);
@@ -2148,6 +2156,7 @@ asoTable_duplicate(struct asoTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "asoTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->asoTable_id = thedata->asoTable_id;
 		if (!(StorageNew->subsystemId = malloc(thedata->subsystemIdLen + 1)))
 			goto destroy;
 		memcpy(StorageNew->subsystemId, thedata->subsystemId, thedata->subsystemIdLen);
@@ -2454,6 +2463,7 @@ asoEntityTable_duplicate(struct asoEntityTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "asoEntityTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->asoEntityTable_id = thedata->asoEntityTable_id;
 		if (!(StorageNew->subsystemId = malloc(thedata->subsystemIdLen + 1)))
 			goto destroy;
 		memcpy(StorageNew->subsystemId, thedata->subsystemId, thedata->subsystemIdLen);
@@ -2753,6 +2763,7 @@ asoInvocationTable_duplicate(struct asoInvocationTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "asoInvocationTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->asoInvocationTable_id = thedata->asoInvocationTable_id;
 		StorageNew->applicationSubsystemId = thedata->applicationSubsystemId;
 		if (!(StorageNew->apInvocationId = malloc(thedata->apInvocationIdLen + 1)))
 			goto destroy;
@@ -2999,6 +3010,7 @@ monoULConnectionTable_duplicate(struct monoULConnectionTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "monoULConnectionTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->monoULConnectionTable_id = thedata->monoULConnectionTable_id;
 		StorageNew->applicationSubsystemId = thedata->applicationSubsystemId;
 		if (!(StorageNew->apInvocationId = malloc(thedata->apInvocationIdLen + 1)))
 			goto destroy;
@@ -3215,6 +3227,7 @@ monoULEntityTable_duplicate(struct monoULEntityTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "monoULEntityTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->monoULEntityTable_id = thedata->monoULEntityTable_id;
 		if (!(StorageNew->subsystemId = malloc(thedata->subsystemIdLen + 1)))
 			goto destroy;
 		memcpy(StorageNew->subsystemId, thedata->subsystemId, thedata->subsystemIdLen);
@@ -3423,6 +3436,7 @@ monolithicUpperLayerSubsystemTable_duplicate(struct monolithicUpperLayerSubsyste
 
 	DEBUGMSGTL(("acseMIB", "monolithicUpperLayerSubsystemTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->monolithicUpperLayerSubsystemTable_id = thedata->monolithicUpperLayerSubsystemTable_id;
 		if (!(StorageNew->monolithicUpperLayerSubsystemId = malloc(thedata->monolithicUpperLayerSubsystemIdLen + 1)))
 			goto destroy;
 		memcpy(StorageNew->monolithicUpperLayerSubsystemId, thedata->monolithicUpperLayerSubsystemId, thedata->monolithicUpperLayerSubsystemIdLen);
@@ -3647,6 +3661,7 @@ pSapTable_duplicate(struct pSapTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "pSapTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->pSapTable_id = thedata->pSapTable_id;
 		if (!(StorageNew->subsystemId = malloc(thedata->subsystemIdLen + 1)))
 			goto destroy;
 		memcpy(StorageNew->subsystemId, thedata->subsystemId, thedata->subsystemIdLen);
@@ -3923,6 +3938,7 @@ presentationConnectionTable_duplicate(struct presentationConnectionTable_data *t
 
 	DEBUGMSGTL(("acseMIB", "presentationConnectionTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->presentationConnectionTable_id = thedata->presentationConnectionTable_id;
 		if (!(StorageNew->presentationSubsystemId = malloc(thedata->presentationSubsystemIdLen + 1)))
 			goto destroy;
 		memcpy(StorageNew->presentationSubsystemId, thedata->presentationSubsystemId, thedata->presentationSubsystemIdLen);
@@ -4257,6 +4273,7 @@ presentationCopmTable_duplicate(struct presentationCopmTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "presentationCopmTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->presentationCopmTable_id = thedata->presentationCopmTable_id;
 		if (!(StorageNew->presentationSubsystemId = malloc(thedata->presentationSubsystemIdLen + 1)))
 			goto destroy;
 		memcpy(StorageNew->presentationSubsystemId, thedata->presentationSubsystemId, thedata->presentationSubsystemIdLen);
@@ -4547,6 +4564,7 @@ presentationEntityTable_duplicate(struct presentationEntityTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "presentationEntityTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->presentationEntityTable_id = thedata->presentationEntityTable_id;
 		if (!(StorageNew->presentationSubsystemId = malloc(thedata->presentationSubsystemIdLen + 1)))
 			goto destroy;
 		memcpy(StorageNew->presentationSubsystemId, thedata->presentationSubsystemId, thedata->presentationSubsystemIdLen);
@@ -4788,6 +4806,7 @@ presentationSubsystemTable_duplicate(struct presentationSubsystemTable_data *the
 
 	DEBUGMSGTL(("acseMIB", "presentationSubsystemTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->presentationSubsystemTable_id = thedata->presentationSubsystemTable_id;
 		if (!(StorageNew->presentationSubsystemId = malloc(thedata->presentationSubsystemIdLen + 1)))
 			goto destroy;
 		memcpy(StorageNew->presentationSubsystemId, thedata->presentationSubsystemId, thedata->presentationSubsystemIdLen);
@@ -5012,6 +5031,7 @@ sSapTable_duplicate(struct sSapTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "sSapTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->sSapTable_id = thedata->sSapTable_id;
 		if (!(StorageNew->subsystemId = malloc(thedata->subsystemIdLen + 1)))
 			goto destroy;
 		memcpy(StorageNew->subsystemId, thedata->subsystemId, thedata->subsystemIdLen);
@@ -5289,6 +5309,7 @@ sessionConnectionTable_duplicate(struct sessionConnectionTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "sessionConnectionTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->sessionConnectionTable_id = thedata->sessionConnectionTable_id;
 		if (!(StorageNew->sessionSubsystemId = malloc(thedata->sessionSubsystemIdLen + 1)))
 			goto destroy;
 		memcpy(StorageNew->sessionSubsystemId, thedata->sessionSubsystemId, thedata->sessionSubsystemIdLen);
@@ -5622,6 +5643,7 @@ sessionCopmTable_duplicate(struct sessionCopmTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "sessionCopmTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->sessionCopmTable_id = thedata->sessionCopmTable_id;
 		if (!(StorageNew->sessionSubsystemId = malloc(thedata->sessionSubsystemIdLen + 1)))
 			goto destroy;
 		memcpy(StorageNew->sessionSubsystemId, thedata->sessionSubsystemId, thedata->sessionSubsystemIdLen);
@@ -5916,6 +5938,7 @@ sessionEntityTable_duplicate(struct sessionEntityTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "sessionEntityTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->sessionEntityTable_id = thedata->sessionEntityTable_id;
 		if (!(StorageNew->sessionSubsystemId = malloc(thedata->sessionSubsystemIdLen + 1)))
 			goto destroy;
 		memcpy(StorageNew->sessionSubsystemId, thedata->sessionSubsystemId, thedata->sessionSubsystemIdLen);
@@ -6157,6 +6180,7 @@ sessionSubsystemTable_duplicate(struct sessionSubsystemTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "sessionSubsystemTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->sessionSubsystemTable_id = thedata->sessionSubsystemTable_id;
 		if (!(StorageNew->sessionSubsystemId = malloc(thedata->sessionSubsystemIdLen + 1)))
 			goto destroy;
 		memcpy(StorageNew->sessionSubsystemId, thedata->sessionSubsystemId, thedata->sessionSubsystemIdLen);
@@ -6366,6 +6390,7 @@ acseEntityTable_duplicate(struct acseEntityTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "acseEntityTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->acseEntityTable_id = thedata->acseEntityTable_id;
 		StorageNew->mtpMsId = thedata->mtpMsId;
 		StorageNew->acseEntityId = thedata->acseEntityId;
 		StorageNew->acseEntityRowStatus = thedata->acseEntityRowStatus;
@@ -6570,6 +6595,7 @@ acseAccessPointTable_duplicate(struct acseAccessPointTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "acseAccessPointTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->acseAccessPointTable_id = thedata->acseAccessPointTable_id;
 		StorageNew->mtpMsId = thedata->mtpMsId;
 		StorageNew->acseEntityId = thedata->acseEntityId;
 		StorageNew->acseAccessPointId = thedata->acseAccessPointId;
@@ -6782,6 +6808,7 @@ acseLinkageTable_duplicate(struct acseLinkageTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "acseLinkageTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->acseLinkageTable_id = thedata->acseLinkageTable_id;
 		StorageNew->mtpMsId = thedata->mtpMsId;
 		if (!(StorageNew->sccpNetworkEntityId = malloc(thedata->sccpNetworkEntityIdLen + 1)))
 			goto destroy;
@@ -11875,7 +11902,7 @@ write_acseAssociationRowStatus(int action, u_char *var_val, u_char var_val_type,
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -12156,7 +12183,7 @@ write_apInvocationRowStatus(int action, u_char *var_val, u_char var_val_type, si
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -12437,7 +12464,7 @@ write_applicationEntityInvocationRowStatus(int action, u_char *var_val, u_char v
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -12752,7 +12779,7 @@ write_asoRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 			break;
 			/* deactivate with underlying device */
@@ -13051,7 +13078,7 @@ write_asoEntityRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -13348,7 +13375,7 @@ write_asoInvocationRowStatus(int action, u_char *var_val, u_char var_val_type, s
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -13629,7 +13656,7 @@ write_monoULConnectionRowStatus(int action, u_char *var_val, u_char var_val_type
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -13896,7 +13923,7 @@ write_monolithicUpperLayerSubssytemRowStatus(int action, u_char *var_val, u_char
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 			break;
 			/* deactivate with underlying device */
@@ -14163,7 +14190,7 @@ write_pSapRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -14478,7 +14505,7 @@ write_presentationCOnnectionRowStatus(int action, u_char *var_val, u_char var_va
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -14777,7 +14804,7 @@ write_presentationCopmRowStatus(int action, u_char *var_val, u_char var_val_type
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -15060,7 +15087,7 @@ write_presentationEntityRowStatus(int action, u_char *var_val, u_char var_val_ty
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -15327,7 +15354,7 @@ write_presentationSubsystemRowStatus(int action, u_char *var_val, u_char var_val
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -15594,7 +15621,7 @@ write_sSapRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 			break;
 			/* deactivate with underlying device */
@@ -15909,7 +15936,7 @@ write_sessionCOnnectionRowStatus(int action, u_char *var_val, u_char var_val_typ
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -16208,7 +16235,7 @@ write_sessionCopmRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -16491,7 +16518,7 @@ write_sessionEntityRowStatus(int action, u_char *var_val, u_char var_val_type, s
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -16758,7 +16785,7 @@ write_sessionSubsystemRowStatus(int action, u_char *var_val, u_char var_val_type
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 			break;
 			/* deactivate with underlying device */
@@ -17037,7 +17064,7 @@ write_acseEntityRowStatus(int action, u_char *var_val, u_char var_val_type, size
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -17330,7 +17357,7 @@ write_acseAccessPointRowStatus(int action, u_char *var_val, u_char var_val_type,
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -17611,7 +17638,7 @@ write_acseLinkageRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */

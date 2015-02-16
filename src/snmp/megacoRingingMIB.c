@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/snmp/megacoRingingMIB.c
+ @(#) src/snmp/megacoRingingMIB.c
 
  -----------------------------------------------------------------------------
 
@@ -312,8 +312,39 @@ megacoRingingMIB_create(void)
 		StorageNew->mgcoRingingCadenceNextGroupId = 0;
 
 	}
+      done:
 	DEBUGMSGTL(("megacoRingingMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	megacoRingingMIB_destroy(&StorageNew);
+	goto done;
+}
+
+/**
+ * @fn struct megacoRingingMIB_data *megacoRingingMIB_duplicate(struct megacoRingingMIB_data *thedata)
+ * @param thedata the mib structure to duplicate
+ * @brief duplicate a mib structure for the mib
+ *
+ * Duplicates the specified mib structure @param thedata and returns a pointer to the newly
+ * allocated mib structure on success, or NULL on failure.
+ */
+struct megacoRingingMIB_data *
+megacoRingingMIB_duplicate(struct megacoRingingMIB_data *thedata)
+{
+	struct megacoRingingMIB_data *StorageNew = SNMP_MALLOC_STRUCT(megacoRingingMIB_data);
+
+	DEBUGMSGTL(("megacoRingingMIB", "megacoRingingMIB_duplicate: duplicating mib... "));
+	if (StorageNew != NULL) {
+		StorageNew->mgcoRingingCadenceNextGroupId = thedata->mgcoRingingCadenceNextGroupId;
+	}
+      done:
+	DEBUGMSGTL(("megacoRingingMIB", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	megacoRingingMIB_destroy(&StorageNew);
+	goto done;
 }
 
 /**
@@ -364,7 +395,7 @@ megacoRingingMIB_add(struct megacoRingingMIB_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for megacoRingingMIB entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case megacoRingingMIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -418,6 +449,62 @@ store_megacoRingingMIB(int majorID, int minorID, void *serverarg, void *clientar
 	}
 	DEBUGMSGTL(("megacoRingingMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int check_megacoRingingMIB(struct megacoRingingMIB_data *StorageTmp, struct megacoRingingMIB_data *StorageOld)
+ * @param StorageTmp the data as updated
+ * @param StorageOld the data previous to update
+ *
+ * This function is used by mibs.  It is used to check, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the ACTION phase.  The COMMIT phase does not ensue unless this check passes.  This function can
+ * return SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before
+ * the varbinds on the mib were applied; the values in StorageTmp are the new values.  The function
+ * is permitted to change the values in StorageTmp to correct them; however, preferences should be
+ * made for setting values that were not in the varbinds.
+ */
+int
+check_megacoRingingMIB(struct megacoRingingMIB_data *StorageTmp, struct megacoRingingMIB_data *StorageOld)
+{
+	/* XXX: provide code to check the scalars for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_megacoRingingMIB(struct megacoRingingMIB_data *StorageTmp, struct megacoRingingMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase)
+ *
+ * This function is used by mibs.  It is used to update, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the COMMIT phase.  The start of the ACTION phase performs a consistency check on the mib before
+ * allowing the request to proceed to the COMMIT phase.  The COMMIT phase then arrives here with
+ * consistency already checked (see check_megacoRingingMIB()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied: the values in StorageTmp are the new values.
+ */
+int
+update_megacoRingingMIB(struct megacoRingingMIB_data *StorageTmp, struct megacoRingingMIB_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	megacoRingingMIB_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn revert_megacoRingingMIB(struct 
+ * @fn void revert_megacoRingingMIB(struct megacoRingingMIB_data *StorageTmp, struct megacoRingingMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase)
+ */
+void
+revert_megacoRingingMIB(struct megacoRingingMIB_data *StorageTmp, struct megacoRingingMIB_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_megacoRingingMIB(StorageOld, NULL);
 }
 
 /**
@@ -521,19 +608,26 @@ mgcoRingingPatternTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->mgcoRingingCadenceGroupId = 0;
-		if ((StorageNew->mgcoRingingPatternName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->mgcoRingingPatternNameLen = strlen("");
+		if ((StorageNew->mgcoRingingPatternName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->mgcoRingingPatternNameLen = 0;
+		StorageNew->mgcoRingingPatternName[StorageNew->mgcoRingingPatternNameLen] = 0;
 		StorageNew->mgcoRingingPatternRowStatus = 0;
 		StorageNew->mgcoRingingPatternRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("megacoRingingMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mgcoRingingPatternTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mgcoRingingPatternTable_data *mgcoRingingPatternTable_duplicate(struct mgcoRingingPatternTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -545,6 +639,15 @@ mgcoRingingPatternTable_duplicate(struct mgcoRingingPatternTable_data *thedata)
 
 	DEBUGMSGTL(("megacoRingingMIB", "mgcoRingingPatternTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mgcoRingingPatternTable_id = thedata->mgcoRingingPatternTable_id;
+		StorageNew->mgcoRingingPatternId = thedata->mgcoRingingPatternId;
+		StorageNew->mgcoRingingCadenceGroupId = thedata->mgcoRingingCadenceGroupId;
+		if (!(StorageNew->mgcoRingingPatternName = malloc(thedata->mgcoRingingPatternNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mgcoRingingPatternName, thedata->mgcoRingingPatternName, thedata->mgcoRingingPatternNameLen);
+		StorageNew->mgcoRingingPatternNameLen = thedata->mgcoRingingPatternNameLen;
+		StorageNew->mgcoRingingPatternName[StorageNew->mgcoRingingPatternNameLen] = 0;
+		StorageNew->mgcoRingingPatternRowStatus = thedata->mgcoRingingPatternRowStatus;
 	}
       done:
 	DEBUGMSGTL(("megacoRingingMIB", "done.\n"));
@@ -640,7 +743,7 @@ mgcoRingingPatternTable_del(struct mgcoRingingPatternTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mgcoRingingPatternTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mgcoRingingPatternTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -725,8 +828,10 @@ mgcoRingingCadenceGroupTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->mgcoRingingCadenceGroupId = 0;
-		if ((StorageNew->mgcoRingingCadenceGroupName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->mgcoRingingCadenceGroupNameLen = strlen("");
+		if ((StorageNew->mgcoRingingCadenceGroupName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->mgcoRingingCadenceGroupNameLen = 0;
+		StorageNew->mgcoRingingCadenceGroupName[StorageNew->mgcoRingingCadenceGroupNameLen] = 0;
 		StorageNew->mgcoRingingCadenceGroupRef = 0;
 		StorageNew->mgcoRingingCadenceGroupRingingMinDuration = 0;
 		StorageNew->mgcoRingingCadenceGroupRingingNomDuration = 0;
@@ -737,14 +842,19 @@ mgcoRingingCadenceGroupTable_create(void)
 		StorageNew->mgcoRingingCadenceGroupRowStatus = 0;
 		StorageNew->mgcoRingingCadenceGroupRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("megacoRingingMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mgcoRingingCadenceGroupTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mgcoRingingCadenceGroupTable_data *mgcoRingingCadenceGroupTable_duplicate(struct mgcoRingingCadenceGroupTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -756,6 +866,22 @@ mgcoRingingCadenceGroupTable_duplicate(struct mgcoRingingCadenceGroupTable_data 
 
 	DEBUGMSGTL(("megacoRingingMIB", "mgcoRingingCadenceGroupTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mgcoRingingCadenceGroupTable_id = thedata->mgcoRingingCadenceGroupTable_id;
+		StorageNew->mgcoRingingCadenceGroupId = thedata->mgcoRingingCadenceGroupId;
+		StorageNew->mgcoRingingCadenceGroupIndex = thedata->mgcoRingingCadenceGroupIndex;
+		if (!(StorageNew->mgcoRingingCadenceGroupName = malloc(thedata->mgcoRingingCadenceGroupNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mgcoRingingCadenceGroupName, thedata->mgcoRingingCadenceGroupName, thedata->mgcoRingingCadenceGroupNameLen);
+		StorageNew->mgcoRingingCadenceGroupNameLen = thedata->mgcoRingingCadenceGroupNameLen;
+		StorageNew->mgcoRingingCadenceGroupName[StorageNew->mgcoRingingCadenceGroupNameLen] = 0;
+		StorageNew->mgcoRingingCadenceGroupRef = thedata->mgcoRingingCadenceGroupRef;
+		StorageNew->mgcoRingingCadenceGroupRingingMinDuration = thedata->mgcoRingingCadenceGroupRingingMinDuration;
+		StorageNew->mgcoRingingCadenceGroupRingingNomDuration = thedata->mgcoRingingCadenceGroupRingingNomDuration;
+		StorageNew->mgcoRingingCadenceGroupRingingMaxDuration = thedata->mgcoRingingCadenceGroupRingingMaxDuration;
+		StorageNew->mgcoRingingCadenceGroupSilentMinDuration = thedata->mgcoRingingCadenceGroupSilentMinDuration;
+		StorageNew->mgcoRingingCadenceGroupSilentNomDuration = thedata->mgcoRingingCadenceGroupSilentNomDuration;
+		StorageNew->mgcoRingingCadenceGroupSilentMaxDuration = thedata->mgcoRingingCadenceGroupSilentMaxDuration;
+		StorageNew->mgcoRingingCadenceGroupRowStatus = thedata->mgcoRingingCadenceGroupRowStatus;
 	}
       done:
 	DEBUGMSGTL(("megacoRingingMIB", "done.\n"));
@@ -853,7 +979,7 @@ mgcoRingingCadenceGroupTable_del(struct mgcoRingingCadenceGroupTable_data *theda
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mgcoRingingCadenceGroupTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mgcoRingingCadenceGroupTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -933,6 +1059,132 @@ store_mgcoRingingCadenceGroupTable(int majorID, int minorID, void *serverarg, vo
 	}
 	DEBUGMSGTL(("megacoRingingMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int activate_mgcoRingingPatternTable_row(struct mgcoRingingPatternTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_mgcoRingingPatternTable_row(struct mgcoRingingPatternTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_mgcoRingingPatternTable_row(struct mgcoRingingPatternTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_mgcoRingingPatternTable_row(struct mgcoRingingPatternTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_mgcoRingingCadenceGroupTable_row(struct mgcoRingingCadenceGroupTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_mgcoRingingCadenceGroupTable_row(struct mgcoRingingCadenceGroupTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_mgcoRingingCadenceGroupTable_row(struct mgcoRingingCadenceGroupTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_mgcoRingingCadenceGroupTable_row(struct mgcoRingingCadenceGroupTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int check_mgcoRingingPatternTable_row(struct mgcoRingingPatternTable_data *StorageTmp, struct mgcoRingingPatternTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mgcoRingingPatternTable_row(struct mgcoRingingPatternTable_data *StorageTmp, struct mgcoRingingPatternTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mgcoRingingPatternTable_row(struct mgcoRingingPatternTable_data *StorageTmp, struct mgcoRingingPatternTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mgcoRingingPatternTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mgcoRingingPatternTable_row(struct mgcoRingingPatternTable_data *StorageTmp, struct mgcoRingingPatternTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mgcoRingingPatternTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mgcoRingingPatternTable_row(struct mgcoRingingPatternTable_data *StorageTmp, struct mgcoRingingPatternTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mgcoRingingPatternTable_row(struct mgcoRingingPatternTable_data *StorageTmp, struct mgcoRingingPatternTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mgcoRingingPatternTable_row(StorageOld, NULL);
 }
 
 /**
@@ -1025,6 +1277,64 @@ var_mgcoRingingPatternTable(struct variable *vp, oid * name, size_t *length, int
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_mgcoRingingCadenceGroupTable_row(struct mgcoRingingCadenceGroupTable_data *StorageTmp, struct mgcoRingingCadenceGroupTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mgcoRingingCadenceGroupTable_row(struct mgcoRingingCadenceGroupTable_data *StorageTmp, struct mgcoRingingCadenceGroupTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mgcoRingingCadenceGroupTable_row(struct mgcoRingingCadenceGroupTable_data *StorageTmp, struct mgcoRingingCadenceGroupTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mgcoRingingCadenceGroupTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mgcoRingingCadenceGroupTable_row(struct mgcoRingingCadenceGroupTable_data *StorageTmp, struct mgcoRingingCadenceGroupTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mgcoRingingCadenceGroupTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mgcoRingingCadenceGroupTable_row(struct mgcoRingingCadenceGroupTable_data *StorageTmp, struct mgcoRingingCadenceGroupTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mgcoRingingCadenceGroupTable_row(struct mgcoRingingCadenceGroupTable_data *StorageTmp, struct mgcoRingingCadenceGroupTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mgcoRingingCadenceGroupTable_row(StorageOld, NULL);
 }
 
 /**
@@ -1175,12 +1485,14 @@ var_mgcoRingingCadenceGroupTable(struct variable *vp, oid * name, size_t *length
 int
 write_mgcoRingingCadenceGroupId(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct mgcoRingingPatternTable_data *StorageTmp = NULL;
+	struct mgcoRingingPatternTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoRingingMIB", "write_mgcoRingingCadenceGroupId entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mgcoRingingPatternTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1210,22 +1522,61 @@ write_mgcoRingingCadenceGroupId(int action, u_char *var_val, u_char var_val_type
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mgcoRingingCadenceGroupId: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mgcoRingingPatternTable_old) == NULL)
+			if (StorageTmp->mgcoRingingPatternTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mgcoRingingPatternTable_old = mgcoRingingPatternTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mgcoRingingPatternTable_rsvs++;
+		StorageTmp->mgcoRingingCadenceGroupId = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mgcoRingingPatternTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mgcoRingingPatternTable_tsts == 0)
+				if ((ret = check_mgcoRingingPatternTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mgcoRingingPatternTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mgcoRingingCadenceGroupId for you to use, and you have just been asked to do something with it.  Note that anything done 
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mgcoRingingCadenceGroupId;
-		StorageTmp->mgcoRingingCadenceGroupId = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mgcoRingingPatternTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mgcoRingingPatternTable_sets == 0)
+				if ((ret = update_mgcoRingingPatternTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mgcoRingingPatternTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mgcoRingingPatternTable_old) != NULL) {
+			mgcoRingingPatternTable_destroy(&StorageTmp->mgcoRingingPatternTable_old);
+			StorageTmp->mgcoRingingPatternTable_rsvs = 0;
+			StorageTmp->mgcoRingingPatternTable_tsts = 0;
+			StorageTmp->mgcoRingingPatternTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mgcoRingingCadenceGroupId = old_value;
+		if ((StorageOld = StorageTmp->mgcoRingingPatternTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mgcoRingingPatternTable_sets == 0)
+			revert_mgcoRingingPatternTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mgcoRingingPatternTable_old) == NULL)
+			break;
+		StorageTmp->mgcoRingingCadenceGroupId = StorageOld->mgcoRingingCadenceGroupId;
+		if (--StorageTmp->mgcoRingingPatternTable_rsvs == 0)
+			mgcoRingingPatternTable_destroy(&StorageTmp->mgcoRingingPatternTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1245,17 +1596,17 @@ write_mgcoRingingCadenceGroupId(int action, u_char *var_val, u_char var_val_type
 int
 write_mgcoRingingPatternName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct mgcoRingingPatternTable_data *StorageTmp = NULL;
+	struct mgcoRingingPatternTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoRingingMIB", "write_mgcoRingingPatternName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mgcoRingingPatternTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->mgcoRingingPatternRowStatus) {
@@ -1278,33 +1629,73 @@ write_mgcoRingingPatternName(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mgcoRingingPatternName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mgcoRingingPatternTable_old) == NULL)
+			if (StorageTmp->mgcoRingingPatternTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mgcoRingingPatternTable_old = mgcoRingingPatternTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mgcoRingingPatternTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->mgcoRingingPatternName);
+		StorageTmp->mgcoRingingPatternName = string;
+		StorageTmp->mgcoRingingPatternNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mgcoRingingPatternTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mgcoRingingPatternTable_tsts == 0)
+				if ((ret = check_mgcoRingingPatternTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mgcoRingingPatternTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mgcoRingingPatternName for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mgcoRingingPatternName;
-		old_length = StorageTmp->mgcoRingingPatternNameLen;
-		StorageTmp->mgcoRingingPatternName = string;
-		StorageTmp->mgcoRingingPatternNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mgcoRingingPatternTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mgcoRingingPatternTable_sets == 0)
+				if ((ret = update_mgcoRingingPatternTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mgcoRingingPatternTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mgcoRingingPatternTable_old) != NULL) {
+			mgcoRingingPatternTable_destroy(&StorageTmp->mgcoRingingPatternTable_old);
+			StorageTmp->mgcoRingingPatternTable_rsvs = 0;
+			StorageTmp->mgcoRingingPatternTable_tsts = 0;
+			StorageTmp->mgcoRingingPatternTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mgcoRingingPatternName = old_value;
-		StorageTmp->mgcoRingingPatternNameLen = old_length;
+		if ((StorageOld = StorageTmp->mgcoRingingPatternTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mgcoRingingPatternTable_sets == 0)
+			revert_mgcoRingingPatternTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->mgcoRingingPatternTable_old) == NULL)
+			break;
+		if (StorageOld->mgcoRingingPatternName != NULL) {
+			SNMP_FREE(StorageTmp->mgcoRingingPatternName);
+			StorageTmp->mgcoRingingPatternName = StorageOld->mgcoRingingPatternName;
+			StorageTmp->mgcoRingingPatternNameLen = StorageOld->mgcoRingingPatternNameLen;
+			StorageOld->mgcoRingingPatternName = NULL;
+			StorageOld->mgcoRingingPatternNameLen = 0;
+		}
+		if (--StorageTmp->mgcoRingingPatternTable_rsvs == 0)
+			mgcoRingingPatternTable_destroy(&StorageTmp->mgcoRingingPatternTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1324,12 +1715,14 @@ write_mgcoRingingPatternName(int action, u_char *var_val, u_char var_val_type, s
 int
 write_mgcoRingingCadenceGroupId(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct mgcoRingingCadenceGroupTable_data *StorageTmp = NULL;
+	struct mgcoRingingCadenceGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoRingingMIB", "write_mgcoRingingCadenceGroupId entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mgcoRingingCadenceGroupTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1359,22 +1752,61 @@ write_mgcoRingingCadenceGroupId(int action, u_char *var_val, u_char var_val_type
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mgcoRingingCadenceGroupId: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+			if (StorageTmp->mgcoRingingCadenceGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old = mgcoRingingCadenceGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mgcoRingingCadenceGroupTable_rsvs++;
+		StorageTmp->mgcoRingingCadenceGroupId = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mgcoRingingCadenceGroupTable_tsts == 0)
+				if ((ret = check_mgcoRingingCadenceGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mgcoRingingCadenceGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mgcoRingingCadenceGroupId for you to use, and you have just been asked to do something with it.  Note that anything done 
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mgcoRingingCadenceGroupId;
-		StorageTmp->mgcoRingingCadenceGroupId = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mgcoRingingCadenceGroupTable_sets == 0)
+				if ((ret = update_mgcoRingingCadenceGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mgcoRingingCadenceGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+			mgcoRingingCadenceGroupTable_destroy(&StorageTmp->mgcoRingingCadenceGroupTable_old);
+			StorageTmp->mgcoRingingCadenceGroupTable_rsvs = 0;
+			StorageTmp->mgcoRingingCadenceGroupTable_tsts = 0;
+			StorageTmp->mgcoRingingCadenceGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mgcoRingingCadenceGroupId = old_value;
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mgcoRingingCadenceGroupTable_sets == 0)
+			revert_mgcoRingingCadenceGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+			break;
+		StorageTmp->mgcoRingingCadenceGroupId = StorageOld->mgcoRingingCadenceGroupId;
+		if (--StorageTmp->mgcoRingingCadenceGroupTable_rsvs == 0)
+			mgcoRingingCadenceGroupTable_destroy(&StorageTmp->mgcoRingingCadenceGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1394,17 +1826,17 @@ write_mgcoRingingCadenceGroupId(int action, u_char *var_val, u_char var_val_type
 int
 write_mgcoRingingCadenceGroupName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct mgcoRingingCadenceGroupTable_data *StorageTmp = NULL;
+	struct mgcoRingingCadenceGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoRingingMIB", "write_mgcoRingingCadenceGroupName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mgcoRingingCadenceGroupTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->mgcoRingingCadenceGroupRowStatus) {
@@ -1427,33 +1859,73 @@ write_mgcoRingingCadenceGroupName(int action, u_char *var_val, u_char var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mgcoRingingCadenceGroupName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+			if (StorageTmp->mgcoRingingCadenceGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old = mgcoRingingCadenceGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mgcoRingingCadenceGroupTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->mgcoRingingCadenceGroupName);
+		StorageTmp->mgcoRingingCadenceGroupName = string;
+		StorageTmp->mgcoRingingCadenceGroupNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mgcoRingingCadenceGroupTable_tsts == 0)
+				if ((ret = check_mgcoRingingCadenceGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mgcoRingingCadenceGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mgcoRingingCadenceGroupName for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mgcoRingingCadenceGroupName;
-		old_length = StorageTmp->mgcoRingingCadenceGroupNameLen;
-		StorageTmp->mgcoRingingCadenceGroupName = string;
-		StorageTmp->mgcoRingingCadenceGroupNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mgcoRingingCadenceGroupTable_sets == 0)
+				if ((ret = update_mgcoRingingCadenceGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mgcoRingingCadenceGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+			mgcoRingingCadenceGroupTable_destroy(&StorageTmp->mgcoRingingCadenceGroupTable_old);
+			StorageTmp->mgcoRingingCadenceGroupTable_rsvs = 0;
+			StorageTmp->mgcoRingingCadenceGroupTable_tsts = 0;
+			StorageTmp->mgcoRingingCadenceGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mgcoRingingCadenceGroupName = old_value;
-		StorageTmp->mgcoRingingCadenceGroupNameLen = old_length;
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mgcoRingingCadenceGroupTable_sets == 0)
+			revert_mgcoRingingCadenceGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+			break;
+		if (StorageOld->mgcoRingingCadenceGroupName != NULL) {
+			SNMP_FREE(StorageTmp->mgcoRingingCadenceGroupName);
+			StorageTmp->mgcoRingingCadenceGroupName = StorageOld->mgcoRingingCadenceGroupName;
+			StorageTmp->mgcoRingingCadenceGroupNameLen = StorageOld->mgcoRingingCadenceGroupNameLen;
+			StorageOld->mgcoRingingCadenceGroupName = NULL;
+			StorageOld->mgcoRingingCadenceGroupNameLen = 0;
+		}
+		if (--StorageTmp->mgcoRingingCadenceGroupTable_rsvs == 0)
+			mgcoRingingCadenceGroupTable_destroy(&StorageTmp->mgcoRingingCadenceGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1473,12 +1945,14 @@ write_mgcoRingingCadenceGroupName(int action, u_char *var_val, u_char var_val_ty
 int
 write_mgcoRingingCadenceGroupRef(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mgcoRingingCadenceGroupTable_data *StorageTmp = NULL;
+	struct mgcoRingingCadenceGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoRingingMIB", "write_mgcoRingingCadenceGroupRef entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mgcoRingingCadenceGroupTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1503,22 +1977,61 @@ write_mgcoRingingCadenceGroupRef(int action, u_char *var_val, u_char var_val_typ
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mgcoRingingCadenceGroupRef: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+			if (StorageTmp->mgcoRingingCadenceGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old = mgcoRingingCadenceGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mgcoRingingCadenceGroupTable_rsvs++;
+		StorageTmp->mgcoRingingCadenceGroupRef = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mgcoRingingCadenceGroupTable_tsts == 0)
+				if ((ret = check_mgcoRingingCadenceGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mgcoRingingCadenceGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mgcoRingingCadenceGroupRef for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mgcoRingingCadenceGroupRef;
-		StorageTmp->mgcoRingingCadenceGroupRef = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mgcoRingingCadenceGroupTable_sets == 0)
+				if ((ret = update_mgcoRingingCadenceGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mgcoRingingCadenceGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+			mgcoRingingCadenceGroupTable_destroy(&StorageTmp->mgcoRingingCadenceGroupTable_old);
+			StorageTmp->mgcoRingingCadenceGroupTable_rsvs = 0;
+			StorageTmp->mgcoRingingCadenceGroupTable_tsts = 0;
+			StorageTmp->mgcoRingingCadenceGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mgcoRingingCadenceGroupRef = old_value;
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mgcoRingingCadenceGroupTable_sets == 0)
+			revert_mgcoRingingCadenceGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+			break;
+		StorageTmp->mgcoRingingCadenceGroupRef = StorageOld->mgcoRingingCadenceGroupRef;
+		if (--StorageTmp->mgcoRingingCadenceGroupTable_rsvs == 0)
+			mgcoRingingCadenceGroupTable_destroy(&StorageTmp->mgcoRingingCadenceGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1538,12 +2051,14 @@ write_mgcoRingingCadenceGroupRef(int action, u_char *var_val, u_char var_val_typ
 int
 write_mgcoRingingCadenceGroupRingingMinDuration(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mgcoRingingCadenceGroupTable_data *StorageTmp = NULL;
+	struct mgcoRingingCadenceGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoRingingMIB", "write_mgcoRingingCadenceGroupRingingMinDuration entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mgcoRingingCadenceGroupTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1573,22 +2088,61 @@ write_mgcoRingingCadenceGroupRingingMinDuration(int action, u_char *var_val, u_c
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mgcoRingingCadenceGroupRingingMinDuration: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+			if (StorageTmp->mgcoRingingCadenceGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old = mgcoRingingCadenceGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mgcoRingingCadenceGroupTable_rsvs++;
+		StorageTmp->mgcoRingingCadenceGroupRingingMinDuration = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mgcoRingingCadenceGroupTable_tsts == 0)
+				if ((ret = check_mgcoRingingCadenceGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mgcoRingingCadenceGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mgcoRingingCadenceGroupRingingMinDuration for you to use, and you have just been asked to do something with it.  Note
 				   that anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mgcoRingingCadenceGroupRingingMinDuration;
-		StorageTmp->mgcoRingingCadenceGroupRingingMinDuration = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mgcoRingingCadenceGroupTable_sets == 0)
+				if ((ret = update_mgcoRingingCadenceGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mgcoRingingCadenceGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+			mgcoRingingCadenceGroupTable_destroy(&StorageTmp->mgcoRingingCadenceGroupTable_old);
+			StorageTmp->mgcoRingingCadenceGroupTable_rsvs = 0;
+			StorageTmp->mgcoRingingCadenceGroupTable_tsts = 0;
+			StorageTmp->mgcoRingingCadenceGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mgcoRingingCadenceGroupRingingMinDuration = old_value;
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mgcoRingingCadenceGroupTable_sets == 0)
+			revert_mgcoRingingCadenceGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+			break;
+		StorageTmp->mgcoRingingCadenceGroupRingingMinDuration = StorageOld->mgcoRingingCadenceGroupRingingMinDuration;
+		if (--StorageTmp->mgcoRingingCadenceGroupTable_rsvs == 0)
+			mgcoRingingCadenceGroupTable_destroy(&StorageTmp->mgcoRingingCadenceGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1608,12 +2162,14 @@ write_mgcoRingingCadenceGroupRingingMinDuration(int action, u_char *var_val, u_c
 int
 write_mgcoRingingCadenceGroupRingingNomDuration(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mgcoRingingCadenceGroupTable_data *StorageTmp = NULL;
+	struct mgcoRingingCadenceGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoRingingMIB", "write_mgcoRingingCadenceGroupRingingNomDuration entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mgcoRingingCadenceGroupTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1643,22 +2199,61 @@ write_mgcoRingingCadenceGroupRingingNomDuration(int action, u_char *var_val, u_c
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mgcoRingingCadenceGroupRingingNomDuration: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+			if (StorageTmp->mgcoRingingCadenceGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old = mgcoRingingCadenceGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mgcoRingingCadenceGroupTable_rsvs++;
+		StorageTmp->mgcoRingingCadenceGroupRingingNomDuration = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mgcoRingingCadenceGroupTable_tsts == 0)
+				if ((ret = check_mgcoRingingCadenceGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mgcoRingingCadenceGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mgcoRingingCadenceGroupRingingNomDuration for you to use, and you have just been asked to do something with it.  Note
 				   that anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mgcoRingingCadenceGroupRingingNomDuration;
-		StorageTmp->mgcoRingingCadenceGroupRingingNomDuration = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mgcoRingingCadenceGroupTable_sets == 0)
+				if ((ret = update_mgcoRingingCadenceGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mgcoRingingCadenceGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+			mgcoRingingCadenceGroupTable_destroy(&StorageTmp->mgcoRingingCadenceGroupTable_old);
+			StorageTmp->mgcoRingingCadenceGroupTable_rsvs = 0;
+			StorageTmp->mgcoRingingCadenceGroupTable_tsts = 0;
+			StorageTmp->mgcoRingingCadenceGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mgcoRingingCadenceGroupRingingNomDuration = old_value;
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mgcoRingingCadenceGroupTable_sets == 0)
+			revert_mgcoRingingCadenceGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+			break;
+		StorageTmp->mgcoRingingCadenceGroupRingingNomDuration = StorageOld->mgcoRingingCadenceGroupRingingNomDuration;
+		if (--StorageTmp->mgcoRingingCadenceGroupTable_rsvs == 0)
+			mgcoRingingCadenceGroupTable_destroy(&StorageTmp->mgcoRingingCadenceGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1678,12 +2273,14 @@ write_mgcoRingingCadenceGroupRingingNomDuration(int action, u_char *var_val, u_c
 int
 write_mgcoRingingCadenceGroupRingingMaxDuration(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mgcoRingingCadenceGroupTable_data *StorageTmp = NULL;
+	struct mgcoRingingCadenceGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoRingingMIB", "write_mgcoRingingCadenceGroupRingingMaxDuration entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mgcoRingingCadenceGroupTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1713,22 +2310,61 @@ write_mgcoRingingCadenceGroupRingingMaxDuration(int action, u_char *var_val, u_c
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mgcoRingingCadenceGroupRingingMaxDuration: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+			if (StorageTmp->mgcoRingingCadenceGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old = mgcoRingingCadenceGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mgcoRingingCadenceGroupTable_rsvs++;
+		StorageTmp->mgcoRingingCadenceGroupRingingMaxDuration = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mgcoRingingCadenceGroupTable_tsts == 0)
+				if ((ret = check_mgcoRingingCadenceGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mgcoRingingCadenceGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mgcoRingingCadenceGroupRingingMaxDuration for you to use, and you have just been asked to do something with it.  Note
 				   that anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mgcoRingingCadenceGroupRingingMaxDuration;
-		StorageTmp->mgcoRingingCadenceGroupRingingMaxDuration = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mgcoRingingCadenceGroupTable_sets == 0)
+				if ((ret = update_mgcoRingingCadenceGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mgcoRingingCadenceGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+			mgcoRingingCadenceGroupTable_destroy(&StorageTmp->mgcoRingingCadenceGroupTable_old);
+			StorageTmp->mgcoRingingCadenceGroupTable_rsvs = 0;
+			StorageTmp->mgcoRingingCadenceGroupTable_tsts = 0;
+			StorageTmp->mgcoRingingCadenceGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mgcoRingingCadenceGroupRingingMaxDuration = old_value;
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mgcoRingingCadenceGroupTable_sets == 0)
+			revert_mgcoRingingCadenceGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+			break;
+		StorageTmp->mgcoRingingCadenceGroupRingingMaxDuration = StorageOld->mgcoRingingCadenceGroupRingingMaxDuration;
+		if (--StorageTmp->mgcoRingingCadenceGroupTable_rsvs == 0)
+			mgcoRingingCadenceGroupTable_destroy(&StorageTmp->mgcoRingingCadenceGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1748,12 +2384,14 @@ write_mgcoRingingCadenceGroupRingingMaxDuration(int action, u_char *var_val, u_c
 int
 write_mgcoRingingCadenceGroupSilentMinDuration(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mgcoRingingCadenceGroupTable_data *StorageTmp = NULL;
+	struct mgcoRingingCadenceGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoRingingMIB", "write_mgcoRingingCadenceGroupSilentMinDuration entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mgcoRingingCadenceGroupTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1783,22 +2421,61 @@ write_mgcoRingingCadenceGroupSilentMinDuration(int action, u_char *var_val, u_ch
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mgcoRingingCadenceGroupSilentMinDuration: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+			if (StorageTmp->mgcoRingingCadenceGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old = mgcoRingingCadenceGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mgcoRingingCadenceGroupTable_rsvs++;
+		StorageTmp->mgcoRingingCadenceGroupSilentMinDuration = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mgcoRingingCadenceGroupTable_tsts == 0)
+				if ((ret = check_mgcoRingingCadenceGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mgcoRingingCadenceGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mgcoRingingCadenceGroupSilentMinDuration for you to use, and you have just been asked to do something with it.  Note
 				   that anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mgcoRingingCadenceGroupSilentMinDuration;
-		StorageTmp->mgcoRingingCadenceGroupSilentMinDuration = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mgcoRingingCadenceGroupTable_sets == 0)
+				if ((ret = update_mgcoRingingCadenceGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mgcoRingingCadenceGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+			mgcoRingingCadenceGroupTable_destroy(&StorageTmp->mgcoRingingCadenceGroupTable_old);
+			StorageTmp->mgcoRingingCadenceGroupTable_rsvs = 0;
+			StorageTmp->mgcoRingingCadenceGroupTable_tsts = 0;
+			StorageTmp->mgcoRingingCadenceGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mgcoRingingCadenceGroupSilentMinDuration = old_value;
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mgcoRingingCadenceGroupTable_sets == 0)
+			revert_mgcoRingingCadenceGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+			break;
+		StorageTmp->mgcoRingingCadenceGroupSilentMinDuration = StorageOld->mgcoRingingCadenceGroupSilentMinDuration;
+		if (--StorageTmp->mgcoRingingCadenceGroupTable_rsvs == 0)
+			mgcoRingingCadenceGroupTable_destroy(&StorageTmp->mgcoRingingCadenceGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1818,12 +2495,14 @@ write_mgcoRingingCadenceGroupSilentMinDuration(int action, u_char *var_val, u_ch
 int
 write_mgcoRingingCadenceGroupSilentNomDuration(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mgcoRingingCadenceGroupTable_data *StorageTmp = NULL;
+	struct mgcoRingingCadenceGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoRingingMIB", "write_mgcoRingingCadenceGroupSilentNomDuration entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mgcoRingingCadenceGroupTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1853,22 +2532,61 @@ write_mgcoRingingCadenceGroupSilentNomDuration(int action, u_char *var_val, u_ch
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mgcoRingingCadenceGroupSilentNomDuration: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+			if (StorageTmp->mgcoRingingCadenceGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old = mgcoRingingCadenceGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mgcoRingingCadenceGroupTable_rsvs++;
+		StorageTmp->mgcoRingingCadenceGroupSilentNomDuration = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mgcoRingingCadenceGroupTable_tsts == 0)
+				if ((ret = check_mgcoRingingCadenceGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mgcoRingingCadenceGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mgcoRingingCadenceGroupSilentNomDuration for you to use, and you have just been asked to do something with it.  Note
 				   that anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mgcoRingingCadenceGroupSilentNomDuration;
-		StorageTmp->mgcoRingingCadenceGroupSilentNomDuration = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mgcoRingingCadenceGroupTable_sets == 0)
+				if ((ret = update_mgcoRingingCadenceGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mgcoRingingCadenceGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+			mgcoRingingCadenceGroupTable_destroy(&StorageTmp->mgcoRingingCadenceGroupTable_old);
+			StorageTmp->mgcoRingingCadenceGroupTable_rsvs = 0;
+			StorageTmp->mgcoRingingCadenceGroupTable_tsts = 0;
+			StorageTmp->mgcoRingingCadenceGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mgcoRingingCadenceGroupSilentNomDuration = old_value;
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mgcoRingingCadenceGroupTable_sets == 0)
+			revert_mgcoRingingCadenceGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+			break;
+		StorageTmp->mgcoRingingCadenceGroupSilentNomDuration = StorageOld->mgcoRingingCadenceGroupSilentNomDuration;
+		if (--StorageTmp->mgcoRingingCadenceGroupTable_rsvs == 0)
+			mgcoRingingCadenceGroupTable_destroy(&StorageTmp->mgcoRingingCadenceGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1888,12 +2606,14 @@ write_mgcoRingingCadenceGroupSilentNomDuration(int action, u_char *var_val, u_ch
 int
 write_mgcoRingingCadenceGroupSilentMaxDuration(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mgcoRingingCadenceGroupTable_data *StorageTmp = NULL;
+	struct mgcoRingingCadenceGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoRingingMIB", "write_mgcoRingingCadenceGroupSilentMaxDuration entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mgcoRingingCadenceGroupTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1923,22 +2643,61 @@ write_mgcoRingingCadenceGroupSilentMaxDuration(int action, u_char *var_val, u_ch
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mgcoRingingCadenceGroupSilentMaxDuration: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+			if (StorageTmp->mgcoRingingCadenceGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old = mgcoRingingCadenceGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mgcoRingingCadenceGroupTable_rsvs++;
+		StorageTmp->mgcoRingingCadenceGroupSilentMaxDuration = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mgcoRingingCadenceGroupTable_tsts == 0)
+				if ((ret = check_mgcoRingingCadenceGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mgcoRingingCadenceGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mgcoRingingCadenceGroupSilentMaxDuration for you to use, and you have just been asked to do something with it.  Note
 				   that anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mgcoRingingCadenceGroupSilentMaxDuration;
-		StorageTmp->mgcoRingingCadenceGroupSilentMaxDuration = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mgcoRingingCadenceGroupTable_sets == 0)
+				if ((ret = update_mgcoRingingCadenceGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mgcoRingingCadenceGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+			mgcoRingingCadenceGroupTable_destroy(&StorageTmp->mgcoRingingCadenceGroupTable_old);
+			StorageTmp->mgcoRingingCadenceGroupTable_rsvs = 0;
+			StorageTmp->mgcoRingingCadenceGroupTable_tsts = 0;
+			StorageTmp->mgcoRingingCadenceGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mgcoRingingCadenceGroupSilentMaxDuration = old_value;
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mgcoRingingCadenceGroupTable_sets == 0)
+			revert_mgcoRingingCadenceGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+			break;
+		StorageTmp->mgcoRingingCadenceGroupSilentMaxDuration = StorageOld->mgcoRingingCadenceGroupSilentMaxDuration;
+		if (--StorageTmp->mgcoRingingCadenceGroupTable_rsvs == 0)
+			mgcoRingingCadenceGroupTable_destroy(&StorageTmp->mgcoRingingCadenceGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1958,13 +2717,13 @@ write_mgcoRingingCadenceGroupSilentMaxDuration(int action, u_char *var_val, u_ch
 int
 write_mgcoRingingCadenceNextGroupId(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct megacoRingingMIB_data *StorageTmp = NULL;
+	struct megacoRingingMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoRingingMIB", "write_mgcoRingingCadenceNextGroupId entering action=%d...  \n", action));
 	if ((StorageTmp = megacoRingingMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -1980,59 +2739,130 @@ write_mgcoRingingCadenceNextGroupId(int action, u_char *var_val, u_char var_val_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mgcoRingingCadenceNextGroupId: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->megacoRingingMIB_old) == NULL)
+			if (StorageTmp->megacoRingingMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->megacoRingingMIB_old = megacoRingingMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->megacoRingingMIB_rsvs++;
+		StorageTmp->mgcoRingingCadenceNextGroupId = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->megacoRingingMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->megacoRingingMIB_tsts == 0)
+				if ((ret = check_megacoRingingMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->megacoRingingMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->mgcoRingingCadenceNextGroupId;
-		StorageTmp->mgcoRingingCadenceNextGroupId = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->mgcoRingingCadenceNextGroupId for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->megacoRingingMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->megacoRingingMIB_sets == 0)
+				if ((ret = update_megacoRingingMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->megacoRingingMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->megacoRingingMIB_old) != NULL) {
+			megacoRingingMIB_destroy(&StorageTmp->megacoRingingMIB_old);
+			StorageTmp->megacoRingingMIB_rsvs = 0;
+			StorageTmp->megacoRingingMIB_tsts = 0;
+			StorageTmp->megacoRingingMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mgcoRingingCadenceNextGroupId = old_value;
+		if ((StorageOld = StorageTmp->megacoRingingMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->megacoRingingMIB_tsts == 0)
+			revert_megacoRingingMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->megacoRingingMIB_old) == NULL)
+			break;
+		StorageTmp->mgcoRingingCadenceNextGroupId = StorageOld->mgcoRingingCadenceNextGroupId;
+		if (--StorageTmp->megacoRingingMIB_rsvs == 0)
+			megacoRingingMIB_destroy(&StorageTmp->megacoRingingMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int mgcoRingingPatternTable_consistent(struct mgcoRingingPatternTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_mgcoRingingPatternTable_row(struct mgcoRingingPatternTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the mgcoRingingPatternTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-mgcoRingingPatternTable_consistent(struct mgcoRingingPatternTable_data *thedata)
+can_act_mgcoRingingPatternTable_row(struct mgcoRingingPatternTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int mgcoRingingCadenceGroupTable_consistent(struct mgcoRingingCadenceGroupTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_mgcoRingingPatternTable_row(struct mgcoRingingPatternTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the mgcoRingingCadenceGroupTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-mgcoRingingCadenceGroupTable_consistent(struct mgcoRingingCadenceGroupTable_data *thedata)
+can_deact_mgcoRingingPatternTable_row(struct mgcoRingingPatternTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_mgcoRingingCadenceGroupTable_row(struct mgcoRingingCadenceGroupTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_mgcoRingingCadenceGroupTable_row(struct mgcoRingingCadenceGroupTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_mgcoRingingCadenceGroupTable_row(struct mgcoRingingCadenceGroupTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_mgcoRingingCadenceGroupTable_row(struct mgcoRingingCadenceGroupTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
@@ -2049,10 +2879,9 @@ mgcoRingingCadenceGroupTable_consistent(struct mgcoRingingCadenceGroupTable_data
 int
 write_mgcoRingingPatternRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct mgcoRingingPatternTable_data *StorageTmp = NULL;
+	struct mgcoRingingPatternTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct mgcoRingingPatternTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 12;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -2079,40 +2908,6 @@ write_mgcoRingingPatternRowStatus(int action, u_char *var_val, u_char var_val_ty
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->mgcoRingingPatternRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->mgcoRingingPatternTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->mgcoRingingPatternTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* mgcoRingingPatternId */
@@ -2142,12 +2937,43 @@ write_mgcoRingingPatternRowStatus(int action, u_char *var_val, u_char var_val_ty
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->mgcoRingingPatternTable_rsvs = 1;
 			vp = vars;
 			StorageNew->mgcoRingingPatternId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&mgcoRingingPatternTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->mgcoRingingPatternRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->mgcoRingingPatternTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->mgcoRingingPatternTable_old) == NULL)
+				if (StorageTmp->mgcoRingingPatternTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->mgcoRingingPatternTable_old = mgcoRingingPatternTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->mgcoRingingPatternTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->mgcoRingingPatternTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -2157,78 +2983,127 @@ write_mgcoRingingPatternRowStatus(int action, u_char *var_val, u_char var_val_ty
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = mgcoRingingPatternTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_mgcoRingingPatternTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->mgcoRingingPatternRowStatus;
-			StorageTmp->mgcoRingingPatternRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = mgcoRingingPatternTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->mgcoRingingPatternRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->mgcoRingingPatternRowStatus != RS_ACTIVE)
+				if ((ret = can_act_mgcoRingingPatternTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->mgcoRingingPatternRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_mgcoRingingPatternTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->mgcoRingingPatternRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_mgcoRingingPatternTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->mgcoRingingPatternRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_mgcoRingingPatternTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->mgcoRingingPatternRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_mgcoRingingPatternTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->mgcoRingingPatternRowStatus;
-			StorageTmp->mgcoRingingPatternRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->mgcoRingingPatternRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_mgcoRingingPatternTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_mgcoRingingPatternTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->mgcoRingingPatternRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->mgcoRingingPatternRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->mgcoRingingPatternRowStatus = set_value;
+			if ((StorageOld = StorageTmp->mgcoRingingPatternTable_old) != NULL) {
+				mgcoRingingPatternTable_destroy(&StorageTmp->mgcoRingingPatternTable_old);
+				StorageTmp->mgcoRingingPatternTable_rsvs = 0;
+				StorageTmp->mgcoRingingPatternTable_tsts = 0;
+				StorageTmp->mgcoRingingPatternTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			mgcoRingingPatternTable_destroy(&StorageDel);
-			/* mgcoRingingPatternTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_mgcoRingingPatternTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->mgcoRingingPatternRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_mgcoRingingPatternTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->mgcoRingingPatternRowStatus = old_value;
+			if (StorageTmp->mgcoRingingPatternRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_mgcoRingingPatternTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -2242,6 +3117,13 @@ write_mgcoRingingPatternRowStatus(int action, u_char *var_val, u_char var_val_ty
 				mgcoRingingPatternTable_del(StorageNew);
 				mgcoRingingPatternTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->mgcoRingingPatternTable_old) == NULL)
+				break;
+			if (--StorageTmp->mgcoRingingPatternTable_rsvs == 0)
+				mgcoRingingPatternTable_destroy(&StorageTmp->mgcoRingingPatternTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -2268,10 +3150,9 @@ write_mgcoRingingPatternRowStatus(int action, u_char *var_val, u_char var_val_ty
 int
 write_mgcoRingingCadenceGroupRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct mgcoRingingCadenceGroupTable_data *StorageTmp = NULL;
+	struct mgcoRingingCadenceGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct mgcoRingingCadenceGroupTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 12;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -2298,40 +3179,6 @@ write_mgcoRingingCadenceGroupRowStatus(int action, u_char *var_val, u_char var_v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->mgcoRingingCadenceGroupRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->mgcoRingingCadenceGroupTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->mgcoRingingCadenceGroupTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* mgcoRingingCadenceGroupId */
@@ -2379,6 +3226,7 @@ write_mgcoRingingCadenceGroupRowStatus(int action, u_char *var_val, u_char var_v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->mgcoRingingCadenceGroupTable_rsvs = 1;
 			vp = vars;
 			StorageNew->mgcoRingingCadenceGroupId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -2386,7 +3234,37 @@ write_mgcoRingingCadenceGroupRowStatus(int action, u_char *var_val, u_char var_v
 			vp = vp->next_variable;
 			header_complex_add_data(&mgcoRingingCadenceGroupTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->mgcoRingingCadenceGroupRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->mgcoRingingCadenceGroupTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+				if (StorageTmp->mgcoRingingCadenceGroupTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old = mgcoRingingCadenceGroupTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->mgcoRingingCadenceGroupTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->mgcoRingingCadenceGroupTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -2396,78 +3274,127 @@ write_mgcoRingingCadenceGroupRowStatus(int action, u_char *var_val, u_char var_v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = mgcoRingingCadenceGroupTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_mgcoRingingCadenceGroupTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->mgcoRingingCadenceGroupRowStatus;
-			StorageTmp->mgcoRingingCadenceGroupRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = mgcoRingingCadenceGroupTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->mgcoRingingCadenceGroupRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->mgcoRingingCadenceGroupRowStatus != RS_ACTIVE)
+				if ((ret = can_act_mgcoRingingCadenceGroupTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->mgcoRingingCadenceGroupRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_mgcoRingingCadenceGroupTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->mgcoRingingCadenceGroupRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_mgcoRingingCadenceGroupTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->mgcoRingingCadenceGroupRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here
+		   must be reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_mgcoRingingCadenceGroupTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->mgcoRingingCadenceGroupRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_mgcoRingingCadenceGroupTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->mgcoRingingCadenceGroupRowStatus;
-			StorageTmp->mgcoRingingCadenceGroupRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->mgcoRingingCadenceGroupRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_mgcoRingingCadenceGroupTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_mgcoRingingCadenceGroupTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->mgcoRingingCadenceGroupRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->mgcoRingingCadenceGroupRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->mgcoRingingCadenceGroupRowStatus = set_value;
+			if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) != NULL) {
+				mgcoRingingCadenceGroupTable_destroy(&StorageTmp->mgcoRingingCadenceGroupTable_old);
+				StorageTmp->mgcoRingingCadenceGroupTable_rsvs = 0;
+				StorageTmp->mgcoRingingCadenceGroupTable_tsts = 0;
+				StorageTmp->mgcoRingingCadenceGroupTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			mgcoRingingCadenceGroupTable_destroy(&StorageDel);
-			/* mgcoRingingCadenceGroupTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_mgcoRingingCadenceGroupTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->mgcoRingingCadenceGroupRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_mgcoRingingCadenceGroupTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->mgcoRingingCadenceGroupRowStatus = old_value;
+			if (StorageTmp->mgcoRingingCadenceGroupRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_mgcoRingingCadenceGroupTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -2481,6 +3408,13 @@ write_mgcoRingingCadenceGroupRowStatus(int action, u_char *var_val, u_char var_v
 				mgcoRingingCadenceGroupTable_del(StorageNew);
 				mgcoRingingCadenceGroupTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->mgcoRingingCadenceGroupTable_old) == NULL)
+				break;
+			if (--StorageTmp->mgcoRingingCadenceGroupTable_rsvs == 0)
+				mgcoRingingCadenceGroupTable_destroy(&StorageTmp->mgcoRingingCadenceGroupTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */

@@ -63,6 +63,10 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct gcpMIB_data {
+	struct gcpMIB_data *gcpMIB_old;
+	uint gcpMIB_rsvs;
+	uint gcpMIB_tsts;
+	uint gcpMIB_sets;
 	uint gcpMIB_request;
 	long gcpDefaultMgcoIdent;	/* ReadWrite */
 	long gcpDefaultMgcoExecutionTime;	/* ReadWrite */
@@ -98,8 +102,13 @@ struct gcpMIB_data {
 	long gcpDefaultSctpLifetime;	/* ReadWrite */
 };
 struct gcpMsTable_data {
+	struct gcpMsTable_data *gcpMsTable_old;
+	uint gcpMsTable_rsvs;
+	uint gcpMsTable_tsts;
+	uint gcpMsTable_sets;
 	uint gcpMsTable_request;
 	uint gcpMsTable_refs;
+	uint gcpMsTable_id;
 	ulong gcpMsId;			/* NoAccess */
 	uint8_t *gcpMsName;		/* Create */
 	size_t gcpMsNameLen;
@@ -124,8 +133,13 @@ struct gcpMsTable_data {
 	long gcpMsRowStatus;		/* Create */
 };
 struct gcpMgTable_data {
+	struct gcpMgTable_data *gcpMgTable_old;
+	uint gcpMgTable_rsvs;
+	uint gcpMgTable_tsts;
+	uint gcpMgTable_sets;
 	uint gcpMgTable_request;
 	uint gcpMgTable_refs;
+	uint gcpMgTable_id;
 	ulong gcpMsId;			/* NoAccess */
 	ulong gcpMgId;			/* NoAccess */
 	long gcpMgLocation;		/* Create */
@@ -153,8 +167,13 @@ struct gcpMgTable_data {
 	long gcpMgRowStatus;		/* Create */
 };
 struct gcpMgcTable_data {
+	struct gcpMgcTable_data *gcpMgcTable_old;
+	uint gcpMgcTable_rsvs;
+	uint gcpMgcTable_tsts;
+	uint gcpMgcTable_sets;
 	uint gcpMgcTable_request;
 	uint gcpMgcTable_refs;
+	uint gcpMgcTable_id;
 	ulong gcpMsId;			/* NoAccess */
 	ulong gcpMgcId;			/* NoAccess */
 	long gcpMgcLocation;		/* Create */
@@ -182,8 +201,13 @@ struct gcpMgcTable_data {
 	long gcpMgcRowStatus;		/* Create */
 };
 struct gcpLinkageTable_data {
+	struct gcpLinkageTable_data *gcpLinkageTable_old;
+	uint gcpLinkageTable_rsvs;
+	uint gcpLinkageTable_tsts;
+	uint gcpLinkageTable_sets;
 	uint gcpLinkageTable_request;
 	uint gcpLinkageTable_refs;
+	uint gcpLinkageTable_id;
 	ulong gcpMsId;			/* NoAccess */
 	ulong gcpMgId;			/* NoAccess */
 	ulong gcpMsId;			/* NoAccess */
@@ -214,16 +238,26 @@ struct gcpLinkageTable_data {
 	long gcpLinkageRowStatus;	/* Create */
 };
 struct gcpUdpProfileTable_data {
+	struct gcpUdpProfileTable_data *gcpUdpProfileTable_old;
+	uint gcpUdpProfileTable_rsvs;
+	uint gcpUdpProfileTable_tsts;
+	uint gcpUdpProfileTable_sets;
 	uint gcpUdpProfileTable_request;
 	uint gcpUdpProfileTable_refs;
+	uint gcpUdpProfileTable_id;
 	uint8_t *gcpUdpProfileId;	/* NoAccess */
 	size_t gcpUdpProfileIdLen;
 	long gcpUdpChecksum;		/* Create */
 	long gcpUdpRowStatus;		/* Create */
 };
 struct gcpTcpProfileTable_data {
+	struct gcpTcpProfileTable_data *gcpTcpProfileTable_old;
+	uint gcpTcpProfileTable_rsvs;
+	uint gcpTcpProfileTable_tsts;
+	uint gcpTcpProfileTable_sets;
 	uint gcpTcpProfileTable_request;
 	uint gcpTcpProfileTable_refs;
+	uint gcpTcpProfileTable_id;
 	uint8_t *gcpTcpProfileId;	/* NoAccess */
 	size_t gcpTcpProfileIdLen;
 	long gcpTcpNoDelay;		/* Create */
@@ -237,8 +271,13 @@ struct gcpTcpProfileTable_data {
 	long gcpTcpRowStatus;		/* Create */
 };
 struct gcpSctpProfileTable_data {
+	struct gcpSctpProfileTable_data *gcpSctpProfileTable_old;
+	uint gcpSctpProfileTable_rsvs;
+	uint gcpSctpProfileTable_tsts;
+	uint gcpSctpProfileTable_sets;
 	uint gcpSctpProfileTable_request;
 	uint gcpSctpProfileTable_refs;
+	uint gcpSctpProfileTable_id;
 	uint8_t *gcpSctpProfileId;	/* NoAccess */
 	size_t gcpSctpProfileIdLen;
 	long gcpSctpNoDelay;		/* Create */
@@ -259,8 +298,13 @@ struct gcpSctpProfileTable_data {
 	long gcpSctpRowStatus;		/* Create */
 };
 struct gcpProtGroupTable_data {
+	struct gcpProtGroupTable_data *gcpProtGroupTable_old;
+	uint gcpProtGroupTable_rsvs;
+	uint gcpProtGroupTable_tsts;
+	uint gcpProtGroupTable_sets;
 	uint gcpProtGroupTable_request;
 	uint gcpProtGroupTable_refs;
+	uint gcpProtGroupTable_id;
 	ulong gcpProtGroupId;		/* NoAccess */
 	long gcpProtGroupOperState;	/* ReadOnly */
 	uint8_t *gcpProtGroupAvailStatus;	/* ReadOnly */
@@ -282,8 +326,13 @@ struct gcpProtGroupTable_data {
 	long gcpProtGroupRowStatus;	/* Create */
 };
 struct gcpSbolTable_data {
+	struct gcpSbolTable_data *gcpSbolTable_old;
+	uint gcpSbolTable_rsvs;
+	uint gcpSbolTable_tsts;
+	uint gcpSbolTable_sets;
 	uint gcpSbolTable_request;
 	uint gcpSbolTable_refs;
+	uint gcpSbolTable_id;
 	ulong gcpProtGroupId;		/* NoAccess */
 	ulong gcpSbolId;		/* NoAccess */
 	oid *gcpSbolObject;		/* Create */
@@ -291,8 +340,13 @@ struct gcpSbolTable_data {
 	long gcpSbolStatus;		/* Create */
 };
 struct gcpProtUnitTable_data {
+	struct gcpProtUnitTable_data *gcpProtUnitTable_old;
+	uint gcpProtUnitTable_rsvs;
+	uint gcpProtUnitTable_tsts;
+	uint gcpProtUnitTable_sets;
 	uint gcpProtUnitTable_request;
 	uint gcpProtUnitTable_refs;
+	uint gcpProtUnitTable_id;
 	ulong gcpProtUnitId;		/* NoAccess */
 	long gcpProtUnitProtecting;	/* Create */
 	oid *gcpProtUnitReliableResourcePointer;	/* Create */
@@ -311,8 +365,13 @@ struct gcpProtUnitTable_data {
 	long gcpProtUnitRowStatus;	/* Create */
 };
 struct gcpRealmTable_data {
+	struct gcpRealmTable_data *gcpRealmTable_old;
+	uint gcpRealmTable_rsvs;
+	uint gcpRealmTable_tsts;
+	uint gcpRealmTable_sets;
 	uint gcpRealmTable_request;
 	uint gcpRealmTable_refs;
+	uint gcpRealmTable_id;
 	ulong gcpMsId;			/* NoAccess */
 	ulong gcpMgId;			/* NoAccess */
 	ulong gcpRealmId;		/* NoAccess */
@@ -325,19 +384,33 @@ struct gcpRealmTable_data {
 	long gcpRealmRowStatus;		/* Create */
 };
 struct gcpInterfaceTable_data {
+	struct gcpInterfaceTable_data *gcpInterfaceTable_old;
+	uint gcpInterfaceTable_rsvs;
+	uint gcpInterfaceTable_tsts;
+	uint gcpInterfaceTable_sets;
 	uint gcpInterfaceTable_request;
 	uint gcpInterfaceTable_refs;
+	uint gcpInterfaceTable_id;
 	ulong gcpMsId;			/* NoAccess */
 	ulong gcpInterfaceId;		/* NoAccess */
 	ulong gcpInterfaceIfindex;	/* Create */
 	ulong gcpInterfaceMgId;		/* Create */
 	long gcpInterfaceType;		/* Create */
 	ulong gcpInterfaceRealm;	/* Create */
+	uint8_t *gcpInterfaceTermId;	/* Create */
+	size_t gcpInterfaceTermIdLen;
+	uint8_t *gcpInterfaceTermPath;	/* Create */
+	size_t gcpInterfaceTermPathLen;
 	long gcpInterfaceRowStatus;	/* Create */
 };
 struct gcpAddressTable_data {
+	struct gcpAddressTable_data *gcpAddressTable_old;
+	uint gcpAddressTable_rsvs;
+	uint gcpAddressTable_tsts;
+	uint gcpAddressTable_sets;
 	uint gcpAddressTable_request;
 	uint gcpAddressTable_refs;
+	uint gcpAddressTable_id;
 	ulong gcpMsId;			/* NoAccess */
 	ulong gcpMgId;			/* NoAccess */
 	ulong gcpRealmId;		/* NoAccess */
@@ -749,6 +822,10 @@ void init_gcpMIB(void);
 void deinit_gcpMIB(void);
 int term_gcpMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_gcpMIB;
+struct gcpMIB_data *gcpMIB_create(void);
+struct gcpMIB_data *gcpMIB_duplicate(struct gcpMIB_data *);
+int gcpMIB_destroy(struct gcpMIB_data **);
+int gcpMIB_add(struct gcpMIB_data *);
 void parse_gcpMIB(const char *, char *);
 SNMPCallback store_gcpMIB;
 void refresh_gcpMIB(int);

@@ -93,7 +93,7 @@ struct tcapOmNodeTable_data {
 	uint tcapOmNodeTable_request;
 	uint tcapOmNodeTable_refs;
 	uint tcapOmNodeTable_id;
-	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* Notify */
 	size_t sccpNetworkEntityIdLen;
 	long tcapOmNodeMessagesSent;	/* ReadOnly */
 	long tcapOmNodeMessagesRecv;	/* ReadOnly */
@@ -110,7 +110,7 @@ struct tcapOmNodeCurrentTable_data {
 	uint tcapOmNodeCurrentTable_request;
 	uint tcapOmNodeCurrentTable_refs;
 	uint tcapOmNodeCurrentTable_id;
-	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* Notify */
 	size_t sccpNetworkEntityIdLen;
 	long tcapOmNodeCurrentMessagesSent;	/* ReadOnly */
 	long tcapOmNodeCurrentMessagesRecv;	/* ReadOnly */
@@ -125,7 +125,7 @@ struct tcapOmNode5minIntTable_data {
 	uint tcapOmNode5minIntTable_request;
 	uint tcapOmNode5minIntTable_refs;
 	uint tcapOmNode5minIntTable_id;
-	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* Notify */
 	size_t sccpNetworkEntityIdLen;
 	long tcapOmInterval;		/* NoAccess */
 	long tcapOmNode5minIntMessagesSent;	/* ReadOnly */
@@ -141,7 +141,7 @@ struct tcapOmNode15minIntTable_data {
 	uint tcapOmNode15minIntTable_request;
 	uint tcapOmNode15minIntTable_refs;
 	uint tcapOmNode15minIntTable_id;
-	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* Notify */
 	size_t sccpNetworkEntityIdLen;
 	long tcapOmInterval;		/* NoAccess */
 	long tcapOmNode15minIntMessagesSent;	/* ReadOnly */
@@ -157,7 +157,7 @@ struct tcapOmMsgsTable_data {
 	uint tcapOmMsgsTable_request;
 	uint tcapOmMsgsTable_refs;
 	uint tcapOmMsgsTable_id;
-	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* Notify */
 	size_t sccpNetworkEntityIdLen;
 	ulong tcapOmMessageType;	/* NoAccess */
 	long tcapOmMsgsMessagesSent;	/* ReadOnly */
@@ -173,7 +173,7 @@ struct tcapOmMsgsCurrentTable_data {
 	uint tcapOmMsgsCurrentTable_request;
 	uint tcapOmMsgsCurrentTable_refs;
 	uint tcapOmMsgsCurrentTable_id;
-	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* Notify */
 	size_t sccpNetworkEntityIdLen;
 	ulong tcapOmMessageType;	/* NoAccess */
 	long tcapOmMsgsCurrentMessagesSent;	/* ReadOnly */
@@ -187,7 +187,7 @@ struct tcapOmMsgs5minIntTable_data {
 	uint tcapOmMsgs5minIntTable_request;
 	uint tcapOmMsgs5minIntTable_refs;
 	uint tcapOmMsgs5minIntTable_id;
-	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* Notify */
 	size_t sccpNetworkEntityIdLen;
 	ulong tcapOmMessageType;	/* NoAccess */
 	long tcapOmInterval;		/* NoAccess */
@@ -202,7 +202,7 @@ struct tcapOmMsgs15minIntTable_data {
 	uint tcapOmMsgs15minIntTable_request;
 	uint tcapOmMsgs15minIntTable_refs;
 	uint tcapOmMsgs15minIntTable_id;
-	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* Notify */
 	size_t sccpNetworkEntityIdLen;
 	ulong tcapOmMessageType;	/* NoAccess */
 	long tcapOmInterval;		/* NoAccess */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/snmp/xmonMIB.c
+ @(#) src/snmp/xmonMIB.c
 
  -----------------------------------------------------------------------------
 
@@ -27638,7 +27638,7 @@ write_xmonInterfaceRowStatus(int action, u_char *var_val, u_char var_val_type, s
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -27909,7 +27909,7 @@ write_xmonRmonRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -28174,7 +28174,7 @@ write_xmonFeedListenRowStatus(int action, u_char *var_val, u_char var_val_type, 
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -28439,7 +28439,7 @@ write_xmonFeedRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -28704,7 +28704,7 @@ write_xmonPushListenRowStatus(int action, u_char *var_val, u_char var_val_type, 
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -28969,7 +28969,7 @@ write_xmonPushRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -29234,7 +29234,7 @@ write_xmonPullListenRowStatus(int action, u_char *var_val, u_char var_val_type, 
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -29499,7 +29499,7 @@ write_xmonPullRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -29764,7 +29764,7 @@ write_xmonUploadRowStatus(int action, u_char *var_val, u_char var_val_type, size
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -30029,7 +30029,7 @@ write_xmonDownloadRowStatus(int action, u_char *var_val, u_char var_val_type, si
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -30296,7 +30296,7 @@ write_xmonSctpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */

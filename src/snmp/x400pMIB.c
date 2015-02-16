@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/snmp/x400pMIB.c
+ @(#) src/snmp/x400pMIB.c
 
  -----------------------------------------------------------------------------
 
@@ -14515,7 +14515,7 @@ write_x400pSyncRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -14782,7 +14782,7 @@ write_x400pDrivRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -15069,7 +15069,7 @@ write_x400pCardStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -15376,7 +15376,7 @@ write_x400pSpanRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 			break;
 			/* deactivate with underlying device */
@@ -15703,7 +15703,7 @@ write_x400pXconRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/snmp/m2paMIB.c
+ @(#) src/snmp/m2paMIB.c
 
  -----------------------------------------------------------------------------
 
@@ -462,8 +462,53 @@ m2paMIB_create(void)
 		StorageNew->m2paDefaultSctpLifetime = 0;
 
 	}
+      done:
 	DEBUGMSGTL(("m2paMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	m2paMIB_destroy(&StorageNew);
+	goto done;
+}
+
+/**
+ * @fn struct m2paMIB_data *m2paMIB_duplicate(struct m2paMIB_data *thedata)
+ * @param thedata the mib structure to duplicate
+ * @brief duplicate a mib structure for the mib
+ *
+ * Duplicates the specified mib structure @param thedata and returns a pointer to the newly
+ * allocated mib structure on success, or NULL on failure.
+ */
+struct m2paMIB_data *
+m2paMIB_duplicate(struct m2paMIB_data *thedata)
+{
+	struct m2paMIB_data *StorageNew = SNMP_MALLOC_STRUCT(m2paMIB_data);
+
+	DEBUGMSGTL(("m2paMIB", "m2paMIB_duplicate: duplicating mib... "));
+	if (StorageNew != NULL) {
+		StorageNew->m2paDefaultSctpNoDelay = thedata->m2paDefaultSctpNoDelay;
+		StorageNew->m2paDefaultSctpMaxseg = thedata->m2paDefaultSctpMaxseg;
+		StorageNew->m2paDefaultSctpHeartbeatItvl = thedata->m2paDefaultSctpHeartbeatItvl;
+		StorageNew->m2paDefaultSctpHeartbeat = thedata->m2paDefaultSctpHeartbeat;
+		StorageNew->m2paDefaultSctpRtoInitial = thedata->m2paDefaultSctpRtoInitial;
+		StorageNew->m2paDefaultSctpRtoMin = thedata->m2paDefaultSctpRtoMin;
+		StorageNew->m2paDefaultSctpRtoMax = thedata->m2paDefaultSctpRtoMax;
+		StorageNew->m2paDefaultSctpPathMaxRetrans = thedata->m2paDefaultSctpPathMaxRetrans;
+		StorageNew->m2paDefaultSctpCookieLife = thedata->m2paDefaultSctpCookieLife;
+		StorageNew->m2paDefaultSctpCookieInc = thedata->m2paDefaultSctpCookieInc;
+		StorageNew->m2paDefaultSctpMaxInitRetries = thedata->m2paDefaultSctpMaxInitRetries;
+		StorageNew->m2paDefaultSctpMaxBurst = thedata->m2paDefaultSctpMaxBurst;
+		StorageNew->m2paDefaultSctpAssocMaxRetrans = thedata->m2paDefaultSctpAssocMaxRetrans;
+		StorageNew->m2paDefaultSctpSackDelay = thedata->m2paDefaultSctpSackDelay;
+		StorageNew->m2paDefaultSctpLifetime = thedata->m2paDefaultSctpLifetime;
+	}
+      done:
+	DEBUGMSGTL(("m2paMIB", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	m2paMIB_destroy(&StorageNew);
+	goto done;
 }
 
 /**
@@ -514,7 +559,7 @@ m2paMIB_add(struct m2paMIB_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for m2paMIB entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case m2paMIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -596,6 +641,62 @@ store_m2paMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	}
 	DEBUGMSGTL(("m2paMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int check_m2paMIB(struct m2paMIB_data *StorageTmp, struct m2paMIB_data *StorageOld)
+ * @param StorageTmp the data as updated
+ * @param StorageOld the data previous to update
+ *
+ * This function is used by mibs.  It is used to check, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the ACTION phase.  The COMMIT phase does not ensue unless this check passes.  This function can
+ * return SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before
+ * the varbinds on the mib were applied; the values in StorageTmp are the new values.  The function
+ * is permitted to change the values in StorageTmp to correct them; however, preferences should be
+ * made for setting values that were not in the varbinds.
+ */
+int
+check_m2paMIB(struct m2paMIB_data *StorageTmp, struct m2paMIB_data *StorageOld)
+{
+	/* XXX: provide code to check the scalars for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_m2paMIB(struct m2paMIB_data *StorageTmp, struct m2paMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase)
+ *
+ * This function is used by mibs.  It is used to update, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the COMMIT phase.  The start of the ACTION phase performs a consistency check on the mib before
+ * allowing the request to proceed to the COMMIT phase.  The COMMIT phase then arrives here with
+ * consistency already checked (see check_m2paMIB()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied: the values in StorageTmp are the new values.
+ */
+int
+update_m2paMIB(struct m2paMIB_data *StorageTmp, struct m2paMIB_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	m2paMIB_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn revert_m2paMIB(struct 
+ * @fn void revert_m2paMIB(struct m2paMIB_data *StorageTmp, struct m2paMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase)
+ */
+void
+revert_m2paMIB(struct m2paMIB_data *StorageTmp, struct m2paMIB_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_m2paMIB(StorageOld, NULL);
 }
 
 /**
@@ -842,8 +943,10 @@ m2paProtocolProfileTable_create(void)
 		StorageNew->m2paReceiveCongestionThresholdAbatement = 3;
 		StorageNew->m2paReceiveCongestionThresholdOnset = 6;
 		StorageNew->m2paReceiveCongestionThresholdDiscard = 9;
-		if ((StorageNew->m2paProtocolProfileName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->m2paProtocolProfileNameLen = strlen("");
+		if ((StorageNew->m2paProtocolProfileName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->m2paProtocolProfileNameLen = 0;
+		StorageNew->m2paProtocolProfileName[StorageNew->m2paProtocolProfileNameLen] = 0;
 		StorageNew->m2paTransCongThresholdAbatementL2Messages = 0;
 		StorageNew->m2paTransCongThresholdAbatementL2Octets = 0;
 		StorageNew->m2paTransCongThresholdOnsetL2Messages = 0;
@@ -861,14 +964,19 @@ m2paProtocolProfileTable_create(void)
 		StorageNew->m2paProtocolProfileRowStatus = 0;
 		StorageNew->m2paProtocolProfileRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("m2paMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	m2paProtocolProfileTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct m2paProtocolProfileTable_data *m2paProtocolProfileTable_duplicate(struct m2paProtocolProfileTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -880,6 +988,78 @@ m2paProtocolProfileTable_duplicate(struct m2paProtocolProfileTable_data *thedata
 
 	DEBUGMSGTL(("m2paMIB", "m2paProtocolProfileTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->m2paProtocolProfileTable_id = thedata->m2paProtocolProfileTable_id;
+		if (!(StorageNew->m2paProtocolProfileId = malloc(thedata->m2paProtocolProfileIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m2paProtocolProfileId, thedata->m2paProtocolProfileId, thedata->m2paProtocolProfileIdLen);
+		StorageNew->m2paProtocolProfileIdLen = thedata->m2paProtocolProfileIdLen;
+		StorageNew->m2paProtocolProfileId[StorageNew->m2paProtocolProfileIdLen] = 0;
+		StorageNew->m2paN1 = thedata->m2paN1;
+		StorageNew->m2paProving = thedata->m2paProving;
+		StorageNew->m2paManagementProvingState = thedata->m2paManagementProvingState;
+		StorageNew->m2paLoopDelayLower = thedata->m2paLoopDelayLower;
+		StorageNew->m2paLoopDelayUpper = thedata->m2paLoopDelayUpper;
+		StorageNew->m2paTransmissionRateIntervalLower = thedata->m2paTransmissionRateIntervalLower;
+		StorageNew->m2paTransmissionRateIntervalUpper = thedata->m2paTransmissionRateIntervalUpper;
+		StorageNew->m2paSctpNoDelay = thedata->m2paSctpNoDelay;
+		StorageNew->m2paSctpMaxseg = thedata->m2paSctpMaxseg;
+		StorageNew->m2paSctpHeartbeatItvl = thedata->m2paSctpHeartbeatItvl;
+		StorageNew->m2paSctpHeartbeat = thedata->m2paSctpHeartbeat;
+		StorageNew->m2paSctpRtoInitial = thedata->m2paSctpRtoInitial;
+		StorageNew->m2paSctpRtoMin = thedata->m2paSctpRtoMin;
+		StorageNew->m2paSctpRtoMax = thedata->m2paSctpRtoMax;
+		StorageNew->m2paSctpPathMaxRetrans = thedata->m2paSctpPathMaxRetrans;
+		StorageNew->m2paSctpCookieLife = thedata->m2paSctpCookieLife;
+		StorageNew->m2paSctpCookieInc = thedata->m2paSctpCookieInc;
+		StorageNew->m2paSctpMaxInitRetries = thedata->m2paSctpMaxInitRetries;
+		StorageNew->m2paSctpMaxBurst = thedata->m2paSctpMaxBurst;
+		StorageNew->m2paSctpAssocMaxRetrans = thedata->m2paSctpAssocMaxRetrans;
+		StorageNew->m2paSctpSackDelay = thedata->m2paSctpSackDelay;
+		StorageNew->m2paSctpLifetime = thedata->m2paSctpLifetime;
+		StorageNew->m2paTimerT1 = thedata->m2paTimerT1;
+		StorageNew->m2paTimerT2 = thedata->m2paTimerT2;
+		StorageNew->m2paTimerT2L = thedata->m2paTimerT2L;
+		StorageNew->m2paTimerT2H = thedata->m2paTimerT2H;
+		StorageNew->m2paTimerT3 = thedata->m2paTimerT3;
+		StorageNew->m2paTimerT4N = thedata->m2paTimerT4N;
+		StorageNew->m2paTimerT4E = thedata->m2paTimerT4E;
+		StorageNew->m2paTimerT6 = thedata->m2paTimerT6;
+		StorageNew->m2paTimerT7 = thedata->m2paTimerT7;
+		StorageNew->m2paTransCongThresholdAbatementL1Messages = thedata->m2paTransCongThresholdAbatementL1Messages;
+		StorageNew->m2paTransCongThresholdAbatementL1Octets = thedata->m2paTransCongThresholdAbatementL1Octets;
+		StorageNew->m2paTransCongThresholdOnsetL1Messages = thedata->m2paTransCongThresholdOnsetL1Messages;
+		StorageNew->m2paTransCongThresholdOnsetL1Octets = thedata->m2paTransCongThresholdOnsetL1Octets;
+		StorageNew->m2paProvingAttempts = thedata->m2paProvingAttempts;
+		StorageNew->m2paNumberOfThresholdLevels = thedata->m2paNumberOfThresholdLevels;
+		StorageNew->m2paCongestionCounting = thedata->m2paCongestionCounting;
+		StorageNew->m2paCongestionReportingBaseObject = thedata->m2paCongestionReportingBaseObject;
+		StorageNew->m2paTimerTx = thedata->m2paTimerTx;
+		StorageNew->m2paTimerTy = thedata->m2paTimerTy;
+		StorageNew->m2paNumberOfCongestionStates = thedata->m2paNumberOfCongestionStates;
+		StorageNew->m2paInitialLevelOfCongestion = thedata->m2paInitialLevelOfCongestion;
+		StorageNew->m2paReceiveCongestionThresholdAbatement = thedata->m2paReceiveCongestionThresholdAbatement;
+		StorageNew->m2paReceiveCongestionThresholdOnset = thedata->m2paReceiveCongestionThresholdOnset;
+		StorageNew->m2paReceiveCongestionThresholdDiscard = thedata->m2paReceiveCongestionThresholdDiscard;
+		if (!(StorageNew->m2paProtocolProfileName = malloc(thedata->m2paProtocolProfileNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m2paProtocolProfileName, thedata->m2paProtocolProfileName, thedata->m2paProtocolProfileNameLen);
+		StorageNew->m2paProtocolProfileNameLen = thedata->m2paProtocolProfileNameLen;
+		StorageNew->m2paProtocolProfileName[StorageNew->m2paProtocolProfileNameLen] = 0;
+		StorageNew->m2paTransCongThresholdAbatementL2Messages = thedata->m2paTransCongThresholdAbatementL2Messages;
+		StorageNew->m2paTransCongThresholdAbatementL2Octets = thedata->m2paTransCongThresholdAbatementL2Octets;
+		StorageNew->m2paTransCongThresholdOnsetL2Messages = thedata->m2paTransCongThresholdOnsetL2Messages;
+		StorageNew->m2paTransCongThresholdOnsetL2Octets = thedata->m2paTransCongThresholdOnsetL2Octets;
+		StorageNew->m2paTransCongThresholdAbatementL3Messages = thedata->m2paTransCongThresholdAbatementL3Messages;
+		StorageNew->m2paTransCongThresholdAbatementL3Octets = thedata->m2paTransCongThresholdAbatementL3Octets;
+		StorageNew->m2paTransCongThresholdOnsetL3Messages = thedata->m2paTransCongThresholdOnsetL3Messages;
+		StorageNew->m2paTransCongThresholdOnsetL3Octets = thedata->m2paTransCongThresholdOnsetL3Octets;
+		StorageNew->m2paTransCongThresholdDiscardL1Messages = thedata->m2paTransCongThresholdDiscardL1Messages;
+		StorageNew->m2paTransCongThresholdDiscardL1Octets = thedata->m2paTransCongThresholdDiscardL1Octets;
+		StorageNew->m2paTransCongThresholdDiscardL2Messages = thedata->m2paTransCongThresholdDiscardL2Messages;
+		StorageNew->m2paTransCongThresholdDiscardL2Octets = thedata->m2paTransCongThresholdDiscardL2Octets;
+		StorageNew->m2paTransCongThresholdDiscardL3Messages = thedata->m2paTransCongThresholdDiscardL3Messages;
+		StorageNew->m2paTransCongThresholdDiscardL3Octets = thedata->m2paTransCongThresholdDiscardL3Octets;
+		StorageNew->m2paProtocolProfileRowStatus = thedata->m2paProtocolProfileRowStatus;
 	}
       done:
 	DEBUGMSGTL(("m2paMIB", "done.\n"));
@@ -977,7 +1157,7 @@ m2paProtocolProfileTable_del(struct m2paProtocolProfileTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for m2paProtocolProfileTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case m2paProtocolProfileTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1166,6 +1346,98 @@ store_m2paProtocolProfileTable(int majorID, int minorID, void *serverarg, void *
 	}
 	DEBUGMSGTL(("m2paMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int activate_m2paProtocolProfileTable_row(struct m2paProtocolProfileTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_m2paProtocolProfileTable_row(struct m2paProtocolProfileTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_m2paProtocolProfileTable_row(struct m2paProtocolProfileTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_m2paProtocolProfileTable_row(struct m2paProtocolProfileTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int check_m2paProtocolProfileTable_row(struct m2paProtocolProfileTable_data *StorageTmp, struct m2paProtocolProfileTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_m2paProtocolProfileTable_row(struct m2paProtocolProfileTable_data *StorageTmp, struct m2paProtocolProfileTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_m2paProtocolProfileTable_row(struct m2paProtocolProfileTable_data *StorageTmp, struct m2paProtocolProfileTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_m2paProtocolProfileTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_m2paProtocolProfileTable_row(struct m2paProtocolProfileTable_data *StorageTmp, struct m2paProtocolProfileTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	m2paProtocolProfileTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_m2paProtocolProfileTable_row(struct m2paProtocolProfileTable_data *StorageTmp, struct m2paProtocolProfileTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_m2paProtocolProfileTable_row(struct m2paProtocolProfileTable_data *StorageTmp, struct m2paProtocolProfileTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_m2paProtocolProfileTable_row(StorageOld, NULL);
 }
 
 /**
@@ -1687,12 +1959,14 @@ var_m2paProtocolProfileTable(struct variable *vp, oid * name, size_t *length, in
 int
 write_m2paN1(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paN1 entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1718,22 +1992,61 @@ write_m2paN1(int action, u_char *var_val, u_char var_val_type, size_t var_val_le
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 1000 */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paN1 = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paN1 for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paN1;
-		StorageTmp->m2paN1 = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paN1 = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paN1 = StorageOld->m2paN1;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1753,12 +2066,14 @@ write_m2paN1(int action, u_char *var_val, u_char var_val_type, size_t var_val_le
 int
 write_m2paProving(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paProving entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1792,22 +2107,61 @@ write_m2paProving(int action, u_char *var_val, u_char var_val_type, size_t var_v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paProving: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paProving = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paProving for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paProving;
-		StorageTmp->m2paProving = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paProving = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paProving = StorageOld->m2paProving;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1827,12 +2181,14 @@ write_m2paProving(int action, u_char *var_val, u_char var_val_type, size_t var_v
 int
 write_m2paManagementProvingState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paManagementProvingState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1866,22 +2222,61 @@ write_m2paManagementProvingState(int action, u_char *var_val, u_char var_val_typ
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paManagementProvingState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paManagementProvingState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paManagementProvingState for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paManagementProvingState;
-		StorageTmp->m2paManagementProvingState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paManagementProvingState = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paManagementProvingState = StorageOld->m2paManagementProvingState;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1901,12 +2296,14 @@ write_m2paManagementProvingState(int action, u_char *var_val, u_char var_val_typ
 int
 write_m2paLoopDelayLower(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paLoopDelayLower entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1936,22 +2333,61 @@ write_m2paLoopDelayLower(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paLoopDelayLower: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paLoopDelayLower = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paLoopDelayLower for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paLoopDelayLower;
-		StorageTmp->m2paLoopDelayLower = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paLoopDelayLower = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paLoopDelayLower = StorageOld->m2paLoopDelayLower;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1971,12 +2407,14 @@ write_m2paLoopDelayLower(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_m2paLoopDelayUpper(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paLoopDelayUpper entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -2006,22 +2444,61 @@ write_m2paLoopDelayUpper(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paLoopDelayUpper: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paLoopDelayUpper = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paLoopDelayUpper for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paLoopDelayUpper;
-		StorageTmp->m2paLoopDelayUpper = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paLoopDelayUpper = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paLoopDelayUpper = StorageOld->m2paLoopDelayUpper;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2041,12 +2518,14 @@ write_m2paLoopDelayUpper(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_m2paTransmissionRateIntervalLower(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransmissionRateIntervalLower entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -2071,22 +2550,61 @@ write_m2paTransmissionRateIntervalLower(int action, u_char *var_val, u_char var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTransmissionRateIntervalLower: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTransmissionRateIntervalLower = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransmissionRateIntervalLower for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTransmissionRateIntervalLower;
-		StorageTmp->m2paTransmissionRateIntervalLower = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTransmissionRateIntervalLower = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTransmissionRateIntervalLower = StorageOld->m2paTransmissionRateIntervalLower;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2106,12 +2624,14 @@ write_m2paTransmissionRateIntervalLower(int action, u_char *var_val, u_char var_
 int
 write_m2paTransmissionRateIntervalUpper(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransmissionRateIntervalUpper entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -2136,22 +2656,61 @@ write_m2paTransmissionRateIntervalUpper(int action, u_char *var_val, u_char var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTransmissionRateIntervalUpper: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTransmissionRateIntervalUpper = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransmissionRateIntervalUpper for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTransmissionRateIntervalUpper;
-		StorageTmp->m2paTransmissionRateIntervalUpper = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTransmissionRateIntervalUpper = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTransmissionRateIntervalUpper = StorageOld->m2paTransmissionRateIntervalUpper;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2171,12 +2730,14 @@ write_m2paTransmissionRateIntervalUpper(int action, u_char *var_val, u_char var_
 int
 write_m2paSctpNoDelay(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpNoDelay entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -2209,22 +2770,61 @@ write_m2paSctpNoDelay(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paSctpNoDelay: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paSctpNoDelay = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpNoDelay for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paSctpNoDelay;
-		StorageTmp->m2paSctpNoDelay = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paSctpNoDelay = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paSctpNoDelay = StorageOld->m2paSctpNoDelay;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2244,12 +2844,14 @@ write_m2paSctpNoDelay(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_m2paSctpMaxseg(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpMaxseg entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -2279,22 +2881,61 @@ write_m2paSctpMaxseg(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paSctpMaxseg: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paSctpMaxseg = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpMaxseg for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paSctpMaxseg;
-		StorageTmp->m2paSctpMaxseg = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paSctpMaxseg = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paSctpMaxseg = StorageOld->m2paSctpMaxseg;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2314,12 +2955,14 @@ write_m2paSctpMaxseg(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_m2paSctpHeartbeatItvl(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpHeartbeatItvl entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -2349,22 +2992,61 @@ write_m2paSctpHeartbeatItvl(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paSctpHeartbeatItvl: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paSctpHeartbeatItvl = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpHeartbeatItvl for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paSctpHeartbeatItvl;
-		StorageTmp->m2paSctpHeartbeatItvl = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paSctpHeartbeatItvl = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paSctpHeartbeatItvl = StorageOld->m2paSctpHeartbeatItvl;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2384,12 +3066,14 @@ write_m2paSctpHeartbeatItvl(int action, u_char *var_val, u_char var_val_type, si
 int
 write_m2paSctpHeartbeat(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpHeartbeat entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -2422,22 +3106,61 @@ write_m2paSctpHeartbeat(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paSctpHeartbeat: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paSctpHeartbeat = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpHeartbeat for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paSctpHeartbeat;
-		StorageTmp->m2paSctpHeartbeat = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paSctpHeartbeat = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paSctpHeartbeat = StorageOld->m2paSctpHeartbeat;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2457,12 +3180,14 @@ write_m2paSctpHeartbeat(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_m2paSctpRtoInitial(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpRtoInitial entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -2492,22 +3217,61 @@ write_m2paSctpRtoInitial(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paSctpRtoInitial: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paSctpRtoInitial = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpRtoInitial for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paSctpRtoInitial;
-		StorageTmp->m2paSctpRtoInitial = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paSctpRtoInitial = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paSctpRtoInitial = StorageOld->m2paSctpRtoInitial;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2527,12 +3291,14 @@ write_m2paSctpRtoInitial(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_m2paSctpRtoMin(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpRtoMin entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -2562,22 +3328,61 @@ write_m2paSctpRtoMin(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paSctpRtoMin: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paSctpRtoMin = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpRtoMin for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paSctpRtoMin;
-		StorageTmp->m2paSctpRtoMin = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paSctpRtoMin = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paSctpRtoMin = StorageOld->m2paSctpRtoMin;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2597,12 +3402,14 @@ write_m2paSctpRtoMin(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_m2paSctpRtoMax(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpRtoMax entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -2632,22 +3439,61 @@ write_m2paSctpRtoMax(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paSctpRtoMax: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paSctpRtoMax = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpRtoMax for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paSctpRtoMax;
-		StorageTmp->m2paSctpRtoMax = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paSctpRtoMax = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paSctpRtoMax = StorageOld->m2paSctpRtoMax;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2667,12 +3513,14 @@ write_m2paSctpRtoMax(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_m2paSctpPathMaxRetrans(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpPathMaxRetrans entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -2697,22 +3545,61 @@ write_m2paSctpPathMaxRetrans(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paSctpPathMaxRetrans: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paSctpPathMaxRetrans = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpPathMaxRetrans for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paSctpPathMaxRetrans;
-		StorageTmp->m2paSctpPathMaxRetrans = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paSctpPathMaxRetrans = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paSctpPathMaxRetrans = StorageOld->m2paSctpPathMaxRetrans;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2732,12 +3619,14 @@ write_m2paSctpPathMaxRetrans(int action, u_char *var_val, u_char var_val_type, s
 int
 write_m2paSctpCookieLife(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpCookieLife entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -2767,22 +3656,61 @@ write_m2paSctpCookieLife(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paSctpCookieLife: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paSctpCookieLife = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpCookieLife for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paSctpCookieLife;
-		StorageTmp->m2paSctpCookieLife = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paSctpCookieLife = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paSctpCookieLife = StorageOld->m2paSctpCookieLife;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2802,12 +3730,14 @@ write_m2paSctpCookieLife(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_m2paSctpCookieInc(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpCookieInc entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -2837,22 +3767,61 @@ write_m2paSctpCookieInc(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paSctpCookieInc: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paSctpCookieInc = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpCookieInc for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paSctpCookieInc;
-		StorageTmp->m2paSctpCookieInc = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paSctpCookieInc = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paSctpCookieInc = StorageOld->m2paSctpCookieInc;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2872,12 +3841,14 @@ write_m2paSctpCookieInc(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_m2paSctpMaxInitRetries(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpMaxInitRetries entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -2902,22 +3873,61 @@ write_m2paSctpMaxInitRetries(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paSctpMaxInitRetries: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paSctpMaxInitRetries = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpMaxInitRetries for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paSctpMaxInitRetries;
-		StorageTmp->m2paSctpMaxInitRetries = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paSctpMaxInitRetries = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paSctpMaxInitRetries = StorageOld->m2paSctpMaxInitRetries;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2937,12 +3947,14 @@ write_m2paSctpMaxInitRetries(int action, u_char *var_val, u_char var_val_type, s
 int
 write_m2paSctpMaxBurst(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpMaxBurst entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -2967,22 +3979,61 @@ write_m2paSctpMaxBurst(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paSctpMaxBurst: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paSctpMaxBurst = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpMaxBurst for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paSctpMaxBurst;
-		StorageTmp->m2paSctpMaxBurst = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paSctpMaxBurst = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paSctpMaxBurst = StorageOld->m2paSctpMaxBurst;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3002,12 +4053,14 @@ write_m2paSctpMaxBurst(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_m2paSctpAssocMaxRetrans(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpAssocMaxRetrans entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3032,22 +4085,61 @@ write_m2paSctpAssocMaxRetrans(int action, u_char *var_val, u_char var_val_type, 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paSctpAssocMaxRetrans: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paSctpAssocMaxRetrans = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpAssocMaxRetrans for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paSctpAssocMaxRetrans;
-		StorageTmp->m2paSctpAssocMaxRetrans = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paSctpAssocMaxRetrans = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paSctpAssocMaxRetrans = StorageOld->m2paSctpAssocMaxRetrans;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3067,12 +4159,14 @@ write_m2paSctpAssocMaxRetrans(int action, u_char *var_val, u_char var_val_type, 
 int
 write_m2paSctpSackDelay(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpSackDelay entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3103,22 +4197,61 @@ write_m2paSctpSackDelay(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paSctpSackDelay: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paSctpSackDelay = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpSackDelay for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paSctpSackDelay;
-		StorageTmp->m2paSctpSackDelay = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paSctpSackDelay = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paSctpSackDelay = StorageOld->m2paSctpSackDelay;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3138,12 +4271,14 @@ write_m2paSctpSackDelay(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_m2paSctpLifetime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paSctpLifetime entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3173,22 +4308,61 @@ write_m2paSctpLifetime(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paSctpLifetime: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paSctpLifetime = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paSctpLifetime for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paSctpLifetime;
-		StorageTmp->m2paSctpLifetime = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paSctpLifetime = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paSctpLifetime = StorageOld->m2paSctpLifetime;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3208,12 +4382,14 @@ write_m2paSctpLifetime(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_m2paTimerT1(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerT1 entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3243,22 +4419,61 @@ write_m2paTimerT1(int action, u_char *var_val, u_char var_val_type, size_t var_v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTimerT1: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTimerT1 = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerT1 for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTimerT1;
-		StorageTmp->m2paTimerT1 = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTimerT1 = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTimerT1 = StorageOld->m2paTimerT1;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3278,12 +4493,14 @@ write_m2paTimerT1(int action, u_char *var_val, u_char var_val_type, size_t var_v
 int
 write_m2paTimerT2(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerT2 entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3313,22 +4530,61 @@ write_m2paTimerT2(int action, u_char *var_val, u_char var_val_type, size_t var_v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTimerT2: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTimerT2 = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerT2 for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTimerT2;
-		StorageTmp->m2paTimerT2 = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTimerT2 = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTimerT2 = StorageOld->m2paTimerT2;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3348,12 +4604,14 @@ write_m2paTimerT2(int action, u_char *var_val, u_char var_val_type, size_t var_v
 int
 write_m2paTimerT2L(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerT2L entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3383,22 +4641,61 @@ write_m2paTimerT2L(int action, u_char *var_val, u_char var_val_type, size_t var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTimerT2L: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTimerT2L = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerT2L for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTimerT2L;
-		StorageTmp->m2paTimerT2L = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTimerT2L = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTimerT2L = StorageOld->m2paTimerT2L;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3418,12 +4715,14 @@ write_m2paTimerT2L(int action, u_char *var_val, u_char var_val_type, size_t var_
 int
 write_m2paTimerT2H(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerT2H entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3453,22 +4752,61 @@ write_m2paTimerT2H(int action, u_char *var_val, u_char var_val_type, size_t var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTimerT2H: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTimerT2H = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerT2H for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTimerT2H;
-		StorageTmp->m2paTimerT2H = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTimerT2H = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTimerT2H = StorageOld->m2paTimerT2H;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3488,12 +4826,14 @@ write_m2paTimerT2H(int action, u_char *var_val, u_char var_val_type, size_t var_
 int
 write_m2paTimerT3(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerT3 entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3523,22 +4863,61 @@ write_m2paTimerT3(int action, u_char *var_val, u_char var_val_type, size_t var_v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTimerT3: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTimerT3 = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerT3 for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTimerT3;
-		StorageTmp->m2paTimerT3 = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTimerT3 = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTimerT3 = StorageOld->m2paTimerT3;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3558,12 +4937,14 @@ write_m2paTimerT3(int action, u_char *var_val, u_char var_val_type, size_t var_v
 int
 write_m2paTimerT4N(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerT4N entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3593,22 +4974,61 @@ write_m2paTimerT4N(int action, u_char *var_val, u_char var_val_type, size_t var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTimerT4N: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTimerT4N = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerT4N for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTimerT4N;
-		StorageTmp->m2paTimerT4N = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTimerT4N = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTimerT4N = StorageOld->m2paTimerT4N;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3628,12 +5048,14 @@ write_m2paTimerT4N(int action, u_char *var_val, u_char var_val_type, size_t var_
 int
 write_m2paTimerT4E(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerT4E entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3663,22 +5085,61 @@ write_m2paTimerT4E(int action, u_char *var_val, u_char var_val_type, size_t var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTimerT4E: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTimerT4E = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerT4E for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTimerT4E;
-		StorageTmp->m2paTimerT4E = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTimerT4E = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTimerT4E = StorageOld->m2paTimerT4E;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3698,12 +5159,14 @@ write_m2paTimerT4E(int action, u_char *var_val, u_char var_val_type, size_t var_
 int
 write_m2paTimerT6(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerT6 entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3733,22 +5196,61 @@ write_m2paTimerT6(int action, u_char *var_val, u_char var_val_type, size_t var_v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTimerT6: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTimerT6 = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerT6 for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTimerT6;
-		StorageTmp->m2paTimerT6 = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTimerT6 = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTimerT6 = StorageOld->m2paTimerT6;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3768,12 +5270,14 @@ write_m2paTimerT6(int action, u_char *var_val, u_char var_val_type, size_t var_v
 int
 write_m2paTimerT7(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerT7 entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3803,22 +5307,61 @@ write_m2paTimerT7(int action, u_char *var_val, u_char var_val_type, size_t var_v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTimerT7: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTimerT7 = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerT7 for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTimerT7;
-		StorageTmp->m2paTimerT7 = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTimerT7 = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTimerT7 = StorageOld->m2paTimerT7;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3838,12 +5381,14 @@ write_m2paTimerT7(int action, u_char *var_val, u_char var_val_type, size_t var_v
 int
 write_m2paTransCongThresholdAbatementL1Messages(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdAbatementL1Messages entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3868,22 +5413,61 @@ write_m2paTransCongThresholdAbatementL1Messages(int action, u_char *var_val, u_c
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTransCongThresholdAbatementL1Messages: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTransCongThresholdAbatementL1Messages = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdAbatementL1Messages for you to use, and you have just been asked to do something with it.  Note
 				   that anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTransCongThresholdAbatementL1Messages;
-		StorageTmp->m2paTransCongThresholdAbatementL1Messages = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTransCongThresholdAbatementL1Messages = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTransCongThresholdAbatementL1Messages = StorageOld->m2paTransCongThresholdAbatementL1Messages;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3903,12 +5487,14 @@ write_m2paTransCongThresholdAbatementL1Messages(int action, u_char *var_val, u_c
 int
 write_m2paTransCongThresholdAbatementL1Octets(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdAbatementL1Octets entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3933,22 +5519,61 @@ write_m2paTransCongThresholdAbatementL1Octets(int action, u_char *var_val, u_cha
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTransCongThresholdAbatementL1Octets: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTransCongThresholdAbatementL1Octets = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdAbatementL1Octets for you to use, and you have just been asked to do something with it.  Note that 
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTransCongThresholdAbatementL1Octets;
-		StorageTmp->m2paTransCongThresholdAbatementL1Octets = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTransCongThresholdAbatementL1Octets = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTransCongThresholdAbatementL1Octets = StorageOld->m2paTransCongThresholdAbatementL1Octets;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3968,12 +5593,14 @@ write_m2paTransCongThresholdAbatementL1Octets(int action, u_char *var_val, u_cha
 int
 write_m2paTransCongThresholdOnsetL1Messages(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdOnsetL1Messages entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3998,22 +5625,61 @@ write_m2paTransCongThresholdOnsetL1Messages(int action, u_char *var_val, u_char 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTransCongThresholdOnsetL1Messages: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTransCongThresholdOnsetL1Messages = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdOnsetL1Messages for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTransCongThresholdOnsetL1Messages;
-		StorageTmp->m2paTransCongThresholdOnsetL1Messages = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTransCongThresholdOnsetL1Messages = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTransCongThresholdOnsetL1Messages = StorageOld->m2paTransCongThresholdOnsetL1Messages;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4033,12 +5699,14 @@ write_m2paTransCongThresholdOnsetL1Messages(int action, u_char *var_val, u_char 
 int
 write_m2paTransCongThresholdOnsetL1Octets(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdOnsetL1Octets entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -4063,22 +5731,61 @@ write_m2paTransCongThresholdOnsetL1Octets(int action, u_char *var_val, u_char va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTransCongThresholdOnsetL1Octets: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTransCongThresholdOnsetL1Octets = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdOnsetL1Octets for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTransCongThresholdOnsetL1Octets;
-		StorageTmp->m2paTransCongThresholdOnsetL1Octets = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTransCongThresholdOnsetL1Octets = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTransCongThresholdOnsetL1Octets = StorageOld->m2paTransCongThresholdOnsetL1Octets;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4098,12 +5805,14 @@ write_m2paTransCongThresholdOnsetL1Octets(int action, u_char *var_val, u_char va
 int
 write_m2paProvingAttempts(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paProvingAttempts entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -4128,22 +5837,61 @@ write_m2paProvingAttempts(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paProvingAttempts: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paProvingAttempts = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paProvingAttempts for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paProvingAttempts;
-		StorageTmp->m2paProvingAttempts = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paProvingAttempts = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paProvingAttempts = StorageOld->m2paProvingAttempts;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4163,12 +5911,14 @@ write_m2paProvingAttempts(int action, u_char *var_val, u_char var_val_type, size
 int
 write_m2paNumberOfThresholdLevels(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paNumberOfThresholdLevels entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -4198,22 +5948,61 @@ write_m2paNumberOfThresholdLevels(int action, u_char *var_val, u_char var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paNumberOfThresholdLevels: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paNumberOfThresholdLevels = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paNumberOfThresholdLevels for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paNumberOfThresholdLevels;
-		StorageTmp->m2paNumberOfThresholdLevels = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paNumberOfThresholdLevels = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paNumberOfThresholdLevels = StorageOld->m2paNumberOfThresholdLevels;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4233,12 +6022,14 @@ write_m2paNumberOfThresholdLevels(int action, u_char *var_val, u_char var_val_ty
 int
 write_m2paCongestionCounting(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paCongestionCounting entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -4272,22 +6063,61 @@ write_m2paCongestionCounting(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paCongestionCounting: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paCongestionCounting = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paCongestionCounting for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paCongestionCounting;
-		StorageTmp->m2paCongestionCounting = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paCongestionCounting = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paCongestionCounting = StorageOld->m2paCongestionCounting;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4307,12 +6137,14 @@ write_m2paCongestionCounting(int action, u_char *var_val, u_char var_val_type, s
 int
 write_m2paCongestionReportingBaseObject(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paCongestionReportingBaseObject entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -4347,22 +6179,61 @@ write_m2paCongestionReportingBaseObject(int action, u_char *var_val, u_char var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paCongestionReportingBaseObject: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paCongestionReportingBaseObject = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paCongestionReportingBaseObject for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paCongestionReportingBaseObject;
-		StorageTmp->m2paCongestionReportingBaseObject = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paCongestionReportingBaseObject = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paCongestionReportingBaseObject = StorageOld->m2paCongestionReportingBaseObject;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4382,12 +6253,14 @@ write_m2paCongestionReportingBaseObject(int action, u_char *var_val, u_char var_
 int
 write_m2paTimerTx(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerTx entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -4417,22 +6290,61 @@ write_m2paTimerTx(int action, u_char *var_val, u_char var_val_type, size_t var_v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTimerTx: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTimerTx = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerTx for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTimerTx;
-		StorageTmp->m2paTimerTx = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTimerTx = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTimerTx = StorageOld->m2paTimerTx;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4452,12 +6364,14 @@ write_m2paTimerTx(int action, u_char *var_val, u_char var_val_type, size_t var_v
 int
 write_m2paTimerTy(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTimerTy entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -4487,22 +6401,61 @@ write_m2paTimerTy(int action, u_char *var_val, u_char var_val_type, size_t var_v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTimerTy: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTimerTy = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTimerTy for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTimerTy;
-		StorageTmp->m2paTimerTy = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTimerTy = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTimerTy = StorageOld->m2paTimerTy;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4522,12 +6475,14 @@ write_m2paTimerTy(int action, u_char *var_val, u_char var_val_type, size_t var_v
 int
 write_m2paNumberOfCongestionStates(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paNumberOfCongestionStates entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -4552,22 +6507,61 @@ write_m2paNumberOfCongestionStates(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paNumberOfCongestionStates: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paNumberOfCongestionStates = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paNumberOfCongestionStates for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paNumberOfCongestionStates;
-		StorageTmp->m2paNumberOfCongestionStates = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paNumberOfCongestionStates = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paNumberOfCongestionStates = StorageOld->m2paNumberOfCongestionStates;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4587,12 +6581,14 @@ write_m2paNumberOfCongestionStates(int action, u_char *var_val, u_char var_val_t
 int
 write_m2paInitialLevelOfCongestion(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paInitialLevelOfCongestion entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -4617,22 +6613,61 @@ write_m2paInitialLevelOfCongestion(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paInitialLevelOfCongestion: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paInitialLevelOfCongestion = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paInitialLevelOfCongestion for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paInitialLevelOfCongestion;
-		StorageTmp->m2paInitialLevelOfCongestion = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paInitialLevelOfCongestion = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paInitialLevelOfCongestion = StorageOld->m2paInitialLevelOfCongestion;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4652,12 +6687,14 @@ write_m2paInitialLevelOfCongestion(int action, u_char *var_val, u_char var_val_t
 int
 write_m2paReceiveCongestionThresholdAbatement(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paReceiveCongestionThresholdAbatement entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -4683,22 +6720,61 @@ write_m2paReceiveCongestionThresholdAbatement(int action, u_char *var_val, u_cha
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 3 */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paReceiveCongestionThresholdAbatement = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paReceiveCongestionThresholdAbatement for you to use, and you have just been asked to do something with it.  Note that 
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paReceiveCongestionThresholdAbatement;
-		StorageTmp->m2paReceiveCongestionThresholdAbatement = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paReceiveCongestionThresholdAbatement = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paReceiveCongestionThresholdAbatement = StorageOld->m2paReceiveCongestionThresholdAbatement;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4718,12 +6794,14 @@ write_m2paReceiveCongestionThresholdAbatement(int action, u_char *var_val, u_cha
 int
 write_m2paReceiveCongestionThresholdOnset(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paReceiveCongestionThresholdOnset entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -4749,22 +6827,61 @@ write_m2paReceiveCongestionThresholdOnset(int action, u_char *var_val, u_char va
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 6 */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paReceiveCongestionThresholdOnset = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paReceiveCongestionThresholdOnset for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paReceiveCongestionThresholdOnset;
-		StorageTmp->m2paReceiveCongestionThresholdOnset = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paReceiveCongestionThresholdOnset = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paReceiveCongestionThresholdOnset = StorageOld->m2paReceiveCongestionThresholdOnset;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4784,12 +6901,14 @@ write_m2paReceiveCongestionThresholdOnset(int action, u_char *var_val, u_char va
 int
 write_m2paReceiveCongestionThresholdDiscard(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paReceiveCongestionThresholdDiscard entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -4815,22 +6934,61 @@ write_m2paReceiveCongestionThresholdDiscard(int action, u_char *var_val, u_char 
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 9 */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paReceiveCongestionThresholdDiscard = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paReceiveCongestionThresholdDiscard for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paReceiveCongestionThresholdDiscard;
-		StorageTmp->m2paReceiveCongestionThresholdDiscard = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paReceiveCongestionThresholdDiscard = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paReceiveCongestionThresholdDiscard = StorageOld->m2paReceiveCongestionThresholdDiscard;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4850,17 +7008,17 @@ write_m2paReceiveCongestionThresholdDiscard(int action, u_char *var_val, u_char 
 int
 write_m2paProtocolProfileName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paProtocolProfileName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m2paProtocolProfileRowStatus) {
@@ -4883,33 +7041,73 @@ write_m2paProtocolProfileName(int action, u_char *var_val, u_char var_val_type, 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paProtocolProfileName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->m2paProtocolProfileName);
+		StorageTmp->m2paProtocolProfileName = string;
+		StorageTmp->m2paProtocolProfileNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paProtocolProfileName for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paProtocolProfileName;
-		old_length = StorageTmp->m2paProtocolProfileNameLen;
-		StorageTmp->m2paProtocolProfileName = string;
-		StorageTmp->m2paProtocolProfileNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paProtocolProfileName = old_value;
-		StorageTmp->m2paProtocolProfileNameLen = old_length;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		if (StorageOld->m2paProtocolProfileName != NULL) {
+			SNMP_FREE(StorageTmp->m2paProtocolProfileName);
+			StorageTmp->m2paProtocolProfileName = StorageOld->m2paProtocolProfileName;
+			StorageTmp->m2paProtocolProfileNameLen = StorageOld->m2paProtocolProfileNameLen;
+			StorageOld->m2paProtocolProfileName = NULL;
+			StorageOld->m2paProtocolProfileNameLen = 0;
+		}
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4929,12 +7127,14 @@ write_m2paProtocolProfileName(int action, u_char *var_val, u_char var_val_type, 
 int
 write_m2paTransCongThresholdAbatementL2Messages(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdAbatementL2Messages entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -4959,22 +7159,61 @@ write_m2paTransCongThresholdAbatementL2Messages(int action, u_char *var_val, u_c
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTransCongThresholdAbatementL2Messages: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTransCongThresholdAbatementL2Messages = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdAbatementL2Messages for you to use, and you have just been asked to do something with it.  Note
 				   that anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTransCongThresholdAbatementL2Messages;
-		StorageTmp->m2paTransCongThresholdAbatementL2Messages = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTransCongThresholdAbatementL2Messages = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTransCongThresholdAbatementL2Messages = StorageOld->m2paTransCongThresholdAbatementL2Messages;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4994,12 +7233,14 @@ write_m2paTransCongThresholdAbatementL2Messages(int action, u_char *var_val, u_c
 int
 write_m2paTransCongThresholdAbatementL2Octets(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdAbatementL2Octets entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5024,22 +7265,61 @@ write_m2paTransCongThresholdAbatementL2Octets(int action, u_char *var_val, u_cha
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTransCongThresholdAbatementL2Octets: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTransCongThresholdAbatementL2Octets = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdAbatementL2Octets for you to use, and you have just been asked to do something with it.  Note that 
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTransCongThresholdAbatementL2Octets;
-		StorageTmp->m2paTransCongThresholdAbatementL2Octets = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTransCongThresholdAbatementL2Octets = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTransCongThresholdAbatementL2Octets = StorageOld->m2paTransCongThresholdAbatementL2Octets;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5059,12 +7339,14 @@ write_m2paTransCongThresholdAbatementL2Octets(int action, u_char *var_val, u_cha
 int
 write_m2paTransCongThresholdOnsetL2Messages(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdOnsetL2Messages entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5089,22 +7371,61 @@ write_m2paTransCongThresholdOnsetL2Messages(int action, u_char *var_val, u_char 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTransCongThresholdOnsetL2Messages: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTransCongThresholdOnsetL2Messages = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdOnsetL2Messages for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTransCongThresholdOnsetL2Messages;
-		StorageTmp->m2paTransCongThresholdOnsetL2Messages = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTransCongThresholdOnsetL2Messages = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTransCongThresholdOnsetL2Messages = StorageOld->m2paTransCongThresholdOnsetL2Messages;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5124,12 +7445,14 @@ write_m2paTransCongThresholdOnsetL2Messages(int action, u_char *var_val, u_char 
 int
 write_m2paTransCongThresholdOnsetL2Octets(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdOnsetL2Octets entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5154,22 +7477,61 @@ write_m2paTransCongThresholdOnsetL2Octets(int action, u_char *var_val, u_char va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTransCongThresholdOnsetL2Octets: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTransCongThresholdOnsetL2Octets = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdOnsetL2Octets for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTransCongThresholdOnsetL2Octets;
-		StorageTmp->m2paTransCongThresholdOnsetL2Octets = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTransCongThresholdOnsetL2Octets = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTransCongThresholdOnsetL2Octets = StorageOld->m2paTransCongThresholdOnsetL2Octets;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5189,12 +7551,14 @@ write_m2paTransCongThresholdOnsetL2Octets(int action, u_char *var_val, u_char va
 int
 write_m2paTransCongThresholdAbatementL3Messages(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdAbatementL3Messages entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5219,22 +7583,61 @@ write_m2paTransCongThresholdAbatementL3Messages(int action, u_char *var_val, u_c
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTransCongThresholdAbatementL3Messages: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTransCongThresholdAbatementL3Messages = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdAbatementL3Messages for you to use, and you have just been asked to do something with it.  Note
 				   that anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTransCongThresholdAbatementL3Messages;
-		StorageTmp->m2paTransCongThresholdAbatementL3Messages = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTransCongThresholdAbatementL3Messages = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTransCongThresholdAbatementL3Messages = StorageOld->m2paTransCongThresholdAbatementL3Messages;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5254,12 +7657,14 @@ write_m2paTransCongThresholdAbatementL3Messages(int action, u_char *var_val, u_c
 int
 write_m2paTransCongThresholdAbatementL3Octets(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdAbatementL3Octets entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5284,22 +7689,61 @@ write_m2paTransCongThresholdAbatementL3Octets(int action, u_char *var_val, u_cha
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTransCongThresholdAbatementL3Octets: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTransCongThresholdAbatementL3Octets = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdAbatementL3Octets for you to use, and you have just been asked to do something with it.  Note that 
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTransCongThresholdAbatementL3Octets;
-		StorageTmp->m2paTransCongThresholdAbatementL3Octets = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTransCongThresholdAbatementL3Octets = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTransCongThresholdAbatementL3Octets = StorageOld->m2paTransCongThresholdAbatementL3Octets;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5319,12 +7763,14 @@ write_m2paTransCongThresholdAbatementL3Octets(int action, u_char *var_val, u_cha
 int
 write_m2paTransCongThresholdOnsetL3Messages(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdOnsetL3Messages entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5349,22 +7795,61 @@ write_m2paTransCongThresholdOnsetL3Messages(int action, u_char *var_val, u_char 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTransCongThresholdOnsetL3Messages: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTransCongThresholdOnsetL3Messages = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdOnsetL3Messages for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTransCongThresholdOnsetL3Messages;
-		StorageTmp->m2paTransCongThresholdOnsetL3Messages = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTransCongThresholdOnsetL3Messages = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTransCongThresholdOnsetL3Messages = StorageOld->m2paTransCongThresholdOnsetL3Messages;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5384,12 +7869,14 @@ write_m2paTransCongThresholdOnsetL3Messages(int action, u_char *var_val, u_char 
 int
 write_m2paTransCongThresholdOnsetL3Octets(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdOnsetL3Octets entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5414,22 +7901,61 @@ write_m2paTransCongThresholdOnsetL3Octets(int action, u_char *var_val, u_char va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTransCongThresholdOnsetL3Octets: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTransCongThresholdOnsetL3Octets = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdOnsetL3Octets for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTransCongThresholdOnsetL3Octets;
-		StorageTmp->m2paTransCongThresholdOnsetL3Octets = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTransCongThresholdOnsetL3Octets = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTransCongThresholdOnsetL3Octets = StorageOld->m2paTransCongThresholdOnsetL3Octets;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5449,12 +7975,14 @@ write_m2paTransCongThresholdOnsetL3Octets(int action, u_char *var_val, u_char va
 int
 write_m2paTransCongThresholdDiscardL1Messages(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdDiscardL1Messages entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5479,22 +8007,61 @@ write_m2paTransCongThresholdDiscardL1Messages(int action, u_char *var_val, u_cha
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTransCongThresholdDiscardL1Messages: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTransCongThresholdDiscardL1Messages = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdDiscardL1Messages for you to use, and you have just been asked to do something with it.  Note that 
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTransCongThresholdDiscardL1Messages;
-		StorageTmp->m2paTransCongThresholdDiscardL1Messages = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTransCongThresholdDiscardL1Messages = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTransCongThresholdDiscardL1Messages = StorageOld->m2paTransCongThresholdDiscardL1Messages;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5514,12 +8081,14 @@ write_m2paTransCongThresholdDiscardL1Messages(int action, u_char *var_val, u_cha
 int
 write_m2paTransCongThresholdDiscardL1Octets(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdDiscardL1Octets entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5544,22 +8113,61 @@ write_m2paTransCongThresholdDiscardL1Octets(int action, u_char *var_val, u_char 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTransCongThresholdDiscardL1Octets: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTransCongThresholdDiscardL1Octets = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdDiscardL1Octets for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTransCongThresholdDiscardL1Octets;
-		StorageTmp->m2paTransCongThresholdDiscardL1Octets = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTransCongThresholdDiscardL1Octets = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTransCongThresholdDiscardL1Octets = StorageOld->m2paTransCongThresholdDiscardL1Octets;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5579,12 +8187,14 @@ write_m2paTransCongThresholdDiscardL1Octets(int action, u_char *var_val, u_char 
 int
 write_m2paTransCongThresholdDiscardL2Messages(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdDiscardL2Messages entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5609,22 +8219,61 @@ write_m2paTransCongThresholdDiscardL2Messages(int action, u_char *var_val, u_cha
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTransCongThresholdDiscardL2Messages: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTransCongThresholdDiscardL2Messages = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdDiscardL2Messages for you to use, and you have just been asked to do something with it.  Note that 
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTransCongThresholdDiscardL2Messages;
-		StorageTmp->m2paTransCongThresholdDiscardL2Messages = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTransCongThresholdDiscardL2Messages = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTransCongThresholdDiscardL2Messages = StorageOld->m2paTransCongThresholdDiscardL2Messages;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5644,12 +8293,14 @@ write_m2paTransCongThresholdDiscardL2Messages(int action, u_char *var_val, u_cha
 int
 write_m2paTransCongThresholdDiscardL2Octets(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdDiscardL2Octets entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5674,22 +8325,61 @@ write_m2paTransCongThresholdDiscardL2Octets(int action, u_char *var_val, u_char 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTransCongThresholdDiscardL2Octets: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTransCongThresholdDiscardL2Octets = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdDiscardL2Octets for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTransCongThresholdDiscardL2Octets;
-		StorageTmp->m2paTransCongThresholdDiscardL2Octets = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTransCongThresholdDiscardL2Octets = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTransCongThresholdDiscardL2Octets = StorageOld->m2paTransCongThresholdDiscardL2Octets;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5709,12 +8399,14 @@ write_m2paTransCongThresholdDiscardL2Octets(int action, u_char *var_val, u_char 
 int
 write_m2paTransCongThresholdDiscardL3Messages(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdDiscardL3Messages entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5739,22 +8431,61 @@ write_m2paTransCongThresholdDiscardL3Messages(int action, u_char *var_val, u_cha
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTransCongThresholdDiscardL3Messages: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTransCongThresholdDiscardL3Messages = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdDiscardL3Messages for you to use, and you have just been asked to do something with it.  Note that 
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTransCongThresholdDiscardL3Messages;
-		StorageTmp->m2paTransCongThresholdDiscardL3Messages = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTransCongThresholdDiscardL3Messages = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTransCongThresholdDiscardL3Messages = StorageOld->m2paTransCongThresholdDiscardL3Messages;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5774,12 +8505,14 @@ write_m2paTransCongThresholdDiscardL3Messages(int action, u_char *var_val, u_cha
 int
 write_m2paTransCongThresholdDiscardL3Octets(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paTransCongThresholdDiscardL3Octets entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m2paProtocolProfileTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5804,22 +8537,61 @@ write_m2paTransCongThresholdDiscardL3Octets(int action, u_char *var_val, u_char 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paTransCongThresholdDiscardL3Octets: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paProtocolProfileTable_rsvs++;
+		StorageTmp->m2paTransCongThresholdDiscardL3Octets = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m2paProtocolProfileTable_tsts == 0)
+				if ((ret = check_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m2paTransCongThresholdDiscardL3Octets for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2paTransCongThresholdDiscardL3Octets;
-		StorageTmp->m2paTransCongThresholdDiscardL3Octets = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paProtocolProfileTable_sets == 0)
+				if ((ret = update_m2paProtocolProfileTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paProtocolProfileTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+			StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+			StorageTmp->m2paProtocolProfileTable_tsts = 0;
+			StorageTmp->m2paProtocolProfileTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paTransCongThresholdDiscardL3Octets = old_value;
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paProtocolProfileTable_sets == 0)
+			revert_m2paProtocolProfileTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+			break;
+		StorageTmp->m2paTransCongThresholdDiscardL3Octets = StorageOld->m2paTransCongThresholdDiscardL3Octets;
+		if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+			m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5839,13 +8611,13 @@ write_m2paTransCongThresholdDiscardL3Octets(int action, u_char *var_val, u_char 
 int
 write_m2paDefaultSctpNoDelay(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paMIB_data *StorageTmp = NULL;
+	struct m2paMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paDefaultSctpNoDelay entering action=%d...  \n", action));
 	if ((StorageTmp = m2paMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -5865,20 +8637,59 @@ write_m2paDefaultSctpNoDelay(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paDefaultSctpNoDelay: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			if (StorageTmp->m2paMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paMIB_old = m2paMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paMIB_rsvs++;
+		StorageTmp->m2paDefaultSctpNoDelay = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->m2paMIB_tsts == 0)
+				if ((ret = check_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->m2paDefaultSctpNoDelay;
-		StorageTmp->m2paDefaultSctpNoDelay = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paDefaultSctpNoDelay for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paMIB_sets == 0)
+				if ((ret = update_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
+			StorageTmp->m2paMIB_rsvs = 0;
+			StorageTmp->m2paMIB_tsts = 0;
+			StorageTmp->m2paMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paDefaultSctpNoDelay = old_value;
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paMIB_tsts == 0)
+			revert_m2paMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		StorageTmp->m2paDefaultSctpNoDelay = StorageOld->m2paDefaultSctpNoDelay;
+		if (--StorageTmp->m2paMIB_rsvs == 0)
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5898,13 +8709,13 @@ write_m2paDefaultSctpNoDelay(int action, u_char *var_val, u_char var_val_type, s
 int
 write_m2paDefaultSctpMaxseg(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paMIB_data *StorageTmp = NULL;
+	struct m2paMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paDefaultSctpMaxseg entering action=%d...  \n", action));
 	if ((StorageTmp = m2paMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_UNSIGNED) {
@@ -5921,20 +8732,59 @@ write_m2paDefaultSctpMaxseg(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paDefaultSctpMaxseg: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			if (StorageTmp->m2paMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paMIB_old = m2paMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paMIB_rsvs++;
+		StorageTmp->m2paDefaultSctpMaxseg = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->m2paMIB_tsts == 0)
+				if ((ret = check_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->m2paDefaultSctpMaxseg;
-		StorageTmp->m2paDefaultSctpMaxseg = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paDefaultSctpMaxseg for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paMIB_sets == 0)
+				if ((ret = update_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
+			StorageTmp->m2paMIB_rsvs = 0;
+			StorageTmp->m2paMIB_tsts = 0;
+			StorageTmp->m2paMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paDefaultSctpMaxseg = old_value;
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paMIB_tsts == 0)
+			revert_m2paMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		StorageTmp->m2paDefaultSctpMaxseg = StorageOld->m2paDefaultSctpMaxseg;
+		if (--StorageTmp->m2paMIB_rsvs == 0)
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5954,13 +8804,13 @@ write_m2paDefaultSctpMaxseg(int action, u_char *var_val, u_char var_val_type, si
 int
 write_m2paDefaultSctpHeartbeatItvl(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paMIB_data *StorageTmp = NULL;
+	struct m2paMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paDefaultSctpHeartbeatItvl entering action=%d...  \n", action));
 	if ((StorageTmp = m2paMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -5977,20 +8827,59 @@ write_m2paDefaultSctpHeartbeatItvl(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paDefaultSctpHeartbeatItvl: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			if (StorageTmp->m2paMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paMIB_old = m2paMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paMIB_rsvs++;
+		StorageTmp->m2paDefaultSctpHeartbeatItvl = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->m2paMIB_tsts == 0)
+				if ((ret = check_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->m2paDefaultSctpHeartbeatItvl;
-		StorageTmp->m2paDefaultSctpHeartbeatItvl = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paDefaultSctpHeartbeatItvl for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paMIB_sets == 0)
+				if ((ret = update_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
+			StorageTmp->m2paMIB_rsvs = 0;
+			StorageTmp->m2paMIB_tsts = 0;
+			StorageTmp->m2paMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paDefaultSctpHeartbeatItvl = old_value;
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paMIB_tsts == 0)
+			revert_m2paMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		StorageTmp->m2paDefaultSctpHeartbeatItvl = StorageOld->m2paDefaultSctpHeartbeatItvl;
+		if (--StorageTmp->m2paMIB_rsvs == 0)
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6010,13 +8899,13 @@ write_m2paDefaultSctpHeartbeatItvl(int action, u_char *var_val, u_char var_val_t
 int
 write_m2paDefaultSctpHeartbeat(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paMIB_data *StorageTmp = NULL;
+	struct m2paMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paDefaultSctpHeartbeat entering action=%d...  \n", action));
 	if ((StorageTmp = m2paMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -6036,20 +8925,59 @@ write_m2paDefaultSctpHeartbeat(int action, u_char *var_val, u_char var_val_type,
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paDefaultSctpHeartbeat: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			if (StorageTmp->m2paMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paMIB_old = m2paMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paMIB_rsvs++;
+		StorageTmp->m2paDefaultSctpHeartbeat = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->m2paMIB_tsts == 0)
+				if ((ret = check_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->m2paDefaultSctpHeartbeat;
-		StorageTmp->m2paDefaultSctpHeartbeat = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paDefaultSctpHeartbeat for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paMIB_sets == 0)
+				if ((ret = update_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
+			StorageTmp->m2paMIB_rsvs = 0;
+			StorageTmp->m2paMIB_tsts = 0;
+			StorageTmp->m2paMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paDefaultSctpHeartbeat = old_value;
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paMIB_tsts == 0)
+			revert_m2paMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		StorageTmp->m2paDefaultSctpHeartbeat = StorageOld->m2paDefaultSctpHeartbeat;
+		if (--StorageTmp->m2paMIB_rsvs == 0)
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6069,13 +8997,13 @@ write_m2paDefaultSctpHeartbeat(int action, u_char *var_val, u_char var_val_type,
 int
 write_m2paDefaultSctpRtoInitial(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paMIB_data *StorageTmp = NULL;
+	struct m2paMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paDefaultSctpRtoInitial entering action=%d...  \n", action));
 	if ((StorageTmp = m2paMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -6092,20 +9020,59 @@ write_m2paDefaultSctpRtoInitial(int action, u_char *var_val, u_char var_val_type
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paDefaultSctpRtoInitial: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			if (StorageTmp->m2paMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paMIB_old = m2paMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paMIB_rsvs++;
+		StorageTmp->m2paDefaultSctpRtoInitial = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->m2paMIB_tsts == 0)
+				if ((ret = check_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->m2paDefaultSctpRtoInitial;
-		StorageTmp->m2paDefaultSctpRtoInitial = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paDefaultSctpRtoInitial for you to use, and you have just been asked to do something with it.  Note that anything done 
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paMIB_sets == 0)
+				if ((ret = update_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
+			StorageTmp->m2paMIB_rsvs = 0;
+			StorageTmp->m2paMIB_tsts = 0;
+			StorageTmp->m2paMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paDefaultSctpRtoInitial = old_value;
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paMIB_tsts == 0)
+			revert_m2paMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		StorageTmp->m2paDefaultSctpRtoInitial = StorageOld->m2paDefaultSctpRtoInitial;
+		if (--StorageTmp->m2paMIB_rsvs == 0)
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6125,13 +9092,13 @@ write_m2paDefaultSctpRtoInitial(int action, u_char *var_val, u_char var_val_type
 int
 write_m2paDefaultSctpRtoMin(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paMIB_data *StorageTmp = NULL;
+	struct m2paMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paDefaultSctpRtoMin entering action=%d...  \n", action));
 	if ((StorageTmp = m2paMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -6148,20 +9115,59 @@ write_m2paDefaultSctpRtoMin(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paDefaultSctpRtoMin: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			if (StorageTmp->m2paMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paMIB_old = m2paMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paMIB_rsvs++;
+		StorageTmp->m2paDefaultSctpRtoMin = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->m2paMIB_tsts == 0)
+				if ((ret = check_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->m2paDefaultSctpRtoMin;
-		StorageTmp->m2paDefaultSctpRtoMin = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paDefaultSctpRtoMin for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paMIB_sets == 0)
+				if ((ret = update_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
+			StorageTmp->m2paMIB_rsvs = 0;
+			StorageTmp->m2paMIB_tsts = 0;
+			StorageTmp->m2paMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paDefaultSctpRtoMin = old_value;
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paMIB_tsts == 0)
+			revert_m2paMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		StorageTmp->m2paDefaultSctpRtoMin = StorageOld->m2paDefaultSctpRtoMin;
+		if (--StorageTmp->m2paMIB_rsvs == 0)
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6181,13 +9187,13 @@ write_m2paDefaultSctpRtoMin(int action, u_char *var_val, u_char var_val_type, si
 int
 write_m2paDefaultSctpRtoMax(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paMIB_data *StorageTmp = NULL;
+	struct m2paMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paDefaultSctpRtoMax entering action=%d...  \n", action));
 	if ((StorageTmp = m2paMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -6204,20 +9210,59 @@ write_m2paDefaultSctpRtoMax(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paDefaultSctpRtoMax: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			if (StorageTmp->m2paMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paMIB_old = m2paMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paMIB_rsvs++;
+		StorageTmp->m2paDefaultSctpRtoMax = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->m2paMIB_tsts == 0)
+				if ((ret = check_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->m2paDefaultSctpRtoMax;
-		StorageTmp->m2paDefaultSctpRtoMax = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paDefaultSctpRtoMax for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paMIB_sets == 0)
+				if ((ret = update_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
+			StorageTmp->m2paMIB_rsvs = 0;
+			StorageTmp->m2paMIB_tsts = 0;
+			StorageTmp->m2paMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paDefaultSctpRtoMax = old_value;
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paMIB_tsts == 0)
+			revert_m2paMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		StorageTmp->m2paDefaultSctpRtoMax = StorageOld->m2paDefaultSctpRtoMax;
+		if (--StorageTmp->m2paMIB_rsvs == 0)
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6237,13 +9282,13 @@ write_m2paDefaultSctpRtoMax(int action, u_char *var_val, u_char var_val_type, si
 int
 write_m2paDefaultSctpPathMaxRetrans(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paMIB_data *StorageTmp = NULL;
+	struct m2paMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paDefaultSctpPathMaxRetrans entering action=%d...  \n", action));
 	if ((StorageTmp = m2paMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_UNSIGNED) {
@@ -6255,20 +9300,59 @@ write_m2paDefaultSctpPathMaxRetrans(int action, u_char *var_val, u_char var_val_
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 5 */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			if (StorageTmp->m2paMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paMIB_old = m2paMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paMIB_rsvs++;
+		StorageTmp->m2paDefaultSctpPathMaxRetrans = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->m2paMIB_tsts == 0)
+				if ((ret = check_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->m2paDefaultSctpPathMaxRetrans;
-		StorageTmp->m2paDefaultSctpPathMaxRetrans = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paDefaultSctpPathMaxRetrans for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paMIB_sets == 0)
+				if ((ret = update_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
+			StorageTmp->m2paMIB_rsvs = 0;
+			StorageTmp->m2paMIB_tsts = 0;
+			StorageTmp->m2paMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paDefaultSctpPathMaxRetrans = old_value;
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paMIB_tsts == 0)
+			revert_m2paMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		StorageTmp->m2paDefaultSctpPathMaxRetrans = StorageOld->m2paDefaultSctpPathMaxRetrans;
+		if (--StorageTmp->m2paMIB_rsvs == 0)
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6288,13 +9372,13 @@ write_m2paDefaultSctpPathMaxRetrans(int action, u_char *var_val, u_char var_val_
 int
 write_m2paDefaultSctpCookieLife(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paMIB_data *StorageTmp = NULL;
+	struct m2paMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paDefaultSctpCookieLife entering action=%d...  \n", action));
 	if ((StorageTmp = m2paMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -6311,20 +9395,59 @@ write_m2paDefaultSctpCookieLife(int action, u_char *var_val, u_char var_val_type
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paDefaultSctpCookieLife: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			if (StorageTmp->m2paMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paMIB_old = m2paMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paMIB_rsvs++;
+		StorageTmp->m2paDefaultSctpCookieLife = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->m2paMIB_tsts == 0)
+				if ((ret = check_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->m2paDefaultSctpCookieLife;
-		StorageTmp->m2paDefaultSctpCookieLife = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paDefaultSctpCookieLife for you to use, and you have just been asked to do something with it.  Note that anything done 
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paMIB_sets == 0)
+				if ((ret = update_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
+			StorageTmp->m2paMIB_rsvs = 0;
+			StorageTmp->m2paMIB_tsts = 0;
+			StorageTmp->m2paMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paDefaultSctpCookieLife = old_value;
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paMIB_tsts == 0)
+			revert_m2paMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		StorageTmp->m2paDefaultSctpCookieLife = StorageOld->m2paDefaultSctpCookieLife;
+		if (--StorageTmp->m2paMIB_rsvs == 0)
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6344,13 +9467,13 @@ write_m2paDefaultSctpCookieLife(int action, u_char *var_val, u_char var_val_type
 int
 write_m2paDefaultSctpCookieInc(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paMIB_data *StorageTmp = NULL;
+	struct m2paMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paDefaultSctpCookieInc entering action=%d...  \n", action));
 	if ((StorageTmp = m2paMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -6367,20 +9490,59 @@ write_m2paDefaultSctpCookieInc(int action, u_char *var_val, u_char var_val_type,
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paDefaultSctpCookieInc: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			if (StorageTmp->m2paMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paMIB_old = m2paMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paMIB_rsvs++;
+		StorageTmp->m2paDefaultSctpCookieInc = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->m2paMIB_tsts == 0)
+				if ((ret = check_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->m2paDefaultSctpCookieInc;
-		StorageTmp->m2paDefaultSctpCookieInc = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paDefaultSctpCookieInc for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paMIB_sets == 0)
+				if ((ret = update_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
+			StorageTmp->m2paMIB_rsvs = 0;
+			StorageTmp->m2paMIB_tsts = 0;
+			StorageTmp->m2paMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paDefaultSctpCookieInc = old_value;
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paMIB_tsts == 0)
+			revert_m2paMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		StorageTmp->m2paDefaultSctpCookieInc = StorageOld->m2paDefaultSctpCookieInc;
+		if (--StorageTmp->m2paMIB_rsvs == 0)
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6400,13 +9562,13 @@ write_m2paDefaultSctpCookieInc(int action, u_char *var_val, u_char var_val_type,
 int
 write_m2paDefaultSctpMaxInitRetries(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paMIB_data *StorageTmp = NULL;
+	struct m2paMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paDefaultSctpMaxInitRetries entering action=%d...  \n", action));
 	if ((StorageTmp = m2paMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_UNSIGNED) {
@@ -6418,20 +9580,59 @@ write_m2paDefaultSctpMaxInitRetries(int action, u_char *var_val, u_char var_val_
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 8 */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			if (StorageTmp->m2paMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paMIB_old = m2paMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paMIB_rsvs++;
+		StorageTmp->m2paDefaultSctpMaxInitRetries = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->m2paMIB_tsts == 0)
+				if ((ret = check_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->m2paDefaultSctpMaxInitRetries;
-		StorageTmp->m2paDefaultSctpMaxInitRetries = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paDefaultSctpMaxInitRetries for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paMIB_sets == 0)
+				if ((ret = update_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
+			StorageTmp->m2paMIB_rsvs = 0;
+			StorageTmp->m2paMIB_tsts = 0;
+			StorageTmp->m2paMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paDefaultSctpMaxInitRetries = old_value;
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paMIB_tsts == 0)
+			revert_m2paMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		StorageTmp->m2paDefaultSctpMaxInitRetries = StorageOld->m2paDefaultSctpMaxInitRetries;
+		if (--StorageTmp->m2paMIB_rsvs == 0)
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6451,13 +9652,13 @@ write_m2paDefaultSctpMaxInitRetries(int action, u_char *var_val, u_char var_val_
 int
 write_m2paDefaultSctpMaxBurst(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paMIB_data *StorageTmp = NULL;
+	struct m2paMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paDefaultSctpMaxBurst entering action=%d...  \n", action));
 	if ((StorageTmp = m2paMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_UNSIGNED) {
@@ -6469,20 +9670,59 @@ write_m2paDefaultSctpMaxBurst(int action, u_char *var_val, u_char var_val_type, 
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 4 */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			if (StorageTmp->m2paMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paMIB_old = m2paMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paMIB_rsvs++;
+		StorageTmp->m2paDefaultSctpMaxBurst = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->m2paMIB_tsts == 0)
+				if ((ret = check_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->m2paDefaultSctpMaxBurst;
-		StorageTmp->m2paDefaultSctpMaxBurst = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paDefaultSctpMaxBurst for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paMIB_sets == 0)
+				if ((ret = update_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
+			StorageTmp->m2paMIB_rsvs = 0;
+			StorageTmp->m2paMIB_tsts = 0;
+			StorageTmp->m2paMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paDefaultSctpMaxBurst = old_value;
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paMIB_tsts == 0)
+			revert_m2paMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		StorageTmp->m2paDefaultSctpMaxBurst = StorageOld->m2paDefaultSctpMaxBurst;
+		if (--StorageTmp->m2paMIB_rsvs == 0)
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6502,13 +9742,13 @@ write_m2paDefaultSctpMaxBurst(int action, u_char *var_val, u_char var_val_type, 
 int
 write_m2paDefaultSctpAssocMaxRetrans(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m2paMIB_data *StorageTmp = NULL;
+	struct m2paMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paDefaultSctpAssocMaxRetrans entering action=%d...  \n", action));
 	if ((StorageTmp = m2paMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_UNSIGNED) {
@@ -6520,20 +9760,59 @@ write_m2paDefaultSctpAssocMaxRetrans(int action, u_char *var_val, u_char var_val
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 10 */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			if (StorageTmp->m2paMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paMIB_old = m2paMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paMIB_rsvs++;
+		StorageTmp->m2paDefaultSctpAssocMaxRetrans = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->m2paMIB_tsts == 0)
+				if ((ret = check_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->m2paDefaultSctpAssocMaxRetrans;
-		StorageTmp->m2paDefaultSctpAssocMaxRetrans = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paDefaultSctpAssocMaxRetrans for you to use, and you have just been asked to do something with it.  Note that anything 
+				   done here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paMIB_sets == 0)
+				if ((ret = update_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
+			StorageTmp->m2paMIB_rsvs = 0;
+			StorageTmp->m2paMIB_tsts = 0;
+			StorageTmp->m2paMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paDefaultSctpAssocMaxRetrans = old_value;
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paMIB_tsts == 0)
+			revert_m2paMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		StorageTmp->m2paDefaultSctpAssocMaxRetrans = StorageOld->m2paDefaultSctpAssocMaxRetrans;
+		if (--StorageTmp->m2paMIB_rsvs == 0)
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6553,13 +9832,13 @@ write_m2paDefaultSctpAssocMaxRetrans(int action, u_char *var_val, u_char var_val
 int
 write_m2paDefaultSctpSackDelay(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paMIB_data *StorageTmp = NULL;
+	struct m2paMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paDefaultSctpSackDelay entering action=%d...  \n", action));
 	if ((StorageTmp = m2paMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -6576,20 +9855,59 @@ write_m2paDefaultSctpSackDelay(int action, u_char *var_val, u_char var_val_type,
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paDefaultSctpSackDelay: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			if (StorageTmp->m2paMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paMIB_old = m2paMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paMIB_rsvs++;
+		StorageTmp->m2paDefaultSctpSackDelay = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->m2paMIB_tsts == 0)
+				if ((ret = check_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->m2paDefaultSctpSackDelay;
-		StorageTmp->m2paDefaultSctpSackDelay = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paDefaultSctpSackDelay for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paMIB_sets == 0)
+				if ((ret = update_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
+			StorageTmp->m2paMIB_rsvs = 0;
+			StorageTmp->m2paMIB_tsts = 0;
+			StorageTmp->m2paMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paDefaultSctpSackDelay = old_value;
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paMIB_tsts == 0)
+			revert_m2paMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		StorageTmp->m2paDefaultSctpSackDelay = StorageOld->m2paDefaultSctpSackDelay;
+		if (--StorageTmp->m2paMIB_rsvs == 0)
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6609,13 +9927,13 @@ write_m2paDefaultSctpSackDelay(int action, u_char *var_val, u_char var_val_type,
 int
 write_m2paDefaultSctpLifetime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m2paMIB_data *StorageTmp = NULL;
+	struct m2paMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m2paMIB", "write_m2paDefaultSctpLifetime entering action=%d...  \n", action));
 	if ((StorageTmp = m2paMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -6632,41 +9950,96 @@ write_m2paDefaultSctpLifetime(int action, u_char *var_val, u_char var_val_type, 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paDefaultSctpLifetime: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			if (StorageTmp->m2paMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->m2paMIB_old = m2paMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m2paMIB_rsvs++;
+		StorageTmp->m2paDefaultSctpLifetime = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->m2paMIB_tsts == 0)
+				if ((ret = check_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->m2paDefaultSctpLifetime;
-		StorageTmp->m2paDefaultSctpLifetime = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->m2paDefaultSctpLifetime for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m2paMIB_sets == 0)
+				if ((ret = update_m2paMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m2paMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m2paMIB_old) != NULL) {
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
+			StorageTmp->m2paMIB_rsvs = 0;
+			StorageTmp->m2paMIB_tsts = 0;
+			StorageTmp->m2paMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2paDefaultSctpLifetime = old_value;
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m2paMIB_tsts == 0)
+			revert_m2paMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m2paMIB_old) == NULL)
+			break;
+		StorageTmp->m2paDefaultSctpLifetime = StorageOld->m2paDefaultSctpLifetime;
+		if (--StorageTmp->m2paMIB_rsvs == 0)
+			m2paMIB_destroy(&StorageTmp->m2paMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int m2paProtocolProfileTable_consistent(struct m2paProtocolProfileTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_m2paProtocolProfileTable_row(struct m2paProtocolProfileTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the m2paProtocolProfileTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-m2paProtocolProfileTable_consistent(struct m2paProtocolProfileTable_data *thedata)
+can_act_m2paProtocolProfileTable_row(struct m2paProtocolProfileTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_m2paProtocolProfileTable_row(struct m2paProtocolProfileTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_m2paProtocolProfileTable_row(struct m2paProtocolProfileTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
@@ -6683,10 +10056,9 @@ m2paProtocolProfileTable_consistent(struct m2paProtocolProfileTable_data *thedat
 int
 write_m2paProtocolProfileRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct m2paProtocolProfileTable_data *StorageTmp = NULL;
+	struct m2paProtocolProfileTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct m2paProtocolProfileTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -6713,40 +10085,6 @@ write_m2paProtocolProfileRowStatus(int action, u_char *var_val, u_char var_val_t
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->m2paProtocolProfileRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->m2paProtocolProfileTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->m2paProtocolProfileTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* m2paProtocolProfileId */
@@ -6771,13 +10109,44 @@ write_m2paProtocolProfileRowStatus(int action, u_char *var_val, u_char var_val_t
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->m2paProtocolProfileTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->m2paProtocolProfileId, vp->val.string, vp->val_len);
 			StorageNew->m2paProtocolProfileIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&m2paProtocolProfileTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->m2paProtocolProfileRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->m2paProtocolProfileTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+				if (StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old = m2paProtocolProfileTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->m2paProtocolProfileTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->m2paProtocolProfileTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -6787,78 +10156,127 @@ write_m2paProtocolProfileRowStatus(int action, u_char *var_val, u_char var_val_t
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = m2paProtocolProfileTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_m2paProtocolProfileTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->m2paProtocolProfileRowStatus;
-			StorageTmp->m2paProtocolProfileRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = m2paProtocolProfileTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->m2paProtocolProfileRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->m2paProtocolProfileRowStatus != RS_ACTIVE)
+				if ((ret = can_act_m2paProtocolProfileTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->m2paProtocolProfileRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_m2paProtocolProfileTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->m2paProtocolProfileRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_m2paProtocolProfileTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->m2paProtocolProfileRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_m2paProtocolProfileTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->m2paProtocolProfileRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_m2paProtocolProfileTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->m2paProtocolProfileRowStatus;
-			StorageTmp->m2paProtocolProfileRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->m2paProtocolProfileRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_m2paProtocolProfileTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_m2paProtocolProfileTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->m2paProtocolProfileRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->m2paProtocolProfileRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->m2paProtocolProfileRowStatus = set_value;
+			if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) != NULL) {
+				m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
+				StorageTmp->m2paProtocolProfileTable_rsvs = 0;
+				StorageTmp->m2paProtocolProfileTable_tsts = 0;
+				StorageTmp->m2paProtocolProfileTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			m2paProtocolProfileTable_destroy(&StorageDel);
-			/* m2paProtocolProfileTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_m2paProtocolProfileTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->m2paProtocolProfileRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_m2paProtocolProfileTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->m2paProtocolProfileRowStatus = old_value;
+			if (StorageTmp->m2paProtocolProfileRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_m2paProtocolProfileTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -6872,6 +10290,13 @@ write_m2paProtocolProfileRowStatus(int action, u_char *var_val, u_char var_val_t
 				m2paProtocolProfileTable_del(StorageNew);
 				m2paProtocolProfileTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->m2paProtocolProfileTable_old) == NULL)
+				break;
+			if (--StorageTmp->m2paProtocolProfileTable_rsvs == 0)
+				m2paProtocolProfileTable_destroy(&StorageTmp->m2paProtocolProfileTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */

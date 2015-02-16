@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/snmp/megacoTonesMIB.c
+ @(#) src/snmp/megacoTonesMIB.c
 
  -----------------------------------------------------------------------------
 
@@ -310,8 +310,39 @@ megacoTonesMIB_create(void)
 		StorageNew->megTonesNextGroupId = 0;
 
 	}
+      done:
 	DEBUGMSGTL(("megacoTonesMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	megacoTonesMIB_destroy(&StorageNew);
+	goto done;
+}
+
+/**
+ * @fn struct megacoTonesMIB_data *megacoTonesMIB_duplicate(struct megacoTonesMIB_data *thedata)
+ * @param thedata the mib structure to duplicate
+ * @brief duplicate a mib structure for the mib
+ *
+ * Duplicates the specified mib structure @param thedata and returns a pointer to the newly
+ * allocated mib structure on success, or NULL on failure.
+ */
+struct megacoTonesMIB_data *
+megacoTonesMIB_duplicate(struct megacoTonesMIB_data *thedata)
+{
+	struct megacoTonesMIB_data *StorageNew = SNMP_MALLOC_STRUCT(megacoTonesMIB_data);
+
+	DEBUGMSGTL(("megacoTonesMIB", "megacoTonesMIB_duplicate: duplicating mib... "));
+	if (StorageNew != NULL) {
+		StorageNew->megTonesNextGroupId = thedata->megTonesNextGroupId;
+	}
+      done:
+	DEBUGMSGTL(("megacoTonesMIB", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	megacoTonesMIB_destroy(&StorageNew);
+	goto done;
 }
 
 /**
@@ -362,7 +393,7 @@ megacoTonesMIB_add(struct megacoTonesMIB_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for megacoTonesMIB entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case megacoTonesMIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -416,6 +447,62 @@ store_megacoTonesMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	}
 	DEBUGMSGTL(("megacoTonesMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int check_megacoTonesMIB(struct megacoTonesMIB_data *StorageTmp, struct megacoTonesMIB_data *StorageOld)
+ * @param StorageTmp the data as updated
+ * @param StorageOld the data previous to update
+ *
+ * This function is used by mibs.  It is used to check, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the ACTION phase.  The COMMIT phase does not ensue unless this check passes.  This function can
+ * return SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before
+ * the varbinds on the mib were applied; the values in StorageTmp are the new values.  The function
+ * is permitted to change the values in StorageTmp to correct them; however, preferences should be
+ * made for setting values that were not in the varbinds.
+ */
+int
+check_megacoTonesMIB(struct megacoTonesMIB_data *StorageTmp, struct megacoTonesMIB_data *StorageOld)
+{
+	/* XXX: provide code to check the scalars for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_megacoTonesMIB(struct megacoTonesMIB_data *StorageTmp, struct megacoTonesMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase)
+ *
+ * This function is used by mibs.  It is used to update, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the COMMIT phase.  The start of the ACTION phase performs a consistency check on the mib before
+ * allowing the request to proceed to the COMMIT phase.  The COMMIT phase then arrives here with
+ * consistency already checked (see check_megacoTonesMIB()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied: the values in StorageTmp are the new values.
+ */
+int
+update_megacoTonesMIB(struct megacoTonesMIB_data *StorageTmp, struct megacoTonesMIB_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	megacoTonesMIB_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn revert_megacoTonesMIB(struct 
+ * @fn void revert_megacoTonesMIB(struct megacoTonesMIB_data *StorageTmp, struct megacoTonesMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase)
+ */
+void
+revert_megacoTonesMIB(struct megacoTonesMIB_data *StorageTmp, struct megacoTonesMIB_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_megacoTonesMIB(StorageOld, NULL);
 }
 
 /**
@@ -519,20 +606,27 @@ megTonesToneTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->megTonesToneGroupId = 0;
-		if ((StorageNew->megTonesToneName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->megTonesToneNameLen = strlen("");
+		if ((StorageNew->megTonesToneName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->megTonesToneNameLen = 0;
+		StorageNew->megTonesToneName[StorageNew->megTonesToneNameLen] = 0;
 		StorageNew->megTonesToneTimeout = 0;
 		StorageNew->megTonesToneRowStatus = 0;
 		StorageNew->megTonesToneRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("megacoTonesMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	megTonesToneTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct megTonesToneTable_data *megTonesToneTable_duplicate(struct megTonesToneTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -544,6 +638,17 @@ megTonesToneTable_duplicate(struct megTonesToneTable_data *thedata)
 
 	DEBUGMSGTL(("megacoTonesMIB", "megTonesToneTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->megTonesToneTable_id = thedata->megTonesToneTable_id;
+		StorageNew->megTonesToneSetId = thedata->megTonesToneSetId;
+		StorageNew->megTonesToneId = thedata->megTonesToneId;
+		StorageNew->megTonesToneGroupId = thedata->megTonesToneGroupId;
+		if (!(StorageNew->megTonesToneName = malloc(thedata->megTonesToneNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->megTonesToneName, thedata->megTonesToneName, thedata->megTonesToneNameLen);
+		StorageNew->megTonesToneNameLen = thedata->megTonesToneNameLen;
+		StorageNew->megTonesToneName[StorageNew->megTonesToneNameLen] = 0;
+		StorageNew->megTonesToneTimeout = thedata->megTonesToneTimeout;
+		StorageNew->megTonesToneRowStatus = thedata->megTonesToneRowStatus;
 	}
       done:
 	DEBUGMSGTL(("megacoTonesMIB", "done.\n"));
@@ -641,7 +746,7 @@ megTonesToneTable_del(struct megTonesToneTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for megTonesToneTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case megTonesToneTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -739,14 +844,19 @@ megTonesGroupTable_create(void)
 		StorageNew->megTonesGroupRowStatus = 0;
 		StorageNew->megTonesGroupRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("megacoTonesMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	megTonesGroupTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct megTonesGroupTable_data *megTonesGroupTable_duplicate(struct megTonesGroupTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -758,6 +868,16 @@ megTonesGroupTable_duplicate(struct megTonesGroupTable_data *thedata)
 
 	DEBUGMSGTL(("megacoTonesMIB", "megTonesGroupTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->megTonesGroupTable_id = thedata->megTonesGroupTable_id;
+		StorageNew->megTonesToneGroupId = thedata->megTonesToneGroupId;
+		StorageNew->megTonesGroupIndex = thedata->megTonesGroupIndex;
+		StorageNew->megTonesGroupRef = thedata->megTonesGroupRef;
+		StorageNew->megTonesGroupGroupLink = thedata->megTonesGroupGroupLink;
+		StorageNew->megTonesGroupFrequency = thedata->megTonesGroupFrequency;
+		StorageNew->megTonesGroupLevel = thedata->megTonesGroupLevel;
+		StorageNew->megTonesGroupDuration = thedata->megTonesGroupDuration;
+		StorageNew->megTonesGroupRepeatCount = thedata->megTonesGroupRepeatCount;
+		StorageNew->megTonesGroupRowStatus = thedata->megTonesGroupRowStatus;
 	}
       done:
 	DEBUGMSGTL(("megacoTonesMIB", "done.\n"));
@@ -853,7 +973,7 @@ megTonesGroupTable_del(struct megTonesGroupTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for megTonesGroupTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case megTonesGroupTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -924,6 +1044,132 @@ store_megTonesGroupTable(int majorID, int minorID, void *serverarg, void *client
 	}
 	DEBUGMSGTL(("megacoTonesMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int activate_megTonesToneTable_row(struct megTonesToneTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_megTonesToneTable_row(struct megTonesToneTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_megTonesToneTable_row(struct megTonesToneTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_megTonesToneTable_row(struct megTonesToneTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_megTonesGroupTable_row(struct megTonesGroupTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_megTonesGroupTable_row(struct megTonesGroupTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_megTonesGroupTable_row(struct megTonesGroupTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_megTonesGroupTable_row(struct megTonesGroupTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int check_megTonesToneTable_row(struct megTonesToneTable_data *StorageTmp, struct megTonesToneTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_megTonesToneTable_row(struct megTonesToneTable_data *StorageTmp, struct megTonesToneTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_megTonesToneTable_row(struct megTonesToneTable_data *StorageTmp, struct megTonesToneTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_megTonesToneTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_megTonesToneTable_row(struct megTonesToneTable_data *StorageTmp, struct megTonesToneTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	megTonesToneTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_megTonesToneTable_row(struct megTonesToneTable_data *StorageTmp, struct megTonesToneTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_megTonesToneTable_row(struct megTonesToneTable_data *StorageTmp, struct megTonesToneTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_megTonesToneTable_row(StorageOld, NULL);
 }
 
 /**
@@ -1023,6 +1269,64 @@ var_megTonesToneTable(struct variable *vp, oid * name, size_t *length, int exact
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_megTonesGroupTable_row(struct megTonesGroupTable_data *StorageTmp, struct megTonesGroupTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_megTonesGroupTable_row(struct megTonesGroupTable_data *StorageTmp, struct megTonesGroupTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_megTonesGroupTable_row(struct megTonesGroupTable_data *StorageTmp, struct megTonesGroupTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_megTonesGroupTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_megTonesGroupTable_row(struct megTonesGroupTable_data *StorageTmp, struct megTonesGroupTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	megTonesGroupTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_megTonesGroupTable_row(struct megTonesGroupTable_data *StorageTmp, struct megTonesGroupTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_megTonesGroupTable_row(struct megTonesGroupTable_data *StorageTmp, struct megTonesGroupTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_megTonesGroupTable_row(StorageOld, NULL);
 }
 
 /**
@@ -1159,12 +1463,14 @@ var_megTonesGroupTable(struct variable *vp, oid * name, size_t *length, int exac
 int
 write_megTonesToneGroupId(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct megTonesToneTable_data *StorageTmp = NULL;
+	struct megTonesToneTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoTonesMIB", "write_megTonesToneGroupId entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(megTonesToneTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1194,22 +1500,61 @@ write_megTonesToneGroupId(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to megTonesToneGroupId: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->megTonesToneTable_old) == NULL)
+			if (StorageTmp->megTonesToneTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->megTonesToneTable_old = megTonesToneTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->megTonesToneTable_rsvs++;
+		StorageTmp->megTonesToneGroupId = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->megTonesToneTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->megTonesToneTable_tsts == 0)
+				if ((ret = check_megTonesToneTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->megTonesToneTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->megTonesToneGroupId for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->megTonesToneGroupId;
-		StorageTmp->megTonesToneGroupId = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->megTonesToneTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->megTonesToneTable_sets == 0)
+				if ((ret = update_megTonesToneTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->megTonesToneTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->megTonesToneTable_old) != NULL) {
+			megTonesToneTable_destroy(&StorageTmp->megTonesToneTable_old);
+			StorageTmp->megTonesToneTable_rsvs = 0;
+			StorageTmp->megTonesToneTable_tsts = 0;
+			StorageTmp->megTonesToneTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->megTonesToneGroupId = old_value;
+		if ((StorageOld = StorageTmp->megTonesToneTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->megTonesToneTable_sets == 0)
+			revert_megTonesToneTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->megTonesToneTable_old) == NULL)
+			break;
+		StorageTmp->megTonesToneGroupId = StorageOld->megTonesToneGroupId;
+		if (--StorageTmp->megTonesToneTable_rsvs == 0)
+			megTonesToneTable_destroy(&StorageTmp->megTonesToneTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1229,17 +1574,17 @@ write_megTonesToneGroupId(int action, u_char *var_val, u_char var_val_type, size
 int
 write_megTonesToneName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct megTonesToneTable_data *StorageTmp = NULL;
+	struct megTonesToneTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoTonesMIB", "write_megTonesToneName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(megTonesToneTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->megTonesToneRowStatus) {
@@ -1262,33 +1607,73 @@ write_megTonesToneName(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to megTonesToneName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->megTonesToneTable_old) == NULL)
+			if (StorageTmp->megTonesToneTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->megTonesToneTable_old = megTonesToneTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->megTonesToneTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->megTonesToneName);
+		StorageTmp->megTonesToneName = string;
+		StorageTmp->megTonesToneNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->megTonesToneTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->megTonesToneTable_tsts == 0)
+				if ((ret = check_megTonesToneTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->megTonesToneTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->megTonesToneName for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->megTonesToneName;
-		old_length = StorageTmp->megTonesToneNameLen;
-		StorageTmp->megTonesToneName = string;
-		StorageTmp->megTonesToneNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->megTonesToneTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->megTonesToneTable_sets == 0)
+				if ((ret = update_megTonesToneTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->megTonesToneTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->megTonesToneTable_old) != NULL) {
+			megTonesToneTable_destroy(&StorageTmp->megTonesToneTable_old);
+			StorageTmp->megTonesToneTable_rsvs = 0;
+			StorageTmp->megTonesToneTable_tsts = 0;
+			StorageTmp->megTonesToneTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->megTonesToneName = old_value;
-		StorageTmp->megTonesToneNameLen = old_length;
+		if ((StorageOld = StorageTmp->megTonesToneTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->megTonesToneTable_sets == 0)
+			revert_megTonesToneTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->megTonesToneTable_old) == NULL)
+			break;
+		if (StorageOld->megTonesToneName != NULL) {
+			SNMP_FREE(StorageTmp->megTonesToneName);
+			StorageTmp->megTonesToneName = StorageOld->megTonesToneName;
+			StorageTmp->megTonesToneNameLen = StorageOld->megTonesToneNameLen;
+			StorageOld->megTonesToneName = NULL;
+			StorageOld->megTonesToneNameLen = 0;
+		}
+		if (--StorageTmp->megTonesToneTable_rsvs == 0)
+			megTonesToneTable_destroy(&StorageTmp->megTonesToneTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1308,12 +1693,14 @@ write_megTonesToneName(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_megTonesToneTimeout(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct megTonesToneTable_data *StorageTmp = NULL;
+	struct megTonesToneTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoTonesMIB", "write_megTonesToneTimeout entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(megTonesToneTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1338,22 +1725,61 @@ write_megTonesToneTimeout(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to megTonesToneTimeout: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->megTonesToneTable_old) == NULL)
+			if (StorageTmp->megTonesToneTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->megTonesToneTable_old = megTonesToneTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->megTonesToneTable_rsvs++;
+		StorageTmp->megTonesToneTimeout = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->megTonesToneTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->megTonesToneTable_tsts == 0)
+				if ((ret = check_megTonesToneTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->megTonesToneTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->megTonesToneTimeout for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->megTonesToneTimeout;
-		StorageTmp->megTonesToneTimeout = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->megTonesToneTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->megTonesToneTable_sets == 0)
+				if ((ret = update_megTonesToneTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->megTonesToneTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->megTonesToneTable_old) != NULL) {
+			megTonesToneTable_destroy(&StorageTmp->megTonesToneTable_old);
+			StorageTmp->megTonesToneTable_rsvs = 0;
+			StorageTmp->megTonesToneTable_tsts = 0;
+			StorageTmp->megTonesToneTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->megTonesToneTimeout = old_value;
+		if ((StorageOld = StorageTmp->megTonesToneTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->megTonesToneTable_sets == 0)
+			revert_megTonesToneTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->megTonesToneTable_old) == NULL)
+			break;
+		StorageTmp->megTonesToneTimeout = StorageOld->megTonesToneTimeout;
+		if (--StorageTmp->megTonesToneTable_rsvs == 0)
+			megTonesToneTable_destroy(&StorageTmp->megTonesToneTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1373,12 +1799,14 @@ write_megTonesToneTimeout(int action, u_char *var_val, u_char var_val_type, size
 int
 write_megTonesToneGroupId(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct megTonesGroupTable_data *StorageTmp = NULL;
+	struct megTonesGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoTonesMIB", "write_megTonesToneGroupId entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(megTonesGroupTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1408,22 +1836,61 @@ write_megTonesToneGroupId(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to megTonesToneGroupId: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) == NULL)
+			if (StorageTmp->megTonesGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->megTonesGroupTable_old = megTonesGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->megTonesGroupTable_rsvs++;
+		StorageTmp->megTonesToneGroupId = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->megTonesGroupTable_tsts == 0)
+				if ((ret = check_megTonesGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->megTonesGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->megTonesToneGroupId for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->megTonesToneGroupId;
-		StorageTmp->megTonesToneGroupId = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->megTonesGroupTable_sets == 0)
+				if ((ret = update_megTonesGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->megTonesGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) != NULL) {
+			megTonesGroupTable_destroy(&StorageTmp->megTonesGroupTable_old);
+			StorageTmp->megTonesGroupTable_rsvs = 0;
+			StorageTmp->megTonesGroupTable_tsts = 0;
+			StorageTmp->megTonesGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->megTonesToneGroupId = old_value;
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->megTonesGroupTable_sets == 0)
+			revert_megTonesGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) == NULL)
+			break;
+		StorageTmp->megTonesToneGroupId = StorageOld->megTonesToneGroupId;
+		if (--StorageTmp->megTonesGroupTable_rsvs == 0)
+			megTonesGroupTable_destroy(&StorageTmp->megTonesGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1443,12 +1910,14 @@ write_megTonesToneGroupId(int action, u_char *var_val, u_char var_val_type, size
 int
 write_megTonesGroupRef(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct megTonesGroupTable_data *StorageTmp = NULL;
+	struct megTonesGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoTonesMIB", "write_megTonesGroupRef entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(megTonesGroupTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1473,22 +1942,61 @@ write_megTonesGroupRef(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to megTonesGroupRef: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) == NULL)
+			if (StorageTmp->megTonesGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->megTonesGroupTable_old = megTonesGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->megTonesGroupTable_rsvs++;
+		StorageTmp->megTonesGroupRef = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->megTonesGroupTable_tsts == 0)
+				if ((ret = check_megTonesGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->megTonesGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->megTonesGroupRef for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->megTonesGroupRef;
-		StorageTmp->megTonesGroupRef = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->megTonesGroupTable_sets == 0)
+				if ((ret = update_megTonesGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->megTonesGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) != NULL) {
+			megTonesGroupTable_destroy(&StorageTmp->megTonesGroupTable_old);
+			StorageTmp->megTonesGroupTable_rsvs = 0;
+			StorageTmp->megTonesGroupTable_tsts = 0;
+			StorageTmp->megTonesGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->megTonesGroupRef = old_value;
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->megTonesGroupTable_sets == 0)
+			revert_megTonesGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) == NULL)
+			break;
+		StorageTmp->megTonesGroupRef = StorageOld->megTonesGroupRef;
+		if (--StorageTmp->megTonesGroupTable_rsvs == 0)
+			megTonesGroupTable_destroy(&StorageTmp->megTonesGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1508,12 +2016,14 @@ write_megTonesGroupRef(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_megTonesGroupGroupLink(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct megTonesGroupTable_data *StorageTmp = NULL;
+	struct megTonesGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoTonesMIB", "write_megTonesGroupGroupLink entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(megTonesGroupTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1549,22 +2059,61 @@ write_megTonesGroupGroupLink(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to megTonesGroupGroupLink: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) == NULL)
+			if (StorageTmp->megTonesGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->megTonesGroupTable_old = megTonesGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->megTonesGroupTable_rsvs++;
+		StorageTmp->megTonesGroupGroupLink = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->megTonesGroupTable_tsts == 0)
+				if ((ret = check_megTonesGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->megTonesGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->megTonesGroupGroupLink for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->megTonesGroupGroupLink;
-		StorageTmp->megTonesGroupGroupLink = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->megTonesGroupTable_sets == 0)
+				if ((ret = update_megTonesGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->megTonesGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) != NULL) {
+			megTonesGroupTable_destroy(&StorageTmp->megTonesGroupTable_old);
+			StorageTmp->megTonesGroupTable_rsvs = 0;
+			StorageTmp->megTonesGroupTable_tsts = 0;
+			StorageTmp->megTonesGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->megTonesGroupGroupLink = old_value;
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->megTonesGroupTable_sets == 0)
+			revert_megTonesGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) == NULL)
+			break;
+		StorageTmp->megTonesGroupGroupLink = StorageOld->megTonesGroupGroupLink;
+		if (--StorageTmp->megTonesGroupTable_rsvs == 0)
+			megTonesGroupTable_destroy(&StorageTmp->megTonesGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1584,12 +2133,14 @@ write_megTonesGroupGroupLink(int action, u_char *var_val, u_char var_val_type, s
 int
 write_megTonesGroupFrequency(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct megTonesGroupTable_data *StorageTmp = NULL;
+	struct megTonesGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoTonesMIB", "write_megTonesGroupFrequency entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(megTonesGroupTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1619,22 +2170,61 @@ write_megTonesGroupFrequency(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to megTonesGroupFrequency: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) == NULL)
+			if (StorageTmp->megTonesGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->megTonesGroupTable_old = megTonesGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->megTonesGroupTable_rsvs++;
+		StorageTmp->megTonesGroupFrequency = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->megTonesGroupTable_tsts == 0)
+				if ((ret = check_megTonesGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->megTonesGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->megTonesGroupFrequency for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->megTonesGroupFrequency;
-		StorageTmp->megTonesGroupFrequency = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->megTonesGroupTable_sets == 0)
+				if ((ret = update_megTonesGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->megTonesGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) != NULL) {
+			megTonesGroupTable_destroy(&StorageTmp->megTonesGroupTable_old);
+			StorageTmp->megTonesGroupTable_rsvs = 0;
+			StorageTmp->megTonesGroupTable_tsts = 0;
+			StorageTmp->megTonesGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->megTonesGroupFrequency = old_value;
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->megTonesGroupTable_sets == 0)
+			revert_megTonesGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) == NULL)
+			break;
+		StorageTmp->megTonesGroupFrequency = StorageOld->megTonesGroupFrequency;
+		if (--StorageTmp->megTonesGroupTable_rsvs == 0)
+			megTonesGroupTable_destroy(&StorageTmp->megTonesGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1654,12 +2244,14 @@ write_megTonesGroupFrequency(int action, u_char *var_val, u_char var_val_type, s
 int
 write_megTonesGroupLevel(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct megTonesGroupTable_data *StorageTmp = NULL;
+	struct megTonesGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoTonesMIB", "write_megTonesGroupLevel entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(megTonesGroupTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1689,22 +2281,61 @@ write_megTonesGroupLevel(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to megTonesGroupLevel: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) == NULL)
+			if (StorageTmp->megTonesGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->megTonesGroupTable_old = megTonesGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->megTonesGroupTable_rsvs++;
+		StorageTmp->megTonesGroupLevel = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->megTonesGroupTable_tsts == 0)
+				if ((ret = check_megTonesGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->megTonesGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->megTonesGroupLevel for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->megTonesGroupLevel;
-		StorageTmp->megTonesGroupLevel = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->megTonesGroupTable_sets == 0)
+				if ((ret = update_megTonesGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->megTonesGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) != NULL) {
+			megTonesGroupTable_destroy(&StorageTmp->megTonesGroupTable_old);
+			StorageTmp->megTonesGroupTable_rsvs = 0;
+			StorageTmp->megTonesGroupTable_tsts = 0;
+			StorageTmp->megTonesGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->megTonesGroupLevel = old_value;
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->megTonesGroupTable_sets == 0)
+			revert_megTonesGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) == NULL)
+			break;
+		StorageTmp->megTonesGroupLevel = StorageOld->megTonesGroupLevel;
+		if (--StorageTmp->megTonesGroupTable_rsvs == 0)
+			megTonesGroupTable_destroy(&StorageTmp->megTonesGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1724,12 +2355,14 @@ write_megTonesGroupLevel(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_megTonesGroupDuration(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct megTonesGroupTable_data *StorageTmp = NULL;
+	struct megTonesGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoTonesMIB", "write_megTonesGroupDuration entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(megTonesGroupTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1759,22 +2392,61 @@ write_megTonesGroupDuration(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to megTonesGroupDuration: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) == NULL)
+			if (StorageTmp->megTonesGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->megTonesGroupTable_old = megTonesGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->megTonesGroupTable_rsvs++;
+		StorageTmp->megTonesGroupDuration = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->megTonesGroupTable_tsts == 0)
+				if ((ret = check_megTonesGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->megTonesGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->megTonesGroupDuration for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->megTonesGroupDuration;
-		StorageTmp->megTonesGroupDuration = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->megTonesGroupTable_sets == 0)
+				if ((ret = update_megTonesGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->megTonesGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) != NULL) {
+			megTonesGroupTable_destroy(&StorageTmp->megTonesGroupTable_old);
+			StorageTmp->megTonesGroupTable_rsvs = 0;
+			StorageTmp->megTonesGroupTable_tsts = 0;
+			StorageTmp->megTonesGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->megTonesGroupDuration = old_value;
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->megTonesGroupTable_sets == 0)
+			revert_megTonesGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) == NULL)
+			break;
+		StorageTmp->megTonesGroupDuration = StorageOld->megTonesGroupDuration;
+		if (--StorageTmp->megTonesGroupTable_rsvs == 0)
+			megTonesGroupTable_destroy(&StorageTmp->megTonesGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1794,12 +2466,14 @@ write_megTonesGroupDuration(int action, u_char *var_val, u_char var_val_type, si
 int
 write_megTonesGroupRepeatCount(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct megTonesGroupTable_data *StorageTmp = NULL;
+	struct megTonesGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 12;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoTonesMIB", "write_megTonesGroupRepeatCount entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(megTonesGroupTableStorage, NULL, &name[12], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1829,22 +2503,61 @@ write_megTonesGroupRepeatCount(int action, u_char *var_val, u_char var_val_type,
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to megTonesGroupRepeatCount: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) == NULL)
+			if (StorageTmp->megTonesGroupTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->megTonesGroupTable_old = megTonesGroupTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->megTonesGroupTable_rsvs++;
+		StorageTmp->megTonesGroupRepeatCount = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->megTonesGroupTable_tsts == 0)
+				if ((ret = check_megTonesGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->megTonesGroupTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->megTonesGroupRepeatCount for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->megTonesGroupRepeatCount;
-		StorageTmp->megTonesGroupRepeatCount = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->megTonesGroupTable_sets == 0)
+				if ((ret = update_megTonesGroupTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->megTonesGroupTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) != NULL) {
+			megTonesGroupTable_destroy(&StorageTmp->megTonesGroupTable_old);
+			StorageTmp->megTonesGroupTable_rsvs = 0;
+			StorageTmp->megTonesGroupTable_tsts = 0;
+			StorageTmp->megTonesGroupTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->megTonesGroupRepeatCount = old_value;
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->megTonesGroupTable_sets == 0)
+			revert_megTonesGroupTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->megTonesGroupTable_old) == NULL)
+			break;
+		StorageTmp->megTonesGroupRepeatCount = StorageOld->megTonesGroupRepeatCount;
+		if (--StorageTmp->megTonesGroupTable_rsvs == 0)
+			megTonesGroupTable_destroy(&StorageTmp->megTonesGroupTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1864,13 +2577,13 @@ write_megTonesGroupRepeatCount(int action, u_char *var_val, u_char var_val_type,
 int
 write_megTonesNextGroupId(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct megacoTonesMIB_data *StorageTmp = NULL;
+	struct megacoTonesMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("megacoTonesMIB", "write_megTonesNextGroupId entering action=%d...  \n", action));
 	if ((StorageTmp = megacoTonesMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -1886,59 +2599,130 @@ write_megTonesNextGroupId(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to megTonesNextGroupId: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->megacoTonesMIB_old) == NULL)
+			if (StorageTmp->megacoTonesMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->megacoTonesMIB_old = megacoTonesMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->megacoTonesMIB_rsvs++;
+		StorageTmp->megTonesNextGroupId = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->megacoTonesMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->megacoTonesMIB_tsts == 0)
+				if ((ret = check_megacoTonesMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->megacoTonesMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->megTonesNextGroupId;
-		StorageTmp->megTonesNextGroupId = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->megTonesNextGroupId for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->megacoTonesMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->megacoTonesMIB_sets == 0)
+				if ((ret = update_megacoTonesMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->megacoTonesMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->megacoTonesMIB_old) != NULL) {
+			megacoTonesMIB_destroy(&StorageTmp->megacoTonesMIB_old);
+			StorageTmp->megacoTonesMIB_rsvs = 0;
+			StorageTmp->megacoTonesMIB_tsts = 0;
+			StorageTmp->megacoTonesMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->megTonesNextGroupId = old_value;
+		if ((StorageOld = StorageTmp->megacoTonesMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->megacoTonesMIB_tsts == 0)
+			revert_megacoTonesMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->megacoTonesMIB_old) == NULL)
+			break;
+		StorageTmp->megTonesNextGroupId = StorageOld->megTonesNextGroupId;
+		if (--StorageTmp->megacoTonesMIB_rsvs == 0)
+			megacoTonesMIB_destroy(&StorageTmp->megacoTonesMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int megTonesToneTable_consistent(struct megTonesToneTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_megTonesToneTable_row(struct megTonesToneTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the megTonesToneTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-megTonesToneTable_consistent(struct megTonesToneTable_data *thedata)
+can_act_megTonesToneTable_row(struct megTonesToneTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int megTonesGroupTable_consistent(struct megTonesGroupTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_megTonesToneTable_row(struct megTonesToneTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the megTonesGroupTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-megTonesGroupTable_consistent(struct megTonesGroupTable_data *thedata)
+can_deact_megTonesToneTable_row(struct megTonesToneTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_megTonesGroupTable_row(struct megTonesGroupTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_megTonesGroupTable_row(struct megTonesGroupTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_megTonesGroupTable_row(struct megTonesGroupTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_megTonesGroupTable_row(struct megTonesGroupTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
@@ -1955,10 +2739,9 @@ megTonesGroupTable_consistent(struct megTonesGroupTable_data *thedata)
 int
 write_megTonesToneRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct megTonesToneTable_data *StorageTmp = NULL;
+	struct megTonesToneTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct megTonesToneTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 12;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -1985,40 +2768,6 @@ write_megTonesToneRowStatus(int action, u_char *var_val, u_char var_val_type, si
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->megTonesToneRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->megTonesToneTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->megTonesToneTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* megTonesToneSetId */
@@ -2066,6 +2815,7 @@ write_megTonesToneRowStatus(int action, u_char *var_val, u_char var_val_type, si
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->megTonesToneTable_rsvs = 1;
 			vp = vars;
 			StorageNew->megTonesToneSetId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -2073,7 +2823,37 @@ write_megTonesToneRowStatus(int action, u_char *var_val, u_char var_val_type, si
 			vp = vp->next_variable;
 			header_complex_add_data(&megTonesToneTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->megTonesToneRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->megTonesToneTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->megTonesToneTable_old) == NULL)
+				if (StorageTmp->megTonesToneTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->megTonesToneTable_old = megTonesToneTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->megTonesToneTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->megTonesToneTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -2083,78 +2863,127 @@ write_megTonesToneRowStatus(int action, u_char *var_val, u_char var_val_type, si
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = megTonesToneTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_megTonesToneTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->megTonesToneRowStatus;
-			StorageTmp->megTonesToneRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = megTonesToneTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->megTonesToneRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->megTonesToneRowStatus != RS_ACTIVE)
+				if ((ret = can_act_megTonesToneTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->megTonesToneRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_megTonesToneTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->megTonesToneRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_megTonesToneTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->megTonesToneRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_megTonesToneTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->megTonesToneRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_megTonesToneTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->megTonesToneRowStatus;
-			StorageTmp->megTonesToneRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->megTonesToneRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_megTonesToneTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_megTonesToneTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->megTonesToneRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->megTonesToneRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->megTonesToneRowStatus = set_value;
+			if ((StorageOld = StorageTmp->megTonesToneTable_old) != NULL) {
+				megTonesToneTable_destroy(&StorageTmp->megTonesToneTable_old);
+				StorageTmp->megTonesToneTable_rsvs = 0;
+				StorageTmp->megTonesToneTable_tsts = 0;
+				StorageTmp->megTonesToneTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			megTonesToneTable_destroy(&StorageDel);
-			/* megTonesToneTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_megTonesToneTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->megTonesToneRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_megTonesToneTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->megTonesToneRowStatus = old_value;
+			if (StorageTmp->megTonesToneRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_megTonesToneTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -2168,6 +2997,13 @@ write_megTonesToneRowStatus(int action, u_char *var_val, u_char var_val_type, si
 				megTonesToneTable_del(StorageNew);
 				megTonesToneTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->megTonesToneTable_old) == NULL)
+				break;
+			if (--StorageTmp->megTonesToneTable_rsvs == 0)
+				megTonesToneTable_destroy(&StorageTmp->megTonesToneTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -2194,10 +3030,9 @@ write_megTonesToneRowStatus(int action, u_char *var_val, u_char var_val_type, si
 int
 write_megTonesGroupRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct megTonesGroupTable_data *StorageTmp = NULL;
+	struct megTonesGroupTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct megTonesGroupTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 12;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -2224,40 +3059,6 @@ write_megTonesGroupRowStatus(int action, u_char *var_val, u_char var_val_type, s
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->megTonesGroupRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->megTonesGroupTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->megTonesGroupTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* megTonesToneGroupId */
@@ -2305,6 +3106,7 @@ write_megTonesGroupRowStatus(int action, u_char *var_val, u_char var_val_type, s
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->megTonesGroupTable_rsvs = 1;
 			vp = vars;
 			StorageNew->megTonesToneGroupId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -2312,7 +3114,37 @@ write_megTonesGroupRowStatus(int action, u_char *var_val, u_char var_val_type, s
 			vp = vp->next_variable;
 			header_complex_add_data(&megTonesGroupTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->megTonesGroupRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->megTonesGroupTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->megTonesGroupTable_old) == NULL)
+				if (StorageTmp->megTonesGroupTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->megTonesGroupTable_old = megTonesGroupTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->megTonesGroupTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->megTonesGroupTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -2322,78 +3154,127 @@ write_megTonesGroupRowStatus(int action, u_char *var_val, u_char var_val_type, s
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = megTonesGroupTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_megTonesGroupTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->megTonesGroupRowStatus;
-			StorageTmp->megTonesGroupRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = megTonesGroupTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->megTonesGroupRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->megTonesGroupRowStatus != RS_ACTIVE)
+				if ((ret = can_act_megTonesGroupTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->megTonesGroupRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_megTonesGroupTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->megTonesGroupRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_megTonesGroupTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->megTonesGroupRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_megTonesGroupTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->megTonesGroupRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_megTonesGroupTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->megTonesGroupRowStatus;
-			StorageTmp->megTonesGroupRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->megTonesGroupRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_megTonesGroupTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_megTonesGroupTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->megTonesGroupRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->megTonesGroupRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->megTonesGroupRowStatus = set_value;
+			if ((StorageOld = StorageTmp->megTonesGroupTable_old) != NULL) {
+				megTonesGroupTable_destroy(&StorageTmp->megTonesGroupTable_old);
+				StorageTmp->megTonesGroupTable_rsvs = 0;
+				StorageTmp->megTonesGroupTable_tsts = 0;
+				StorageTmp->megTonesGroupTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			megTonesGroupTable_destroy(&StorageDel);
-			/* megTonesGroupTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_megTonesGroupTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->megTonesGroupRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_megTonesGroupTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->megTonesGroupRowStatus = old_value;
+			if (StorageTmp->megTonesGroupRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_megTonesGroupTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -2407,6 +3288,13 @@ write_megTonesGroupRowStatus(int action, u_char *var_val, u_char var_val_type, s
 				megTonesGroupTable_del(StorageNew);
 				megTonesGroupTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->megTonesGroupTable_old) == NULL)
+				break;
+			if (--StorageTmp->megTonesGroupTable_rsvs == 0)
+				megTonesGroupTable_destroy(&StorageTmp->megTonesGroupTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */

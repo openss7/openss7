@@ -63,12 +63,21 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct megacoTonesMIB_data {
+	struct megacoTonesMIB_data *megacoTonesMIB_old;
+	uint megacoTonesMIB_rsvs;
+	uint megacoTonesMIB_tsts;
+	uint megacoTonesMIB_sets;
 	uint megacoTonesMIB_request;
 	long megTonesNextGroupId;	/* ReadWrite */
 };
 struct megTonesToneTable_data {
+	struct megTonesToneTable_data *megTonesToneTable_old;
+	uint megTonesToneTable_rsvs;
+	uint megTonesToneTable_tsts;
+	uint megTonesToneTable_sets;
 	uint megTonesToneTable_request;
 	uint megTonesToneTable_refs;
+	uint megTonesToneTable_id;
 	ulong megTonesToneSetId;	/* NoAccess */
 	ulong megTonesToneId;		/* NoAccess */
 	ulong megTonesToneGroupId;	/* Create */
@@ -78,8 +87,13 @@ struct megTonesToneTable_data {
 	long megTonesToneRowStatus;	/* Create */
 };
 struct megTonesGroupTable_data {
+	struct megTonesGroupTable_data *megTonesGroupTable_old;
+	uint megTonesGroupTable_rsvs;
+	uint megTonesGroupTable_tsts;
+	uint megTonesGroupTable_sets;
 	uint megTonesGroupTable_request;
 	uint megTonesGroupTable_refs;
+	uint megTonesGroupTable_id;
 	ulong megTonesToneGroupId;	/* Create */
 	ulong megTonesGroupIndex;	/* NoAccess */
 	long megTonesGroupRef;		/* Create */
@@ -122,6 +136,10 @@ void init_megacoTonesMIB(void);
 void deinit_megacoTonesMIB(void);
 int term_megacoTonesMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_megacoTonesMIB;
+struct megacoTonesMIB_data *megacoTonesMIB_create(void);
+struct megacoTonesMIB_data *megacoTonesMIB_duplicate(struct megacoTonesMIB_data *);
+int megacoTonesMIB_destroy(struct megacoTonesMIB_data **);
+int megacoTonesMIB_add(struct megacoTonesMIB_data *);
 void parse_megacoTonesMIB(const char *, char *);
 SNMPCallback store_megacoTonesMIB;
 void refresh_megacoTonesMIB(int);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/snmp/gmiMIB.c
+ @(#) src/snmp/gmiMIB.c
 
  -----------------------------------------------------------------------------
 
@@ -367,8 +367,38 @@ gmiMIB_create(void)
 		/* XXX: fill in default scalar values here into StorageNew */
 
 	}
+      done:
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	gmiMIB_destroy(&StorageNew);
+	goto done;
+}
+
+/**
+ * @fn struct gmiMIB_data *gmiMIB_duplicate(struct gmiMIB_data *thedata)
+ * @param thedata the mib structure to duplicate
+ * @brief duplicate a mib structure for the mib
+ *
+ * Duplicates the specified mib structure @param thedata and returns a pointer to the newly
+ * allocated mib structure on success, or NULL on failure.
+ */
+struct gmiMIB_data *
+gmiMIB_duplicate(struct gmiMIB_data *thedata)
+{
+	struct gmiMIB_data *StorageNew = SNMP_MALLOC_STRUCT(gmiMIB_data);
+
+	DEBUGMSGTL(("gmiMIB", "gmiMIB_duplicate: duplicating mib... "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("gmiMIB", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	gmiMIB_destroy(&StorageNew);
+	goto done;
 }
 
 /**
@@ -419,7 +449,7 @@ gmiMIB_add(struct gmiMIB_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for gmiMIB entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case gmiMIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -471,6 +501,62 @@ store_gmiMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	}
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int check_gmiMIB(struct gmiMIB_data *StorageTmp, struct gmiMIB_data *StorageOld)
+ * @param StorageTmp the data as updated
+ * @param StorageOld the data previous to update
+ *
+ * This function is used by mibs.  It is used to check, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the ACTION phase.  The COMMIT phase does not ensue unless this check passes.  This function can
+ * return SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before
+ * the varbinds on the mib were applied; the values in StorageTmp are the new values.  The function
+ * is permitted to change the values in StorageTmp to correct them; however, preferences should be
+ * made for setting values that were not in the varbinds.
+ */
+int
+check_gmiMIB(struct gmiMIB_data *StorageTmp, struct gmiMIB_data *StorageOld)
+{
+	/* XXX: provide code to check the scalars for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_gmiMIB(struct gmiMIB_data *StorageTmp, struct gmiMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase)
+ *
+ * This function is used by mibs.  It is used to update, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the COMMIT phase.  The start of the ACTION phase performs a consistency check on the mib before
+ * allowing the request to proceed to the COMMIT phase.  The COMMIT phase then arrives here with
+ * consistency already checked (see check_gmiMIB()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied: the values in StorageTmp are the new values.
+ */
+int
+update_gmiMIB(struct gmiMIB_data *StorageTmp, struct gmiMIB_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	gmiMIB_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn revert_gmiMIB(struct 
+ * @fn void revert_gmiMIB(struct gmiMIB_data *StorageTmp, struct gmiMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase)
+ */
+void
+revert_gmiMIB(struct gmiMIB_data *StorageTmp, struct gmiMIB_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_gmiMIB(StorageOld, NULL);
 }
 
 /**
@@ -566,21 +652,28 @@ applicationProcessTable_create(void)
 	DEBUGMSGTL(("gmiMIB", "applicationProcessTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->applicationProcessTitle = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->applicationProcessTitle = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->applicationProcessTitleLen = 2;
-		if ((StorageNew->supportEntityNames = (uint8_t *) strdup("")) != NULL)
-			StorageNew->supportEntityNamesLen = strlen("");
+		if ((StorageNew->supportEntityNames = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->supportEntityNamesLen = 0;
+		StorageNew->supportEntityNames[StorageNew->supportEntityNamesLen] = 0;
 		StorageNew->applicationProcessOpState = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	applicationProcessTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct applicationProcessTable_data *applicationProcessTable_duplicate(struct applicationProcessTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -592,6 +685,21 @@ applicationProcessTable_duplicate(struct applicationProcessTable_data *thedata)
 
 	DEBUGMSGTL(("gmiMIB", "applicationProcessTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->applicationProcessTable_id = thedata->applicationProcessTable_id;
+		if (!(StorageNew->applicationProcessId = malloc(thedata->applicationProcessIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->applicationProcessId, thedata->applicationProcessId, thedata->applicationProcessIdLen);
+		StorageNew->applicationProcessIdLen = thedata->applicationProcessIdLen;
+		StorageNew->applicationProcessId[StorageNew->applicationProcessIdLen] = 0;
+		if (!(StorageNew->applicationProcessTitle = snmp_duplicate_objid(thedata->applicationProcessTitle, thedata->applicationProcessTitleLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->applicationProcessTitleLen = thedata->applicationProcessTitleLen;
+		if (!(StorageNew->supportEntityNames = malloc(thedata->supportEntityNamesLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->supportEntityNames, thedata->supportEntityNames, thedata->supportEntityNamesLen);
+		StorageNew->supportEntityNamesLen = thedata->supportEntityNamesLen;
+		StorageNew->supportEntityNames[StorageNew->supportEntityNamesLen] = 0;
+		StorageNew->applicationProcessOpState = thedata->applicationProcessOpState;
 	}
       done:
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
@@ -691,7 +799,7 @@ applicationProcessTable_del(struct applicationProcessTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for applicationProcessTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case applicationProcessTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -785,21 +893,29 @@ communicationsEntityTable_create(void)
 	DEBUGMSGTL(("gmiMIB", "communicationsEntityTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->subsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->subsystemIdLen = strlen("");
-		if ((StorageNew->localSapNames = (uint8_t *) strdup("")) != NULL)
-			StorageNew->localSapNamesLen = strlen("");
+		if ((StorageNew->subsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->subsystemIdLen = 0;
+		StorageNew->subsystemId[StorageNew->subsystemIdLen] = 0;
+		if ((StorageNew->localSapNames = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->localSapNamesLen = 0;
+		StorageNew->localSapNames[StorageNew->localSapNamesLen] = 0;
 		StorageNew->communicationsEntityOpState = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	communicationsEntityTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct communicationsEntityTable_data *communicationsEntityTable_duplicate(struct communicationsEntityTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -811,6 +927,23 @@ communicationsEntityTable_duplicate(struct communicationsEntityTable_data *theda
 
 	DEBUGMSGTL(("gmiMIB", "communicationsEntityTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->communicationsEntityTable_id = thedata->communicationsEntityTable_id;
+		if (!(StorageNew->subsystemId = malloc(thedata->subsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->subsystemId, thedata->subsystemId, thedata->subsystemIdLen);
+		StorageNew->subsystemIdLen = thedata->subsystemIdLen;
+		StorageNew->subsystemId[StorageNew->subsystemIdLen] = 0;
+		if (!(StorageNew->communicationsEntityId = malloc(thedata->communicationsEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->communicationsEntityId, thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
+		StorageNew->communicationsEntityIdLen = thedata->communicationsEntityIdLen;
+		StorageNew->communicationsEntityId[StorageNew->communicationsEntityIdLen] = 0;
+		if (!(StorageNew->localSapNames = malloc(thedata->localSapNamesLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->localSapNames, thedata->localSapNames, thedata->localSapNamesLen);
+		StorageNew->localSapNamesLen = thedata->localSapNamesLen;
+		StorageNew->localSapNames[StorageNew->localSapNamesLen] = 0;
+		StorageNew->communicationsEntityOpState = thedata->communicationsEntityOpState;
 	}
       done:
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
@@ -912,7 +1045,7 @@ communicationsEntityTable_del(struct communicationsEntityTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for communicationsEntityTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case communicationsEntityTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1006,24 +1139,35 @@ communicationsInfoRecordTable_create(void)
 	DEBUGMSGTL(("gmiMIB", "communicationsInfoRecordTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->logId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->logIdLen = strlen("");
-		if ((StorageNew->logRecordId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->logRecordIdLen = strlen("");
-		if ((StorageNew->informationType = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->logId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->logIdLen = 0;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		if ((StorageNew->logRecordId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->logRecordIdLen = 0;
+		StorageNew->logRecordId[StorageNew->logRecordIdLen] = 0;
+		if ((StorageNew->informationType = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->informationTypeLen = 2;
-		if ((StorageNew->informationData = (uint8_t *) strdup("")) != NULL)
-			StorageNew->informationDataLen = strlen("");
-
+		if ((StorageNew->informationData = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->informationDataLen = 0;
+		StorageNew->informationData[StorageNew->informationDataLen] = 0;
 	}
+      done:
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	communicationsInfoRecordTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct communicationsInfoRecordTable_data *communicationsInfoRecordTable_duplicate(struct communicationsInfoRecordTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1035,6 +1179,25 @@ communicationsInfoRecordTable_duplicate(struct communicationsInfoRecordTable_dat
 
 	DEBUGMSGTL(("gmiMIB", "communicationsInfoRecordTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->communicationsInfoRecordTable_id = thedata->communicationsInfoRecordTable_id;
+		if (!(StorageNew->logId = malloc(thedata->logIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logId, thedata->logId, thedata->logIdLen);
+		StorageNew->logIdLen = thedata->logIdLen;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		if (!(StorageNew->logRecordId = malloc(thedata->logRecordIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logRecordId, thedata->logRecordId, thedata->logRecordIdLen);
+		StorageNew->logRecordIdLen = thedata->logRecordIdLen;
+		StorageNew->logRecordId[StorageNew->logRecordIdLen] = 0;
+		if (!(StorageNew->informationType = snmp_duplicate_objid(thedata->informationType, thedata->informationTypeLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->informationTypeLen = thedata->informationTypeLen;
+		if (!(StorageNew->informationData = malloc(thedata->informationDataLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->informationData, thedata->informationData, thedata->informationDataLen);
+		StorageNew->informationDataLen = thedata->informationDataLen;
+		StorageNew->informationData[StorageNew->informationDataLen] = 0;
 	}
       done:
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
@@ -1138,7 +1301,7 @@ communicationsInfoRecordTable_del(struct communicationsInfoRecordTable_data *the
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for communicationsInfoRecordTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case communicationsInfoRecordTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1237,23 +1400,31 @@ clProtocolMachineTable_create(void)
 	DEBUGMSGTL(("gmiMIB", "clProtocolMachineTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->subsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->subsystemIdLen = strlen("");
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->communicationsEntityIdLen = strlen("");
+		if ((StorageNew->subsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->subsystemIdLen = 0;
+		StorageNew->subsystemId[StorageNew->subsystemIdLen] = 0;
+		if ((StorageNew->communicationsEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->communicationsEntityIdLen = 0;
+		StorageNew->communicationsEntityId[StorageNew->communicationsEntityIdLen] = 0;
 		StorageNew->clProtocolMachineOpState = 0;
 		StorageNew->totalRemoteSAPs = (struct counter64) {
 		0, 0};
-
 	}
+      done:
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	clProtocolMachineTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct clProtocolMachineTable_data *clProtocolMachineTable_duplicate(struct clProtocolMachineTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1265,6 +1436,24 @@ clProtocolMachineTable_duplicate(struct clProtocolMachineTable_data *thedata)
 
 	DEBUGMSGTL(("gmiMIB", "clProtocolMachineTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->clProtocolMachineTable_id = thedata->clProtocolMachineTable_id;
+		if (!(StorageNew->subsystemId = malloc(thedata->subsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->subsystemId, thedata->subsystemId, thedata->subsystemIdLen);
+		StorageNew->subsystemIdLen = thedata->subsystemIdLen;
+		StorageNew->subsystemId[StorageNew->subsystemIdLen] = 0;
+		if (!(StorageNew->communicationsEntityId = malloc(thedata->communicationsEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->communicationsEntityId, thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
+		StorageNew->communicationsEntityIdLen = thedata->communicationsEntityIdLen;
+		StorageNew->communicationsEntityId[StorageNew->communicationsEntityIdLen] = 0;
+		if (!(StorageNew->clProtocolMachineId = malloc(thedata->clProtocolMachineIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->clProtocolMachineId, thedata->clProtocolMachineId, thedata->clProtocolMachineIdLen);
+		StorageNew->clProtocolMachineIdLen = thedata->clProtocolMachineIdLen;
+		StorageNew->clProtocolMachineId[StorageNew->clProtocolMachineIdLen] = 0;
+		StorageNew->clProtocolMachineOpState = thedata->clProtocolMachineOpState;
+		StorageNew->totalRemoteSAPs = thedata->totalRemoteSAPs;
 	}
       done:
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
@@ -1368,7 +1557,7 @@ clProtocolMachineTable_del(struct clProtocolMachineTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for clProtocolMachineTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case clProtocolMachineTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1464,21 +1653,29 @@ coProtocolMachineTable_create(void)
 	DEBUGMSGTL(("gmiMIB", "coProtocolMachineTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->subsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->subsystemIdLen = strlen("");
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->communicationsEntityIdLen = strlen("");
+		if ((StorageNew->subsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->subsystemIdLen = 0;
+		StorageNew->subsystemId[StorageNew->subsystemIdLen] = 0;
+		if ((StorageNew->communicationsEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->communicationsEntityIdLen = 0;
+		StorageNew->communicationsEntityId[StorageNew->communicationsEntityIdLen] = 0;
 		StorageNew->coProtocolMachineOpState = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	coProtocolMachineTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct coProtocolMachineTable_data *coProtocolMachineTable_duplicate(struct coProtocolMachineTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1490,6 +1687,23 @@ coProtocolMachineTable_duplicate(struct coProtocolMachineTable_data *thedata)
 
 	DEBUGMSGTL(("gmiMIB", "coProtocolMachineTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->coProtocolMachineTable_id = thedata->coProtocolMachineTable_id;
+		if (!(StorageNew->subsystemId = malloc(thedata->subsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->subsystemId, thedata->subsystemId, thedata->subsystemIdLen);
+		StorageNew->subsystemIdLen = thedata->subsystemIdLen;
+		StorageNew->subsystemId[StorageNew->subsystemIdLen] = 0;
+		if (!(StorageNew->communicationsEntityId = malloc(thedata->communicationsEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->communicationsEntityId, thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
+		StorageNew->communicationsEntityIdLen = thedata->communicationsEntityIdLen;
+		StorageNew->communicationsEntityId[StorageNew->communicationsEntityIdLen] = 0;
+		if (!(StorageNew->coProtocolMachineId = malloc(thedata->coProtocolMachineIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->coProtocolMachineId, thedata->coProtocolMachineId, thedata->coProtocolMachineIdLen);
+		StorageNew->coProtocolMachineIdLen = thedata->coProtocolMachineIdLen;
+		StorageNew->coProtocolMachineId[StorageNew->coProtocolMachineIdLen] = 0;
+		StorageNew->coProtocolMachineOpState = thedata->coProtocolMachineOpState;
 	}
       done:
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
@@ -1593,7 +1807,7 @@ coProtocolMachineTable_del(struct coProtocolMachineTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for coProtocolMachineTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case coProtocolMachineTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1687,23 +1901,33 @@ sap1Table_create(void)
 	DEBUGMSGTL(("gmiMIB", "sap1Table_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->subsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->subsystemIdLen = strlen("");
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->communicationsEntityIdLen = strlen("");
+		if ((StorageNew->subsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->subsystemIdLen = 0;
+		StorageNew->subsystemId[StorageNew->subsystemIdLen] = 0;
+		if ((StorageNew->communicationsEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->communicationsEntityIdLen = 0;
+		StorageNew->communicationsEntityId[StorageNew->communicationsEntityIdLen] = 0;
 		StorageNew->sap1Address = 0;
-		if ((StorageNew->sap1UserEntityNames = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sap1UserEntityNamesLen = strlen("");
-
+		if ((StorageNew->sap1UserEntityNames = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sap1UserEntityNamesLen = 0;
+		StorageNew->sap1UserEntityNames[StorageNew->sap1UserEntityNamesLen] = 0;
 	}
+      done:
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	sap1Table_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct sap1Table_data *sap1Table_duplicate(struct sap1Table_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1715,6 +1939,28 @@ sap1Table_duplicate(struct sap1Table_data *thedata)
 
 	DEBUGMSGTL(("gmiMIB", "sap1Table_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->sap1Table_id = thedata->sap1Table_id;
+		if (!(StorageNew->subsystemId = malloc(thedata->subsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->subsystemId, thedata->subsystemId, thedata->subsystemIdLen);
+		StorageNew->subsystemIdLen = thedata->subsystemIdLen;
+		StorageNew->subsystemId[StorageNew->subsystemIdLen] = 0;
+		if (!(StorageNew->communicationsEntityId = malloc(thedata->communicationsEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->communicationsEntityId, thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
+		StorageNew->communicationsEntityIdLen = thedata->communicationsEntityIdLen;
+		StorageNew->communicationsEntityId[StorageNew->communicationsEntityIdLen] = 0;
+		if (!(StorageNew->sap1Id = malloc(thedata->sap1IdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sap1Id, thedata->sap1Id, thedata->sap1IdLen);
+		StorageNew->sap1IdLen = thedata->sap1IdLen;
+		StorageNew->sap1Id[StorageNew->sap1IdLen] = 0;
+		StorageNew->sap1Address = thedata->sap1Address;
+		if (!(StorageNew->sap1UserEntityNames = malloc(thedata->sap1UserEntityNamesLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sap1UserEntityNames, thedata->sap1UserEntityNames, thedata->sap1UserEntityNamesLen);
+		StorageNew->sap1UserEntityNamesLen = thedata->sap1UserEntityNamesLen;
+		StorageNew->sap1UserEntityNames[StorageNew->sap1UserEntityNamesLen] = 0;
 	}
       done:
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
@@ -1820,7 +2066,7 @@ sap1Table_del(struct sap1Table_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for sap1Table entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case sap1Table).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1921,24 +2167,36 @@ sap2Table_create(void)
 	DEBUGMSGTL(("gmiMIB", "sap2Table_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->subsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->subsystemIdLen = strlen("");
-		if ((StorageNew->sap2Address = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sap2AddressLen = strlen("");
-		if ((StorageNew->sap2UserEntityNames = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sap2UserEntityNamesLen = strlen("");
-		if ((StorageNew->sap2providerEntityNames = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sap2providerEntityNamesLen = strlen("");
-
+		if ((StorageNew->subsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->subsystemIdLen = 0;
+		StorageNew->subsystemId[StorageNew->subsystemIdLen] = 0;
+		if ((StorageNew->sap2Address = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sap2AddressLen = 0;
+		StorageNew->sap2Address[StorageNew->sap2AddressLen] = 0;
+		if ((StorageNew->sap2UserEntityNames = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sap2UserEntityNamesLen = 0;
+		StorageNew->sap2UserEntityNames[StorageNew->sap2UserEntityNamesLen] = 0;
+		if ((StorageNew->sap2providerEntityNames = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sap2providerEntityNamesLen = 0;
+		StorageNew->sap2providerEntityNames[StorageNew->sap2providerEntityNamesLen] = 0;
 	}
+      done:
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	sap2Table_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct sap2Table_data *sap2Table_duplicate(struct sap2Table_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1950,6 +2208,32 @@ sap2Table_duplicate(struct sap2Table_data *thedata)
 
 	DEBUGMSGTL(("gmiMIB", "sap2Table_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->sap2Table_id = thedata->sap2Table_id;
+		if (!(StorageNew->subsystemId = malloc(thedata->subsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->subsystemId, thedata->subsystemId, thedata->subsystemIdLen);
+		StorageNew->subsystemIdLen = thedata->subsystemIdLen;
+		StorageNew->subsystemId[StorageNew->subsystemIdLen] = 0;
+		if (!(StorageNew->sap2Id = malloc(thedata->sap2IdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sap2Id, thedata->sap2Id, thedata->sap2IdLen);
+		StorageNew->sap2IdLen = thedata->sap2IdLen;
+		StorageNew->sap2Id[StorageNew->sap2IdLen] = 0;
+		if (!(StorageNew->sap2Address = malloc(thedata->sap2AddressLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sap2Address, thedata->sap2Address, thedata->sap2AddressLen);
+		StorageNew->sap2AddressLen = thedata->sap2AddressLen;
+		StorageNew->sap2Address[StorageNew->sap2AddressLen] = 0;
+		if (!(StorageNew->sap2UserEntityNames = malloc(thedata->sap2UserEntityNamesLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sap2UserEntityNames, thedata->sap2UserEntityNames, thedata->sap2UserEntityNamesLen);
+		StorageNew->sap2UserEntityNamesLen = thedata->sap2UserEntityNamesLen;
+		StorageNew->sap2UserEntityNames[StorageNew->sap2UserEntityNamesLen] = 0;
+		if (!(StorageNew->sap2providerEntityNames = malloc(thedata->sap2providerEntityNamesLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sap2providerEntityNames, thedata->sap2providerEntityNames, thedata->sap2providerEntityNamesLen);
+		StorageNew->sap2providerEntityNamesLen = thedata->sap2providerEntityNamesLen;
+		StorageNew->sap2providerEntityNames[StorageNew->sap2providerEntityNamesLen] = 0;
 	}
       done:
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
@@ -2053,7 +2337,7 @@ sap2Table_del(struct sap2Table_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for sap2Table entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case sap2Table).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2159,26 +2443,40 @@ singlePeerConnectionTable_create(void)
 	DEBUGMSGTL(("gmiMIB", "singlePeerConnectionTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->subsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->subsystemIdLen = strlen("");
-		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->communicationsEntityIdLen = strlen("");
-		if ((StorageNew->coProtocolMachineId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->coProtocolMachineIdLen = strlen("");
-		if ((StorageNew->underlyingConnectionNames = (uint8_t *) strdup("")) != NULL)
-			StorageNew->underlyingConnectionNamesLen = strlen("");
-		if ((StorageNew->supportedConnectionNames = (uint8_t *) strdup("")) != NULL)
-			StorageNew->supportedConnectionNamesLen = strlen("");
-
+		if ((StorageNew->subsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->subsystemIdLen = 0;
+		StorageNew->subsystemId[StorageNew->subsystemIdLen] = 0;
+		if ((StorageNew->communicationsEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->communicationsEntityIdLen = 0;
+		StorageNew->communicationsEntityId[StorageNew->communicationsEntityIdLen] = 0;
+		if ((StorageNew->coProtocolMachineId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->coProtocolMachineIdLen = 0;
+		StorageNew->coProtocolMachineId[StorageNew->coProtocolMachineIdLen] = 0;
+		if ((StorageNew->underlyingConnectionNames = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->underlyingConnectionNamesLen = 0;
+		StorageNew->underlyingConnectionNames[StorageNew->underlyingConnectionNamesLen] = 0;
+		if ((StorageNew->supportedConnectionNames = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->supportedConnectionNamesLen = 0;
+		StorageNew->supportedConnectionNames[StorageNew->supportedConnectionNamesLen] = 0;
 	}
+      done:
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	singlePeerConnectionTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct singlePeerConnectionTable_data *singlePeerConnectionTable_duplicate(struct singlePeerConnectionTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2190,6 +2488,37 @@ singlePeerConnectionTable_duplicate(struct singlePeerConnectionTable_data *theda
 
 	DEBUGMSGTL(("gmiMIB", "singlePeerConnectionTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->singlePeerConnectionTable_id = thedata->singlePeerConnectionTable_id;
+		if (!(StorageNew->subsystemId = malloc(thedata->subsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->subsystemId, thedata->subsystemId, thedata->subsystemIdLen);
+		StorageNew->subsystemIdLen = thedata->subsystemIdLen;
+		StorageNew->subsystemId[StorageNew->subsystemIdLen] = 0;
+		if (!(StorageNew->communicationsEntityId = malloc(thedata->communicationsEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->communicationsEntityId, thedata->communicationsEntityId, thedata->communicationsEntityIdLen);
+		StorageNew->communicationsEntityIdLen = thedata->communicationsEntityIdLen;
+		StorageNew->communicationsEntityId[StorageNew->communicationsEntityIdLen] = 0;
+		if (!(StorageNew->coProtocolMachineId = malloc(thedata->coProtocolMachineIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->coProtocolMachineId, thedata->coProtocolMachineId, thedata->coProtocolMachineIdLen);
+		StorageNew->coProtocolMachineIdLen = thedata->coProtocolMachineIdLen;
+		StorageNew->coProtocolMachineId[StorageNew->coProtocolMachineIdLen] = 0;
+		if (!(StorageNew->connectionId = malloc(thedata->connectionIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->connectionId, thedata->connectionId, thedata->connectionIdLen);
+		StorageNew->connectionIdLen = thedata->connectionIdLen;
+		StorageNew->connectionId[StorageNew->connectionIdLen] = 0;
+		if (!(StorageNew->underlyingConnectionNames = malloc(thedata->underlyingConnectionNamesLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->underlyingConnectionNames, thedata->underlyingConnectionNames, thedata->underlyingConnectionNamesLen);
+		StorageNew->underlyingConnectionNamesLen = thedata->underlyingConnectionNamesLen;
+		StorageNew->underlyingConnectionNames[StorageNew->underlyingConnectionNamesLen] = 0;
+		if (!(StorageNew->supportedConnectionNames = malloc(thedata->supportedConnectionNamesLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->supportedConnectionNames, thedata->supportedConnectionNames, thedata->supportedConnectionNamesLen);
+		StorageNew->supportedConnectionNamesLen = thedata->supportedConnectionNamesLen;
+		StorageNew->supportedConnectionNames[StorageNew->supportedConnectionNamesLen] = 0;
 	}
       done:
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
@@ -2301,7 +2630,7 @@ singlePeerConnectionTable_del(struct singlePeerConnectionTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for singlePeerConnectionTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case singlePeerConnectionTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2414,16 +2743,20 @@ subsystemTable_create(void)
 	DEBUGMSGTL(("gmiMIB", "subsystemTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-
 	}
+      done:
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	subsystemTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct subsystemTable_data *subsystemTable_duplicate(struct subsystemTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2435,6 +2768,12 @@ subsystemTable_duplicate(struct subsystemTable_data *thedata)
 
 	DEBUGMSGTL(("gmiMIB", "subsystemTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->subsystemTable_id = thedata->subsystemTable_id;
+		if (!(StorageNew->subsystemId = malloc(thedata->subsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->subsystemId, thedata->subsystemId, thedata->subsystemIdLen);
+		StorageNew->subsystemIdLen = thedata->subsystemIdLen;
+		StorageNew->subsystemId[StorageNew->subsystemIdLen] = 0;
 	}
       done:
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
@@ -2530,7 +2869,7 @@ subsystemTable_del(struct subsystemTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for subsystemTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case subsystemTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2590,6 +2929,64 @@ store_subsystemTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	}
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int check_applicationProcessTable_row(struct applicationProcessTable_data *StorageTmp, struct applicationProcessTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_applicationProcessTable_row(struct applicationProcessTable_data *StorageTmp, struct applicationProcessTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_applicationProcessTable_row(struct applicationProcessTable_data *StorageTmp, struct applicationProcessTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_applicationProcessTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_applicationProcessTable_row(struct applicationProcessTable_data *StorageTmp, struct applicationProcessTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	applicationProcessTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_applicationProcessTable_row(struct applicationProcessTable_data *StorageTmp, struct applicationProcessTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_applicationProcessTable_row(struct applicationProcessTable_data *StorageTmp, struct applicationProcessTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_applicationProcessTable_row(StorageOld, NULL);
 }
 
 /**
@@ -2682,6 +3079,64 @@ var_applicationProcessTable(struct variable *vp, oid * name, size_t *length, int
 }
 
 /**
+ * @fn int check_communicationsEntityTable_row(struct communicationsEntityTable_data *StorageTmp, struct communicationsEntityTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_communicationsEntityTable_row(struct communicationsEntityTable_data *StorageTmp, struct communicationsEntityTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_communicationsEntityTable_row(struct communicationsEntityTable_data *StorageTmp, struct communicationsEntityTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_communicationsEntityTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_communicationsEntityTable_row(struct communicationsEntityTable_data *StorageTmp, struct communicationsEntityTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	communicationsEntityTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_communicationsEntityTable_row(struct communicationsEntityTable_data *StorageTmp, struct communicationsEntityTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_communicationsEntityTable_row(struct communicationsEntityTable_data *StorageTmp, struct communicationsEntityTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_communicationsEntityTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_communicationsEntityTable_row(struct communicationsEntityTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -2762,6 +3217,64 @@ var_communicationsEntityTable(struct variable *vp, oid * name, size_t *length, i
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_communicationsInfoRecordTable_row(struct communicationsInfoRecordTable_data *StorageTmp, struct communicationsInfoRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_communicationsInfoRecordTable_row(struct communicationsInfoRecordTable_data *StorageTmp, struct communicationsInfoRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_communicationsInfoRecordTable_row(struct communicationsInfoRecordTable_data *StorageTmp, struct communicationsInfoRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_communicationsInfoRecordTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_communicationsInfoRecordTable_row(struct communicationsInfoRecordTable_data *StorageTmp, struct communicationsInfoRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	communicationsInfoRecordTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_communicationsInfoRecordTable_row(struct communicationsInfoRecordTable_data *StorageTmp, struct communicationsInfoRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_communicationsInfoRecordTable_row(struct communicationsInfoRecordTable_data *StorageTmp, struct communicationsInfoRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_communicationsInfoRecordTable_row(StorageOld, NULL);
 }
 
 /**
@@ -2848,6 +3361,64 @@ var_communicationsInfoRecordTable(struct variable *vp, oid * name, size_t *lengt
 }
 
 /**
+ * @fn int check_clProtocolMachineTable_row(struct clProtocolMachineTable_data *StorageTmp, struct clProtocolMachineTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_clProtocolMachineTable_row(struct clProtocolMachineTable_data *StorageTmp, struct clProtocolMachineTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_clProtocolMachineTable_row(struct clProtocolMachineTable_data *StorageTmp, struct clProtocolMachineTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_clProtocolMachineTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_clProtocolMachineTable_row(struct clProtocolMachineTable_data *StorageTmp, struct clProtocolMachineTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	clProtocolMachineTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_clProtocolMachineTable_row(struct clProtocolMachineTable_data *StorageTmp, struct clProtocolMachineTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_clProtocolMachineTable_row(struct clProtocolMachineTable_data *StorageTmp, struct clProtocolMachineTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_clProtocolMachineTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_clProtocolMachineTable_row(struct clProtocolMachineTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -2931,6 +3502,64 @@ var_clProtocolMachineTable(struct variable *vp, oid * name, size_t *length, int 
 }
 
 /**
+ * @fn int check_coProtocolMachineTable_row(struct coProtocolMachineTable_data *StorageTmp, struct coProtocolMachineTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_coProtocolMachineTable_row(struct coProtocolMachineTable_data *StorageTmp, struct coProtocolMachineTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_coProtocolMachineTable_row(struct coProtocolMachineTable_data *StorageTmp, struct coProtocolMachineTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_coProtocolMachineTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_coProtocolMachineTable_row(struct coProtocolMachineTable_data *StorageTmp, struct coProtocolMachineTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	coProtocolMachineTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_coProtocolMachineTable_row(struct coProtocolMachineTable_data *StorageTmp, struct coProtocolMachineTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_coProtocolMachineTable_row(struct coProtocolMachineTable_data *StorageTmp, struct coProtocolMachineTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_coProtocolMachineTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_coProtocolMachineTable_row(struct coProtocolMachineTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -3005,6 +3634,64 @@ var_coProtocolMachineTable(struct variable *vp, oid * name, size_t *length, int 
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_sap1Table_row(struct sap1Table_data *StorageTmp, struct sap1Table_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_sap1Table_row(struct sap1Table_data *StorageTmp, struct sap1Table_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_sap1Table_row(struct sap1Table_data *StorageTmp, struct sap1Table_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_sap1Table_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_sap1Table_row(struct sap1Table_data *StorageTmp, struct sap1Table_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	sap1Table_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_sap1Table_row(struct sap1Table_data *StorageTmp, struct sap1Table_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_sap1Table_row(struct sap1Table_data *StorageTmp, struct sap1Table_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_sap1Table_row(StorageOld, NULL);
 }
 
 /**
@@ -3088,6 +3775,64 @@ var_sap1Table(struct variable *vp, oid * name, size_t *length, int exact, size_t
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_sap2Table_row(struct sap2Table_data *StorageTmp, struct sap2Table_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_sap2Table_row(struct sap2Table_data *StorageTmp, struct sap2Table_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_sap2Table_row(struct sap2Table_data *StorageTmp, struct sap2Table_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_sap2Table_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_sap2Table_row(struct sap2Table_data *StorageTmp, struct sap2Table_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	sap2Table_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_sap2Table_row(struct sap2Table_data *StorageTmp, struct sap2Table_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_sap2Table_row(struct sap2Table_data *StorageTmp, struct sap2Table_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_sap2Table_row(StorageOld, NULL);
 }
 
 /**
@@ -3180,6 +3925,64 @@ var_sap2Table(struct variable *vp, oid * name, size_t *length, int exact, size_t
 }
 
 /**
+ * @fn int check_singlePeerConnectionTable_row(struct singlePeerConnectionTable_data *StorageTmp, struct singlePeerConnectionTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_singlePeerConnectionTable_row(struct singlePeerConnectionTable_data *StorageTmp, struct singlePeerConnectionTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_singlePeerConnectionTable_row(struct singlePeerConnectionTable_data *StorageTmp, struct singlePeerConnectionTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_singlePeerConnectionTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_singlePeerConnectionTable_row(struct singlePeerConnectionTable_data *StorageTmp, struct singlePeerConnectionTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	singlePeerConnectionTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_singlePeerConnectionTable_row(struct singlePeerConnectionTable_data *StorageTmp, struct singlePeerConnectionTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_singlePeerConnectionTable_row(struct singlePeerConnectionTable_data *StorageTmp, struct singlePeerConnectionTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_singlePeerConnectionTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_singlePeerConnectionTable_row(struct singlePeerConnectionTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -3263,6 +4066,64 @@ var_singlePeerConnectionTable(struct variable *vp, oid * name, size_t *length, i
 }
 
 /**
+ * @fn int check_subsystemTable_row(struct subsystemTable_data *StorageTmp, struct subsystemTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_subsystemTable_row(struct subsystemTable_data *StorageTmp, struct subsystemTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_subsystemTable_row(struct subsystemTable_data *StorageTmp, struct subsystemTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_subsystemTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_subsystemTable_row(struct subsystemTable_data *StorageTmp, struct subsystemTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	subsystemTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_subsystemTable_row(struct subsystemTable_data *StorageTmp, struct subsystemTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_subsystemTable_row(struct subsystemTable_data *StorageTmp, struct subsystemTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_subsystemTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_subsystemTable_row(struct subsystemTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -3331,168 +4192,6 @@ var_subsystemTable(struct variable *vp, oid * name, size_t *length, int exact, s
 		ERROR_MSG("");
 	}
 	return (rval);
-}
-
-/**
- * @fn int applicationProcessTable_consistent(struct applicationProcessTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the applicationProcessTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-applicationProcessTable_consistent(struct applicationProcessTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int communicationsEntityTable_consistent(struct communicationsEntityTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the communicationsEntityTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-communicationsEntityTable_consistent(struct communicationsEntityTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int communicationsInfoRecordTable_consistent(struct communicationsInfoRecordTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the communicationsInfoRecordTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-communicationsInfoRecordTable_consistent(struct communicationsInfoRecordTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int clProtocolMachineTable_consistent(struct clProtocolMachineTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the clProtocolMachineTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-clProtocolMachineTable_consistent(struct clProtocolMachineTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int coProtocolMachineTable_consistent(struct coProtocolMachineTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the coProtocolMachineTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-coProtocolMachineTable_consistent(struct coProtocolMachineTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int sap1Table_consistent(struct sap1Table_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the sap1Table table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-sap1Table_consistent(struct sap1Table_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int sap2Table_consistent(struct sap2Table_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the sap2Table table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-sap2Table_consistent(struct sap2Table_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int singlePeerConnectionTable_consistent(struct singlePeerConnectionTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the singlePeerConnectionTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-singlePeerConnectionTable_consistent(struct singlePeerConnectionTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int subsystemTable_consistent(struct subsystemTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the subsystemTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-subsystemTable_consistent(struct subsystemTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
 }
 
 void

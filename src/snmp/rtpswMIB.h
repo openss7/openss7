@@ -63,11 +63,20 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct rtpswMIB_data {
+	struct rtpswMIB_data *rtpswMIB_old;
+	uint rtpswMIB_rsvs;
+	uint rtpswMIB_tsts;
+	uint rtpswMIB_sets;
 	uint rtpswMIB_request;
 };
 struct rtpswInterfaceTable_data {
+	struct rtpswInterfaceTable_data *rtpswInterfaceTable_old;
+	uint rtpswInterfaceTable_rsvs;
+	uint rtpswInterfaceTable_tsts;
+	uint rtpswInterfaceTable_sets;
 	uint rtpswInterfaceTable_request;
 	uint rtpswInterfaceTable_refs;
+	uint rtpswInterfaceTable_id;
 	ulong rtpswInterfaceId;		/* NoAccess */
 	ulong rtpswInterfaceIndex;	/* Create */
 	uint8_t *rtpswInterfaceName;	/* Create */
@@ -81,8 +90,13 @@ struct rtpswInterfaceTable_data {
 	long rtpswInterfaceRowStatus;	/* Create */
 };
 struct rtpswIfAddrTable_data {
+	struct rtpswIfAddrTable_data *rtpswIfAddrTable_old;
+	uint rtpswIfAddrTable_rsvs;
+	uint rtpswIfAddrTable_tsts;
+	uint rtpswIfAddrTable_sets;
 	uint rtpswIfAddrTable_request;
 	uint rtpswIfAddrTable_refs;
+	uint rtpswIfAddrTable_id;
 	ulong rtpswIfAddrId;		/* NoAccess */
 	ulong rtpswIfIndex;		/* ReadOnly */
 	uint8_t *rtpswIfName;		/* ReadOnly */
@@ -99,8 +113,13 @@ struct rtpswIfAddrTable_data {
 	long rtpswIfAddrRowStatus;	/* Create */
 };
 struct rtpswTermPointTable_data {
+	struct rtpswTermPointTable_data *rtpswTermPointTable_old;
+	uint rtpswTermPointTable_rsvs;
+	uint rtpswTermPointTable_tsts;
+	uint rtpswTermPointTable_sets;
 	uint rtpswTermPointTable_request;
 	uint rtpswTermPointTable_refs;
+	uint rtpswTermPointTable_id;
 	ulong rtpswTermPointId;		/* NoAccess */
 	long rtpswTermPointState;	/* ReadOnly */
 	long rtpswTermPointType;	/* ReadOnly */
@@ -114,16 +133,26 @@ struct rtpswTermPointTable_data {
 	size_t rtpswTermPointProcStatusLen;
 };
 struct rtpswTermPointRevTable_data {
+	struct rtpswTermPointRevTable_data *rtpswTermPointRevTable_old;
+	uint rtpswTermPointRevTable_rsvs;
+	uint rtpswTermPointRevTable_tsts;
+	uint rtpswTermPointRevTable_sets;
 	uint rtpswTermPointRevTable_request;
 	uint rtpswTermPointRevTable_refs;
+	uint rtpswTermPointRevTable_id;
 	long rtpswTermPointRevType;	/* NoAccess */
 	uint8_t *rtpswTermPointRevAddr;	/* NoAccess */
 	size_t rtpswTermPointRevAddrLen;
 	ulong rtpswTermPointTableIndex;	/* ReadOnly */
 };
 struct rtpswForwTable_data {
+	struct rtpswForwTable_data *rtpswForwTable_old;
+	uint rtpswForwTable_rsvs;
+	uint rtpswForwTable_tsts;
+	uint rtpswForwTable_sets;
 	uint rtpswForwTable_request;
 	uint rtpswForwTable_refs;
+	uint rtpswForwTable_id;
 	ulong rtpswForwId;		/* NoAccess */
 	long rtpswForwTpType;		/* ReadOnly */
 	uint8_t *rtpswForwTpCalling;	/* ReadOnly */
@@ -134,15 +163,25 @@ struct rtpswForwTable_data {
 	size_t rtpswForwStateLen;
 };
 struct rtpswForwRevTable_data {
+	struct rtpswForwRevTable_data *rtpswForwRevTable_old;
+	uint rtpswForwRevTable_rsvs;
+	uint rtpswForwRevTable_tsts;
+	uint rtpswForwRevTable_sets;
 	uint rtpswForwRevTable_request;
 	uint rtpswForwRevTable_refs;
+	uint rtpswForwRevTable_id;
 	ulong rtpswTermPointId;		/* NoAccess */
 	ulong rtpswTermPointId;		/* NoAccess */
 	ulong rtpswForwTableIndex;	/* ReadOnly */
 };
 struct rtpswCallTable_data {
+	struct rtpswCallTable_data *rtpswCallTable_old;
+	uint rtpswCallTable_rsvs;
+	uint rtpswCallTable_tsts;
+	uint rtpswCallTable_sets;
 	uint rtpswCallTable_request;
 	uint rtpswCallTable_refs;
+	uint rtpswCallTable_id;
 	ulong rtpswCallId;		/* NoAccess */
 	long rtpswCallTpCallingType;	/* ReadOnly */
 	uint8_t *rtpswCallTpRemoteCalling;	/* ReadOnly */
@@ -336,6 +375,10 @@ void init_rtpswMIB(void);
 void deinit_rtpswMIB(void);
 int term_rtpswMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_rtpswMIB;
+struct rtpswMIB_data *rtpswMIB_create(void);
+struct rtpswMIB_data *rtpswMIB_duplicate(struct rtpswMIB_data *);
+int rtpswMIB_destroy(struct rtpswMIB_data **);
+int rtpswMIB_add(struct rtpswMIB_data *);
 void parse_rtpswMIB(const char *, char *);
 SNMPCallback store_rtpswMIB;
 void refresh_rtpswMIB(int);

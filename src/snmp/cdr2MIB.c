@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/snmp/cdr2MIB.c
+ @(#) src/snmp/cdr2MIB.c
 
  -----------------------------------------------------------------------------
 
@@ -809,8 +809,38 @@ cdr2MIB_create(void)
 		/* XXX: fill in default scalar values here into StorageNew */
 
 	}
+      done:
 	DEBUGMSGTL(("cdr2MIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	cdr2MIB_destroy(&StorageNew);
+	goto done;
+}
+
+/**
+ * @fn struct cdr2MIB_data *cdr2MIB_duplicate(struct cdr2MIB_data *thedata)
+ * @param thedata the mib structure to duplicate
+ * @brief duplicate a mib structure for the mib
+ *
+ * Duplicates the specified mib structure @param thedata and returns a pointer to the newly
+ * allocated mib structure on success, or NULL on failure.
+ */
+struct cdr2MIB_data *
+cdr2MIB_duplicate(struct cdr2MIB_data *thedata)
+{
+	struct cdr2MIB_data *StorageNew = SNMP_MALLOC_STRUCT(cdr2MIB_data);
+
+	DEBUGMSGTL(("cdr2MIB", "cdr2MIB_duplicate: duplicating mib... "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("cdr2MIB", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	cdr2MIB_destroy(&StorageNew);
+	goto done;
 }
 
 /**
@@ -861,7 +891,7 @@ cdr2MIB_add(struct cdr2MIB_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for cdr2MIB entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case cdr2MIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -913,6 +943,62 @@ store_cdr2MIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	}
 	DEBUGMSGTL(("cdr2MIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int check_cdr2MIB(struct cdr2MIB_data *StorageTmp, struct cdr2MIB_data *StorageOld)
+ * @param StorageTmp the data as updated
+ * @param StorageOld the data previous to update
+ *
+ * This function is used by mibs.  It is used to check, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the ACTION phase.  The COMMIT phase does not ensue unless this check passes.  This function can
+ * return SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before
+ * the varbinds on the mib were applied; the values in StorageTmp are the new values.  The function
+ * is permitted to change the values in StorageTmp to correct them; however, preferences should be
+ * made for setting values that were not in the varbinds.
+ */
+int
+check_cdr2MIB(struct cdr2MIB_data *StorageTmp, struct cdr2MIB_data *StorageOld)
+{
+	/* XXX: provide code to check the scalars for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_cdr2MIB(struct cdr2MIB_data *StorageTmp, struct cdr2MIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase)
+ *
+ * This function is used by mibs.  It is used to update, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the COMMIT phase.  The start of the ACTION phase performs a consistency check on the mib before
+ * allowing the request to proceed to the COMMIT phase.  The COMMIT phase then arrives here with
+ * consistency already checked (see check_cdr2MIB()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied: the values in StorageTmp are the new values.
+ */
+int
+update_cdr2MIB(struct cdr2MIB_data *StorageTmp, struct cdr2MIB_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	cdr2MIB_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn revert_cdr2MIB(struct 
+ * @fn void revert_cdr2MIB(struct cdr2MIB_data *StorageTmp, struct cdr2MIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase)
+ */
+void
+revert_cdr2MIB(struct cdr2MIB_data *StorageTmp, struct cdr2MIB_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_cdr2MIB(StorageOld, NULL);
 }
 
 /**
@@ -1008,16 +1094,20 @@ callDetailDataTable_create(void)
 	DEBUGMSGTL(("cdr2MIB", "callDetailDataTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-
 	}
+      done:
 	DEBUGMSGTL(("cdr2MIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	callDetailDataTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct callDetailDataTable_data *callDetailDataTable_duplicate(struct callDetailDataTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1029,6 +1119,12 @@ callDetailDataTable_duplicate(struct callDetailDataTable_data *thedata)
 
 	DEBUGMSGTL(("cdr2MIB", "callDetailDataTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->callDetailDataTable_id = thedata->callDetailDataTable_id;
+		if (!(StorageNew->callDetailDataId = malloc(thedata->callDetailDataIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->callDetailDataId, thedata->callDetailDataId, thedata->callDetailDataIdLen);
+		StorageNew->callDetailDataIdLen = thedata->callDetailDataIdLen;
+		StorageNew->callDetailDataId[StorageNew->callDetailDataIdLen] = 0;
 	}
       done:
 	DEBUGMSGTL(("cdr2MIB", "done.\n"));
@@ -1124,7 +1220,7 @@ callDetailDataTable_del(struct callDetailDataTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for callDetailDataTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case callDetailDataTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1202,21 +1298,29 @@ simpleUsageMeteringControlTable_create(void)
 	DEBUGMSGTL(("cdr2MIB", "simpleUsageMeteringControlTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->controlObjectId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->controlObjectIdLen = strlen("");
-		if (memdup((u_char **) &StorageNew->creationTriggerList, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if ((StorageNew->controlObjectId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->controlObjectIdLen = 0;
+		StorageNew->controlObjectId[StorageNew->controlObjectIdLen] = 0;
+		if (memdup((u_char **) &StorageNew->creationTriggerList, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->creationTriggerListLen = 1;
 		StorageNew->simpleUsageMeteringControlEntryStatus = 0;
 		StorageNew->simpleUsageMeteringControlEntryStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("cdr2MIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	simpleUsageMeteringControlTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct simpleUsageMeteringControlTable_data *simpleUsageMeteringControlTable_duplicate(struct simpleUsageMeteringControlTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1228,6 +1332,18 @@ simpleUsageMeteringControlTable_duplicate(struct simpleUsageMeteringControlTable
 
 	DEBUGMSGTL(("cdr2MIB", "simpleUsageMeteringControlTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->simpleUsageMeteringControlTable_id = thedata->simpleUsageMeteringControlTable_id;
+		if (!(StorageNew->controlObjectId = malloc(thedata->controlObjectIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->controlObjectId, thedata->controlObjectId, thedata->controlObjectIdLen);
+		StorageNew->controlObjectIdLen = thedata->controlObjectIdLen;
+		StorageNew->controlObjectId[StorageNew->controlObjectIdLen] = 0;
+		if (!(StorageNew->creationTriggerList = malloc(thedata->creationTriggerListLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->creationTriggerList, thedata->creationTriggerList, thedata->creationTriggerListLen);
+		StorageNew->creationTriggerListLen = thedata->creationTriggerListLen;
+		StorageNew->creationTriggerList[StorageNew->creationTriggerListLen] = 0;
+		StorageNew->simpleUsageMeteringControlEntryStatus = thedata->simpleUsageMeteringControlEntryStatus;
 	}
       done:
 	DEBUGMSGTL(("cdr2MIB", "done.\n"));
@@ -1325,7 +1441,7 @@ simpleUsageMeteringControlTable_del(struct simpleUsageMeteringControlTable_data 
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for simpleUsageMeteringControlTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case simpleUsageMeteringControlTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1412,22 +1528,30 @@ configurableSimpleUsageMeteringControlTable_create(void)
 	DEBUGMSGTL(("cdr2MIB", "configurableSimpleUsageMeteringControlTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->controlObjectId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->controlObjectIdLen = strlen("");
+		if ((StorageNew->controlObjectId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->controlObjectIdLen = 0;
+		StorageNew->controlObjectId[StorageNew->controlObjectIdLen] = 0;
 		StorageNew->samplingRate = 0;
-		if (memdup((u_char **) &StorageNew->configurationMask, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->configurationMask, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->configurationMaskLen = 2;
 		StorageNew->configurationRowStatus = 0;
 		StorageNew->configurationRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("cdr2MIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	configurableSimpleUsageMeteringControlTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct configurableSimpleUsageMeteringControlTable_data *configurableSimpleUsageMeteringControlTable_duplicate(struct configurableSimpleUsageMeteringControlTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1439,6 +1563,19 @@ configurableSimpleUsageMeteringControlTable_duplicate(struct configurableSimpleU
 
 	DEBUGMSGTL(("cdr2MIB", "configurableSimpleUsageMeteringControlTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->configurableSimpleUsageMeteringControlTable_id = thedata->configurableSimpleUsageMeteringControlTable_id;
+		if (!(StorageNew->controlObjectId = malloc(thedata->controlObjectIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->controlObjectId, thedata->controlObjectId, thedata->controlObjectIdLen);
+		StorageNew->controlObjectIdLen = thedata->controlObjectIdLen;
+		StorageNew->controlObjectId[StorageNew->controlObjectIdLen] = 0;
+		StorageNew->samplingRate = thedata->samplingRate;
+		if (!(StorageNew->configurationMask = malloc(thedata->configurationMaskLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->configurationMask, thedata->configurationMask, thedata->configurationMaskLen);
+		StorageNew->configurationMaskLen = thedata->configurationMaskLen;
+		StorageNew->configurationMask[StorageNew->configurationMaskLen] = 0;
+		StorageNew->configurationRowStatus = thedata->configurationRowStatus;
 	}
       done:
 	DEBUGMSGTL(("cdr2MIB", "done.\n"));
@@ -1536,7 +1673,7 @@ configurableSimpleUsageMeteringControlTable_del(struct configurableSimpleUsageMe
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for configurableSimpleUsageMeteringControlTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case configurableSimpleUsageMeteringControlTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1625,22 +1762,29 @@ blockGeneratingLogTable_create(void)
 	DEBUGMSGTL(("cdr2MIB", "blockGeneratingLogTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->logId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->logIdLen = strlen("");
+		if ((StorageNew->logId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->logIdLen = 0;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
 		StorageNew->blockGeneratingLogMaxBlockSize = 0;
 		StorageNew->blockGeneratingLogMaxTimeInterval = 0;
 		StorageNew->blockGeneratingLogStorageType = 0;
 		StorageNew->blockGeneratingLogRowStatus = 0;
 		StorageNew->blockGeneratingLogRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("cdr2MIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	blockGeneratingLogTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct blockGeneratingLogTable_data *blockGeneratingLogTable_duplicate(struct blockGeneratingLogTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1652,6 +1796,16 @@ blockGeneratingLogTable_duplicate(struct blockGeneratingLogTable_data *thedata)
 
 	DEBUGMSGTL(("cdr2MIB", "blockGeneratingLogTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->blockGeneratingLogTable_id = thedata->blockGeneratingLogTable_id;
+		if (!(StorageNew->logId = malloc(thedata->logIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logId, thedata->logId, thedata->logIdLen);
+		StorageNew->logIdLen = thedata->logIdLen;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		StorageNew->blockGeneratingLogMaxBlockSize = thedata->blockGeneratingLogMaxBlockSize;
+		StorageNew->blockGeneratingLogMaxTimeInterval = thedata->blockGeneratingLogMaxTimeInterval;
+		StorageNew->blockGeneratingLogStorageType = thedata->blockGeneratingLogStorageType;
+		StorageNew->blockGeneratingLogRowStatus = thedata->blockGeneratingLogRowStatus;
 	}
       done:
 	DEBUGMSGTL(("cdr2MIB", "done.\n"));
@@ -1747,7 +1901,7 @@ blockGeneratingLogTable_del(struct blockGeneratingLogTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for blockGeneratingLogTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case blockGeneratingLogTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1833,23 +1987,31 @@ fileGeneratingLogTable_create(void)
 	DEBUGMSGTL(("cdr2MIB", "fileGeneratingLogTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->logId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->logIdLen = strlen("");
-		if ((StorageNew->timesOfDay = (uint8_t *) strdup("")) != NULL)
+		if ((StorageNew->logId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->logIdLen = 0;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		if ((StorageNew->timesOfDay = (uint8_t *) strdup("")) == NULL)
+			goto nomem;
 			StorageNew->timesOfDayLen = strlen("");
 		StorageNew->periodicTrigger = 0;
 		StorageNew->fileGeneratingLogStorageType = ST_NONVOLATILE;
 		StorageNew->fileGeneratingLogEntryStatus = 0;
 		StorageNew->fileGeneratingLogEntryStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("cdr2MIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	fileGeneratingLogTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct fileGeneratingLogTable_data *fileGeneratingLogTable_duplicate(struct fileGeneratingLogTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1861,6 +2023,20 @@ fileGeneratingLogTable_duplicate(struct fileGeneratingLogTable_data *thedata)
 
 	DEBUGMSGTL(("cdr2MIB", "fileGeneratingLogTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->fileGeneratingLogTable_id = thedata->fileGeneratingLogTable_id;
+		if (!(StorageNew->logId = malloc(thedata->logIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logId, thedata->logId, thedata->logIdLen);
+		StorageNew->logIdLen = thedata->logIdLen;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		if (!(StorageNew->timesOfDay = malloc(thedata->timesOfDayLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->timesOfDay, thedata->timesOfDay, thedata->timesOfDayLen);
+		StorageNew->timesOfDayLen = thedata->timesOfDayLen;
+		StorageNew->timesOfDay[StorageNew->timesOfDayLen] = 0;
+		StorageNew->periodicTrigger = thedata->periodicTrigger;
+		StorageNew->fileGeneratingLogStorageType = thedata->fileGeneratingLogStorageType;
+		StorageNew->fileGeneratingLogEntryStatus = thedata->fileGeneratingLogEntryStatus;
 	}
       done:
 	DEBUGMSGTL(("cdr2MIB", "done.\n"));
@@ -1958,7 +2134,7 @@ fileGeneratingLogTable_del(struct fileGeneratingLogTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for fileGeneratingLogTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case fileGeneratingLogTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2049,133 +2225,233 @@ callDetailLogRecordTable_create(void)
 	DEBUGMSGTL(("cdr2MIB", "callDetailLogRecordTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->logId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->logIdLen = strlen("");
-		if ((StorageNew->logRecordId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->logRecordIdLen = strlen("");
-		if ((StorageNew->networkProviderId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->networkProviderIdLen = strlen("");
+		if ((StorageNew->logId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->logIdLen = 0;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		if ((StorageNew->logRecordId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->logRecordIdLen = 0;
+		StorageNew->logRecordId[StorageNew->logRecordIdLen] = 0;
+		if ((StorageNew->networkProviderId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->networkProviderIdLen = 0;
+		StorageNew->networkProviderId[StorageNew->networkProviderIdLen] = 0;
 		StorageNew->recordType = 0;
-		if ((StorageNew->seizureTime = (uint8_t *) strdup("")) != NULL)
-			StorageNew->seizureTimeLen = strlen("");
-		if ((StorageNew->answerTime = (uint8_t *) strdup("")) != NULL)
-			StorageNew->answerTimeLen = strlen("");
-		if ((StorageNew->partialTime = (uint8_t *) strdup("")) != NULL)
-			StorageNew->partialTimeLen = strlen("");
-		if ((StorageNew->eventTime = (uint8_t *) strdup("")) != NULL)
-			StorageNew->eventTimeLen = strlen("");
-		if ((StorageNew->callingPartyNumber = (uint8_t *) strdup("")) != NULL)
-			StorageNew->callingPartyNumberLen = strlen("");
-		if ((StorageNew->calledPartyNumber = (uint8_t *) strdup("")) != NULL)
-			StorageNew->calledPartyNumberLen = strlen("");
-		if ((StorageNew->redirectingNumber = (uint8_t *) strdup("")) != NULL)
-			StorageNew->redirectingNumberLen = strlen("");
-		if ((StorageNew->redirectionNumber = (uint8_t *) strdup("")) != NULL)
-			StorageNew->redirectionNumberLen = strlen("");
-		if ((StorageNew->originalCalledNumber = (uint8_t *) strdup("")) != NULL)
-			StorageNew->originalCalledNumberLen = strlen("");
-		if ((StorageNew->callingPartyNumberNotScreened = (uint8_t *) strdup("")) != NULL)
-			StorageNew->callingPartyNumberNotScreenedLen = strlen("");
-		if ((StorageNew->operatorSpecific1Number = (uint8_t *) strdup("")) != NULL)
-			StorageNew->operatorSpecific1NumberLen = strlen("");
-		if ((StorageNew->operatorSpecific2Number = (uint8_t *) strdup("")) != NULL)
-			StorageNew->operatorSpecific2NumberLen = strlen("");
-		if ((StorageNew->operatorSpecific3Number = (uint8_t *) strdup("")) != NULL)
-			StorageNew->operatorSpecific3NumberLen = strlen("");
-		if ((StorageNew->bearerService = (uint8_t *) strdup("")) != NULL)
-			StorageNew->bearerServiceLen = strlen("");
+		if ((StorageNew->seizureTime = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->seizureTimeLen = 0;
+		StorageNew->seizureTime[StorageNew->seizureTimeLen] = 0;
+		if ((StorageNew->answerTime = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->answerTimeLen = 0;
+		StorageNew->answerTime[StorageNew->answerTimeLen] = 0;
+		if ((StorageNew->partialTime = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->partialTimeLen = 0;
+		StorageNew->partialTime[StorageNew->partialTimeLen] = 0;
+		if ((StorageNew->eventTime = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->eventTimeLen = 0;
+		StorageNew->eventTime[StorageNew->eventTimeLen] = 0;
+		if ((StorageNew->callingPartyNumber = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->callingPartyNumberLen = 0;
+		StorageNew->callingPartyNumber[StorageNew->callingPartyNumberLen] = 0;
+		if ((StorageNew->calledPartyNumber = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->calledPartyNumberLen = 0;
+		StorageNew->calledPartyNumber[StorageNew->calledPartyNumberLen] = 0;
+		if ((StorageNew->redirectingNumber = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->redirectingNumberLen = 0;
+		StorageNew->redirectingNumber[StorageNew->redirectingNumberLen] = 0;
+		if ((StorageNew->redirectionNumber = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->redirectionNumberLen = 0;
+		StorageNew->redirectionNumber[StorageNew->redirectionNumberLen] = 0;
+		if ((StorageNew->originalCalledNumber = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->originalCalledNumberLen = 0;
+		StorageNew->originalCalledNumber[StorageNew->originalCalledNumberLen] = 0;
+		if ((StorageNew->callingPartyNumberNotScreened = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->callingPartyNumberNotScreenedLen = 0;
+		StorageNew->callingPartyNumberNotScreened[StorageNew->callingPartyNumberNotScreenedLen] = 0;
+		if ((StorageNew->operatorSpecific1Number = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->operatorSpecific1NumberLen = 0;
+		StorageNew->operatorSpecific1Number[StorageNew->operatorSpecific1NumberLen] = 0;
+		if ((StorageNew->operatorSpecific2Number = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->operatorSpecific2NumberLen = 0;
+		StorageNew->operatorSpecific2Number[StorageNew->operatorSpecific2NumberLen] = 0;
+		if ((StorageNew->operatorSpecific3Number = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->operatorSpecific3NumberLen = 0;
+		StorageNew->operatorSpecific3Number[StorageNew->operatorSpecific3NumberLen] = 0;
+		if ((StorageNew->bearerService = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->bearerServiceLen = 0;
+		StorageNew->bearerService[StorageNew->bearerServiceLen] = 0;
 		StorageNew->participantServiceUser = 0;
-		if ((StorageNew->callIdentificationNumber = (uint8_t *) strdup("")) != NULL)
-			StorageNew->callIdentificationNumberLen = strlen("");
-		if ((StorageNew->supplementaryServices = (uint8_t *) strdup("")) != NULL)
-			StorageNew->supplementaryServicesLen = strlen("");
+		if ((StorageNew->callIdentificationNumber = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->callIdentificationNumberLen = 0;
+		StorageNew->callIdentificationNumber[StorageNew->callIdentificationNumberLen] = 0;
+		if ((StorageNew->supplementaryServices = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->supplementaryServicesLen = 0;
+		StorageNew->supplementaryServices[StorageNew->supplementaryServicesLen] = 0;
 		StorageNew->immediateNotificationForUsageMetering = 0;
-		if ((StorageNew->cause = (uint8_t *) strdup("")) != NULL)
-			StorageNew->causeLen = strlen("");
-		if ((StorageNew->personalUserId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->personalUserIdLen = strlen("");
+		if ((StorageNew->cause = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->causeLen = 0;
+		StorageNew->cause[StorageNew->causeLen] = 0;
+		if ((StorageNew->personalUserId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->personalUserIdLen = 0;
+		StorageNew->personalUserId[StorageNew->personalUserIdLen] = 0;
 		StorageNew->chargedParticipant = 0;
-		if ((StorageNew->chargedDirectoryNumber = (uint8_t *) strdup("")) != NULL)
-			StorageNew->chargedDirectoryNumberLen = strlen("");
+		if ((StorageNew->chargedDirectoryNumber = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->chargedDirectoryNumberLen = 0;
+		StorageNew->chargedDirectoryNumber[StorageNew->chargedDirectoryNumberLen] = 0;
 		StorageNew->percentageToBeBilled = 0;
-		if ((StorageNew->accountCodeInput = (uint8_t *) strdup("")) != NULL)
-			StorageNew->accountCodeInputLen = strlen("");
-		if ((StorageNew->iNServiceCode = (uint8_t *) strdup("")) != NULL)
-			StorageNew->iNServiceCodeLen = strlen("");
-		if ((StorageNew->queueTimeStamp = (uint8_t *) strdup("")) != NULL)
-			StorageNew->queueTimeStampLen = strlen("");
+		if ((StorageNew->accountCodeInput = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->accountCodeInputLen = 0;
+		StorageNew->accountCodeInput[StorageNew->accountCodeInputLen] = 0;
+		if ((StorageNew->iNServiceCode = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->iNServiceCodeLen = 0;
+		StorageNew->iNServiceCode[StorageNew->iNServiceCodeLen] = 0;
+		if ((StorageNew->queueTimeStamp = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->queueTimeStampLen = 0;
+		StorageNew->queueTimeStamp[StorageNew->queueTimeStampLen] = 0;
 		StorageNew->queueDuration = 0;
-		if ((StorageNew->serviceSpecificINInformation = (uint8_t *) strdup("")) != NULL)
-			StorageNew->serviceSpecificINInformationLen = strlen("");
+		if ((StorageNew->serviceSpecificINInformation = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->serviceSpecificINInformationLen = 0;
+		StorageNew->serviceSpecificINInformation[StorageNew->serviceSpecificINInformationLen] = 0;
 		StorageNew->partialRecordNumber = 0;
 		StorageNew->partialRecordReason = 0;
-		if ((StorageNew->exchangeInfo = (uint8_t *) strdup("")) != NULL)
-			StorageNew->exchangeInfoLen = strlen("");
-		if ((StorageNew->relatedCallNumber = (uint8_t *) strdup("")) != NULL)
-			StorageNew->relatedCallNumberLen = strlen("");
-		if (memdup((u_char **) &StorageNew->cDRPurpose, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if ((StorageNew->exchangeInfo = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->exchangeInfoLen = 0;
+		StorageNew->exchangeInfo[StorageNew->exchangeInfoLen] = 0;
+		if ((StorageNew->relatedCallNumber = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->relatedCallNumberLen = 0;
+		StorageNew->relatedCallNumber[StorageNew->relatedCallNumberLen] = 0;
+		if (memdup((u_char **) &StorageNew->cDRPurpose, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->cDRPurposeLen = 1;
-		if ((StorageNew->physicalLineCode = (uint8_t *) strdup("")) != NULL)
-			StorageNew->physicalLineCodeLen = strlen("");
-		if ((StorageNew->receivedDigits = (uint8_t *) strdup("")) != NULL)
-			StorageNew->receivedDigitsLen = strlen("");
-		if ((StorageNew->operatorSpecific1AdditionalNumber = (uint8_t *) strdup("")) != NULL)
-			StorageNew->operatorSpecific1AdditionalNumberLen = strlen("");
-		if ((StorageNew->operatorSpecific2AdditionalNumber = (uint8_t *) strdup("")) != NULL)
-			StorageNew->operatorSpecific2AdditionalNumberLen = strlen("");
-		if ((StorageNew->operatorSpecific3AdditionalNumber = (uint8_t *) strdup("")) != NULL)
-			StorageNew->operatorSpecific3AdditionalNumberLen = strlen("");
-		if ((StorageNew->callingPartyCategory = (uint8_t *) strdup("")) != NULL)
-			StorageNew->callingPartyCategoryLen = strlen("");
+		if ((StorageNew->physicalLineCode = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->physicalLineCodeLen = 0;
+		StorageNew->physicalLineCode[StorageNew->physicalLineCodeLen] = 0;
+		if ((StorageNew->receivedDigits = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->receivedDigitsLen = 0;
+		StorageNew->receivedDigits[StorageNew->receivedDigitsLen] = 0;
+		if ((StorageNew->operatorSpecific1AdditionalNumber = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->operatorSpecific1AdditionalNumberLen = 0;
+		StorageNew->operatorSpecific1AdditionalNumber[StorageNew->operatorSpecific1AdditionalNumberLen] = 0;
+		if ((StorageNew->operatorSpecific2AdditionalNumber = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->operatorSpecific2AdditionalNumberLen = 0;
+		StorageNew->operatorSpecific2AdditionalNumber[StorageNew->operatorSpecific2AdditionalNumberLen] = 0;
+		if ((StorageNew->operatorSpecific3AdditionalNumber = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->operatorSpecific3AdditionalNumberLen = 0;
+		StorageNew->operatorSpecific3AdditionalNumber[StorageNew->operatorSpecific3AdditionalNumberLen] = 0;
+		if ((StorageNew->callingPartyCategory = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->callingPartyCategoryLen = 0;
+		StorageNew->callingPartyCategory[StorageNew->callingPartyCategoryLen] = 0;
 		StorageNew->callingPartyType = 0;
-		if ((StorageNew->chargeInformation = (uint8_t *) strdup("")) != NULL)
-			StorageNew->chargeInformationLen = strlen("");
-		if ((StorageNew->progress = (uint8_t *) strdup("")) != NULL)
-			StorageNew->progressLen = strlen("");
-		if (memdup((u_char **) &StorageNew->accessDelivery, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if ((StorageNew->chargeInformation = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->chargeInformationLen = 0;
+		StorageNew->chargeInformation[StorageNew->chargeInformationLen] = 0;
+		if ((StorageNew->progress = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->progressLen = 0;
+		StorageNew->progress[StorageNew->progressLen] = 0;
+		if (memdup((u_char **) &StorageNew->accessDelivery, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->accessDeliveryLen = 1;
-		if ((StorageNew->trunkGroupOutgoing = (uint8_t *) strdup("")) != NULL)
-			StorageNew->trunkGroupOutgoingLen = strlen("");
-		if ((StorageNew->trunkGroupIncoming = (uint8_t *) strdup("")) != NULL)
-			StorageNew->trunkGroupIncomingLen = strlen("");
-		if ((StorageNew->fallbackBearerService = (uint8_t *) strdup("")) != NULL)
-			StorageNew->fallbackBearerServiceLen = strlen("");
-		if ((StorageNew->teleservice = (uint8_t *) strdup("")) != NULL)
-			StorageNew->teleserviceLen = strlen("");
+		if ((StorageNew->trunkGroupOutgoing = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->trunkGroupOutgoingLen = 0;
+		StorageNew->trunkGroupOutgoing[StorageNew->trunkGroupOutgoingLen] = 0;
+		if ((StorageNew->trunkGroupIncoming = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->trunkGroupIncomingLen = 0;
+		StorageNew->trunkGroupIncoming[StorageNew->trunkGroupIncomingLen] = 0;
+		if ((StorageNew->fallbackBearerService = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->fallbackBearerServiceLen = 0;
+		StorageNew->fallbackBearerService[StorageNew->fallbackBearerServiceLen] = 0;
+		if ((StorageNew->teleservice = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->teleserviceLen = 0;
+		StorageNew->teleservice[StorageNew->teleserviceLen] = 0;
 		StorageNew->conversationTime = 0;
 		StorageNew->durationTimeACM = 0;
 		StorageNew->durationTimeBAnswer = 0;
 		StorageNew->durationTimeNoBAnswer = 0;
-		if ((StorageNew->uUInfo = (uint8_t *) strdup("")) != NULL)
-			StorageNew->uUInfoLen = strlen("");
-		if ((StorageNew->standardExtensions = (uint8_t *) strdup("")) != NULL)
-			StorageNew->standardExtensionsLen = strlen("");
-		if ((StorageNew->recordExtensions = (uint8_t *) strdup("")) != NULL)
-			StorageNew->recordExtensionsLen = strlen("");
-		if ((StorageNew->bPartyCategory = (uint8_t *) strdup("")) != NULL)
-			StorageNew->bPartyCategoryLen = strlen("");
+		if ((StorageNew->uUInfo = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->uUInfoLen = 0;
+		StorageNew->uUInfo[StorageNew->uUInfoLen] = 0;
+		if ((StorageNew->standardExtensions = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->standardExtensionsLen = 0;
+		StorageNew->standardExtensions[StorageNew->standardExtensionsLen] = 0;
+		if ((StorageNew->recordExtensions = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->recordExtensionsLen = 0;
+		StorageNew->recordExtensions[StorageNew->recordExtensionsLen] = 0;
+		if ((StorageNew->bPartyCategory = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->bPartyCategoryLen = 0;
+		StorageNew->bPartyCategory[StorageNew->bPartyCategoryLen] = 0;
 		StorageNew->iSUPPreferred = 0;
 		StorageNew->networkManagementControls = 0;
 		StorageNew->glare = 0;
 		StorageNew->recordId = 0;
 		StorageNew->dataValidity = 0;
 		StorageNew->callStatus = 0;
-		if ((StorageNew->carrierId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->carrierIdLen = strlen("");
-		if ((StorageNew->dPC = (uint8_t *) strdup("")) != NULL)
-			StorageNew->dPCLen = strlen("");
-		if ((StorageNew->oPC = (uint8_t *) strdup("")) != NULL)
-			StorageNew->oPCLen = strlen("");
-
+		if ((StorageNew->carrierId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->carrierIdLen = 0;
+		StorageNew->carrierId[StorageNew->carrierIdLen] = 0;
+		if ((StorageNew->dPC = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->dPCLen = 0;
+		StorageNew->dPC[StorageNew->dPCLen] = 0;
+		if ((StorageNew->oPC = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->oPCLen = 0;
+		StorageNew->oPC[StorageNew->oPCLen] = 0;
 	}
+      done:
 	DEBUGMSGTL(("cdr2MIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	callDetailLogRecordTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct callDetailLogRecordTable_data *callDetailLogRecordTable_duplicate(struct callDetailLogRecordTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2187,6 +2463,271 @@ callDetailLogRecordTable_duplicate(struct callDetailLogRecordTable_data *thedata
 
 	DEBUGMSGTL(("cdr2MIB", "callDetailLogRecordTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->callDetailLogRecordTable_id = thedata->callDetailLogRecordTable_id;
+		if (!(StorageNew->logId = malloc(thedata->logIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logId, thedata->logId, thedata->logIdLen);
+		StorageNew->logIdLen = thedata->logIdLen;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		if (!(StorageNew->logRecordId = malloc(thedata->logRecordIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logRecordId, thedata->logRecordId, thedata->logRecordIdLen);
+		StorageNew->logRecordIdLen = thedata->logRecordIdLen;
+		StorageNew->logRecordId[StorageNew->logRecordIdLen] = 0;
+		if (!(StorageNew->networkProviderId = malloc(thedata->networkProviderIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->networkProviderId, thedata->networkProviderId, thedata->networkProviderIdLen);
+		StorageNew->networkProviderIdLen = thedata->networkProviderIdLen;
+		StorageNew->networkProviderId[StorageNew->networkProviderIdLen] = 0;
+		StorageNew->recordType = thedata->recordType;
+		if (!(StorageNew->seizureTime = malloc(thedata->seizureTimeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->seizureTime, thedata->seizureTime, thedata->seizureTimeLen);
+		StorageNew->seizureTimeLen = thedata->seizureTimeLen;
+		StorageNew->seizureTime[StorageNew->seizureTimeLen] = 0;
+		if (!(StorageNew->answerTime = malloc(thedata->answerTimeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->answerTime, thedata->answerTime, thedata->answerTimeLen);
+		StorageNew->answerTimeLen = thedata->answerTimeLen;
+		StorageNew->answerTime[StorageNew->answerTimeLen] = 0;
+		if (!(StorageNew->partialTime = malloc(thedata->partialTimeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->partialTime, thedata->partialTime, thedata->partialTimeLen);
+		StorageNew->partialTimeLen = thedata->partialTimeLen;
+		StorageNew->partialTime[StorageNew->partialTimeLen] = 0;
+		if (!(StorageNew->eventTime = malloc(thedata->eventTimeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->eventTime, thedata->eventTime, thedata->eventTimeLen);
+		StorageNew->eventTimeLen = thedata->eventTimeLen;
+		StorageNew->eventTime[StorageNew->eventTimeLen] = 0;
+		if (!(StorageNew->callingPartyNumber = malloc(thedata->callingPartyNumberLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->callingPartyNumber, thedata->callingPartyNumber, thedata->callingPartyNumberLen);
+		StorageNew->callingPartyNumberLen = thedata->callingPartyNumberLen;
+		StorageNew->callingPartyNumber[StorageNew->callingPartyNumberLen] = 0;
+		if (!(StorageNew->calledPartyNumber = malloc(thedata->calledPartyNumberLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->calledPartyNumber, thedata->calledPartyNumber, thedata->calledPartyNumberLen);
+		StorageNew->calledPartyNumberLen = thedata->calledPartyNumberLen;
+		StorageNew->calledPartyNumber[StorageNew->calledPartyNumberLen] = 0;
+		if (!(StorageNew->redirectingNumber = malloc(thedata->redirectingNumberLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->redirectingNumber, thedata->redirectingNumber, thedata->redirectingNumberLen);
+		StorageNew->redirectingNumberLen = thedata->redirectingNumberLen;
+		StorageNew->redirectingNumber[StorageNew->redirectingNumberLen] = 0;
+		if (!(StorageNew->redirectionNumber = malloc(thedata->redirectionNumberLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->redirectionNumber, thedata->redirectionNumber, thedata->redirectionNumberLen);
+		StorageNew->redirectionNumberLen = thedata->redirectionNumberLen;
+		StorageNew->redirectionNumber[StorageNew->redirectionNumberLen] = 0;
+		if (!(StorageNew->originalCalledNumber = malloc(thedata->originalCalledNumberLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->originalCalledNumber, thedata->originalCalledNumber, thedata->originalCalledNumberLen);
+		StorageNew->originalCalledNumberLen = thedata->originalCalledNumberLen;
+		StorageNew->originalCalledNumber[StorageNew->originalCalledNumberLen] = 0;
+		if (!(StorageNew->callingPartyNumberNotScreened = malloc(thedata->callingPartyNumberNotScreenedLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->callingPartyNumberNotScreened, thedata->callingPartyNumberNotScreened, thedata->callingPartyNumberNotScreenedLen);
+		StorageNew->callingPartyNumberNotScreenedLen = thedata->callingPartyNumberNotScreenedLen;
+		StorageNew->callingPartyNumberNotScreened[StorageNew->callingPartyNumberNotScreenedLen] = 0;
+		if (!(StorageNew->operatorSpecific1Number = malloc(thedata->operatorSpecific1NumberLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->operatorSpecific1Number, thedata->operatorSpecific1Number, thedata->operatorSpecific1NumberLen);
+		StorageNew->operatorSpecific1NumberLen = thedata->operatorSpecific1NumberLen;
+		StorageNew->operatorSpecific1Number[StorageNew->operatorSpecific1NumberLen] = 0;
+		if (!(StorageNew->operatorSpecific2Number = malloc(thedata->operatorSpecific2NumberLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->operatorSpecific2Number, thedata->operatorSpecific2Number, thedata->operatorSpecific2NumberLen);
+		StorageNew->operatorSpecific2NumberLen = thedata->operatorSpecific2NumberLen;
+		StorageNew->operatorSpecific2Number[StorageNew->operatorSpecific2NumberLen] = 0;
+		if (!(StorageNew->operatorSpecific3Number = malloc(thedata->operatorSpecific3NumberLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->operatorSpecific3Number, thedata->operatorSpecific3Number, thedata->operatorSpecific3NumberLen);
+		StorageNew->operatorSpecific3NumberLen = thedata->operatorSpecific3NumberLen;
+		StorageNew->operatorSpecific3Number[StorageNew->operatorSpecific3NumberLen] = 0;
+		if (!(StorageNew->bearerService = malloc(thedata->bearerServiceLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->bearerService, thedata->bearerService, thedata->bearerServiceLen);
+		StorageNew->bearerServiceLen = thedata->bearerServiceLen;
+		StorageNew->bearerService[StorageNew->bearerServiceLen] = 0;
+		StorageNew->participantServiceUser = thedata->participantServiceUser;
+		if (!(StorageNew->callIdentificationNumber = malloc(thedata->callIdentificationNumberLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->callIdentificationNumber, thedata->callIdentificationNumber, thedata->callIdentificationNumberLen);
+		StorageNew->callIdentificationNumberLen = thedata->callIdentificationNumberLen;
+		StorageNew->callIdentificationNumber[StorageNew->callIdentificationNumberLen] = 0;
+		if (!(StorageNew->supplementaryServices = malloc(thedata->supplementaryServicesLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->supplementaryServices, thedata->supplementaryServices, thedata->supplementaryServicesLen);
+		StorageNew->supplementaryServicesLen = thedata->supplementaryServicesLen;
+		StorageNew->supplementaryServices[StorageNew->supplementaryServicesLen] = 0;
+		StorageNew->immediateNotificationForUsageMetering = thedata->immediateNotificationForUsageMetering;
+		if (!(StorageNew->cause = malloc(thedata->causeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->cause, thedata->cause, thedata->causeLen);
+		StorageNew->causeLen = thedata->causeLen;
+		StorageNew->cause[StorageNew->causeLen] = 0;
+		if (!(StorageNew->personalUserId = malloc(thedata->personalUserIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->personalUserId, thedata->personalUserId, thedata->personalUserIdLen);
+		StorageNew->personalUserIdLen = thedata->personalUserIdLen;
+		StorageNew->personalUserId[StorageNew->personalUserIdLen] = 0;
+		StorageNew->chargedParticipant = thedata->chargedParticipant;
+		if (!(StorageNew->chargedDirectoryNumber = malloc(thedata->chargedDirectoryNumberLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->chargedDirectoryNumber, thedata->chargedDirectoryNumber, thedata->chargedDirectoryNumberLen);
+		StorageNew->chargedDirectoryNumberLen = thedata->chargedDirectoryNumberLen;
+		StorageNew->chargedDirectoryNumber[StorageNew->chargedDirectoryNumberLen] = 0;
+		StorageNew->percentageToBeBilled = thedata->percentageToBeBilled;
+		if (!(StorageNew->accountCodeInput = malloc(thedata->accountCodeInputLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->accountCodeInput, thedata->accountCodeInput, thedata->accountCodeInputLen);
+		StorageNew->accountCodeInputLen = thedata->accountCodeInputLen;
+		StorageNew->accountCodeInput[StorageNew->accountCodeInputLen] = 0;
+		if (!(StorageNew->iNServiceCode = malloc(thedata->iNServiceCodeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->iNServiceCode, thedata->iNServiceCode, thedata->iNServiceCodeLen);
+		StorageNew->iNServiceCodeLen = thedata->iNServiceCodeLen;
+		StorageNew->iNServiceCode[StorageNew->iNServiceCodeLen] = 0;
+		if (!(StorageNew->queueTimeStamp = malloc(thedata->queueTimeStampLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->queueTimeStamp, thedata->queueTimeStamp, thedata->queueTimeStampLen);
+		StorageNew->queueTimeStampLen = thedata->queueTimeStampLen;
+		StorageNew->queueTimeStamp[StorageNew->queueTimeStampLen] = 0;
+		StorageNew->queueDuration = thedata->queueDuration;
+		if (!(StorageNew->serviceSpecificINInformation = malloc(thedata->serviceSpecificINInformationLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->serviceSpecificINInformation, thedata->serviceSpecificINInformation, thedata->serviceSpecificINInformationLen);
+		StorageNew->serviceSpecificINInformationLen = thedata->serviceSpecificINInformationLen;
+		StorageNew->serviceSpecificINInformation[StorageNew->serviceSpecificINInformationLen] = 0;
+		StorageNew->partialRecordNumber = thedata->partialRecordNumber;
+		StorageNew->partialRecordReason = thedata->partialRecordReason;
+		if (!(StorageNew->exchangeInfo = malloc(thedata->exchangeInfoLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->exchangeInfo, thedata->exchangeInfo, thedata->exchangeInfoLen);
+		StorageNew->exchangeInfoLen = thedata->exchangeInfoLen;
+		StorageNew->exchangeInfo[StorageNew->exchangeInfoLen] = 0;
+		if (!(StorageNew->relatedCallNumber = malloc(thedata->relatedCallNumberLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->relatedCallNumber, thedata->relatedCallNumber, thedata->relatedCallNumberLen);
+		StorageNew->relatedCallNumberLen = thedata->relatedCallNumberLen;
+		StorageNew->relatedCallNumber[StorageNew->relatedCallNumberLen] = 0;
+		if (!(StorageNew->cDRPurpose = malloc(thedata->cDRPurposeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->cDRPurpose, thedata->cDRPurpose, thedata->cDRPurposeLen);
+		StorageNew->cDRPurposeLen = thedata->cDRPurposeLen;
+		StorageNew->cDRPurpose[StorageNew->cDRPurposeLen] = 0;
+		if (!(StorageNew->physicalLineCode = malloc(thedata->physicalLineCodeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->physicalLineCode, thedata->physicalLineCode, thedata->physicalLineCodeLen);
+		StorageNew->physicalLineCodeLen = thedata->physicalLineCodeLen;
+		StorageNew->physicalLineCode[StorageNew->physicalLineCodeLen] = 0;
+		if (!(StorageNew->receivedDigits = malloc(thedata->receivedDigitsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->receivedDigits, thedata->receivedDigits, thedata->receivedDigitsLen);
+		StorageNew->receivedDigitsLen = thedata->receivedDigitsLen;
+		StorageNew->receivedDigits[StorageNew->receivedDigitsLen] = 0;
+		if (!(StorageNew->operatorSpecific1AdditionalNumber = malloc(thedata->operatorSpecific1AdditionalNumberLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->operatorSpecific1AdditionalNumber, thedata->operatorSpecific1AdditionalNumber, thedata->operatorSpecific1AdditionalNumberLen);
+		StorageNew->operatorSpecific1AdditionalNumberLen = thedata->operatorSpecific1AdditionalNumberLen;
+		StorageNew->operatorSpecific1AdditionalNumber[StorageNew->operatorSpecific1AdditionalNumberLen] = 0;
+		if (!(StorageNew->operatorSpecific2AdditionalNumber = malloc(thedata->operatorSpecific2AdditionalNumberLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->operatorSpecific2AdditionalNumber, thedata->operatorSpecific2AdditionalNumber, thedata->operatorSpecific2AdditionalNumberLen);
+		StorageNew->operatorSpecific2AdditionalNumberLen = thedata->operatorSpecific2AdditionalNumberLen;
+		StorageNew->operatorSpecific2AdditionalNumber[StorageNew->operatorSpecific2AdditionalNumberLen] = 0;
+		if (!(StorageNew->operatorSpecific3AdditionalNumber = malloc(thedata->operatorSpecific3AdditionalNumberLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->operatorSpecific3AdditionalNumber, thedata->operatorSpecific3AdditionalNumber, thedata->operatorSpecific3AdditionalNumberLen);
+		StorageNew->operatorSpecific3AdditionalNumberLen = thedata->operatorSpecific3AdditionalNumberLen;
+		StorageNew->operatorSpecific3AdditionalNumber[StorageNew->operatorSpecific3AdditionalNumberLen] = 0;
+		if (!(StorageNew->callingPartyCategory = malloc(thedata->callingPartyCategoryLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->callingPartyCategory, thedata->callingPartyCategory, thedata->callingPartyCategoryLen);
+		StorageNew->callingPartyCategoryLen = thedata->callingPartyCategoryLen;
+		StorageNew->callingPartyCategory[StorageNew->callingPartyCategoryLen] = 0;
+		StorageNew->callingPartyType = thedata->callingPartyType;
+		if (!(StorageNew->chargeInformation = malloc(thedata->chargeInformationLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->chargeInformation, thedata->chargeInformation, thedata->chargeInformationLen);
+		StorageNew->chargeInformationLen = thedata->chargeInformationLen;
+		StorageNew->chargeInformation[StorageNew->chargeInformationLen] = 0;
+		if (!(StorageNew->progress = malloc(thedata->progressLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->progress, thedata->progress, thedata->progressLen);
+		StorageNew->progressLen = thedata->progressLen;
+		StorageNew->progress[StorageNew->progressLen] = 0;
+		if (!(StorageNew->accessDelivery = malloc(thedata->accessDeliveryLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->accessDelivery, thedata->accessDelivery, thedata->accessDeliveryLen);
+		StorageNew->accessDeliveryLen = thedata->accessDeliveryLen;
+		StorageNew->accessDelivery[StorageNew->accessDeliveryLen] = 0;
+		if (!(StorageNew->trunkGroupOutgoing = malloc(thedata->trunkGroupOutgoingLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->trunkGroupOutgoing, thedata->trunkGroupOutgoing, thedata->trunkGroupOutgoingLen);
+		StorageNew->trunkGroupOutgoingLen = thedata->trunkGroupOutgoingLen;
+		StorageNew->trunkGroupOutgoing[StorageNew->trunkGroupOutgoingLen] = 0;
+		if (!(StorageNew->trunkGroupIncoming = malloc(thedata->trunkGroupIncomingLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->trunkGroupIncoming, thedata->trunkGroupIncoming, thedata->trunkGroupIncomingLen);
+		StorageNew->trunkGroupIncomingLen = thedata->trunkGroupIncomingLen;
+		StorageNew->trunkGroupIncoming[StorageNew->trunkGroupIncomingLen] = 0;
+		if (!(StorageNew->fallbackBearerService = malloc(thedata->fallbackBearerServiceLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->fallbackBearerService, thedata->fallbackBearerService, thedata->fallbackBearerServiceLen);
+		StorageNew->fallbackBearerServiceLen = thedata->fallbackBearerServiceLen;
+		StorageNew->fallbackBearerService[StorageNew->fallbackBearerServiceLen] = 0;
+		if (!(StorageNew->teleservice = malloc(thedata->teleserviceLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->teleservice, thedata->teleservice, thedata->teleserviceLen);
+		StorageNew->teleserviceLen = thedata->teleserviceLen;
+		StorageNew->teleservice[StorageNew->teleserviceLen] = 0;
+		StorageNew->conversationTime = thedata->conversationTime;
+		StorageNew->durationTimeACM = thedata->durationTimeACM;
+		StorageNew->durationTimeBAnswer = thedata->durationTimeBAnswer;
+		StorageNew->durationTimeNoBAnswer = thedata->durationTimeNoBAnswer;
+		if (!(StorageNew->uUInfo = malloc(thedata->uUInfoLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->uUInfo, thedata->uUInfo, thedata->uUInfoLen);
+		StorageNew->uUInfoLen = thedata->uUInfoLen;
+		StorageNew->uUInfo[StorageNew->uUInfoLen] = 0;
+		if (!(StorageNew->standardExtensions = malloc(thedata->standardExtensionsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->standardExtensions, thedata->standardExtensions, thedata->standardExtensionsLen);
+		StorageNew->standardExtensionsLen = thedata->standardExtensionsLen;
+		StorageNew->standardExtensions[StorageNew->standardExtensionsLen] = 0;
+		if (!(StorageNew->recordExtensions = malloc(thedata->recordExtensionsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->recordExtensions, thedata->recordExtensions, thedata->recordExtensionsLen);
+		StorageNew->recordExtensionsLen = thedata->recordExtensionsLen;
+		StorageNew->recordExtensions[StorageNew->recordExtensionsLen] = 0;
+		if (!(StorageNew->bPartyCategory = malloc(thedata->bPartyCategoryLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->bPartyCategory, thedata->bPartyCategory, thedata->bPartyCategoryLen);
+		StorageNew->bPartyCategoryLen = thedata->bPartyCategoryLen;
+		StorageNew->bPartyCategory[StorageNew->bPartyCategoryLen] = 0;
+		StorageNew->iSUPPreferred = thedata->iSUPPreferred;
+		StorageNew->networkManagementControls = thedata->networkManagementControls;
+		StorageNew->glare = thedata->glare;
+		StorageNew->recordId = thedata->recordId;
+		StorageNew->dataValidity = thedata->dataValidity;
+		StorageNew->callStatus = thedata->callStatus;
+		if (!(StorageNew->carrierId = malloc(thedata->carrierIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->carrierId, thedata->carrierId, thedata->carrierIdLen);
+		StorageNew->carrierIdLen = thedata->carrierIdLen;
+		StorageNew->carrierId[StorageNew->carrierIdLen] = 0;
+		if (!(StorageNew->dPC = malloc(thedata->dPCLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->dPC, thedata->dPC, thedata->dPCLen);
+		StorageNew->dPCLen = thedata->dPCLen;
+		StorageNew->dPC[StorageNew->dPCLen] = 0;
+		if (!(StorageNew->oPC = malloc(thedata->oPCLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->oPC, thedata->oPC, thedata->oPCLen);
+		StorageNew->oPCLen = thedata->oPCLen;
+		StorageNew->oPC[StorageNew->oPCLen] = 0;
 	}
       done:
 	DEBUGMSGTL(("cdr2MIB", "done.\n"));
@@ -2380,7 +2921,7 @@ callDetailLogRecordTable_del(struct callDetailLogRecordTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for callDetailLogRecordTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case callDetailLogRecordTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2832,21 +3373,29 @@ configurableSimpleUsageMeteringControlR2Table_create(void)
 	DEBUGMSGTL(("cdr2MIB", "configurableSimpleUsageMeteringControlR2Table_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->controlObjectId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->controlObjectIdLen = strlen("");
-		if (memdup((u_char **) &StorageNew->configurationR2Mask, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if ((StorageNew->controlObjectId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->controlObjectIdLen = 0;
+		StorageNew->controlObjectId[StorageNew->controlObjectIdLen] = 0;
+		if (memdup((u_char **) &StorageNew->configurationR2Mask, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->configurationR2MaskLen = 1;
 		StorageNew->configurationR2Status = 0;
 		StorageNew->configurationR2Status = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("cdr2MIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	configurableSimpleUsageMeteringControlR2Table_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct configurableSimpleUsageMeteringControlR2Table_data *configurableSimpleUsageMeteringControlR2Table_duplicate(struct configurableSimpleUsageMeteringControlR2Table_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2858,6 +3407,18 @@ configurableSimpleUsageMeteringControlR2Table_duplicate(struct configurableSimpl
 
 	DEBUGMSGTL(("cdr2MIB", "configurableSimpleUsageMeteringControlR2Table_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->configurableSimpleUsageMeteringControlR2Table_id = thedata->configurableSimpleUsageMeteringControlR2Table_id;
+		if (!(StorageNew->controlObjectId = malloc(thedata->controlObjectIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->controlObjectId, thedata->controlObjectId, thedata->controlObjectIdLen);
+		StorageNew->controlObjectIdLen = thedata->controlObjectIdLen;
+		StorageNew->controlObjectId[StorageNew->controlObjectIdLen] = 0;
+		if (!(StorageNew->configurationR2Mask = malloc(thedata->configurationR2MaskLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->configurationR2Mask, thedata->configurationR2Mask, thedata->configurationR2MaskLen);
+		StorageNew->configurationR2MaskLen = thedata->configurationR2MaskLen;
+		StorageNew->configurationR2Mask[StorageNew->configurationR2MaskLen] = 0;
+		StorageNew->configurationR2Status = thedata->configurationR2Status;
 	}
       done:
 	DEBUGMSGTL(("cdr2MIB", "done.\n"));
@@ -2955,7 +3516,7 @@ configurableSimpleUsageMeteringControlR2Table_del(struct configurableSimpleUsage
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for configurableSimpleUsageMeteringControlR2Table entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case configurableSimpleUsageMeteringControlR2Table).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3042,19 +3603,25 @@ blockGeneratingLogR2Table_create(void)
 	DEBUGMSGTL(("cdr2MIB", "blockGeneratingLogR2Table_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->logId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->logIdLen = strlen("");
+		if ((StorageNew->logId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->logIdLen = 0;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
 		StorageNew->blockGeneratingLogVersion = BLOCKGENERATINGLOGVERSION_VERSION1;
-
 	}
+      done:
 	DEBUGMSGTL(("cdr2MIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	blockGeneratingLogR2Table_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct blockGeneratingLogR2Table_data *blockGeneratingLogR2Table_duplicate(struct blockGeneratingLogR2Table_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3066,6 +3633,13 @@ blockGeneratingLogR2Table_duplicate(struct blockGeneratingLogR2Table_data *theda
 
 	DEBUGMSGTL(("cdr2MIB", "blockGeneratingLogR2Table_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->blockGeneratingLogR2Table_id = thedata->blockGeneratingLogR2Table_id;
+		if (!(StorageNew->logId = malloc(thedata->logIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logId, thedata->logId, thedata->logIdLen);
+		StorageNew->logIdLen = thedata->logIdLen;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		StorageNew->blockGeneratingLogVersion = thedata->blockGeneratingLogVersion;
 	}
       done:
 	DEBUGMSGTL(("cdr2MIB", "done.\n"));
@@ -3161,7 +3735,7 @@ blockGeneratingLogR2Table_del(struct blockGeneratingLogR2Table_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for blockGeneratingLogR2Table entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case blockGeneratingLogR2Table).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3241,10 +3815,14 @@ callDetailLogRecordR2Table_create(void)
 	DEBUGMSGTL(("cdr2MIB", "callDetailLogRecordR2Table_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->logId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->logIdLen = strlen("");
-		if ((StorageNew->logRecordId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->logRecordIdLen = strlen("");
+		if ((StorageNew->logId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->logIdLen = 0;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		if ((StorageNew->logRecordId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->logRecordIdLen = 0;
+		StorageNew->logRecordId[StorageNew->logRecordIdLen] = 0;
 		StorageNew->sequenceId = (struct counter64) {
 		0, 0};
 		StorageNew->zoneId = (struct counter64) {
@@ -3253,169 +3831,281 @@ callDetailLogRecordR2Table_create(void)
 		0, 0};
 		StorageNew->fileSeqId = (struct counter64) {
 		0, 0};
-		if ((StorageNew->callId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->callIdLen = strlen("");
-		if ((StorageNew->lastUpdate = (uint8_t *) strdup("")) != NULL)
-			StorageNew->lastUpdateLen = strlen("");
-		if ((StorageNew->eventOrder = (uint8_t *) strdup("")) != NULL)
-			StorageNew->eventOrderLen = strlen("");
+		if ((StorageNew->callId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->callIdLen = 0;
+		StorageNew->callId[StorageNew->callIdLen] = 0;
+		if ((StorageNew->lastUpdate = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->lastUpdateLen = 0;
+		StorageNew->lastUpdate[StorageNew->lastUpdateLen] = 0;
+		if ((StorageNew->eventOrder = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->eventOrderLen = 0;
+		StorageNew->eventOrder[StorageNew->eventOrderLen] = 0;
 		StorageNew->status = 0;
 		StorageNew->callType = 0;
-		if ((StorageNew->clngPtyNbr = (uint8_t *) strdup("")) != NULL)
-			StorageNew->clngPtyNbrLen = strlen("");
-		if ((StorageNew->chargeNbr = (uint8_t *) strdup("")) != NULL)
-			StorageNew->chargeNbrLen = strlen("");
-		if ((StorageNew->clldPtyNbr = (uint8_t *) strdup("")) != NULL)
-			StorageNew->clldPtyNbrLen = strlen("");
+		if ((StorageNew->clngPtyNbr = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->clngPtyNbrLen = 0;
+		StorageNew->clngPtyNbr[StorageNew->clngPtyNbrLen] = 0;
+		if ((StorageNew->chargeNbr = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->chargeNbrLen = 0;
+		StorageNew->chargeNbr[StorageNew->chargeNbrLen] = 0;
+		if ((StorageNew->clldPtyNbr = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->clldPtyNbrLen = 0;
+		StorageNew->clldPtyNbr[StorageNew->clldPtyNbrLen] = 0;
 		StorageNew->clldPtyNoa = 0;
-		if ((StorageNew->origLnInfo = (uint8_t *) strdup("")) != NULL)
-			StorageNew->origLnInfoLen = strlen("");
-		if ((StorageNew->ingLrn = (uint8_t *) strdup("")) != NULL)
-			StorageNew->ingLrnLen = strlen("");
-		if ((StorageNew->ingCic = (uint8_t *) strdup("")) != NULL)
-			StorageNew->ingCicLen = strlen("");
+		if ((StorageNew->origLnInfo = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->origLnInfoLen = 0;
+		StorageNew->origLnInfo[StorageNew->origLnInfoLen] = 0;
+		if ((StorageNew->ingLrn = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->ingLrnLen = 0;
+		StorageNew->ingLrn[StorageNew->ingLrnLen] = 0;
+		if ((StorageNew->ingCic = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->ingCicLen = 0;
+		StorageNew->ingCic[StorageNew->ingCicLen] = 0;
 		StorageNew->ingCsi = 0;
 		StorageNew->ingCceId = 0;
 		StorageNew->ingTgProt = 0;
 		StorageNew->ingTgType = 0;
 		StorageNew->ingTgId = 0;
-		if ((StorageNew->ingCallStart = (uint8_t *) strdup("")) != NULL)
-			StorageNew->ingCallStartLen = strlen("");
+		if ((StorageNew->ingCallStart = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->ingCallStartLen = 0;
+		StorageNew->ingCallStart[StorageNew->ingCallStartLen] = 0;
 		StorageNew->ingGateId = 0;
 		StorageNew->ingCardId = 0;
 		StorageNew->ingSpanId = 0;
 		StorageNew->ingChanId = 0;
 		StorageNew->ingIsdnDChan = 0;
 		StorageNew->ingIsdnCrn = 0;
-		if ((StorageNew->ingCreatConnCplt = (uint8_t *) strdup("")) != NULL)
-			StorageNew->ingCreatConnCpltLen = strlen("");
-		if ((StorageNew->ingAddrCplt = (uint8_t *) strdup("")) != NULL)
-			StorageNew->ingAddrCpltLen = strlen("");
-		if ((StorageNew->ingCallAns = (uint8_t *) strdup("")) != NULL)
-			StorageNew->ingCallAnsLen = strlen("");
-		if ((StorageNew->transNbr = (uint8_t *) strdup("")) != NULL)
-			StorageNew->transNbrLen = strlen("");
-		if ((StorageNew->termLrn = (uint8_t *) strdup("")) != NULL)
-			StorageNew->termLrnLen = strlen("");
-		if ((StorageNew->transCic = (uint8_t *) strdup("")) != NULL)
-			StorageNew->transCicLen = strlen("");
-		if ((StorageNew->ingCallRls = (uint8_t *) strdup("")) != NULL)
-			StorageNew->ingCallRlsLen = strlen("");
+		if ((StorageNew->ingCreatConnCplt = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->ingCreatConnCpltLen = 0;
+		StorageNew->ingCreatConnCplt[StorageNew->ingCreatConnCpltLen] = 0;
+		if ((StorageNew->ingAddrCplt = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->ingAddrCpltLen = 0;
+		StorageNew->ingAddrCplt[StorageNew->ingAddrCpltLen] = 0;
+		if ((StorageNew->ingCallAns = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->ingCallAnsLen = 0;
+		StorageNew->ingCallAns[StorageNew->ingCallAnsLen] = 0;
+		if ((StorageNew->transNbr = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->transNbrLen = 0;
+		StorageNew->transNbr[StorageNew->transNbrLen] = 0;
+		if ((StorageNew->termLrn = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->termLrnLen = 0;
+		StorageNew->termLrn[StorageNew->termLrnLen] = 0;
+		if ((StorageNew->transCic = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->transCicLen = 0;
+		StorageNew->transCic[StorageNew->transCicLen] = 0;
+		if ((StorageNew->ingCallRls = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->ingCallRlsLen = 0;
+		StorageNew->ingCallRls[StorageNew->ingCallRlsLen] = 0;
 		StorageNew->ingRlsCause = 0;
 		StorageNew->egrCceId = 0;
 		StorageNew->egrTgProt = 0;
 		StorageNew->egrTgType = 0;
 		StorageNew->egrTgId = 0;
-		if ((StorageNew->egrCallStart = (uint8_t *) strdup("")) != NULL)
-			StorageNew->egrCallStartLen = strlen("");
+		if ((StorageNew->egrCallStart = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->egrCallStartLen = 0;
+		StorageNew->egrCallStart[StorageNew->egrCallStartLen] = 0;
 		StorageNew->egrGateId = 0;
 		StorageNew->egrCardId = 0;
 		StorageNew->egrSpanId = 0;
 		StorageNew->egrChanId = 0;
 		StorageNew->egrIsdnDChan = 0;
 		StorageNew->egrIsdnCrn = 0;
-		if ((StorageNew->egrCreatConnCplt = (uint8_t *) strdup("")) != NULL)
-			StorageNew->egrCreatConnCpltLen = strlen("");
-		if ((StorageNew->egrAddrCplt = (uint8_t *) strdup("")) != NULL)
-			StorageNew->egrAddrCpltLen = strlen("");
-		if ((StorageNew->egrCallAns = (uint8_t *) strdup("")) != NULL)
-			StorageNew->egrCallAnsLen = strlen("");
-		if ((StorageNew->egrCallRls = (uint8_t *) strdup("")) != NULL)
-			StorageNew->egrCallRlsLen = strlen("");
+		if ((StorageNew->egrCreatConnCplt = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->egrCreatConnCpltLen = 0;
+		StorageNew->egrCreatConnCplt[StorageNew->egrCreatConnCpltLen] = 0;
+		if ((StorageNew->egrAddrCplt = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->egrAddrCpltLen = 0;
+		StorageNew->egrAddrCplt[StorageNew->egrAddrCpltLen] = 0;
+		if ((StorageNew->egrCallAns = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->egrCallAnsLen = 0;
+		StorageNew->egrCallAns[StorageNew->egrCallAnsLen] = 0;
+		if ((StorageNew->egrCallRls = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->egrCallRlsLen = 0;
+		StorageNew->egrCallRls[StorageNew->egrCallRlsLen] = 0;
 		StorageNew->egrRlsCause = 0;
-		if ((StorageNew->chkptFirst = (uint8_t *) strdup("")) != NULL)
-			StorageNew->chkptFirstLen = strlen("");
-		if ((StorageNew->chkptLast = (uint8_t *) strdup("")) != NULL)
-			StorageNew->chkptLastLen = strlen("");
-		if ((StorageNew->ingGateName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->ingGateNameLen = strlen("");
-		if ((StorageNew->egrGateName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->egrGateNameLen = strlen("");
-		if ((StorageNew->ingTgName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->ingTgNameLen = strlen("");
-		if ((StorageNew->egrTgName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->egrTgNameLen = strlen("");
-		if ((StorageNew->origGateIp = (uint8_t *) strdup("")) != NULL)
-			StorageNew->origGateIpLen = strlen("");
-		if ((StorageNew->termGateIp = (uint8_t *) strdup("")) != NULL)
-			StorageNew->termGateIpLen = strlen("");
-		if ((StorageNew->h323ConfId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->h323ConfIdLen = strlen("");
+		if ((StorageNew->chkptFirst = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->chkptFirstLen = 0;
+		StorageNew->chkptFirst[StorageNew->chkptFirstLen] = 0;
+		if ((StorageNew->chkptLast = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->chkptLastLen = 0;
+		StorageNew->chkptLast[StorageNew->chkptLastLen] = 0;
+		if ((StorageNew->ingGateName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->ingGateNameLen = 0;
+		StorageNew->ingGateName[StorageNew->ingGateNameLen] = 0;
+		if ((StorageNew->egrGateName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->egrGateNameLen = 0;
+		StorageNew->egrGateName[StorageNew->egrGateNameLen] = 0;
+		if ((StorageNew->ingTgName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->ingTgNameLen = 0;
+		StorageNew->ingTgName[StorageNew->ingTgNameLen] = 0;
+		if ((StorageNew->egrTgName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->egrTgNameLen = 0;
+		StorageNew->egrTgName[StorageNew->egrTgNameLen] = 0;
+		if ((StorageNew->origGateIp = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->origGateIpLen = 0;
+		StorageNew->origGateIp[StorageNew->origGateIpLen] = 0;
+		if ((StorageNew->termGateIp = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->termGateIpLen = 0;
+		StorageNew->termGateIp[StorageNew->termGateIpLen] = 0;
+		if ((StorageNew->h323ConfId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->h323ConfIdLen = 0;
+		StorageNew->h323ConfId[StorageNew->h323ConfIdLen] = 0;
 		StorageNew->ingCardPort = 0;
 		StorageNew->ingCardPath = 0;
 		StorageNew->egrCardPort = 0;
 		StorageNew->egrCardPath = 0;
 		StorageNew->ingTg = 0;
 		StorageNew->egrTg = 0;
-		if ((StorageNew->dialedNbr = (uint8_t *) strdup("")) != NULL)
-			StorageNew->dialedNbrLen = strlen("");
+		if ((StorageNew->dialedNbr = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->dialedNbrLen = 0;
+		StorageNew->dialedNbr[StorageNew->dialedNbrLen] = 0;
 		StorageNew->dialedNoa = 0;
-		if ((StorageNew->redirNbr = (uint8_t *) strdup("")) != NULL)
-			StorageNew->redirNbrLen = strlen("");
+		if ((StorageNew->redirNbr = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->redirNbrLen = 0;
+		StorageNew->redirNbr[StorageNew->redirNbrLen] = 0;
 		StorageNew->redirNoa = 0;
 		StorageNew->redirInd = 0;
 		StorageNew->redirRsn = 0;
-		if ((StorageNew->calledNbr = (uint8_t *) strdup("")) != NULL)
-			StorageNew->calledNbrLen = strlen("");
+		if ((StorageNew->calledNbr = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->calledNbrLen = 0;
+		StorageNew->calledNbr[StorageNew->calledNbrLen] = 0;
 		StorageNew->calledNoa = 0;
 		StorageNew->redirRsnOrig = 0;
 		StorageNew->redirCntr = 0;
 		StorageNew->redirPrsntnInd = 0;
-		if ((StorageNew->ingJuris = (uint8_t *) strdup("")) != NULL)
-			StorageNew->ingJurisLen = strlen("");
-		if ((StorageNew->egrJuris = (uint8_t *) strdup("")) != NULL)
-			StorageNew->egrJurisLen = strlen("");
+		if ((StorageNew->ingJuris = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->ingJurisLen = 0;
+		StorageNew->ingJuris[StorageNew->ingJurisLen] = 0;
+		if ((StorageNew->egrJuris = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->egrJurisLen = 0;
+		StorageNew->egrJuris[StorageNew->egrJurisLen] = 0;
 		StorageNew->ingTrunkBearCap = 0;
 		StorageNew->egrTrunkBearCap = 0;
-		if ((StorageNew->transNetSelCarr = (uint8_t *) strdup("")) != NULL)
-			StorageNew->transNetSelCarrLen = strlen("");
+		if ((StorageNew->transNetSelCarr = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->transNetSelCarrLen = 0;
+		StorageNew->transNetSelCarr[StorageNew->transNetSelCarrLen] = 0;
 		StorageNew->clngPtyNoa = 0;
-		if ((StorageNew->ingRlsCauseIntrnl = (uint8_t *) strdup("")) != NULL)
-			StorageNew->ingRlsCauseIntrnlLen = strlen("");
-		if ((StorageNew->egrRlsCauseIntrnl = (uint8_t *) strdup("")) != NULL)
-			StorageNew->egrRlsCauseIntrnlLen = strlen("");
-		if ((StorageNew->egrClldNbr = (uint8_t *) strdup("")) != NULL)
-			StorageNew->egrClldNbrLen = strlen("");
+		if ((StorageNew->ingRlsCauseIntrnl = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->ingRlsCauseIntrnlLen = 0;
+		StorageNew->ingRlsCauseIntrnl[StorageNew->ingRlsCauseIntrnlLen] = 0;
+		if ((StorageNew->egrRlsCauseIntrnl = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->egrRlsCauseIntrnlLen = 0;
+		StorageNew->egrRlsCauseIntrnl[StorageNew->egrRlsCauseIntrnlLen] = 0;
+		if ((StorageNew->egrClldNbr = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->egrClldNbrLen = 0;
+		StorageNew->egrClldNbr[StorageNew->egrClldNbrLen] = 0;
 		StorageNew->egrClldNoa = 0;
-		if ((StorageNew->egrCnndNbr = (uint8_t *) strdup("")) != NULL)
-			StorageNew->egrCnndNbrLen = strlen("");
+		if ((StorageNew->egrCnndNbr = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->egrCnndNbrLen = 0;
+		StorageNew->egrCnndNbr[StorageNew->egrCnndNbrLen] = 0;
 		StorageNew->egrCnndNoa = 0;
 		StorageNew->clngPtyPrsntnInd = 0;
 		StorageNew->ingIri = 0;
 		StorageNew->egrOri = 0;
-		if ((StorageNew->ingCallidExtrnl = (uint8_t *) strdup("")) != NULL)
-			StorageNew->ingCallidExtrnlLen = strlen("");
-		if ((StorageNew->egrCallidExtrnl = (uint8_t *) strdup("")) != NULL)
-			StorageNew->egrCallidExtrnlLen = strlen("");
-		if ((StorageNew->ingChargeInfo = (uint8_t *) strdup("")) != NULL)
-			StorageNew->ingChargeInfoLen = strlen("");
-		if ((StorageNew->egrChargeInfo = (uint8_t *) strdup("")) != NULL)
-			StorageNew->egrChargeInfoLen = strlen("");
-		if ((StorageNew->ingPrtlInd = (uint8_t *) strdup("")) != NULL)
-			StorageNew->ingPrtlIndLen = strlen("");
+		if ((StorageNew->ingCallidExtrnl = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->ingCallidExtrnlLen = 0;
+		StorageNew->ingCallidExtrnl[StorageNew->ingCallidExtrnlLen] = 0;
+		if ((StorageNew->egrCallidExtrnl = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->egrCallidExtrnlLen = 0;
+		StorageNew->egrCallidExtrnl[StorageNew->egrCallidExtrnlLen] = 0;
+		if ((StorageNew->ingChargeInfo = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->ingChargeInfoLen = 0;
+		StorageNew->ingChargeInfo[StorageNew->ingChargeInfoLen] = 0;
+		if ((StorageNew->egrChargeInfo = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->egrChargeInfoLen = 0;
+		StorageNew->egrChargeInfo[StorageNew->egrChargeInfoLen] = 0;
+		if ((StorageNew->ingPrtlInd = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->ingPrtlIndLen = 0;
+		StorageNew->ingPrtlInd[StorageNew->ingPrtlIndLen] = 0;
 		StorageNew->ingNatfwdCliblkInd = 0;
 		StorageNew->ingNatfwdNtaInd = 0;
-		if ((StorageNew->ingLastDvrtLnDigs = (uint8_t *) strdup("")) != NULL)
-			StorageNew->ingLastDvrtLnDigsLen = strlen("");
+		if ((StorageNew->ingLastDvrtLnDigs = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->ingLastDvrtLnDigsLen = 0;
+		StorageNew->ingLastDvrtLnDigs[StorageNew->ingLastDvrtLnDigsLen] = 0;
 		StorageNew->ingLastDvrtLnNoa = 0;
-		if ((StorageNew->j7IngAddlPtyCat = (uint8_t *) strdup("")) != NULL)
-			StorageNew->j7IngAddlPtyCatLen = strlen("");
-		if ((StorageNew->j7IngChgAreaInfo = (uint8_t *) strdup("")) != NULL)
-			StorageNew->j7IngChgAreaInfoLen = strlen("");
-		if ((StorageNew->j7IngFwdCallInd = (uint8_t *) strdup("")) != NULL)
-			StorageNew->j7IngFwdCallIndLen = strlen("");
-		if ((StorageNew->j7EgrAddlPtyCat = (uint8_t *) strdup("")) != NULL)
-			StorageNew->j7EgrAddlPtyCatLen = strlen("");
-		if ((StorageNew->j7EgrChgAreaInfo = (uint8_t *) strdup("")) != NULL)
-			StorageNew->j7EgrChgAreaInfoLen = strlen("");
-		if ((StorageNew->j7EgrBkwCallInd = (uint8_t *) strdup("")) != NULL)
-			StorageNew->j7EgrBkwCallIndLen = strlen("");
-		if ((StorageNew->j7CarrInfoXfer = (uint8_t *) strdup("")) != NULL)
-			StorageNew->j7CarrInfoXferLen = strlen("");
-		if ((StorageNew->ingSs7GnrcParm = (uint8_t *) strdup("")) != NULL)
-			StorageNew->ingSs7GnrcParmLen = strlen("");
-		if ((StorageNew->egrSs7GnrcParm = (uint8_t *) strdup("")) != NULL)
-			StorageNew->egrSs7GnrcParmLen = strlen("");
+		if ((StorageNew->j7IngAddlPtyCat = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->j7IngAddlPtyCatLen = 0;
+		StorageNew->j7IngAddlPtyCat[StorageNew->j7IngAddlPtyCatLen] = 0;
+		if ((StorageNew->j7IngChgAreaInfo = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->j7IngChgAreaInfoLen = 0;
+		StorageNew->j7IngChgAreaInfo[StorageNew->j7IngChgAreaInfoLen] = 0;
+		if ((StorageNew->j7IngFwdCallInd = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->j7IngFwdCallIndLen = 0;
+		StorageNew->j7IngFwdCallInd[StorageNew->j7IngFwdCallIndLen] = 0;
+		if ((StorageNew->j7EgrAddlPtyCat = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->j7EgrAddlPtyCatLen = 0;
+		StorageNew->j7EgrAddlPtyCat[StorageNew->j7EgrAddlPtyCatLen] = 0;
+		if ((StorageNew->j7EgrChgAreaInfo = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->j7EgrChgAreaInfoLen = 0;
+		StorageNew->j7EgrChgAreaInfo[StorageNew->j7EgrChgAreaInfoLen] = 0;
+		if ((StorageNew->j7EgrBkwCallInd = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->j7EgrBkwCallIndLen = 0;
+		StorageNew->j7EgrBkwCallInd[StorageNew->j7EgrBkwCallIndLen] = 0;
+		if ((StorageNew->j7CarrInfoXfer = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->j7CarrInfoXferLen = 0;
+		StorageNew->j7CarrInfoXfer[StorageNew->j7CarrInfoXferLen] = 0;
+		if ((StorageNew->ingSs7GnrcParm = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->ingSs7GnrcParmLen = 0;
+		StorageNew->ingSs7GnrcParm[StorageNew->ingSs7GnrcParmLen] = 0;
+		if ((StorageNew->egrSs7GnrcParm = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->egrSs7GnrcParmLen = 0;
+		StorageNew->egrSs7GnrcParm[StorageNew->egrSs7GnrcParmLen] = 0;
 		StorageNew->ingPktsSent = 0;
 		StorageNew->ingPktsRcvd = 0;
 		StorageNew->ingPktsLost = 0;
@@ -3434,18 +4124,30 @@ callDetailLogRecordR2Table_create(void)
 		StorageNew->egrCodec = 0;
 		StorageNew->ingLocGateId = 0;
 		StorageNew->egrLocGateId = 0;
-		if ((StorageNew->ingCasCrctSzr = (uint8_t *) strdup("")) != NULL)
-			StorageNew->ingCasCrctSzrLen = strlen("");
-		if ((StorageNew->egrCasCrctSzr = (uint8_t *) strdup("")) != NULL)
-			StorageNew->egrCasCrctSzrLen = strlen("");
-		if ((StorageNew->ingZz = (uint8_t *) strdup("")) != NULL)
-			StorageNew->ingZzLen = strlen("");
-		if ((StorageNew->egrZz = (uint8_t *) strdup("")) != NULL)
-			StorageNew->egrZzLen = strlen("");
-		if ((StorageNew->ingCtryAddrType = (uint8_t *) strdup("")) != NULL)
-			StorageNew->ingCtryAddrTypeLen = strlen("");
-		if ((StorageNew->egrCtryAddrType = (uint8_t *) strdup("")) != NULL)
-			StorageNew->egrCtryAddrTypeLen = strlen("");
+		if ((StorageNew->ingCasCrctSzr = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->ingCasCrctSzrLen = 0;
+		StorageNew->ingCasCrctSzr[StorageNew->ingCasCrctSzrLen] = 0;
+		if ((StorageNew->egrCasCrctSzr = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->egrCasCrctSzrLen = 0;
+		StorageNew->egrCasCrctSzr[StorageNew->egrCasCrctSzrLen] = 0;
+		if ((StorageNew->ingZz = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->ingZzLen = 0;
+		StorageNew->ingZz[StorageNew->ingZzLen] = 0;
+		if ((StorageNew->egrZz = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->egrZzLen = 0;
+		StorageNew->egrZz[StorageNew->egrZzLen] = 0;
+		if ((StorageNew->ingCtryAddrType = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->ingCtryAddrTypeLen = 0;
+		StorageNew->ingCtryAddrType[StorageNew->ingCtryAddrTypeLen] = 0;
+		if ((StorageNew->egrCtryAddrType = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->egrCtryAddrTypeLen = 0;
+		StorageNew->egrCtryAddrType[StorageNew->egrCtryAddrTypeLen] = 0;
 		StorageNew->ingPartition = 0;
 		StorageNew->egrPartition = 0;
 		StorageNew->ingClngPtyCat = 0;
@@ -3455,28 +4157,38 @@ callDetailLogRecordR2Table_create(void)
 		StorageNew->callDuration = 0;
 		StorageNew->ingRlsDrctn = 0;
 		StorageNew->egrRlsDrctn = 0;
-		if ((StorageNew->ingAnsLctim = (uint8_t *) strdup("")) != NULL)
-			StorageNew->ingAnsLctimLen = strlen("");
-		if ((StorageNew->egrAnsLctim = (uint8_t *) strdup("")) != NULL)
-			StorageNew->egrAnsLctimLen = strlen("");
+		if ((StorageNew->ingAnsLctim = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->ingAnsLctimLen = 0;
+		StorageNew->ingAnsLctim[StorageNew->ingAnsLctimLen] = 0;
+		if ((StorageNew->egrAnsLctim = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->egrAnsLctimLen = 0;
+		StorageNew->egrAnsLctim[StorageNew->egrAnsLctimLen] = 0;
 		StorageNew->ingHlcChrsId = 0;
 		StorageNew->egrHlcChrsId = 0;
 		StorageNew->ingLlcXferCap = 0;
 		StorageNew->egrLlcXferCap = 0;
-		if ((StorageNew->routeList = (uint8_t *) strdup("")) != NULL)
-			StorageNew->routeListLen = strlen("");
+		if ((StorageNew->routeList = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->routeListLen = 0;
+		StorageNew->routeList[StorageNew->routeListLen] = 0;
 		StorageNew->ingPointCode = 0;
 		StorageNew->egrPointCode = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("cdr2MIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	callDetailLogRecordR2Table_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct callDetailLogRecordR2Table_data *callDetailLogRecordR2Table_duplicate(struct callDetailLogRecordR2Table_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3488,6 +4200,430 @@ callDetailLogRecordR2Table_duplicate(struct callDetailLogRecordR2Table_data *the
 
 	DEBUGMSGTL(("cdr2MIB", "callDetailLogRecordR2Table_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->callDetailLogRecordR2Table_id = thedata->callDetailLogRecordR2Table_id;
+		if (!(StorageNew->logId = malloc(thedata->logIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logId, thedata->logId, thedata->logIdLen);
+		StorageNew->logIdLen = thedata->logIdLen;
+		StorageNew->logId[StorageNew->logIdLen] = 0;
+		if (!(StorageNew->logRecordId = malloc(thedata->logRecordIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->logRecordId, thedata->logRecordId, thedata->logRecordIdLen);
+		StorageNew->logRecordIdLen = thedata->logRecordIdLen;
+		StorageNew->logRecordId[StorageNew->logRecordIdLen] = 0;
+		StorageNew->sequenceId = thedata->sequenceId;
+		StorageNew->zoneId = thedata->zoneId;
+		StorageNew->recSeqId = thedata->recSeqId;
+		StorageNew->fileSeqId = thedata->fileSeqId;
+		if (!(StorageNew->callId = malloc(thedata->callIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->callId, thedata->callId, thedata->callIdLen);
+		StorageNew->callIdLen = thedata->callIdLen;
+		StorageNew->callId[StorageNew->callIdLen] = 0;
+		if (!(StorageNew->lastUpdate = malloc(thedata->lastUpdateLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->lastUpdate, thedata->lastUpdate, thedata->lastUpdateLen);
+		StorageNew->lastUpdateLen = thedata->lastUpdateLen;
+		StorageNew->lastUpdate[StorageNew->lastUpdateLen] = 0;
+		if (!(StorageNew->eventOrder = malloc(thedata->eventOrderLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->eventOrder, thedata->eventOrder, thedata->eventOrderLen);
+		StorageNew->eventOrderLen = thedata->eventOrderLen;
+		StorageNew->eventOrder[StorageNew->eventOrderLen] = 0;
+		StorageNew->status = thedata->status;
+		StorageNew->callType = thedata->callType;
+		if (!(StorageNew->clngPtyNbr = malloc(thedata->clngPtyNbrLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->clngPtyNbr, thedata->clngPtyNbr, thedata->clngPtyNbrLen);
+		StorageNew->clngPtyNbrLen = thedata->clngPtyNbrLen;
+		StorageNew->clngPtyNbr[StorageNew->clngPtyNbrLen] = 0;
+		if (!(StorageNew->chargeNbr = malloc(thedata->chargeNbrLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->chargeNbr, thedata->chargeNbr, thedata->chargeNbrLen);
+		StorageNew->chargeNbrLen = thedata->chargeNbrLen;
+		StorageNew->chargeNbr[StorageNew->chargeNbrLen] = 0;
+		if (!(StorageNew->clldPtyNbr = malloc(thedata->clldPtyNbrLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->clldPtyNbr, thedata->clldPtyNbr, thedata->clldPtyNbrLen);
+		StorageNew->clldPtyNbrLen = thedata->clldPtyNbrLen;
+		StorageNew->clldPtyNbr[StorageNew->clldPtyNbrLen] = 0;
+		StorageNew->clldPtyNoa = thedata->clldPtyNoa;
+		if (!(StorageNew->origLnInfo = malloc(thedata->origLnInfoLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->origLnInfo, thedata->origLnInfo, thedata->origLnInfoLen);
+		StorageNew->origLnInfoLen = thedata->origLnInfoLen;
+		StorageNew->origLnInfo[StorageNew->origLnInfoLen] = 0;
+		if (!(StorageNew->ingLrn = malloc(thedata->ingLrnLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->ingLrn, thedata->ingLrn, thedata->ingLrnLen);
+		StorageNew->ingLrnLen = thedata->ingLrnLen;
+		StorageNew->ingLrn[StorageNew->ingLrnLen] = 0;
+		if (!(StorageNew->ingCic = malloc(thedata->ingCicLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->ingCic, thedata->ingCic, thedata->ingCicLen);
+		StorageNew->ingCicLen = thedata->ingCicLen;
+		StorageNew->ingCic[StorageNew->ingCicLen] = 0;
+		StorageNew->ingCsi = thedata->ingCsi;
+		StorageNew->ingCceId = thedata->ingCceId;
+		StorageNew->ingTgProt = thedata->ingTgProt;
+		StorageNew->ingTgType = thedata->ingTgType;
+		StorageNew->ingTgId = thedata->ingTgId;
+		if (!(StorageNew->ingCallStart = malloc(thedata->ingCallStartLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->ingCallStart, thedata->ingCallStart, thedata->ingCallStartLen);
+		StorageNew->ingCallStartLen = thedata->ingCallStartLen;
+		StorageNew->ingCallStart[StorageNew->ingCallStartLen] = 0;
+		StorageNew->ingGateId = thedata->ingGateId;
+		StorageNew->ingCardId = thedata->ingCardId;
+		StorageNew->ingSpanId = thedata->ingSpanId;
+		StorageNew->ingChanId = thedata->ingChanId;
+		StorageNew->ingIsdnDChan = thedata->ingIsdnDChan;
+		StorageNew->ingIsdnCrn = thedata->ingIsdnCrn;
+		if (!(StorageNew->ingCreatConnCplt = malloc(thedata->ingCreatConnCpltLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->ingCreatConnCplt, thedata->ingCreatConnCplt, thedata->ingCreatConnCpltLen);
+		StorageNew->ingCreatConnCpltLen = thedata->ingCreatConnCpltLen;
+		StorageNew->ingCreatConnCplt[StorageNew->ingCreatConnCpltLen] = 0;
+		if (!(StorageNew->ingAddrCplt = malloc(thedata->ingAddrCpltLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->ingAddrCplt, thedata->ingAddrCplt, thedata->ingAddrCpltLen);
+		StorageNew->ingAddrCpltLen = thedata->ingAddrCpltLen;
+		StorageNew->ingAddrCplt[StorageNew->ingAddrCpltLen] = 0;
+		if (!(StorageNew->ingCallAns = malloc(thedata->ingCallAnsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->ingCallAns, thedata->ingCallAns, thedata->ingCallAnsLen);
+		StorageNew->ingCallAnsLen = thedata->ingCallAnsLen;
+		StorageNew->ingCallAns[StorageNew->ingCallAnsLen] = 0;
+		if (!(StorageNew->transNbr = malloc(thedata->transNbrLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->transNbr, thedata->transNbr, thedata->transNbrLen);
+		StorageNew->transNbrLen = thedata->transNbrLen;
+		StorageNew->transNbr[StorageNew->transNbrLen] = 0;
+		if (!(StorageNew->termLrn = malloc(thedata->termLrnLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->termLrn, thedata->termLrn, thedata->termLrnLen);
+		StorageNew->termLrnLen = thedata->termLrnLen;
+		StorageNew->termLrn[StorageNew->termLrnLen] = 0;
+		if (!(StorageNew->transCic = malloc(thedata->transCicLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->transCic, thedata->transCic, thedata->transCicLen);
+		StorageNew->transCicLen = thedata->transCicLen;
+		StorageNew->transCic[StorageNew->transCicLen] = 0;
+		if (!(StorageNew->ingCallRls = malloc(thedata->ingCallRlsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->ingCallRls, thedata->ingCallRls, thedata->ingCallRlsLen);
+		StorageNew->ingCallRlsLen = thedata->ingCallRlsLen;
+		StorageNew->ingCallRls[StorageNew->ingCallRlsLen] = 0;
+		StorageNew->ingRlsCause = thedata->ingRlsCause;
+		StorageNew->egrCceId = thedata->egrCceId;
+		StorageNew->egrTgProt = thedata->egrTgProt;
+		StorageNew->egrTgType = thedata->egrTgType;
+		StorageNew->egrTgId = thedata->egrTgId;
+		if (!(StorageNew->egrCallStart = malloc(thedata->egrCallStartLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->egrCallStart, thedata->egrCallStart, thedata->egrCallStartLen);
+		StorageNew->egrCallStartLen = thedata->egrCallStartLen;
+		StorageNew->egrCallStart[StorageNew->egrCallStartLen] = 0;
+		StorageNew->egrGateId = thedata->egrGateId;
+		StorageNew->egrCardId = thedata->egrCardId;
+		StorageNew->egrSpanId = thedata->egrSpanId;
+		StorageNew->egrChanId = thedata->egrChanId;
+		StorageNew->egrIsdnDChan = thedata->egrIsdnDChan;
+		StorageNew->egrIsdnCrn = thedata->egrIsdnCrn;
+		if (!(StorageNew->egrCreatConnCplt = malloc(thedata->egrCreatConnCpltLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->egrCreatConnCplt, thedata->egrCreatConnCplt, thedata->egrCreatConnCpltLen);
+		StorageNew->egrCreatConnCpltLen = thedata->egrCreatConnCpltLen;
+		StorageNew->egrCreatConnCplt[StorageNew->egrCreatConnCpltLen] = 0;
+		if (!(StorageNew->egrAddrCplt = malloc(thedata->egrAddrCpltLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->egrAddrCplt, thedata->egrAddrCplt, thedata->egrAddrCpltLen);
+		StorageNew->egrAddrCpltLen = thedata->egrAddrCpltLen;
+		StorageNew->egrAddrCplt[StorageNew->egrAddrCpltLen] = 0;
+		if (!(StorageNew->egrCallAns = malloc(thedata->egrCallAnsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->egrCallAns, thedata->egrCallAns, thedata->egrCallAnsLen);
+		StorageNew->egrCallAnsLen = thedata->egrCallAnsLen;
+		StorageNew->egrCallAns[StorageNew->egrCallAnsLen] = 0;
+		if (!(StorageNew->egrCallRls = malloc(thedata->egrCallRlsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->egrCallRls, thedata->egrCallRls, thedata->egrCallRlsLen);
+		StorageNew->egrCallRlsLen = thedata->egrCallRlsLen;
+		StorageNew->egrCallRls[StorageNew->egrCallRlsLen] = 0;
+		StorageNew->egrRlsCause = thedata->egrRlsCause;
+		if (!(StorageNew->chkptFirst = malloc(thedata->chkptFirstLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->chkptFirst, thedata->chkptFirst, thedata->chkptFirstLen);
+		StorageNew->chkptFirstLen = thedata->chkptFirstLen;
+		StorageNew->chkptFirst[StorageNew->chkptFirstLen] = 0;
+		if (!(StorageNew->chkptLast = malloc(thedata->chkptLastLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->chkptLast, thedata->chkptLast, thedata->chkptLastLen);
+		StorageNew->chkptLastLen = thedata->chkptLastLen;
+		StorageNew->chkptLast[StorageNew->chkptLastLen] = 0;
+		if (!(StorageNew->ingGateName = malloc(thedata->ingGateNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->ingGateName, thedata->ingGateName, thedata->ingGateNameLen);
+		StorageNew->ingGateNameLen = thedata->ingGateNameLen;
+		StorageNew->ingGateName[StorageNew->ingGateNameLen] = 0;
+		if (!(StorageNew->egrGateName = malloc(thedata->egrGateNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->egrGateName, thedata->egrGateName, thedata->egrGateNameLen);
+		StorageNew->egrGateNameLen = thedata->egrGateNameLen;
+		StorageNew->egrGateName[StorageNew->egrGateNameLen] = 0;
+		if (!(StorageNew->ingTgName = malloc(thedata->ingTgNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->ingTgName, thedata->ingTgName, thedata->ingTgNameLen);
+		StorageNew->ingTgNameLen = thedata->ingTgNameLen;
+		StorageNew->ingTgName[StorageNew->ingTgNameLen] = 0;
+		if (!(StorageNew->egrTgName = malloc(thedata->egrTgNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->egrTgName, thedata->egrTgName, thedata->egrTgNameLen);
+		StorageNew->egrTgNameLen = thedata->egrTgNameLen;
+		StorageNew->egrTgName[StorageNew->egrTgNameLen] = 0;
+		if (!(StorageNew->origGateIp = malloc(thedata->origGateIpLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->origGateIp, thedata->origGateIp, thedata->origGateIpLen);
+		StorageNew->origGateIpLen = thedata->origGateIpLen;
+		StorageNew->origGateIp[StorageNew->origGateIpLen] = 0;
+		if (!(StorageNew->termGateIp = malloc(thedata->termGateIpLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->termGateIp, thedata->termGateIp, thedata->termGateIpLen);
+		StorageNew->termGateIpLen = thedata->termGateIpLen;
+		StorageNew->termGateIp[StorageNew->termGateIpLen] = 0;
+		if (!(StorageNew->h323ConfId = malloc(thedata->h323ConfIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->h323ConfId, thedata->h323ConfId, thedata->h323ConfIdLen);
+		StorageNew->h323ConfIdLen = thedata->h323ConfIdLen;
+		StorageNew->h323ConfId[StorageNew->h323ConfIdLen] = 0;
+		StorageNew->ingCardPort = thedata->ingCardPort;
+		StorageNew->ingCardPath = thedata->ingCardPath;
+		StorageNew->egrCardPort = thedata->egrCardPort;
+		StorageNew->egrCardPath = thedata->egrCardPath;
+		StorageNew->ingTg = thedata->ingTg;
+		StorageNew->egrTg = thedata->egrTg;
+		if (!(StorageNew->dialedNbr = malloc(thedata->dialedNbrLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->dialedNbr, thedata->dialedNbr, thedata->dialedNbrLen);
+		StorageNew->dialedNbrLen = thedata->dialedNbrLen;
+		StorageNew->dialedNbr[StorageNew->dialedNbrLen] = 0;
+		StorageNew->dialedNoa = thedata->dialedNoa;
+		if (!(StorageNew->redirNbr = malloc(thedata->redirNbrLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->redirNbr, thedata->redirNbr, thedata->redirNbrLen);
+		StorageNew->redirNbrLen = thedata->redirNbrLen;
+		StorageNew->redirNbr[StorageNew->redirNbrLen] = 0;
+		StorageNew->redirNoa = thedata->redirNoa;
+		StorageNew->redirInd = thedata->redirInd;
+		StorageNew->redirRsn = thedata->redirRsn;
+		if (!(StorageNew->calledNbr = malloc(thedata->calledNbrLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->calledNbr, thedata->calledNbr, thedata->calledNbrLen);
+		StorageNew->calledNbrLen = thedata->calledNbrLen;
+		StorageNew->calledNbr[StorageNew->calledNbrLen] = 0;
+		StorageNew->calledNoa = thedata->calledNoa;
+		StorageNew->redirRsnOrig = thedata->redirRsnOrig;
+		StorageNew->redirCntr = thedata->redirCntr;
+		StorageNew->redirPrsntnInd = thedata->redirPrsntnInd;
+		if (!(StorageNew->ingJuris = malloc(thedata->ingJurisLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->ingJuris, thedata->ingJuris, thedata->ingJurisLen);
+		StorageNew->ingJurisLen = thedata->ingJurisLen;
+		StorageNew->ingJuris[StorageNew->ingJurisLen] = 0;
+		if (!(StorageNew->egrJuris = malloc(thedata->egrJurisLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->egrJuris, thedata->egrJuris, thedata->egrJurisLen);
+		StorageNew->egrJurisLen = thedata->egrJurisLen;
+		StorageNew->egrJuris[StorageNew->egrJurisLen] = 0;
+		StorageNew->ingTrunkBearCap = thedata->ingTrunkBearCap;
+		StorageNew->egrTrunkBearCap = thedata->egrTrunkBearCap;
+		if (!(StorageNew->transNetSelCarr = malloc(thedata->transNetSelCarrLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->transNetSelCarr, thedata->transNetSelCarr, thedata->transNetSelCarrLen);
+		StorageNew->transNetSelCarrLen = thedata->transNetSelCarrLen;
+		StorageNew->transNetSelCarr[StorageNew->transNetSelCarrLen] = 0;
+		StorageNew->clngPtyNoa = thedata->clngPtyNoa;
+		if (!(StorageNew->ingRlsCauseIntrnl = malloc(thedata->ingRlsCauseIntrnlLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->ingRlsCauseIntrnl, thedata->ingRlsCauseIntrnl, thedata->ingRlsCauseIntrnlLen);
+		StorageNew->ingRlsCauseIntrnlLen = thedata->ingRlsCauseIntrnlLen;
+		StorageNew->ingRlsCauseIntrnl[StorageNew->ingRlsCauseIntrnlLen] = 0;
+		if (!(StorageNew->egrRlsCauseIntrnl = malloc(thedata->egrRlsCauseIntrnlLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->egrRlsCauseIntrnl, thedata->egrRlsCauseIntrnl, thedata->egrRlsCauseIntrnlLen);
+		StorageNew->egrRlsCauseIntrnlLen = thedata->egrRlsCauseIntrnlLen;
+		StorageNew->egrRlsCauseIntrnl[StorageNew->egrRlsCauseIntrnlLen] = 0;
+		if (!(StorageNew->egrClldNbr = malloc(thedata->egrClldNbrLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->egrClldNbr, thedata->egrClldNbr, thedata->egrClldNbrLen);
+		StorageNew->egrClldNbrLen = thedata->egrClldNbrLen;
+		StorageNew->egrClldNbr[StorageNew->egrClldNbrLen] = 0;
+		StorageNew->egrClldNoa = thedata->egrClldNoa;
+		if (!(StorageNew->egrCnndNbr = malloc(thedata->egrCnndNbrLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->egrCnndNbr, thedata->egrCnndNbr, thedata->egrCnndNbrLen);
+		StorageNew->egrCnndNbrLen = thedata->egrCnndNbrLen;
+		StorageNew->egrCnndNbr[StorageNew->egrCnndNbrLen] = 0;
+		StorageNew->egrCnndNoa = thedata->egrCnndNoa;
+		StorageNew->clngPtyPrsntnInd = thedata->clngPtyPrsntnInd;
+		StorageNew->ingIri = thedata->ingIri;
+		StorageNew->egrOri = thedata->egrOri;
+		if (!(StorageNew->ingCallidExtrnl = malloc(thedata->ingCallidExtrnlLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->ingCallidExtrnl, thedata->ingCallidExtrnl, thedata->ingCallidExtrnlLen);
+		StorageNew->ingCallidExtrnlLen = thedata->ingCallidExtrnlLen;
+		StorageNew->ingCallidExtrnl[StorageNew->ingCallidExtrnlLen] = 0;
+		if (!(StorageNew->egrCallidExtrnl = malloc(thedata->egrCallidExtrnlLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->egrCallidExtrnl, thedata->egrCallidExtrnl, thedata->egrCallidExtrnlLen);
+		StorageNew->egrCallidExtrnlLen = thedata->egrCallidExtrnlLen;
+		StorageNew->egrCallidExtrnl[StorageNew->egrCallidExtrnlLen] = 0;
+		if (!(StorageNew->ingChargeInfo = malloc(thedata->ingChargeInfoLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->ingChargeInfo, thedata->ingChargeInfo, thedata->ingChargeInfoLen);
+		StorageNew->ingChargeInfoLen = thedata->ingChargeInfoLen;
+		StorageNew->ingChargeInfo[StorageNew->ingChargeInfoLen] = 0;
+		if (!(StorageNew->egrChargeInfo = malloc(thedata->egrChargeInfoLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->egrChargeInfo, thedata->egrChargeInfo, thedata->egrChargeInfoLen);
+		StorageNew->egrChargeInfoLen = thedata->egrChargeInfoLen;
+		StorageNew->egrChargeInfo[StorageNew->egrChargeInfoLen] = 0;
+		if (!(StorageNew->ingPrtlInd = malloc(thedata->ingPrtlIndLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->ingPrtlInd, thedata->ingPrtlInd, thedata->ingPrtlIndLen);
+		StorageNew->ingPrtlIndLen = thedata->ingPrtlIndLen;
+		StorageNew->ingPrtlInd[StorageNew->ingPrtlIndLen] = 0;
+		StorageNew->ingNatfwdCliblkInd = thedata->ingNatfwdCliblkInd;
+		StorageNew->ingNatfwdNtaInd = thedata->ingNatfwdNtaInd;
+		if (!(StorageNew->ingLastDvrtLnDigs = malloc(thedata->ingLastDvrtLnDigsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->ingLastDvrtLnDigs, thedata->ingLastDvrtLnDigs, thedata->ingLastDvrtLnDigsLen);
+		StorageNew->ingLastDvrtLnDigsLen = thedata->ingLastDvrtLnDigsLen;
+		StorageNew->ingLastDvrtLnDigs[StorageNew->ingLastDvrtLnDigsLen] = 0;
+		StorageNew->ingLastDvrtLnNoa = thedata->ingLastDvrtLnNoa;
+		if (!(StorageNew->j7IngAddlPtyCat = malloc(thedata->j7IngAddlPtyCatLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->j7IngAddlPtyCat, thedata->j7IngAddlPtyCat, thedata->j7IngAddlPtyCatLen);
+		StorageNew->j7IngAddlPtyCatLen = thedata->j7IngAddlPtyCatLen;
+		StorageNew->j7IngAddlPtyCat[StorageNew->j7IngAddlPtyCatLen] = 0;
+		if (!(StorageNew->j7IngChgAreaInfo = malloc(thedata->j7IngChgAreaInfoLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->j7IngChgAreaInfo, thedata->j7IngChgAreaInfo, thedata->j7IngChgAreaInfoLen);
+		StorageNew->j7IngChgAreaInfoLen = thedata->j7IngChgAreaInfoLen;
+		StorageNew->j7IngChgAreaInfo[StorageNew->j7IngChgAreaInfoLen] = 0;
+		if (!(StorageNew->j7IngFwdCallInd = malloc(thedata->j7IngFwdCallIndLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->j7IngFwdCallInd, thedata->j7IngFwdCallInd, thedata->j7IngFwdCallIndLen);
+		StorageNew->j7IngFwdCallIndLen = thedata->j7IngFwdCallIndLen;
+		StorageNew->j7IngFwdCallInd[StorageNew->j7IngFwdCallIndLen] = 0;
+		if (!(StorageNew->j7EgrAddlPtyCat = malloc(thedata->j7EgrAddlPtyCatLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->j7EgrAddlPtyCat, thedata->j7EgrAddlPtyCat, thedata->j7EgrAddlPtyCatLen);
+		StorageNew->j7EgrAddlPtyCatLen = thedata->j7EgrAddlPtyCatLen;
+		StorageNew->j7EgrAddlPtyCat[StorageNew->j7EgrAddlPtyCatLen] = 0;
+		if (!(StorageNew->j7EgrChgAreaInfo = malloc(thedata->j7EgrChgAreaInfoLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->j7EgrChgAreaInfo, thedata->j7EgrChgAreaInfo, thedata->j7EgrChgAreaInfoLen);
+		StorageNew->j7EgrChgAreaInfoLen = thedata->j7EgrChgAreaInfoLen;
+		StorageNew->j7EgrChgAreaInfo[StorageNew->j7EgrChgAreaInfoLen] = 0;
+		if (!(StorageNew->j7EgrBkwCallInd = malloc(thedata->j7EgrBkwCallIndLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->j7EgrBkwCallInd, thedata->j7EgrBkwCallInd, thedata->j7EgrBkwCallIndLen);
+		StorageNew->j7EgrBkwCallIndLen = thedata->j7EgrBkwCallIndLen;
+		StorageNew->j7EgrBkwCallInd[StorageNew->j7EgrBkwCallIndLen] = 0;
+		if (!(StorageNew->j7CarrInfoXfer = malloc(thedata->j7CarrInfoXferLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->j7CarrInfoXfer, thedata->j7CarrInfoXfer, thedata->j7CarrInfoXferLen);
+		StorageNew->j7CarrInfoXferLen = thedata->j7CarrInfoXferLen;
+		StorageNew->j7CarrInfoXfer[StorageNew->j7CarrInfoXferLen] = 0;
+		if (!(StorageNew->ingSs7GnrcParm = malloc(thedata->ingSs7GnrcParmLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->ingSs7GnrcParm, thedata->ingSs7GnrcParm, thedata->ingSs7GnrcParmLen);
+		StorageNew->ingSs7GnrcParmLen = thedata->ingSs7GnrcParmLen;
+		StorageNew->ingSs7GnrcParm[StorageNew->ingSs7GnrcParmLen] = 0;
+		if (!(StorageNew->egrSs7GnrcParm = malloc(thedata->egrSs7GnrcParmLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->egrSs7GnrcParm, thedata->egrSs7GnrcParm, thedata->egrSs7GnrcParmLen);
+		StorageNew->egrSs7GnrcParmLen = thedata->egrSs7GnrcParmLen;
+		StorageNew->egrSs7GnrcParm[StorageNew->egrSs7GnrcParmLen] = 0;
+		StorageNew->ingPktsSent = thedata->ingPktsSent;
+		StorageNew->ingPktsRcvd = thedata->ingPktsRcvd;
+		StorageNew->ingPktsLost = thedata->ingPktsLost;
+		StorageNew->ingPktsXfer = thedata->ingPktsXfer;
+		StorageNew->ingJitter = thedata->ingJitter;
+		StorageNew->ingLtncy = thedata->ingLtncy;
+		StorageNew->egrPktsSent = thedata->egrPktsSent;
+		StorageNew->egrPktsRcvd = thedata->egrPktsRcvd;
+		StorageNew->egrPktsLost = thedata->egrPktsLost;
+		StorageNew->egrPktsXfer = thedata->egrPktsXfer;
+		StorageNew->egrJitter = thedata->egrJitter;
+		StorageNew->egrLtncy = thedata->egrLtncy;
+		StorageNew->ingCrctId = thedata->ingCrctId;
+		StorageNew->egrCrctId = thedata->egrCrctId;
+		StorageNew->ingCodec = thedata->ingCodec;
+		StorageNew->egrCodec = thedata->egrCodec;
+		StorageNew->ingLocGateId = thedata->ingLocGateId;
+		StorageNew->egrLocGateId = thedata->egrLocGateId;
+		if (!(StorageNew->ingCasCrctSzr = malloc(thedata->ingCasCrctSzrLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->ingCasCrctSzr, thedata->ingCasCrctSzr, thedata->ingCasCrctSzrLen);
+		StorageNew->ingCasCrctSzrLen = thedata->ingCasCrctSzrLen;
+		StorageNew->ingCasCrctSzr[StorageNew->ingCasCrctSzrLen] = 0;
+		if (!(StorageNew->egrCasCrctSzr = malloc(thedata->egrCasCrctSzrLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->egrCasCrctSzr, thedata->egrCasCrctSzr, thedata->egrCasCrctSzrLen);
+		StorageNew->egrCasCrctSzrLen = thedata->egrCasCrctSzrLen;
+		StorageNew->egrCasCrctSzr[StorageNew->egrCasCrctSzrLen] = 0;
+		if (!(StorageNew->ingZz = malloc(thedata->ingZzLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->ingZz, thedata->ingZz, thedata->ingZzLen);
+		StorageNew->ingZzLen = thedata->ingZzLen;
+		StorageNew->ingZz[StorageNew->ingZzLen] = 0;
+		if (!(StorageNew->egrZz = malloc(thedata->egrZzLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->egrZz, thedata->egrZz, thedata->egrZzLen);
+		StorageNew->egrZzLen = thedata->egrZzLen;
+		StorageNew->egrZz[StorageNew->egrZzLen] = 0;
+		if (!(StorageNew->ingCtryAddrType = malloc(thedata->ingCtryAddrTypeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->ingCtryAddrType, thedata->ingCtryAddrType, thedata->ingCtryAddrTypeLen);
+		StorageNew->ingCtryAddrTypeLen = thedata->ingCtryAddrTypeLen;
+		StorageNew->ingCtryAddrType[StorageNew->ingCtryAddrTypeLen] = 0;
+		if (!(StorageNew->egrCtryAddrType = malloc(thedata->egrCtryAddrTypeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->egrCtryAddrType, thedata->egrCtryAddrType, thedata->egrCtryAddrTypeLen);
+		StorageNew->egrCtryAddrTypeLen = thedata->egrCtryAddrTypeLen;
+		StorageNew->egrCtryAddrType[StorageNew->egrCtryAddrTypeLen] = 0;
+		StorageNew->ingPartition = thedata->ingPartition;
+		StorageNew->egrPartition = thedata->egrPartition;
+		StorageNew->ingClngPtyCat = thedata->ingClngPtyCat;
+		StorageNew->ingRlsCauseLctn = thedata->ingRlsCauseLctn;
+		StorageNew->egrRlsCauseLctn = thedata->egrRlsCauseLctn;
+		StorageNew->clldPtyCat = thedata->clldPtyCat;
+		StorageNew->callDuration = thedata->callDuration;
+		StorageNew->ingRlsDrctn = thedata->ingRlsDrctn;
+		StorageNew->egrRlsDrctn = thedata->egrRlsDrctn;
+		if (!(StorageNew->ingAnsLctim = malloc(thedata->ingAnsLctimLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->ingAnsLctim, thedata->ingAnsLctim, thedata->ingAnsLctimLen);
+		StorageNew->ingAnsLctimLen = thedata->ingAnsLctimLen;
+		StorageNew->ingAnsLctim[StorageNew->ingAnsLctimLen] = 0;
+		if (!(StorageNew->egrAnsLctim = malloc(thedata->egrAnsLctimLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->egrAnsLctim, thedata->egrAnsLctim, thedata->egrAnsLctimLen);
+		StorageNew->egrAnsLctimLen = thedata->egrAnsLctimLen;
+		StorageNew->egrAnsLctim[StorageNew->egrAnsLctimLen] = 0;
+		StorageNew->ingHlcChrsId = thedata->ingHlcChrsId;
+		StorageNew->egrHlcChrsId = thedata->egrHlcChrsId;
+		StorageNew->ingLlcXferCap = thedata->ingLlcXferCap;
+		StorageNew->egrLlcXferCap = thedata->egrLlcXferCap;
+		if (!(StorageNew->routeList = malloc(thedata->routeListLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->routeList, thedata->routeList, thedata->routeListLen);
+		StorageNew->routeListLen = thedata->routeListLen;
+		StorageNew->routeList[StorageNew->routeListLen] = 0;
+		StorageNew->ingPointCode = thedata->ingPointCode;
+		StorageNew->egrPointCode = thedata->egrPointCode;
 	}
       done:
 	DEBUGMSGTL(("cdr2MIB", "done.\n"));
@@ -3717,7 +4853,7 @@ callDetailLogRecordR2Table_del(struct callDetailLogRecordR2Table_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for callDetailLogRecordR2Table entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case callDetailLogRecordR2Table).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -4418,6 +5554,234 @@ store_callDetailLogRecordR2Table(int majorID, int minorID, void *serverarg, void
 }
 
 /**
+ * @fn int activate_simpleUsageMeteringControlTable_row(struct simpleUsageMeteringControlTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_simpleUsageMeteringControlTable_row(struct simpleUsageMeteringControlTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_simpleUsageMeteringControlTable_row(struct simpleUsageMeteringControlTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_simpleUsageMeteringControlTable_row(struct simpleUsageMeteringControlTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_configurableSimpleUsageMeteringControlTable_row(struct configurableSimpleUsageMeteringControlTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_configurableSimpleUsageMeteringControlTable_row(struct configurableSimpleUsageMeteringControlTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_configurableSimpleUsageMeteringControlTable_row(struct configurableSimpleUsageMeteringControlTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_configurableSimpleUsageMeteringControlTable_row(struct configurableSimpleUsageMeteringControlTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_blockGeneratingLogTable_row(struct blockGeneratingLogTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_blockGeneratingLogTable_row(struct blockGeneratingLogTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_blockGeneratingLogTable_row(struct blockGeneratingLogTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_blockGeneratingLogTable_row(struct blockGeneratingLogTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_fileGeneratingLogTable_row(struct fileGeneratingLogTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_fileGeneratingLogTable_row(struct fileGeneratingLogTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_fileGeneratingLogTable_row(struct fileGeneratingLogTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_fileGeneratingLogTable_row(struct fileGeneratingLogTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_configurableSimpleUsageMeteringControlR2Table_row(struct configurableSimpleUsageMeteringControlR2Table_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_configurableSimpleUsageMeteringControlR2Table_row(struct configurableSimpleUsageMeteringControlR2Table_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_configurableSimpleUsageMeteringControlR2Table_row(struct configurableSimpleUsageMeteringControlR2Table_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_configurableSimpleUsageMeteringControlR2Table_row(struct configurableSimpleUsageMeteringControlR2Table_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int check_callDetailDataTable_row(struct callDetailDataTable_data *StorageTmp, struct callDetailDataTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_callDetailDataTable_row(struct callDetailDataTable_data *StorageTmp, struct callDetailDataTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_callDetailDataTable_row(struct callDetailDataTable_data *StorageTmp, struct callDetailDataTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_callDetailDataTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_callDetailDataTable_row(struct callDetailDataTable_data *StorageTmp, struct callDetailDataTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	callDetailDataTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_callDetailDataTable_row(struct callDetailDataTable_data *StorageTmp, struct callDetailDataTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_callDetailDataTable_row(struct callDetailDataTable_data *StorageTmp, struct callDetailDataTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_callDetailDataTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_callDetailDataTable_row(struct callDetailDataTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -4486,6 +5850,64 @@ var_callDetailDataTable(struct variable *vp, oid * name, size_t *length, int exa
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_simpleUsageMeteringControlTable_row(struct simpleUsageMeteringControlTable_data *StorageTmp, struct simpleUsageMeteringControlTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_simpleUsageMeteringControlTable_row(struct simpleUsageMeteringControlTable_data *StorageTmp, struct simpleUsageMeteringControlTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_simpleUsageMeteringControlTable_row(struct simpleUsageMeteringControlTable_data *StorageTmp, struct simpleUsageMeteringControlTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_simpleUsageMeteringControlTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_simpleUsageMeteringControlTable_row(struct simpleUsageMeteringControlTable_data *StorageTmp, struct simpleUsageMeteringControlTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	simpleUsageMeteringControlTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_simpleUsageMeteringControlTable_row(struct simpleUsageMeteringControlTable_data *StorageTmp, struct simpleUsageMeteringControlTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_simpleUsageMeteringControlTable_row(struct simpleUsageMeteringControlTable_data *StorageTmp, struct simpleUsageMeteringControlTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_simpleUsageMeteringControlTable_row(StorageOld, NULL);
 }
 
 /**
@@ -4571,6 +5993,64 @@ var_simpleUsageMeteringControlTable(struct variable *vp, oid * name, size_t *len
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_configurableSimpleUsageMeteringControlTable_row(struct configurableSimpleUsageMeteringControlTable_data *StorageTmp, struct configurableSimpleUsageMeteringControlTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_configurableSimpleUsageMeteringControlTable_row(struct configurableSimpleUsageMeteringControlTable_data *StorageTmp, struct configurableSimpleUsageMeteringControlTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_configurableSimpleUsageMeteringControlTable_row(struct configurableSimpleUsageMeteringControlTable_data *StorageTmp, struct configurableSimpleUsageMeteringControlTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_configurableSimpleUsageMeteringControlTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_configurableSimpleUsageMeteringControlTable_row(struct configurableSimpleUsageMeteringControlTable_data *StorageTmp, struct configurableSimpleUsageMeteringControlTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	configurableSimpleUsageMeteringControlTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_configurableSimpleUsageMeteringControlTable_row(struct configurableSimpleUsageMeteringControlTable_data *StorageTmp, struct configurableSimpleUsageMeteringControlTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_configurableSimpleUsageMeteringControlTable_row(struct configurableSimpleUsageMeteringControlTable_data *StorageTmp, struct configurableSimpleUsageMeteringControlTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_configurableSimpleUsageMeteringControlTable_row(StorageOld, NULL);
 }
 
 /**
@@ -4663,6 +6143,64 @@ var_configurableSimpleUsageMeteringControlTable(struct variable *vp, oid * name,
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_blockGeneratingLogTable_row(struct blockGeneratingLogTable_data *StorageTmp, struct blockGeneratingLogTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_blockGeneratingLogTable_row(struct blockGeneratingLogTable_data *StorageTmp, struct blockGeneratingLogTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_blockGeneratingLogTable_row(struct blockGeneratingLogTable_data *StorageTmp, struct blockGeneratingLogTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_blockGeneratingLogTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_blockGeneratingLogTable_row(struct blockGeneratingLogTable_data *StorageTmp, struct blockGeneratingLogTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	blockGeneratingLogTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_blockGeneratingLogTable_row(struct blockGeneratingLogTable_data *StorageTmp, struct blockGeneratingLogTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_blockGeneratingLogTable_row(struct blockGeneratingLogTable_data *StorageTmp, struct blockGeneratingLogTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_blockGeneratingLogTable_row(StorageOld, NULL);
 }
 
 /**
@@ -4765,6 +6303,64 @@ var_blockGeneratingLogTable(struct variable *vp, oid * name, size_t *length, int
 }
 
 /**
+ * @fn int check_fileGeneratingLogTable_row(struct fileGeneratingLogTable_data *StorageTmp, struct fileGeneratingLogTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_fileGeneratingLogTable_row(struct fileGeneratingLogTable_data *StorageTmp, struct fileGeneratingLogTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_fileGeneratingLogTable_row(struct fileGeneratingLogTable_data *StorageTmp, struct fileGeneratingLogTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_fileGeneratingLogTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_fileGeneratingLogTable_row(struct fileGeneratingLogTable_data *StorageTmp, struct fileGeneratingLogTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	fileGeneratingLogTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_fileGeneratingLogTable_row(struct fileGeneratingLogTable_data *StorageTmp, struct fileGeneratingLogTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_fileGeneratingLogTable_row(struct fileGeneratingLogTable_data *StorageTmp, struct fileGeneratingLogTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_fileGeneratingLogTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_fileGeneratingLogTable_row(struct fileGeneratingLogTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -4861,6 +6457,64 @@ var_fileGeneratingLogTable(struct variable *vp, oid * name, size_t *length, int 
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_callDetailLogRecordTable_row(struct callDetailLogRecordTable_data *StorageTmp, struct callDetailLogRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_callDetailLogRecordTable_row(struct callDetailLogRecordTable_data *StorageTmp, struct callDetailLogRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_callDetailLogRecordTable_row(struct callDetailLogRecordTable_data *StorageTmp, struct callDetailLogRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_callDetailLogRecordTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_callDetailLogRecordTable_row(struct callDetailLogRecordTable_data *StorageTmp, struct callDetailLogRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	callDetailLogRecordTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_callDetailLogRecordTable_row(struct callDetailLogRecordTable_data *StorageTmp, struct callDetailLogRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_callDetailLogRecordTable_row(struct callDetailLogRecordTable_data *StorageTmp, struct callDetailLogRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_callDetailLogRecordTable_row(StorageOld, NULL);
 }
 
 /**
@@ -5331,6 +6985,64 @@ var_callDetailLogRecordTable(struct variable *vp, oid * name, size_t *length, in
 }
 
 /**
+ * @fn int check_configurableSimpleUsageMeteringControlR2Table_row(struct configurableSimpleUsageMeteringControlR2Table_data *StorageTmp, struct configurableSimpleUsageMeteringControlR2Table_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_configurableSimpleUsageMeteringControlR2Table_row(struct configurableSimpleUsageMeteringControlR2Table_data *StorageTmp, struct configurableSimpleUsageMeteringControlR2Table_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_configurableSimpleUsageMeteringControlR2Table_row(struct configurableSimpleUsageMeteringControlR2Table_data *StorageTmp, struct configurableSimpleUsageMeteringControlR2Table_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_configurableSimpleUsageMeteringControlR2Table_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_configurableSimpleUsageMeteringControlR2Table_row(struct configurableSimpleUsageMeteringControlR2Table_data *StorageTmp, struct configurableSimpleUsageMeteringControlR2Table_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	configurableSimpleUsageMeteringControlR2Table_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_configurableSimpleUsageMeteringControlR2Table_row(struct configurableSimpleUsageMeteringControlR2Table_data *StorageTmp, struct configurableSimpleUsageMeteringControlR2Table_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_configurableSimpleUsageMeteringControlR2Table_row(struct configurableSimpleUsageMeteringControlR2Table_data *StorageTmp, struct configurableSimpleUsageMeteringControlR2Table_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_configurableSimpleUsageMeteringControlR2Table_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_configurableSimpleUsageMeteringControlR2Table_row(struct configurableSimpleUsageMeteringControlR2Table_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -5416,6 +7128,64 @@ var_configurableSimpleUsageMeteringControlR2Table(struct variable *vp, oid * nam
 }
 
 /**
+ * @fn int check_blockGeneratingLogR2Table_row(struct blockGeneratingLogR2Table_data *StorageTmp, struct blockGeneratingLogR2Table_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_blockGeneratingLogR2Table_row(struct blockGeneratingLogR2Table_data *StorageTmp, struct blockGeneratingLogR2Table_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_blockGeneratingLogR2Table_row(struct blockGeneratingLogR2Table_data *StorageTmp, struct blockGeneratingLogR2Table_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_blockGeneratingLogR2Table_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_blockGeneratingLogR2Table_row(struct blockGeneratingLogR2Table_data *StorageTmp, struct blockGeneratingLogR2Table_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	blockGeneratingLogR2Table_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_blockGeneratingLogR2Table_row(struct blockGeneratingLogR2Table_data *StorageTmp, struct blockGeneratingLogR2Table_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_blockGeneratingLogR2Table_row(struct blockGeneratingLogR2Table_data *StorageTmp, struct blockGeneratingLogR2Table_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_blockGeneratingLogR2Table_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_blockGeneratingLogR2Table_row(struct blockGeneratingLogR2Table_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -5491,6 +7261,64 @@ var_blockGeneratingLogR2Table(struct variable *vp, oid * name, size_t *length, i
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_callDetailLogRecordR2Table_row(struct callDetailLogRecordR2Table_data *StorageTmp, struct callDetailLogRecordR2Table_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_callDetailLogRecordR2Table_row(struct callDetailLogRecordR2Table_data *StorageTmp, struct callDetailLogRecordR2Table_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_callDetailLogRecordR2Table_row(struct callDetailLogRecordR2Table_data *StorageTmp, struct callDetailLogRecordR2Table_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_callDetailLogRecordR2Table_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_callDetailLogRecordR2Table_row(struct callDetailLogRecordR2Table_data *StorageTmp, struct callDetailLogRecordR2Table_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	callDetailLogRecordR2Table_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_callDetailLogRecordR2Table_row(struct callDetailLogRecordR2Table_data *StorageTmp, struct callDetailLogRecordR2Table_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_callDetailLogRecordR2Table_row(struct callDetailLogRecordR2Table_data *StorageTmp, struct callDetailLogRecordR2Table_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_callDetailLogRecordR2Table_row(StorageOld, NULL);
 }
 
 /**
@@ -6496,17 +8324,17 @@ var_callDetailLogRecordR2Table(struct variable *vp, oid * name, size_t *length, 
 int
 write_creationTriggerList(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct simpleUsageMeteringControlTable_data *StorageTmp = NULL;
+	struct simpleUsageMeteringControlTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("cdr2MIB", "write_creationTriggerList entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(simpleUsageMeteringControlTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->simpleUsageMeteringControlEntryStatus) {
@@ -6536,33 +8364,73 @@ write_creationTriggerList(int action, u_char *var_val, u_char var_val_type, size
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->simpleUsageMeteringControlTable_old) == NULL)
+			if (StorageTmp->simpleUsageMeteringControlTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->simpleUsageMeteringControlTable_old = simpleUsageMeteringControlTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->simpleUsageMeteringControlTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->creationTriggerList);
+		StorageTmp->creationTriggerList = string;
+		StorageTmp->creationTriggerListLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->simpleUsageMeteringControlTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->simpleUsageMeteringControlTable_tsts == 0)
+				if ((ret = check_simpleUsageMeteringControlTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->simpleUsageMeteringControlTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->creationTriggerList for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->creationTriggerList;
-		old_length = StorageTmp->creationTriggerListLen;
-		StorageTmp->creationTriggerList = string;
-		StorageTmp->creationTriggerListLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->simpleUsageMeteringControlTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->simpleUsageMeteringControlTable_sets == 0)
+				if ((ret = update_simpleUsageMeteringControlTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->simpleUsageMeteringControlTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->simpleUsageMeteringControlTable_old) != NULL) {
+			simpleUsageMeteringControlTable_destroy(&StorageTmp->simpleUsageMeteringControlTable_old);
+			StorageTmp->simpleUsageMeteringControlTable_rsvs = 0;
+			StorageTmp->simpleUsageMeteringControlTable_tsts = 0;
+			StorageTmp->simpleUsageMeteringControlTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->creationTriggerList = old_value;
-		StorageTmp->creationTriggerListLen = old_length;
+		if ((StorageOld = StorageTmp->simpleUsageMeteringControlTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->simpleUsageMeteringControlTable_sets == 0)
+			revert_simpleUsageMeteringControlTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->simpleUsageMeteringControlTable_old) == NULL)
+			break;
+		if (StorageOld->creationTriggerList != NULL) {
+			SNMP_FREE(StorageTmp->creationTriggerList);
+			StorageTmp->creationTriggerList = StorageOld->creationTriggerList;
+			StorageTmp->creationTriggerListLen = StorageOld->creationTriggerListLen;
+			StorageOld->creationTriggerList = NULL;
+			StorageOld->creationTriggerListLen = 0;
+		}
+		if (--StorageTmp->simpleUsageMeteringControlTable_rsvs == 0)
+			simpleUsageMeteringControlTable_destroy(&StorageTmp->simpleUsageMeteringControlTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6582,12 +8450,14 @@ write_creationTriggerList(int action, u_char *var_val, u_char var_val_type, size
 int
 write_samplingRate(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct configurableSimpleUsageMeteringControlTable_data *StorageTmp = NULL;
+	struct configurableSimpleUsageMeteringControlTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("cdr2MIB", "write_samplingRate entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(configurableSimpleUsageMeteringControlTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6612,22 +8482,61 @@ write_samplingRate(int action, u_char *var_val, u_char var_val_type, size_t var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to samplingRate: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlTable_old) == NULL)
+			if (StorageTmp->configurableSimpleUsageMeteringControlTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlTable_old = configurableSimpleUsageMeteringControlTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->configurableSimpleUsageMeteringControlTable_rsvs++;
+		StorageTmp->samplingRate = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->configurableSimpleUsageMeteringControlTable_tsts == 0)
+				if ((ret = check_configurableSimpleUsageMeteringControlTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->configurableSimpleUsageMeteringControlTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->samplingRate for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->samplingRate;
-		StorageTmp->samplingRate = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->configurableSimpleUsageMeteringControlTable_sets == 0)
+				if ((ret = update_configurableSimpleUsageMeteringControlTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->configurableSimpleUsageMeteringControlTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlTable_old) != NULL) {
+			configurableSimpleUsageMeteringControlTable_destroy(&StorageTmp->configurableSimpleUsageMeteringControlTable_old);
+			StorageTmp->configurableSimpleUsageMeteringControlTable_rsvs = 0;
+			StorageTmp->configurableSimpleUsageMeteringControlTable_tsts = 0;
+			StorageTmp->configurableSimpleUsageMeteringControlTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->samplingRate = old_value;
+		if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->configurableSimpleUsageMeteringControlTable_sets == 0)
+			revert_configurableSimpleUsageMeteringControlTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlTable_old) == NULL)
+			break;
+		StorageTmp->samplingRate = StorageOld->samplingRate;
+		if (--StorageTmp->configurableSimpleUsageMeteringControlTable_rsvs == 0)
+			configurableSimpleUsageMeteringControlTable_destroy(&StorageTmp->configurableSimpleUsageMeteringControlTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6647,17 +8556,17 @@ write_samplingRate(int action, u_char *var_val, u_char var_val_type, size_t var_
 int
 write_configurationMask(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct configurableSimpleUsageMeteringControlTable_data *StorageTmp = NULL;
+	struct configurableSimpleUsageMeteringControlTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("cdr2MIB", "write_configurationMask entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(configurableSimpleUsageMeteringControlTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->configurationRowStatus) {
@@ -6687,33 +8596,73 @@ write_configurationMask(int action, u_char *var_val, u_char var_val_type, size_t
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlTable_old) == NULL)
+			if (StorageTmp->configurableSimpleUsageMeteringControlTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlTable_old = configurableSimpleUsageMeteringControlTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->configurableSimpleUsageMeteringControlTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->configurationMask);
+		StorageTmp->configurationMask = string;
+		StorageTmp->configurationMaskLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->configurableSimpleUsageMeteringControlTable_tsts == 0)
+				if ((ret = check_configurableSimpleUsageMeteringControlTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->configurableSimpleUsageMeteringControlTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->configurationMask for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->configurationMask;
-		old_length = StorageTmp->configurationMaskLen;
-		StorageTmp->configurationMask = string;
-		StorageTmp->configurationMaskLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->configurableSimpleUsageMeteringControlTable_sets == 0)
+				if ((ret = update_configurableSimpleUsageMeteringControlTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->configurableSimpleUsageMeteringControlTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlTable_old) != NULL) {
+			configurableSimpleUsageMeteringControlTable_destroy(&StorageTmp->configurableSimpleUsageMeteringControlTable_old);
+			StorageTmp->configurableSimpleUsageMeteringControlTable_rsvs = 0;
+			StorageTmp->configurableSimpleUsageMeteringControlTable_tsts = 0;
+			StorageTmp->configurableSimpleUsageMeteringControlTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->configurationMask = old_value;
-		StorageTmp->configurationMaskLen = old_length;
+		if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->configurableSimpleUsageMeteringControlTable_sets == 0)
+			revert_configurableSimpleUsageMeteringControlTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlTable_old) == NULL)
+			break;
+		if (StorageOld->configurationMask != NULL) {
+			SNMP_FREE(StorageTmp->configurationMask);
+			StorageTmp->configurationMask = StorageOld->configurationMask;
+			StorageTmp->configurationMaskLen = StorageOld->configurationMaskLen;
+			StorageOld->configurationMask = NULL;
+			StorageOld->configurationMaskLen = 0;
+		}
+		if (--StorageTmp->configurableSimpleUsageMeteringControlTable_rsvs == 0)
+			configurableSimpleUsageMeteringControlTable_destroy(&StorageTmp->configurableSimpleUsageMeteringControlTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6733,12 +8682,14 @@ write_configurationMask(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_blockGeneratingLogMaxBlockSize(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct blockGeneratingLogTable_data *StorageTmp = NULL;
+	struct blockGeneratingLogTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("cdr2MIB", "write_blockGeneratingLogMaxBlockSize entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(blockGeneratingLogTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6768,22 +8719,61 @@ write_blockGeneratingLogMaxBlockSize(int action, u_char *var_val, u_char var_val
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to blockGeneratingLogMaxBlockSize: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->blockGeneratingLogTable_old) == NULL)
+			if (StorageTmp->blockGeneratingLogTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->blockGeneratingLogTable_old = blockGeneratingLogTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->blockGeneratingLogTable_rsvs++;
+		StorageTmp->blockGeneratingLogMaxBlockSize = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->blockGeneratingLogTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->blockGeneratingLogTable_tsts == 0)
+				if ((ret = check_blockGeneratingLogTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->blockGeneratingLogTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->blockGeneratingLogMaxBlockSize for you to use, and you have just been asked to do something with it.  Note that anything 
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->blockGeneratingLogMaxBlockSize;
-		StorageTmp->blockGeneratingLogMaxBlockSize = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->blockGeneratingLogTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->blockGeneratingLogTable_sets == 0)
+				if ((ret = update_blockGeneratingLogTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->blockGeneratingLogTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->blockGeneratingLogTable_old) != NULL) {
+			blockGeneratingLogTable_destroy(&StorageTmp->blockGeneratingLogTable_old);
+			StorageTmp->blockGeneratingLogTable_rsvs = 0;
+			StorageTmp->blockGeneratingLogTable_tsts = 0;
+			StorageTmp->blockGeneratingLogTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->blockGeneratingLogMaxBlockSize = old_value;
+		if ((StorageOld = StorageTmp->blockGeneratingLogTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->blockGeneratingLogTable_sets == 0)
+			revert_blockGeneratingLogTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->blockGeneratingLogTable_old) == NULL)
+			break;
+		StorageTmp->blockGeneratingLogMaxBlockSize = StorageOld->blockGeneratingLogMaxBlockSize;
+		if (--StorageTmp->blockGeneratingLogTable_rsvs == 0)
+			blockGeneratingLogTable_destroy(&StorageTmp->blockGeneratingLogTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6803,12 +8793,14 @@ write_blockGeneratingLogMaxBlockSize(int action, u_char *var_val, u_char var_val
 int
 write_blockGeneratingLogMaxTimeInterval(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct blockGeneratingLogTable_data *StorageTmp = NULL;
+	struct blockGeneratingLogTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("cdr2MIB", "write_blockGeneratingLogMaxTimeInterval entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(blockGeneratingLogTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6838,22 +8830,61 @@ write_blockGeneratingLogMaxTimeInterval(int action, u_char *var_val, u_char var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to blockGeneratingLogMaxTimeInterval: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->blockGeneratingLogTable_old) == NULL)
+			if (StorageTmp->blockGeneratingLogTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->blockGeneratingLogTable_old = blockGeneratingLogTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->blockGeneratingLogTable_rsvs++;
+		StorageTmp->blockGeneratingLogMaxTimeInterval = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->blockGeneratingLogTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->blockGeneratingLogTable_tsts == 0)
+				if ((ret = check_blockGeneratingLogTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->blockGeneratingLogTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->blockGeneratingLogMaxTimeInterval for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->blockGeneratingLogMaxTimeInterval;
-		StorageTmp->blockGeneratingLogMaxTimeInterval = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->blockGeneratingLogTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->blockGeneratingLogTable_sets == 0)
+				if ((ret = update_blockGeneratingLogTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->blockGeneratingLogTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->blockGeneratingLogTable_old) != NULL) {
+			blockGeneratingLogTable_destroy(&StorageTmp->blockGeneratingLogTable_old);
+			StorageTmp->blockGeneratingLogTable_rsvs = 0;
+			StorageTmp->blockGeneratingLogTable_tsts = 0;
+			StorageTmp->blockGeneratingLogTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->blockGeneratingLogMaxTimeInterval = old_value;
+		if ((StorageOld = StorageTmp->blockGeneratingLogTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->blockGeneratingLogTable_sets == 0)
+			revert_blockGeneratingLogTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->blockGeneratingLogTable_old) == NULL)
+			break;
+		StorageTmp->blockGeneratingLogMaxTimeInterval = StorageOld->blockGeneratingLogMaxTimeInterval;
+		if (--StorageTmp->blockGeneratingLogTable_rsvs == 0)
+			blockGeneratingLogTable_destroy(&StorageTmp->blockGeneratingLogTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6873,12 +8904,14 @@ write_blockGeneratingLogMaxTimeInterval(int action, u_char *var_val, u_char var_
 int
 write_blockGeneratingLogStorageType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct blockGeneratingLogTable_data *StorageTmp = NULL;
+	struct blockGeneratingLogTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("cdr2MIB", "write_blockGeneratingLogStorageType entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(blockGeneratingLogTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6914,22 +8947,61 @@ write_blockGeneratingLogStorageType(int action, u_char *var_val, u_char var_val_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to blockGeneratingLogStorageType: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->blockGeneratingLogTable_old) == NULL)
+			if (StorageTmp->blockGeneratingLogTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->blockGeneratingLogTable_old = blockGeneratingLogTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->blockGeneratingLogTable_rsvs++;
+		StorageTmp->blockGeneratingLogStorageType = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->blockGeneratingLogTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->blockGeneratingLogTable_tsts == 0)
+				if ((ret = check_blockGeneratingLogTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->blockGeneratingLogTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->blockGeneratingLogStorageType for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->blockGeneratingLogStorageType;
-		StorageTmp->blockGeneratingLogStorageType = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->blockGeneratingLogTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->blockGeneratingLogTable_sets == 0)
+				if ((ret = update_blockGeneratingLogTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->blockGeneratingLogTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->blockGeneratingLogTable_old) != NULL) {
+			blockGeneratingLogTable_destroy(&StorageTmp->blockGeneratingLogTable_old);
+			StorageTmp->blockGeneratingLogTable_rsvs = 0;
+			StorageTmp->blockGeneratingLogTable_tsts = 0;
+			StorageTmp->blockGeneratingLogTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->blockGeneratingLogStorageType = old_value;
+		if ((StorageOld = StorageTmp->blockGeneratingLogTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->blockGeneratingLogTable_sets == 0)
+			revert_blockGeneratingLogTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->blockGeneratingLogTable_old) == NULL)
+			break;
+		StorageTmp->blockGeneratingLogStorageType = StorageOld->blockGeneratingLogStorageType;
+		if (--StorageTmp->blockGeneratingLogTable_rsvs == 0)
+			blockGeneratingLogTable_destroy(&StorageTmp->blockGeneratingLogTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6949,17 +9021,17 @@ write_blockGeneratingLogStorageType(int action, u_char *var_val, u_char var_val_
 int
 write_timesOfDay(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct fileGeneratingLogTable_data *StorageTmp = NULL;
+	struct fileGeneratingLogTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("cdr2MIB", "write_timesOfDay entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(fileGeneratingLogTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->fileGeneratingLogEntryStatus) {
@@ -6983,33 +9055,73 @@ write_timesOfDay(int action, u_char *var_val, u_char var_val_type, size_t var_va
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value \"\" */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->fileGeneratingLogTable_old) == NULL)
+			if (StorageTmp->fileGeneratingLogTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->fileGeneratingLogTable_old = fileGeneratingLogTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->fileGeneratingLogTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->timesOfDay);
+		StorageTmp->timesOfDay = string;
+		StorageTmp->timesOfDayLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->fileGeneratingLogTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->fileGeneratingLogTable_tsts == 0)
+				if ((ret = check_fileGeneratingLogTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->fileGeneratingLogTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->timesOfDay for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->timesOfDay;
-		old_length = StorageTmp->timesOfDayLen;
-		StorageTmp->timesOfDay = string;
-		StorageTmp->timesOfDayLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->fileGeneratingLogTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->fileGeneratingLogTable_sets == 0)
+				if ((ret = update_fileGeneratingLogTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->fileGeneratingLogTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->fileGeneratingLogTable_old) != NULL) {
+			fileGeneratingLogTable_destroy(&StorageTmp->fileGeneratingLogTable_old);
+			StorageTmp->fileGeneratingLogTable_rsvs = 0;
+			StorageTmp->fileGeneratingLogTable_tsts = 0;
+			StorageTmp->fileGeneratingLogTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->timesOfDay = old_value;
-		StorageTmp->timesOfDayLen = old_length;
+		if ((StorageOld = StorageTmp->fileGeneratingLogTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->fileGeneratingLogTable_sets == 0)
+			revert_fileGeneratingLogTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->fileGeneratingLogTable_old) == NULL)
+			break;
+		if (StorageOld->timesOfDay != NULL) {
+			SNMP_FREE(StorageTmp->timesOfDay);
+			StorageTmp->timesOfDay = StorageOld->timesOfDay;
+			StorageTmp->timesOfDayLen = StorageOld->timesOfDayLen;
+			StorageOld->timesOfDay = NULL;
+			StorageOld->timesOfDayLen = 0;
+		}
+		if (--StorageTmp->fileGeneratingLogTable_rsvs == 0)
+			fileGeneratingLogTable_destroy(&StorageTmp->fileGeneratingLogTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7029,12 +9141,14 @@ write_timesOfDay(int action, u_char *var_val, u_char var_val_type, size_t var_va
 int
 write_periodicTrigger(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct fileGeneratingLogTable_data *StorageTmp = NULL;
+	struct fileGeneratingLogTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("cdr2MIB", "write_periodicTrigger entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(fileGeneratingLogTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7065,22 +9179,61 @@ write_periodicTrigger(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to periodicTrigger: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->fileGeneratingLogTable_old) == NULL)
+			if (StorageTmp->fileGeneratingLogTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->fileGeneratingLogTable_old = fileGeneratingLogTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->fileGeneratingLogTable_rsvs++;
+		StorageTmp->periodicTrigger = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->fileGeneratingLogTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->fileGeneratingLogTable_tsts == 0)
+				if ((ret = check_fileGeneratingLogTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->fileGeneratingLogTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->periodicTrigger for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->periodicTrigger;
-		StorageTmp->periodicTrigger = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->fileGeneratingLogTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->fileGeneratingLogTable_sets == 0)
+				if ((ret = update_fileGeneratingLogTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->fileGeneratingLogTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->fileGeneratingLogTable_old) != NULL) {
+			fileGeneratingLogTable_destroy(&StorageTmp->fileGeneratingLogTable_old);
+			StorageTmp->fileGeneratingLogTable_rsvs = 0;
+			StorageTmp->fileGeneratingLogTable_tsts = 0;
+			StorageTmp->fileGeneratingLogTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->periodicTrigger = old_value;
+		if ((StorageOld = StorageTmp->fileGeneratingLogTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->fileGeneratingLogTable_sets == 0)
+			revert_fileGeneratingLogTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->fileGeneratingLogTable_old) == NULL)
+			break;
+		StorageTmp->periodicTrigger = StorageOld->periodicTrigger;
+		if (--StorageTmp->fileGeneratingLogTable_rsvs == 0)
+			fileGeneratingLogTable_destroy(&StorageTmp->fileGeneratingLogTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7100,12 +9253,14 @@ write_periodicTrigger(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_fileGeneratingLogStorageType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct fileGeneratingLogTable_data *StorageTmp = NULL;
+	struct fileGeneratingLogTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("cdr2MIB", "write_fileGeneratingLogStorageType entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(fileGeneratingLogTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7142,22 +9297,61 @@ write_fileGeneratingLogStorageType(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to fileGeneratingLogStorageType: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->fileGeneratingLogTable_old) == NULL)
+			if (StorageTmp->fileGeneratingLogTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->fileGeneratingLogTable_old = fileGeneratingLogTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->fileGeneratingLogTable_rsvs++;
+		StorageTmp->fileGeneratingLogStorageType = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->fileGeneratingLogTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->fileGeneratingLogTable_tsts == 0)
+				if ((ret = check_fileGeneratingLogTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->fileGeneratingLogTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->fileGeneratingLogStorageType for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->fileGeneratingLogStorageType;
-		StorageTmp->fileGeneratingLogStorageType = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->fileGeneratingLogTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->fileGeneratingLogTable_sets == 0)
+				if ((ret = update_fileGeneratingLogTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->fileGeneratingLogTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->fileGeneratingLogTable_old) != NULL) {
+			fileGeneratingLogTable_destroy(&StorageTmp->fileGeneratingLogTable_old);
+			StorageTmp->fileGeneratingLogTable_rsvs = 0;
+			StorageTmp->fileGeneratingLogTable_tsts = 0;
+			StorageTmp->fileGeneratingLogTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->fileGeneratingLogStorageType = old_value;
+		if ((StorageOld = StorageTmp->fileGeneratingLogTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->fileGeneratingLogTable_sets == 0)
+			revert_fileGeneratingLogTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->fileGeneratingLogTable_old) == NULL)
+			break;
+		StorageTmp->fileGeneratingLogStorageType = StorageOld->fileGeneratingLogStorageType;
+		if (--StorageTmp->fileGeneratingLogTable_rsvs == 0)
+			fileGeneratingLogTable_destroy(&StorageTmp->fileGeneratingLogTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7177,17 +9371,17 @@ write_fileGeneratingLogStorageType(int action, u_char *var_val, u_char var_val_t
 int
 write_configurationR2Mask(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct configurableSimpleUsageMeteringControlR2Table_data *StorageTmp = NULL;
+	struct configurableSimpleUsageMeteringControlR2Table_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("cdr2MIB", "write_configurationR2Mask entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(configurableSimpleUsageMeteringControlR2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->configurationR2Status) {
@@ -7217,33 +9411,73 @@ write_configurationR2Mask(int action, u_char *var_val, u_char var_val_type, size
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlR2Table_old) == NULL)
+			if (StorageTmp->configurableSimpleUsageMeteringControlR2Table_rsvs == 0)
+				if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlR2Table_old = configurableSimpleUsageMeteringControlR2Table_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->configurableSimpleUsageMeteringControlR2Table_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->configurationR2Mask);
+		StorageTmp->configurationR2Mask = string;
+		StorageTmp->configurationR2MaskLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlR2Table_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->configurableSimpleUsageMeteringControlR2Table_tsts == 0)
+				if ((ret = check_configurableSimpleUsageMeteringControlR2Table_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->configurableSimpleUsageMeteringControlR2Table_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->configurationR2Mask for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->configurationR2Mask;
-		old_length = StorageTmp->configurationR2MaskLen;
-		StorageTmp->configurationR2Mask = string;
-		StorageTmp->configurationR2MaskLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlR2Table_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->configurableSimpleUsageMeteringControlR2Table_sets == 0)
+				if ((ret = update_configurableSimpleUsageMeteringControlR2Table_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->configurableSimpleUsageMeteringControlR2Table_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlR2Table_old) != NULL) {
+			configurableSimpleUsageMeteringControlR2Table_destroy(&StorageTmp->configurableSimpleUsageMeteringControlR2Table_old);
+			StorageTmp->configurableSimpleUsageMeteringControlR2Table_rsvs = 0;
+			StorageTmp->configurableSimpleUsageMeteringControlR2Table_tsts = 0;
+			StorageTmp->configurableSimpleUsageMeteringControlR2Table_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->configurationR2Mask = old_value;
-		StorageTmp->configurationR2MaskLen = old_length;
+		if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlR2Table_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->configurableSimpleUsageMeteringControlR2Table_sets == 0)
+			revert_configurableSimpleUsageMeteringControlR2Table_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlR2Table_old) == NULL)
+			break;
+		if (StorageOld->configurationR2Mask != NULL) {
+			SNMP_FREE(StorageTmp->configurationR2Mask);
+			StorageTmp->configurationR2Mask = StorageOld->configurationR2Mask;
+			StorageTmp->configurationR2MaskLen = StorageOld->configurationR2MaskLen;
+			StorageOld->configurationR2Mask = NULL;
+			StorageOld->configurationR2MaskLen = 0;
+		}
+		if (--StorageTmp->configurableSimpleUsageMeteringControlR2Table_rsvs == 0)
+			configurableSimpleUsageMeteringControlR2Table_destroy(&StorageTmp->configurableSimpleUsageMeteringControlR2Table_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7263,12 +9497,14 @@ write_configurationR2Mask(int action, u_char *var_val, u_char var_val_type, size
 int
 write_blockGeneratingLogVersion(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct blockGeneratingLogR2Table_data *StorageTmp = NULL;
+	struct blockGeneratingLogR2Table_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("cdr2MIB", "write_blockGeneratingLogVersion entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(blockGeneratingLogR2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -7291,185 +9527,232 @@ write_blockGeneratingLogVersion(int action, u_char *var_val, u_char var_val_type
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to blockGeneratingLogVersion: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->blockGeneratingLogR2Table_old) == NULL)
+			if (StorageTmp->blockGeneratingLogR2Table_rsvs == 0)
+				if ((StorageOld = StorageTmp->blockGeneratingLogR2Table_old = blockGeneratingLogR2Table_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->blockGeneratingLogR2Table_rsvs++;
+		StorageTmp->blockGeneratingLogVersion = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->blockGeneratingLogR2Table_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->blockGeneratingLogR2Table_tsts == 0)
+				if ((ret = check_blockGeneratingLogR2Table_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->blockGeneratingLogR2Table_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->blockGeneratingLogVersion for you to use, and you have just been asked to do something with it.  Note that anything done 
 				   here must be reversable in the UNDO case */
-		old_value = StorageTmp->blockGeneratingLogVersion;
-		StorageTmp->blockGeneratingLogVersion = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->blockGeneratingLogR2Table_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->blockGeneratingLogR2Table_sets == 0)
+				if ((ret = update_blockGeneratingLogR2Table_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->blockGeneratingLogR2Table_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->blockGeneratingLogR2Table_old) != NULL) {
+			blockGeneratingLogR2Table_destroy(&StorageTmp->blockGeneratingLogR2Table_old);
+			StorageTmp->blockGeneratingLogR2Table_rsvs = 0;
+			StorageTmp->blockGeneratingLogR2Table_tsts = 0;
+			StorageTmp->blockGeneratingLogR2Table_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->blockGeneratingLogVersion = old_value;
+		if ((StorageOld = StorageTmp->blockGeneratingLogR2Table_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->blockGeneratingLogR2Table_sets == 0)
+			revert_blockGeneratingLogR2Table_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->blockGeneratingLogR2Table_old) == NULL)
+			break;
+		StorageTmp->blockGeneratingLogVersion = StorageOld->blockGeneratingLogVersion;
+		if (--StorageTmp->blockGeneratingLogR2Table_rsvs == 0)
+			blockGeneratingLogR2Table_destroy(&StorageTmp->blockGeneratingLogR2Table_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int callDetailDataTable_consistent(struct callDetailDataTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_simpleUsageMeteringControlTable_row(struct simpleUsageMeteringControlTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the callDetailDataTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-callDetailDataTable_consistent(struct callDetailDataTable_data *thedata)
+can_act_simpleUsageMeteringControlTable_row(struct simpleUsageMeteringControlTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int simpleUsageMeteringControlTable_consistent(struct simpleUsageMeteringControlTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_simpleUsageMeteringControlTable_row(struct simpleUsageMeteringControlTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the simpleUsageMeteringControlTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-simpleUsageMeteringControlTable_consistent(struct simpleUsageMeteringControlTable_data *thedata)
+can_deact_simpleUsageMeteringControlTable_row(struct simpleUsageMeteringControlTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int configurableSimpleUsageMeteringControlTable_consistent(struct configurableSimpleUsageMeteringControlTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_configurableSimpleUsageMeteringControlTable_row(struct configurableSimpleUsageMeteringControlTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the configurableSimpleUsageMeteringControlTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-configurableSimpleUsageMeteringControlTable_consistent(struct configurableSimpleUsageMeteringControlTable_data *thedata)
+can_act_configurableSimpleUsageMeteringControlTable_row(struct configurableSimpleUsageMeteringControlTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int blockGeneratingLogTable_consistent(struct blockGeneratingLogTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_configurableSimpleUsageMeteringControlTable_row(struct configurableSimpleUsageMeteringControlTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the blockGeneratingLogTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-blockGeneratingLogTable_consistent(struct blockGeneratingLogTable_data *thedata)
+can_deact_configurableSimpleUsageMeteringControlTable_row(struct configurableSimpleUsageMeteringControlTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int fileGeneratingLogTable_consistent(struct fileGeneratingLogTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_blockGeneratingLogTable_row(struct blockGeneratingLogTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the fileGeneratingLogTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-fileGeneratingLogTable_consistent(struct fileGeneratingLogTable_data *thedata)
+can_act_blockGeneratingLogTable_row(struct blockGeneratingLogTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int callDetailLogRecordTable_consistent(struct callDetailLogRecordTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_blockGeneratingLogTable_row(struct blockGeneratingLogTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the callDetailLogRecordTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-callDetailLogRecordTable_consistent(struct callDetailLogRecordTable_data *thedata)
+can_deact_blockGeneratingLogTable_row(struct blockGeneratingLogTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int configurableSimpleUsageMeteringControlR2Table_consistent(struct configurableSimpleUsageMeteringControlR2Table_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_fileGeneratingLogTable_row(struct fileGeneratingLogTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the configurableSimpleUsageMeteringControlR2Table table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-configurableSimpleUsageMeteringControlR2Table_consistent(struct configurableSimpleUsageMeteringControlR2Table_data *thedata)
+can_act_fileGeneratingLogTable_row(struct fileGeneratingLogTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int blockGeneratingLogR2Table_consistent(struct blockGeneratingLogR2Table_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_fileGeneratingLogTable_row(struct fileGeneratingLogTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the blockGeneratingLogR2Table table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-blockGeneratingLogR2Table_consistent(struct blockGeneratingLogR2Table_data *thedata)
+can_deact_fileGeneratingLogTable_row(struct fileGeneratingLogTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int callDetailLogRecordR2Table_consistent(struct callDetailLogRecordR2Table_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_configurableSimpleUsageMeteringControlR2Table_row(struct configurableSimpleUsageMeteringControlR2Table_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the callDetailLogRecordR2Table table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-callDetailLogRecordR2Table_consistent(struct callDetailLogRecordR2Table_data *thedata)
+can_act_configurableSimpleUsageMeteringControlR2Table_row(struct configurableSimpleUsageMeteringControlR2Table_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_configurableSimpleUsageMeteringControlR2Table_row(struct configurableSimpleUsageMeteringControlR2Table_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_configurableSimpleUsageMeteringControlR2Table_row(struct configurableSimpleUsageMeteringControlR2Table_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
@@ -7486,10 +9769,9 @@ callDetailLogRecordR2Table_consistent(struct callDetailLogRecordR2Table_data *th
 int
 write_simpleUsageMeteringControlEntryStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct simpleUsageMeteringControlTable_data *StorageTmp = NULL;
+	struct simpleUsageMeteringControlTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct simpleUsageMeteringControlTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -7516,40 +9798,6 @@ write_simpleUsageMeteringControlEntryStatus(int action, u_char *var_val, u_char 
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->simpleUsageMeteringControlEntryStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->simpleUsageMeteringControlTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->simpleUsageMeteringControlTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* controlObjectId */
@@ -7574,13 +9822,44 @@ write_simpleUsageMeteringControlEntryStatus(int action, u_char *var_val, u_char 
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->simpleUsageMeteringControlTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->controlObjectId, vp->val.string, vp->val_len);
 			StorageNew->controlObjectIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&simpleUsageMeteringControlTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->simpleUsageMeteringControlEntryStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->simpleUsageMeteringControlTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->simpleUsageMeteringControlTable_old) == NULL)
+				if (StorageTmp->simpleUsageMeteringControlTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->simpleUsageMeteringControlTable_old = simpleUsageMeteringControlTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->simpleUsageMeteringControlTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->simpleUsageMeteringControlTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -7590,78 +9869,127 @@ write_simpleUsageMeteringControlEntryStatus(int action, u_char *var_val, u_char 
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = simpleUsageMeteringControlTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_simpleUsageMeteringControlTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->simpleUsageMeteringControlEntryStatus;
-			StorageTmp->simpleUsageMeteringControlEntryStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = simpleUsageMeteringControlTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->simpleUsageMeteringControlEntryStatus = old_value;
+			if (StorageTmp->simpleUsageMeteringControlEntryStatus != RS_ACTIVE)
+				if ((ret = can_act_simpleUsageMeteringControlTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->simpleUsageMeteringControlEntryStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_simpleUsageMeteringControlTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->simpleUsageMeteringControlEntryStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_simpleUsageMeteringControlTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->simpleUsageMeteringControlEntryStatus for you to use, and you have just been asked to do something with it.  Note that anything done
+		   here must be reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_simpleUsageMeteringControlTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->simpleUsageMeteringControlEntryStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_simpleUsageMeteringControlTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->simpleUsageMeteringControlEntryStatus;
-			StorageTmp->simpleUsageMeteringControlEntryStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->simpleUsageMeteringControlEntryStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_simpleUsageMeteringControlTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_simpleUsageMeteringControlTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->simpleUsageMeteringControlEntryStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->simpleUsageMeteringControlEntryStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->simpleUsageMeteringControlEntryStatus = set_value;
+			if ((StorageOld = StorageTmp->simpleUsageMeteringControlTable_old) != NULL) {
+				simpleUsageMeteringControlTable_destroy(&StorageTmp->simpleUsageMeteringControlTable_old);
+				StorageTmp->simpleUsageMeteringControlTable_rsvs = 0;
+				StorageTmp->simpleUsageMeteringControlTable_tsts = 0;
+				StorageTmp->simpleUsageMeteringControlTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			simpleUsageMeteringControlTable_destroy(&StorageDel);
-			/* simpleUsageMeteringControlTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_simpleUsageMeteringControlTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->simpleUsageMeteringControlEntryStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_simpleUsageMeteringControlTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->simpleUsageMeteringControlEntryStatus = old_value;
+			if (StorageTmp->simpleUsageMeteringControlEntryStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_simpleUsageMeteringControlTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -7675,6 +10003,13 @@ write_simpleUsageMeteringControlEntryStatus(int action, u_char *var_val, u_char 
 				simpleUsageMeteringControlTable_del(StorageNew);
 				simpleUsageMeteringControlTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->simpleUsageMeteringControlTable_old) == NULL)
+				break;
+			if (--StorageTmp->simpleUsageMeteringControlTable_rsvs == 0)
+				simpleUsageMeteringControlTable_destroy(&StorageTmp->simpleUsageMeteringControlTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -7701,10 +10036,9 @@ write_simpleUsageMeteringControlEntryStatus(int action, u_char *var_val, u_char 
 int
 write_configurationRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct configurableSimpleUsageMeteringControlTable_data *StorageTmp = NULL;
+	struct configurableSimpleUsageMeteringControlTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct configurableSimpleUsageMeteringControlTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -7731,40 +10065,6 @@ write_configurationRowStatus(int action, u_char *var_val, u_char var_val_type, s
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->configurationRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->configurableSimpleUsageMeteringControlTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->configurableSimpleUsageMeteringControlTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* controlObjectId */
@@ -7789,13 +10089,44 @@ write_configurationRowStatus(int action, u_char *var_val, u_char var_val_type, s
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->configurableSimpleUsageMeteringControlTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->controlObjectId, vp->val.string, vp->val_len);
 			StorageNew->controlObjectIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&configurableSimpleUsageMeteringControlTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->configurationRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->configurableSimpleUsageMeteringControlTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlTable_old) == NULL)
+				if (StorageTmp->configurableSimpleUsageMeteringControlTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlTable_old = configurableSimpleUsageMeteringControlTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->configurableSimpleUsageMeteringControlTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->configurableSimpleUsageMeteringControlTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -7805,78 +10136,127 @@ write_configurationRowStatus(int action, u_char *var_val, u_char var_val_type, s
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = configurableSimpleUsageMeteringControlTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_configurableSimpleUsageMeteringControlTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->configurationRowStatus;
-			StorageTmp->configurationRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = configurableSimpleUsageMeteringControlTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->configurationRowStatus = old_value;
+			if (StorageTmp->configurationRowStatus != RS_ACTIVE)
+				if ((ret = can_act_configurableSimpleUsageMeteringControlTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->configurationRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_configurableSimpleUsageMeteringControlTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->configurationRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_configurableSimpleUsageMeteringControlTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->configurationRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_configurableSimpleUsageMeteringControlTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->configurationRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_configurableSimpleUsageMeteringControlTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->configurationRowStatus;
-			StorageTmp->configurationRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->configurationRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_configurableSimpleUsageMeteringControlTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+			break;
+			/* deactivate with underlying device */
+			if (deactivate_configurableSimpleUsageMeteringControlTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->configurationRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->configurationRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->configurationRowStatus = set_value;
+			if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlTable_old) != NULL) {
+				configurableSimpleUsageMeteringControlTable_destroy(&StorageTmp->configurableSimpleUsageMeteringControlTable_old);
+				StorageTmp->configurableSimpleUsageMeteringControlTable_rsvs = 0;
+				StorageTmp->configurableSimpleUsageMeteringControlTable_tsts = 0;
+				StorageTmp->configurableSimpleUsageMeteringControlTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			configurableSimpleUsageMeteringControlTable_destroy(&StorageDel);
-			/* configurableSimpleUsageMeteringControlTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_configurableSimpleUsageMeteringControlTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->configurationRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_configurableSimpleUsageMeteringControlTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->configurationRowStatus = old_value;
+			if (StorageTmp->configurationRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_configurableSimpleUsageMeteringControlTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -7890,6 +10270,13 @@ write_configurationRowStatus(int action, u_char *var_val, u_char var_val_type, s
 				configurableSimpleUsageMeteringControlTable_del(StorageNew);
 				configurableSimpleUsageMeteringControlTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlTable_old) == NULL)
+				break;
+			if (--StorageTmp->configurableSimpleUsageMeteringControlTable_rsvs == 0)
+				configurableSimpleUsageMeteringControlTable_destroy(&StorageTmp->configurableSimpleUsageMeteringControlTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -7916,10 +10303,9 @@ write_configurationRowStatus(int action, u_char *var_val, u_char var_val_type, s
 int
 write_blockGeneratingLogRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct blockGeneratingLogTable_data *StorageTmp = NULL;
+	struct blockGeneratingLogTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct blockGeneratingLogTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -7946,40 +10332,6 @@ write_blockGeneratingLogRowStatus(int action, u_char *var_val, u_char var_val_ty
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->blockGeneratingLogRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->blockGeneratingLogTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->blockGeneratingLogTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* logId */
@@ -8004,13 +10356,44 @@ write_blockGeneratingLogRowStatus(int action, u_char *var_val, u_char var_val_ty
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->blockGeneratingLogTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->logId, vp->val.string, vp->val_len);
 			StorageNew->logIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&blockGeneratingLogTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->blockGeneratingLogRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->blockGeneratingLogTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->blockGeneratingLogTable_old) == NULL)
+				if (StorageTmp->blockGeneratingLogTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->blockGeneratingLogTable_old = blockGeneratingLogTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->blockGeneratingLogTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->blockGeneratingLogTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -8020,78 +10403,127 @@ write_blockGeneratingLogRowStatus(int action, u_char *var_val, u_char var_val_ty
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = blockGeneratingLogTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_blockGeneratingLogTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->blockGeneratingLogRowStatus;
-			StorageTmp->blockGeneratingLogRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = blockGeneratingLogTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->blockGeneratingLogRowStatus = old_value;
+			if (StorageTmp->blockGeneratingLogRowStatus != RS_ACTIVE)
+				if ((ret = can_act_blockGeneratingLogTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->blockGeneratingLogRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_blockGeneratingLogTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->blockGeneratingLogRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_blockGeneratingLogTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->blockGeneratingLogRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_blockGeneratingLogTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->blockGeneratingLogRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_blockGeneratingLogTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->blockGeneratingLogRowStatus;
-			StorageTmp->blockGeneratingLogRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->blockGeneratingLogRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_blockGeneratingLogTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_blockGeneratingLogTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->blockGeneratingLogRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->blockGeneratingLogRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->blockGeneratingLogRowStatus = set_value;
+			if ((StorageOld = StorageTmp->blockGeneratingLogTable_old) != NULL) {
+				blockGeneratingLogTable_destroy(&StorageTmp->blockGeneratingLogTable_old);
+				StorageTmp->blockGeneratingLogTable_rsvs = 0;
+				StorageTmp->blockGeneratingLogTable_tsts = 0;
+				StorageTmp->blockGeneratingLogTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			blockGeneratingLogTable_destroy(&StorageDel);
-			/* blockGeneratingLogTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_blockGeneratingLogTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->blockGeneratingLogRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_blockGeneratingLogTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->blockGeneratingLogRowStatus = old_value;
+			if (StorageTmp->blockGeneratingLogRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_blockGeneratingLogTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -8105,6 +10537,13 @@ write_blockGeneratingLogRowStatus(int action, u_char *var_val, u_char var_val_ty
 				blockGeneratingLogTable_del(StorageNew);
 				blockGeneratingLogTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->blockGeneratingLogTable_old) == NULL)
+				break;
+			if (--StorageTmp->blockGeneratingLogTable_rsvs == 0)
+				blockGeneratingLogTable_destroy(&StorageTmp->blockGeneratingLogTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -8131,10 +10570,9 @@ write_blockGeneratingLogRowStatus(int action, u_char *var_val, u_char var_val_ty
 int
 write_fileGeneratingLogEntryStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct fileGeneratingLogTable_data *StorageTmp = NULL;
+	struct fileGeneratingLogTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct fileGeneratingLogTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -8161,40 +10599,6 @@ write_fileGeneratingLogEntryStatus(int action, u_char *var_val, u_char var_val_t
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->fileGeneratingLogEntryStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->fileGeneratingLogTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->fileGeneratingLogTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* logId */
@@ -8219,13 +10623,44 @@ write_fileGeneratingLogEntryStatus(int action, u_char *var_val, u_char var_val_t
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->fileGeneratingLogTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->logId, vp->val.string, vp->val_len);
 			StorageNew->logIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&fileGeneratingLogTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->fileGeneratingLogEntryStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->fileGeneratingLogTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->fileGeneratingLogTable_old) == NULL)
+				if (StorageTmp->fileGeneratingLogTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->fileGeneratingLogTable_old = fileGeneratingLogTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->fileGeneratingLogTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->fileGeneratingLogTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -8235,78 +10670,127 @@ write_fileGeneratingLogEntryStatus(int action, u_char *var_val, u_char var_val_t
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = fileGeneratingLogTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_fileGeneratingLogTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->fileGeneratingLogEntryStatus;
-			StorageTmp->fileGeneratingLogEntryStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = fileGeneratingLogTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->fileGeneratingLogEntryStatus = old_value;
+			if (StorageTmp->fileGeneratingLogEntryStatus != RS_ACTIVE)
+				if ((ret = can_act_fileGeneratingLogTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->fileGeneratingLogEntryStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_fileGeneratingLogTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->fileGeneratingLogEntryStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_fileGeneratingLogTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->fileGeneratingLogEntryStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_fileGeneratingLogTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->fileGeneratingLogEntryStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_fileGeneratingLogTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->fileGeneratingLogEntryStatus;
-			StorageTmp->fileGeneratingLogEntryStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->fileGeneratingLogEntryStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_fileGeneratingLogTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_fileGeneratingLogTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->fileGeneratingLogEntryStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->fileGeneratingLogEntryStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->fileGeneratingLogEntryStatus = set_value;
+			if ((StorageOld = StorageTmp->fileGeneratingLogTable_old) != NULL) {
+				fileGeneratingLogTable_destroy(&StorageTmp->fileGeneratingLogTable_old);
+				StorageTmp->fileGeneratingLogTable_rsvs = 0;
+				StorageTmp->fileGeneratingLogTable_tsts = 0;
+				StorageTmp->fileGeneratingLogTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			fileGeneratingLogTable_destroy(&StorageDel);
-			/* fileGeneratingLogTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_fileGeneratingLogTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->fileGeneratingLogEntryStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_fileGeneratingLogTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->fileGeneratingLogEntryStatus = old_value;
+			if (StorageTmp->fileGeneratingLogEntryStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_fileGeneratingLogTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -8320,6 +10804,13 @@ write_fileGeneratingLogEntryStatus(int action, u_char *var_val, u_char var_val_t
 				fileGeneratingLogTable_del(StorageNew);
 				fileGeneratingLogTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->fileGeneratingLogTable_old) == NULL)
+				break;
+			if (--StorageTmp->fileGeneratingLogTable_rsvs == 0)
+				fileGeneratingLogTable_destroy(&StorageTmp->fileGeneratingLogTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -8346,10 +10837,9 @@ write_fileGeneratingLogEntryStatus(int action, u_char *var_val, u_char var_val_t
 int
 write_configurationR2Status(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct configurableSimpleUsageMeteringControlR2Table_data *StorageTmp = NULL;
+	struct configurableSimpleUsageMeteringControlR2Table_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct configurableSimpleUsageMeteringControlR2Table_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -8376,40 +10866,6 @@ write_configurationR2Status(int action, u_char *var_val, u_char var_val_type, si
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->configurationR2Status == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->configurableSimpleUsageMeteringControlR2Table_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->configurableSimpleUsageMeteringControlR2Table_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* controlObjectId */
@@ -8434,13 +10890,44 @@ write_configurationR2Status(int action, u_char *var_val, u_char var_val_type, si
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->configurableSimpleUsageMeteringControlR2Table_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->controlObjectId, vp->val.string, vp->val_len);
 			StorageNew->controlObjectIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&configurableSimpleUsageMeteringControlR2TableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->configurationR2Status == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->configurableSimpleUsageMeteringControlR2Table_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlR2Table_old) == NULL)
+				if (StorageTmp->configurableSimpleUsageMeteringControlR2Table_rsvs == 0)
+					if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlR2Table_old = configurableSimpleUsageMeteringControlR2Table_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->configurableSimpleUsageMeteringControlR2Table_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->configurableSimpleUsageMeteringControlR2Table_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -8450,78 +10937,127 @@ write_configurationR2Status(int action, u_char *var_val, u_char var_val_type, si
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = configurableSimpleUsageMeteringControlR2Table_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_configurableSimpleUsageMeteringControlR2Table_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->configurationR2Status;
-			StorageTmp->configurationR2Status = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = configurableSimpleUsageMeteringControlR2Table_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->configurationR2Status = old_value;
+			if (StorageTmp->configurationR2Status != RS_ACTIVE)
+				if ((ret = can_act_configurableSimpleUsageMeteringControlR2Table_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->configurationR2Status != RS_NOTINSERVICE)
+				if ((ret = can_deact_configurableSimpleUsageMeteringControlR2Table_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->configurationR2Status != RS_NOTINSERVICE)
+				if ((ret = can_deact_configurableSimpleUsageMeteringControlR2Table_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->configurationR2Status for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_configurableSimpleUsageMeteringControlR2Table_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->configurationR2Status != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_configurableSimpleUsageMeteringControlR2Table_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->configurationR2Status;
-			StorageTmp->configurationR2Status = set_value;
+			/* state change already performed */
+			if (StorageTmp->configurationR2Status != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_configurableSimpleUsageMeteringControlR2Table_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_configurableSimpleUsageMeteringControlR2Table_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->configurationR2Status = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->configurationR2Status = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->configurationR2Status = set_value;
+			if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlR2Table_old) != NULL) {
+				configurableSimpleUsageMeteringControlR2Table_destroy(&StorageTmp->configurableSimpleUsageMeteringControlR2Table_old);
+				StorageTmp->configurableSimpleUsageMeteringControlR2Table_rsvs = 0;
+				StorageTmp->configurableSimpleUsageMeteringControlR2Table_tsts = 0;
+				StorageTmp->configurableSimpleUsageMeteringControlR2Table_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			configurableSimpleUsageMeteringControlR2Table_destroy(&StorageDel);
-			/* configurableSimpleUsageMeteringControlR2Table_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_configurableSimpleUsageMeteringControlR2Table_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->configurationR2Status == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_configurableSimpleUsageMeteringControlR2Table_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->configurationR2Status = old_value;
+			if (StorageTmp->configurationR2Status == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_configurableSimpleUsageMeteringControlR2Table_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -8535,6 +11071,13 @@ write_configurationR2Status(int action, u_char *var_val, u_char var_val_type, si
 				configurableSimpleUsageMeteringControlR2Table_del(StorageNew);
 				configurableSimpleUsageMeteringControlR2Table_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->configurableSimpleUsageMeteringControlR2Table_old) == NULL)
+				break;
+			if (--StorageTmp->configurableSimpleUsageMeteringControlR2Table_rsvs == 0)
+				configurableSimpleUsageMeteringControlR2Table_destroy(&StorageTmp->configurableSimpleUsageMeteringControlR2Table_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */

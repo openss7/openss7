@@ -63,13 +63,22 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct slMIB_data {
+	struct slMIB_data *slMIB_old;
+	uint slMIB_rsvs;
+	uint slMIB_tsts;
+	uint slMIB_sets;
 	uint slMIB_request;
 	ulong slSdtNextIndex;		/* ReadOnly */
 	ulong slSdlNextIndex;		/* ReadOnly */
 };
 struct slProfileTable_data {
+	struct slProfileTable_data *slProfileTable_old;
+	uint slProfileTable_rsvs;
+	uint slProfileTable_tsts;
+	uint slProfileTable_sets;
 	uint slProfileTable_request;
 	uint slProfileTable_refs;
+	uint slProfileTable_id;
 	uint8_t *slProfileId;		/* NoAccess */
 	size_t slProfileIdLen;
 	long slProfileTransmissionRate;	/* NoAccess */
@@ -114,8 +123,13 @@ struct slProfileTable_data {
 	long slProfileRowStatus;	/* Create */
 };
 struct slTable_data {
+	struct slTable_data *slTable_old;
+	uint slTable_rsvs;
+	uint slTable_tsts;
+	uint slTable_sets;
 	uint slTable_request;
 	uint slTable_refs;
+	uint slTable_id;
 	ulong slId;			/* NoAccess */
 	ulong slMaxCapacitySL;		/* Create */
 	uint8_t *slProceduralStatus;	/* ReadOnly */
@@ -136,8 +150,13 @@ struct slTable_data {
 	long slRowStatus;		/* Create */
 };
 struct slSdlListTable_data {
+	struct slSdlListTable_data *slSdlListTable_old;
+	uint slSdlListTable_rsvs;
+	uint slSdlListTable_tsts;
+	uint slSdlListTable_sets;
 	uint slSdlListTable_request;
 	uint slSdlListTable_refs;
+	uint slSdlListTable_id;
 	ulong slId;			/* NoAccess */
 	ulong slSdlListId;		/* NoAccess */
 	uint8_t *slSdlListPointer;	/* Create */
@@ -145,8 +164,13 @@ struct slSdlListTable_data {
 	long slSdlListRowStatus;	/* Create */
 };
 struct slSdtListTable_data {
+	struct slSdtListTable_data *slSdtListTable_old;
+	uint slSdtListTable_rsvs;
+	uint slSdtListTable_tsts;
+	uint slSdtListTable_sets;
 	uint slSdtListTable_request;
 	uint slSdtListTable_refs;
+	uint slSdtListTable_id;
 	ulong slId;			/* NoAccess */
 	ulong slSdtListId;		/* NoAccess */
 	uint8_t *slSdtListPointer;	/* Create */
@@ -154,8 +178,13 @@ struct slSdtListTable_data {
 	long slSdtListRowStatus;	/* Create */
 };
 struct slNbTable_data {
+	struct slNbTable_data *slNbTable_old;
+	uint slNbTable_rsvs;
+	uint slNbTable_tsts;
+	uint slNbTable_sets;
 	uint slNbTable_request;
 	uint slNbTable_refs;
+	uint slNbTable_id;
 	uint8_t *slSdtProfileId;	/* NoAccess */
 	size_t slSdtProfileIdLen;
 	long slNbTransmissionRate;	/* Create */
@@ -174,8 +203,13 @@ struct slNbTable_data {
 	long slNbRowStatus;		/* Create */
 };
 struct slSaalTable_data {
+	struct slSaalTable_data *slSaalTable_old;
+	uint slSaalTable_rsvs;
+	uint slSaalTable_tsts;
+	uint slSaalTable_sets;
 	uint slSaalTable_request;
 	uint slSaalTable_refs;
+	uint slSaalTable_id;
 	uint8_t *slSdtProfileId;	/* NoAccess */
 	size_t slSdtProfileIdLen;
 	long slSaalBufferRelease;	/* Create */
@@ -206,8 +240,13 @@ struct slSaalTable_data {
 	long slSaalRowStatus;		/* Create */
 };
 struct slM2paTable_data {
+	struct slM2paTable_data *slM2paTable_old;
+	uint slM2paTable_rsvs;
+	uint slM2paTable_tsts;
+	uint slM2paTable_sets;
 	uint slM2paTable_request;
 	uint slM2paTable_refs;
+	uint slM2paTable_id;
 	uint8_t *slSdtProfileId;	/* NoAccess */
 	size_t slSdtProfileIdLen;
 	ulong slM2paN1;			/* Create */
@@ -236,8 +275,13 @@ struct slM2paTable_data {
 	long slM2paRowStatus;		/* Create */
 };
 struct slSdtTable_data {
+	struct slSdtTable_data *slSdtTable_old;
+	uint slSdtTable_rsvs;
+	uint slSdtTable_tsts;
+	uint slSdtTable_sets;
 	uint slSdtTable_request;
 	uint slSdtTable_refs;
+	uint slSdtTable_id;
 	ulong slSdtId;			/* NoAccess */
 	long slSdtAdministrativeState;	/* Create */
 	long slSdtOperationalState;	/* ReadOnly */
@@ -255,8 +299,13 @@ struct slSdtTable_data {
 	long slSdtRowStatus;		/* Create */
 };
 struct slSdlTable_data {
+	struct slSdlTable_data *slSdlTable_old;
+	uint slSdlTable_rsvs;
+	uint slSdlTable_tsts;
+	uint slSdlTable_sets;
 	uint slSdlTable_request;
 	uint slSdlTable_refs;
+	uint slSdlTable_id;
 	ulong slSdlId;			/* NoAccess */
 	uint8_t *slSdlAdjPc;		/* Create */
 	size_t slSdlAdjPcLen;
@@ -416,6 +465,10 @@ void init_slMIB(void);
 void deinit_slMIB(void);
 int term_slMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_slMIB;
+struct slMIB_data *slMIB_create(void);
+struct slMIB_data *slMIB_duplicate(struct slMIB_data *);
+int slMIB_destroy(struct slMIB_data **);
+int slMIB_add(struct slMIB_data *);
 void parse_slMIB(const char *, char *);
 SNMPCallback store_slMIB;
 void refresh_slMIB(int);

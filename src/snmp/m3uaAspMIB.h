@@ -63,14 +63,23 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct m3uaAspMIB_data {
+	struct m3uaAspMIB_data *m3uaAspMIB_old;
+	uint m3uaAspMIB_rsvs;
+	uint m3uaAspMIB_tsts;
+	uint m3uaAspMIB_sets;
 	uint m3uaAspMIB_request;
 	ulong m3uaAspNextIndex;		/* ReadOnly */
 	ulong m3uaAspAgNextIndex;	/* ReadOnly */
 	ulong m3uaAspSpNextIndex;	/* ReadOnly */
 };
 struct m3uaAspTable_data {
+	struct m3uaAspTable_data *m3uaAspTable_old;
+	uint m3uaAspTable_rsvs;
+	uint m3uaAspTable_tsts;
+	uint m3uaAspTable_sets;
 	uint m3uaAspTable_request;
 	uint m3uaAspTable_refs;
+	uint m3uaAspTable_id;
 	ulong m3uaAspIndex;		/* NoAccess */
 	uint8_t *m3uaAspName;		/* Create */
 	size_t m3uaAspNameLen;
@@ -87,8 +96,13 @@ struct m3uaAspTable_data {
 	long m3uaAspStatus;		/* Create */
 };
 struct m3uaAspAgTable_data {
+	struct m3uaAspAgTable_data *m3uaAspAgTable_old;
+	uint m3uaAspAgTable_rsvs;
+	uint m3uaAspAgTable_tsts;
+	uint m3uaAspAgTable_sets;
 	uint m3uaAspAgTable_request;
 	uint m3uaAspAgTable_refs;
+	uint m3uaAspAgTable_id;
 	ulong m3uaAspAgIndex;		/* NoAccess */
 	oid *m3uaAspAgProtocolVersion;	/* Create */
 	size_t m3uaAspAgProtocolVersionLen;
@@ -110,8 +124,13 @@ struct m3uaAspAgTable_data {
 	long m3uaAspAgStatus;		/* Create */
 };
 struct m3uaAspSgTable_data {
+	struct m3uaAspSgTable_data *m3uaAspSgTable_old;
+	uint m3uaAspSgTable_rsvs;
+	uint m3uaAspSgTable_tsts;
+	uint m3uaAspSgTable_sets;
 	uint m3uaAspSgTable_request;
 	uint m3uaAspSgTable_refs;
+	uint m3uaAspSgTable_id;
 	ulong m3uaAspAgIndex;		/* NoAccess */
 	ulong m3uaAspSgIndex;		/* NoAccess */
 	uint8_t *m3uaAspSgName;		/* Create */
@@ -142,8 +161,13 @@ struct m3uaAspSgTable_data {
 	long m3uaAspSgStatus;		/* Create */
 };
 struct m3uaAspSgpTable_data {
+	struct m3uaAspSgpTable_data *m3uaAspSgpTable_old;
+	uint m3uaAspSgpTable_rsvs;
+	uint m3uaAspSgpTable_tsts;
+	uint m3uaAspSgpTable_sets;
 	uint m3uaAspSgpTable_request;
 	uint m3uaAspSgpTable_refs;
+	uint m3uaAspSgpTable_id;
 	ulong m3uaAspAgIndex;		/* NoAccess */
 	ulong m3uaAspSgIndex;		/* NoAccess */
 	ulong m3uaAspSgpIndex;		/* NoAccess */
@@ -163,8 +187,13 @@ struct m3uaAspSgpTable_data {
 	long m3uaAspSgpStatus;		/* Create */
 };
 struct m3uaAspSpTable_data {
+	struct m3uaAspSpTable_data *m3uaAspSpTable_old;
+	uint m3uaAspSpTable_rsvs;
+	uint m3uaAspSpTable_tsts;
+	uint m3uaAspSpTable_sets;
 	uint m3uaAspSpTable_request;
 	uint m3uaAspSpTable_refs;
+	uint m3uaAspSpTable_id;
 	ulong m3uaAspSpIndex;		/* Notify */
 	uint8_t *m3uaAspSpName;		/* Create */
 	size_t m3uaAspSpNameLen;
@@ -190,8 +219,13 @@ struct m3uaAspSpTable_data {
 	long m3uaAspSpStatus;		/* Create */
 };
 struct m3uaAspMtTable_data {
+	struct m3uaAspMtTable_data *m3uaAspMtTable_old;
+	uint m3uaAspMtTable_rsvs;
+	uint m3uaAspMtTable_tsts;
+	uint m3uaAspMtTable_sets;
 	uint m3uaAspMtTable_request;
 	uint m3uaAspMtTable_refs;
+	uint m3uaAspMtTable_id;
 	ulong m3uaAspSpIndex;		/* Notify */
 	long m3uaAspMtIndex;		/* NoAccess */
 	uint8_t *m3uaAspMtName;		/* Create */
@@ -205,8 +239,13 @@ struct m3uaAspMtTable_data {
 	long m3uaAspMtStatus;		/* Create */
 };
 struct m3uaAspRsTable_data {
+	struct m3uaAspRsTable_data *m3uaAspRsTable_old;
+	uint m3uaAspRsTable_rsvs;
+	uint m3uaAspRsTable_tsts;
+	uint m3uaAspRsTable_sets;
 	uint m3uaAspRsTable_request;
 	uint m3uaAspRsTable_refs;
+	uint m3uaAspRsTable_id;
 	ulong m3uaAspSpIndex;		/* Notify */
 	ulong m3uaAspRsIndex;		/* Notify */
 	uint8_t *m3uaAspRsName;		/* ReadOnly */
@@ -233,8 +272,13 @@ struct m3uaAspRsTable_data {
 	long m3uaAspRsStatus;		/* Create */
 };
 struct m3uaAspRlTable_data {
+	struct m3uaAspRlTable_data *m3uaAspRlTable_old;
+	uint m3uaAspRlTable_rsvs;
+	uint m3uaAspRlTable_tsts;
+	uint m3uaAspRlTable_sets;
 	uint m3uaAspRlTable_request;
 	uint m3uaAspRlTable_refs;
+	uint m3uaAspRlTable_id;
 	ulong m3uaAspSpIndex;		/* Notify */
 	ulong m3uaAspRsIndex;		/* Notify */
 	ulong m3uaAspAgIndex;		/* NoAccess */
@@ -249,8 +293,13 @@ struct m3uaAspRlTable_data {
 	long m3uaAspRlStatus;		/* Create */
 };
 struct m3uaAspRtTable_data {
+	struct m3uaAspRtTable_data *m3uaAspRtTable_old;
+	uint m3uaAspRtTable_rsvs;
+	uint m3uaAspRtTable_tsts;
+	uint m3uaAspRtTable_sets;
 	uint m3uaAspRtTable_request;
 	uint m3uaAspRtTable_refs;
+	uint m3uaAspRtTable_id;
 	ulong m3uaAspSpIndex;		/* Notify */
 	ulong m3uaAspRsIndex;		/* Notify */
 	ulong m3uaAspAgIndex;		/* NoAccess */
@@ -268,8 +317,13 @@ struct m3uaAspRtTable_data {
 	long m3uaAspRtStatus;		/* Create */
 };
 struct m3uaAspRcTable_data {
+	struct m3uaAspRcTable_data *m3uaAspRcTable_old;
+	uint m3uaAspRcTable_rsvs;
+	uint m3uaAspRcTable_tsts;
+	uint m3uaAspRcTable_sets;
 	uint m3uaAspRcTable_request;
 	uint m3uaAspRcTable_refs;
+	uint m3uaAspRcTable_id;
 	ulong m3uaAspIndex;		/* NoAccess */
 	ulong m3uaAspSpIndex;		/* Notify */
 	long m3uaAspMtIndex;		/* NoAccess */
@@ -281,8 +335,13 @@ struct m3uaAspRcTable_data {
 	long m3uaAspRcStatus;		/* Create */
 };
 struct m3uaAspAsTable_data {
+	struct m3uaAspAsTable_data *m3uaAspAsTable_old;
+	uint m3uaAspAsTable_rsvs;
+	uint m3uaAspAsTable_tsts;
+	uint m3uaAspAsTable_sets;
 	uint m3uaAspAsTable_request;
 	uint m3uaAspAsTable_refs;
+	uint m3uaAspAsTable_id;
 	ulong m3uaAspIndex;		/* NoAccess */
 	ulong m3uaAspSpIndex;		/* Notify */
 	long m3uaAspMtIndex;		/* NoAccess */
@@ -295,8 +354,13 @@ struct m3uaAspAsTable_data {
 	long m3uaAspAsUsageState;	/* ReadOnly */
 };
 struct m3uaAspAfTable_data {
+	struct m3uaAspAfTable_data *m3uaAspAfTable_old;
+	uint m3uaAspAfTable_rsvs;
+	uint m3uaAspAfTable_tsts;
+	uint m3uaAspAfTable_sets;
 	uint m3uaAspAfTable_request;
 	uint m3uaAspAfTable_refs;
+	uint m3uaAspAfTable_id;
 	ulong m3uaAspIndex;		/* NoAccess */
 	ulong m3uaAspSpIndex;		/* Notify */
 	long m3uaAspMtIndex;		/* NoAccess */
@@ -741,6 +805,10 @@ void init_m3uaAspMIB(void);
 void deinit_m3uaAspMIB(void);
 int term_m3uaAspMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_m3uaAspMIB;
+struct m3uaAspMIB_data *m3uaAspMIB_create(void);
+struct m3uaAspMIB_data *m3uaAspMIB_duplicate(struct m3uaAspMIB_data *);
+int m3uaAspMIB_destroy(struct m3uaAspMIB_data **);
+int m3uaAspMIB_add(struct m3uaAspMIB_data *);
 void parse_m3uaAspMIB(const char *, char *);
 SNMPCallback store_m3uaAspMIB;
 void refresh_m3uaAspMIB(int);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/snmp/ss7MIB.c
+ @(#) src/snmp/ss7MIB.c
 
  -----------------------------------------------------------------------------
 
@@ -1638,7 +1638,7 @@ write_ss7NetworkRowStatus(int action, u_char *var_val, u_char var_val_type, size
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */

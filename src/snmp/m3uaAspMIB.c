@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/snmp/m3uaAspMIB.c
+ @(#) src/snmp/m3uaAspMIB.c
 
  -----------------------------------------------------------------------------
 
@@ -611,8 +611,41 @@ m3uaAspMIB_create(void)
 		StorageNew->m3uaAspSpNextIndex = 0;
 
 	}
+      done:
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	m3uaAspMIB_destroy(&StorageNew);
+	goto done;
+}
+
+/**
+ * @fn struct m3uaAspMIB_data *m3uaAspMIB_duplicate(struct m3uaAspMIB_data *thedata)
+ * @param thedata the mib structure to duplicate
+ * @brief duplicate a mib structure for the mib
+ *
+ * Duplicates the specified mib structure @param thedata and returns a pointer to the newly
+ * allocated mib structure on success, or NULL on failure.
+ */
+struct m3uaAspMIB_data *
+m3uaAspMIB_duplicate(struct m3uaAspMIB_data *thedata)
+{
+	struct m3uaAspMIB_data *StorageNew = SNMP_MALLOC_STRUCT(m3uaAspMIB_data);
+
+	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspMIB_duplicate: duplicating mib... "));
+	if (StorageNew != NULL) {
+		StorageNew->m3uaAspNextIndex = thedata->m3uaAspNextIndex;
+		StorageNew->m3uaAspAgNextIndex = thedata->m3uaAspAgNextIndex;
+		StorageNew->m3uaAspSpNextIndex = thedata->m3uaAspSpNextIndex;
+	}
+      done:
+	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	m3uaAspMIB_destroy(&StorageNew);
+	goto done;
 }
 
 /**
@@ -663,7 +696,7 @@ m3uaAspMIB_add(struct m3uaAspMIB_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for m3uaAspMIB entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case m3uaAspMIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -721,6 +754,62 @@ store_m3uaAspMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	}
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int check_m3uaAspMIB(struct m3uaAspMIB_data *StorageTmp, struct m3uaAspMIB_data *StorageOld)
+ * @param StorageTmp the data as updated
+ * @param StorageOld the data previous to update
+ *
+ * This function is used by mibs.  It is used to check, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the ACTION phase.  The COMMIT phase does not ensue unless this check passes.  This function can
+ * return SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before
+ * the varbinds on the mib were applied; the values in StorageTmp are the new values.  The function
+ * is permitted to change the values in StorageTmp to correct them; however, preferences should be
+ * made for setting values that were not in the varbinds.
+ */
+int
+check_m3uaAspMIB(struct m3uaAspMIB_data *StorageTmp, struct m3uaAspMIB_data *StorageOld)
+{
+	/* XXX: provide code to check the scalars for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_m3uaAspMIB(struct m3uaAspMIB_data *StorageTmp, struct m3uaAspMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase)
+ *
+ * This function is used by mibs.  It is used to update, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the COMMIT phase.  The start of the ACTION phase performs a consistency check on the mib before
+ * allowing the request to proceed to the COMMIT phase.  The COMMIT phase then arrives here with
+ * consistency already checked (see check_m3uaAspMIB()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied: the values in StorageTmp are the new values.
+ */
+int
+update_m3uaAspMIB(struct m3uaAspMIB_data *StorageTmp, struct m3uaAspMIB_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	m3uaAspMIB_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn revert_m3uaAspMIB(struct 
+ * @fn void revert_m3uaAspMIB(struct m3uaAspMIB_data *StorageTmp, struct m3uaAspMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase)
+ */
+void
+revert_m3uaAspMIB(struct m3uaAspMIB_data *StorageTmp, struct m3uaAspMIB_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_m3uaAspMIB(StorageOld, NULL);
 }
 
 /**
@@ -834,29 +923,38 @@ m3uaAspTable_create(void)
 	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->m3uaAspName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->m3uaAspNameLen = strlen("");
+		if ((StorageNew->m3uaAspName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->m3uaAspNameLen = 0;
+		StorageNew->m3uaAspName[StorageNew->m3uaAspNameLen] = 0;
 		StorageNew->m3uaAspAdministrativeState = 0;
-		if (memdup((u_char **) &StorageNew->m3uaAspProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->m3uaAspProceduralStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->m3uaAspProceduralStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->m3uaAspProceduralStatusLen = 1;
 		StorageNew->m3uaAspUsageState = 0;
 		StorageNew->m3uaAspState = 0;
-		if (memdup((u_char **) &StorageNew->m3uaAspCapabilities, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->m3uaAspCapabilitiesLen = 2;
+		if (memdup((u_char **) &StorageNew->m3uaAspCapabilities, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->m3uaAspCapabilitiesLen = 2;
 		StorageNew->m3uaAspIdPolicy = 0;
 		StorageNew->m3uaAspRegistrationPolicy = 0;
 		StorageNew->m3uaAspAssociationPolicy = 0;
 		StorageNew->m3uaAspStatus = 0;
 		StorageNew->m3uaAspStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	m3uaAspTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct m3uaAspTable_data *m3uaAspTable_duplicate(struct m3uaAspTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -868,6 +966,30 @@ m3uaAspTable_duplicate(struct m3uaAspTable_data *thedata)
 
 	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->m3uaAspTable_id = thedata->m3uaAspTable_id;
+		StorageNew->m3uaAspIndex = thedata->m3uaAspIndex;
+		if (!(StorageNew->m3uaAspName = malloc(thedata->m3uaAspNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspName, thedata->m3uaAspName, thedata->m3uaAspNameLen);
+		StorageNew->m3uaAspNameLen = thedata->m3uaAspNameLen;
+		StorageNew->m3uaAspName[StorageNew->m3uaAspNameLen] = 0;
+		StorageNew->m3uaAspAdministrativeState = thedata->m3uaAspAdministrativeState;
+		if (!(StorageNew->m3uaAspProceduralStatus = malloc(thedata->m3uaAspProceduralStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspProceduralStatus, thedata->m3uaAspProceduralStatus, thedata->m3uaAspProceduralStatusLen);
+		StorageNew->m3uaAspProceduralStatusLen = thedata->m3uaAspProceduralStatusLen;
+		StorageNew->m3uaAspProceduralStatus[StorageNew->m3uaAspProceduralStatusLen] = 0;
+		StorageNew->m3uaAspUsageState = thedata->m3uaAspUsageState;
+		StorageNew->m3uaAspState = thedata->m3uaAspState;
+		if (!(StorageNew->m3uaAspCapabilities = malloc(thedata->m3uaAspCapabilitiesLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspCapabilities, thedata->m3uaAspCapabilities, thedata->m3uaAspCapabilitiesLen);
+		StorageNew->m3uaAspCapabilitiesLen = thedata->m3uaAspCapabilitiesLen;
+		StorageNew->m3uaAspCapabilities[StorageNew->m3uaAspCapabilitiesLen] = 0;
+		StorageNew->m3uaAspIdPolicy = thedata->m3uaAspIdPolicy;
+		StorageNew->m3uaAspRegistrationPolicy = thedata->m3uaAspRegistrationPolicy;
+		StorageNew->m3uaAspAssociationPolicy = thedata->m3uaAspAssociationPolicy;
+		StorageNew->m3uaAspStatus = thedata->m3uaAspStatus;
 	}
       done:
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
@@ -967,7 +1089,7 @@ m3uaAspTable_del(struct m3uaAspTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for m3uaAspTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case m3uaAspTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1075,10 +1197,12 @@ m3uaAspAgTable_create(void)
 	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspAgTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->m3uaAspAgProtocolVersion = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->m3uaAspAgProtocolVersionLen = 2;
-		if (memdup((u_char **) &StorageNew->m3uaAspAgOptions, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->m3uaAspAgOptionsLen = 2;
+		if ((StorageNew->m3uaAspAgProtocolVersion = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->m3uaAspAgProtocolVersionLen = 2;
+		if (memdup((u_char **) &StorageNew->m3uaAspAgOptions, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->m3uaAspAgOptionsLen = 2;
 		StorageNew->m3uaAspAgRegistrationPolicy = 0;
 		StorageNew->m3uaAspAgAspIdPolicy = 0;
 		StorageNew->m3uaAspAgAspProtocolPayloadId = 0;
@@ -1095,14 +1219,19 @@ m3uaAspAgTable_create(void)
 		StorageNew->m3uaAspAgStatus = 0;
 		StorageNew->m3uaAspAgStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	m3uaAspAgTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct m3uaAspAgTable_data *m3uaAspAgTable_duplicate(struct m3uaAspAgTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1114,6 +1243,30 @@ m3uaAspAgTable_duplicate(struct m3uaAspAgTable_data *thedata)
 
 	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspAgTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->m3uaAspAgTable_id = thedata->m3uaAspAgTable_id;
+		StorageNew->m3uaAspAgIndex = thedata->m3uaAspAgIndex;
+		if (!(StorageNew->m3uaAspAgProtocolVersion = snmp_duplicate_objid(thedata->m3uaAspAgProtocolVersion, thedata->m3uaAspAgProtocolVersionLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->m3uaAspAgProtocolVersionLen = thedata->m3uaAspAgProtocolVersionLen;
+		if (!(StorageNew->m3uaAspAgOptions = malloc(thedata->m3uaAspAgOptionsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspAgOptions, thedata->m3uaAspAgOptions, thedata->m3uaAspAgOptionsLen);
+		StorageNew->m3uaAspAgOptionsLen = thedata->m3uaAspAgOptionsLen;
+		StorageNew->m3uaAspAgOptions[StorageNew->m3uaAspAgOptionsLen] = 0;
+		StorageNew->m3uaAspAgRegistrationPolicy = thedata->m3uaAspAgRegistrationPolicy;
+		StorageNew->m3uaAspAgAspIdPolicy = thedata->m3uaAspAgAspIdPolicy;
+		StorageNew->m3uaAspAgAspProtocolPayloadId = thedata->m3uaAspAgAspProtocolPayloadId;
+		StorageNew->m3uaAspAgIpPort = thedata->m3uaAspAgIpPort;
+		StorageNew->m3uaAspAgMinOstreams = thedata->m3uaAspAgMinOstreams;
+		StorageNew->m3uaAspAgMaxIstreams = thedata->m3uaAspAgMaxIstreams;
+		StorageNew->m3uaAspAgTimerT7 = thedata->m3uaAspAgTimerT7;
+		StorageNew->m3uaAspAgTimerT19 = thedata->m3uaAspAgTimerT19;
+		StorageNew->m3uaAspAgTimerT21 = thedata->m3uaAspAgTimerT21;
+		StorageNew->m3uaAspAgTimerT25A = thedata->m3uaAspAgTimerT25A;
+		StorageNew->m3uaAspAgTimerT28A = thedata->m3uaAspAgTimerT28A;
+		StorageNew->m3uaAspAgTimerT29A = thedata->m3uaAspAgTimerT29A;
+		StorageNew->m3uaAspAgTimerT30A = thedata->m3uaAspAgTimerT30A;
+		StorageNew->m3uaAspAgStatus = thedata->m3uaAspAgStatus;
 	}
       done:
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
@@ -1211,7 +1364,7 @@ m3uaAspAgTable_del(struct m3uaAspAgTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for m3uaAspAgTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case m3uaAspAgTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1327,12 +1480,15 @@ m3uaAspSgTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->m3uaAspAgIndex = 0;
-		if ((StorageNew->m3uaAspSgName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->m3uaAspSgNameLen = strlen("");
+		if ((StorageNew->m3uaAspSgName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->m3uaAspSgNameLen = 0;
+		StorageNew->m3uaAspSgName[StorageNew->m3uaAspSgNameLen] = 0;
 		StorageNew->m3uaAspSgAdministrativeState = M3UAASPSGADMINISTRATIVESTATE_LOCKED;
 		StorageNew->m3uaAspSgOperationalState = M3UAASPSGOPERATIONALSTATE_DISABLED;
-		if (memdup((u_char **) &StorageNew->m3uaAspSgProcedurealStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->m3uaAspSgProcedurealStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->m3uaAspSgProcedurealStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->m3uaAspSgProcedurealStatusLen = 1;
 		StorageNew->m3uaAspSgUsgageState = M3UAASPSGUSGAGESTATE_IDLE;
 		StorageNew->m3uaAspSgAspState = 0;
 		StorageNew->m3uaAspSgMaxInitRetrans = 5;
@@ -1355,14 +1511,19 @@ m3uaAspSgTable_create(void)
 		StorageNew->m3uaAspSgStatus = 0;
 		StorageNew->m3uaAspSgStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	m3uaAspSgTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct m3uaAspSgTable_data *m3uaAspSgTable_duplicate(struct m3uaAspSgTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1374,6 +1535,41 @@ m3uaAspSgTable_duplicate(struct m3uaAspSgTable_data *thedata)
 
 	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspSgTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->m3uaAspSgTable_id = thedata->m3uaAspSgTable_id;
+		StorageNew->m3uaAspAgIndex = thedata->m3uaAspAgIndex;
+		StorageNew->m3uaAspSgIndex = thedata->m3uaAspSgIndex;
+		if (!(StorageNew->m3uaAspSgName = malloc(thedata->m3uaAspSgNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspSgName, thedata->m3uaAspSgName, thedata->m3uaAspSgNameLen);
+		StorageNew->m3uaAspSgNameLen = thedata->m3uaAspSgNameLen;
+		StorageNew->m3uaAspSgName[StorageNew->m3uaAspSgNameLen] = 0;
+		StorageNew->m3uaAspSgAdministrativeState = thedata->m3uaAspSgAdministrativeState;
+		StorageNew->m3uaAspSgOperationalState = thedata->m3uaAspSgOperationalState;
+		if (!(StorageNew->m3uaAspSgProcedurealStatus = malloc(thedata->m3uaAspSgProcedurealStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspSgProcedurealStatus, thedata->m3uaAspSgProcedurealStatus, thedata->m3uaAspSgProcedurealStatusLen);
+		StorageNew->m3uaAspSgProcedurealStatusLen = thedata->m3uaAspSgProcedurealStatusLen;
+		StorageNew->m3uaAspSgProcedurealStatus[StorageNew->m3uaAspSgProcedurealStatusLen] = 0;
+		StorageNew->m3uaAspSgUsgageState = thedata->m3uaAspSgUsgageState;
+		StorageNew->m3uaAspSgAspState = thedata->m3uaAspSgAspState;
+		StorageNew->m3uaAspSgMaxInitRetrans = thedata->m3uaAspSgMaxInitRetrans;
+		StorageNew->m3uaAspSgMaxPathRetrans = thedata->m3uaAspSgMaxPathRetrans;
+		StorageNew->m3uaAspSgMaxLifeTime = thedata->m3uaAspSgMaxLifeTime;
+		StorageNew->m3uaAspSgTimerT1 = thedata->m3uaAspSgTimerT1;
+		StorageNew->m3uaAspSgTimerT2 = thedata->m3uaAspSgTimerT2;
+		StorageNew->m3uaAspSgTimerT3 = thedata->m3uaAspSgTimerT3;
+		StorageNew->m3uaAspSgTimerT4 = thedata->m3uaAspSgTimerT4;
+		StorageNew->m3uaAspSgTimerT5 = thedata->m3uaAspSgTimerT5;
+		StorageNew->m3uaAspSgTimerT17 = thedata->m3uaAspSgTimerT17;
+		StorageNew->m3uaAspSgTimerT19A = thedata->m3uaAspSgTimerT19A;
+		StorageNew->m3uaAspSgTimerT24 = thedata->m3uaAspSgTimerT24;
+		StorageNew->m3uaAspSgTimerT31A = thedata->m3uaAspSgTimerT31A;
+		StorageNew->m3uaAspSgTimerT32A = thedata->m3uaAspSgTimerT32A;
+		StorageNew->m3uaAspSgTimerT33A = thedata->m3uaAspSgTimerT33A;
+		StorageNew->m3uaAspSgTimerT34A = thedata->m3uaAspSgTimerT34A;
+		StorageNew->m3uaAspSgTimerT1T = thedata->m3uaAspSgTimerT1T;
+		StorageNew->m3uaAspSgTimerT2T = thedata->m3uaAspSgTimerT2T;
+		StorageNew->m3uaAspSgStatus = thedata->m3uaAspSgStatus;
 	}
       done:
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
@@ -1473,7 +1669,7 @@ m3uaAspSgTable_del(struct m3uaAspSgTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for m3uaAspSgTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case m3uaAspSgTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1608,30 +1804,42 @@ m3uaAspSgpTable_create(void)
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->m3uaAspAgIndex = 0;
 		StorageNew->m3uaAspSgIndex = 0;
-		if ((StorageNew->m3uaAspSgpName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->m3uaAspSgpNameLen = strlen("");
+		if ((StorageNew->m3uaAspSgpName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->m3uaAspSgpNameLen = 0;
+		StorageNew->m3uaAspSgpName[StorageNew->m3uaAspSgpNameLen] = 0;
 		StorageNew->m3uaAspSgpAdministrativeState = M3UAASPSGPADMINISTRATIVESTATE_LOCKED;
-		if (memdup((u_char **) &StorageNew->m3uaAspSgpProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->m3uaAspSgpProceduralStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->m3uaAspSgpProceduralStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->m3uaAspSgpProceduralStatusLen = 1;
 		StorageNew->m3uaAspSgpOperationalState = M3UAASPSGPOPERATIONALSTATE_DISABLED;
 		StorageNew->m3uaAspSgpUsageState = M3UAASPSGPUSAGESTATE_IDLE;
 		StorageNew->m3uaAspSgpAspState = 0;
 		StorageNew->m3uaAspSgpPrimaryAddressType = 0;
-		if ((StorageNew->m3uaAspSgpPrimaryAddress = (uint8_t *) strdup("")) != NULL)
-			StorageNew->m3uaAspSgpPrimaryAddressLen = strlen("");
-		if ((StorageNew->m3uaAspSgpHostName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->m3uaAspSgpHostNameLen = strlen("");
+		if ((StorageNew->m3uaAspSgpPrimaryAddress = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->m3uaAspSgpPrimaryAddressLen = 0;
+		StorageNew->m3uaAspSgpPrimaryAddress[StorageNew->m3uaAspSgpPrimaryAddressLen] = 0;
+		if ((StorageNew->m3uaAspSgpHostName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->m3uaAspSgpHostNameLen = 0;
+		StorageNew->m3uaAspSgpHostName[StorageNew->m3uaAspSgpHostNameLen] = 0;
 		StorageNew->m3uaAspSgpStatus = 0;
 		StorageNew->m3uaAspSgpStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	m3uaAspSgpTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct m3uaAspSgpTable_data *m3uaAspSgpTable_duplicate(struct m3uaAspSgpTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1643,6 +1851,36 @@ m3uaAspSgpTable_duplicate(struct m3uaAspSgpTable_data *thedata)
 
 	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspSgpTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->m3uaAspSgpTable_id = thedata->m3uaAspSgpTable_id;
+		StorageNew->m3uaAspAgIndex = thedata->m3uaAspAgIndex;
+		StorageNew->m3uaAspSgIndex = thedata->m3uaAspSgIndex;
+		StorageNew->m3uaAspSgpIndex = thedata->m3uaAspSgpIndex;
+		if (!(StorageNew->m3uaAspSgpName = malloc(thedata->m3uaAspSgpNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspSgpName, thedata->m3uaAspSgpName, thedata->m3uaAspSgpNameLen);
+		StorageNew->m3uaAspSgpNameLen = thedata->m3uaAspSgpNameLen;
+		StorageNew->m3uaAspSgpName[StorageNew->m3uaAspSgpNameLen] = 0;
+		StorageNew->m3uaAspSgpAdministrativeState = thedata->m3uaAspSgpAdministrativeState;
+		if (!(StorageNew->m3uaAspSgpProceduralStatus = malloc(thedata->m3uaAspSgpProceduralStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspSgpProceduralStatus, thedata->m3uaAspSgpProceduralStatus, thedata->m3uaAspSgpProceduralStatusLen);
+		StorageNew->m3uaAspSgpProceduralStatusLen = thedata->m3uaAspSgpProceduralStatusLen;
+		StorageNew->m3uaAspSgpProceduralStatus[StorageNew->m3uaAspSgpProceduralStatusLen] = 0;
+		StorageNew->m3uaAspSgpOperationalState = thedata->m3uaAspSgpOperationalState;
+		StorageNew->m3uaAspSgpUsageState = thedata->m3uaAspSgpUsageState;
+		StorageNew->m3uaAspSgpAspState = thedata->m3uaAspSgpAspState;
+		StorageNew->m3uaAspSgpPrimaryAddressType = thedata->m3uaAspSgpPrimaryAddressType;
+		if (!(StorageNew->m3uaAspSgpPrimaryAddress = malloc(thedata->m3uaAspSgpPrimaryAddressLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspSgpPrimaryAddress, thedata->m3uaAspSgpPrimaryAddress, thedata->m3uaAspSgpPrimaryAddressLen);
+		StorageNew->m3uaAspSgpPrimaryAddressLen = thedata->m3uaAspSgpPrimaryAddressLen;
+		StorageNew->m3uaAspSgpPrimaryAddress[StorageNew->m3uaAspSgpPrimaryAddressLen] = 0;
+		if (!(StorageNew->m3uaAspSgpHostName = malloc(thedata->m3uaAspSgpHostNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspSgpHostName, thedata->m3uaAspSgpHostName, thedata->m3uaAspSgpHostNameLen);
+		StorageNew->m3uaAspSgpHostNameLen = thedata->m3uaAspSgpHostNameLen;
+		StorageNew->m3uaAspSgpHostName[StorageNew->m3uaAspSgpHostNameLen] = 0;
+		StorageNew->m3uaAspSgpStatus = thedata->m3uaAspSgpStatus;
 	}
       done:
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
@@ -1748,7 +1986,7 @@ m3uaAspSgpTable_del(struct m3uaAspSgpTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for m3uaAspSgpTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case m3uaAspSgpTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1865,19 +2103,26 @@ m3uaAspSpTable_create(void)
 	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspSpTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->m3uaAspSpName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->m3uaAspSpNameLen = strlen("");
+		if ((StorageNew->m3uaAspSpName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->m3uaAspSpNameLen = 0;
+		StorageNew->m3uaAspSpName[StorageNew->m3uaAspSpNameLen] = 0;
 		StorageNew->m3uaAspSpOperationalState = 0;
 		StorageNew->m3uaAspSpUsageState = 0;
 		StorageNew->m3uaAspSpAdministrativeState = 0;
-		if (memdup((u_char **) &StorageNew->m3uaAspSpAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->m3uaAspSpAlarmStatusLen = 1;
-		if (memdup((u_char **) &StorageNew->m3uaAspSpProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->m3uaAspSpProceduralStatusLen = 1;
-		if (memdup((u_char **) &StorageNew->m3uaAspSpAvailabilityStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->m3uaAspSpAvailabilityStatusLen = 2;
-		if ((StorageNew->m3uaAspSpPointCode = (uint8_t *) strdup("")) != NULL)
-			StorageNew->m3uaAspSpPointCodeLen = strlen("");
+		if (memdup((u_char **) &StorageNew->m3uaAspSpAlarmStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->m3uaAspSpAlarmStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->m3uaAspSpProceduralStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->m3uaAspSpProceduralStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->m3uaAspSpAvailabilityStatus, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->m3uaAspSpAvailabilityStatusLen = 2;
+		if ((StorageNew->m3uaAspSpPointCode = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->m3uaAspSpPointCodeLen = 0;
+		StorageNew->m3uaAspSpPointCode[StorageNew->m3uaAspSpPointCodeLen] = 0;
 		StorageNew->m3uaAspSpTimerT1R = 0;
 		StorageNew->m3uaAspSpTimerT18 = 0;
 		StorageNew->m3uaAspSpTimerT20 = 0;
@@ -1889,14 +2134,19 @@ m3uaAspSpTable_create(void)
 		StorageNew->m3uaAspSpStatus = 0;
 		StorageNew->m3uaAspSpStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	m3uaAspSpTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct m3uaAspSpTable_data *m3uaAspSpTable_duplicate(struct m3uaAspSpTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1908,6 +2158,45 @@ m3uaAspSpTable_duplicate(struct m3uaAspSpTable_data *thedata)
 
 	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspSpTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->m3uaAspSpTable_id = thedata->m3uaAspSpTable_id;
+		StorageNew->m3uaAspSpIndex = thedata->m3uaAspSpIndex;
+		if (!(StorageNew->m3uaAspSpName = malloc(thedata->m3uaAspSpNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspSpName, thedata->m3uaAspSpName, thedata->m3uaAspSpNameLen);
+		StorageNew->m3uaAspSpNameLen = thedata->m3uaAspSpNameLen;
+		StorageNew->m3uaAspSpName[StorageNew->m3uaAspSpNameLen] = 0;
+		StorageNew->m3uaAspSpOperationalState = thedata->m3uaAspSpOperationalState;
+		StorageNew->m3uaAspSpUsageState = thedata->m3uaAspSpUsageState;
+		StorageNew->m3uaAspSpAdministrativeState = thedata->m3uaAspSpAdministrativeState;
+		if (!(StorageNew->m3uaAspSpAlarmStatus = malloc(thedata->m3uaAspSpAlarmStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspSpAlarmStatus, thedata->m3uaAspSpAlarmStatus, thedata->m3uaAspSpAlarmStatusLen);
+		StorageNew->m3uaAspSpAlarmStatusLen = thedata->m3uaAspSpAlarmStatusLen;
+		StorageNew->m3uaAspSpAlarmStatus[StorageNew->m3uaAspSpAlarmStatusLen] = 0;
+		if (!(StorageNew->m3uaAspSpProceduralStatus = malloc(thedata->m3uaAspSpProceduralStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspSpProceduralStatus, thedata->m3uaAspSpProceduralStatus, thedata->m3uaAspSpProceduralStatusLen);
+		StorageNew->m3uaAspSpProceduralStatusLen = thedata->m3uaAspSpProceduralStatusLen;
+		StorageNew->m3uaAspSpProceduralStatus[StorageNew->m3uaAspSpProceduralStatusLen] = 0;
+		if (!(StorageNew->m3uaAspSpAvailabilityStatus = malloc(thedata->m3uaAspSpAvailabilityStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspSpAvailabilityStatus, thedata->m3uaAspSpAvailabilityStatus, thedata->m3uaAspSpAvailabilityStatusLen);
+		StorageNew->m3uaAspSpAvailabilityStatusLen = thedata->m3uaAspSpAvailabilityStatusLen;
+		StorageNew->m3uaAspSpAvailabilityStatus[StorageNew->m3uaAspSpAvailabilityStatusLen] = 0;
+		if (!(StorageNew->m3uaAspSpPointCode = malloc(thedata->m3uaAspSpPointCodeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspSpPointCode, thedata->m3uaAspSpPointCode, thedata->m3uaAspSpPointCodeLen);
+		StorageNew->m3uaAspSpPointCodeLen = thedata->m3uaAspSpPointCodeLen;
+		StorageNew->m3uaAspSpPointCode[StorageNew->m3uaAspSpPointCodeLen] = 0;
+		StorageNew->m3uaAspSpTimerT1R = thedata->m3uaAspSpTimerT1R;
+		StorageNew->m3uaAspSpTimerT18 = thedata->m3uaAspSpTimerT18;
+		StorageNew->m3uaAspSpTimerT20 = thedata->m3uaAspSpTimerT20;
+		StorageNew->m3uaAspSpTimerT22A = thedata->m3uaAspSpTimerT22A;
+		StorageNew->m3uaAspSpTimerT23A = thedata->m3uaAspSpTimerT23A;
+		StorageNew->m3uaAspSpTimerT24A = thedata->m3uaAspSpTimerT24A;
+		StorageNew->m3uaAspSpTimerT26A = thedata->m3uaAspSpTimerT26A;
+		StorageNew->m3uaAspSpTimerT27A = thedata->m3uaAspSpTimerT27A;
+		StorageNew->m3uaAspSpStatus = thedata->m3uaAspSpStatus;
 	}
       done:
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
@@ -2011,7 +2300,7 @@ m3uaAspSpTable_del(struct m3uaAspSpTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for m3uaAspSpTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case m3uaAspSpTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2144,25 +2433,33 @@ m3uaAspMtTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->m3uaAspSpIndex = 0;
-		if ((StorageNew->m3uaAspMtName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->m3uaAspMtNameLen = strlen("");
+		if ((StorageNew->m3uaAspMtName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->m3uaAspMtNameLen = 0;
+		StorageNew->m3uaAspMtName[StorageNew->m3uaAspMtNameLen] = 0;
 		StorageNew->m3uaAspMtAdministrativeState = M3UAASPMTADMINISTRATIVESTATE_LOCKED;
 		StorageNew->m3uaAspMtOperationalState = M3UAASPMTOPERATIONALSTATE_DISABLED;
-		if (memdup((u_char **) &StorageNew->m3uaAspMtProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->m3uaAspMtProceduralStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->m3uaAspMtProceduralStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->m3uaAspMtProceduralStatusLen = 1;
 		StorageNew->m3uaAspMtUsageState = M3UAASPMTUSAGESTATE_IDLE;
 		StorageNew->m3uaAspMtAsState = M3UAASPMTASSTATE_DOWN;
 		StorageNew->m3uaAspMtStatus = 0;
 		StorageNew->m3uaAspMtStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	m3uaAspMtTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct m3uaAspMtTable_data *m3uaAspMtTable_duplicate(struct m3uaAspMtTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2174,6 +2471,24 @@ m3uaAspMtTable_duplicate(struct m3uaAspMtTable_data *thedata)
 
 	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspMtTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->m3uaAspMtTable_id = thedata->m3uaAspMtTable_id;
+		StorageNew->m3uaAspSpIndex = thedata->m3uaAspSpIndex;
+		StorageNew->m3uaAspMtIndex = thedata->m3uaAspMtIndex;
+		if (!(StorageNew->m3uaAspMtName = malloc(thedata->m3uaAspMtNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspMtName, thedata->m3uaAspMtName, thedata->m3uaAspMtNameLen);
+		StorageNew->m3uaAspMtNameLen = thedata->m3uaAspMtNameLen;
+		StorageNew->m3uaAspMtName[StorageNew->m3uaAspMtNameLen] = 0;
+		StorageNew->m3uaAspMtAdministrativeState = thedata->m3uaAspMtAdministrativeState;
+		StorageNew->m3uaAspMtOperationalState = thedata->m3uaAspMtOperationalState;
+		if (!(StorageNew->m3uaAspMtProceduralStatus = malloc(thedata->m3uaAspMtProceduralStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspMtProceduralStatus, thedata->m3uaAspMtProceduralStatus, thedata->m3uaAspMtProceduralStatusLen);
+		StorageNew->m3uaAspMtProceduralStatusLen = thedata->m3uaAspMtProceduralStatusLen;
+		StorageNew->m3uaAspMtProceduralStatus[StorageNew->m3uaAspMtProceduralStatusLen] = 0;
+		StorageNew->m3uaAspMtUsageState = thedata->m3uaAspMtUsageState;
+		StorageNew->m3uaAspMtAsState = thedata->m3uaAspMtAsState;
+		StorageNew->m3uaAspMtStatus = thedata->m3uaAspMtStatus;
 	}
       done:
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
@@ -2273,7 +2588,7 @@ m3uaAspMtTable_del(struct m3uaAspMtTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for m3uaAspMtTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case m3uaAspMtTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2373,38 +2688,51 @@ m3uaAspRsTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->m3uaAspSpIndex = 0;
-		if ((StorageNew->m3uaAspRsName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->m3uaAspRsNameLen = strlen("");
-		if ((StorageNew->m3uaAspRsRemotePointCode = (uint8_t *) strdup("")) != NULL)
-			StorageNew->m3uaAspRsRemotePointCodeLen = strlen("");
+		if ((StorageNew->m3uaAspRsName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->m3uaAspRsNameLen = 0;
+		StorageNew->m3uaAspRsName[StorageNew->m3uaAspRsNameLen] = 0;
+		if ((StorageNew->m3uaAspRsRemotePointCode = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->m3uaAspRsRemotePointCodeLen = 0;
+		StorageNew->m3uaAspRsRemotePointCode[StorageNew->m3uaAspRsRemotePointCodeLen] = 0;
 		StorageNew->m3uaAspRsOperationalState = 0;
 		StorageNew->m3uaAspRsAdministrativeState = 0;
 		StorageNew->m3uaAspRsUsageState = 0;
-		if (memdup((u_char **) &StorageNew->m3uaAspRsAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->m3uaAspRsAlarmStatusLen = 1;
-		if (memdup((u_char **) &StorageNew->m3uaAspRsProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->m3uaAspRsProceduralStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->m3uaAspRsAlarmStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->m3uaAspRsAlarmStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->m3uaAspRsProceduralStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->m3uaAspRsProceduralStatusLen = 1;
 		StorageNew->m3uaAspRsTimerT8 = 0;
 		StorageNew->m3uaAspRsTimerT11 = 0;
 		StorageNew->m3uaAspRsTimerT15 = 0;
 		StorageNew->m3uaAspRsTimerT16 = 0;
 		StorageNew->m3uaAspRsTimerT18A = 0;
-		if (memdup((u_char **) &StorageNew->m3uaAspRsOptions, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->m3uaAspRsOptionsLen = 1;
-		if (memdup((u_char **) &StorageNew->m3uaAspRsAvailabilityStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->m3uaAspRsAvailabilityStatusLen = 2;
+		if (memdup((u_char **) &StorageNew->m3uaAspRsOptions, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->m3uaAspRsOptionsLen = 1;
+		if (memdup((u_char **) &StorageNew->m3uaAspRsAvailabilityStatus, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->m3uaAspRsAvailabilityStatusLen = 2;
 		StorageNew->m3uaAspRsCongestionLevel = 0;
 		StorageNew->m3uaAspRsStatus = 0;
 		StorageNew->m3uaAspRsStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	m3uaAspRsTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct m3uaAspRsTable_data *m3uaAspRsTable_duplicate(struct m3uaAspRsTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2416,6 +2744,49 @@ m3uaAspRsTable_duplicate(struct m3uaAspRsTable_data *thedata)
 
 	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspRsTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->m3uaAspRsTable_id = thedata->m3uaAspRsTable_id;
+		StorageNew->m3uaAspSpIndex = thedata->m3uaAspSpIndex;
+		StorageNew->m3uaAspRsIndex = thedata->m3uaAspRsIndex;
+		if (!(StorageNew->m3uaAspRsName = malloc(thedata->m3uaAspRsNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspRsName, thedata->m3uaAspRsName, thedata->m3uaAspRsNameLen);
+		StorageNew->m3uaAspRsNameLen = thedata->m3uaAspRsNameLen;
+		StorageNew->m3uaAspRsName[StorageNew->m3uaAspRsNameLen] = 0;
+		if (!(StorageNew->m3uaAspRsRemotePointCode = malloc(thedata->m3uaAspRsRemotePointCodeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspRsRemotePointCode, thedata->m3uaAspRsRemotePointCode, thedata->m3uaAspRsRemotePointCodeLen);
+		StorageNew->m3uaAspRsRemotePointCodeLen = thedata->m3uaAspRsRemotePointCodeLen;
+		StorageNew->m3uaAspRsRemotePointCode[StorageNew->m3uaAspRsRemotePointCodeLen] = 0;
+		StorageNew->m3uaAspRsOperationalState = thedata->m3uaAspRsOperationalState;
+		StorageNew->m3uaAspRsAdministrativeState = thedata->m3uaAspRsAdministrativeState;
+		StorageNew->m3uaAspRsUsageState = thedata->m3uaAspRsUsageState;
+		if (!(StorageNew->m3uaAspRsAlarmStatus = malloc(thedata->m3uaAspRsAlarmStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspRsAlarmStatus, thedata->m3uaAspRsAlarmStatus, thedata->m3uaAspRsAlarmStatusLen);
+		StorageNew->m3uaAspRsAlarmStatusLen = thedata->m3uaAspRsAlarmStatusLen;
+		StorageNew->m3uaAspRsAlarmStatus[StorageNew->m3uaAspRsAlarmStatusLen] = 0;
+		if (!(StorageNew->m3uaAspRsProceduralStatus = malloc(thedata->m3uaAspRsProceduralStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspRsProceduralStatus, thedata->m3uaAspRsProceduralStatus, thedata->m3uaAspRsProceduralStatusLen);
+		StorageNew->m3uaAspRsProceduralStatusLen = thedata->m3uaAspRsProceduralStatusLen;
+		StorageNew->m3uaAspRsProceduralStatus[StorageNew->m3uaAspRsProceduralStatusLen] = 0;
+		StorageNew->m3uaAspRsTimerT8 = thedata->m3uaAspRsTimerT8;
+		StorageNew->m3uaAspRsTimerT11 = thedata->m3uaAspRsTimerT11;
+		StorageNew->m3uaAspRsTimerT15 = thedata->m3uaAspRsTimerT15;
+		StorageNew->m3uaAspRsTimerT16 = thedata->m3uaAspRsTimerT16;
+		StorageNew->m3uaAspRsTimerT18A = thedata->m3uaAspRsTimerT18A;
+		if (!(StorageNew->m3uaAspRsOptions = malloc(thedata->m3uaAspRsOptionsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspRsOptions, thedata->m3uaAspRsOptions, thedata->m3uaAspRsOptionsLen);
+		StorageNew->m3uaAspRsOptionsLen = thedata->m3uaAspRsOptionsLen;
+		StorageNew->m3uaAspRsOptions[StorageNew->m3uaAspRsOptionsLen] = 0;
+		if (!(StorageNew->m3uaAspRsAvailabilityStatus = malloc(thedata->m3uaAspRsAvailabilityStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspRsAvailabilityStatus, thedata->m3uaAspRsAvailabilityStatus, thedata->m3uaAspRsAvailabilityStatusLen);
+		StorageNew->m3uaAspRsAvailabilityStatusLen = thedata->m3uaAspRsAvailabilityStatusLen;
+		StorageNew->m3uaAspRsAvailabilityStatus[StorageNew->m3uaAspRsAvailabilityStatusLen] = 0;
+		StorageNew->m3uaAspRsCongestionLevel = thedata->m3uaAspRsCongestionLevel;
+		StorageNew->m3uaAspRsStatus = thedata->m3uaAspRsStatus;
 	}
       done:
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
@@ -2523,7 +2894,7 @@ m3uaAspRsTable_del(struct m3uaAspRsTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for m3uaAspRsTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case m3uaAspRsTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2666,22 +3037,29 @@ m3uaAspRlTable_create(void)
 		StorageNew->m3uaAspRlCost = 0;
 		StorageNew->m3uaAspRlAdministrativeState = M3UAASPRLADMINISTRATIVESTATE_LOCKED;
 		StorageNew->m3uaAspRlOperationalState = M3UAASPRLOPERATIONALSTATE_ENABLED;
-		if (memdup((u_char **) &StorageNew->m3uaAspRlProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->m3uaAspRlProceduralStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->m3uaAspRlProceduralStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->m3uaAspRlProceduralStatusLen = 1;
 		StorageNew->m3uaAspRlUsageState = 0;
-		if (memdup((u_char **) &StorageNew->m3uaAspRlAvailabilityStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->m3uaAspRlAvailabilityStatusLen = 2;
+		if (memdup((u_char **) &StorageNew->m3uaAspRlAvailabilityStatus, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->m3uaAspRlAvailabilityStatusLen = 2;
 		StorageNew->m3uaAspRlStatus = 0;
 		StorageNew->m3uaAspRlStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	m3uaAspRlTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct m3uaAspRlTable_data *m3uaAspRlTable_duplicate(struct m3uaAspRlTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2693,6 +3071,25 @@ m3uaAspRlTable_duplicate(struct m3uaAspRlTable_data *thedata)
 
 	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspRlTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->m3uaAspRlTable_id = thedata->m3uaAspRlTable_id;
+		StorageNew->m3uaAspSpIndex = thedata->m3uaAspSpIndex;
+		StorageNew->m3uaAspRsIndex = thedata->m3uaAspRsIndex;
+		StorageNew->m3uaAspAgIndex = thedata->m3uaAspAgIndex;
+		StorageNew->m3uaAspRlCost = thedata->m3uaAspRlCost;
+		StorageNew->m3uaAspRlAdministrativeState = thedata->m3uaAspRlAdministrativeState;
+		StorageNew->m3uaAspRlOperationalState = thedata->m3uaAspRlOperationalState;
+		if (!(StorageNew->m3uaAspRlProceduralStatus = malloc(thedata->m3uaAspRlProceduralStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspRlProceduralStatus, thedata->m3uaAspRlProceduralStatus, thedata->m3uaAspRlProceduralStatusLen);
+		StorageNew->m3uaAspRlProceduralStatusLen = thedata->m3uaAspRlProceduralStatusLen;
+		StorageNew->m3uaAspRlProceduralStatus[StorageNew->m3uaAspRlProceduralStatusLen] = 0;
+		StorageNew->m3uaAspRlUsageState = thedata->m3uaAspRlUsageState;
+		if (!(StorageNew->m3uaAspRlAvailabilityStatus = malloc(thedata->m3uaAspRlAvailabilityStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspRlAvailabilityStatus, thedata->m3uaAspRlAvailabilityStatus, thedata->m3uaAspRlAvailabilityStatusLen);
+		StorageNew->m3uaAspRlAvailabilityStatusLen = thedata->m3uaAspRlAvailabilityStatusLen;
+		StorageNew->m3uaAspRlAvailabilityStatus[StorageNew->m3uaAspRlAvailabilityStatusLen] = 0;
+		StorageNew->m3uaAspRlStatus = thedata->m3uaAspRlStatus;
 	}
       done:
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
@@ -2794,7 +3191,7 @@ m3uaAspRlTable_del(struct m3uaAspRlTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for m3uaAspRlTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case m3uaAspRlTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2902,24 +3299,31 @@ m3uaAspRtTable_create(void)
 		StorageNew->m3uaAspRtCost = 0;
 		StorageNew->m3uaAspRtTimerT6 = 80;
 		StorageNew->m3uaAspRtTimerT10 = 6000;
-		if (memdup((u_char **) &StorageNew->m3uaAspRtAvailabilityStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->m3uaAspRtAvailabilityStatusLen = 2;
+		if (memdup((u_char **) &StorageNew->m3uaAspRtAvailabilityStatus, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->m3uaAspRtAvailabilityStatusLen = 2;
 		StorageNew->m3uaAspRtAdminstrativeState = 0;
 		StorageNew->m3uaAspRtOperationalState = 0;
-		if (memdup((u_char **) &StorageNew->m3uaAspRtProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->m3uaAspRtProceduralStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->m3uaAspRtProceduralStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->m3uaAspRtProceduralStatusLen = 1;
 		StorageNew->m3uaAspRtUsageState = 0;
 		StorageNew->m3uaAspRtStatus = 0;
 		StorageNew->m3uaAspRtStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	m3uaAspRtTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct m3uaAspRtTable_data *m3uaAspRtTable_duplicate(struct m3uaAspRtTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2931,6 +3335,28 @@ m3uaAspRtTable_duplicate(struct m3uaAspRtTable_data *thedata)
 
 	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspRtTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->m3uaAspRtTable_id = thedata->m3uaAspRtTable_id;
+		StorageNew->m3uaAspSpIndex = thedata->m3uaAspSpIndex;
+		StorageNew->m3uaAspRsIndex = thedata->m3uaAspRsIndex;
+		StorageNew->m3uaAspAgIndex = thedata->m3uaAspAgIndex;
+		StorageNew->m3uaAspSgIndex = thedata->m3uaAspSgIndex;
+		StorageNew->m3uaAspRtCost = thedata->m3uaAspRtCost;
+		StorageNew->m3uaAspRtTimerT6 = thedata->m3uaAspRtTimerT6;
+		StorageNew->m3uaAspRtTimerT10 = thedata->m3uaAspRtTimerT10;
+		if (!(StorageNew->m3uaAspRtAvailabilityStatus = malloc(thedata->m3uaAspRtAvailabilityStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspRtAvailabilityStatus, thedata->m3uaAspRtAvailabilityStatus, thedata->m3uaAspRtAvailabilityStatusLen);
+		StorageNew->m3uaAspRtAvailabilityStatusLen = thedata->m3uaAspRtAvailabilityStatusLen;
+		StorageNew->m3uaAspRtAvailabilityStatus[StorageNew->m3uaAspRtAvailabilityStatusLen] = 0;
+		StorageNew->m3uaAspRtAdminstrativeState = thedata->m3uaAspRtAdminstrativeState;
+		StorageNew->m3uaAspRtOperationalState = thedata->m3uaAspRtOperationalState;
+		if (!(StorageNew->m3uaAspRtProceduralStatus = malloc(thedata->m3uaAspRtProceduralStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspRtProceduralStatus, thedata->m3uaAspRtProceduralStatus, thedata->m3uaAspRtProceduralStatusLen);
+		StorageNew->m3uaAspRtProceduralStatusLen = thedata->m3uaAspRtProceduralStatusLen;
+		StorageNew->m3uaAspRtProceduralStatus[StorageNew->m3uaAspRtProceduralStatusLen] = 0;
+		StorageNew->m3uaAspRtUsageState = thedata->m3uaAspRtUsageState;
+		StorageNew->m3uaAspRtStatus = thedata->m3uaAspRtStatus;
 	}
       done:
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
@@ -3034,7 +3460,7 @@ m3uaAspRtTable_del(struct m3uaAspRtTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for m3uaAspRtTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case m3uaAspRtTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3147,19 +3573,25 @@ m3uaAspRcTable_create(void)
 		StorageNew->m3uaAspAgIndex = 0;
 		StorageNew->m3uaAspRcValue = 0;
 		StorageNew->m3uaAspRcRegistrationPolicy = 0;
-		if ((StorageNew->m3uaAspRcTrafficMode = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->m3uaAspRcTrafficModeLen = 2;
+		if ((StorageNew->m3uaAspRcTrafficMode = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->m3uaAspRcTrafficModeLen = 2;
 		StorageNew->m3uaAspRcStatus = 0;
 		StorageNew->m3uaAspRcStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	m3uaAspRcTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct m3uaAspRcTable_data *m3uaAspRcTable_duplicate(struct m3uaAspRcTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3171,6 +3603,17 @@ m3uaAspRcTable_duplicate(struct m3uaAspRcTable_data *thedata)
 
 	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspRcTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->m3uaAspRcTable_id = thedata->m3uaAspRcTable_id;
+		StorageNew->m3uaAspIndex = thedata->m3uaAspIndex;
+		StorageNew->m3uaAspSpIndex = thedata->m3uaAspSpIndex;
+		StorageNew->m3uaAspMtIndex = thedata->m3uaAspMtIndex;
+		StorageNew->m3uaAspAgIndex = thedata->m3uaAspAgIndex;
+		StorageNew->m3uaAspRcValue = thedata->m3uaAspRcValue;
+		StorageNew->m3uaAspRcRegistrationPolicy = thedata->m3uaAspRcRegistrationPolicy;
+		if (!(StorageNew->m3uaAspRcTrafficMode = snmp_duplicate_objid(thedata->m3uaAspRcTrafficMode, thedata->m3uaAspRcTrafficModeLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->m3uaAspRcTrafficModeLen = thedata->m3uaAspRcTrafficModeLen;
+		StorageNew->m3uaAspRcStatus = thedata->m3uaAspRcStatus;
 	}
       done:
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
@@ -3272,7 +3715,7 @@ m3uaAspRcTable_del(struct m3uaAspRcTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for m3uaAspRcTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case m3uaAspRcTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3371,19 +3814,24 @@ m3uaAspAsTable_create(void)
 		StorageNew->m3uaAspSgIndex = 0;
 		StorageNew->m3uaAspAsAsState = 0;
 		StorageNew->m3uaAspAsOperationalState = 0;
-		if (memdup((u_char **) &StorageNew->m3uaAspAsProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->m3uaAspAsProceduralStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->m3uaAspAsProceduralStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->m3uaAspAsProceduralStatusLen = 1;
 		StorageNew->m3uaAspAsUsageState = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	m3uaAspAsTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct m3uaAspAsTable_data *m3uaAspAsTable_duplicate(struct m3uaAspAsTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3395,6 +3843,20 @@ m3uaAspAsTable_duplicate(struct m3uaAspAsTable_data *thedata)
 
 	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspAsTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->m3uaAspAsTable_id = thedata->m3uaAspAsTable_id;
+		StorageNew->m3uaAspIndex = thedata->m3uaAspIndex;
+		StorageNew->m3uaAspSpIndex = thedata->m3uaAspSpIndex;
+		StorageNew->m3uaAspMtIndex = thedata->m3uaAspMtIndex;
+		StorageNew->m3uaAspAgIndex = thedata->m3uaAspAgIndex;
+		StorageNew->m3uaAspSgIndex = thedata->m3uaAspSgIndex;
+		StorageNew->m3uaAspAsAsState = thedata->m3uaAspAsAsState;
+		StorageNew->m3uaAspAsOperationalState = thedata->m3uaAspAsOperationalState;
+		if (!(StorageNew->m3uaAspAsProceduralStatus = malloc(thedata->m3uaAspAsProceduralStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspAsProceduralStatus, thedata->m3uaAspAsProceduralStatus, thedata->m3uaAspAsProceduralStatusLen);
+		StorageNew->m3uaAspAsProceduralStatusLen = thedata->m3uaAspAsProceduralStatusLen;
+		StorageNew->m3uaAspAsProceduralStatus[StorageNew->m3uaAspAsProceduralStatusLen] = 0;
+		StorageNew->m3uaAspAsUsageState = thedata->m3uaAspAsUsageState;
 	}
       done:
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
@@ -3498,7 +3960,7 @@ m3uaAspAsTable_del(struct m3uaAspAsTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for m3uaAspAsTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case m3uaAspAsTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3601,19 +4063,24 @@ m3uaAspAfTable_create(void)
 		StorageNew->m3uaAspAfAsState = 0;
 		StorageNew->m3uaAspAfAdministrativeState = 0;
 		StorageNew->m3uaAspAfOperationalState = 0;
-		if (memdup((u_char **) &StorageNew->m3uaAspAfProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->m3uaAspAfProceduralStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->m3uaAspAfProceduralStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->m3uaAspAfProceduralStatusLen = 1;
 		StorageNew->m3uaAspAfUsageState = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	m3uaAspAfTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct m3uaAspAfTable_data *m3uaAspAfTable_duplicate(struct m3uaAspAfTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3625,6 +4092,22 @@ m3uaAspAfTable_duplicate(struct m3uaAspAfTable_data *thedata)
 
 	DEBUGMSGTL(("m3uaAspMIB", "m3uaAspAfTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->m3uaAspAfTable_id = thedata->m3uaAspAfTable_id;
+		StorageNew->m3uaAspIndex = thedata->m3uaAspIndex;
+		StorageNew->m3uaAspSpIndex = thedata->m3uaAspSpIndex;
+		StorageNew->m3uaAspMtIndex = thedata->m3uaAspMtIndex;
+		StorageNew->m3uaAspAgIndex = thedata->m3uaAspAgIndex;
+		StorageNew->m3uaAspSgIndex = thedata->m3uaAspSgIndex;
+		StorageNew->m3uaAspSgpIndex = thedata->m3uaAspSgpIndex;
+		StorageNew->m3uaAspAfAsState = thedata->m3uaAspAfAsState;
+		StorageNew->m3uaAspAfAdministrativeState = thedata->m3uaAspAfAdministrativeState;
+		StorageNew->m3uaAspAfOperationalState = thedata->m3uaAspAfOperationalState;
+		if (!(StorageNew->m3uaAspAfProceduralStatus = malloc(thedata->m3uaAspAfProceduralStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->m3uaAspAfProceduralStatus, thedata->m3uaAspAfProceduralStatus, thedata->m3uaAspAfProceduralStatusLen);
+		StorageNew->m3uaAspAfProceduralStatusLen = thedata->m3uaAspAfProceduralStatusLen;
+		StorageNew->m3uaAspAfProceduralStatus[StorageNew->m3uaAspAfProceduralStatusLen] = 0;
+		StorageNew->m3uaAspAfUsageState = thedata->m3uaAspAfUsageState;
 	}
       done:
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
@@ -3730,7 +4213,7 @@ m3uaAspAfTable_del(struct m3uaAspAfTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for m3uaAspAfTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case m3uaAspAfTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3810,6 +4293,404 @@ store_m3uaAspAfTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	}
 	DEBUGMSGTL(("m3uaAspMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int activate_m3uaAspTable_row(struct m3uaAspTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_m3uaAspTable_row(struct m3uaAspTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_m3uaAspTable_row(struct m3uaAspTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_m3uaAspTable_row(struct m3uaAspTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_m3uaAspAgTable_row(struct m3uaAspAgTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_m3uaAspAgTable_row(struct m3uaAspAgTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_m3uaAspAgTable_row(struct m3uaAspAgTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_m3uaAspAgTable_row(struct m3uaAspAgTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_m3uaAspSgTable_row(struct m3uaAspSgTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_m3uaAspSgTable_row(struct m3uaAspSgTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_m3uaAspSgTable_row(struct m3uaAspSgTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_m3uaAspSgTable_row(struct m3uaAspSgTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_m3uaAspSgpTable_row(struct m3uaAspSgpTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_m3uaAspSgpTable_row(struct m3uaAspSgpTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_m3uaAspSgpTable_row(struct m3uaAspSgpTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_m3uaAspSgpTable_row(struct m3uaAspSgpTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_m3uaAspSpTable_row(struct m3uaAspSpTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_m3uaAspSpTable_row(struct m3uaAspSpTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_m3uaAspSpTable_row(struct m3uaAspSpTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_m3uaAspSpTable_row(struct m3uaAspSpTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_m3uaAspMtTable_row(struct m3uaAspMtTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_m3uaAspMtTable_row(struct m3uaAspMtTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_m3uaAspMtTable_row(struct m3uaAspMtTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_m3uaAspMtTable_row(struct m3uaAspMtTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_m3uaAspRsTable_row(struct m3uaAspRsTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_m3uaAspRsTable_row(struct m3uaAspRsTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_m3uaAspRsTable_row(struct m3uaAspRsTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_m3uaAspRsTable_row(struct m3uaAspRsTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_m3uaAspRlTable_row(struct m3uaAspRlTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_m3uaAspRlTable_row(struct m3uaAspRlTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_m3uaAspRlTable_row(struct m3uaAspRlTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_m3uaAspRlTable_row(struct m3uaAspRlTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_m3uaAspRtTable_row(struct m3uaAspRtTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_m3uaAspRtTable_row(struct m3uaAspRtTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_m3uaAspRtTable_row(struct m3uaAspRtTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_m3uaAspRtTable_row(struct m3uaAspRtTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_m3uaAspRcTable_row(struct m3uaAspRcTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_m3uaAspRcTable_row(struct m3uaAspRcTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_m3uaAspRcTable_row(struct m3uaAspRcTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_m3uaAspRcTable_row(struct m3uaAspRcTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int check_m3uaAspTable_row(struct m3uaAspTable_data *StorageTmp, struct m3uaAspTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_m3uaAspTable_row(struct m3uaAspTable_data *StorageTmp, struct m3uaAspTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_m3uaAspTable_row(struct m3uaAspTable_data *StorageTmp, struct m3uaAspTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_m3uaAspTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_m3uaAspTable_row(struct m3uaAspTable_data *StorageTmp, struct m3uaAspTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	m3uaAspTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_m3uaAspTable_row(struct m3uaAspTable_data *StorageTmp, struct m3uaAspTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_m3uaAspTable_row(struct m3uaAspTable_data *StorageTmp, struct m3uaAspTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_m3uaAspTable_row(StorageOld, NULL);
 }
 
 /**
@@ -3948,6 +4829,64 @@ var_m3uaAspTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_m3uaAspAgTable_row(struct m3uaAspAgTable_data *StorageTmp, struct m3uaAspAgTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_m3uaAspAgTable_row(struct m3uaAspAgTable_data *StorageTmp, struct m3uaAspAgTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_m3uaAspAgTable_row(struct m3uaAspAgTable_data *StorageTmp, struct m3uaAspAgTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_m3uaAspAgTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_m3uaAspAgTable_row(struct m3uaAspAgTable_data *StorageTmp, struct m3uaAspAgTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	m3uaAspAgTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_m3uaAspAgTable_row(struct m3uaAspAgTable_data *StorageTmp, struct m3uaAspAgTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_m3uaAspAgTable_row(struct m3uaAspAgTable_data *StorageTmp, struct m3uaAspAgTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_m3uaAspAgTable_row(StorageOld, NULL);
 }
 
 /**
@@ -4131,6 +5070,64 @@ var_m3uaAspAgTable(struct variable *vp, oid * name, size_t *length, int exact, s
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_m3uaAspSgTable_row(struct m3uaAspSgTable_data *StorageTmp, struct m3uaAspSgTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_m3uaAspSgTable_row(struct m3uaAspSgTable_data *StorageTmp, struct m3uaAspSgTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_m3uaAspSgTable_row(struct m3uaAspSgTable_data *StorageTmp, struct m3uaAspSgTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_m3uaAspSgTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_m3uaAspSgTable_row(struct m3uaAspSgTable_data *StorageTmp, struct m3uaAspSgTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	m3uaAspSgTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_m3uaAspSgTable_row(struct m3uaAspSgTable_data *StorageTmp, struct m3uaAspSgTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_m3uaAspSgTable_row(struct m3uaAspSgTable_data *StorageTmp, struct m3uaAspSgTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_m3uaAspSgTable_row(StorageOld, NULL);
 }
 
 /**
@@ -4369,6 +5366,64 @@ var_m3uaAspSgTable(struct variable *vp, oid * name, size_t *length, int exact, s
 }
 
 /**
+ * @fn int check_m3uaAspSgpTable_row(struct m3uaAspSgpTable_data *StorageTmp, struct m3uaAspSgpTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_m3uaAspSgpTable_row(struct m3uaAspSgpTable_data *StorageTmp, struct m3uaAspSgpTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_m3uaAspSgpTable_row(struct m3uaAspSgpTable_data *StorageTmp, struct m3uaAspSgpTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_m3uaAspSgpTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_m3uaAspSgpTable_row(struct m3uaAspSgpTable_data *StorageTmp, struct m3uaAspSgpTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	m3uaAspSgpTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_m3uaAspSgpTable_row(struct m3uaAspSgpTable_data *StorageTmp, struct m3uaAspSgpTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_m3uaAspSgpTable_row(struct m3uaAspSgpTable_data *StorageTmp, struct m3uaAspSgpTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_m3uaAspSgpTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_m3uaAspSgpTable_row(struct m3uaAspSgpTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -4504,6 +5559,64 @@ var_m3uaAspSgpTable(struct variable *vp, oid * name, size_t *length, int exact, 
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_m3uaAspSpTable_row(struct m3uaAspSpTable_data *StorageTmp, struct m3uaAspSpTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_m3uaAspSpTable_row(struct m3uaAspSpTable_data *StorageTmp, struct m3uaAspSpTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_m3uaAspSpTable_row(struct m3uaAspSpTable_data *StorageTmp, struct m3uaAspSpTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_m3uaAspSpTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_m3uaAspSpTable_row(struct m3uaAspSpTable_data *StorageTmp, struct m3uaAspSpTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	m3uaAspSpTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_m3uaAspSpTable_row(struct m3uaAspSpTable_data *StorageTmp, struct m3uaAspSpTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_m3uaAspSpTable_row(struct m3uaAspSpTable_data *StorageTmp, struct m3uaAspSpTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_m3uaAspSpTable_row(StorageOld, NULL);
 }
 
 /**
@@ -4693,6 +5806,64 @@ var_m3uaAspSpTable(struct variable *vp, oid * name, size_t *length, int exact, s
 }
 
 /**
+ * @fn int check_m3uaAspMtTable_row(struct m3uaAspMtTable_data *StorageTmp, struct m3uaAspMtTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_m3uaAspMtTable_row(struct m3uaAspMtTable_data *StorageTmp, struct m3uaAspMtTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_m3uaAspMtTable_row(struct m3uaAspMtTable_data *StorageTmp, struct m3uaAspMtTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_m3uaAspMtTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_m3uaAspMtTable_row(struct m3uaAspMtTable_data *StorageTmp, struct m3uaAspMtTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	m3uaAspMtTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_m3uaAspMtTable_row(struct m3uaAspMtTable_data *StorageTmp, struct m3uaAspMtTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_m3uaAspMtTable_row(struct m3uaAspMtTable_data *StorageTmp, struct m3uaAspMtTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_m3uaAspMtTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_m3uaAspMtTable_row(struct m3uaAspMtTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -4807,6 +5978,64 @@ var_m3uaAspMtTable(struct variable *vp, oid * name, size_t *length, int exact, s
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_m3uaAspRsTable_row(struct m3uaAspRsTable_data *StorageTmp, struct m3uaAspRsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_m3uaAspRsTable_row(struct m3uaAspRsTable_data *StorageTmp, struct m3uaAspRsTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_m3uaAspRsTable_row(struct m3uaAspRsTable_data *StorageTmp, struct m3uaAspRsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_m3uaAspRsTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_m3uaAspRsTable_row(struct m3uaAspRsTable_data *StorageTmp, struct m3uaAspRsTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	m3uaAspRsTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_m3uaAspRsTable_row(struct m3uaAspRsTable_data *StorageTmp, struct m3uaAspRsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_m3uaAspRsTable_row(struct m3uaAspRsTable_data *StorageTmp, struct m3uaAspRsTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_m3uaAspRsTable_row(StorageOld, NULL);
 }
 
 /**
@@ -4980,6 +6209,64 @@ var_m3uaAspRsTable(struct variable *vp, oid * name, size_t *length, int exact, s
 }
 
 /**
+ * @fn int check_m3uaAspRlTable_row(struct m3uaAspRlTable_data *StorageTmp, struct m3uaAspRlTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_m3uaAspRlTable_row(struct m3uaAspRlTable_data *StorageTmp, struct m3uaAspRlTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_m3uaAspRlTable_row(struct m3uaAspRlTable_data *StorageTmp, struct m3uaAspRlTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_m3uaAspRlTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_m3uaAspRlTable_row(struct m3uaAspRlTable_data *StorageTmp, struct m3uaAspRlTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	m3uaAspRlTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_m3uaAspRlTable_row(struct m3uaAspRlTable_data *StorageTmp, struct m3uaAspRlTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_m3uaAspRlTable_row(struct m3uaAspRlTable_data *StorageTmp, struct m3uaAspRlTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_m3uaAspRlTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_m3uaAspRlTable_row(struct m3uaAspRlTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -5093,6 +6380,64 @@ var_m3uaAspRlTable(struct variable *vp, oid * name, size_t *length, int exact, s
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_m3uaAspRtTable_row(struct m3uaAspRtTable_data *StorageTmp, struct m3uaAspRtTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_m3uaAspRtTable_row(struct m3uaAspRtTable_data *StorageTmp, struct m3uaAspRtTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_m3uaAspRtTable_row(struct m3uaAspRtTable_data *StorageTmp, struct m3uaAspRtTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_m3uaAspRtTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_m3uaAspRtTable_row(struct m3uaAspRtTable_data *StorageTmp, struct m3uaAspRtTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	m3uaAspRtTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_m3uaAspRtTable_row(struct m3uaAspRtTable_data *StorageTmp, struct m3uaAspRtTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_m3uaAspRtTable_row(struct m3uaAspRtTable_data *StorageTmp, struct m3uaAspRtTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_m3uaAspRtTable_row(StorageOld, NULL);
 }
 
 /**
@@ -5222,6 +6567,64 @@ var_m3uaAspRtTable(struct variable *vp, oid * name, size_t *length, int exact, s
 }
 
 /**
+ * @fn int check_m3uaAspRcTable_row(struct m3uaAspRcTable_data *StorageTmp, struct m3uaAspRcTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_m3uaAspRcTable_row(struct m3uaAspRcTable_data *StorageTmp, struct m3uaAspRcTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_m3uaAspRcTable_row(struct m3uaAspRcTable_data *StorageTmp, struct m3uaAspRcTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_m3uaAspRcTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_m3uaAspRcTable_row(struct m3uaAspRcTable_data *StorageTmp, struct m3uaAspRcTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	m3uaAspRcTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_m3uaAspRcTable_row(struct m3uaAspRcTable_data *StorageTmp, struct m3uaAspRcTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_m3uaAspRcTable_row(struct m3uaAspRcTable_data *StorageTmp, struct m3uaAspRcTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_m3uaAspRcTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_m3uaAspRcTable_row(struct m3uaAspRcTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -5321,6 +6724,64 @@ var_m3uaAspRcTable(struct variable *vp, oid * name, size_t *length, int exact, s
 }
 
 /**
+ * @fn int check_m3uaAspAsTable_row(struct m3uaAspAsTable_data *StorageTmp, struct m3uaAspAsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_m3uaAspAsTable_row(struct m3uaAspAsTable_data *StorageTmp, struct m3uaAspAsTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_m3uaAspAsTable_row(struct m3uaAspAsTable_data *StorageTmp, struct m3uaAspAsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_m3uaAspAsTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_m3uaAspAsTable_row(struct m3uaAspAsTable_data *StorageTmp, struct m3uaAspAsTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	m3uaAspAsTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_m3uaAspAsTable_row(struct m3uaAspAsTable_data *StorageTmp, struct m3uaAspAsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_m3uaAspAsTable_row(struct m3uaAspAsTable_data *StorageTmp, struct m3uaAspAsTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_m3uaAspAsTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_m3uaAspAsTable_row(struct m3uaAspAsTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -5413,6 +6874,64 @@ var_m3uaAspAsTable(struct variable *vp, oid * name, size_t *length, int exact, s
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_m3uaAspAfTable_row(struct m3uaAspAfTable_data *StorageTmp, struct m3uaAspAfTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_m3uaAspAfTable_row(struct m3uaAspAfTable_data *StorageTmp, struct m3uaAspAfTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_m3uaAspAfTable_row(struct m3uaAspAfTable_data *StorageTmp, struct m3uaAspAfTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_m3uaAspAfTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_m3uaAspAfTable_row(struct m3uaAspAfTable_data *StorageTmp, struct m3uaAspAfTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	m3uaAspAfTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_m3uaAspAfTable_row(struct m3uaAspAfTable_data *StorageTmp, struct m3uaAspAfTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_m3uaAspAfTable_row(struct m3uaAspAfTable_data *StorageTmp, struct m3uaAspAfTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_m3uaAspAfTable_row(StorageOld, NULL);
 }
 
 /**
@@ -5532,17 +7051,17 @@ var_m3uaAspAfTable(struct variable *vp, oid * name, size_t *length, int exact, s
 int
 write_m3uaAspName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct m3uaAspTable_data *StorageTmp = NULL;
+	struct m3uaAspTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspStatus) {
@@ -5565,33 +7084,73 @@ write_m3uaAspName(int action, u_char *var_val, u_char var_val_type, size_t var_v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) == NULL)
+			if (StorageTmp->m3uaAspTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspTable_old = m3uaAspTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->m3uaAspName);
+		StorageTmp->m3uaAspName = string;
+		StorageTmp->m3uaAspNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspTable_tsts == 0)
+				if ((ret = check_m3uaAspTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspName for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspName;
-		old_length = StorageTmp->m3uaAspNameLen;
-		StorageTmp->m3uaAspName = string;
-		StorageTmp->m3uaAspNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspTable_sets == 0)
+				if ((ret = update_m3uaAspTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) != NULL) {
+			m3uaAspTable_destroy(&StorageTmp->m3uaAspTable_old);
+			StorageTmp->m3uaAspTable_rsvs = 0;
+			StorageTmp->m3uaAspTable_tsts = 0;
+			StorageTmp->m3uaAspTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspName = old_value;
-		StorageTmp->m3uaAspNameLen = old_length;
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspTable_sets == 0)
+			revert_m3uaAspTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) == NULL)
+			break;
+		if (StorageOld->m3uaAspName != NULL) {
+			SNMP_FREE(StorageTmp->m3uaAspName);
+			StorageTmp->m3uaAspName = StorageOld->m3uaAspName;
+			StorageTmp->m3uaAspNameLen = StorageOld->m3uaAspNameLen;
+			StorageOld->m3uaAspName = NULL;
+			StorageOld->m3uaAspNameLen = 0;
+		}
+		if (--StorageTmp->m3uaAspTable_rsvs == 0)
+			m3uaAspTable_destroy(&StorageTmp->m3uaAspTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5611,12 +7170,14 @@ write_m3uaAspName(int action, u_char *var_val, u_char var_val_type, size_t var_v
 int
 write_m3uaAspAdministrativeState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspTable_data *StorageTmp = NULL;
+	struct m3uaAspTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAdministrativeState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5650,22 +7211,61 @@ write_m3uaAspAdministrativeState(int action, u_char *var_val, u_char var_val_typ
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspAdministrativeState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) == NULL)
+			if (StorageTmp->m3uaAspTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspTable_old = m3uaAspTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspTable_rsvs++;
+		StorageTmp->m3uaAspAdministrativeState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspTable_tsts == 0)
+				if ((ret = check_m3uaAspTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspAdministrativeState;
-		StorageTmp->m3uaAspAdministrativeState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspTable_sets == 0)
+				if ((ret = update_m3uaAspTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) != NULL) {
+			m3uaAspTable_destroy(&StorageTmp->m3uaAspTable_old);
+			StorageTmp->m3uaAspTable_rsvs = 0;
+			StorageTmp->m3uaAspTable_tsts = 0;
+			StorageTmp->m3uaAspTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspAdministrativeState = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspTable_sets == 0)
+			revert_m3uaAspTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspAdministrativeState = StorageOld->m3uaAspAdministrativeState;
+		if (--StorageTmp->m3uaAspTable_rsvs == 0)
+			m3uaAspTable_destroy(&StorageTmp->m3uaAspTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5685,17 +7285,17 @@ write_m3uaAspAdministrativeState(int action, u_char *var_val, u_char var_val_typ
 int
 write_m3uaAspCapabilities(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct m3uaAspTable_data *StorageTmp = NULL;
+	struct m3uaAspTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspCapabilities entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspStatus) {
@@ -5725,33 +7325,73 @@ write_m3uaAspCapabilities(int action, u_char *var_val, u_char var_val_type, size
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) == NULL)
+			if (StorageTmp->m3uaAspTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspTable_old = m3uaAspTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->m3uaAspCapabilities);
+		StorageTmp->m3uaAspCapabilities = string;
+		StorageTmp->m3uaAspCapabilitiesLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspTable_tsts == 0)
+				if ((ret = check_m3uaAspTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspCapabilities for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspCapabilities;
-		old_length = StorageTmp->m3uaAspCapabilitiesLen;
-		StorageTmp->m3uaAspCapabilities = string;
-		StorageTmp->m3uaAspCapabilitiesLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspTable_sets == 0)
+				if ((ret = update_m3uaAspTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) != NULL) {
+			m3uaAspTable_destroy(&StorageTmp->m3uaAspTable_old);
+			StorageTmp->m3uaAspTable_rsvs = 0;
+			StorageTmp->m3uaAspTable_tsts = 0;
+			StorageTmp->m3uaAspTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspCapabilities = old_value;
-		StorageTmp->m3uaAspCapabilitiesLen = old_length;
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspTable_sets == 0)
+			revert_m3uaAspTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) == NULL)
+			break;
+		if (StorageOld->m3uaAspCapabilities != NULL) {
+			SNMP_FREE(StorageTmp->m3uaAspCapabilities);
+			StorageTmp->m3uaAspCapabilities = StorageOld->m3uaAspCapabilities;
+			StorageTmp->m3uaAspCapabilitiesLen = StorageOld->m3uaAspCapabilitiesLen;
+			StorageOld->m3uaAspCapabilities = NULL;
+			StorageOld->m3uaAspCapabilitiesLen = 0;
+		}
+		if (--StorageTmp->m3uaAspTable_rsvs == 0)
+			m3uaAspTable_destroy(&StorageTmp->m3uaAspTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5771,12 +7411,14 @@ write_m3uaAspCapabilities(int action, u_char *var_val, u_char var_val_type, size
 int
 write_m3uaAspIdPolicy(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspTable_data *StorageTmp = NULL;
+	struct m3uaAspTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspIdPolicy entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5811,22 +7453,61 @@ write_m3uaAspIdPolicy(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspIdPolicy: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) == NULL)
+			if (StorageTmp->m3uaAspTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspTable_old = m3uaAspTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspTable_rsvs++;
+		StorageTmp->m3uaAspIdPolicy = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspTable_tsts == 0)
+				if ((ret = check_m3uaAspTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspIdPolicy for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspIdPolicy;
-		StorageTmp->m3uaAspIdPolicy = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspTable_sets == 0)
+				if ((ret = update_m3uaAspTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) != NULL) {
+			m3uaAspTable_destroy(&StorageTmp->m3uaAspTable_old);
+			StorageTmp->m3uaAspTable_rsvs = 0;
+			StorageTmp->m3uaAspTable_tsts = 0;
+			StorageTmp->m3uaAspTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspIdPolicy = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspTable_sets == 0)
+			revert_m3uaAspTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspIdPolicy = StorageOld->m3uaAspIdPolicy;
+		if (--StorageTmp->m3uaAspTable_rsvs == 0)
+			m3uaAspTable_destroy(&StorageTmp->m3uaAspTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5846,12 +7527,14 @@ write_m3uaAspIdPolicy(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_m3uaAspRegistrationPolicy(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspTable_data *StorageTmp = NULL;
+	struct m3uaAspTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspRegistrationPolicy entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5886,22 +7569,61 @@ write_m3uaAspRegistrationPolicy(int action, u_char *var_val, u_char var_val_type
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRegistrationPolicy: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) == NULL)
+			if (StorageTmp->m3uaAspTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspTable_old = m3uaAspTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspTable_rsvs++;
+		StorageTmp->m3uaAspRegistrationPolicy = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspTable_tsts == 0)
+				if ((ret = check_m3uaAspTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspRegistrationPolicy for you to use, and you have just been asked to do something with it.  Note that anything done 
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspRegistrationPolicy;
-		StorageTmp->m3uaAspRegistrationPolicy = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspTable_sets == 0)
+				if ((ret = update_m3uaAspTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) != NULL) {
+			m3uaAspTable_destroy(&StorageTmp->m3uaAspTable_old);
+			StorageTmp->m3uaAspTable_rsvs = 0;
+			StorageTmp->m3uaAspTable_tsts = 0;
+			StorageTmp->m3uaAspTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspRegistrationPolicy = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspTable_sets == 0)
+			revert_m3uaAspTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspRegistrationPolicy = StorageOld->m3uaAspRegistrationPolicy;
+		if (--StorageTmp->m3uaAspTable_rsvs == 0)
+			m3uaAspTable_destroy(&StorageTmp->m3uaAspTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5921,12 +7643,14 @@ write_m3uaAspRegistrationPolicy(int action, u_char *var_val, u_char var_val_type
 int
 write_m3uaAspAssociationPolicy(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspTable_data *StorageTmp = NULL;
+	struct m3uaAspTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAssociationPolicy entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5961,22 +7685,61 @@ write_m3uaAspAssociationPolicy(int action, u_char *var_val, u_char var_val_type,
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspAssociationPolicy: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) == NULL)
+			if (StorageTmp->m3uaAspTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspTable_old = m3uaAspTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspTable_rsvs++;
+		StorageTmp->m3uaAspAssociationPolicy = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspTable_tsts == 0)
+				if ((ret = check_m3uaAspTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAssociationPolicy for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspAssociationPolicy;
-		StorageTmp->m3uaAspAssociationPolicy = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspTable_sets == 0)
+				if ((ret = update_m3uaAspTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) != NULL) {
+			m3uaAspTable_destroy(&StorageTmp->m3uaAspTable_old);
+			StorageTmp->m3uaAspTable_rsvs = 0;
+			StorageTmp->m3uaAspTable_tsts = 0;
+			StorageTmp->m3uaAspTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspAssociationPolicy = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspTable_sets == 0)
+			revert_m3uaAspTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspAssociationPolicy = StorageOld->m3uaAspAssociationPolicy;
+		if (--StorageTmp->m3uaAspTable_rsvs == 0)
+			m3uaAspTable_destroy(&StorageTmp->m3uaAspTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5996,17 +7759,17 @@ write_m3uaAspAssociationPolicy(int action, u_char *var_val, u_char var_val_type,
 int
 write_m3uaAspAgProtocolVersion(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct m3uaAspAgTable_data *StorageTmp = NULL;
+	struct m3uaAspAgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgProtocolVersion entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspAgStatus) {
@@ -6028,31 +7791,71 @@ write_m3uaAspAgProtocolVersion(int action, u_char *var_val, u_char var_val_type,
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspAgProtocolVersion: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			if (StorageTmp->m3uaAspAgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspAgTable_old = m3uaAspAgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspAgTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->m3uaAspAgProtocolVersion);
+		StorageTmp->m3uaAspAgProtocolVersion = objid;
+		StorageTmp->m3uaAspAgProtocolVersionLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspAgTable_tsts == 0)
+				if ((ret = check_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgProtocolVersion for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspAgProtocolVersion;
-		old_length = StorageTmp->m3uaAspAgProtocolVersionLen;
-		StorageTmp->m3uaAspAgProtocolVersion = objid;
-		StorageTmp->m3uaAspAgProtocolVersionLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspAgTable_sets == 0)
+				if ((ret = update_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
+			StorageTmp->m3uaAspAgTable_rsvs = 0;
+			StorageTmp->m3uaAspAgTable_tsts = 0;
+			StorageTmp->m3uaAspAgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspAgProtocolVersion = old_value;
-		StorageTmp->m3uaAspAgProtocolVersionLen = old_length;
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspAgTable_sets == 0)
+			revert_m3uaAspAgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		if (StorageOld->m3uaAspAgProtocolVersion != NULL) {
+			SNMP_FREE(StorageTmp->m3uaAspAgProtocolVersion);
+			StorageTmp->m3uaAspAgProtocolVersion = StorageOld->m3uaAspAgProtocolVersion;
+			StorageTmp->m3uaAspAgProtocolVersionLen = StorageOld->m3uaAspAgProtocolVersionLen;
+			StorageOld->m3uaAspAgProtocolVersion = NULL;
+			StorageOld->m3uaAspAgProtocolVersionLen = 0;
+		}
+		if (--StorageTmp->m3uaAspAgTable_rsvs == 0)
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6072,17 +7875,17 @@ write_m3uaAspAgProtocolVersion(int action, u_char *var_val, u_char var_val_type,
 int
 write_m3uaAspAgOptions(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct m3uaAspAgTable_data *StorageTmp = NULL;
+	struct m3uaAspAgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgOptions entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspAgStatus) {
@@ -6112,33 +7915,73 @@ write_m3uaAspAgOptions(int action, u_char *var_val, u_char var_val_type, size_t 
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			if (StorageTmp->m3uaAspAgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspAgTable_old = m3uaAspAgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspAgTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->m3uaAspAgOptions);
+		StorageTmp->m3uaAspAgOptions = string;
+		StorageTmp->m3uaAspAgOptionsLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspAgTable_tsts == 0)
+				if ((ret = check_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgOptions for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspAgOptions;
-		old_length = StorageTmp->m3uaAspAgOptionsLen;
-		StorageTmp->m3uaAspAgOptions = string;
-		StorageTmp->m3uaAspAgOptionsLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspAgTable_sets == 0)
+				if ((ret = update_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
+			StorageTmp->m3uaAspAgTable_rsvs = 0;
+			StorageTmp->m3uaAspAgTable_tsts = 0;
+			StorageTmp->m3uaAspAgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspAgOptions = old_value;
-		StorageTmp->m3uaAspAgOptionsLen = old_length;
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspAgTable_sets == 0)
+			revert_m3uaAspAgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		if (StorageOld->m3uaAspAgOptions != NULL) {
+			SNMP_FREE(StorageTmp->m3uaAspAgOptions);
+			StorageTmp->m3uaAspAgOptions = StorageOld->m3uaAspAgOptions;
+			StorageTmp->m3uaAspAgOptionsLen = StorageOld->m3uaAspAgOptionsLen;
+			StorageOld->m3uaAspAgOptions = NULL;
+			StorageOld->m3uaAspAgOptionsLen = 0;
+		}
+		if (--StorageTmp->m3uaAspAgTable_rsvs == 0)
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6158,12 +8001,14 @@ write_m3uaAspAgOptions(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_m3uaAspAgRegistrationPolicy(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspAgTable_data *StorageTmp = NULL;
+	struct m3uaAspAgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgRegistrationPolicy entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6198,22 +8043,61 @@ write_m3uaAspAgRegistrationPolicy(int action, u_char *var_val, u_char var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspAgRegistrationPolicy: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			if (StorageTmp->m3uaAspAgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspAgTable_old = m3uaAspAgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspAgTable_rsvs++;
+		StorageTmp->m3uaAspAgRegistrationPolicy = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspAgTable_tsts == 0)
+				if ((ret = check_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgRegistrationPolicy for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspAgRegistrationPolicy;
-		StorageTmp->m3uaAspAgRegistrationPolicy = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspAgTable_sets == 0)
+				if ((ret = update_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
+			StorageTmp->m3uaAspAgTable_rsvs = 0;
+			StorageTmp->m3uaAspAgTable_tsts = 0;
+			StorageTmp->m3uaAspAgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspAgRegistrationPolicy = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspAgTable_sets == 0)
+			revert_m3uaAspAgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspAgRegistrationPolicy = StorageOld->m3uaAspAgRegistrationPolicy;
+		if (--StorageTmp->m3uaAspAgTable_rsvs == 0)
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6233,12 +8117,14 @@ write_m3uaAspAgRegistrationPolicy(int action, u_char *var_val, u_char var_val_ty
 int
 write_m3uaAspAgAspIdPolicy(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspAgTable_data *StorageTmp = NULL;
+	struct m3uaAspAgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgAspIdPolicy entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6273,22 +8159,61 @@ write_m3uaAspAgAspIdPolicy(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspAgAspIdPolicy: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			if (StorageTmp->m3uaAspAgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspAgTable_old = m3uaAspAgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspAgTable_rsvs++;
+		StorageTmp->m3uaAspAgAspIdPolicy = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspAgTable_tsts == 0)
+				if ((ret = check_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgAspIdPolicy for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspAgAspIdPolicy;
-		StorageTmp->m3uaAspAgAspIdPolicy = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspAgTable_sets == 0)
+				if ((ret = update_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
+			StorageTmp->m3uaAspAgTable_rsvs = 0;
+			StorageTmp->m3uaAspAgTable_tsts = 0;
+			StorageTmp->m3uaAspAgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspAgAspIdPolicy = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspAgTable_sets == 0)
+			revert_m3uaAspAgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspAgAspIdPolicy = StorageOld->m3uaAspAgAspIdPolicy;
+		if (--StorageTmp->m3uaAspAgTable_rsvs == 0)
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6308,12 +8233,14 @@ write_m3uaAspAgAspIdPolicy(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_m3uaAspAgAspProtocolPayloadId(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspAgTable_data *StorageTmp = NULL;
+	struct m3uaAspAgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgAspProtocolPayloadId entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6343,22 +8270,61 @@ write_m3uaAspAgAspProtocolPayloadId(int action, u_char *var_val, u_char var_val_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspAgAspProtocolPayloadId: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			if (StorageTmp->m3uaAspAgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspAgTable_old = m3uaAspAgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspAgTable_rsvs++;
+		StorageTmp->m3uaAspAgAspProtocolPayloadId = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspAgTable_tsts == 0)
+				if ((ret = check_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgAspProtocolPayloadId for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspAgAspProtocolPayloadId;
-		StorageTmp->m3uaAspAgAspProtocolPayloadId = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspAgTable_sets == 0)
+				if ((ret = update_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
+			StorageTmp->m3uaAspAgTable_rsvs = 0;
+			StorageTmp->m3uaAspAgTable_tsts = 0;
+			StorageTmp->m3uaAspAgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspAgAspProtocolPayloadId = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspAgTable_sets == 0)
+			revert_m3uaAspAgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspAgAspProtocolPayloadId = StorageOld->m3uaAspAgAspProtocolPayloadId;
+		if (--StorageTmp->m3uaAspAgTable_rsvs == 0)
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6378,12 +8344,14 @@ write_m3uaAspAgAspProtocolPayloadId(int action, u_char *var_val, u_char var_val_
 int
 write_m3uaAspAgIpPort(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m3uaAspAgTable_data *StorageTmp = NULL;
+	struct m3uaAspAgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgIpPort entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6414,22 +8382,61 @@ write_m3uaAspAgIpPort(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspAgIpPort: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			if (StorageTmp->m3uaAspAgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspAgTable_old = m3uaAspAgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspAgTable_rsvs++;
+		StorageTmp->m3uaAspAgIpPort = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspAgTable_tsts == 0)
+				if ((ret = check_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgIpPort for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspAgIpPort;
-		StorageTmp->m3uaAspAgIpPort = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspAgTable_sets == 0)
+				if ((ret = update_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
+			StorageTmp->m3uaAspAgTable_rsvs = 0;
+			StorageTmp->m3uaAspAgTable_tsts = 0;
+			StorageTmp->m3uaAspAgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspAgIpPort = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspAgTable_sets == 0)
+			revert_m3uaAspAgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspAgIpPort = StorageOld->m3uaAspAgIpPort;
+		if (--StorageTmp->m3uaAspAgTable_rsvs == 0)
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6449,12 +8456,14 @@ write_m3uaAspAgIpPort(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_m3uaAspAgMinOstreams(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspAgTable_data *StorageTmp = NULL;
+	struct m3uaAspAgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgMinOstreams entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6485,22 +8494,61 @@ write_m3uaAspAgMinOstreams(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspAgMinOstreams: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			if (StorageTmp->m3uaAspAgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspAgTable_old = m3uaAspAgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspAgTable_rsvs++;
+		StorageTmp->m3uaAspAgMinOstreams = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspAgTable_tsts == 0)
+				if ((ret = check_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgMinOstreams for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspAgMinOstreams;
-		StorageTmp->m3uaAspAgMinOstreams = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspAgTable_sets == 0)
+				if ((ret = update_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
+			StorageTmp->m3uaAspAgTable_rsvs = 0;
+			StorageTmp->m3uaAspAgTable_tsts = 0;
+			StorageTmp->m3uaAspAgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspAgMinOstreams = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspAgTable_sets == 0)
+			revert_m3uaAspAgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspAgMinOstreams = StorageOld->m3uaAspAgMinOstreams;
+		if (--StorageTmp->m3uaAspAgTable_rsvs == 0)
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6520,12 +8568,14 @@ write_m3uaAspAgMinOstreams(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_m3uaAspAgMaxIstreams(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspAgTable_data *StorageTmp = NULL;
+	struct m3uaAspAgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgMaxIstreams entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6555,22 +8605,61 @@ write_m3uaAspAgMaxIstreams(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspAgMaxIstreams: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			if (StorageTmp->m3uaAspAgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspAgTable_old = m3uaAspAgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspAgTable_rsvs++;
+		StorageTmp->m3uaAspAgMaxIstreams = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspAgTable_tsts == 0)
+				if ((ret = check_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgMaxIstreams for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspAgMaxIstreams;
-		StorageTmp->m3uaAspAgMaxIstreams = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspAgTable_sets == 0)
+				if ((ret = update_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
+			StorageTmp->m3uaAspAgTable_rsvs = 0;
+			StorageTmp->m3uaAspAgTable_tsts = 0;
+			StorageTmp->m3uaAspAgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspAgMaxIstreams = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspAgTable_sets == 0)
+			revert_m3uaAspAgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspAgMaxIstreams = StorageOld->m3uaAspAgMaxIstreams;
+		if (--StorageTmp->m3uaAspAgTable_rsvs == 0)
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6590,12 +8679,14 @@ write_m3uaAspAgMaxIstreams(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_m3uaAspAgTimerT7(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspAgTable_data *StorageTmp = NULL;
+	struct m3uaAspAgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgTimerT7 entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6625,22 +8716,61 @@ write_m3uaAspAgTimerT7(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspAgTimerT7: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			if (StorageTmp->m3uaAspAgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspAgTable_old = m3uaAspAgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspAgTable_rsvs++;
+		StorageTmp->m3uaAspAgTimerT7 = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspAgTable_tsts == 0)
+				if ((ret = check_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgTimerT7 for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspAgTimerT7;
-		StorageTmp->m3uaAspAgTimerT7 = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspAgTable_sets == 0)
+				if ((ret = update_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
+			StorageTmp->m3uaAspAgTable_rsvs = 0;
+			StorageTmp->m3uaAspAgTable_tsts = 0;
+			StorageTmp->m3uaAspAgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspAgTimerT7 = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspAgTable_sets == 0)
+			revert_m3uaAspAgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspAgTimerT7 = StorageOld->m3uaAspAgTimerT7;
+		if (--StorageTmp->m3uaAspAgTable_rsvs == 0)
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6660,12 +8790,14 @@ write_m3uaAspAgTimerT7(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_m3uaAspAgTimerT19(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspAgTable_data *StorageTmp = NULL;
+	struct m3uaAspAgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgTimerT19 entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6695,22 +8827,61 @@ write_m3uaAspAgTimerT19(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspAgTimerT19: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			if (StorageTmp->m3uaAspAgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspAgTable_old = m3uaAspAgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspAgTable_rsvs++;
+		StorageTmp->m3uaAspAgTimerT19 = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspAgTable_tsts == 0)
+				if ((ret = check_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgTimerT19 for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspAgTimerT19;
-		StorageTmp->m3uaAspAgTimerT19 = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspAgTable_sets == 0)
+				if ((ret = update_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
+			StorageTmp->m3uaAspAgTable_rsvs = 0;
+			StorageTmp->m3uaAspAgTable_tsts = 0;
+			StorageTmp->m3uaAspAgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspAgTimerT19 = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspAgTable_sets == 0)
+			revert_m3uaAspAgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspAgTimerT19 = StorageOld->m3uaAspAgTimerT19;
+		if (--StorageTmp->m3uaAspAgTable_rsvs == 0)
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6730,12 +8901,14 @@ write_m3uaAspAgTimerT19(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_m3uaAspAgTimerT21(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspAgTable_data *StorageTmp = NULL;
+	struct m3uaAspAgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgTimerT21 entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6765,22 +8938,61 @@ write_m3uaAspAgTimerT21(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspAgTimerT21: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			if (StorageTmp->m3uaAspAgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspAgTable_old = m3uaAspAgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspAgTable_rsvs++;
+		StorageTmp->m3uaAspAgTimerT21 = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspAgTable_tsts == 0)
+				if ((ret = check_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgTimerT21 for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspAgTimerT21;
-		StorageTmp->m3uaAspAgTimerT21 = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspAgTable_sets == 0)
+				if ((ret = update_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
+			StorageTmp->m3uaAspAgTable_rsvs = 0;
+			StorageTmp->m3uaAspAgTable_tsts = 0;
+			StorageTmp->m3uaAspAgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspAgTimerT21 = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspAgTable_sets == 0)
+			revert_m3uaAspAgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspAgTimerT21 = StorageOld->m3uaAspAgTimerT21;
+		if (--StorageTmp->m3uaAspAgTable_rsvs == 0)
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6800,12 +9012,14 @@ write_m3uaAspAgTimerT21(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_m3uaAspAgTimerT25A(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspAgTable_data *StorageTmp = NULL;
+	struct m3uaAspAgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgTimerT25A entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6835,22 +9049,61 @@ write_m3uaAspAgTimerT25A(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspAgTimerT25A: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			if (StorageTmp->m3uaAspAgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspAgTable_old = m3uaAspAgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspAgTable_rsvs++;
+		StorageTmp->m3uaAspAgTimerT25A = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspAgTable_tsts == 0)
+				if ((ret = check_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgTimerT25A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspAgTimerT25A;
-		StorageTmp->m3uaAspAgTimerT25A = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspAgTable_sets == 0)
+				if ((ret = update_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
+			StorageTmp->m3uaAspAgTable_rsvs = 0;
+			StorageTmp->m3uaAspAgTable_tsts = 0;
+			StorageTmp->m3uaAspAgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspAgTimerT25A = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspAgTable_sets == 0)
+			revert_m3uaAspAgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspAgTimerT25A = StorageOld->m3uaAspAgTimerT25A;
+		if (--StorageTmp->m3uaAspAgTable_rsvs == 0)
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6870,12 +9123,14 @@ write_m3uaAspAgTimerT25A(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_m3uaAspAgTimerT28A(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspAgTable_data *StorageTmp = NULL;
+	struct m3uaAspAgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgTimerT28A entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6905,22 +9160,61 @@ write_m3uaAspAgTimerT28A(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspAgTimerT28A: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			if (StorageTmp->m3uaAspAgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspAgTable_old = m3uaAspAgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspAgTable_rsvs++;
+		StorageTmp->m3uaAspAgTimerT28A = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspAgTable_tsts == 0)
+				if ((ret = check_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgTimerT28A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspAgTimerT28A;
-		StorageTmp->m3uaAspAgTimerT28A = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspAgTable_sets == 0)
+				if ((ret = update_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
+			StorageTmp->m3uaAspAgTable_rsvs = 0;
+			StorageTmp->m3uaAspAgTable_tsts = 0;
+			StorageTmp->m3uaAspAgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspAgTimerT28A = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspAgTable_sets == 0)
+			revert_m3uaAspAgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspAgTimerT28A = StorageOld->m3uaAspAgTimerT28A;
+		if (--StorageTmp->m3uaAspAgTable_rsvs == 0)
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6940,12 +9234,14 @@ write_m3uaAspAgTimerT28A(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_m3uaAspAgTimerT29A(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspAgTable_data *StorageTmp = NULL;
+	struct m3uaAspAgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgTimerT29A entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6975,22 +9271,61 @@ write_m3uaAspAgTimerT29A(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspAgTimerT29A: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			if (StorageTmp->m3uaAspAgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspAgTable_old = m3uaAspAgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspAgTable_rsvs++;
+		StorageTmp->m3uaAspAgTimerT29A = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspAgTable_tsts == 0)
+				if ((ret = check_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgTimerT29A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspAgTimerT29A;
-		StorageTmp->m3uaAspAgTimerT29A = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspAgTable_sets == 0)
+				if ((ret = update_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
+			StorageTmp->m3uaAspAgTable_rsvs = 0;
+			StorageTmp->m3uaAspAgTable_tsts = 0;
+			StorageTmp->m3uaAspAgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspAgTimerT29A = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspAgTable_sets == 0)
+			revert_m3uaAspAgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspAgTimerT29A = StorageOld->m3uaAspAgTimerT29A;
+		if (--StorageTmp->m3uaAspAgTable_rsvs == 0)
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7010,12 +9345,14 @@ write_m3uaAspAgTimerT29A(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_m3uaAspAgTimerT30A(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspAgTable_data *StorageTmp = NULL;
+	struct m3uaAspAgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgTimerT30A entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7045,22 +9382,61 @@ write_m3uaAspAgTimerT30A(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspAgTimerT30A: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			if (StorageTmp->m3uaAspAgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspAgTable_old = m3uaAspAgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspAgTable_rsvs++;
+		StorageTmp->m3uaAspAgTimerT30A = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspAgTable_tsts == 0)
+				if ((ret = check_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAgTimerT30A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspAgTimerT30A;
-		StorageTmp->m3uaAspAgTimerT30A = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspAgTable_sets == 0)
+				if ((ret = update_m3uaAspAgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
+			StorageTmp->m3uaAspAgTable_rsvs = 0;
+			StorageTmp->m3uaAspAgTable_tsts = 0;
+			StorageTmp->m3uaAspAgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspAgTimerT30A = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspAgTable_sets == 0)
+			revert_m3uaAspAgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspAgTimerT30A = StorageOld->m3uaAspAgTimerT30A;
+		if (--StorageTmp->m3uaAspAgTable_rsvs == 0)
+			m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7080,17 +9456,17 @@ write_m3uaAspAgTimerT30A(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_m3uaAspSgName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct m3uaAspSgTable_data *StorageTmp = NULL;
+	struct m3uaAspSgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspSgStatus) {
@@ -7113,33 +9489,73 @@ write_m3uaAspSgName(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			if (StorageTmp->m3uaAspSgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSgTable_old = m3uaAspSgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSgTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->m3uaAspSgName);
+		StorageTmp->m3uaAspSgName = string;
+		StorageTmp->m3uaAspSgNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSgTable_tsts == 0)
+				if ((ret = check_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgName for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSgName;
-		old_length = StorageTmp->m3uaAspSgNameLen;
-		StorageTmp->m3uaAspSgName = string;
-		StorageTmp->m3uaAspSgNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSgTable_sets == 0)
+				if ((ret = update_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
+			StorageTmp->m3uaAspSgTable_rsvs = 0;
+			StorageTmp->m3uaAspSgTable_tsts = 0;
+			StorageTmp->m3uaAspSgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgName = old_value;
-		StorageTmp->m3uaAspSgNameLen = old_length;
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSgTable_sets == 0)
+			revert_m3uaAspSgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		if (StorageOld->m3uaAspSgName != NULL) {
+			SNMP_FREE(StorageTmp->m3uaAspSgName);
+			StorageTmp->m3uaAspSgName = StorageOld->m3uaAspSgName;
+			StorageTmp->m3uaAspSgNameLen = StorageOld->m3uaAspSgNameLen;
+			StorageOld->m3uaAspSgName = NULL;
+			StorageOld->m3uaAspSgNameLen = 0;
+		}
+		if (--StorageTmp->m3uaAspSgTable_rsvs == 0)
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7159,12 +9575,14 @@ write_m3uaAspSgName(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_m3uaAspSgAdministrativeState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSgTable_data *StorageTmp = NULL;
+	struct m3uaAspSgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgAdministrativeState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7199,22 +9617,61 @@ write_m3uaAspSgAdministrativeState(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgAdministrativeState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			if (StorageTmp->m3uaAspSgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSgTable_old = m3uaAspSgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSgTable_rsvs++;
+		StorageTmp->m3uaAspSgAdministrativeState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSgTable_tsts == 0)
+				if ((ret = check_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSgAdministrativeState;
-		StorageTmp->m3uaAspSgAdministrativeState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSgTable_sets == 0)
+				if ((ret = update_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
+			StorageTmp->m3uaAspSgTable_rsvs = 0;
+			StorageTmp->m3uaAspSgTable_tsts = 0;
+			StorageTmp->m3uaAspSgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgAdministrativeState = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSgTable_sets == 0)
+			revert_m3uaAspSgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSgAdministrativeState = StorageOld->m3uaAspSgAdministrativeState;
+		if (--StorageTmp->m3uaAspSgTable_rsvs == 0)
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7234,12 +9691,14 @@ write_m3uaAspSgAdministrativeState(int action, u_char *var_val, u_char var_val_t
 int
 write_m3uaAspSgAspState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSgTable_data *StorageTmp = NULL;
+	struct m3uaAspSgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgAspState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7274,22 +9733,61 @@ write_m3uaAspSgAspState(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgAspState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			if (StorageTmp->m3uaAspSgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSgTable_old = m3uaAspSgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSgTable_rsvs++;
+		StorageTmp->m3uaAspSgAspState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSgTable_tsts == 0)
+				if ((ret = check_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgAspState for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSgAspState;
-		StorageTmp->m3uaAspSgAspState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSgTable_sets == 0)
+				if ((ret = update_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
+			StorageTmp->m3uaAspSgTable_rsvs = 0;
+			StorageTmp->m3uaAspSgTable_tsts = 0;
+			StorageTmp->m3uaAspSgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgAspState = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSgTable_sets == 0)
+			revert_m3uaAspSgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSgAspState = StorageOld->m3uaAspSgAspState;
+		if (--StorageTmp->m3uaAspSgTable_rsvs == 0)
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7309,12 +9807,14 @@ write_m3uaAspSgAspState(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_m3uaAspSgMaxInitRetrans(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m3uaAspSgTable_data *StorageTmp = NULL;
+	struct m3uaAspSgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgMaxInitRetrans entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7340,22 +9840,61 @@ write_m3uaAspSgMaxInitRetrans(int action, u_char *var_val, u_char var_val_type, 
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 5 */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			if (StorageTmp->m3uaAspSgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSgTable_old = m3uaAspSgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSgTable_rsvs++;
+		StorageTmp->m3uaAspSgMaxInitRetrans = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSgTable_tsts == 0)
+				if ((ret = check_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgMaxInitRetrans for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSgMaxInitRetrans;
-		StorageTmp->m3uaAspSgMaxInitRetrans = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSgTable_sets == 0)
+				if ((ret = update_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
+			StorageTmp->m3uaAspSgTable_rsvs = 0;
+			StorageTmp->m3uaAspSgTable_tsts = 0;
+			StorageTmp->m3uaAspSgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgMaxInitRetrans = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSgTable_sets == 0)
+			revert_m3uaAspSgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSgMaxInitRetrans = StorageOld->m3uaAspSgMaxInitRetrans;
+		if (--StorageTmp->m3uaAspSgTable_rsvs == 0)
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7375,12 +9914,14 @@ write_m3uaAspSgMaxInitRetrans(int action, u_char *var_val, u_char var_val_type, 
 int
 write_m3uaAspSgMaxLifeTime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSgTable_data *StorageTmp = NULL;
+	struct m3uaAspSgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgMaxLifeTime entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7410,22 +9951,61 @@ write_m3uaAspSgMaxLifeTime(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgMaxLifeTime: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			if (StorageTmp->m3uaAspSgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSgTable_old = m3uaAspSgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSgTable_rsvs++;
+		StorageTmp->m3uaAspSgMaxLifeTime = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSgTable_tsts == 0)
+				if ((ret = check_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgMaxLifeTime for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSgMaxLifeTime;
-		StorageTmp->m3uaAspSgMaxLifeTime = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSgTable_sets == 0)
+				if ((ret = update_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
+			StorageTmp->m3uaAspSgTable_rsvs = 0;
+			StorageTmp->m3uaAspSgTable_tsts = 0;
+			StorageTmp->m3uaAspSgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgMaxLifeTime = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSgTable_sets == 0)
+			revert_m3uaAspSgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSgMaxLifeTime = StorageOld->m3uaAspSgMaxLifeTime;
+		if (--StorageTmp->m3uaAspSgTable_rsvs == 0)
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7445,12 +10025,14 @@ write_m3uaAspSgMaxLifeTime(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_m3uaAspSgTimerT1(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSgTable_data *StorageTmp = NULL;
+	struct m3uaAspSgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT1 entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7481,22 +10063,61 @@ write_m3uaAspSgTimerT1(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgTimerT1: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			if (StorageTmp->m3uaAspSgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSgTable_old = m3uaAspSgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSgTable_rsvs++;
+		StorageTmp->m3uaAspSgTimerT1 = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSgTable_tsts == 0)
+				if ((ret = check_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT1 for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSgTimerT1;
-		StorageTmp->m3uaAspSgTimerT1 = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSgTable_sets == 0)
+				if ((ret = update_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
+			StorageTmp->m3uaAspSgTable_rsvs = 0;
+			StorageTmp->m3uaAspSgTable_tsts = 0;
+			StorageTmp->m3uaAspSgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgTimerT1 = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSgTable_sets == 0)
+			revert_m3uaAspSgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSgTimerT1 = StorageOld->m3uaAspSgTimerT1;
+		if (--StorageTmp->m3uaAspSgTable_rsvs == 0)
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7516,12 +10137,14 @@ write_m3uaAspSgTimerT1(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_m3uaAspSgTimerT2(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSgTable_data *StorageTmp = NULL;
+	struct m3uaAspSgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT2 entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7552,22 +10175,61 @@ write_m3uaAspSgTimerT2(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgTimerT2: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			if (StorageTmp->m3uaAspSgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSgTable_old = m3uaAspSgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSgTable_rsvs++;
+		StorageTmp->m3uaAspSgTimerT2 = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSgTable_tsts == 0)
+				if ((ret = check_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT2 for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSgTimerT2;
-		StorageTmp->m3uaAspSgTimerT2 = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSgTable_sets == 0)
+				if ((ret = update_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
+			StorageTmp->m3uaAspSgTable_rsvs = 0;
+			StorageTmp->m3uaAspSgTable_tsts = 0;
+			StorageTmp->m3uaAspSgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgTimerT2 = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSgTable_sets == 0)
+			revert_m3uaAspSgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSgTimerT2 = StorageOld->m3uaAspSgTimerT2;
+		if (--StorageTmp->m3uaAspSgTable_rsvs == 0)
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7587,12 +10249,14 @@ write_m3uaAspSgTimerT2(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_m3uaAspSgTimerT3(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSgTable_data *StorageTmp = NULL;
+	struct m3uaAspSgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT3 entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7623,22 +10287,61 @@ write_m3uaAspSgTimerT3(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgTimerT3: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			if (StorageTmp->m3uaAspSgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSgTable_old = m3uaAspSgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSgTable_rsvs++;
+		StorageTmp->m3uaAspSgTimerT3 = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSgTable_tsts == 0)
+				if ((ret = check_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT3 for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSgTimerT3;
-		StorageTmp->m3uaAspSgTimerT3 = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSgTable_sets == 0)
+				if ((ret = update_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
+			StorageTmp->m3uaAspSgTable_rsvs = 0;
+			StorageTmp->m3uaAspSgTable_tsts = 0;
+			StorageTmp->m3uaAspSgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgTimerT3 = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSgTable_sets == 0)
+			revert_m3uaAspSgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSgTimerT3 = StorageOld->m3uaAspSgTimerT3;
+		if (--StorageTmp->m3uaAspSgTable_rsvs == 0)
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7658,12 +10361,14 @@ write_m3uaAspSgTimerT3(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_m3uaAspSgTimerT4(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSgTable_data *StorageTmp = NULL;
+	struct m3uaAspSgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT4 entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7694,22 +10399,61 @@ write_m3uaAspSgTimerT4(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgTimerT4: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			if (StorageTmp->m3uaAspSgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSgTable_old = m3uaAspSgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSgTable_rsvs++;
+		StorageTmp->m3uaAspSgTimerT4 = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSgTable_tsts == 0)
+				if ((ret = check_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT4 for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSgTimerT4;
-		StorageTmp->m3uaAspSgTimerT4 = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSgTable_sets == 0)
+				if ((ret = update_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
+			StorageTmp->m3uaAspSgTable_rsvs = 0;
+			StorageTmp->m3uaAspSgTable_tsts = 0;
+			StorageTmp->m3uaAspSgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgTimerT4 = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSgTable_sets == 0)
+			revert_m3uaAspSgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSgTimerT4 = StorageOld->m3uaAspSgTimerT4;
+		if (--StorageTmp->m3uaAspSgTable_rsvs == 0)
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7729,12 +10473,14 @@ write_m3uaAspSgTimerT4(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_m3uaAspSgTimerT5(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSgTable_data *StorageTmp = NULL;
+	struct m3uaAspSgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT5 entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7765,22 +10511,61 @@ write_m3uaAspSgTimerT5(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgTimerT5: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			if (StorageTmp->m3uaAspSgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSgTable_old = m3uaAspSgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSgTable_rsvs++;
+		StorageTmp->m3uaAspSgTimerT5 = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSgTable_tsts == 0)
+				if ((ret = check_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT5 for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSgTimerT5;
-		StorageTmp->m3uaAspSgTimerT5 = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSgTable_sets == 0)
+				if ((ret = update_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
+			StorageTmp->m3uaAspSgTable_rsvs = 0;
+			StorageTmp->m3uaAspSgTable_tsts = 0;
+			StorageTmp->m3uaAspSgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgTimerT5 = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSgTable_sets == 0)
+			revert_m3uaAspSgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSgTimerT5 = StorageOld->m3uaAspSgTimerT5;
+		if (--StorageTmp->m3uaAspSgTable_rsvs == 0)
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7800,12 +10585,14 @@ write_m3uaAspSgTimerT5(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_m3uaAspSgTimerT17(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSgTable_data *StorageTmp = NULL;
+	struct m3uaAspSgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT17 entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7836,22 +10623,61 @@ write_m3uaAspSgTimerT17(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgTimerT17: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			if (StorageTmp->m3uaAspSgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSgTable_old = m3uaAspSgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSgTable_rsvs++;
+		StorageTmp->m3uaAspSgTimerT17 = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSgTable_tsts == 0)
+				if ((ret = check_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT17 for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSgTimerT17;
-		StorageTmp->m3uaAspSgTimerT17 = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSgTable_sets == 0)
+				if ((ret = update_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
+			StorageTmp->m3uaAspSgTable_rsvs = 0;
+			StorageTmp->m3uaAspSgTable_tsts = 0;
+			StorageTmp->m3uaAspSgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgTimerT17 = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSgTable_sets == 0)
+			revert_m3uaAspSgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSgTimerT17 = StorageOld->m3uaAspSgTimerT17;
+		if (--StorageTmp->m3uaAspSgTable_rsvs == 0)
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7871,12 +10697,14 @@ write_m3uaAspSgTimerT17(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_m3uaAspSgTimerT19A(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSgTable_data *StorageTmp = NULL;
+	struct m3uaAspSgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT19A entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7907,22 +10735,61 @@ write_m3uaAspSgTimerT19A(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgTimerT19A: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			if (StorageTmp->m3uaAspSgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSgTable_old = m3uaAspSgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSgTable_rsvs++;
+		StorageTmp->m3uaAspSgTimerT19A = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSgTable_tsts == 0)
+				if ((ret = check_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT19A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSgTimerT19A;
-		StorageTmp->m3uaAspSgTimerT19A = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSgTable_sets == 0)
+				if ((ret = update_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
+			StorageTmp->m3uaAspSgTable_rsvs = 0;
+			StorageTmp->m3uaAspSgTable_tsts = 0;
+			StorageTmp->m3uaAspSgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgTimerT19A = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSgTable_sets == 0)
+			revert_m3uaAspSgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSgTimerT19A = StorageOld->m3uaAspSgTimerT19A;
+		if (--StorageTmp->m3uaAspSgTable_rsvs == 0)
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7942,12 +10809,14 @@ write_m3uaAspSgTimerT19A(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_m3uaAspSgTimerT24(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSgTable_data *StorageTmp = NULL;
+	struct m3uaAspSgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT24 entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7978,22 +10847,61 @@ write_m3uaAspSgTimerT24(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgTimerT24: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			if (StorageTmp->m3uaAspSgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSgTable_old = m3uaAspSgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSgTable_rsvs++;
+		StorageTmp->m3uaAspSgTimerT24 = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSgTable_tsts == 0)
+				if ((ret = check_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT24 for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSgTimerT24;
-		StorageTmp->m3uaAspSgTimerT24 = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSgTable_sets == 0)
+				if ((ret = update_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
+			StorageTmp->m3uaAspSgTable_rsvs = 0;
+			StorageTmp->m3uaAspSgTable_tsts = 0;
+			StorageTmp->m3uaAspSgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgTimerT24 = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSgTable_sets == 0)
+			revert_m3uaAspSgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSgTimerT24 = StorageOld->m3uaAspSgTimerT24;
+		if (--StorageTmp->m3uaAspSgTable_rsvs == 0)
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8013,12 +10921,14 @@ write_m3uaAspSgTimerT24(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_m3uaAspSgTimerT31A(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSgTable_data *StorageTmp = NULL;
+	struct m3uaAspSgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT31A entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8049,22 +10959,61 @@ write_m3uaAspSgTimerT31A(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgTimerT31A: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			if (StorageTmp->m3uaAspSgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSgTable_old = m3uaAspSgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSgTable_rsvs++;
+		StorageTmp->m3uaAspSgTimerT31A = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSgTable_tsts == 0)
+				if ((ret = check_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT31A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSgTimerT31A;
-		StorageTmp->m3uaAspSgTimerT31A = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSgTable_sets == 0)
+				if ((ret = update_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
+			StorageTmp->m3uaAspSgTable_rsvs = 0;
+			StorageTmp->m3uaAspSgTable_tsts = 0;
+			StorageTmp->m3uaAspSgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgTimerT31A = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSgTable_sets == 0)
+			revert_m3uaAspSgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSgTimerT31A = StorageOld->m3uaAspSgTimerT31A;
+		if (--StorageTmp->m3uaAspSgTable_rsvs == 0)
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8084,12 +11033,14 @@ write_m3uaAspSgTimerT31A(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_m3uaAspSgTimerT32A(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSgTable_data *StorageTmp = NULL;
+	struct m3uaAspSgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT32A entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8120,22 +11071,61 @@ write_m3uaAspSgTimerT32A(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgTimerT32A: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			if (StorageTmp->m3uaAspSgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSgTable_old = m3uaAspSgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSgTable_rsvs++;
+		StorageTmp->m3uaAspSgTimerT32A = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSgTable_tsts == 0)
+				if ((ret = check_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT32A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSgTimerT32A;
-		StorageTmp->m3uaAspSgTimerT32A = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSgTable_sets == 0)
+				if ((ret = update_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
+			StorageTmp->m3uaAspSgTable_rsvs = 0;
+			StorageTmp->m3uaAspSgTable_tsts = 0;
+			StorageTmp->m3uaAspSgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgTimerT32A = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSgTable_sets == 0)
+			revert_m3uaAspSgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSgTimerT32A = StorageOld->m3uaAspSgTimerT32A;
+		if (--StorageTmp->m3uaAspSgTable_rsvs == 0)
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8155,12 +11145,14 @@ write_m3uaAspSgTimerT32A(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_m3uaAspSgTimerT33A(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSgTable_data *StorageTmp = NULL;
+	struct m3uaAspSgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT33A entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8191,22 +11183,61 @@ write_m3uaAspSgTimerT33A(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgTimerT33A: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			if (StorageTmp->m3uaAspSgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSgTable_old = m3uaAspSgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSgTable_rsvs++;
+		StorageTmp->m3uaAspSgTimerT33A = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSgTable_tsts == 0)
+				if ((ret = check_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT33A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSgTimerT33A;
-		StorageTmp->m3uaAspSgTimerT33A = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSgTable_sets == 0)
+				if ((ret = update_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
+			StorageTmp->m3uaAspSgTable_rsvs = 0;
+			StorageTmp->m3uaAspSgTable_tsts = 0;
+			StorageTmp->m3uaAspSgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgTimerT33A = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSgTable_sets == 0)
+			revert_m3uaAspSgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSgTimerT33A = StorageOld->m3uaAspSgTimerT33A;
+		if (--StorageTmp->m3uaAspSgTable_rsvs == 0)
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8226,12 +11257,14 @@ write_m3uaAspSgTimerT33A(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_m3uaAspSgTimerT34A(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSgTable_data *StorageTmp = NULL;
+	struct m3uaAspSgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT34A entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8262,22 +11295,61 @@ write_m3uaAspSgTimerT34A(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgTimerT34A: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			if (StorageTmp->m3uaAspSgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSgTable_old = m3uaAspSgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSgTable_rsvs++;
+		StorageTmp->m3uaAspSgTimerT34A = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSgTable_tsts == 0)
+				if ((ret = check_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT34A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSgTimerT34A;
-		StorageTmp->m3uaAspSgTimerT34A = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSgTable_sets == 0)
+				if ((ret = update_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
+			StorageTmp->m3uaAspSgTable_rsvs = 0;
+			StorageTmp->m3uaAspSgTable_tsts = 0;
+			StorageTmp->m3uaAspSgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgTimerT34A = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSgTable_sets == 0)
+			revert_m3uaAspSgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSgTimerT34A = StorageOld->m3uaAspSgTimerT34A;
+		if (--StorageTmp->m3uaAspSgTable_rsvs == 0)
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8297,12 +11369,14 @@ write_m3uaAspSgTimerT34A(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_m3uaAspSgTimerT1T(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSgTable_data *StorageTmp = NULL;
+	struct m3uaAspSgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT1T entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8333,22 +11407,61 @@ write_m3uaAspSgTimerT1T(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgTimerT1T: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			if (StorageTmp->m3uaAspSgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSgTable_old = m3uaAspSgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSgTable_rsvs++;
+		StorageTmp->m3uaAspSgTimerT1T = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSgTable_tsts == 0)
+				if ((ret = check_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT1T for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSgTimerT1T;
-		StorageTmp->m3uaAspSgTimerT1T = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSgTable_sets == 0)
+				if ((ret = update_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
+			StorageTmp->m3uaAspSgTable_rsvs = 0;
+			StorageTmp->m3uaAspSgTable_tsts = 0;
+			StorageTmp->m3uaAspSgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgTimerT1T = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSgTable_sets == 0)
+			revert_m3uaAspSgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSgTimerT1T = StorageOld->m3uaAspSgTimerT1T;
+		if (--StorageTmp->m3uaAspSgTable_rsvs == 0)
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8368,12 +11481,14 @@ write_m3uaAspSgTimerT1T(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_m3uaAspSgTimerT2T(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSgTable_data *StorageTmp = NULL;
+	struct m3uaAspSgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgTimerT2T entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8404,22 +11519,61 @@ write_m3uaAspSgTimerT2T(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgTimerT2T: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			if (StorageTmp->m3uaAspSgTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSgTable_old = m3uaAspSgTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSgTable_rsvs++;
+		StorageTmp->m3uaAspSgTimerT2T = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSgTable_tsts == 0)
+				if ((ret = check_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgTimerT2T for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSgTimerT2T;
-		StorageTmp->m3uaAspSgTimerT2T = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSgTable_sets == 0)
+				if ((ret = update_m3uaAspSgTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
+			StorageTmp->m3uaAspSgTable_rsvs = 0;
+			StorageTmp->m3uaAspSgTable_tsts = 0;
+			StorageTmp->m3uaAspSgTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgTimerT2T = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSgTable_sets == 0)
+			revert_m3uaAspSgTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSgTimerT2T = StorageOld->m3uaAspSgTimerT2T;
+		if (--StorageTmp->m3uaAspSgTable_rsvs == 0)
+			m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8439,17 +11593,17 @@ write_m3uaAspSgTimerT2T(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_m3uaAspSgpName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct m3uaAspSgpTable_data *StorageTmp = NULL;
+	struct m3uaAspSgpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgpName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSgpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspSgpStatus) {
@@ -8472,33 +11626,73 @@ write_m3uaAspSgpName(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgpName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) == NULL)
+			if (StorageTmp->m3uaAspSgpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSgpTable_old = m3uaAspSgpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSgpTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->m3uaAspSgpName);
+		StorageTmp->m3uaAspSgpName = string;
+		StorageTmp->m3uaAspSgpNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSgpTable_tsts == 0)
+				if ((ret = check_m3uaAspSgpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgpName for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSgpName;
-		old_length = StorageTmp->m3uaAspSgpNameLen;
-		StorageTmp->m3uaAspSgpName = string;
-		StorageTmp->m3uaAspSgpNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSgpTable_sets == 0)
+				if ((ret = update_m3uaAspSgpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) != NULL) {
+			m3uaAspSgpTable_destroy(&StorageTmp->m3uaAspSgpTable_old);
+			StorageTmp->m3uaAspSgpTable_rsvs = 0;
+			StorageTmp->m3uaAspSgpTable_tsts = 0;
+			StorageTmp->m3uaAspSgpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgpName = old_value;
-		StorageTmp->m3uaAspSgpNameLen = old_length;
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSgpTable_sets == 0)
+			revert_m3uaAspSgpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) == NULL)
+			break;
+		if (StorageOld->m3uaAspSgpName != NULL) {
+			SNMP_FREE(StorageTmp->m3uaAspSgpName);
+			StorageTmp->m3uaAspSgpName = StorageOld->m3uaAspSgpName;
+			StorageTmp->m3uaAspSgpNameLen = StorageOld->m3uaAspSgpNameLen;
+			StorageOld->m3uaAspSgpName = NULL;
+			StorageOld->m3uaAspSgpNameLen = 0;
+		}
+		if (--StorageTmp->m3uaAspSgpTable_rsvs == 0)
+			m3uaAspSgpTable_destroy(&StorageTmp->m3uaAspSgpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8518,12 +11712,14 @@ write_m3uaAspSgpName(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_m3uaAspSgpAdministrativeState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSgpTable_data *StorageTmp = NULL;
+	struct m3uaAspSgpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgpAdministrativeState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSgpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8558,22 +11754,61 @@ write_m3uaAspSgpAdministrativeState(int action, u_char *var_val, u_char var_val_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgpAdministrativeState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) == NULL)
+			if (StorageTmp->m3uaAspSgpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSgpTable_old = m3uaAspSgpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSgpTable_rsvs++;
+		StorageTmp->m3uaAspSgpAdministrativeState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSgpTable_tsts == 0)
+				if ((ret = check_m3uaAspSgpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgpAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSgpAdministrativeState;
-		StorageTmp->m3uaAspSgpAdministrativeState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSgpTable_sets == 0)
+				if ((ret = update_m3uaAspSgpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) != NULL) {
+			m3uaAspSgpTable_destroy(&StorageTmp->m3uaAspSgpTable_old);
+			StorageTmp->m3uaAspSgpTable_rsvs = 0;
+			StorageTmp->m3uaAspSgpTable_tsts = 0;
+			StorageTmp->m3uaAspSgpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgpAdministrativeState = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSgpTable_sets == 0)
+			revert_m3uaAspSgpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSgpAdministrativeState = StorageOld->m3uaAspSgpAdministrativeState;
+		if (--StorageTmp->m3uaAspSgpTable_rsvs == 0)
+			m3uaAspSgpTable_destroy(&StorageTmp->m3uaAspSgpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8593,12 +11828,14 @@ write_m3uaAspSgpAdministrativeState(int action, u_char *var_val, u_char var_val_
 int
 write_m3uaAspSgpAspState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSgpTable_data *StorageTmp = NULL;
+	struct m3uaAspSgpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgpAspState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSgpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8633,22 +11870,61 @@ write_m3uaAspSgpAspState(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgpAspState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) == NULL)
+			if (StorageTmp->m3uaAspSgpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSgpTable_old = m3uaAspSgpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSgpTable_rsvs++;
+		StorageTmp->m3uaAspSgpAspState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSgpTable_tsts == 0)
+				if ((ret = check_m3uaAspSgpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgpAspState for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSgpAspState;
-		StorageTmp->m3uaAspSgpAspState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSgpTable_sets == 0)
+				if ((ret = update_m3uaAspSgpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) != NULL) {
+			m3uaAspSgpTable_destroy(&StorageTmp->m3uaAspSgpTable_old);
+			StorageTmp->m3uaAspSgpTable_rsvs = 0;
+			StorageTmp->m3uaAspSgpTable_tsts = 0;
+			StorageTmp->m3uaAspSgpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgpAspState = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSgpTable_sets == 0)
+			revert_m3uaAspSgpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSgpAspState = StorageOld->m3uaAspSgpAspState;
+		if (--StorageTmp->m3uaAspSgpTable_rsvs == 0)
+			m3uaAspSgpTable_destroy(&StorageTmp->m3uaAspSgpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8668,12 +11944,14 @@ write_m3uaAspSgpAspState(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_m3uaAspSgpPrimaryAddressType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSgpTable_data *StorageTmp = NULL;
+	struct m3uaAspSgpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgpPrimaryAddressType entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSgpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8710,22 +11988,61 @@ write_m3uaAspSgpPrimaryAddressType(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgpPrimaryAddressType: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) == NULL)
+			if (StorageTmp->m3uaAspSgpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSgpTable_old = m3uaAspSgpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSgpTable_rsvs++;
+		StorageTmp->m3uaAspSgpPrimaryAddressType = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSgpTable_tsts == 0)
+				if ((ret = check_m3uaAspSgpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgpPrimaryAddressType for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSgpPrimaryAddressType;
-		StorageTmp->m3uaAspSgpPrimaryAddressType = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSgpTable_sets == 0)
+				if ((ret = update_m3uaAspSgpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) != NULL) {
+			m3uaAspSgpTable_destroy(&StorageTmp->m3uaAspSgpTable_old);
+			StorageTmp->m3uaAspSgpTable_rsvs = 0;
+			StorageTmp->m3uaAspSgpTable_tsts = 0;
+			StorageTmp->m3uaAspSgpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgpPrimaryAddressType = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSgpTable_sets == 0)
+			revert_m3uaAspSgpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSgpPrimaryAddressType = StorageOld->m3uaAspSgpPrimaryAddressType;
+		if (--StorageTmp->m3uaAspSgpTable_rsvs == 0)
+			m3uaAspSgpTable_destroy(&StorageTmp->m3uaAspSgpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8745,17 +12062,17 @@ write_m3uaAspSgpPrimaryAddressType(int action, u_char *var_val, u_char var_val_t
 int
 write_m3uaAspSgpPrimaryAddress(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct m3uaAspSgpTable_data *StorageTmp = NULL;
+	struct m3uaAspSgpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgpPrimaryAddress entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSgpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspSgpStatus) {
@@ -8778,33 +12095,73 @@ write_m3uaAspSgpPrimaryAddress(int action, u_char *var_val, u_char var_val_type,
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgpPrimaryAddress: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) == NULL)
+			if (StorageTmp->m3uaAspSgpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSgpTable_old = m3uaAspSgpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSgpTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->m3uaAspSgpPrimaryAddress);
+		StorageTmp->m3uaAspSgpPrimaryAddress = string;
+		StorageTmp->m3uaAspSgpPrimaryAddressLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSgpTable_tsts == 0)
+				if ((ret = check_m3uaAspSgpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgpPrimaryAddress for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSgpPrimaryAddress;
-		old_length = StorageTmp->m3uaAspSgpPrimaryAddressLen;
-		StorageTmp->m3uaAspSgpPrimaryAddress = string;
-		StorageTmp->m3uaAspSgpPrimaryAddressLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSgpTable_sets == 0)
+				if ((ret = update_m3uaAspSgpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) != NULL) {
+			m3uaAspSgpTable_destroy(&StorageTmp->m3uaAspSgpTable_old);
+			StorageTmp->m3uaAspSgpTable_rsvs = 0;
+			StorageTmp->m3uaAspSgpTable_tsts = 0;
+			StorageTmp->m3uaAspSgpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgpPrimaryAddress = old_value;
-		StorageTmp->m3uaAspSgpPrimaryAddressLen = old_length;
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSgpTable_sets == 0)
+			revert_m3uaAspSgpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) == NULL)
+			break;
+		if (StorageOld->m3uaAspSgpPrimaryAddress != NULL) {
+			SNMP_FREE(StorageTmp->m3uaAspSgpPrimaryAddress);
+			StorageTmp->m3uaAspSgpPrimaryAddress = StorageOld->m3uaAspSgpPrimaryAddress;
+			StorageTmp->m3uaAspSgpPrimaryAddressLen = StorageOld->m3uaAspSgpPrimaryAddressLen;
+			StorageOld->m3uaAspSgpPrimaryAddress = NULL;
+			StorageOld->m3uaAspSgpPrimaryAddressLen = 0;
+		}
+		if (--StorageTmp->m3uaAspSgpTable_rsvs == 0)
+			m3uaAspSgpTable_destroy(&StorageTmp->m3uaAspSgpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8824,17 +12181,17 @@ write_m3uaAspSgpPrimaryAddress(int action, u_char *var_val, u_char var_val_type,
 int
 write_m3uaAspSgpHostName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct m3uaAspSgpTable_data *StorageTmp = NULL;
+	struct m3uaAspSgpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgpHostName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSgpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspSgpStatus) {
@@ -8857,33 +12214,73 @@ write_m3uaAspSgpHostName(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgpHostName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) == NULL)
+			if (StorageTmp->m3uaAspSgpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSgpTable_old = m3uaAspSgpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSgpTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->m3uaAspSgpHostName);
+		StorageTmp->m3uaAspSgpHostName = string;
+		StorageTmp->m3uaAspSgpHostNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSgpTable_tsts == 0)
+				if ((ret = check_m3uaAspSgpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgpHostName for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSgpHostName;
-		old_length = StorageTmp->m3uaAspSgpHostNameLen;
-		StorageTmp->m3uaAspSgpHostName = string;
-		StorageTmp->m3uaAspSgpHostNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSgpTable_sets == 0)
+				if ((ret = update_m3uaAspSgpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSgpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) != NULL) {
+			m3uaAspSgpTable_destroy(&StorageTmp->m3uaAspSgpTable_old);
+			StorageTmp->m3uaAspSgpTable_rsvs = 0;
+			StorageTmp->m3uaAspSgpTable_tsts = 0;
+			StorageTmp->m3uaAspSgpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSgpHostName = old_value;
-		StorageTmp->m3uaAspSgpHostNameLen = old_length;
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSgpTable_sets == 0)
+			revert_m3uaAspSgpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) == NULL)
+			break;
+		if (StorageOld->m3uaAspSgpHostName != NULL) {
+			SNMP_FREE(StorageTmp->m3uaAspSgpHostName);
+			StorageTmp->m3uaAspSgpHostName = StorageOld->m3uaAspSgpHostName;
+			StorageTmp->m3uaAspSgpHostNameLen = StorageOld->m3uaAspSgpHostNameLen;
+			StorageOld->m3uaAspSgpHostName = NULL;
+			StorageOld->m3uaAspSgpHostNameLen = 0;
+		}
+		if (--StorageTmp->m3uaAspSgpTable_rsvs == 0)
+			m3uaAspSgpTable_destroy(&StorageTmp->m3uaAspSgpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8903,17 +12300,17 @@ write_m3uaAspSgpHostName(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_m3uaAspSpName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct m3uaAspSpTable_data *StorageTmp = NULL;
+	struct m3uaAspSpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSpName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspSpStatus) {
@@ -8936,33 +12333,73 @@ write_m3uaAspSpName(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSpName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			if (StorageTmp->m3uaAspSpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSpTable_old = m3uaAspSpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSpTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->m3uaAspSpName);
+		StorageTmp->m3uaAspSpName = string;
+		StorageTmp->m3uaAspSpNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSpTable_tsts == 0)
+				if ((ret = check_m3uaAspSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSpName for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSpName;
-		old_length = StorageTmp->m3uaAspSpNameLen;
-		StorageTmp->m3uaAspSpName = string;
-		StorageTmp->m3uaAspSpNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSpTable_sets == 0)
+				if ((ret = update_m3uaAspSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			m3uaAspSpTable_destroy(&StorageTmp->m3uaAspSpTable_old);
+			StorageTmp->m3uaAspSpTable_rsvs = 0;
+			StorageTmp->m3uaAspSpTable_tsts = 0;
+			StorageTmp->m3uaAspSpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSpName = old_value;
-		StorageTmp->m3uaAspSpNameLen = old_length;
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSpTable_sets == 0)
+			revert_m3uaAspSpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			break;
+		if (StorageOld->m3uaAspSpName != NULL) {
+			SNMP_FREE(StorageTmp->m3uaAspSpName);
+			StorageTmp->m3uaAspSpName = StorageOld->m3uaAspSpName;
+			StorageTmp->m3uaAspSpNameLen = StorageOld->m3uaAspSpNameLen;
+			StorageOld->m3uaAspSpName = NULL;
+			StorageOld->m3uaAspSpNameLen = 0;
+		}
+		if (--StorageTmp->m3uaAspSpTable_rsvs == 0)
+			m3uaAspSpTable_destroy(&StorageTmp->m3uaAspSpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8982,12 +12419,14 @@ write_m3uaAspSpName(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_m3uaAspSpAdministrativeState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSpTable_data *StorageTmp = NULL;
+	struct m3uaAspSpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSpAdministrativeState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9021,22 +12460,61 @@ write_m3uaAspSpAdministrativeState(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSpAdministrativeState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			if (StorageTmp->m3uaAspSpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSpTable_old = m3uaAspSpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSpTable_rsvs++;
+		StorageTmp->m3uaAspSpAdministrativeState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSpTable_tsts == 0)
+				if ((ret = check_m3uaAspSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSpAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSpAdministrativeState;
-		StorageTmp->m3uaAspSpAdministrativeState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSpTable_sets == 0)
+				if ((ret = update_m3uaAspSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			m3uaAspSpTable_destroy(&StorageTmp->m3uaAspSpTable_old);
+			StorageTmp->m3uaAspSpTable_rsvs = 0;
+			StorageTmp->m3uaAspSpTable_tsts = 0;
+			StorageTmp->m3uaAspSpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSpAdministrativeState = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSpTable_sets == 0)
+			revert_m3uaAspSpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSpAdministrativeState = StorageOld->m3uaAspSpAdministrativeState;
+		if (--StorageTmp->m3uaAspSpTable_rsvs == 0)
+			m3uaAspSpTable_destroy(&StorageTmp->m3uaAspSpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9056,17 +12534,17 @@ write_m3uaAspSpAdministrativeState(int action, u_char *var_val, u_char var_val_t
 int
 write_m3uaAspSpAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct m3uaAspSpTable_data *StorageTmp = NULL;
+	struct m3uaAspSpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSpAlarmStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspSpStatus) {
@@ -9096,33 +12574,73 @@ write_m3uaAspSpAlarmStatus(int action, u_char *var_val, u_char var_val_type, siz
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			if (StorageTmp->m3uaAspSpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSpTable_old = m3uaAspSpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSpTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->m3uaAspSpAlarmStatus);
+		StorageTmp->m3uaAspSpAlarmStatus = string;
+		StorageTmp->m3uaAspSpAlarmStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSpTable_tsts == 0)
+				if ((ret = check_m3uaAspSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSpAlarmStatus for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSpAlarmStatus;
-		old_length = StorageTmp->m3uaAspSpAlarmStatusLen;
-		StorageTmp->m3uaAspSpAlarmStatus = string;
-		StorageTmp->m3uaAspSpAlarmStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSpTable_sets == 0)
+				if ((ret = update_m3uaAspSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			m3uaAspSpTable_destroy(&StorageTmp->m3uaAspSpTable_old);
+			StorageTmp->m3uaAspSpTable_rsvs = 0;
+			StorageTmp->m3uaAspSpTable_tsts = 0;
+			StorageTmp->m3uaAspSpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSpAlarmStatus = old_value;
-		StorageTmp->m3uaAspSpAlarmStatusLen = old_length;
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSpTable_sets == 0)
+			revert_m3uaAspSpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			break;
+		if (StorageOld->m3uaAspSpAlarmStatus != NULL) {
+			SNMP_FREE(StorageTmp->m3uaAspSpAlarmStatus);
+			StorageTmp->m3uaAspSpAlarmStatus = StorageOld->m3uaAspSpAlarmStatus;
+			StorageTmp->m3uaAspSpAlarmStatusLen = StorageOld->m3uaAspSpAlarmStatusLen;
+			StorageOld->m3uaAspSpAlarmStatus = NULL;
+			StorageOld->m3uaAspSpAlarmStatusLen = 0;
+		}
+		if (--StorageTmp->m3uaAspSpTable_rsvs == 0)
+			m3uaAspSpTable_destroy(&StorageTmp->m3uaAspSpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9142,17 +12660,17 @@ write_m3uaAspSpAlarmStatus(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_m3uaAspSpPointCode(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct m3uaAspSpTable_data *StorageTmp = NULL;
+	struct m3uaAspSpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSpPointCode entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspSpStatus) {
@@ -9175,33 +12693,73 @@ write_m3uaAspSpPointCode(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSpPointCode: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			if (StorageTmp->m3uaAspSpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSpTable_old = m3uaAspSpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSpTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->m3uaAspSpPointCode);
+		StorageTmp->m3uaAspSpPointCode = string;
+		StorageTmp->m3uaAspSpPointCodeLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSpTable_tsts == 0)
+				if ((ret = check_m3uaAspSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSpPointCode for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSpPointCode;
-		old_length = StorageTmp->m3uaAspSpPointCodeLen;
-		StorageTmp->m3uaAspSpPointCode = string;
-		StorageTmp->m3uaAspSpPointCodeLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSpTable_sets == 0)
+				if ((ret = update_m3uaAspSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			m3uaAspSpTable_destroy(&StorageTmp->m3uaAspSpTable_old);
+			StorageTmp->m3uaAspSpTable_rsvs = 0;
+			StorageTmp->m3uaAspSpTable_tsts = 0;
+			StorageTmp->m3uaAspSpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSpPointCode = old_value;
-		StorageTmp->m3uaAspSpPointCodeLen = old_length;
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSpTable_sets == 0)
+			revert_m3uaAspSpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			break;
+		if (StorageOld->m3uaAspSpPointCode != NULL) {
+			SNMP_FREE(StorageTmp->m3uaAspSpPointCode);
+			StorageTmp->m3uaAspSpPointCode = StorageOld->m3uaAspSpPointCode;
+			StorageTmp->m3uaAspSpPointCodeLen = StorageOld->m3uaAspSpPointCodeLen;
+			StorageOld->m3uaAspSpPointCode = NULL;
+			StorageOld->m3uaAspSpPointCodeLen = 0;
+		}
+		if (--StorageTmp->m3uaAspSpTable_rsvs == 0)
+			m3uaAspSpTable_destroy(&StorageTmp->m3uaAspSpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9221,12 +12779,14 @@ write_m3uaAspSpPointCode(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_m3uaAspSpTimerT1R(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSpTable_data *StorageTmp = NULL;
+	struct m3uaAspSpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSpTimerT1R entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9256,22 +12816,61 @@ write_m3uaAspSpTimerT1R(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSpTimerT1R: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			if (StorageTmp->m3uaAspSpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSpTable_old = m3uaAspSpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSpTable_rsvs++;
+		StorageTmp->m3uaAspSpTimerT1R = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSpTable_tsts == 0)
+				if ((ret = check_m3uaAspSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSpTimerT1R for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSpTimerT1R;
-		StorageTmp->m3uaAspSpTimerT1R = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSpTable_sets == 0)
+				if ((ret = update_m3uaAspSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			m3uaAspSpTable_destroy(&StorageTmp->m3uaAspSpTable_old);
+			StorageTmp->m3uaAspSpTable_rsvs = 0;
+			StorageTmp->m3uaAspSpTable_tsts = 0;
+			StorageTmp->m3uaAspSpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSpTimerT1R = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSpTable_sets == 0)
+			revert_m3uaAspSpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSpTimerT1R = StorageOld->m3uaAspSpTimerT1R;
+		if (--StorageTmp->m3uaAspSpTable_rsvs == 0)
+			m3uaAspSpTable_destroy(&StorageTmp->m3uaAspSpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9291,12 +12890,14 @@ write_m3uaAspSpTimerT1R(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_m3uaAspSpTimerT18(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSpTable_data *StorageTmp = NULL;
+	struct m3uaAspSpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSpTimerT18 entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9326,22 +12927,61 @@ write_m3uaAspSpTimerT18(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSpTimerT18: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			if (StorageTmp->m3uaAspSpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSpTable_old = m3uaAspSpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSpTable_rsvs++;
+		StorageTmp->m3uaAspSpTimerT18 = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSpTable_tsts == 0)
+				if ((ret = check_m3uaAspSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSpTimerT18 for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSpTimerT18;
-		StorageTmp->m3uaAspSpTimerT18 = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSpTable_sets == 0)
+				if ((ret = update_m3uaAspSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			m3uaAspSpTable_destroy(&StorageTmp->m3uaAspSpTable_old);
+			StorageTmp->m3uaAspSpTable_rsvs = 0;
+			StorageTmp->m3uaAspSpTable_tsts = 0;
+			StorageTmp->m3uaAspSpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSpTimerT18 = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSpTable_sets == 0)
+			revert_m3uaAspSpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSpTimerT18 = StorageOld->m3uaAspSpTimerT18;
+		if (--StorageTmp->m3uaAspSpTable_rsvs == 0)
+			m3uaAspSpTable_destroy(&StorageTmp->m3uaAspSpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9361,12 +13001,14 @@ write_m3uaAspSpTimerT18(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_m3uaAspSpTimerT20(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSpTable_data *StorageTmp = NULL;
+	struct m3uaAspSpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSpTimerT20 entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9396,22 +13038,61 @@ write_m3uaAspSpTimerT20(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSpTimerT20: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			if (StorageTmp->m3uaAspSpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSpTable_old = m3uaAspSpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSpTable_rsvs++;
+		StorageTmp->m3uaAspSpTimerT20 = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSpTable_tsts == 0)
+				if ((ret = check_m3uaAspSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSpTimerT20 for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSpTimerT20;
-		StorageTmp->m3uaAspSpTimerT20 = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSpTable_sets == 0)
+				if ((ret = update_m3uaAspSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			m3uaAspSpTable_destroy(&StorageTmp->m3uaAspSpTable_old);
+			StorageTmp->m3uaAspSpTable_rsvs = 0;
+			StorageTmp->m3uaAspSpTable_tsts = 0;
+			StorageTmp->m3uaAspSpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSpTimerT20 = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSpTable_sets == 0)
+			revert_m3uaAspSpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSpTimerT20 = StorageOld->m3uaAspSpTimerT20;
+		if (--StorageTmp->m3uaAspSpTable_rsvs == 0)
+			m3uaAspSpTable_destroy(&StorageTmp->m3uaAspSpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9431,12 +13112,14 @@ write_m3uaAspSpTimerT20(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_m3uaAspSpTimerT22A(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSpTable_data *StorageTmp = NULL;
+	struct m3uaAspSpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSpTimerT22A entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9466,22 +13149,61 @@ write_m3uaAspSpTimerT22A(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSpTimerT22A: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			if (StorageTmp->m3uaAspSpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSpTable_old = m3uaAspSpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSpTable_rsvs++;
+		StorageTmp->m3uaAspSpTimerT22A = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSpTable_tsts == 0)
+				if ((ret = check_m3uaAspSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSpTimerT22A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSpTimerT22A;
-		StorageTmp->m3uaAspSpTimerT22A = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSpTable_sets == 0)
+				if ((ret = update_m3uaAspSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			m3uaAspSpTable_destroy(&StorageTmp->m3uaAspSpTable_old);
+			StorageTmp->m3uaAspSpTable_rsvs = 0;
+			StorageTmp->m3uaAspSpTable_tsts = 0;
+			StorageTmp->m3uaAspSpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSpTimerT22A = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSpTable_sets == 0)
+			revert_m3uaAspSpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSpTimerT22A = StorageOld->m3uaAspSpTimerT22A;
+		if (--StorageTmp->m3uaAspSpTable_rsvs == 0)
+			m3uaAspSpTable_destroy(&StorageTmp->m3uaAspSpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9501,12 +13223,14 @@ write_m3uaAspSpTimerT22A(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_m3uaAspSpTimerT23A(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSpTable_data *StorageTmp = NULL;
+	struct m3uaAspSpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSpTimerT23A entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9536,22 +13260,61 @@ write_m3uaAspSpTimerT23A(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSpTimerT23A: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			if (StorageTmp->m3uaAspSpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSpTable_old = m3uaAspSpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSpTable_rsvs++;
+		StorageTmp->m3uaAspSpTimerT23A = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSpTable_tsts == 0)
+				if ((ret = check_m3uaAspSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSpTimerT23A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSpTimerT23A;
-		StorageTmp->m3uaAspSpTimerT23A = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSpTable_sets == 0)
+				if ((ret = update_m3uaAspSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			m3uaAspSpTable_destroy(&StorageTmp->m3uaAspSpTable_old);
+			StorageTmp->m3uaAspSpTable_rsvs = 0;
+			StorageTmp->m3uaAspSpTable_tsts = 0;
+			StorageTmp->m3uaAspSpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSpTimerT23A = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSpTable_sets == 0)
+			revert_m3uaAspSpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSpTimerT23A = StorageOld->m3uaAspSpTimerT23A;
+		if (--StorageTmp->m3uaAspSpTable_rsvs == 0)
+			m3uaAspSpTable_destroy(&StorageTmp->m3uaAspSpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9571,12 +13334,14 @@ write_m3uaAspSpTimerT23A(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_m3uaAspSpTimerT24A(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSpTable_data *StorageTmp = NULL;
+	struct m3uaAspSpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSpTimerT24A entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9606,22 +13371,61 @@ write_m3uaAspSpTimerT24A(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSpTimerT24A: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			if (StorageTmp->m3uaAspSpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSpTable_old = m3uaAspSpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSpTable_rsvs++;
+		StorageTmp->m3uaAspSpTimerT24A = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSpTable_tsts == 0)
+				if ((ret = check_m3uaAspSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSpTimerT24A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSpTimerT24A;
-		StorageTmp->m3uaAspSpTimerT24A = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSpTable_sets == 0)
+				if ((ret = update_m3uaAspSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			m3uaAspSpTable_destroy(&StorageTmp->m3uaAspSpTable_old);
+			StorageTmp->m3uaAspSpTable_rsvs = 0;
+			StorageTmp->m3uaAspSpTable_tsts = 0;
+			StorageTmp->m3uaAspSpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSpTimerT24A = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSpTable_sets == 0)
+			revert_m3uaAspSpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSpTimerT24A = StorageOld->m3uaAspSpTimerT24A;
+		if (--StorageTmp->m3uaAspSpTable_rsvs == 0)
+			m3uaAspSpTable_destroy(&StorageTmp->m3uaAspSpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9641,12 +13445,14 @@ write_m3uaAspSpTimerT24A(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_m3uaAspSpTimerT26A(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSpTable_data *StorageTmp = NULL;
+	struct m3uaAspSpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSpTimerT26A entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9676,22 +13482,61 @@ write_m3uaAspSpTimerT26A(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSpTimerT26A: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			if (StorageTmp->m3uaAspSpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSpTable_old = m3uaAspSpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSpTable_rsvs++;
+		StorageTmp->m3uaAspSpTimerT26A = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSpTable_tsts == 0)
+				if ((ret = check_m3uaAspSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSpTimerT26A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSpTimerT26A;
-		StorageTmp->m3uaAspSpTimerT26A = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSpTable_sets == 0)
+				if ((ret = update_m3uaAspSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			m3uaAspSpTable_destroy(&StorageTmp->m3uaAspSpTable_old);
+			StorageTmp->m3uaAspSpTable_rsvs = 0;
+			StorageTmp->m3uaAspSpTable_tsts = 0;
+			StorageTmp->m3uaAspSpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSpTimerT26A = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSpTable_sets == 0)
+			revert_m3uaAspSpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSpTimerT26A = StorageOld->m3uaAspSpTimerT26A;
+		if (--StorageTmp->m3uaAspSpTable_rsvs == 0)
+			m3uaAspSpTable_destroy(&StorageTmp->m3uaAspSpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9711,12 +13556,14 @@ write_m3uaAspSpTimerT26A(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_m3uaAspSpTimerT27A(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspSpTable_data *StorageTmp = NULL;
+	struct m3uaAspSpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSpTimerT27A entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspSpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9746,22 +13593,61 @@ write_m3uaAspSpTimerT27A(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSpTimerT27A: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			if (StorageTmp->m3uaAspSpTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspSpTable_old = m3uaAspSpTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspSpTable_rsvs++;
+		StorageTmp->m3uaAspSpTimerT27A = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspSpTable_tsts == 0)
+				if ((ret = check_m3uaAspSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSpTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSpTimerT27A for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspSpTimerT27A;
-		StorageTmp->m3uaAspSpTimerT27A = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspSpTable_sets == 0)
+				if ((ret = update_m3uaAspSpTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspSpTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+			m3uaAspSpTable_destroy(&StorageTmp->m3uaAspSpTable_old);
+			StorageTmp->m3uaAspSpTable_rsvs = 0;
+			StorageTmp->m3uaAspSpTable_tsts = 0;
+			StorageTmp->m3uaAspSpTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspSpTimerT27A = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspSpTable_sets == 0)
+			revert_m3uaAspSpTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspSpTimerT27A = StorageOld->m3uaAspSpTimerT27A;
+		if (--StorageTmp->m3uaAspSpTable_rsvs == 0)
+			m3uaAspSpTable_destroy(&StorageTmp->m3uaAspSpTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9781,17 +13667,17 @@ write_m3uaAspSpTimerT27A(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_m3uaAspMtName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct m3uaAspMtTable_data *StorageTmp = NULL;
+	struct m3uaAspMtTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspMtName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspMtTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspMtStatus) {
@@ -9814,33 +13700,73 @@ write_m3uaAspMtName(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspMtName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspMtTable_old) == NULL)
+			if (StorageTmp->m3uaAspMtTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspMtTable_old = m3uaAspMtTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspMtTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->m3uaAspMtName);
+		StorageTmp->m3uaAspMtName = string;
+		StorageTmp->m3uaAspMtNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspMtTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspMtTable_tsts == 0)
+				if ((ret = check_m3uaAspMtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspMtTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspMtName for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspMtName;
-		old_length = StorageTmp->m3uaAspMtNameLen;
-		StorageTmp->m3uaAspMtName = string;
-		StorageTmp->m3uaAspMtNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspMtTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspMtTable_sets == 0)
+				if ((ret = update_m3uaAspMtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspMtTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspMtTable_old) != NULL) {
+			m3uaAspMtTable_destroy(&StorageTmp->m3uaAspMtTable_old);
+			StorageTmp->m3uaAspMtTable_rsvs = 0;
+			StorageTmp->m3uaAspMtTable_tsts = 0;
+			StorageTmp->m3uaAspMtTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspMtName = old_value;
-		StorageTmp->m3uaAspMtNameLen = old_length;
+		if ((StorageOld = StorageTmp->m3uaAspMtTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspMtTable_sets == 0)
+			revert_m3uaAspMtTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->m3uaAspMtTable_old) == NULL)
+			break;
+		if (StorageOld->m3uaAspMtName != NULL) {
+			SNMP_FREE(StorageTmp->m3uaAspMtName);
+			StorageTmp->m3uaAspMtName = StorageOld->m3uaAspMtName;
+			StorageTmp->m3uaAspMtNameLen = StorageOld->m3uaAspMtNameLen;
+			StorageOld->m3uaAspMtName = NULL;
+			StorageOld->m3uaAspMtNameLen = 0;
+		}
+		if (--StorageTmp->m3uaAspMtTable_rsvs == 0)
+			m3uaAspMtTable_destroy(&StorageTmp->m3uaAspMtTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9860,12 +13786,14 @@ write_m3uaAspMtName(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_m3uaAspMtAdministrativeState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspMtTable_data *StorageTmp = NULL;
+	struct m3uaAspMtTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspMtAdministrativeState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspMtTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9900,22 +13828,61 @@ write_m3uaAspMtAdministrativeState(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspMtAdministrativeState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspMtTable_old) == NULL)
+			if (StorageTmp->m3uaAspMtTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspMtTable_old = m3uaAspMtTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspMtTable_rsvs++;
+		StorageTmp->m3uaAspMtAdministrativeState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspMtTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspMtTable_tsts == 0)
+				if ((ret = check_m3uaAspMtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspMtTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspMtAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspMtAdministrativeState;
-		StorageTmp->m3uaAspMtAdministrativeState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspMtTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspMtTable_sets == 0)
+				if ((ret = update_m3uaAspMtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspMtTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspMtTable_old) != NULL) {
+			m3uaAspMtTable_destroy(&StorageTmp->m3uaAspMtTable_old);
+			StorageTmp->m3uaAspMtTable_rsvs = 0;
+			StorageTmp->m3uaAspMtTable_tsts = 0;
+			StorageTmp->m3uaAspMtTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspMtAdministrativeState = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspMtTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspMtTable_sets == 0)
+			revert_m3uaAspMtTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspMtTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspMtAdministrativeState = StorageOld->m3uaAspMtAdministrativeState;
+		if (--StorageTmp->m3uaAspMtTable_rsvs == 0)
+			m3uaAspMtTable_destroy(&StorageTmp->m3uaAspMtTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9935,12 +13902,14 @@ write_m3uaAspMtAdministrativeState(int action, u_char *var_val, u_char var_val_t
 int
 write_m3uaAspMtAsState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspMtTable_data *StorageTmp = NULL;
+	struct m3uaAspMtTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspMtAsState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspMtTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9979,22 +13948,61 @@ write_m3uaAspMtAsState(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspMtAsState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspMtTable_old) == NULL)
+			if (StorageTmp->m3uaAspMtTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspMtTable_old = m3uaAspMtTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspMtTable_rsvs++;
+		StorageTmp->m3uaAspMtAsState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspMtTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspMtTable_tsts == 0)
+				if ((ret = check_m3uaAspMtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspMtTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspMtAsState for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspMtAsState;
-		StorageTmp->m3uaAspMtAsState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspMtTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspMtTable_sets == 0)
+				if ((ret = update_m3uaAspMtTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspMtTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspMtTable_old) != NULL) {
+			m3uaAspMtTable_destroy(&StorageTmp->m3uaAspMtTable_old);
+			StorageTmp->m3uaAspMtTable_rsvs = 0;
+			StorageTmp->m3uaAspMtTable_tsts = 0;
+			StorageTmp->m3uaAspMtTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspMtAsState = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspMtTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspMtTable_sets == 0)
+			revert_m3uaAspMtTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspMtTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspMtAsState = StorageOld->m3uaAspMtAsState;
+		if (--StorageTmp->m3uaAspMtTable_rsvs == 0)
+			m3uaAspMtTable_destroy(&StorageTmp->m3uaAspMtTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10014,12 +14022,14 @@ write_m3uaAspMtAsState(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_m3uaAspRsAdministrativeState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspRsTable_data *StorageTmp = NULL;
+	struct m3uaAspRsTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspRsAdministrativeState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspRsTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10053,22 +14063,61 @@ write_m3uaAspRsAdministrativeState(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRsAdministrativeState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspRsTable_old) == NULL)
+			if (StorageTmp->m3uaAspRsTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspRsTable_old = m3uaAspRsTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspRsTable_rsvs++;
+		StorageTmp->m3uaAspRsAdministrativeState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspRsTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspRsTable_tsts == 0)
+				if ((ret = check_m3uaAspRsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspRsTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspRsAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspRsAdministrativeState;
-		StorageTmp->m3uaAspRsAdministrativeState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspRsTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspRsTable_sets == 0)
+				if ((ret = update_m3uaAspRsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspRsTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspRsTable_old) != NULL) {
+			m3uaAspRsTable_destroy(&StorageTmp->m3uaAspRsTable_old);
+			StorageTmp->m3uaAspRsTable_rsvs = 0;
+			StorageTmp->m3uaAspRsTable_tsts = 0;
+			StorageTmp->m3uaAspRsTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspRsAdministrativeState = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspRsTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspRsTable_sets == 0)
+			revert_m3uaAspRsTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspRsTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspRsAdministrativeState = StorageOld->m3uaAspRsAdministrativeState;
+		if (--StorageTmp->m3uaAspRsTable_rsvs == 0)
+			m3uaAspRsTable_destroy(&StorageTmp->m3uaAspRsTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10088,17 +14137,17 @@ write_m3uaAspRsAdministrativeState(int action, u_char *var_val, u_char var_val_t
 int
 write_m3uaAspRsAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct m3uaAspRsTable_data *StorageTmp = NULL;
+	struct m3uaAspRsTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspRsAlarmStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspRsTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspRsStatus) {
@@ -10128,33 +14177,73 @@ write_m3uaAspRsAlarmStatus(int action, u_char *var_val, u_char var_val_type, siz
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspRsTable_old) == NULL)
+			if (StorageTmp->m3uaAspRsTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspRsTable_old = m3uaAspRsTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspRsTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->m3uaAspRsAlarmStatus);
+		StorageTmp->m3uaAspRsAlarmStatus = string;
+		StorageTmp->m3uaAspRsAlarmStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspRsTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspRsTable_tsts == 0)
+				if ((ret = check_m3uaAspRsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspRsTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspRsAlarmStatus for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspRsAlarmStatus;
-		old_length = StorageTmp->m3uaAspRsAlarmStatusLen;
-		StorageTmp->m3uaAspRsAlarmStatus = string;
-		StorageTmp->m3uaAspRsAlarmStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspRsTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspRsTable_sets == 0)
+				if ((ret = update_m3uaAspRsTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspRsTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspRsTable_old) != NULL) {
+			m3uaAspRsTable_destroy(&StorageTmp->m3uaAspRsTable_old);
+			StorageTmp->m3uaAspRsTable_rsvs = 0;
+			StorageTmp->m3uaAspRsTable_tsts = 0;
+			StorageTmp->m3uaAspRsTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspRsAlarmStatus = old_value;
-		StorageTmp->m3uaAspRsAlarmStatusLen = old_length;
+		if ((StorageOld = StorageTmp->m3uaAspRsTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspRsTable_sets == 0)
+			revert_m3uaAspRsTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->m3uaAspRsTable_old) == NULL)
+			break;
+		if (StorageOld->m3uaAspRsAlarmStatus != NULL) {
+			SNMP_FREE(StorageTmp->m3uaAspRsAlarmStatus);
+			StorageTmp->m3uaAspRsAlarmStatus = StorageOld->m3uaAspRsAlarmStatus;
+			StorageTmp->m3uaAspRsAlarmStatusLen = StorageOld->m3uaAspRsAlarmStatusLen;
+			StorageOld->m3uaAspRsAlarmStatus = NULL;
+			StorageOld->m3uaAspRsAlarmStatusLen = 0;
+		}
+		if (--StorageTmp->m3uaAspRsTable_rsvs == 0)
+			m3uaAspRsTable_destroy(&StorageTmp->m3uaAspRsTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10174,12 +14263,14 @@ write_m3uaAspRsAlarmStatus(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_m3uaAspRlCost(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m3uaAspRlTable_data *StorageTmp = NULL;
+	struct m3uaAspRlTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspRlCost entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspRlTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10205,22 +14296,61 @@ write_m3uaAspRlCost(int action, u_char *var_val, u_char var_val_type, size_t var
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 0 */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspRlTable_old) == NULL)
+			if (StorageTmp->m3uaAspRlTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspRlTable_old = m3uaAspRlTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspRlTable_rsvs++;
+		StorageTmp->m3uaAspRlCost = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspRlTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspRlTable_tsts == 0)
+				if ((ret = check_m3uaAspRlTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspRlTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspRlCost for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspRlCost;
-		StorageTmp->m3uaAspRlCost = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspRlTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspRlTable_sets == 0)
+				if ((ret = update_m3uaAspRlTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspRlTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspRlTable_old) != NULL) {
+			m3uaAspRlTable_destroy(&StorageTmp->m3uaAspRlTable_old);
+			StorageTmp->m3uaAspRlTable_rsvs = 0;
+			StorageTmp->m3uaAspRlTable_tsts = 0;
+			StorageTmp->m3uaAspRlTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspRlCost = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspRlTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspRlTable_sets == 0)
+			revert_m3uaAspRlTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspRlTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspRlCost = StorageOld->m3uaAspRlCost;
+		if (--StorageTmp->m3uaAspRlTable_rsvs == 0)
+			m3uaAspRlTable_destroy(&StorageTmp->m3uaAspRlTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10240,12 +14370,14 @@ write_m3uaAspRlCost(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_m3uaAspRlAdministrativeState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspRlTable_data *StorageTmp = NULL;
+	struct m3uaAspRlTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspRlAdministrativeState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspRlTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10280,22 +14412,61 @@ write_m3uaAspRlAdministrativeState(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRlAdministrativeState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspRlTable_old) == NULL)
+			if (StorageTmp->m3uaAspRlTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspRlTable_old = m3uaAspRlTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspRlTable_rsvs++;
+		StorageTmp->m3uaAspRlAdministrativeState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspRlTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspRlTable_tsts == 0)
+				if ((ret = check_m3uaAspRlTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspRlTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspRlAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspRlAdministrativeState;
-		StorageTmp->m3uaAspRlAdministrativeState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspRlTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspRlTable_sets == 0)
+				if ((ret = update_m3uaAspRlTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspRlTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspRlTable_old) != NULL) {
+			m3uaAspRlTable_destroy(&StorageTmp->m3uaAspRlTable_old);
+			StorageTmp->m3uaAspRlTable_rsvs = 0;
+			StorageTmp->m3uaAspRlTable_tsts = 0;
+			StorageTmp->m3uaAspRlTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspRlAdministrativeState = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspRlTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspRlTable_sets == 0)
+			revert_m3uaAspRlTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspRlTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspRlAdministrativeState = StorageOld->m3uaAspRlAdministrativeState;
+		if (--StorageTmp->m3uaAspRlTable_rsvs == 0)
+			m3uaAspRlTable_destroy(&StorageTmp->m3uaAspRlTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10315,12 +14486,14 @@ write_m3uaAspRlAdministrativeState(int action, u_char *var_val, u_char var_val_t
 int
 write_m3uaAspRcValue(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct m3uaAspRcTable_data *StorageTmp = NULL;
+	struct m3uaAspRcTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspRcValue entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspRcTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10345,22 +14518,61 @@ write_m3uaAspRcValue(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRcValue: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspRcTable_old) == NULL)
+			if (StorageTmp->m3uaAspRcTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspRcTable_old = m3uaAspRcTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspRcTable_rsvs++;
+		StorageTmp->m3uaAspRcValue = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspRcTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspRcTable_tsts == 0)
+				if ((ret = check_m3uaAspRcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspRcTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspRcValue for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspRcValue;
-		StorageTmp->m3uaAspRcValue = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspRcTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspRcTable_sets == 0)
+				if ((ret = update_m3uaAspRcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspRcTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspRcTable_old) != NULL) {
+			m3uaAspRcTable_destroy(&StorageTmp->m3uaAspRcTable_old);
+			StorageTmp->m3uaAspRcTable_rsvs = 0;
+			StorageTmp->m3uaAspRcTable_tsts = 0;
+			StorageTmp->m3uaAspRcTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspRcValue = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspRcTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspRcTable_sets == 0)
+			revert_m3uaAspRcTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspRcTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspRcValue = StorageOld->m3uaAspRcValue;
+		if (--StorageTmp->m3uaAspRcTable_rsvs == 0)
+			m3uaAspRcTable_destroy(&StorageTmp->m3uaAspRcTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10380,12 +14592,14 @@ write_m3uaAspRcValue(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_m3uaAspRcRegistrationPolicy(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspRcTable_data *StorageTmp = NULL;
+	struct m3uaAspRcTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspRcRegistrationPolicy entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspRcTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10420,22 +14634,61 @@ write_m3uaAspRcRegistrationPolicy(int action, u_char *var_val, u_char var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRcRegistrationPolicy: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspRcTable_old) == NULL)
+			if (StorageTmp->m3uaAspRcTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspRcTable_old = m3uaAspRcTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspRcTable_rsvs++;
+		StorageTmp->m3uaAspRcRegistrationPolicy = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspRcTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspRcTable_tsts == 0)
+				if ((ret = check_m3uaAspRcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspRcTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspRcRegistrationPolicy for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspRcRegistrationPolicy;
-		StorageTmp->m3uaAspRcRegistrationPolicy = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspRcTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspRcTable_sets == 0)
+				if ((ret = update_m3uaAspRcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspRcTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspRcTable_old) != NULL) {
+			m3uaAspRcTable_destroy(&StorageTmp->m3uaAspRcTable_old);
+			StorageTmp->m3uaAspRcTable_rsvs = 0;
+			StorageTmp->m3uaAspRcTable_tsts = 0;
+			StorageTmp->m3uaAspRcTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspRcRegistrationPolicy = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspRcTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspRcTable_sets == 0)
+			revert_m3uaAspRcTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspRcTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspRcRegistrationPolicy = StorageOld->m3uaAspRcRegistrationPolicy;
+		if (--StorageTmp->m3uaAspRcTable_rsvs == 0)
+			m3uaAspRcTable_destroy(&StorageTmp->m3uaAspRcTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10455,17 +14708,17 @@ write_m3uaAspRcRegistrationPolicy(int action, u_char *var_val, u_char var_val_ty
 int
 write_m3uaAspRcTrafficMode(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct m3uaAspRcTable_data *StorageTmp = NULL;
+	struct m3uaAspRcTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspRcTrafficMode entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspRcTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->m3uaAspRcStatus) {
@@ -10487,31 +14740,71 @@ write_m3uaAspRcTrafficMode(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRcTrafficMode: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspRcTable_old) == NULL)
+			if (StorageTmp->m3uaAspRcTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspRcTable_old = m3uaAspRcTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspRcTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->m3uaAspRcTrafficMode);
+		StorageTmp->m3uaAspRcTrafficMode = objid;
+		StorageTmp->m3uaAspRcTrafficModeLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspRcTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspRcTable_tsts == 0)
+				if ((ret = check_m3uaAspRcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspRcTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspRcTrafficMode for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspRcTrafficMode;
-		old_length = StorageTmp->m3uaAspRcTrafficModeLen;
-		StorageTmp->m3uaAspRcTrafficMode = objid;
-		StorageTmp->m3uaAspRcTrafficModeLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspRcTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspRcTable_sets == 0)
+				if ((ret = update_m3uaAspRcTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspRcTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspRcTable_old) != NULL) {
+			m3uaAspRcTable_destroy(&StorageTmp->m3uaAspRcTable_old);
+			StorageTmp->m3uaAspRcTable_rsvs = 0;
+			StorageTmp->m3uaAspRcTable_tsts = 0;
+			StorageTmp->m3uaAspRcTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspRcTrafficMode = old_value;
-		StorageTmp->m3uaAspRcTrafficModeLen = old_length;
+		if ((StorageOld = StorageTmp->m3uaAspRcTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspRcTable_sets == 0)
+			revert_m3uaAspRcTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->m3uaAspRcTable_old) == NULL)
+			break;
+		if (StorageOld->m3uaAspRcTrafficMode != NULL) {
+			SNMP_FREE(StorageTmp->m3uaAspRcTrafficMode);
+			StorageTmp->m3uaAspRcTrafficMode = StorageOld->m3uaAspRcTrafficMode;
+			StorageTmp->m3uaAspRcTrafficModeLen = StorageOld->m3uaAspRcTrafficModeLen;
+			StorageOld->m3uaAspRcTrafficMode = NULL;
+			StorageOld->m3uaAspRcTrafficModeLen = 0;
+		}
+		if (--StorageTmp->m3uaAspRcTable_rsvs == 0)
+			m3uaAspRcTable_destroy(&StorageTmp->m3uaAspRcTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10531,12 +14824,14 @@ write_m3uaAspRcTrafficMode(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_m3uaAspAfAsState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspAfTable_data *StorageTmp = NULL;
+	struct m3uaAspAfTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAfAsState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspAfTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -10563,20 +14858,59 @@ write_m3uaAspAfAsState(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspAfAsState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAfTable_old) == NULL)
+			if (StorageTmp->m3uaAspAfTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspAfTable_old = m3uaAspAfTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspAfTable_rsvs++;
+		StorageTmp->m3uaAspAfAsState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspAfTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspAfTable_tsts == 0)
+				if ((ret = check_m3uaAspAfTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAfTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAfAsState for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
-		old_value = StorageTmp->m3uaAspAfAsState;
-		StorageTmp->m3uaAspAfAsState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAfTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspAfTable_sets == 0)
+				if ((ret = update_m3uaAspAfTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAfTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspAfTable_old) != NULL) {
+			m3uaAspAfTable_destroy(&StorageTmp->m3uaAspAfTable_old);
+			StorageTmp->m3uaAspAfTable_rsvs = 0;
+			StorageTmp->m3uaAspAfTable_tsts = 0;
+			StorageTmp->m3uaAspAfTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspAfAsState = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspAfTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspAfTable_sets == 0)
+			revert_m3uaAspAfTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspAfTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspAfAsState = StorageOld->m3uaAspAfAsState;
+		if (--StorageTmp->m3uaAspAfTable_rsvs == 0)
+			m3uaAspAfTable_destroy(&StorageTmp->m3uaAspAfTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10596,12 +14930,14 @@ write_m3uaAspAfAsState(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_m3uaAspAfAdministrativeState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct m3uaAspAfTable_data *StorageTmp = NULL;
+	struct m3uaAspAfTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAfAdministrativeState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(m3uaAspAfTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -10624,239 +14960,402 @@ write_m3uaAspAfAdministrativeState(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspAfAdministrativeState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAfTable_old) == NULL)
+			if (StorageTmp->m3uaAspAfTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->m3uaAspAfTable_old = m3uaAspAfTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->m3uaAspAfTable_rsvs++;
+		StorageTmp->m3uaAspAfAdministrativeState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->m3uaAspAfTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->m3uaAspAfTable_tsts == 0)
+				if ((ret = check_m3uaAspAfTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAfTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspAfAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
-		old_value = StorageTmp->m3uaAspAfAdministrativeState;
-		StorageTmp->m3uaAspAfAdministrativeState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->m3uaAspAfTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->m3uaAspAfTable_sets == 0)
+				if ((ret = update_m3uaAspAfTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->m3uaAspAfTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->m3uaAspAfTable_old) != NULL) {
+			m3uaAspAfTable_destroy(&StorageTmp->m3uaAspAfTable_old);
+			StorageTmp->m3uaAspAfTable_rsvs = 0;
+			StorageTmp->m3uaAspAfTable_tsts = 0;
+			StorageTmp->m3uaAspAfTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspAfAdministrativeState = old_value;
+		if ((StorageOld = StorageTmp->m3uaAspAfTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->m3uaAspAfTable_sets == 0)
+			revert_m3uaAspAfTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->m3uaAspAfTable_old) == NULL)
+			break;
+		StorageTmp->m3uaAspAfAdministrativeState = StorageOld->m3uaAspAfAdministrativeState;
+		if (--StorageTmp->m3uaAspAfTable_rsvs == 0)
+			m3uaAspAfTable_destroy(&StorageTmp->m3uaAspAfTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int m3uaAspTable_consistent(struct m3uaAspTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_m3uaAspTable_row(struct m3uaAspTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the m3uaAspTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-m3uaAspTable_consistent(struct m3uaAspTable_data *thedata)
+can_act_m3uaAspTable_row(struct m3uaAspTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int m3uaAspAgTable_consistent(struct m3uaAspAgTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_m3uaAspTable_row(struct m3uaAspTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the m3uaAspAgTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-m3uaAspAgTable_consistent(struct m3uaAspAgTable_data *thedata)
+can_deact_m3uaAspTable_row(struct m3uaAspTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int m3uaAspSgTable_consistent(struct m3uaAspSgTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_m3uaAspAgTable_row(struct m3uaAspAgTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the m3uaAspSgTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-m3uaAspSgTable_consistent(struct m3uaAspSgTable_data *thedata)
+can_act_m3uaAspAgTable_row(struct m3uaAspAgTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int m3uaAspSgpTable_consistent(struct m3uaAspSgpTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_m3uaAspAgTable_row(struct m3uaAspAgTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the m3uaAspSgpTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-m3uaAspSgpTable_consistent(struct m3uaAspSgpTable_data *thedata)
+can_deact_m3uaAspAgTable_row(struct m3uaAspAgTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int m3uaAspSpTable_consistent(struct m3uaAspSpTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_m3uaAspSgTable_row(struct m3uaAspSgTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the m3uaAspSpTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-m3uaAspSpTable_consistent(struct m3uaAspSpTable_data *thedata)
+can_act_m3uaAspSgTable_row(struct m3uaAspSgTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int m3uaAspMtTable_consistent(struct m3uaAspMtTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_m3uaAspSgTable_row(struct m3uaAspSgTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the m3uaAspMtTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-m3uaAspMtTable_consistent(struct m3uaAspMtTable_data *thedata)
+can_deact_m3uaAspSgTable_row(struct m3uaAspSgTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int m3uaAspRsTable_consistent(struct m3uaAspRsTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_m3uaAspSgpTable_row(struct m3uaAspSgpTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the m3uaAspRsTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-m3uaAspRsTable_consistent(struct m3uaAspRsTable_data *thedata)
+can_act_m3uaAspSgpTable_row(struct m3uaAspSgpTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int m3uaAspRlTable_consistent(struct m3uaAspRlTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_m3uaAspSgpTable_row(struct m3uaAspSgpTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the m3uaAspRlTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-m3uaAspRlTable_consistent(struct m3uaAspRlTable_data *thedata)
+can_deact_m3uaAspSgpTable_row(struct m3uaAspSgpTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int m3uaAspRtTable_consistent(struct m3uaAspRtTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_m3uaAspSpTable_row(struct m3uaAspSpTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the m3uaAspRtTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-m3uaAspRtTable_consistent(struct m3uaAspRtTable_data *thedata)
+can_act_m3uaAspSpTable_row(struct m3uaAspSpTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int m3uaAspRcTable_consistent(struct m3uaAspRcTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_m3uaAspSpTable_row(struct m3uaAspSpTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the m3uaAspRcTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-m3uaAspRcTable_consistent(struct m3uaAspRcTable_data *thedata)
+can_deact_m3uaAspSpTable_row(struct m3uaAspSpTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int m3uaAspAsTable_consistent(struct m3uaAspAsTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_m3uaAspMtTable_row(struct m3uaAspMtTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the m3uaAspAsTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-m3uaAspAsTable_consistent(struct m3uaAspAsTable_data *thedata)
+can_act_m3uaAspMtTable_row(struct m3uaAspMtTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int m3uaAspAfTable_consistent(struct m3uaAspAfTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_m3uaAspMtTable_row(struct m3uaAspMtTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the m3uaAspAfTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-m3uaAspAfTable_consistent(struct m3uaAspAfTable_data *thedata)
+can_deact_m3uaAspMtTable_row(struct m3uaAspMtTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_m3uaAspRsTable_row(struct m3uaAspRsTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_m3uaAspRsTable_row(struct m3uaAspRsTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_m3uaAspRsTable_row(struct m3uaAspRsTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_m3uaAspRsTable_row(struct m3uaAspRsTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_m3uaAspRlTable_row(struct m3uaAspRlTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_m3uaAspRlTable_row(struct m3uaAspRlTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_m3uaAspRlTable_row(struct m3uaAspRlTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_m3uaAspRlTable_row(struct m3uaAspRlTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_m3uaAspRtTable_row(struct m3uaAspRtTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_m3uaAspRtTable_row(struct m3uaAspRtTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_m3uaAspRtTable_row(struct m3uaAspRtTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_m3uaAspRtTable_row(struct m3uaAspRtTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_m3uaAspRcTable_row(struct m3uaAspRcTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_m3uaAspRcTable_row(struct m3uaAspRcTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_m3uaAspRcTable_row(struct m3uaAspRcTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_m3uaAspRcTable_row(struct m3uaAspRcTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
@@ -10873,10 +15372,9 @@ m3uaAspAfTable_consistent(struct m3uaAspAfTable_data *thedata)
 int
 write_m3uaAspStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct m3uaAspTable_data *StorageTmp = NULL;
+	struct m3uaAspTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct m3uaAspTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -10903,40 +15401,6 @@ write_m3uaAspStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->m3uaAspStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->m3uaAspTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->m3uaAspTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* m3uaAspIndex */
@@ -10960,12 +15424,43 @@ write_m3uaAspStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->m3uaAspTable_rsvs = 1;
 			vp = vars;
 			StorageNew->m3uaAspIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&m3uaAspTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->m3uaAspStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->m3uaAspTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->m3uaAspTable_old) == NULL)
+				if (StorageTmp->m3uaAspTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->m3uaAspTable_old = m3uaAspTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->m3uaAspTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->m3uaAspTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -10975,78 +15470,127 @@ write_m3uaAspStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = m3uaAspTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_m3uaAspTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->m3uaAspStatus;
-			StorageTmp->m3uaAspStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = m3uaAspTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->m3uaAspStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->m3uaAspStatus != RS_ACTIVE)
+				if ((ret = can_act_m3uaAspTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->m3uaAspStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_m3uaAspTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->m3uaAspStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_m3uaAspTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->m3uaAspStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+		   the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_m3uaAspTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->m3uaAspStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_m3uaAspTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->m3uaAspStatus;
-			StorageTmp->m3uaAspStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->m3uaAspStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_m3uaAspTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_m3uaAspTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->m3uaAspStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->m3uaAspStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->m3uaAspStatus = set_value;
+			if ((StorageOld = StorageTmp->m3uaAspTable_old) != NULL) {
+				m3uaAspTable_destroy(&StorageTmp->m3uaAspTable_old);
+				StorageTmp->m3uaAspTable_rsvs = 0;
+				StorageTmp->m3uaAspTable_tsts = 0;
+				StorageTmp->m3uaAspTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			m3uaAspTable_destroy(&StorageDel);
-			/* m3uaAspTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_m3uaAspTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->m3uaAspStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_m3uaAspTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->m3uaAspStatus = old_value;
+			if (StorageTmp->m3uaAspStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_m3uaAspTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -11060,6 +15604,13 @@ write_m3uaAspStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 				m3uaAspTable_del(StorageNew);
 				m3uaAspTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->m3uaAspTable_old) == NULL)
+				break;
+			if (--StorageTmp->m3uaAspTable_rsvs == 0)
+				m3uaAspTable_destroy(&StorageTmp->m3uaAspTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -11086,10 +15637,9 @@ write_m3uaAspStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_m3uaAspAgStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct m3uaAspAgTable_data *StorageTmp = NULL;
+	struct m3uaAspAgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct m3uaAspAgTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -11116,40 +15666,6 @@ write_m3uaAspAgStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->m3uaAspAgStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->m3uaAspAgTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->m3uaAspAgTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* m3uaAspAgIndex */
@@ -11173,12 +15689,43 @@ write_m3uaAspAgStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->m3uaAspAgTable_rsvs = 1;
 			vp = vars;
 			StorageNew->m3uaAspAgIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&m3uaAspAgTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->m3uaAspAgStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->m3uaAspAgTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+				if (StorageTmp->m3uaAspAgTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->m3uaAspAgTable_old = m3uaAspAgTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->m3uaAspAgTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->m3uaAspAgTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -11188,78 +15735,127 @@ write_m3uaAspAgStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = m3uaAspAgTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_m3uaAspAgTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->m3uaAspAgStatus;
-			StorageTmp->m3uaAspAgStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = m3uaAspAgTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->m3uaAspAgStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->m3uaAspAgStatus != RS_ACTIVE)
+				if ((ret = can_act_m3uaAspAgTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->m3uaAspAgStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_m3uaAspAgTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->m3uaAspAgStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_m3uaAspAgTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->m3uaAspAgStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_m3uaAspAgTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->m3uaAspAgStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_m3uaAspAgTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->m3uaAspAgStatus;
-			StorageTmp->m3uaAspAgStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->m3uaAspAgStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_m3uaAspAgTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_m3uaAspAgTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->m3uaAspAgStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->m3uaAspAgStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->m3uaAspAgStatus = set_value;
+			if ((StorageOld = StorageTmp->m3uaAspAgTable_old) != NULL) {
+				m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
+				StorageTmp->m3uaAspAgTable_rsvs = 0;
+				StorageTmp->m3uaAspAgTable_tsts = 0;
+				StorageTmp->m3uaAspAgTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			m3uaAspAgTable_destroy(&StorageDel);
-			/* m3uaAspAgTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_m3uaAspAgTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->m3uaAspAgStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_m3uaAspAgTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->m3uaAspAgStatus = old_value;
+			if (StorageTmp->m3uaAspAgStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_m3uaAspAgTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -11273,6 +15869,13 @@ write_m3uaAspAgStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				m3uaAspAgTable_del(StorageNew);
 				m3uaAspAgTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->m3uaAspAgTable_old) == NULL)
+				break;
+			if (--StorageTmp->m3uaAspAgTable_rsvs == 0)
+				m3uaAspAgTable_destroy(&StorageTmp->m3uaAspAgTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -11299,10 +15902,9 @@ write_m3uaAspAgStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_m3uaAspSgStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct m3uaAspSgTable_data *StorageTmp = NULL;
+	struct m3uaAspSgTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct m3uaAspSgTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -11329,40 +15931,6 @@ write_m3uaAspSgStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->m3uaAspSgStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->m3uaAspSgTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->m3uaAspSgTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* m3uaAspAgIndex */
@@ -11398,6 +15966,7 @@ write_m3uaAspSgStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->m3uaAspSgTable_rsvs = 1;
 			vp = vars;
 			StorageNew->m3uaAspAgIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -11405,7 +15974,37 @@ write_m3uaAspSgStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			vp = vp->next_variable;
 			header_complex_add_data(&m3uaAspSgTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->m3uaAspSgStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->m3uaAspSgTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+				if (StorageTmp->m3uaAspSgTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->m3uaAspSgTable_old = m3uaAspSgTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->m3uaAspSgTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->m3uaAspSgTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -11415,78 +16014,127 @@ write_m3uaAspSgStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = m3uaAspSgTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_m3uaAspSgTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->m3uaAspSgStatus;
-			StorageTmp->m3uaAspSgStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = m3uaAspSgTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->m3uaAspSgStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->m3uaAspSgStatus != RS_ACTIVE)
+				if ((ret = can_act_m3uaAspSgTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->m3uaAspSgStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_m3uaAspSgTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->m3uaAspSgStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_m3uaAspSgTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->m3uaAspSgStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_m3uaAspSgTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->m3uaAspSgStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_m3uaAspSgTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->m3uaAspSgStatus;
-			StorageTmp->m3uaAspSgStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->m3uaAspSgStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_m3uaAspSgTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_m3uaAspSgTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->m3uaAspSgStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->m3uaAspSgStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->m3uaAspSgStatus = set_value;
+			if ((StorageOld = StorageTmp->m3uaAspSgTable_old) != NULL) {
+				m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
+				StorageTmp->m3uaAspSgTable_rsvs = 0;
+				StorageTmp->m3uaAspSgTable_tsts = 0;
+				StorageTmp->m3uaAspSgTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			m3uaAspSgTable_destroy(&StorageDel);
-			/* m3uaAspSgTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_m3uaAspSgTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->m3uaAspSgStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_m3uaAspSgTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->m3uaAspSgStatus = old_value;
+			if (StorageTmp->m3uaAspSgStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_m3uaAspSgTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -11500,6 +16148,13 @@ write_m3uaAspSgStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				m3uaAspSgTable_del(StorageNew);
 				m3uaAspSgTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->m3uaAspSgTable_old) == NULL)
+				break;
+			if (--StorageTmp->m3uaAspSgTable_rsvs == 0)
+				m3uaAspSgTable_destroy(&StorageTmp->m3uaAspSgTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -11526,10 +16181,9 @@ write_m3uaAspSgStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_m3uaAspSgpStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct m3uaAspSgpTable_data *StorageTmp = NULL;
+	struct m3uaAspSgpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct m3uaAspSgpTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -11556,40 +16210,6 @@ write_m3uaAspSgpStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->m3uaAspSgpStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->m3uaAspSgpTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->m3uaAspSgpTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* m3uaAspAgIndex */
@@ -11637,6 +16257,7 @@ write_m3uaAspSgpStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->m3uaAspSgpTable_rsvs = 1;
 			vp = vars;
 			StorageNew->m3uaAspAgIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -11646,7 +16267,37 @@ write_m3uaAspSgpStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 			vp = vp->next_variable;
 			header_complex_add_data(&m3uaAspSgpTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->m3uaAspSgpStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->m3uaAspSgpTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) == NULL)
+				if (StorageTmp->m3uaAspSgpTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->m3uaAspSgpTable_old = m3uaAspSgpTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->m3uaAspSgpTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->m3uaAspSgpTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -11656,78 +16307,127 @@ write_m3uaAspSgpStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = m3uaAspSgpTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_m3uaAspSgpTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->m3uaAspSgpStatus;
-			StorageTmp->m3uaAspSgpStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = m3uaAspSgpTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->m3uaAspSgpStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->m3uaAspSgpStatus != RS_ACTIVE)
+				if ((ret = can_act_m3uaAspSgpTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->m3uaAspSgpStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_m3uaAspSgpTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->m3uaAspSgpStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_m3uaAspSgpTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->m3uaAspSgpStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_m3uaAspSgpTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->m3uaAspSgpStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_m3uaAspSgpTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->m3uaAspSgpStatus;
-			StorageTmp->m3uaAspSgpStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->m3uaAspSgpStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_m3uaAspSgpTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_m3uaAspSgpTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->m3uaAspSgpStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->m3uaAspSgpStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->m3uaAspSgpStatus = set_value;
+			if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) != NULL) {
+				m3uaAspSgpTable_destroy(&StorageTmp->m3uaAspSgpTable_old);
+				StorageTmp->m3uaAspSgpTable_rsvs = 0;
+				StorageTmp->m3uaAspSgpTable_tsts = 0;
+				StorageTmp->m3uaAspSgpTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			m3uaAspSgpTable_destroy(&StorageDel);
-			/* m3uaAspSgpTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_m3uaAspSgpTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->m3uaAspSgpStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_m3uaAspSgpTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->m3uaAspSgpStatus = old_value;
+			if (StorageTmp->m3uaAspSgpStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_m3uaAspSgpTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -11741,6 +16441,13 @@ write_m3uaAspSgpStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				m3uaAspSgpTable_del(StorageNew);
 				m3uaAspSgpTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->m3uaAspSgpTable_old) == NULL)
+				break;
+			if (--StorageTmp->m3uaAspSgpTable_rsvs == 0)
+				m3uaAspSgpTable_destroy(&StorageTmp->m3uaAspSgpTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -11767,10 +16474,9 @@ write_m3uaAspSgpStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_m3uaAspSpStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct m3uaAspSpTable_data *StorageTmp = NULL;
+	struct m3uaAspSpTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct m3uaAspSpTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -11797,40 +16503,6 @@ write_m3uaAspSpStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->m3uaAspSpStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->m3uaAspSpTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->m3uaAspSpTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* m3uaAspSpIndex */
@@ -11854,12 +16526,43 @@ write_m3uaAspSpStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->m3uaAspSpTable_rsvs = 1;
 			vp = vars;
 			StorageNew->m3uaAspSpIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&m3uaAspSpTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->m3uaAspSpStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->m3uaAspSpTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+				if (StorageTmp->m3uaAspSpTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->m3uaAspSpTable_old = m3uaAspSpTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->m3uaAspSpTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->m3uaAspSpTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -11869,78 +16572,127 @@ write_m3uaAspSpStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = m3uaAspSpTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_m3uaAspSpTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->m3uaAspSpStatus;
-			StorageTmp->m3uaAspSpStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = m3uaAspSpTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->m3uaAspSpStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->m3uaAspSpStatus != RS_ACTIVE)
+				if ((ret = can_act_m3uaAspSpTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->m3uaAspSpStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_m3uaAspSpTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->m3uaAspSpStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_m3uaAspSpTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->m3uaAspSpStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_m3uaAspSpTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->m3uaAspSpStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_m3uaAspSpTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->m3uaAspSpStatus;
-			StorageTmp->m3uaAspSpStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->m3uaAspSpStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_m3uaAspSpTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_m3uaAspSpTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->m3uaAspSpStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->m3uaAspSpStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->m3uaAspSpStatus = set_value;
+			if ((StorageOld = StorageTmp->m3uaAspSpTable_old) != NULL) {
+				m3uaAspSpTable_destroy(&StorageTmp->m3uaAspSpTable_old);
+				StorageTmp->m3uaAspSpTable_rsvs = 0;
+				StorageTmp->m3uaAspSpTable_tsts = 0;
+				StorageTmp->m3uaAspSpTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			m3uaAspSpTable_destroy(&StorageDel);
-			/* m3uaAspSpTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_m3uaAspSpTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->m3uaAspSpStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_m3uaAspSpTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->m3uaAspSpStatus = old_value;
+			if (StorageTmp->m3uaAspSpStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_m3uaAspSpTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -11954,6 +16706,13 @@ write_m3uaAspSpStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				m3uaAspSpTable_del(StorageNew);
 				m3uaAspSpTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->m3uaAspSpTable_old) == NULL)
+				break;
+			if (--StorageTmp->m3uaAspSpTable_rsvs == 0)
+				m3uaAspSpTable_destroy(&StorageTmp->m3uaAspSpTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -11980,10 +16739,9 @@ write_m3uaAspSpStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_m3uaAspMtStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct m3uaAspMtTable_data *StorageTmp = NULL;
+	struct m3uaAspMtTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct m3uaAspMtTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -12010,40 +16768,6 @@ write_m3uaAspMtStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->m3uaAspMtStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->m3uaAspMtTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->m3uaAspMtTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* m3uaAspSpIndex */
@@ -12102,6 +16826,7 @@ write_m3uaAspMtStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->m3uaAspMtTable_rsvs = 1;
 			vp = vars;
 			StorageNew->m3uaAspSpIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -12109,7 +16834,37 @@ write_m3uaAspMtStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			vp = vp->next_variable;
 			header_complex_add_data(&m3uaAspMtTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->m3uaAspMtStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->m3uaAspMtTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->m3uaAspMtTable_old) == NULL)
+				if (StorageTmp->m3uaAspMtTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->m3uaAspMtTable_old = m3uaAspMtTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->m3uaAspMtTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->m3uaAspMtTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -12119,78 +16874,127 @@ write_m3uaAspMtStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = m3uaAspMtTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_m3uaAspMtTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->m3uaAspMtStatus;
-			StorageTmp->m3uaAspMtStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = m3uaAspMtTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->m3uaAspMtStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->m3uaAspMtStatus != RS_ACTIVE)
+				if ((ret = can_act_m3uaAspMtTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->m3uaAspMtStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_m3uaAspMtTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->m3uaAspMtStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_m3uaAspMtTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->m3uaAspMtStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_m3uaAspMtTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->m3uaAspMtStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_m3uaAspMtTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->m3uaAspMtStatus;
-			StorageTmp->m3uaAspMtStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->m3uaAspMtStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_m3uaAspMtTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_m3uaAspMtTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->m3uaAspMtStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->m3uaAspMtStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->m3uaAspMtStatus = set_value;
+			if ((StorageOld = StorageTmp->m3uaAspMtTable_old) != NULL) {
+				m3uaAspMtTable_destroy(&StorageTmp->m3uaAspMtTable_old);
+				StorageTmp->m3uaAspMtTable_rsvs = 0;
+				StorageTmp->m3uaAspMtTable_tsts = 0;
+				StorageTmp->m3uaAspMtTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			m3uaAspMtTable_destroy(&StorageDel);
-			/* m3uaAspMtTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_m3uaAspMtTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->m3uaAspMtStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_m3uaAspMtTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->m3uaAspMtStatus = old_value;
+			if (StorageTmp->m3uaAspMtStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_m3uaAspMtTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -12204,6 +17008,13 @@ write_m3uaAspMtStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				m3uaAspMtTable_del(StorageNew);
 				m3uaAspMtTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->m3uaAspMtTable_old) == NULL)
+				break;
+			if (--StorageTmp->m3uaAspMtTable_rsvs == 0)
+				m3uaAspMtTable_destroy(&StorageTmp->m3uaAspMtTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -12230,10 +17041,9 @@ write_m3uaAspMtStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_m3uaAspRsStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct m3uaAspRsTable_data *StorageTmp = NULL;
+	struct m3uaAspRsTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct m3uaAspRsTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -12260,40 +17070,6 @@ write_m3uaAspRsStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->m3uaAspRsStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->m3uaAspRsTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->m3uaAspRsTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* m3uaAspSpIndex */
@@ -12329,6 +17105,7 @@ write_m3uaAspRsStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->m3uaAspRsTable_rsvs = 1;
 			vp = vars;
 			StorageNew->m3uaAspSpIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -12336,7 +17113,37 @@ write_m3uaAspRsStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			vp = vp->next_variable;
 			header_complex_add_data(&m3uaAspRsTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->m3uaAspRsStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->m3uaAspRsTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->m3uaAspRsTable_old) == NULL)
+				if (StorageTmp->m3uaAspRsTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->m3uaAspRsTable_old = m3uaAspRsTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->m3uaAspRsTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->m3uaAspRsTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -12346,78 +17153,127 @@ write_m3uaAspRsStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = m3uaAspRsTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_m3uaAspRsTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->m3uaAspRsStatus;
-			StorageTmp->m3uaAspRsStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = m3uaAspRsTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->m3uaAspRsStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->m3uaAspRsStatus != RS_ACTIVE)
+				if ((ret = can_act_m3uaAspRsTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->m3uaAspRsStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_m3uaAspRsTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->m3uaAspRsStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_m3uaAspRsTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->m3uaAspRsStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_m3uaAspRsTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->m3uaAspRsStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_m3uaAspRsTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->m3uaAspRsStatus;
-			StorageTmp->m3uaAspRsStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->m3uaAspRsStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_m3uaAspRsTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_m3uaAspRsTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->m3uaAspRsStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->m3uaAspRsStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->m3uaAspRsStatus = set_value;
+			if ((StorageOld = StorageTmp->m3uaAspRsTable_old) != NULL) {
+				m3uaAspRsTable_destroy(&StorageTmp->m3uaAspRsTable_old);
+				StorageTmp->m3uaAspRsTable_rsvs = 0;
+				StorageTmp->m3uaAspRsTable_tsts = 0;
+				StorageTmp->m3uaAspRsTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			m3uaAspRsTable_destroy(&StorageDel);
-			/* m3uaAspRsTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_m3uaAspRsTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->m3uaAspRsStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_m3uaAspRsTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->m3uaAspRsStatus = old_value;
+			if (StorageTmp->m3uaAspRsStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_m3uaAspRsTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -12431,6 +17287,13 @@ write_m3uaAspRsStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				m3uaAspRsTable_del(StorageNew);
 				m3uaAspRsTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->m3uaAspRsTable_old) == NULL)
+				break;
+			if (--StorageTmp->m3uaAspRsTable_rsvs == 0)
+				m3uaAspRsTable_destroy(&StorageTmp->m3uaAspRsTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -12457,10 +17320,9 @@ write_m3uaAspRsStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_m3uaAspRlStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct m3uaAspRlTable_data *StorageTmp = NULL;
+	struct m3uaAspRlTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct m3uaAspRlTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -12487,40 +17349,6 @@ write_m3uaAspRlStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->m3uaAspRlStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->m3uaAspRlTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->m3uaAspRlTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* m3uaAspSpIndex */
@@ -12568,6 +17396,7 @@ write_m3uaAspRlStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->m3uaAspRlTable_rsvs = 1;
 			vp = vars;
 			StorageNew->m3uaAspSpIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -12577,7 +17406,37 @@ write_m3uaAspRlStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			vp = vp->next_variable;
 			header_complex_add_data(&m3uaAspRlTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->m3uaAspRlStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->m3uaAspRlTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->m3uaAspRlTable_old) == NULL)
+				if (StorageTmp->m3uaAspRlTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->m3uaAspRlTable_old = m3uaAspRlTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->m3uaAspRlTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->m3uaAspRlTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -12587,78 +17446,127 @@ write_m3uaAspRlStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = m3uaAspRlTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_m3uaAspRlTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->m3uaAspRlStatus;
-			StorageTmp->m3uaAspRlStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = m3uaAspRlTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->m3uaAspRlStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->m3uaAspRlStatus != RS_ACTIVE)
+				if ((ret = can_act_m3uaAspRlTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->m3uaAspRlStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_m3uaAspRlTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->m3uaAspRlStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_m3uaAspRlTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->m3uaAspRlStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_m3uaAspRlTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->m3uaAspRlStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_m3uaAspRlTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->m3uaAspRlStatus;
-			StorageTmp->m3uaAspRlStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->m3uaAspRlStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_m3uaAspRlTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_m3uaAspRlTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->m3uaAspRlStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->m3uaAspRlStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->m3uaAspRlStatus = set_value;
+			if ((StorageOld = StorageTmp->m3uaAspRlTable_old) != NULL) {
+				m3uaAspRlTable_destroy(&StorageTmp->m3uaAspRlTable_old);
+				StorageTmp->m3uaAspRlTable_rsvs = 0;
+				StorageTmp->m3uaAspRlTable_tsts = 0;
+				StorageTmp->m3uaAspRlTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			m3uaAspRlTable_destroy(&StorageDel);
-			/* m3uaAspRlTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_m3uaAspRlTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->m3uaAspRlStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_m3uaAspRlTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->m3uaAspRlStatus = old_value;
+			if (StorageTmp->m3uaAspRlStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_m3uaAspRlTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -12672,6 +17580,13 @@ write_m3uaAspRlStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				m3uaAspRlTable_del(StorageNew);
 				m3uaAspRlTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->m3uaAspRlTable_old) == NULL)
+				break;
+			if (--StorageTmp->m3uaAspRlTable_rsvs == 0)
+				m3uaAspRlTable_destroy(&StorageTmp->m3uaAspRlTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -12698,10 +17613,9 @@ write_m3uaAspRlStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_m3uaAspRtStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct m3uaAspRtTable_data *StorageTmp = NULL;
+	struct m3uaAspRtTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct m3uaAspRtTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -12728,40 +17642,6 @@ write_m3uaAspRtStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->m3uaAspRtStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->m3uaAspRtTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->m3uaAspRtTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* m3uaAspSpIndex */
@@ -12821,6 +17701,7 @@ write_m3uaAspRtStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->m3uaAspRtTable_rsvs = 1;
 			vp = vars;
 			StorageNew->m3uaAspSpIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -12832,7 +17713,37 @@ write_m3uaAspRtStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			vp = vp->next_variable;
 			header_complex_add_data(&m3uaAspRtTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->m3uaAspRtStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->m3uaAspRtTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->m3uaAspRtTable_old) == NULL)
+				if (StorageTmp->m3uaAspRtTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->m3uaAspRtTable_old = m3uaAspRtTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->m3uaAspRtTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->m3uaAspRtTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -12842,78 +17753,127 @@ write_m3uaAspRtStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = m3uaAspRtTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_m3uaAspRtTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->m3uaAspRtStatus;
-			StorageTmp->m3uaAspRtStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = m3uaAspRtTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->m3uaAspRtStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->m3uaAspRtStatus != RS_ACTIVE)
+				if ((ret = can_act_m3uaAspRtTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->m3uaAspRtStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_m3uaAspRtTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->m3uaAspRtStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_m3uaAspRtTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->m3uaAspRtStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_m3uaAspRtTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->m3uaAspRtStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_m3uaAspRtTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->m3uaAspRtStatus;
-			StorageTmp->m3uaAspRtStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->m3uaAspRtStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_m3uaAspRtTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_m3uaAspRtTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->m3uaAspRtStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->m3uaAspRtStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->m3uaAspRtStatus = set_value;
+			if ((StorageOld = StorageTmp->m3uaAspRtTable_old) != NULL) {
+				m3uaAspRtTable_destroy(&StorageTmp->m3uaAspRtTable_old);
+				StorageTmp->m3uaAspRtTable_rsvs = 0;
+				StorageTmp->m3uaAspRtTable_tsts = 0;
+				StorageTmp->m3uaAspRtTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			m3uaAspRtTable_destroy(&StorageDel);
-			/* m3uaAspRtTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_m3uaAspRtTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->m3uaAspRtStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_m3uaAspRtTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->m3uaAspRtStatus = old_value;
+			if (StorageTmp->m3uaAspRtStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_m3uaAspRtTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -12927,6 +17887,13 @@ write_m3uaAspRtStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				m3uaAspRtTable_del(StorageNew);
 				m3uaAspRtTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->m3uaAspRtTable_old) == NULL)
+				break;
+			if (--StorageTmp->m3uaAspRtTable_rsvs == 0)
+				m3uaAspRtTable_destroy(&StorageTmp->m3uaAspRtTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -12953,10 +17920,9 @@ write_m3uaAspRtStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_m3uaAspRcStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct m3uaAspRcTable_data *StorageTmp = NULL;
+	struct m3uaAspRcTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct m3uaAspRcTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -12983,40 +17949,6 @@ write_m3uaAspRcStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->m3uaAspRcStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->m3uaAspRcTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->m3uaAspRcTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* m3uaAspIndex */
@@ -13099,6 +18031,7 @@ write_m3uaAspRcStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->m3uaAspRcTable_rsvs = 1;
 			vp = vars;
 			StorageNew->m3uaAspIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -13110,7 +18043,37 @@ write_m3uaAspRcStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			vp = vp->next_variable;
 			header_complex_add_data(&m3uaAspRcTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->m3uaAspRcStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->m3uaAspRcTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->m3uaAspRcTable_old) == NULL)
+				if (StorageTmp->m3uaAspRcTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->m3uaAspRcTable_old = m3uaAspRcTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->m3uaAspRcTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->m3uaAspRcTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -13120,78 +18083,127 @@ write_m3uaAspRcStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = m3uaAspRcTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_m3uaAspRcTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->m3uaAspRcStatus;
-			StorageTmp->m3uaAspRcStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = m3uaAspRcTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->m3uaAspRcStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->m3uaAspRcStatus != RS_ACTIVE)
+				if ((ret = can_act_m3uaAspRcTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->m3uaAspRcStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_m3uaAspRcTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->m3uaAspRcStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_m3uaAspRcTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->m3uaAspRcStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_m3uaAspRcTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->m3uaAspRcStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_m3uaAspRcTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->m3uaAspRcStatus;
-			StorageTmp->m3uaAspRcStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->m3uaAspRcStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_m3uaAspRcTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_m3uaAspRcTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->m3uaAspRcStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->m3uaAspRcStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->m3uaAspRcStatus = set_value;
+			if ((StorageOld = StorageTmp->m3uaAspRcTable_old) != NULL) {
+				m3uaAspRcTable_destroy(&StorageTmp->m3uaAspRcTable_old);
+				StorageTmp->m3uaAspRcTable_rsvs = 0;
+				StorageTmp->m3uaAspRcTable_tsts = 0;
+				StorageTmp->m3uaAspRcTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			m3uaAspRcTable_destroy(&StorageDel);
-			/* m3uaAspRcTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_m3uaAspRcTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->m3uaAspRcStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_m3uaAspRcTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->m3uaAspRcStatus = old_value;
+			if (StorageTmp->m3uaAspRcStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_m3uaAspRcTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -13205,6 +18217,13 @@ write_m3uaAspRcStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				m3uaAspRcTable_del(StorageNew);
 				m3uaAspRcTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->m3uaAspRcTable_old) == NULL)
+				break;
+			if (--StorageTmp->m3uaAspRcTable_rsvs == 0)
+				m3uaAspRcTable_destroy(&StorageTmp->m3uaAspRcTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */

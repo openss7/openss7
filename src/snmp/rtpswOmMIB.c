@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/snmp/rtpswOmMIB.c
+ @(#) src/snmp/rtpswOmMIB.c
 
  -----------------------------------------------------------------------------
 
@@ -578,8 +578,52 @@ rtpswOmMIB_create(void)
 		StorageNew->rtpswForwOm15minValidIntervals = 0;
 
 	}
+      done:
 	DEBUGMSGTL(("rtpswOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	rtpswOmMIB_destroy(&StorageNew);
+	goto done;
+}
+
+/**
+ * @fn struct rtpswOmMIB_data *rtpswOmMIB_duplicate(struct rtpswOmMIB_data *thedata)
+ * @param thedata the mib structure to duplicate
+ * @brief duplicate a mib structure for the mib
+ *
+ * Duplicates the specified mib structure @param thedata and returns a pointer to the newly
+ * allocated mib structure on success, or NULL on failure.
+ */
+struct rtpswOmMIB_data *
+rtpswOmMIB_duplicate(struct rtpswOmMIB_data *thedata)
+{
+	struct rtpswOmMIB_data *StorageNew = SNMP_MALLOC_STRUCT(rtpswOmMIB_data);
+
+	DEBUGMSGTL(("rtpswOmMIB", "rtpswOmMIB_duplicate: duplicating mib... "));
+	if (StorageNew != NULL) {
+		StorageNew->rtpswOmCurrOctetsSent = thedata->rtpswOmCurrOctetsSent;
+		StorageNew->rtpswOmCurrOctetsRecv = thedata->rtpswOmCurrOctetsRecv;
+		StorageNew->rtpswOmCurrPacketsSent = thedata->rtpswOmCurrPacketsSent;
+		StorageNew->rtpswOmCurrPacketsRecv = thedata->rtpswOmCurrPacketsRecv;
+		StorageNew->rtpswOmCurrStunPacketsSent = thedata->rtpswOmCurrStunPacketsSent;
+		StorageNew->rtpswOmCurrStunPacketsRecv = thedata->rtpswOmCurrStunPacketsRecv;
+		StorageNew->rtpswOm5minValidIntervals = thedata->rtpswOm5minValidIntervals;
+		StorageNew->rtpswOm15minValidIntervals = thedata->rtpswOm15minValidIntervals;
+		StorageNew->rtpswForwOmOctetsFor = thedata->rtpswForwOmOctetsFor;
+		StorageNew->rtpswForwOmOctetsRev = thedata->rtpswForwOmOctetsRev;
+		StorageNew->rtpswForwOmPacketsFor = thedata->rtpswForwOmPacketsFor;
+		StorageNew->rtpswForwOmPacketsRev = thedata->rtpswForwOmPacketsRev;
+		StorageNew->rtpswForwOm5minValidIntervals = thedata->rtpswForwOm5minValidIntervals;
+		StorageNew->rtpswForwOm15minValidIntervals = thedata->rtpswForwOm15minValidIntervals;
+	}
+      done:
+	DEBUGMSGTL(("rtpswOmMIB", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	rtpswOmMIB_destroy(&StorageNew);
+	goto done;
 }
 
 /**
@@ -630,7 +674,7 @@ rtpswOmMIB_add(struct rtpswOmMIB_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for rtpswOmMIB entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case rtpswOmMIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -710,6 +754,62 @@ store_rtpswOmMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	}
 	DEBUGMSGTL(("rtpswOmMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int check_rtpswOmMIB(struct rtpswOmMIB_data *StorageTmp, struct rtpswOmMIB_data *StorageOld)
+ * @param StorageTmp the data as updated
+ * @param StorageOld the data previous to update
+ *
+ * This function is used by mibs.  It is used to check, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the ACTION phase.  The COMMIT phase does not ensue unless this check passes.  This function can
+ * return SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before
+ * the varbinds on the mib were applied; the values in StorageTmp are the new values.  The function
+ * is permitted to change the values in StorageTmp to correct them; however, preferences should be
+ * made for setting values that were not in the varbinds.
+ */
+int
+check_rtpswOmMIB(struct rtpswOmMIB_data *StorageTmp, struct rtpswOmMIB_data *StorageOld)
+{
+	/* XXX: provide code to check the scalars for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_rtpswOmMIB(struct rtpswOmMIB_data *StorageTmp, struct rtpswOmMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase)
+ *
+ * This function is used by mibs.  It is used to update, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the COMMIT phase.  The start of the ACTION phase performs a consistency check on the mib before
+ * allowing the request to proceed to the COMMIT phase.  The COMMIT phase then arrives here with
+ * consistency already checked (see check_rtpswOmMIB()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied: the values in StorageTmp are the new values.
+ */
+int
+update_rtpswOmMIB(struct rtpswOmMIB_data *StorageTmp, struct rtpswOmMIB_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	rtpswOmMIB_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn revert_rtpswOmMIB(struct 
+ * @fn void revert_rtpswOmMIB(struct rtpswOmMIB_data *StorageTmp, struct rtpswOmMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase)
+ */
+void
+revert_rtpswOmMIB(struct rtpswOmMIB_data *StorageTmp, struct rtpswOmMIB_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_rtpswOmMIB(StorageOld, NULL);
 }
 
 /**
@@ -902,16 +1002,20 @@ rtpswOm5MinHistoryTable_create(void)
 		0, 0};
 		StorageNew->rtpswOm5MinStunPktsRecv = (struct counter64) {
 		0, 0};
-
 	}
+      done:
 	DEBUGMSGTL(("rtpswOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	rtpswOm5MinHistoryTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct rtpswOm5MinHistoryTable_data *rtpswOm5MinHistoryTable_duplicate(struct rtpswOm5MinHistoryTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -923,6 +1027,14 @@ rtpswOm5MinHistoryTable_duplicate(struct rtpswOm5MinHistoryTable_data *thedata)
 
 	DEBUGMSGTL(("rtpswOmMIB", "rtpswOm5MinHistoryTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->rtpswOm5MinHistoryTable_id = thedata->rtpswOm5MinHistoryTable_id;
+		StorageNew->rtpswOm5MinInterval = thedata->rtpswOm5MinInterval;
+		StorageNew->rtpswOm5MinOctetsSent = thedata->rtpswOm5MinOctetsSent;
+		StorageNew->rtpswOm5MinOctetsRecv = thedata->rtpswOm5MinOctetsRecv;
+		StorageNew->rtpswOm5MinPacketsSent = thedata->rtpswOm5MinPacketsSent;
+		StorageNew->rtpswOm5MinPacketsRecv = thedata->rtpswOm5MinPacketsRecv;
+		StorageNew->rtpswOm5MinStunPktsSent = thedata->rtpswOm5MinStunPktsSent;
+		StorageNew->rtpswOm5MinStunPktsRecv = thedata->rtpswOm5MinStunPktsRecv;
 	}
       done:
 	DEBUGMSGTL(("rtpswOmMIB", "done.\n"));
@@ -1016,7 +1128,7 @@ rtpswOm5MinHistoryTable_del(struct rtpswOm5MinHistoryTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for rtpswOm5MinHistoryTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case rtpswOm5MinHistoryTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1114,16 +1226,20 @@ rtpswOm15MinHistoryTable_create(void)
 		0, 0};
 		StorageNew->rtpswOm15MinStunPktsRecv = (struct counter64) {
 		0, 0};
-
 	}
+      done:
 	DEBUGMSGTL(("rtpswOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	rtpswOm15MinHistoryTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct rtpswOm15MinHistoryTable_data *rtpswOm15MinHistoryTable_duplicate(struct rtpswOm15MinHistoryTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1135,6 +1251,14 @@ rtpswOm15MinHistoryTable_duplicate(struct rtpswOm15MinHistoryTable_data *thedata
 
 	DEBUGMSGTL(("rtpswOmMIB", "rtpswOm15MinHistoryTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->rtpswOm15MinHistoryTable_id = thedata->rtpswOm15MinHistoryTable_id;
+		StorageNew->rtpswOm15MinInterval = thedata->rtpswOm15MinInterval;
+		StorageNew->rtpswOm15MinOctetsSent = thedata->rtpswOm15MinOctetsSent;
+		StorageNew->rtpswOm15MinOctetsRecv = thedata->rtpswOm15MinOctetsRecv;
+		StorageNew->rtpswOm15MinPacketsSent = thedata->rtpswOm15MinPacketsSent;
+		StorageNew->rtpswOm15MinPacketsRecv = thedata->rtpswOm15MinPacketsRecv;
+		StorageNew->rtpswOm15MinStunPktsSent = thedata->rtpswOm15MinStunPktsSent;
+		StorageNew->rtpswOm15MinStunPktsRecv = thedata->rtpswOm15MinStunPktsRecv;
 	}
       done:
 	DEBUGMSGTL(("rtpswOmMIB", "done.\n"));
@@ -1228,7 +1352,7 @@ rtpswOm15MinHistoryTable_del(struct rtpswOm15MinHistoryTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for rtpswOm15MinHistoryTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case rtpswOm15MinHistoryTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1328,16 +1452,20 @@ rtpswInterfaceCurrentTable_create(void)
 		0, 0};
 		StorageNew->rtpswIfOm5minValidIntervals = 0;
 		StorageNew->rtpswIfOm15minValidIntervals = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("rtpswOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	rtpswInterfaceCurrentTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct rtpswInterfaceCurrentTable_data *rtpswInterfaceCurrentTable_duplicate(struct rtpswInterfaceCurrentTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1349,6 +1477,16 @@ rtpswInterfaceCurrentTable_duplicate(struct rtpswInterfaceCurrentTable_data *the
 
 	DEBUGMSGTL(("rtpswOmMIB", "rtpswInterfaceCurrentTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->rtpswInterfaceCurrentTable_id = thedata->rtpswInterfaceCurrentTable_id;
+		StorageNew->rtpswInterfaceId = thedata->rtpswInterfaceId;
+		StorageNew->rtpswIfOmOctetsSent = thedata->rtpswIfOmOctetsSent;
+		StorageNew->rtpswIfOmOctetsRecv = thedata->rtpswIfOmOctetsRecv;
+		StorageNew->rtpswIfOmPacketsSent = thedata->rtpswIfOmPacketsSent;
+		StorageNew->rtpswIfOmPacketsRecv = thedata->rtpswIfOmPacketsRecv;
+		StorageNew->rtpswIfOmStunPktsSent = thedata->rtpswIfOmStunPktsSent;
+		StorageNew->rtpswIfOmStunPktsRecv = thedata->rtpswIfOmStunPktsRecv;
+		StorageNew->rtpswIfOm5minValidIntervals = thedata->rtpswIfOm5minValidIntervals;
+		StorageNew->rtpswIfOm15minValidIntervals = thedata->rtpswIfOm15minValidIntervals;
 	}
       done:
 	DEBUGMSGTL(("rtpswOmMIB", "done.\n"));
@@ -1442,7 +1580,7 @@ rtpswInterfaceCurrentTable_del(struct rtpswInterfaceCurrentTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for rtpswInterfaceCurrentTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case rtpswInterfaceCurrentTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1544,16 +1682,20 @@ rtpswInterface5MinHistoryTable_create(void)
 		0, 0};
 		StorageNew->rtpswIfOm5MinStunPktsRecv = (struct counter64) {
 		0, 0};
-
 	}
+      done:
 	DEBUGMSGTL(("rtpswOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	rtpswInterface5MinHistoryTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct rtpswInterface5MinHistoryTable_data *rtpswInterface5MinHistoryTable_duplicate(struct rtpswInterface5MinHistoryTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1565,6 +1707,15 @@ rtpswInterface5MinHistoryTable_duplicate(struct rtpswInterface5MinHistoryTable_d
 
 	DEBUGMSGTL(("rtpswOmMIB", "rtpswInterface5MinHistoryTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->rtpswInterface5MinHistoryTable_id = thedata->rtpswInterface5MinHistoryTable_id;
+		StorageNew->rtpswInterfaceId = thedata->rtpswInterfaceId;
+		StorageNew->rtpswOm5MinInterval = thedata->rtpswOm5MinInterval;
+		StorageNew->rtpswIfOm5MinOctetsSent = thedata->rtpswIfOm5MinOctetsSent;
+		StorageNew->rtpswIfOm5MinOctetsRecv = thedata->rtpswIfOm5MinOctetsRecv;
+		StorageNew->rtpswIfOm5MinPacketsSent = thedata->rtpswIfOm5MinPacketsSent;
+		StorageNew->rtpswIfOm5MinPacketsRecv = thedata->rtpswIfOm5MinPacketsRecv;
+		StorageNew->rtpswIfOm5MinStunPktsSent = thedata->rtpswIfOm5MinStunPktsSent;
+		StorageNew->rtpswIfOm5MinStunPktsRecv = thedata->rtpswIfOm5MinStunPktsRecv;
 	}
       done:
 	DEBUGMSGTL(("rtpswOmMIB", "done.\n"));
@@ -1660,7 +1811,7 @@ rtpswInterface5MinHistoryTable_del(struct rtpswInterface5MinHistoryTable_data *t
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for rtpswInterface5MinHistoryTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case rtpswInterface5MinHistoryTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1760,16 +1911,20 @@ rtpswInterface15MinHistoryTable_create(void)
 		0, 0};
 		StorageNew->rtpswIfOm15MinStunPktsRecv = (struct counter64) {
 		0, 0};
-
 	}
+      done:
 	DEBUGMSGTL(("rtpswOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	rtpswInterface15MinHistoryTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct rtpswInterface15MinHistoryTable_data *rtpswInterface15MinHistoryTable_duplicate(struct rtpswInterface15MinHistoryTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1781,6 +1936,15 @@ rtpswInterface15MinHistoryTable_duplicate(struct rtpswInterface15MinHistoryTable
 
 	DEBUGMSGTL(("rtpswOmMIB", "rtpswInterface15MinHistoryTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->rtpswInterface15MinHistoryTable_id = thedata->rtpswInterface15MinHistoryTable_id;
+		StorageNew->rtpswInterfaceId = thedata->rtpswInterfaceId;
+		StorageNew->rtpswOm15MinInterval = thedata->rtpswOm15MinInterval;
+		StorageNew->rtpswIfOm15MinOctetsSent = thedata->rtpswIfOm15MinOctetsSent;
+		StorageNew->rtpswIfOm15MinOctetsRecv = thedata->rtpswIfOm15MinOctetsRecv;
+		StorageNew->rtpswIfOm15MinPacketsSent = thedata->rtpswIfOm15MinPacketsSent;
+		StorageNew->rtpswIfOm15MinPacketsRecv = thedata->rtpswIfOm15MinPacketsRecv;
+		StorageNew->rtpswIfOm15MinStunPktsSent = thedata->rtpswIfOm15MinStunPktsSent;
+		StorageNew->rtpswIfOm15MinStunPktsRecv = thedata->rtpswIfOm15MinStunPktsRecv;
 	}
       done:
 	DEBUGMSGTL(("rtpswOmMIB", "done.\n"));
@@ -1876,7 +2040,7 @@ rtpswInterface15MinHistoryTable_del(struct rtpswInterface15MinHistoryTable_data 
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for rtpswInterface15MinHistoryTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case rtpswInterface15MinHistoryTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1978,16 +2142,20 @@ rtpswIfAddrCurrentTable_create(void)
 		0, 0};
 		StorageNew->rtpswIfAddrOm5minValidIntervals = 0;
 		StorageNew->rtpswIfAddrOm15minValidIntervals = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("rtpswOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	rtpswIfAddrCurrentTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct rtpswIfAddrCurrentTable_data *rtpswIfAddrCurrentTable_duplicate(struct rtpswIfAddrCurrentTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1999,6 +2167,16 @@ rtpswIfAddrCurrentTable_duplicate(struct rtpswIfAddrCurrentTable_data *thedata)
 
 	DEBUGMSGTL(("rtpswOmMIB", "rtpswIfAddrCurrentTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->rtpswIfAddrCurrentTable_id = thedata->rtpswIfAddrCurrentTable_id;
+		StorageNew->rtpswIfAddrId = thedata->rtpswIfAddrId;
+		StorageNew->rtpswIfAddrOmOctetsSent = thedata->rtpswIfAddrOmOctetsSent;
+		StorageNew->rtpswIfAddrOmOctetsRecv = thedata->rtpswIfAddrOmOctetsRecv;
+		StorageNew->rtpswIfAddrOmPacketsSent = thedata->rtpswIfAddrOmPacketsSent;
+		StorageNew->rtpswIfAddrOmPacketsRecv = thedata->rtpswIfAddrOmPacketsRecv;
+		StorageNew->rtpswIfAddrOmStunPktsSent = thedata->rtpswIfAddrOmStunPktsSent;
+		StorageNew->rtpswIfAddrOmStunPktsRecv = thedata->rtpswIfAddrOmStunPktsRecv;
+		StorageNew->rtpswIfAddrOm5minValidIntervals = thedata->rtpswIfAddrOm5minValidIntervals;
+		StorageNew->rtpswIfAddrOm15minValidIntervals = thedata->rtpswIfAddrOm15minValidIntervals;
 	}
       done:
 	DEBUGMSGTL(("rtpswOmMIB", "done.\n"));
@@ -2092,7 +2270,7 @@ rtpswIfAddrCurrentTable_del(struct rtpswIfAddrCurrentTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for rtpswIfAddrCurrentTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case rtpswIfAddrCurrentTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2195,16 +2373,20 @@ rtpswIfAddr5MinHistoryTable_create(void)
 		0, 0};
 		StorageNew->rtpswIfAddrOm5MinStunPktsRecv = (struct counter64) {
 		0, 0};
-
 	}
+      done:
 	DEBUGMSGTL(("rtpswOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	rtpswIfAddr5MinHistoryTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct rtpswIfAddr5MinHistoryTable_data *rtpswIfAddr5MinHistoryTable_duplicate(struct rtpswIfAddr5MinHistoryTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2216,6 +2398,15 @@ rtpswIfAddr5MinHistoryTable_duplicate(struct rtpswIfAddr5MinHistoryTable_data *t
 
 	DEBUGMSGTL(("rtpswOmMIB", "rtpswIfAddr5MinHistoryTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->rtpswIfAddr5MinHistoryTable_id = thedata->rtpswIfAddr5MinHistoryTable_id;
+		StorageNew->rtpswIfAddrId = thedata->rtpswIfAddrId;
+		StorageNew->rtpswOm5MinInterval = thedata->rtpswOm5MinInterval;
+		StorageNew->rtpswIfAddrOm5MinOctetsSent = thedata->rtpswIfAddrOm5MinOctetsSent;
+		StorageNew->rtpswIfAddrOm5MinOctetsRecv = thedata->rtpswIfAddrOm5MinOctetsRecv;
+		StorageNew->rtpswIfAddrOm5MinPacketsSent = thedata->rtpswIfAddrOm5MinPacketsSent;
+		StorageNew->rtpswIfAddrOm5MinPacketsRecv = thedata->rtpswIfAddrOm5MinPacketsRecv;
+		StorageNew->rtpswIfAddrOm5MinStunPktsSent = thedata->rtpswIfAddrOm5MinStunPktsSent;
+		StorageNew->rtpswIfAddrOm5MinStunPktsRecv = thedata->rtpswIfAddrOm5MinStunPktsRecv;
 	}
       done:
 	DEBUGMSGTL(("rtpswOmMIB", "done.\n"));
@@ -2311,7 +2502,7 @@ rtpswIfAddr5MinHistoryTable_del(struct rtpswIfAddr5MinHistoryTable_data *thedata
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for rtpswIfAddr5MinHistoryTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case rtpswIfAddr5MinHistoryTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2412,16 +2603,20 @@ rtpswIfAddr15MinHistoryTable_create(void)
 		0, 0};
 		StorageNew->rtpswIfAddrOm15MinStunPktsRecv = (struct counter64) {
 		0, 0};
-
 	}
+      done:
 	DEBUGMSGTL(("rtpswOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	rtpswIfAddr15MinHistoryTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct rtpswIfAddr15MinHistoryTable_data *rtpswIfAddr15MinHistoryTable_duplicate(struct rtpswIfAddr15MinHistoryTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2433,6 +2628,15 @@ rtpswIfAddr15MinHistoryTable_duplicate(struct rtpswIfAddr15MinHistoryTable_data 
 
 	DEBUGMSGTL(("rtpswOmMIB", "rtpswIfAddr15MinHistoryTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->rtpswIfAddr15MinHistoryTable_id = thedata->rtpswIfAddr15MinHistoryTable_id;
+		StorageNew->rtpswIfAddrId = thedata->rtpswIfAddrId;
+		StorageNew->rtpswOm15MinInterval = thedata->rtpswOm15MinInterval;
+		StorageNew->rtpswIfAddrOm15MinOctetsSent = thedata->rtpswIfAddrOm15MinOctetsSent;
+		StorageNew->rtpswIfAddrOm15MinOctetsRecv = thedata->rtpswIfAddrOm15MinOctetsRecv;
+		StorageNew->rtpswIfAddrOm15MinPacketsSent = thedata->rtpswIfAddrOm15MinPacketsSent;
+		StorageNew->rtpswIfAddrOm15MinPacketsRecv = thedata->rtpswIfAddrOm15MinPacketsRecv;
+		StorageNew->rtpswIfAddrOm15MinStunPktsSent = thedata->rtpswIfAddrOm15MinStunPktsSent;
+		StorageNew->rtpswIfAddrOm15MinStunPktsRecv = thedata->rtpswIfAddrOm15MinStunPktsRecv;
 	}
       done:
 	DEBUGMSGTL(("rtpswOmMIB", "done.\n"));
@@ -2528,7 +2732,7 @@ rtpswIfAddr15MinHistoryTable_del(struct rtpswIfAddr15MinHistoryTable_data *theda
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for rtpswIfAddr15MinHistoryTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case rtpswIfAddr15MinHistoryTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2624,16 +2828,20 @@ rtpswForw5MinHistoryTable_create(void)
 		0, 0};
 		StorageNew->rtpswForwOm5MinPacketsRev = (struct counter64) {
 		0, 0};
-
 	}
+      done:
 	DEBUGMSGTL(("rtpswOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	rtpswForw5MinHistoryTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct rtpswForw5MinHistoryTable_data *rtpswForw5MinHistoryTable_duplicate(struct rtpswForw5MinHistoryTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2645,6 +2853,12 @@ rtpswForw5MinHistoryTable_duplicate(struct rtpswForw5MinHistoryTable_data *theda
 
 	DEBUGMSGTL(("rtpswOmMIB", "rtpswForw5MinHistoryTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->rtpswForw5MinHistoryTable_id = thedata->rtpswForw5MinHistoryTable_id;
+		StorageNew->rtpswOm5MinInterval = thedata->rtpswOm5MinInterval;
+		StorageNew->rtpswForwOm5MinOctetsFor = thedata->rtpswForwOm5MinOctetsFor;
+		StorageNew->rtpswForwOm5MinOctetsRev = thedata->rtpswForwOm5MinOctetsRev;
+		StorageNew->rtpswForwOm5MinPacketsFor = thedata->rtpswForwOm5MinPacketsFor;
+		StorageNew->rtpswForwOm5MinPacketsRev = thedata->rtpswForwOm5MinPacketsRev;
 	}
       done:
 	DEBUGMSGTL(("rtpswOmMIB", "done.\n"));
@@ -2738,7 +2952,7 @@ rtpswForw5MinHistoryTable_del(struct rtpswForw5MinHistoryTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for rtpswForw5MinHistoryTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case rtpswForw5MinHistoryTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2828,16 +3042,20 @@ rtpswForw15MinHistoryTable_create(void)
 		0, 0};
 		StorageNew->rtpswForwOm15MinPacketsRev = (struct counter64) {
 		0, 0};
-
 	}
+      done:
 	DEBUGMSGTL(("rtpswOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	rtpswForw15MinHistoryTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct rtpswForw15MinHistoryTable_data *rtpswForw15MinHistoryTable_duplicate(struct rtpswForw15MinHistoryTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2849,6 +3067,12 @@ rtpswForw15MinHistoryTable_duplicate(struct rtpswForw15MinHistoryTable_data *the
 
 	DEBUGMSGTL(("rtpswOmMIB", "rtpswForw15MinHistoryTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->rtpswForw15MinHistoryTable_id = thedata->rtpswForw15MinHistoryTable_id;
+		StorageNew->rtpswOm15MinInterval = thedata->rtpswOm15MinInterval;
+		StorageNew->rtpswForwOm15MinOctetsFor = thedata->rtpswForwOm15MinOctetsFor;
+		StorageNew->rtpswForwOm15MinOctetsRev = thedata->rtpswForwOm15MinOctetsRev;
+		StorageNew->rtpswForwOm15MinPacketsFor = thedata->rtpswForwOm15MinPacketsFor;
+		StorageNew->rtpswForwOm15MinPacketsRev = thedata->rtpswForwOm15MinPacketsRev;
 	}
       done:
 	DEBUGMSGTL(("rtpswOmMIB", "done.\n"));
@@ -2942,7 +3166,7 @@ rtpswForw15MinHistoryTable_del(struct rtpswForw15MinHistoryTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for rtpswForw15MinHistoryTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case rtpswForw15MinHistoryTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3036,16 +3260,20 @@ rtpswOmTermPointCurrentTable_create(void)
 		StorageNew->rtpswOmRtpPacketsLost = 0;
 		StorageNew->rtpswOmRtpJitter = 0;
 		StorageNew->rtpswOmRtpDelay = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("rtpswOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	rtpswOmTermPointCurrentTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct rtpswOmTermPointCurrentTable_data *rtpswOmTermPointCurrentTable_duplicate(struct rtpswOmTermPointCurrentTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3057,6 +3285,20 @@ rtpswOmTermPointCurrentTable_duplicate(struct rtpswOmTermPointCurrentTable_data 
 
 	DEBUGMSGTL(("rtpswOmMIB", "rtpswOmTermPointCurrentTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->rtpswOmTermPointCurrentTable_id = thedata->rtpswOmTermPointCurrentTable_id;
+		StorageNew->rtpswTermPointId = thedata->rtpswTermPointId;
+		StorageNew->rtpswOmTpMediaAware = thedata->rtpswOmTpMediaAware;
+		StorageNew->rtpswOmRtpPacketsSent = thedata->rtpswOmRtpPacketsSent;
+		StorageNew->rtpswOmRtpPacketsRecv = thedata->rtpswOmRtpPacketsRecv;
+		StorageNew->rtpswOmRtcpPacketsSent = thedata->rtpswOmRtcpPacketsSent;
+		StorageNew->rtpswOmRtcpPacketsRecv = thedata->rtpswOmRtcpPacketsRecv;
+		StorageNew->rtpswOmStunPacketsSent = thedata->rtpswOmStunPacketsSent;
+		StorageNew->rtpswOmStunPacketsRecv = thedata->rtpswOmStunPacketsRecv;
+		StorageNew->rtpswOmRtpOctetsSent = thedata->rtpswOmRtpOctetsSent;
+		StorageNew->rtpswOmRtpOctetsRecv = thedata->rtpswOmRtpOctetsRecv;
+		StorageNew->rtpswOmRtpPacketsLost = thedata->rtpswOmRtpPacketsLost;
+		StorageNew->rtpswOmRtpJitter = thedata->rtpswOmRtpJitter;
+		StorageNew->rtpswOmRtpDelay = thedata->rtpswOmRtpDelay;
 	}
       done:
 	DEBUGMSGTL(("rtpswOmMIB", "done.\n"));
@@ -3150,7 +3392,7 @@ rtpswOmTermPointCurrentTable_del(struct rtpswOmTermPointCurrentTable_data *theda
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for rtpswOmTermPointCurrentTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case rtpswOmTermPointCurrentTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3248,8 +3490,10 @@ rtpswOmCallCurrentTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->rtpswCallId = 0;
-		if ((StorageNew->rtpswOmCallStartTime = (uint8_t *) strdup("")) != NULL)
-			StorageNew->rtpswOmCallStartTimeLen = strlen("");
+		if ((StorageNew->rtpswOmCallStartTime = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->rtpswOmCallStartTimeLen = 0;
+		StorageNew->rtpswOmCallStartTime[StorageNew->rtpswOmCallStartTimeLen] = 0;
 		StorageNew->rtpswOmIpOctetsCallerSent = 0;
 		StorageNew->rtpswOmIpOctetsCallerRecv = 0;
 		StorageNew->rtpswOmIpOctetsCalleeSent = 0;
@@ -3274,16 +3518,20 @@ rtpswOmCallCurrentTable_create(void)
 		StorageNew->rtpswOmRtpStunPcktsCallerRecv = 0;
 		StorageNew->rtpswOmRtpStunPcktsCalleeSent = 0;
 		StorageNew->rtpswOmRtpStunPcktsCalleeRecv = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("rtpswOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	rtpswOmCallCurrentTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct rtpswOmCallCurrentTable_data *rtpswOmCallCurrentTable_duplicate(struct rtpswOmCallCurrentTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3295,6 +3543,37 @@ rtpswOmCallCurrentTable_duplicate(struct rtpswOmCallCurrentTable_data *thedata)
 
 	DEBUGMSGTL(("rtpswOmMIB", "rtpswOmCallCurrentTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->rtpswOmCallCurrentTable_id = thedata->rtpswOmCallCurrentTable_id;
+		StorageNew->rtpswCallId = thedata->rtpswCallId;
+		if (!(StorageNew->rtpswOmCallStartTime = malloc(thedata->rtpswOmCallStartTimeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->rtpswOmCallStartTime, thedata->rtpswOmCallStartTime, thedata->rtpswOmCallStartTimeLen);
+		StorageNew->rtpswOmCallStartTimeLen = thedata->rtpswOmCallStartTimeLen;
+		StorageNew->rtpswOmCallStartTime[StorageNew->rtpswOmCallStartTimeLen] = 0;
+		StorageNew->rtpswOmIpOctetsCallerSent = thedata->rtpswOmIpOctetsCallerSent;
+		StorageNew->rtpswOmIpOctetsCallerRecv = thedata->rtpswOmIpOctetsCallerRecv;
+		StorageNew->rtpswOmIpOctetsCalleeSent = thedata->rtpswOmIpOctetsCalleeSent;
+		StorageNew->rtpswOmIpOctetsCalleeRecv = thedata->rtpswOmIpOctetsCalleeRecv;
+		StorageNew->rtpswOmIpPacketsCallerSent = thedata->rtpswOmIpPacketsCallerSent;
+		StorageNew->rtpswOmIpPacketsCallerRecv = thedata->rtpswOmIpPacketsCallerRecv;
+		StorageNew->rtpswOmIpPacketsCalleeSent = thedata->rtpswOmIpPacketsCalleeSent;
+		StorageNew->rtpswOmIpPacketsCalleeRecv = thedata->rtpswOmIpPacketsCalleeRecv;
+		StorageNew->rtpswOmRtpOctetsCallerSent = thedata->rtpswOmRtpOctetsCallerSent;
+		StorageNew->rtpswOmRtpOctetsCallerRecv = thedata->rtpswOmRtpOctetsCallerRecv;
+		StorageNew->rtpswOmRtpOctetsCalleeSent = thedata->rtpswOmRtpOctetsCalleeSent;
+		StorageNew->rtpswOmRtpOctetsCalleeRecv = thedata->rtpswOmRtpOctetsCalleeRecv;
+		StorageNew->rtpswOmRtpPacketsCallerSent = thedata->rtpswOmRtpPacketsCallerSent;
+		StorageNew->rtpswOmRtpPacketsCallerRecv = thedata->rtpswOmRtpPacketsCallerRecv;
+		StorageNew->rtpswOmRtpPacketsCalleeSent = thedata->rtpswOmRtpPacketsCalleeSent;
+		StorageNew->rtpswOmRtpPacketsCalleeRecv = thedata->rtpswOmRtpPacketsCalleeRecv;
+		StorageNew->rtpswOmRtcpPacketsCallerSent = thedata->rtpswOmRtcpPacketsCallerSent;
+		StorageNew->rtpswOmRtcpPacketsCallerRecv = thedata->rtpswOmRtcpPacketsCallerRecv;
+		StorageNew->rtpswOmRtcpPacketsCalleeSent = thedata->rtpswOmRtcpPacketsCalleeSent;
+		StorageNew->rtpswOmRtcpPacketsCalleeRecv = thedata->rtpswOmRtcpPacketsCalleeRecv;
+		StorageNew->rtpswOmRtpStunPcktsCallerSent = thedata->rtpswOmRtpStunPcktsCallerSent;
+		StorageNew->rtpswOmRtpStunPcktsCallerRecv = thedata->rtpswOmRtpStunPcktsCallerRecv;
+		StorageNew->rtpswOmRtpStunPcktsCalleeSent = thedata->rtpswOmRtpStunPcktsCalleeSent;
+		StorageNew->rtpswOmRtpStunPcktsCalleeRecv = thedata->rtpswOmRtpStunPcktsCalleeRecv;
 	}
       done:
 	DEBUGMSGTL(("rtpswOmMIB", "done.\n"));
@@ -3390,7 +3669,7 @@ rtpswOmCallCurrentTable_del(struct rtpswOmCallCurrentTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for rtpswOmCallCurrentTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case rtpswOmCallCurrentTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3503,6 +3782,64 @@ store_rtpswOmCallCurrentTable(int majorID, int minorID, void *serverarg, void *c
 }
 
 /**
+ * @fn int check_rtpswOm5MinHistoryTable_row(struct rtpswOm5MinHistoryTable_data *StorageTmp, struct rtpswOm5MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_rtpswOm5MinHistoryTable_row(struct rtpswOm5MinHistoryTable_data *StorageTmp, struct rtpswOm5MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_rtpswOm5MinHistoryTable_row(struct rtpswOm5MinHistoryTable_data *StorageTmp, struct rtpswOm5MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_rtpswOm5MinHistoryTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_rtpswOm5MinHistoryTable_row(struct rtpswOm5MinHistoryTable_data *StorageTmp, struct rtpswOm5MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	rtpswOm5MinHistoryTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_rtpswOm5MinHistoryTable_row(struct rtpswOm5MinHistoryTable_data *StorageTmp, struct rtpswOm5MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_rtpswOm5MinHistoryTable_row(struct rtpswOm5MinHistoryTable_data *StorageTmp, struct rtpswOm5MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_rtpswOm5MinHistoryTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_rtpswOm5MinHistoryTable_row(struct rtpswOm5MinHistoryTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -3610,6 +3947,64 @@ var_rtpswOm5MinHistoryTable(struct variable *vp, oid * name, size_t *length, int
 }
 
 /**
+ * @fn int check_rtpswOm15MinHistoryTable_row(struct rtpswOm15MinHistoryTable_data *StorageTmp, struct rtpswOm15MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_rtpswOm15MinHistoryTable_row(struct rtpswOm15MinHistoryTable_data *StorageTmp, struct rtpswOm15MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_rtpswOm15MinHistoryTable_row(struct rtpswOm15MinHistoryTable_data *StorageTmp, struct rtpswOm15MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_rtpswOm15MinHistoryTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_rtpswOm15MinHistoryTable_row(struct rtpswOm15MinHistoryTable_data *StorageTmp, struct rtpswOm15MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	rtpswOm15MinHistoryTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_rtpswOm15MinHistoryTable_row(struct rtpswOm15MinHistoryTable_data *StorageTmp, struct rtpswOm15MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_rtpswOm15MinHistoryTable_row(struct rtpswOm15MinHistoryTable_data *StorageTmp, struct rtpswOm15MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_rtpswOm15MinHistoryTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_rtpswOm15MinHistoryTable_row(struct rtpswOm15MinHistoryTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -3714,6 +4109,64 @@ var_rtpswOm15MinHistoryTable(struct variable *vp, oid * name, size_t *length, in
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_rtpswInterfaceCurrentTable_row(struct rtpswInterfaceCurrentTable_data *StorageTmp, struct rtpswInterfaceCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_rtpswInterfaceCurrentTable_row(struct rtpswInterfaceCurrentTable_data *StorageTmp, struct rtpswInterfaceCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_rtpswInterfaceCurrentTable_row(struct rtpswInterfaceCurrentTable_data *StorageTmp, struct rtpswInterfaceCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_rtpswInterfaceCurrentTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_rtpswInterfaceCurrentTable_row(struct rtpswInterfaceCurrentTable_data *StorageTmp, struct rtpswInterfaceCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	rtpswInterfaceCurrentTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_rtpswInterfaceCurrentTable_row(struct rtpswInterfaceCurrentTable_data *StorageTmp, struct rtpswInterfaceCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_rtpswInterfaceCurrentTable_row(struct rtpswInterfaceCurrentTable_data *StorageTmp, struct rtpswInterfaceCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_rtpswInterfaceCurrentTable_row(StorageOld, NULL);
 }
 
 /**
@@ -3836,6 +4289,64 @@ var_rtpswInterfaceCurrentTable(struct variable *vp, oid * name, size_t *length, 
 }
 
 /**
+ * @fn int check_rtpswInterface5MinHistoryTable_row(struct rtpswInterface5MinHistoryTable_data *StorageTmp, struct rtpswInterface5MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_rtpswInterface5MinHistoryTable_row(struct rtpswInterface5MinHistoryTable_data *StorageTmp, struct rtpswInterface5MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_rtpswInterface5MinHistoryTable_row(struct rtpswInterface5MinHistoryTable_data *StorageTmp, struct rtpswInterface5MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_rtpswInterface5MinHistoryTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_rtpswInterface5MinHistoryTable_row(struct rtpswInterface5MinHistoryTable_data *StorageTmp, struct rtpswInterface5MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	rtpswInterface5MinHistoryTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_rtpswInterface5MinHistoryTable_row(struct rtpswInterface5MinHistoryTable_data *StorageTmp, struct rtpswInterface5MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_rtpswInterface5MinHistoryTable_row(struct rtpswInterface5MinHistoryTable_data *StorageTmp, struct rtpswInterface5MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_rtpswInterface5MinHistoryTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_rtpswInterface5MinHistoryTable_row(struct rtpswInterface5MinHistoryTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -3943,6 +4454,64 @@ var_rtpswInterface5MinHistoryTable(struct variable *vp, oid * name, size_t *leng
 }
 
 /**
+ * @fn int check_rtpswInterface15MinHistoryTable_row(struct rtpswInterface15MinHistoryTable_data *StorageTmp, struct rtpswInterface15MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_rtpswInterface15MinHistoryTable_row(struct rtpswInterface15MinHistoryTable_data *StorageTmp, struct rtpswInterface15MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_rtpswInterface15MinHistoryTable_row(struct rtpswInterface15MinHistoryTable_data *StorageTmp, struct rtpswInterface15MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_rtpswInterface15MinHistoryTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_rtpswInterface15MinHistoryTable_row(struct rtpswInterface15MinHistoryTable_data *StorageTmp, struct rtpswInterface15MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	rtpswInterface15MinHistoryTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_rtpswInterface15MinHistoryTable_row(struct rtpswInterface15MinHistoryTable_data *StorageTmp, struct rtpswInterface15MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_rtpswInterface15MinHistoryTable_row(struct rtpswInterface15MinHistoryTable_data *StorageTmp, struct rtpswInterface15MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_rtpswInterface15MinHistoryTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_rtpswInterface15MinHistoryTable_row(struct rtpswInterface15MinHistoryTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -4047,6 +4616,64 @@ var_rtpswInterface15MinHistoryTable(struct variable *vp, oid * name, size_t *len
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_rtpswIfAddrCurrentTable_row(struct rtpswIfAddrCurrentTable_data *StorageTmp, struct rtpswIfAddrCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_rtpswIfAddrCurrentTable_row(struct rtpswIfAddrCurrentTable_data *StorageTmp, struct rtpswIfAddrCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_rtpswIfAddrCurrentTable_row(struct rtpswIfAddrCurrentTable_data *StorageTmp, struct rtpswIfAddrCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_rtpswIfAddrCurrentTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_rtpswIfAddrCurrentTable_row(struct rtpswIfAddrCurrentTable_data *StorageTmp, struct rtpswIfAddrCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	rtpswIfAddrCurrentTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_rtpswIfAddrCurrentTable_row(struct rtpswIfAddrCurrentTable_data *StorageTmp, struct rtpswIfAddrCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_rtpswIfAddrCurrentTable_row(struct rtpswIfAddrCurrentTable_data *StorageTmp, struct rtpswIfAddrCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_rtpswIfAddrCurrentTable_row(StorageOld, NULL);
 }
 
 /**
@@ -4169,6 +4796,64 @@ var_rtpswIfAddrCurrentTable(struct variable *vp, oid * name, size_t *length, int
 }
 
 /**
+ * @fn int check_rtpswIfAddr5MinHistoryTable_row(struct rtpswIfAddr5MinHistoryTable_data *StorageTmp, struct rtpswIfAddr5MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_rtpswIfAddr5MinHistoryTable_row(struct rtpswIfAddr5MinHistoryTable_data *StorageTmp, struct rtpswIfAddr5MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_rtpswIfAddr5MinHistoryTable_row(struct rtpswIfAddr5MinHistoryTable_data *StorageTmp, struct rtpswIfAddr5MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_rtpswIfAddr5MinHistoryTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_rtpswIfAddr5MinHistoryTable_row(struct rtpswIfAddr5MinHistoryTable_data *StorageTmp, struct rtpswIfAddr5MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	rtpswIfAddr5MinHistoryTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_rtpswIfAddr5MinHistoryTable_row(struct rtpswIfAddr5MinHistoryTable_data *StorageTmp, struct rtpswIfAddr5MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_rtpswIfAddr5MinHistoryTable_row(struct rtpswIfAddr5MinHistoryTable_data *StorageTmp, struct rtpswIfAddr5MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_rtpswIfAddr5MinHistoryTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_rtpswIfAddr5MinHistoryTable_row(struct rtpswIfAddr5MinHistoryTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -4273,6 +4958,64 @@ var_rtpswIfAddr5MinHistoryTable(struct variable *vp, oid * name, size_t *length,
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_rtpswIfAddr15MinHistoryTable_row(struct rtpswIfAddr15MinHistoryTable_data *StorageTmp, struct rtpswIfAddr15MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_rtpswIfAddr15MinHistoryTable_row(struct rtpswIfAddr15MinHistoryTable_data *StorageTmp, struct rtpswIfAddr15MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_rtpswIfAddr15MinHistoryTable_row(struct rtpswIfAddr15MinHistoryTable_data *StorageTmp, struct rtpswIfAddr15MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_rtpswIfAddr15MinHistoryTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_rtpswIfAddr15MinHistoryTable_row(struct rtpswIfAddr15MinHistoryTable_data *StorageTmp, struct rtpswIfAddr15MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	rtpswIfAddr15MinHistoryTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_rtpswIfAddr15MinHistoryTable_row(struct rtpswIfAddr15MinHistoryTable_data *StorageTmp, struct rtpswIfAddr15MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_rtpswIfAddr15MinHistoryTable_row(struct rtpswIfAddr15MinHistoryTable_data *StorageTmp, struct rtpswIfAddr15MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_rtpswIfAddr15MinHistoryTable_row(StorageOld, NULL);
 }
 
 /**
@@ -4383,6 +5126,64 @@ var_rtpswIfAddr15MinHistoryTable(struct variable *vp, oid * name, size_t *length
 }
 
 /**
+ * @fn int check_rtpswForw5MinHistoryTable_row(struct rtpswForw5MinHistoryTable_data *StorageTmp, struct rtpswForw5MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_rtpswForw5MinHistoryTable_row(struct rtpswForw5MinHistoryTable_data *StorageTmp, struct rtpswForw5MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_rtpswForw5MinHistoryTable_row(struct rtpswForw5MinHistoryTable_data *StorageTmp, struct rtpswForw5MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_rtpswForw5MinHistoryTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_rtpswForw5MinHistoryTable_row(struct rtpswForw5MinHistoryTable_data *StorageTmp, struct rtpswForw5MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	rtpswForw5MinHistoryTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_rtpswForw5MinHistoryTable_row(struct rtpswForw5MinHistoryTable_data *StorageTmp, struct rtpswForw5MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_rtpswForw5MinHistoryTable_row(struct rtpswForw5MinHistoryTable_data *StorageTmp, struct rtpswForw5MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_rtpswForw5MinHistoryTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_rtpswForw5MinHistoryTable_row(struct rtpswForw5MinHistoryTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -4478,6 +5279,64 @@ var_rtpswForw5MinHistoryTable(struct variable *vp, oid * name, size_t *length, i
 }
 
 /**
+ * @fn int check_rtpswForw15MinHistoryTable_row(struct rtpswForw15MinHistoryTable_data *StorageTmp, struct rtpswForw15MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_rtpswForw15MinHistoryTable_row(struct rtpswForw15MinHistoryTable_data *StorageTmp, struct rtpswForw15MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_rtpswForw15MinHistoryTable_row(struct rtpswForw15MinHistoryTable_data *StorageTmp, struct rtpswForw15MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_rtpswForw15MinHistoryTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_rtpswForw15MinHistoryTable_row(struct rtpswForw15MinHistoryTable_data *StorageTmp, struct rtpswForw15MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	rtpswForw15MinHistoryTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_rtpswForw15MinHistoryTable_row(struct rtpswForw15MinHistoryTable_data *StorageTmp, struct rtpswForw15MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_rtpswForw15MinHistoryTable_row(struct rtpswForw15MinHistoryTable_data *StorageTmp, struct rtpswForw15MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_rtpswForw15MinHistoryTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_rtpswForw15MinHistoryTable_row(struct rtpswForw15MinHistoryTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -4570,6 +5429,64 @@ var_rtpswForw15MinHistoryTable(struct variable *vp, oid * name, size_t *length, 
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_rtpswOmTermPointCurrentTable_row(struct rtpswOmTermPointCurrentTable_data *StorageTmp, struct rtpswOmTermPointCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_rtpswOmTermPointCurrentTable_row(struct rtpswOmTermPointCurrentTable_data *StorageTmp, struct rtpswOmTermPointCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_rtpswOmTermPointCurrentTable_row(struct rtpswOmTermPointCurrentTable_data *StorageTmp, struct rtpswOmTermPointCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_rtpswOmTermPointCurrentTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_rtpswOmTermPointCurrentTable_row(struct rtpswOmTermPointCurrentTable_data *StorageTmp, struct rtpswOmTermPointCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	rtpswOmTermPointCurrentTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_rtpswOmTermPointCurrentTable_row(struct rtpswOmTermPointCurrentTable_data *StorageTmp, struct rtpswOmTermPointCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_rtpswOmTermPointCurrentTable_row(struct rtpswOmTermPointCurrentTable_data *StorageTmp, struct rtpswOmTermPointCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_rtpswOmTermPointCurrentTable_row(StorageOld, NULL);
 }
 
 /**
@@ -4713,6 +5630,64 @@ var_rtpswOmTermPointCurrentTable(struct variable *vp, oid * name, size_t *length
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_rtpswOmCallCurrentTable_row(struct rtpswOmCallCurrentTable_data *StorageTmp, struct rtpswOmCallCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_rtpswOmCallCurrentTable_row(struct rtpswOmCallCurrentTable_data *StorageTmp, struct rtpswOmCallCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_rtpswOmCallCurrentTable_row(struct rtpswOmCallCurrentTable_data *StorageTmp, struct rtpswOmCallCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_rtpswOmCallCurrentTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_rtpswOmCallCurrentTable_row(struct rtpswOmCallCurrentTable_data *StorageTmp, struct rtpswOmCallCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	rtpswOmCallCurrentTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_rtpswOmCallCurrentTable_row(struct rtpswOmCallCurrentTable_data *StorageTmp, struct rtpswOmCallCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_rtpswOmCallCurrentTable_row(struct rtpswOmCallCurrentTable_data *StorageTmp, struct rtpswOmCallCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_rtpswOmCallCurrentTable_row(StorageOld, NULL);
 }
 
 /**
@@ -4934,222 +5909,6 @@ var_rtpswOmCallCurrentTable(struct variable *vp, oid * name, size_t *length, int
 		ERROR_MSG("");
 	}
 	return (rval);
-}
-
-/**
- * @fn int rtpswOm5MinHistoryTable_consistent(struct rtpswOm5MinHistoryTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the rtpswOm5MinHistoryTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-rtpswOm5MinHistoryTable_consistent(struct rtpswOm5MinHistoryTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int rtpswOm15MinHistoryTable_consistent(struct rtpswOm15MinHistoryTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the rtpswOm15MinHistoryTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-rtpswOm15MinHistoryTable_consistent(struct rtpswOm15MinHistoryTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int rtpswInterfaceCurrentTable_consistent(struct rtpswInterfaceCurrentTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the rtpswInterfaceCurrentTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-rtpswInterfaceCurrentTable_consistent(struct rtpswInterfaceCurrentTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int rtpswInterface5MinHistoryTable_consistent(struct rtpswInterface5MinHistoryTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the rtpswInterface5MinHistoryTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-rtpswInterface5MinHistoryTable_consistent(struct rtpswInterface5MinHistoryTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int rtpswInterface15MinHistoryTable_consistent(struct rtpswInterface15MinHistoryTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the rtpswInterface15MinHistoryTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-rtpswInterface15MinHistoryTable_consistent(struct rtpswInterface15MinHistoryTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int rtpswIfAddrCurrentTable_consistent(struct rtpswIfAddrCurrentTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the rtpswIfAddrCurrentTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-rtpswIfAddrCurrentTable_consistent(struct rtpswIfAddrCurrentTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int rtpswIfAddr5MinHistoryTable_consistent(struct rtpswIfAddr5MinHistoryTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the rtpswIfAddr5MinHistoryTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-rtpswIfAddr5MinHistoryTable_consistent(struct rtpswIfAddr5MinHistoryTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int rtpswIfAddr15MinHistoryTable_consistent(struct rtpswIfAddr15MinHistoryTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the rtpswIfAddr15MinHistoryTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-rtpswIfAddr15MinHistoryTable_consistent(struct rtpswIfAddr15MinHistoryTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int rtpswForw5MinHistoryTable_consistent(struct rtpswForw5MinHistoryTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the rtpswForw5MinHistoryTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-rtpswForw5MinHistoryTable_consistent(struct rtpswForw5MinHistoryTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int rtpswForw15MinHistoryTable_consistent(struct rtpswForw15MinHistoryTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the rtpswForw15MinHistoryTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-rtpswForw15MinHistoryTable_consistent(struct rtpswForw15MinHistoryTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int rtpswOmTermPointCurrentTable_consistent(struct rtpswOmTermPointCurrentTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the rtpswOmTermPointCurrentTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-rtpswOmTermPointCurrentTable_consistent(struct rtpswOmTermPointCurrentTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int rtpswOmCallCurrentTable_consistent(struct rtpswOmCallCurrentTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the rtpswOmCallCurrentTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-rtpswOmCallCurrentTable_consistent(struct rtpswOmCallCurrentTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
 }
 
 /**

@@ -63,11 +63,20 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct gmiMIB_data {
+	struct gmiMIB_data *gmiMIB_old;
+	uint gmiMIB_rsvs;
+	uint gmiMIB_tsts;
+	uint gmiMIB_sets;
 	uint gmiMIB_request;
 };
 struct applicationProcessTable_data {
+	struct applicationProcessTable_data *applicationProcessTable_old;
+	uint applicationProcessTable_rsvs;
+	uint applicationProcessTable_tsts;
+	uint applicationProcessTable_sets;
 	uint applicationProcessTable_request;
 	uint applicationProcessTable_refs;
+	uint applicationProcessTable_id;
 	uint8_t *applicationProcessId;	/* NoAccess */
 	size_t applicationProcessIdLen;
 	oid *applicationProcessTitle;	/* ReadOnly */
@@ -77,8 +86,13 @@ struct applicationProcessTable_data {
 	long applicationProcessOpState;	/* ReadOnly */
 };
 struct communicationsEntityTable_data {
+	struct communicationsEntityTable_data *communicationsEntityTable_old;
+	uint communicationsEntityTable_rsvs;
+	uint communicationsEntityTable_tsts;
+	uint communicationsEntityTable_sets;
 	uint communicationsEntityTable_request;
 	uint communicationsEntityTable_refs;
+	uint communicationsEntityTable_id;
 	uint8_t *subsystemId;		/* ReadOnly */
 	size_t subsystemIdLen;
 	uint8_t *communicationsEntityId;	/* NoAccess */
@@ -88,8 +102,13 @@ struct communicationsEntityTable_data {
 	long communicationsEntityOpState;	/* ReadOnly */
 };
 struct communicationsInfoRecordTable_data {
+	struct communicationsInfoRecordTable_data *communicationsInfoRecordTable_old;
+	uint communicationsInfoRecordTable_rsvs;
+	uint communicationsInfoRecordTable_tsts;
+	uint communicationsInfoRecordTable_sets;
 	uint communicationsInfoRecordTable_request;
 	uint communicationsInfoRecordTable_refs;
+	uint communicationsInfoRecordTable_id;
 	uint8_t *logId;			/* NoAccess */
 	size_t logIdLen;
 	uint8_t *logRecordId;		/* NoAccess */
@@ -100,8 +119,13 @@ struct communicationsInfoRecordTable_data {
 	size_t informationDataLen;
 };
 struct clProtocolMachineTable_data {
+	struct clProtocolMachineTable_data *clProtocolMachineTable_old;
+	uint clProtocolMachineTable_rsvs;
+	uint clProtocolMachineTable_tsts;
+	uint clProtocolMachineTable_sets;
 	uint clProtocolMachineTable_request;
 	uint clProtocolMachineTable_refs;
+	uint clProtocolMachineTable_id;
 	uint8_t *subsystemId;		/* ReadOnly */
 	size_t subsystemIdLen;
 	uint8_t *communicationsEntityId;	/* NoAccess */
@@ -112,8 +136,13 @@ struct clProtocolMachineTable_data {
 	struct counter64 totalRemoteSAPs;	/* ReadOnly */
 };
 struct coProtocolMachineTable_data {
+	struct coProtocolMachineTable_data *coProtocolMachineTable_old;
+	uint coProtocolMachineTable_rsvs;
+	uint coProtocolMachineTable_tsts;
+	uint coProtocolMachineTable_sets;
 	uint coProtocolMachineTable_request;
 	uint coProtocolMachineTable_refs;
+	uint coProtocolMachineTable_id;
 	uint8_t *subsystemId;		/* ReadOnly */
 	size_t subsystemIdLen;
 	uint8_t *communicationsEntityId;	/* NoAccess */
@@ -123,8 +152,13 @@ struct coProtocolMachineTable_data {
 	long coProtocolMachineOpState;	/* ReadOnly */
 };
 struct sap1Table_data {
+	struct sap1Table_data *sap1Table_old;
+	uint sap1Table_rsvs;
+	uint sap1Table_tsts;
+	uint sap1Table_sets;
 	uint sap1Table_request;
 	uint sap1Table_refs;
+	uint sap1Table_id;
 	uint8_t *subsystemId;		/* ReadOnly */
 	size_t subsystemIdLen;
 	uint8_t *communicationsEntityId;	/* NoAccess */
@@ -136,8 +170,13 @@ struct sap1Table_data {
 	size_t sap1UserEntityNamesLen;
 };
 struct sap2Table_data {
+	struct sap2Table_data *sap2Table_old;
+	uint sap2Table_rsvs;
+	uint sap2Table_tsts;
+	uint sap2Table_sets;
 	uint sap2Table_request;
 	uint sap2Table_refs;
+	uint sap2Table_id;
 	uint8_t *subsystemId;		/* ReadOnly */
 	size_t subsystemIdLen;
 	uint8_t *sap2Id;		/* NoAccess */
@@ -150,8 +189,13 @@ struct sap2Table_data {
 	size_t sap2providerEntityNamesLen;
 };
 struct singlePeerConnectionTable_data {
+	struct singlePeerConnectionTable_data *singlePeerConnectionTable_old;
+	uint singlePeerConnectionTable_rsvs;
+	uint singlePeerConnectionTable_tsts;
+	uint singlePeerConnectionTable_sets;
 	uint singlePeerConnectionTable_request;
 	uint singlePeerConnectionTable_refs;
+	uint singlePeerConnectionTable_id;
 	uint8_t *subsystemId;		/* ReadOnly */
 	size_t subsystemIdLen;
 	uint8_t *communicationsEntityId;	/* NoAccess */
@@ -166,8 +210,13 @@ struct singlePeerConnectionTable_data {
 	size_t supportedConnectionNamesLen;
 };
 struct subsystemTable_data {
+	struct subsystemTable_data *subsystemTable_old;
+	uint subsystemTable_rsvs;
+	uint subsystemTable_tsts;
+	uint subsystemTable_sets;
 	uint subsystemTable_request;
 	uint subsystemTable_refs;
+	uint subsystemTable_id;
 	uint8_t *subsystemId;		/* ReadOnly */
 	size_t subsystemIdLen;
 };
@@ -232,6 +281,10 @@ void init_gmiMIB(void);
 void deinit_gmiMIB(void);
 int term_gmiMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_gmiMIB;
+struct gmiMIB_data *gmiMIB_create(void);
+struct gmiMIB_data *gmiMIB_duplicate(struct gmiMIB_data *);
+int gmiMIB_destroy(struct gmiMIB_data **);
+int gmiMIB_add(struct gmiMIB_data *);
 void parse_gmiMIB(const char *, char *);
 SNMPCallback store_gmiMIB;
 void refresh_gmiMIB(int);

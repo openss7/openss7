@@ -63,11 +63,20 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct smiMIB_data {
+	struct smiMIB_data *smiMIB_old;
+	uint smiMIB_rsvs;
+	uint smiMIB_tsts;
+	uint smiMIB_sets;
 	uint smiMIB_request;
 };
 struct discriminatorTable_data {
+	struct discriminatorTable_data *discriminatorTable_old;
+	uint discriminatorTable_rsvs;
+	uint discriminatorTable_tsts;
+	uint discriminatorTable_sets;
 	uint discriminatorTable_request;
 	uint discriminatorTable_refs;
+	uint discriminatorTable_id;
 	uint8_t *discriminatorId;	/* NoAccess */
 	size_t discriminatorIdLen;
 	uint8_t *discriminatorConstruct;	/* Create */
@@ -87,8 +96,13 @@ struct discriminatorTable_data {
 	long discriminatorEntryStatus;	/* Create */
 };
 struct eventForwardingDiscriminatorTable_data {
+	struct eventForwardingDiscriminatorTable_data *eventForwardingDiscriminatorTable_old;
+	uint eventForwardingDiscriminatorTable_rsvs;
+	uint eventForwardingDiscriminatorTable_tsts;
+	uint eventForwardingDiscriminatorTable_sets;
 	uint eventForwardingDiscriminatorTable_request;
 	uint eventForwardingDiscriminatorTable_refs;
+	uint eventForwardingDiscriminatorTable_id;
 	uint8_t *discriminatorId;	/* NoAccess */
 	size_t discriminatorIdLen;
 	uint8_t *destination;		/* Create */
@@ -101,8 +115,13 @@ struct eventForwardingDiscriminatorTable_data {
 	long eventForwardingDiscriminatorEntryStatus;	/* Create */
 };
 struct logTable_data {
+	struct logTable_data *logTable_old;
+	uint logTable_rsvs;
+	uint logTable_tsts;
+	uint logTable_sets;
 	uint logTable_request;
 	uint logTable_refs;
+	uint logTable_id;
 	uint8_t *logId;			/* NoAccess */
 	size_t logIdLen;
 	uint8_t *logDiscriminatorConstruct;	/* Create */
@@ -128,8 +147,13 @@ struct logTable_data {
 	long logEntryStatus;		/* Create */
 };
 struct logRecordTable_data {
+	struct logRecordTable_data *logRecordTable_old;
+	uint logRecordTable_rsvs;
+	uint logRecordTable_tsts;
+	uint logRecordTable_sets;
 	uint logRecordTable_request;
 	uint logRecordTable_refs;
+	uint logRecordTable_id;
 	uint8_t *logId;			/* NoAccess */
 	size_t logIdLen;
 	uint8_t *logRecordId;		/* NoAccess */
@@ -138,8 +162,13 @@ struct logRecordTable_data {
 	long logRecordEntryStatus;	/* Create */
 };
 struct eventLogRecordTable_data {
+	struct eventLogRecordTable_data *eventLogRecordTable_old;
+	uint eventLogRecordTable_rsvs;
+	uint eventLogRecordTable_tsts;
+	uint eventLogRecordTable_sets;
 	uint eventLogRecordTable_request;
 	uint eventLogRecordTable_refs;
+	uint eventLogRecordTable_id;
 	uint8_t *logId;			/* NoAccess */
 	size_t logIdLen;
 	uint8_t *logRecordId;		/* NoAccess */
@@ -160,8 +189,13 @@ struct eventLogRecordTable_data {
 	size_t eventAdditionalInformationLen;
 };
 struct alarmRecordTable_data {
+	struct alarmRecordTable_data *alarmRecordTable_old;
+	uint alarmRecordTable_rsvs;
+	uint alarmRecordTable_tsts;
+	uint alarmRecordTable_sets;
 	uint alarmRecordTable_request;
 	uint alarmRecordTable_refs;
+	uint alarmRecordTable_id;
 	uint8_t *logId;			/* NoAccess */
 	size_t logIdLen;
 	uint8_t *logRecordId;		/* NoAccess */
@@ -185,8 +219,13 @@ struct alarmRecordTable_data {
 	size_t alarmRecordProposedRepairActionsLen;
 };
 struct attributeValueChangeRecordTable_data {
+	struct attributeValueChangeRecordTable_data *attributeValueChangeRecordTable_old;
+	uint attributeValueChangeRecordTable_rsvs;
+	uint attributeValueChangeRecordTable_tsts;
+	uint attributeValueChangeRecordTable_sets;
 	uint attributeValueChangeRecordTable_request;
 	uint attributeValueChangeRecordTable_refs;
+	uint attributeValueChangeRecordTable_id;
 	uint8_t *logId;			/* NoAccess */
 	size_t logIdLen;
 	uint8_t *logRecordId;		/* NoAccess */
@@ -198,8 +237,13 @@ struct attributeValueChangeRecordTable_data {
 	size_t attributeValueChangeAttributeIdentifierListLen;
 };
 struct objectCreationRecordTable_data {
+	struct objectCreationRecordTable_data *objectCreationRecordTable_old;
+	uint objectCreationRecordTable_rsvs;
+	uint objectCreationRecordTable_tsts;
+	uint objectCreationRecordTable_sets;
 	uint objectCreationRecordTable_request;
 	uint objectCreationRecordTable_refs;
+	uint objectCreationRecordTable_id;
 	uint8_t *logId;			/* NoAccess */
 	size_t logIdLen;
 	uint8_t *logRecordId;		/* NoAccess */
@@ -209,8 +253,13 @@ struct objectCreationRecordTable_data {
 	size_t objectCreationAttributeIdentifierListLen;
 };
 struct objectDeletionRecordTable_data {
+	struct objectDeletionRecordTable_data *objectDeletionRecordTable_old;
+	uint objectDeletionRecordTable_rsvs;
+	uint objectDeletionRecordTable_tsts;
+	uint objectDeletionRecordTable_sets;
 	uint objectDeletionRecordTable_request;
 	uint objectDeletionRecordTable_refs;
+	uint objectDeletionRecordTable_id;
 	uint8_t *logId;			/* NoAccess */
 	size_t logIdLen;
 	uint8_t *logRecordId;		/* NoAccess */
@@ -220,8 +269,13 @@ struct objectDeletionRecordTable_data {
 	size_t objectDeletionAttributeIdentifierListLen;
 };
 struct relationshipChangeRecordTable_data {
+	struct relationshipChangeRecordTable_data *relationshipChangeRecordTable_old;
+	uint relationshipChangeRecordTable_rsvs;
+	uint relationshipChangeRecordTable_tsts;
+	uint relationshipChangeRecordTable_sets;
 	uint relationshipChangeRecordTable_request;
 	uint relationshipChangeRecordTable_refs;
+	uint relationshipChangeRecordTable_id;
 	uint8_t *logId;			/* NoAccess */
 	size_t logIdLen;
 	uint8_t *logRecordId;		/* NoAccess */
@@ -233,8 +287,13 @@ struct relationshipChangeRecordTable_data {
 	size_t relationshipChangeAttributeIdentifierListLen;
 };
 struct securityAlarmReportRecordTable_data {
+	struct securityAlarmReportRecordTable_data *securityAlarmReportRecordTable_old;
+	uint securityAlarmReportRecordTable_rsvs;
+	uint securityAlarmReportRecordTable_tsts;
+	uint securityAlarmReportRecordTable_sets;
 	uint securityAlarmReportRecordTable_request;
 	uint securityAlarmReportRecordTable_refs;
+	uint securityAlarmReportRecordTable_id;
 	uint8_t *logId;			/* NoAccess */
 	size_t logIdLen;
 	uint8_t *logRecordId;		/* NoAccess */
@@ -250,8 +309,13 @@ struct securityAlarmReportRecordTable_data {
 	size_t securityServiceProviderLen;
 };
 struct stateChangeRecordTable_data {
+	struct stateChangeRecordTable_data *stateChangeRecordTable_old;
+	uint stateChangeRecordTable_rsvs;
+	uint stateChangeRecordTable_tsts;
+	uint stateChangeRecordTable_sets;
 	uint stateChangeRecordTable_request;
 	uint stateChangeRecordTable_refs;
+	uint stateChangeRecordTable_id;
 	uint8_t *logId;			/* NoAccess */
 	size_t logIdLen;
 	uint8_t *logRecordId;		/* NoAccess */
@@ -693,6 +757,10 @@ void init_smiMIB(void);
 void deinit_smiMIB(void);
 int term_smiMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_smiMIB;
+struct smiMIB_data *smiMIB_create(void);
+struct smiMIB_data *smiMIB_duplicate(struct smiMIB_data *);
+int smiMIB_destroy(struct smiMIB_data **);
+int smiMIB_add(struct smiMIB_data *);
 void parse_smiMIB(const char *, char *);
 SNMPCallback store_smiMIB;
 void refresh_smiMIB(int);

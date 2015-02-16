@@ -63,11 +63,20 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct sfpMIB_data {
+	struct sfpMIB_data *sfpMIB_old;
+	uint sfpMIB_rsvs;
+	uint sfpMIB_tsts;
+	uint sfpMIB_sets;
 	uint sfpMIB_request;
 };
 struct sfpModuleTable_data {
+	struct sfpModuleTable_data *sfpModuleTable_old;
+	uint sfpModuleTable_rsvs;
+	uint sfpModuleTable_tsts;
+	uint sfpModuleTable_sets;
 	uint sfpModuleTable_request;
 	uint sfpModuleTable_refs;
+	uint sfpModuleTable_id;
 	ulong sfpModuleId;		/* NoAccess */
 	long sfpModuleType;		/* ReadOnly */
 	long sfpModuleExtendedType;	/* ReadOnly */
@@ -106,8 +115,13 @@ struct sfpModuleTable_data {
 	size_t sfpModuleManufactureDateLen;
 };
 struct sfpApplTable_data {
+	struct sfpApplTable_data *sfpApplTable_old;
+	uint sfpApplTable_rsvs;
+	uint sfpApplTable_tsts;
+	uint sfpApplTable_sets;
 	uint sfpApplTable_request;
 	uint sfpApplTable_refs;
+	uint sfpApplTable_id;
 	ulong sfpModuleId;		/* NoAccess */
 	long sfpApplControlMode;	/* ReadOnly */
 	long sfpApplTableLength;	/* ReadOnly */
@@ -115,8 +129,13 @@ struct sfpApplTable_data {
 	long sfpApplSelectValue;	/* ReadOnly */
 };
 struct sfpApplCodeTable_data {
+	struct sfpApplCodeTable_data *sfpApplCodeTable_old;
+	uint sfpApplCodeTable_rsvs;
+	uint sfpApplCodeTable_tsts;
+	uint sfpApplCodeTable_sets;
 	uint sfpApplCodeTable_request;
 	uint sfpApplCodeTable_refs;
+	uint sfpApplCodeTable_id;
 	ulong sfpModuleId;		/* NoAccess */
 	ulong sfpApplCodeIndex;		/* NoAccess */
 	long sfpApplCodeSelect;		/* ReadOnly */
@@ -124,8 +143,13 @@ struct sfpApplCodeTable_data {
 	long sfpApplCodeValue;		/* ReadOnly */
 };
 struct sfpDiagTable_data {
+	struct sfpDiagTable_data *sfpDiagTable_old;
+	uint sfpDiagTable_rsvs;
+	uint sfpDiagTable_tsts;
+	uint sfpDiagTable_sets;
 	uint sfpDiagTable_request;
 	uint sfpDiagTable_refs;
+	uint sfpDiagTable_id;
 	ulong sfpModuleId;		/* NoAccess */
 	uint8_t *sfpDiagType;		/* ReadOnly */
 	size_t sfpDiagTypeLen;
@@ -155,8 +179,13 @@ struct sfpDiagTable_data {
 	ulong sfpDiagRxPowerLoWarning;	/* ReadOnly */
 };
 struct sfpCalibTable_data {
+	struct sfpCalibTable_data *sfpCalibTable_old;
+	uint sfpCalibTable_rsvs;
+	uint sfpCalibTable_tsts;
+	uint sfpCalibTable_sets;
 	uint sfpCalibTable_request;
 	uint sfpCalibTable_refs;
+	uint sfpCalibTable_id;
 	ulong sfpModuleId;		/* NoAccess */
 	ulong sfpCalibRxPwr0;		/* ReadOnly */
 	ulong sfpCalibRxPwr1;		/* ReadOnly */
@@ -173,8 +202,13 @@ struct sfpCalibTable_data {
 	long sfpCalibVOffset;		/* ReadOnly */
 };
 struct sfpMonTable_data {
+	struct sfpMonTable_data *sfpMonTable_old;
+	uint sfpMonTable_rsvs;
+	uint sfpMonTable_tsts;
+	uint sfpMonTable_sets;
 	uint sfpMonTable_request;
 	uint sfpMonTable_refs;
+	uint sfpMonTable_id;
 	ulong sfpModuleId;		/* NoAccess */
 	ulong sfpMonTemp;		/* ReadOnly */
 	ulong sfpMonVolt;		/* ReadOnly */
@@ -194,8 +228,13 @@ struct sfpMonTable_data {
 	long sfpMonSoftTxDisable;	/* ReadWrite */
 };
 struct sfpStatusTable_data {
+	struct sfpStatusTable_data *sfpStatusTable_old;
+	uint sfpStatusTable_rsvs;
+	uint sfpStatusTable_tsts;
+	uint sfpStatusTable_sets;
 	uint sfpStatusTable_request;
 	uint sfpStatusTable_refs;
+	uint sfpStatusTable_id;
 	ulong sfpModuleId;		/* NoAccess */
 	oid *sfpStatusEquipId;		/* ReadOnly */
 	size_t sfpStatusEquipIdLen;
@@ -885,6 +924,10 @@ void init_sfpMIB(void);
 void deinit_sfpMIB(void);
 int term_sfpMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_sfpMIB;
+struct sfpMIB_data *sfpMIB_create(void);
+struct sfpMIB_data *sfpMIB_duplicate(struct sfpMIB_data *);
+int sfpMIB_destroy(struct sfpMIB_data **);
+int sfpMIB_add(struct sfpMIB_data *);
 void parse_sfpMIB(const char *, char *);
 SNMPCallback store_sfpMIB;
 void refresh_sfpMIB(int);

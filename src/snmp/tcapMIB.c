@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/snmp/tcapMIB.c
+ @(#) src/snmp/tcapMIB.c
 
  -----------------------------------------------------------------------------
 
@@ -8641,7 +8641,7 @@ write_tcapApplicationSubsystemRowStatus(int action, u_char *var_val, u_char var_
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -8906,7 +8906,7 @@ write_tcapTransactionCopmRowStatus(int action, u_char *var_val, u_char var_val_t
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -9209,7 +9209,7 @@ write_tcapApplicationProcessRowStatus(int action, u_char *var_val, u_char var_va
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -9526,7 +9526,7 @@ write_tcapSupportEntityRowStatus(int action, u_char *var_val, u_char var_val_typ
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -9809,7 +9809,7 @@ write_tcapApplicationEntityRowStatus(int action, u_char *var_val, u_char var_val
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -10106,7 +10106,7 @@ write_tcapLocalSapNameRowStatus(int action, u_char *var_val, u_char var_val_type
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -10403,7 +10403,7 @@ write_tcapApplicationContextRowStatus(int action, u_char *var_val, u_char var_va
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -10684,7 +10684,7 @@ write_tcapAbstractSyntaxRowStatus(int action, u_char *var_val, u_char var_val_ty
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */
@@ -10966,7 +10966,7 @@ write_tcapTransferSyntaxRowStatus(int action, u_char *var_val, u_char var_val_ty
 			}
 			break;
 		case RS_DESTROY:
-			/* commit destrution to underlying device */
+			/* commit destruction to underlying device */
 			if (StorageDel == NULL)
 				break;
 			/* deactivate with underlying device */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/snmp/metricMIB.c
+ @(#) src/snmp/metricMIB.c
 
  -----------------------------------------------------------------------------
 
@@ -440,8 +440,38 @@ metricMIB_create(void)
 		/* XXX: fill in default scalar values here into StorageNew */
 
 	}
+      done:
 	DEBUGMSGTL(("metricMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	metricMIB_destroy(&StorageNew);
+	goto done;
+}
+
+/**
+ * @fn struct metricMIB_data *metricMIB_duplicate(struct metricMIB_data *thedata)
+ * @param thedata the mib structure to duplicate
+ * @brief duplicate a mib structure for the mib
+ *
+ * Duplicates the specified mib structure @param thedata and returns a pointer to the newly
+ * allocated mib structure on success, or NULL on failure.
+ */
+struct metricMIB_data *
+metricMIB_duplicate(struct metricMIB_data *thedata)
+{
+	struct metricMIB_data *StorageNew = SNMP_MALLOC_STRUCT(metricMIB_data);
+
+	DEBUGMSGTL(("metricMIB", "metricMIB_duplicate: duplicating mib... "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("metricMIB", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	metricMIB_destroy(&StorageNew);
+	goto done;
 }
 
 /**
@@ -492,7 +522,7 @@ metricMIB_add(struct metricMIB_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for metricMIB entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case metricMIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -544,6 +574,62 @@ store_metricMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	}
 	DEBUGMSGTL(("metricMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int check_metricMIB(struct metricMIB_data *StorageTmp, struct metricMIB_data *StorageOld)
+ * @param StorageTmp the data as updated
+ * @param StorageOld the data previous to update
+ *
+ * This function is used by mibs.  It is used to check, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the ACTION phase.  The COMMIT phase does not ensue unless this check passes.  This function can
+ * return SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before
+ * the varbinds on the mib were applied; the values in StorageTmp are the new values.  The function
+ * is permitted to change the values in StorageTmp to correct them; however, preferences should be
+ * made for setting values that were not in the varbinds.
+ */
+int
+check_metricMIB(struct metricMIB_data *StorageTmp, struct metricMIB_data *StorageOld)
+{
+	/* XXX: provide code to check the scalars for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_metricMIB(struct metricMIB_data *StorageTmp, struct metricMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase)
+ *
+ * This function is used by mibs.  It is used to update, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the COMMIT phase.  The start of the ACTION phase performs a consistency check on the mib before
+ * allowing the request to proceed to the COMMIT phase.  The COMMIT phase then arrives here with
+ * consistency already checked (see check_metricMIB()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied: the values in StorageTmp are the new values.
+ */
+int
+update_metricMIB(struct metricMIB_data *StorageTmp, struct metricMIB_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	metricMIB_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn revert_metricMIB(struct 
+ * @fn void revert_metricMIB(struct metricMIB_data *StorageTmp, struct metricMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase)
+ */
+void
+revert_metricMIB(struct metricMIB_data *StorageTmp, struct metricMIB_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_metricMIB(StorageOld, NULL);
 }
 
 /**
@@ -642,34 +728,51 @@ scannerTable_create(void)
 		StorageNew->scannerAdministrativeState = 0;
 		StorageNew->granularityPeriod = 0;
 		StorageNew->scannerOperationalState = 0;
-		if (memdup((u_char **) &StorageNew->scannerAvaiabilityStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->scannerAvaiabilityStatusLen = 2;
-		if ((StorageNew->scannerStartTime = (uint8_t *) strdup("")) != NULL)
-			StorageNew->scannerStartTimeLen = strlen("");
-		if ((StorageNew->scannerStopTime = (uint8_t *) strdup("")) != NULL)
-			StorageNew->scannerStopTimeLen = strlen("");
-		if ((StorageNew->scannerIntervalsOfDay = (uint8_t *) strdup("")) != NULL)
-			StorageNew->scannerIntervalsOfDayLen = strlen("");
-		if ((StorageNew->scannerWeekMask = (uint8_t *) strdup("")) != NULL)
-			StorageNew->scannerWeekMaskLen = strlen("");
-		if ((StorageNew->scannerSchedulerName = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->scannerSchedulerNameLen = 2;
-		if ((StorageNew->scannerPeriodSynchronizationTime = (uint8_t *) strdup("")) != NULL)
-			StorageNew->scannerPeriodSynchronizationTimeLen = strlen("");
+		if (memdup((u_char **) &StorageNew->scannerAvaiabilityStatus, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->scannerAvaiabilityStatusLen = 2;
+		if ((StorageNew->scannerStartTime = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->scannerStartTimeLen = 0;
+		StorageNew->scannerStartTime[StorageNew->scannerStartTimeLen] = 0;
+		if ((StorageNew->scannerStopTime = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->scannerStopTimeLen = 0;
+		StorageNew->scannerStopTime[StorageNew->scannerStopTimeLen] = 0;
+		if ((StorageNew->scannerIntervalsOfDay = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->scannerIntervalsOfDayLen = 0;
+		StorageNew->scannerIntervalsOfDay[StorageNew->scannerIntervalsOfDayLen] = 0;
+		if ((StorageNew->scannerWeekMask = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->scannerWeekMaskLen = 0;
+		StorageNew->scannerWeekMask[StorageNew->scannerWeekMaskLen] = 0;
+		if ((StorageNew->scannerSchedulerName = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->scannerSchedulerNameLen = 2;
+		if ((StorageNew->scannerPeriodSynchronizationTime = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->scannerPeriodSynchronizationTimeLen = 0;
+		StorageNew->scannerPeriodSynchronizationTime[StorageNew->scannerPeriodSynchronizationTimeLen] = 0;
 		StorageNew->scannerCreatDeleteNotifications = 0;
 		StorageNew->scannerAttributeValueChangeNotifications = 0;
 		StorageNew->scannerStateChangeNotifications = 0;
 		StorageNew->scannerRowStatus = 0;
 		StorageNew->scannerRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("metricMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	scannerTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct scannerTable_data *scannerTable_duplicate(struct scannerTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -681,6 +784,52 @@ scannerTable_duplicate(struct scannerTable_data *thedata)
 
 	DEBUGMSGTL(("metricMIB", "scannerTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->scannerTable_id = thedata->scannerTable_id;
+		if (!(StorageNew->scannerId = malloc(thedata->scannerIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->scannerId, thedata->scannerId, thedata->scannerIdLen);
+		StorageNew->scannerIdLen = thedata->scannerIdLen;
+		StorageNew->scannerId[StorageNew->scannerIdLen] = 0;
+		StorageNew->scannerAdministrativeState = thedata->scannerAdministrativeState;
+		StorageNew->granularityPeriod = thedata->granularityPeriod;
+		StorageNew->scannerOperationalState = thedata->scannerOperationalState;
+		if (!(StorageNew->scannerAvaiabilityStatus = malloc(thedata->scannerAvaiabilityStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->scannerAvaiabilityStatus, thedata->scannerAvaiabilityStatus, thedata->scannerAvaiabilityStatusLen);
+		StorageNew->scannerAvaiabilityStatusLen = thedata->scannerAvaiabilityStatusLen;
+		StorageNew->scannerAvaiabilityStatus[StorageNew->scannerAvaiabilityStatusLen] = 0;
+		if (!(StorageNew->scannerStartTime = malloc(thedata->scannerStartTimeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->scannerStartTime, thedata->scannerStartTime, thedata->scannerStartTimeLen);
+		StorageNew->scannerStartTimeLen = thedata->scannerStartTimeLen;
+		StorageNew->scannerStartTime[StorageNew->scannerStartTimeLen] = 0;
+		if (!(StorageNew->scannerStopTime = malloc(thedata->scannerStopTimeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->scannerStopTime, thedata->scannerStopTime, thedata->scannerStopTimeLen);
+		StorageNew->scannerStopTimeLen = thedata->scannerStopTimeLen;
+		StorageNew->scannerStopTime[StorageNew->scannerStopTimeLen] = 0;
+		if (!(StorageNew->scannerIntervalsOfDay = malloc(thedata->scannerIntervalsOfDayLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->scannerIntervalsOfDay, thedata->scannerIntervalsOfDay, thedata->scannerIntervalsOfDayLen);
+		StorageNew->scannerIntervalsOfDayLen = thedata->scannerIntervalsOfDayLen;
+		StorageNew->scannerIntervalsOfDay[StorageNew->scannerIntervalsOfDayLen] = 0;
+		if (!(StorageNew->scannerWeekMask = malloc(thedata->scannerWeekMaskLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->scannerWeekMask, thedata->scannerWeekMask, thedata->scannerWeekMaskLen);
+		StorageNew->scannerWeekMaskLen = thedata->scannerWeekMaskLen;
+		StorageNew->scannerWeekMask[StorageNew->scannerWeekMaskLen] = 0;
+		if (!(StorageNew->scannerSchedulerName = snmp_duplicate_objid(thedata->scannerSchedulerName, thedata->scannerSchedulerNameLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->scannerSchedulerNameLen = thedata->scannerSchedulerNameLen;
+		if (!(StorageNew->scannerPeriodSynchronizationTime = malloc(thedata->scannerPeriodSynchronizationTimeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->scannerPeriodSynchronizationTime, thedata->scannerPeriodSynchronizationTime, thedata->scannerPeriodSynchronizationTimeLen);
+		StorageNew->scannerPeriodSynchronizationTimeLen = thedata->scannerPeriodSynchronizationTimeLen;
+		StorageNew->scannerPeriodSynchronizationTime[StorageNew->scannerPeriodSynchronizationTimeLen] = 0;
+		StorageNew->scannerCreatDeleteNotifications = thedata->scannerCreatDeleteNotifications;
+		StorageNew->scannerAttributeValueChangeNotifications = thedata->scannerAttributeValueChangeNotifications;
+		StorageNew->scannerStateChangeNotifications = thedata->scannerStateChangeNotifications;
+		StorageNew->scannerRowStatus = thedata->scannerRowStatus;
 	}
       done:
 	DEBUGMSGTL(("metricMIB", "done.\n"));
@@ -790,7 +939,7 @@ scannerTable_del(struct scannerTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for scannerTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case scannerTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -931,44 +1080,58 @@ monitorMetricTable_create(void)
 	DEBUGMSGTL(("metricMIB", "monitorMetricTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->scannerId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->scannerIdLen = strlen("");
-		if ((StorageNew->observedObjectInstance = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->observedObjectInstanceLen = 2;
-		if ((StorageNew->observedAttributeId = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->observedAttributeIdLen = 2;
+		if ((StorageNew->scannerId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->scannerIdLen = 0;
+		StorageNew->scannerId[StorageNew->scannerIdLen] = 0;
+		if ((StorageNew->observedObjectInstance = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->observedObjectInstanceLen = 2;
+		if ((StorageNew->observedAttributeId = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->observedAttributeIdLen = 2;
 		StorageNew->derivedGauge = 0;
 		StorageNew->counterDifferencePackage = 0;
 		StorageNew->previousScanCounterValue = 0;
-		if (memdup((u_char **) &StorageNew->counterDifferenceProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->counterDifferenceProceduralStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->counterDifferenceProceduralStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->counterDifferenceProceduralStatusLen = 1;
 		StorageNew->counterOverflowPackage = 0;
 		StorageNew->modulusValue = 0;
 		StorageNew->gaugeDifferencePackage = 0;
 		StorageNew->previousScanGaugeValue = 0;
-		if (memdup((u_char **) &StorageNew->gaugeDirferenceProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->gaugeDirferenceProceduralStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->gaugeDirferenceProceduralStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->gaugeDirferenceProceduralStatusLen = 1;
 		StorageNew->metricLowThreshold = 0;
 		StorageNew->metricLowNotify = 0;
 		StorageNew->metricLowSeverityIndication = 0;
 		StorageNew->metricHighThreshold = 0;
 		StorageNew->metricHighNotify = 0;
 		StorageNew->metricHighSeverityIndication = 0;
-		if ((StorageNew->metricSpecificProblemsIndicator = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->metricSpecificProblemsIndicatorLen = 2;
-		if ((StorageNew->derivedGaugeTimeStamp = (uint8_t *) strdup("")) != NULL)
-			StorageNew->derivedGaugeTimeStampLen = strlen("");
+		if ((StorageNew->metricSpecificProblemsIndicator = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->metricSpecificProblemsIndicatorLen = 2;
+		if ((StorageNew->derivedGaugeTimeStamp = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->derivedGaugeTimeStampLen = 0;
+		StorageNew->derivedGaugeTimeStamp[StorageNew->derivedGaugeTimeStampLen] = 0;
 		StorageNew->monitorMetricRowStatus = 0;
 		StorageNew->monitorMetricRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("metricMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	monitorMetricTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct monitorMetricTable_data *monitorMetricTable_duplicate(struct monitorMetricTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -980,6 +1143,50 @@ monitorMetricTable_duplicate(struct monitorMetricTable_data *thedata)
 
 	DEBUGMSGTL(("metricMIB", "monitorMetricTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->monitorMetricTable_id = thedata->monitorMetricTable_id;
+		if (!(StorageNew->scannerId = malloc(thedata->scannerIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->scannerId, thedata->scannerId, thedata->scannerIdLen);
+		StorageNew->scannerIdLen = thedata->scannerIdLen;
+		StorageNew->scannerId[StorageNew->scannerIdLen] = 0;
+		if (!(StorageNew->observedObjectInstance = snmp_duplicate_objid(thedata->observedObjectInstance, thedata->observedObjectInstanceLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->observedObjectInstanceLen = thedata->observedObjectInstanceLen;
+		if (!(StorageNew->observedAttributeId = snmp_duplicate_objid(thedata->observedAttributeId, thedata->observedAttributeIdLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->observedAttributeIdLen = thedata->observedAttributeIdLen;
+		StorageNew->derivedGauge = thedata->derivedGauge;
+		StorageNew->counterDifferencePackage = thedata->counterDifferencePackage;
+		StorageNew->previousScanCounterValue = thedata->previousScanCounterValue;
+		if (!(StorageNew->counterDifferenceProceduralStatus = malloc(thedata->counterDifferenceProceduralStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->counterDifferenceProceduralStatus, thedata->counterDifferenceProceduralStatus, thedata->counterDifferenceProceduralStatusLen);
+		StorageNew->counterDifferenceProceduralStatusLen = thedata->counterDifferenceProceduralStatusLen;
+		StorageNew->counterDifferenceProceduralStatus[StorageNew->counterDifferenceProceduralStatusLen] = 0;
+		StorageNew->counterOverflowPackage = thedata->counterOverflowPackage;
+		StorageNew->modulusValue = thedata->modulusValue;
+		StorageNew->gaugeDifferencePackage = thedata->gaugeDifferencePackage;
+		StorageNew->previousScanGaugeValue = thedata->previousScanGaugeValue;
+		if (!(StorageNew->gaugeDirferenceProceduralStatus = malloc(thedata->gaugeDirferenceProceduralStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->gaugeDirferenceProceduralStatus, thedata->gaugeDirferenceProceduralStatus, thedata->gaugeDirferenceProceduralStatusLen);
+		StorageNew->gaugeDirferenceProceduralStatusLen = thedata->gaugeDirferenceProceduralStatusLen;
+		StorageNew->gaugeDirferenceProceduralStatus[StorageNew->gaugeDirferenceProceduralStatusLen] = 0;
+		StorageNew->metricLowThreshold = thedata->metricLowThreshold;
+		StorageNew->metricLowNotify = thedata->metricLowNotify;
+		StorageNew->metricLowSeverityIndication = thedata->metricLowSeverityIndication;
+		StorageNew->metricHighThreshold = thedata->metricHighThreshold;
+		StorageNew->metricHighNotify = thedata->metricHighNotify;
+		StorageNew->metricHighSeverityIndication = thedata->metricHighSeverityIndication;
+		if (!(StorageNew->metricSpecificProblemsIndicator = snmp_duplicate_objid(thedata->metricSpecificProblemsIndicator, thedata->metricSpecificProblemsIndicatorLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->metricSpecificProblemsIndicatorLen = thedata->metricSpecificProblemsIndicatorLen;
+		if (!(StorageNew->derivedGaugeTimeStamp = malloc(thedata->derivedGaugeTimeStampLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->derivedGaugeTimeStamp, thedata->derivedGaugeTimeStamp, thedata->derivedGaugeTimeStampLen);
+		StorageNew->derivedGaugeTimeStampLen = thedata->derivedGaugeTimeStampLen;
+		StorageNew->derivedGaugeTimeStamp[StorageNew->derivedGaugeTimeStampLen] = 0;
+		StorageNew->monitorMetricRowStatus = thedata->monitorMetricRowStatus;
 	}
       done:
 	DEBUGMSGTL(("metricMIB", "done.\n"));
@@ -1087,7 +1294,7 @@ monitorMetricTable_del(struct monitorMetricTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for monitorMetricTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case monitorMetricTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1235,8 +1442,10 @@ meanMonitorTable_create(void)
 	DEBUGMSGTL(("metricMIB", "meanMonitorTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->scannerId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->scannerIdLen = strlen("");
+		if ((StorageNew->scannerId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->scannerIdLen = 0;
+		StorageNew->scannerId[StorageNew->scannerIdLen] = 0;
 		StorageNew->estimateOfMean = 0;
 		StorageNew->movingTimePeriod = 0;
 		StorageNew->estimateOfMeanLowThreshold = 0;
@@ -1245,19 +1454,25 @@ meanMonitorTable_create(void)
 		StorageNew->estimateOfMeanHighThreshold = 0;
 		StorageNew->estimateOfMeanHighNotify = 0;
 		StorageNew->estimateOfMeanHighSeverityIndication = 0;
-		if ((StorageNew->estimateOfMeanSpecificProblemsIndicator = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->estimateOfMeanSpecificProblemsIndicatorLen = 2;
+		if ((StorageNew->estimateOfMeanSpecificProblemsIndicator = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->estimateOfMeanSpecificProblemsIndicatorLen = 2;
 		StorageNew->meanMonitorRowStatus = 0;
 		StorageNew->meanMonitorRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("metricMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	meanMonitorTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct meanMonitorTable_data *meanMonitorTable_duplicate(struct meanMonitorTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1269,6 +1484,26 @@ meanMonitorTable_duplicate(struct meanMonitorTable_data *thedata)
 
 	DEBUGMSGTL(("metricMIB", "meanMonitorTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->meanMonitorTable_id = thedata->meanMonitorTable_id;
+		if (!(StorageNew->scannerId = malloc(thedata->scannerIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->scannerId, thedata->scannerId, thedata->scannerIdLen);
+		StorageNew->scannerIdLen = thedata->scannerIdLen;
+		StorageNew->scannerId[StorageNew->scannerIdLen] = 0;
+		StorageNew->estimateOfMean = thedata->estimateOfMean;
+		StorageNew->movingTimePeriod = thedata->movingTimePeriod;
+		StorageNew->estimateOfMeanLowThreshold = thedata->estimateOfMeanLowThreshold;
+		StorageNew->estimateOfMeanLowNotify = thedata->estimateOfMeanLowNotify;
+		StorageNew->estimateOfMeanLowSeverityIndication = thedata->estimateOfMeanLowSeverityIndication;
+		StorageNew->estimateOfMeanHighThreshold = thedata->estimateOfMeanHighThreshold;
+		StorageNew->estimateOfMeanHighNotify = thedata->estimateOfMeanHighNotify;
+		StorageNew->estimateOfMeanHighSeverityIndication = thedata->estimateOfMeanHighSeverityIndication;
+		if (!
+		    (StorageNew->estimateOfMeanSpecificProblemsIndicator =
+		     snmp_duplicate_objid(thedata->estimateOfMeanSpecificProblemsIndicator, thedata->estimateOfMeanSpecificProblemsIndicatorLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->estimateOfMeanSpecificProblemsIndicatorLen = thedata->estimateOfMeanSpecificProblemsIndicatorLen;
+		StorageNew->meanMonitorRowStatus = thedata->meanMonitorRowStatus;
 	}
       done:
 	DEBUGMSGTL(("metricMIB", "done.\n"));
@@ -1366,7 +1601,7 @@ meanMonitorTable_del(struct meanMonitorTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for meanMonitorTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case meanMonitorTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1469,20 +1704,27 @@ algorithmIndicatingMeanMonitorTable_create(void)
 	DEBUGMSGTL(("metricMIB", "algorithmIndicatingMeanMonitorTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->scannerId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->scannerIdLen = strlen("");
-		if ((StorageNew->algorithmIdentifier = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->algorithmIdentifierLen = 2;
-
+		if ((StorageNew->scannerId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->scannerIdLen = 0;
+		StorageNew->scannerId[StorageNew->scannerIdLen] = 0;
+		if ((StorageNew->algorithmIdentifier = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->algorithmIdentifierLen = 2;
 	}
+      done:
 	DEBUGMSGTL(("metricMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	algorithmIndicatingMeanMonitorTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct algorithmIndicatingMeanMonitorTable_data *algorithmIndicatingMeanMonitorTable_duplicate(struct algorithmIndicatingMeanMonitorTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1494,6 +1736,15 @@ algorithmIndicatingMeanMonitorTable_duplicate(struct algorithmIndicatingMeanMoni
 
 	DEBUGMSGTL(("metricMIB", "algorithmIndicatingMeanMonitorTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->algorithmIndicatingMeanMonitorTable_id = thedata->algorithmIndicatingMeanMonitorTable_id;
+		if (!(StorageNew->scannerId = malloc(thedata->scannerIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->scannerId, thedata->scannerId, thedata->scannerIdLen);
+		StorageNew->scannerIdLen = thedata->scannerIdLen;
+		StorageNew->scannerId[StorageNew->scannerIdLen] = 0;
+		if (!(StorageNew->algorithmIdentifier = snmp_duplicate_objid(thedata->algorithmIdentifier, thedata->algorithmIdentifierLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->algorithmIdentifierLen = thedata->algorithmIdentifierLen;
 	}
       done:
 	DEBUGMSGTL(("metricMIB", "done.\n"));
@@ -1591,7 +1842,7 @@ algorithmIndicatingMeanMonitorTable_del(struct algorithmIndicatingMeanMonitorTab
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for algorithmIndicatingMeanMonitorTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case algorithmIndicatingMeanMonitorTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1676,19 +1927,26 @@ movingAverageMeanMonitorTable_create(void)
 	DEBUGMSGTL(("metricMIB", "movingAverageMeanMonitorTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->scannerId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->scannerIdLen = strlen("");
+		if ((StorageNew->scannerId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->scannerIdLen = 0;
+		StorageNew->scannerId[StorageNew->scannerIdLen] = 0;
 		StorageNew->movingAverageMeanMonitorRowStatus = 0;
 		StorageNew->movingAverageMeanMonitorRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("metricMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	movingAverageMeanMonitorTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct movingAverageMeanMonitorTable_data *movingAverageMeanMonitorTable_duplicate(struct movingAverageMeanMonitorTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1700,6 +1958,13 @@ movingAverageMeanMonitorTable_duplicate(struct movingAverageMeanMonitorTable_dat
 
 	DEBUGMSGTL(("metricMIB", "movingAverageMeanMonitorTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->movingAverageMeanMonitorTable_id = thedata->movingAverageMeanMonitorTable_id;
+		if (!(StorageNew->scannerId = malloc(thedata->scannerIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->scannerId, thedata->scannerId, thedata->scannerIdLen);
+		StorageNew->scannerIdLen = thedata->scannerIdLen;
+		StorageNew->scannerId[StorageNew->scannerIdLen] = 0;
+		StorageNew->movingAverageMeanMonitorRowStatus = thedata->movingAverageMeanMonitorRowStatus;
 	}
       done:
 	DEBUGMSGTL(("metricMIB", "done.\n"));
@@ -1795,7 +2060,7 @@ movingAverageMeanMonitorTable_del(struct movingAverageMeanMonitorTable_data *the
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for movingAverageMeanMonitorTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case movingAverageMeanMonitorTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1875,8 +2140,10 @@ meanAndPercentileMonitorTable_create(void)
 	DEBUGMSGTL(("metricMIB", "meanAndPercentileMonitorTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->scannerId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->scannerIdLen = strlen("");
+		if ((StorageNew->scannerId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->scannerIdLen = 0;
+		StorageNew->scannerId[StorageNew->scannerIdLen] = 0;
 		StorageNew->percentileSecondMovingTimePeriod = 0;
 		StorageNew->estimateOfLargestInReplication = 0;
 		StorageNew->estimateOfSmallestInReplication = 0;
@@ -1888,14 +2155,19 @@ meanAndPercentileMonitorTable_create(void)
 		StorageNew->meanAndPercentileMonitorRowStatus = 0;
 		StorageNew->meanAndPercentileMonitorRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("metricMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	meanAndPercentileMonitorTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct meanAndPercentileMonitorTable_data *meanAndPercentileMonitorTable_duplicate(struct meanAndPercentileMonitorTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1907,6 +2179,21 @@ meanAndPercentileMonitorTable_duplicate(struct meanAndPercentileMonitorTable_dat
 
 	DEBUGMSGTL(("metricMIB", "meanAndPercentileMonitorTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->meanAndPercentileMonitorTable_id = thedata->meanAndPercentileMonitorTable_id;
+		if (!(StorageNew->scannerId = malloc(thedata->scannerIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->scannerId, thedata->scannerId, thedata->scannerIdLen);
+		StorageNew->scannerIdLen = thedata->scannerIdLen;
+		StorageNew->scannerId[StorageNew->scannerIdLen] = 0;
+		StorageNew->percentileSecondMovingTimePeriod = thedata->percentileSecondMovingTimePeriod;
+		StorageNew->estimateOfLargestInReplication = thedata->estimateOfLargestInReplication;
+		StorageNew->estimateOfSmallestInReplication = thedata->estimateOfSmallestInReplication;
+		StorageNew->estimateOfMedian = thedata->estimateOfMedian;
+		StorageNew->estimateOf100PCTPercentile = thedata->estimateOf100PCTPercentile;
+		StorageNew->estimateOfPCTPercentile = thedata->estimateOfPCTPercentile;
+		StorageNew->numberOfReplications = thedata->numberOfReplications;
+		StorageNew->configurablePercentilePackage = thedata->configurablePercentilePackage;
+		StorageNew->meanAndPercentileMonitorRowStatus = thedata->meanAndPercentileMonitorRowStatus;
 	}
       done:
 	DEBUGMSGTL(("metricMIB", "done.\n"));
@@ -2002,7 +2289,7 @@ meanAndPercentileMonitorTable_del(struct meanAndPercentileMonitorTable_data *the
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for meanAndPercentileMonitorTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case meanAndPercentileMonitorTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2098,21 +2385,28 @@ meanAndVarianceMonitorTable_create(void)
 	DEBUGMSGTL(("metricMIB", "meanAndVarianceMonitorTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->scannerId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->scannerIdLen = strlen("");
+		if ((StorageNew->scannerId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->scannerIdLen = 0;
+		StorageNew->scannerId[StorageNew->scannerIdLen] = 0;
 		StorageNew->varianceSecondMovingTimePeriod = 0;
 		StorageNew->estimateOfVariance = 0;
 		StorageNew->meanAndVarianceMonitorRowStatus = 0;
 		StorageNew->meanAndVarianceMonitorRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("metricMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	meanAndVarianceMonitorTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct meanAndVarianceMonitorTable_data *meanAndVarianceMonitorTable_duplicate(struct meanAndVarianceMonitorTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2124,6 +2418,15 @@ meanAndVarianceMonitorTable_duplicate(struct meanAndVarianceMonitorTable_data *t
 
 	DEBUGMSGTL(("metricMIB", "meanAndVarianceMonitorTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->meanAndVarianceMonitorTable_id = thedata->meanAndVarianceMonitorTable_id;
+		if (!(StorageNew->scannerId = malloc(thedata->scannerIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->scannerId, thedata->scannerId, thedata->scannerIdLen);
+		StorageNew->scannerIdLen = thedata->scannerIdLen;
+		StorageNew->scannerId[StorageNew->scannerIdLen] = 0;
+		StorageNew->varianceSecondMovingTimePeriod = thedata->varianceSecondMovingTimePeriod;
+		StorageNew->estimateOfVariance = thedata->estimateOfVariance;
+		StorageNew->meanAndVarianceMonitorRowStatus = thedata->meanAndVarianceMonitorRowStatus;
 	}
       done:
 	DEBUGMSGTL(("metricMIB", "done.\n"));
@@ -2219,7 +2522,7 @@ meanAndVarianceMonitorTable_del(struct meanAndVarianceMonitorTable_data *thedata
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for meanAndVarianceMonitorTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case meanAndVarianceMonitorTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2303,21 +2606,28 @@ meanAndMinMaxMonitorTable_create(void)
 	DEBUGMSGTL(("metricMIB", "meanAndMinMaxMonitorTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->scannerId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->scannerIdLen = strlen("");
+		if ((StorageNew->scannerId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->scannerIdLen = 0;
+		StorageNew->scannerId[StorageNew->scannerIdLen] = 0;
 		StorageNew->estimateOfLargest = 0;
 		StorageNew->estimateOfSmallest = 0;
 		StorageNew->meanAndMinMaxMonitorRowStatus = 0;
 		StorageNew->meanAndMinMaxMonitorRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("metricMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	meanAndMinMaxMonitorTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct meanAndMinMaxMonitorTable_data *meanAndMinMaxMonitorTable_duplicate(struct meanAndMinMaxMonitorTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2329,6 +2639,15 @@ meanAndMinMaxMonitorTable_duplicate(struct meanAndMinMaxMonitorTable_data *theda
 
 	DEBUGMSGTL(("metricMIB", "meanAndMinMaxMonitorTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->meanAndMinMaxMonitorTable_id = thedata->meanAndMinMaxMonitorTable_id;
+		if (!(StorageNew->scannerId = malloc(thedata->scannerIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->scannerId, thedata->scannerId, thedata->scannerIdLen);
+		StorageNew->scannerIdLen = thedata->scannerIdLen;
+		StorageNew->scannerId[StorageNew->scannerIdLen] = 0;
+		StorageNew->estimateOfLargest = thedata->estimateOfLargest;
+		StorageNew->estimateOfSmallest = thedata->estimateOfSmallest;
+		StorageNew->meanAndMinMaxMonitorRowStatus = thedata->meanAndMinMaxMonitorRowStatus;
 	}
       done:
 	DEBUGMSGTL(("metricMIB", "done.\n"));
@@ -2424,7 +2743,7 @@ meanAndMinMaxMonitorTable_del(struct meanAndMinMaxMonitorTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for meanAndMinMaxMonitorTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case meanAndMinMaxMonitorTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2490,6 +2809,302 @@ store_meanAndMinMaxMonitorTable(int majorID, int minorID, void *serverarg, void 
 	}
 	DEBUGMSGTL(("metricMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int activate_scannerTable_row(struct scannerTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_scannerTable_row(struct scannerTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_scannerTable_row(struct scannerTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_scannerTable_row(struct scannerTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_monitorMetricTable_row(struct monitorMetricTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_monitorMetricTable_row(struct monitorMetricTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_monitorMetricTable_row(struct monitorMetricTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_monitorMetricTable_row(struct monitorMetricTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_meanMonitorTable_row(struct meanMonitorTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_meanMonitorTable_row(struct meanMonitorTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_meanMonitorTable_row(struct meanMonitorTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_meanMonitorTable_row(struct meanMonitorTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_movingAverageMeanMonitorTable_row(struct movingAverageMeanMonitorTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_movingAverageMeanMonitorTable_row(struct movingAverageMeanMonitorTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_movingAverageMeanMonitorTable_row(struct movingAverageMeanMonitorTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_movingAverageMeanMonitorTable_row(struct movingAverageMeanMonitorTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_meanAndPercentileMonitorTable_row(struct meanAndPercentileMonitorTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_meanAndPercentileMonitorTable_row(struct meanAndPercentileMonitorTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_meanAndPercentileMonitorTable_row(struct meanAndPercentileMonitorTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_meanAndPercentileMonitorTable_row(struct meanAndPercentileMonitorTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_meanAndVarianceMonitorTable_row(struct meanAndVarianceMonitorTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_meanAndVarianceMonitorTable_row(struct meanAndVarianceMonitorTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_meanAndVarianceMonitorTable_row(struct meanAndVarianceMonitorTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_meanAndVarianceMonitorTable_row(struct meanAndVarianceMonitorTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_meanAndMinMaxMonitorTable_row(struct meanAndMinMaxMonitorTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_meanAndMinMaxMonitorTable_row(struct meanAndMinMaxMonitorTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_meanAndMinMaxMonitorTable_row(struct meanAndMinMaxMonitorTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_meanAndMinMaxMonitorTable_row(struct meanAndMinMaxMonitorTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int check_scannerTable_row(struct scannerTable_data *StorageTmp, struct scannerTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_scannerTable_row(struct scannerTable_data *StorageTmp, struct scannerTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_scannerTable_row(struct scannerTable_data *StorageTmp, struct scannerTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_scannerTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_scannerTable_row(struct scannerTable_data *StorageTmp, struct scannerTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	scannerTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_scannerTable_row(struct scannerTable_data *StorageTmp, struct scannerTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_scannerTable_row(struct scannerTable_data *StorageTmp, struct scannerTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_scannerTable_row(StorageOld, NULL);
 }
 
 /**
@@ -2657,6 +3272,64 @@ var_scannerTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_monitorMetricTable_row(struct monitorMetricTable_data *StorageTmp, struct monitorMetricTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_monitorMetricTable_row(struct monitorMetricTable_data *StorageTmp, struct monitorMetricTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_monitorMetricTable_row(struct monitorMetricTable_data *StorageTmp, struct monitorMetricTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_monitorMetricTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_monitorMetricTable_row(struct monitorMetricTable_data *StorageTmp, struct monitorMetricTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	monitorMetricTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_monitorMetricTable_row(struct monitorMetricTable_data *StorageTmp, struct monitorMetricTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_monitorMetricTable_row(struct monitorMetricTable_data *StorageTmp, struct monitorMetricTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_monitorMetricTable_row(StorageOld, NULL);
 }
 
 /**
@@ -2869,6 +3542,64 @@ var_monitorMetricTable(struct variable *vp, oid * name, size_t *length, int exac
 }
 
 /**
+ * @fn int check_meanMonitorTable_row(struct meanMonitorTable_data *StorageTmp, struct meanMonitorTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_meanMonitorTable_row(struct meanMonitorTable_data *StorageTmp, struct meanMonitorTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_meanMonitorTable_row(struct meanMonitorTable_data *StorageTmp, struct meanMonitorTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_meanMonitorTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_meanMonitorTable_row(struct meanMonitorTable_data *StorageTmp, struct meanMonitorTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	meanMonitorTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_meanMonitorTable_row(struct meanMonitorTable_data *StorageTmp, struct meanMonitorTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_meanMonitorTable_row(struct meanMonitorTable_data *StorageTmp, struct meanMonitorTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_meanMonitorTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_meanMonitorTable_row(struct meanMonitorTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -3009,6 +3740,64 @@ var_meanMonitorTable(struct variable *vp, oid * name, size_t *length, int exact,
 }
 
 /**
+ * @fn int check_algorithmIndicatingMeanMonitorTable_row(struct algorithmIndicatingMeanMonitorTable_data *StorageTmp, struct algorithmIndicatingMeanMonitorTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_algorithmIndicatingMeanMonitorTable_row(struct algorithmIndicatingMeanMonitorTable_data *StorageTmp, struct algorithmIndicatingMeanMonitorTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_algorithmIndicatingMeanMonitorTable_row(struct algorithmIndicatingMeanMonitorTable_data *StorageTmp, struct algorithmIndicatingMeanMonitorTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_algorithmIndicatingMeanMonitorTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_algorithmIndicatingMeanMonitorTable_row(struct algorithmIndicatingMeanMonitorTable_data *StorageTmp, struct algorithmIndicatingMeanMonitorTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	algorithmIndicatingMeanMonitorTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_algorithmIndicatingMeanMonitorTable_row(struct algorithmIndicatingMeanMonitorTable_data *StorageTmp, struct algorithmIndicatingMeanMonitorTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_algorithmIndicatingMeanMonitorTable_row(struct algorithmIndicatingMeanMonitorTable_data *StorageTmp, struct algorithmIndicatingMeanMonitorTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_algorithmIndicatingMeanMonitorTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_algorithmIndicatingMeanMonitorTable_row(struct algorithmIndicatingMeanMonitorTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -3083,6 +3872,64 @@ var_algorithmIndicatingMeanMonitorTable(struct variable *vp, oid * name, size_t 
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_movingAverageMeanMonitorTable_row(struct movingAverageMeanMonitorTable_data *StorageTmp, struct movingAverageMeanMonitorTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_movingAverageMeanMonitorTable_row(struct movingAverageMeanMonitorTable_data *StorageTmp, struct movingAverageMeanMonitorTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_movingAverageMeanMonitorTable_row(struct movingAverageMeanMonitorTable_data *StorageTmp, struct movingAverageMeanMonitorTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_movingAverageMeanMonitorTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_movingAverageMeanMonitorTable_row(struct movingAverageMeanMonitorTable_data *StorageTmp, struct movingAverageMeanMonitorTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	movingAverageMeanMonitorTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_movingAverageMeanMonitorTable_row(struct movingAverageMeanMonitorTable_data *StorageTmp, struct movingAverageMeanMonitorTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_movingAverageMeanMonitorTable_row(struct movingAverageMeanMonitorTable_data *StorageTmp, struct movingAverageMeanMonitorTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_movingAverageMeanMonitorTable_row(StorageOld, NULL);
 }
 
 /**
@@ -3161,6 +4008,64 @@ var_movingAverageMeanMonitorTable(struct variable *vp, oid * name, size_t *lengt
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_meanAndPercentileMonitorTable_row(struct meanAndPercentileMonitorTable_data *StorageTmp, struct meanAndPercentileMonitorTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_meanAndPercentileMonitorTable_row(struct meanAndPercentileMonitorTable_data *StorageTmp, struct meanAndPercentileMonitorTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_meanAndPercentileMonitorTable_row(struct meanAndPercentileMonitorTable_data *StorageTmp, struct meanAndPercentileMonitorTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_meanAndPercentileMonitorTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_meanAndPercentileMonitorTable_row(struct meanAndPercentileMonitorTable_data *StorageTmp, struct meanAndPercentileMonitorTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	meanAndPercentileMonitorTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_meanAndPercentileMonitorTable_row(struct meanAndPercentileMonitorTable_data *StorageTmp, struct meanAndPercentileMonitorTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_meanAndPercentileMonitorTable_row(struct meanAndPercentileMonitorTable_data *StorageTmp, struct meanAndPercentileMonitorTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_meanAndPercentileMonitorTable_row(StorageOld, NULL);
 }
 
 /**
@@ -3293,6 +4198,64 @@ var_meanAndPercentileMonitorTable(struct variable *vp, oid * name, size_t *lengt
 }
 
 /**
+ * @fn int check_meanAndVarianceMonitorTable_row(struct meanAndVarianceMonitorTable_data *StorageTmp, struct meanAndVarianceMonitorTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_meanAndVarianceMonitorTable_row(struct meanAndVarianceMonitorTable_data *StorageTmp, struct meanAndVarianceMonitorTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_meanAndVarianceMonitorTable_row(struct meanAndVarianceMonitorTable_data *StorageTmp, struct meanAndVarianceMonitorTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_meanAndVarianceMonitorTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_meanAndVarianceMonitorTable_row(struct meanAndVarianceMonitorTable_data *StorageTmp, struct meanAndVarianceMonitorTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	meanAndVarianceMonitorTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_meanAndVarianceMonitorTable_row(struct meanAndVarianceMonitorTable_data *StorageTmp, struct meanAndVarianceMonitorTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_meanAndVarianceMonitorTable_row(struct meanAndVarianceMonitorTable_data *StorageTmp, struct meanAndVarianceMonitorTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_meanAndVarianceMonitorTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_meanAndVarianceMonitorTable_row(struct meanAndVarianceMonitorTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -3381,6 +4344,64 @@ var_meanAndVarianceMonitorTable(struct variable *vp, oid * name, size_t *length,
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_meanAndMinMaxMonitorTable_row(struct meanAndMinMaxMonitorTable_data *StorageTmp, struct meanAndMinMaxMonitorTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_meanAndMinMaxMonitorTable_row(struct meanAndMinMaxMonitorTable_data *StorageTmp, struct meanAndMinMaxMonitorTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_meanAndMinMaxMonitorTable_row(struct meanAndMinMaxMonitorTable_data *StorageTmp, struct meanAndMinMaxMonitorTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_meanAndMinMaxMonitorTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_meanAndMinMaxMonitorTable_row(struct meanAndMinMaxMonitorTable_data *StorageTmp, struct meanAndMinMaxMonitorTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	meanAndMinMaxMonitorTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_meanAndMinMaxMonitorTable_row(struct meanAndMinMaxMonitorTable_data *StorageTmp, struct meanAndMinMaxMonitorTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_meanAndMinMaxMonitorTable_row(struct meanAndMinMaxMonitorTable_data *StorageTmp, struct meanAndMinMaxMonitorTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_meanAndMinMaxMonitorTable_row(StorageOld, NULL);
 }
 
 /**
@@ -3487,12 +4508,14 @@ var_meanAndMinMaxMonitorTable(struct variable *vp, oid * name, size_t *length, i
 int
 write_scannerAdministrativeState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct scannerTable_data *StorageTmp = NULL;
+	struct scannerTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_scannerAdministrativeState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(scannerTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3526,22 +4549,61 @@ write_scannerAdministrativeState(int action, u_char *var_val, u_char var_val_typ
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to scannerAdministrativeState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			if (StorageTmp->scannerTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->scannerTable_old = scannerTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->scannerTable_rsvs++;
+		StorageTmp->scannerAdministrativeState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->scannerTable_tsts == 0)
+				if ((ret = check_scannerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->scannerTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->scannerAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->scannerAdministrativeState;
-		StorageTmp->scannerAdministrativeState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->scannerTable_sets == 0)
+				if ((ret = update_scannerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->scannerTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			scannerTable_destroy(&StorageTmp->scannerTable_old);
+			StorageTmp->scannerTable_rsvs = 0;
+			StorageTmp->scannerTable_tsts = 0;
+			StorageTmp->scannerTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->scannerAdministrativeState = old_value;
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->scannerTable_sets == 0)
+			revert_scannerTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			break;
+		StorageTmp->scannerAdministrativeState = StorageOld->scannerAdministrativeState;
+		if (--StorageTmp->scannerTable_rsvs == 0)
+			scannerTable_destroy(&StorageTmp->scannerTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3561,12 +4623,14 @@ write_scannerAdministrativeState(int action, u_char *var_val, u_char var_val_typ
 int
 write_granularityPeriod(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct scannerTable_data *StorageTmp = NULL;
+	struct scannerTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_granularityPeriod entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(scannerTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -3591,22 +4655,61 @@ write_granularityPeriod(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to granularityPeriod: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			if (StorageTmp->scannerTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->scannerTable_old = scannerTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->scannerTable_rsvs++;
+		StorageTmp->granularityPeriod = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->scannerTable_tsts == 0)
+				if ((ret = check_scannerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->scannerTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->granularityPeriod for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->granularityPeriod;
-		StorageTmp->granularityPeriod = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->scannerTable_sets == 0)
+				if ((ret = update_scannerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->scannerTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			scannerTable_destroy(&StorageTmp->scannerTable_old);
+			StorageTmp->scannerTable_rsvs = 0;
+			StorageTmp->scannerTable_tsts = 0;
+			StorageTmp->scannerTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->granularityPeriod = old_value;
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->scannerTable_sets == 0)
+			revert_scannerTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			break;
+		StorageTmp->granularityPeriod = StorageOld->granularityPeriod;
+		if (--StorageTmp->scannerTable_rsvs == 0)
+			scannerTable_destroy(&StorageTmp->scannerTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3626,17 +4729,17 @@ write_granularityPeriod(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_scannerStartTime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct scannerTable_data *StorageTmp = NULL;
+	struct scannerTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_scannerStartTime entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(scannerTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->scannerRowStatus) {
@@ -3659,33 +4762,73 @@ write_scannerStartTime(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to scannerStartTime: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			if (StorageTmp->scannerTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->scannerTable_old = scannerTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->scannerTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->scannerStartTime);
+		StorageTmp->scannerStartTime = string;
+		StorageTmp->scannerStartTimeLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->scannerTable_tsts == 0)
+				if ((ret = check_scannerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->scannerTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->scannerStartTime for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->scannerStartTime;
-		old_length = StorageTmp->scannerStartTimeLen;
-		StorageTmp->scannerStartTime = string;
-		StorageTmp->scannerStartTimeLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->scannerTable_sets == 0)
+				if ((ret = update_scannerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->scannerTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			scannerTable_destroy(&StorageTmp->scannerTable_old);
+			StorageTmp->scannerTable_rsvs = 0;
+			StorageTmp->scannerTable_tsts = 0;
+			StorageTmp->scannerTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->scannerStartTime = old_value;
-		StorageTmp->scannerStartTimeLen = old_length;
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->scannerTable_sets == 0)
+			revert_scannerTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			break;
+		if (StorageOld->scannerStartTime != NULL) {
+			SNMP_FREE(StorageTmp->scannerStartTime);
+			StorageTmp->scannerStartTime = StorageOld->scannerStartTime;
+			StorageTmp->scannerStartTimeLen = StorageOld->scannerStartTimeLen;
+			StorageOld->scannerStartTime = NULL;
+			StorageOld->scannerStartTimeLen = 0;
+		}
+		if (--StorageTmp->scannerTable_rsvs == 0)
+			scannerTable_destroy(&StorageTmp->scannerTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3705,17 +4848,17 @@ write_scannerStartTime(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_scannerStopTime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct scannerTable_data *StorageTmp = NULL;
+	struct scannerTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_scannerStopTime entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(scannerTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->scannerRowStatus) {
@@ -3738,33 +4881,73 @@ write_scannerStopTime(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to scannerStopTime: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			if (StorageTmp->scannerTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->scannerTable_old = scannerTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->scannerTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->scannerStopTime);
+		StorageTmp->scannerStopTime = string;
+		StorageTmp->scannerStopTimeLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->scannerTable_tsts == 0)
+				if ((ret = check_scannerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->scannerTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->scannerStopTime for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->scannerStopTime;
-		old_length = StorageTmp->scannerStopTimeLen;
-		StorageTmp->scannerStopTime = string;
-		StorageTmp->scannerStopTimeLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->scannerTable_sets == 0)
+				if ((ret = update_scannerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->scannerTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			scannerTable_destroy(&StorageTmp->scannerTable_old);
+			StorageTmp->scannerTable_rsvs = 0;
+			StorageTmp->scannerTable_tsts = 0;
+			StorageTmp->scannerTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->scannerStopTime = old_value;
-		StorageTmp->scannerStopTimeLen = old_length;
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->scannerTable_sets == 0)
+			revert_scannerTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			break;
+		if (StorageOld->scannerStopTime != NULL) {
+			SNMP_FREE(StorageTmp->scannerStopTime);
+			StorageTmp->scannerStopTime = StorageOld->scannerStopTime;
+			StorageTmp->scannerStopTimeLen = StorageOld->scannerStopTimeLen;
+			StorageOld->scannerStopTime = NULL;
+			StorageOld->scannerStopTimeLen = 0;
+		}
+		if (--StorageTmp->scannerTable_rsvs == 0)
+			scannerTable_destroy(&StorageTmp->scannerTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3784,17 +4967,17 @@ write_scannerStopTime(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_scannerIntervalsOfDay(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct scannerTable_data *StorageTmp = NULL;
+	struct scannerTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_scannerIntervalsOfDay entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(scannerTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->scannerRowStatus) {
@@ -3816,33 +4999,73 @@ write_scannerIntervalsOfDay(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to scannerIntervalsOfDay: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			if (StorageTmp->scannerTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->scannerTable_old = scannerTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->scannerTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->scannerIntervalsOfDay);
+		StorageTmp->scannerIntervalsOfDay = string;
+		StorageTmp->scannerIntervalsOfDayLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->scannerTable_tsts == 0)
+				if ((ret = check_scannerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->scannerTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->scannerIntervalsOfDay for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->scannerIntervalsOfDay;
-		old_length = StorageTmp->scannerIntervalsOfDayLen;
-		StorageTmp->scannerIntervalsOfDay = string;
-		StorageTmp->scannerIntervalsOfDayLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->scannerTable_sets == 0)
+				if ((ret = update_scannerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->scannerTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			scannerTable_destroy(&StorageTmp->scannerTable_old);
+			StorageTmp->scannerTable_rsvs = 0;
+			StorageTmp->scannerTable_tsts = 0;
+			StorageTmp->scannerTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->scannerIntervalsOfDay = old_value;
-		StorageTmp->scannerIntervalsOfDayLen = old_length;
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->scannerTable_sets == 0)
+			revert_scannerTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			break;
+		if (StorageOld->scannerIntervalsOfDay != NULL) {
+			SNMP_FREE(StorageTmp->scannerIntervalsOfDay);
+			StorageTmp->scannerIntervalsOfDay = StorageOld->scannerIntervalsOfDay;
+			StorageTmp->scannerIntervalsOfDayLen = StorageOld->scannerIntervalsOfDayLen;
+			StorageOld->scannerIntervalsOfDay = NULL;
+			StorageOld->scannerIntervalsOfDayLen = 0;
+		}
+		if (--StorageTmp->scannerTable_rsvs == 0)
+			scannerTable_destroy(&StorageTmp->scannerTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3862,17 +5085,17 @@ write_scannerIntervalsOfDay(int action, u_char *var_val, u_char var_val_type, si
 int
 write_scannerWeekMask(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct scannerTable_data *StorageTmp = NULL;
+	struct scannerTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_scannerWeekMask entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(scannerTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->scannerRowStatus) {
@@ -3894,33 +5117,73 @@ write_scannerWeekMask(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to scannerWeekMask: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			if (StorageTmp->scannerTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->scannerTable_old = scannerTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->scannerTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->scannerWeekMask);
+		StorageTmp->scannerWeekMask = string;
+		StorageTmp->scannerWeekMaskLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->scannerTable_tsts == 0)
+				if ((ret = check_scannerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->scannerTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->scannerWeekMask for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->scannerWeekMask;
-		old_length = StorageTmp->scannerWeekMaskLen;
-		StorageTmp->scannerWeekMask = string;
-		StorageTmp->scannerWeekMaskLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->scannerTable_sets == 0)
+				if ((ret = update_scannerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->scannerTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			scannerTable_destroy(&StorageTmp->scannerTable_old);
+			StorageTmp->scannerTable_rsvs = 0;
+			StorageTmp->scannerTable_tsts = 0;
+			StorageTmp->scannerTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->scannerWeekMask = old_value;
-		StorageTmp->scannerWeekMaskLen = old_length;
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->scannerTable_sets == 0)
+			revert_scannerTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			break;
+		if (StorageOld->scannerWeekMask != NULL) {
+			SNMP_FREE(StorageTmp->scannerWeekMask);
+			StorageTmp->scannerWeekMask = StorageOld->scannerWeekMask;
+			StorageTmp->scannerWeekMaskLen = StorageOld->scannerWeekMaskLen;
+			StorageOld->scannerWeekMask = NULL;
+			StorageOld->scannerWeekMaskLen = 0;
+		}
+		if (--StorageTmp->scannerTable_rsvs == 0)
+			scannerTable_destroy(&StorageTmp->scannerTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3940,17 +5203,17 @@ write_scannerWeekMask(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_scannerSchedulerName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct scannerTable_data *StorageTmp = NULL;
+	struct scannerTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_scannerSchedulerName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(scannerTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->scannerRowStatus) {
@@ -3972,31 +5235,71 @@ write_scannerSchedulerName(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to scannerSchedulerName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			if (StorageTmp->scannerTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->scannerTable_old = scannerTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->scannerTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->scannerSchedulerName);
+		StorageTmp->scannerSchedulerName = objid;
+		StorageTmp->scannerSchedulerNameLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->scannerTable_tsts == 0)
+				if ((ret = check_scannerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->scannerTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->scannerSchedulerName for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->scannerSchedulerName;
-		old_length = StorageTmp->scannerSchedulerNameLen;
-		StorageTmp->scannerSchedulerName = objid;
-		StorageTmp->scannerSchedulerNameLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->scannerTable_sets == 0)
+				if ((ret = update_scannerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->scannerTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			scannerTable_destroy(&StorageTmp->scannerTable_old);
+			StorageTmp->scannerTable_rsvs = 0;
+			StorageTmp->scannerTable_tsts = 0;
+			StorageTmp->scannerTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->scannerSchedulerName = old_value;
-		StorageTmp->scannerSchedulerNameLen = old_length;
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->scannerTable_sets == 0)
+			revert_scannerTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			break;
+		if (StorageOld->scannerSchedulerName != NULL) {
+			SNMP_FREE(StorageTmp->scannerSchedulerName);
+			StorageTmp->scannerSchedulerName = StorageOld->scannerSchedulerName;
+			StorageTmp->scannerSchedulerNameLen = StorageOld->scannerSchedulerNameLen;
+			StorageOld->scannerSchedulerName = NULL;
+			StorageOld->scannerSchedulerNameLen = 0;
+		}
+		if (--StorageTmp->scannerTable_rsvs == 0)
+			scannerTable_destroy(&StorageTmp->scannerTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4016,17 +5319,17 @@ write_scannerSchedulerName(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_scannerPeriodSynchronizationTime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct scannerTable_data *StorageTmp = NULL;
+	struct scannerTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_scannerPeriodSynchronizationTime entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(scannerTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->scannerRowStatus) {
@@ -4049,33 +5352,73 @@ write_scannerPeriodSynchronizationTime(int action, u_char *var_val, u_char var_v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to scannerPeriodSynchronizationTime: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			if (StorageTmp->scannerTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->scannerTable_old = scannerTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->scannerTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->scannerPeriodSynchronizationTime);
+		StorageTmp->scannerPeriodSynchronizationTime = string;
+		StorageTmp->scannerPeriodSynchronizationTimeLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->scannerTable_tsts == 0)
+				if ((ret = check_scannerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->scannerTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->scannerPeriodSynchronizationTime for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->scannerPeriodSynchronizationTime;
-		old_length = StorageTmp->scannerPeriodSynchronizationTimeLen;
-		StorageTmp->scannerPeriodSynchronizationTime = string;
-		StorageTmp->scannerPeriodSynchronizationTimeLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->scannerTable_sets == 0)
+				if ((ret = update_scannerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->scannerTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			scannerTable_destroy(&StorageTmp->scannerTable_old);
+			StorageTmp->scannerTable_rsvs = 0;
+			StorageTmp->scannerTable_tsts = 0;
+			StorageTmp->scannerTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->scannerPeriodSynchronizationTime = old_value;
-		StorageTmp->scannerPeriodSynchronizationTimeLen = old_length;
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->scannerTable_sets == 0)
+			revert_scannerTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			break;
+		if (StorageOld->scannerPeriodSynchronizationTime != NULL) {
+			SNMP_FREE(StorageTmp->scannerPeriodSynchronizationTime);
+			StorageTmp->scannerPeriodSynchronizationTime = StorageOld->scannerPeriodSynchronizationTime;
+			StorageTmp->scannerPeriodSynchronizationTimeLen = StorageOld->scannerPeriodSynchronizationTimeLen;
+			StorageOld->scannerPeriodSynchronizationTime = NULL;
+			StorageOld->scannerPeriodSynchronizationTimeLen = 0;
+		}
+		if (--StorageTmp->scannerTable_rsvs == 0)
+			scannerTable_destroy(&StorageTmp->scannerTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4095,12 +5438,14 @@ write_scannerPeriodSynchronizationTime(int action, u_char *var_val, u_char var_v
 int
 write_scannerCreatDeleteNotifications(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct scannerTable_data *StorageTmp = NULL;
+	struct scannerTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_scannerCreatDeleteNotifications entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(scannerTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -4133,22 +5478,61 @@ write_scannerCreatDeleteNotifications(int action, u_char *var_val, u_char var_va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to scannerCreatDeleteNotifications: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			if (StorageTmp->scannerTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->scannerTable_old = scannerTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->scannerTable_rsvs++;
+		StorageTmp->scannerCreatDeleteNotifications = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->scannerTable_tsts == 0)
+				if ((ret = check_scannerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->scannerTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->scannerCreatDeleteNotifications for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->scannerCreatDeleteNotifications;
-		StorageTmp->scannerCreatDeleteNotifications = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->scannerTable_sets == 0)
+				if ((ret = update_scannerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->scannerTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			scannerTable_destroy(&StorageTmp->scannerTable_old);
+			StorageTmp->scannerTable_rsvs = 0;
+			StorageTmp->scannerTable_tsts = 0;
+			StorageTmp->scannerTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->scannerCreatDeleteNotifications = old_value;
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->scannerTable_sets == 0)
+			revert_scannerTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			break;
+		StorageTmp->scannerCreatDeleteNotifications = StorageOld->scannerCreatDeleteNotifications;
+		if (--StorageTmp->scannerTable_rsvs == 0)
+			scannerTable_destroy(&StorageTmp->scannerTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4168,12 +5552,14 @@ write_scannerCreatDeleteNotifications(int action, u_char *var_val, u_char var_va
 int
 write_scannerAttributeValueChangeNotifications(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct scannerTable_data *StorageTmp = NULL;
+	struct scannerTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_scannerAttributeValueChangeNotifications entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(scannerTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -4206,22 +5592,61 @@ write_scannerAttributeValueChangeNotifications(int action, u_char *var_val, u_ch
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to scannerAttributeValueChangeNotifications: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			if (StorageTmp->scannerTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->scannerTable_old = scannerTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->scannerTable_rsvs++;
+		StorageTmp->scannerAttributeValueChangeNotifications = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->scannerTable_tsts == 0)
+				if ((ret = check_scannerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->scannerTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->scannerAttributeValueChangeNotifications for you to use, and you have just been asked to do something with it.  Note
 				   that anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->scannerAttributeValueChangeNotifications;
-		StorageTmp->scannerAttributeValueChangeNotifications = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->scannerTable_sets == 0)
+				if ((ret = update_scannerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->scannerTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			scannerTable_destroy(&StorageTmp->scannerTable_old);
+			StorageTmp->scannerTable_rsvs = 0;
+			StorageTmp->scannerTable_tsts = 0;
+			StorageTmp->scannerTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->scannerAttributeValueChangeNotifications = old_value;
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->scannerTable_sets == 0)
+			revert_scannerTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			break;
+		StorageTmp->scannerAttributeValueChangeNotifications = StorageOld->scannerAttributeValueChangeNotifications;
+		if (--StorageTmp->scannerTable_rsvs == 0)
+			scannerTable_destroy(&StorageTmp->scannerTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4241,12 +5666,14 @@ write_scannerAttributeValueChangeNotifications(int action, u_char *var_val, u_ch
 int
 write_scannerStateChangeNotifications(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct scannerTable_data *StorageTmp = NULL;
+	struct scannerTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_scannerStateChangeNotifications entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(scannerTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -4279,22 +5706,61 @@ write_scannerStateChangeNotifications(int action, u_char *var_val, u_char var_va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to scannerStateChangeNotifications: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			if (StorageTmp->scannerTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->scannerTable_old = scannerTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->scannerTable_rsvs++;
+		StorageTmp->scannerStateChangeNotifications = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->scannerTable_tsts == 0)
+				if ((ret = check_scannerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->scannerTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->scannerStateChangeNotifications for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->scannerStateChangeNotifications;
-		StorageTmp->scannerStateChangeNotifications = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->scannerTable_sets == 0)
+				if ((ret = update_scannerTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->scannerTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+			scannerTable_destroy(&StorageTmp->scannerTable_old);
+			StorageTmp->scannerTable_rsvs = 0;
+			StorageTmp->scannerTable_tsts = 0;
+			StorageTmp->scannerTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->scannerStateChangeNotifications = old_value;
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->scannerTable_sets == 0)
+			revert_scannerTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+			break;
+		StorageTmp->scannerStateChangeNotifications = StorageOld->scannerStateChangeNotifications;
+		if (--StorageTmp->scannerTable_rsvs == 0)
+			scannerTable_destroy(&StorageTmp->scannerTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4314,17 +5780,17 @@ write_scannerStateChangeNotifications(int action, u_char *var_val, u_char var_va
 int
 write_observedObjectInstance(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct monitorMetricTable_data *StorageTmp = NULL;
+	struct monitorMetricTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_observedObjectInstance entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(monitorMetricTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->monitorMetricRowStatus) {
@@ -4346,31 +5812,71 @@ write_observedObjectInstance(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to observedObjectInstance: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			if (StorageTmp->monitorMetricTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->monitorMetricTable_old = monitorMetricTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->monitorMetricTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->observedObjectInstance);
+		StorageTmp->observedObjectInstance = objid;
+		StorageTmp->observedObjectInstanceLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->monitorMetricTable_tsts == 0)
+				if ((ret = check_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->observedObjectInstance for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->observedObjectInstance;
-		old_length = StorageTmp->observedObjectInstanceLen;
-		StorageTmp->observedObjectInstance = objid;
-		StorageTmp->observedObjectInstanceLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->monitorMetricTable_sets == 0)
+				if ((ret = update_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
+			StorageTmp->monitorMetricTable_rsvs = 0;
+			StorageTmp->monitorMetricTable_tsts = 0;
+			StorageTmp->monitorMetricTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->observedObjectInstance = old_value;
-		StorageTmp->observedObjectInstanceLen = old_length;
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->monitorMetricTable_sets == 0)
+			revert_monitorMetricTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		if (StorageOld->observedObjectInstance != NULL) {
+			SNMP_FREE(StorageTmp->observedObjectInstance);
+			StorageTmp->observedObjectInstance = StorageOld->observedObjectInstance;
+			StorageTmp->observedObjectInstanceLen = StorageOld->observedObjectInstanceLen;
+			StorageOld->observedObjectInstance = NULL;
+			StorageOld->observedObjectInstanceLen = 0;
+		}
+		if (--StorageTmp->monitorMetricTable_rsvs == 0)
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4390,17 +5896,17 @@ write_observedObjectInstance(int action, u_char *var_val, u_char var_val_type, s
 int
 write_observedAttributeId(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct monitorMetricTable_data *StorageTmp = NULL;
+	struct monitorMetricTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_observedAttributeId entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(monitorMetricTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->monitorMetricRowStatus) {
@@ -4422,31 +5928,71 @@ write_observedAttributeId(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to observedAttributeId: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			if (StorageTmp->monitorMetricTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->monitorMetricTable_old = monitorMetricTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->monitorMetricTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->observedAttributeId);
+		StorageTmp->observedAttributeId = objid;
+		StorageTmp->observedAttributeIdLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->monitorMetricTable_tsts == 0)
+				if ((ret = check_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->observedAttributeId for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->observedAttributeId;
-		old_length = StorageTmp->observedAttributeIdLen;
-		StorageTmp->observedAttributeId = objid;
-		StorageTmp->observedAttributeIdLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->monitorMetricTable_sets == 0)
+				if ((ret = update_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
+			StorageTmp->monitorMetricTable_rsvs = 0;
+			StorageTmp->monitorMetricTable_tsts = 0;
+			StorageTmp->monitorMetricTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->observedAttributeId = old_value;
-		StorageTmp->observedAttributeIdLen = old_length;
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->monitorMetricTable_sets == 0)
+			revert_monitorMetricTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		if (StorageOld->observedAttributeId != NULL) {
+			SNMP_FREE(StorageTmp->observedAttributeId);
+			StorageTmp->observedAttributeId = StorageOld->observedAttributeId;
+			StorageTmp->observedAttributeIdLen = StorageOld->observedAttributeIdLen;
+			StorageOld->observedAttributeId = NULL;
+			StorageOld->observedAttributeIdLen = 0;
+		}
+		if (--StorageTmp->monitorMetricTable_rsvs == 0)
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4466,12 +6012,14 @@ write_observedAttributeId(int action, u_char *var_val, u_char var_val_type, size
 int
 write_derivedGauge(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct monitorMetricTable_data *StorageTmp = NULL;
+	struct monitorMetricTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_derivedGauge entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(monitorMetricTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -4496,22 +6044,61 @@ write_derivedGauge(int action, u_char *var_val, u_char var_val_type, size_t var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to derivedGauge: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			if (StorageTmp->monitorMetricTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->monitorMetricTable_old = monitorMetricTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->monitorMetricTable_rsvs++;
+		StorageTmp->derivedGauge = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->monitorMetricTable_tsts == 0)
+				if ((ret = check_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->derivedGauge for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->derivedGauge;
-		StorageTmp->derivedGauge = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->monitorMetricTable_sets == 0)
+				if ((ret = update_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
+			StorageTmp->monitorMetricTable_rsvs = 0;
+			StorageTmp->monitorMetricTable_tsts = 0;
+			StorageTmp->monitorMetricTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->derivedGauge = old_value;
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->monitorMetricTable_sets == 0)
+			revert_monitorMetricTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		StorageTmp->derivedGauge = StorageOld->derivedGauge;
+		if (--StorageTmp->monitorMetricTable_rsvs == 0)
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4531,12 +6118,14 @@ write_derivedGauge(int action, u_char *var_val, u_char var_val_type, size_t var_
 int
 write_counterDifferencePackage(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct monitorMetricTable_data *StorageTmp = NULL;
+	struct monitorMetricTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_counterDifferencePackage entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(monitorMetricTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -4569,22 +6158,61 @@ write_counterDifferencePackage(int action, u_char *var_val, u_char var_val_type,
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to counterDifferencePackage: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			if (StorageTmp->monitorMetricTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->monitorMetricTable_old = monitorMetricTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->monitorMetricTable_rsvs++;
+		StorageTmp->counterDifferencePackage = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->monitorMetricTable_tsts == 0)
+				if ((ret = check_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->counterDifferencePackage for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->counterDifferencePackage;
-		StorageTmp->counterDifferencePackage = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->monitorMetricTable_sets == 0)
+				if ((ret = update_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
+			StorageTmp->monitorMetricTable_rsvs = 0;
+			StorageTmp->monitorMetricTable_tsts = 0;
+			StorageTmp->monitorMetricTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->counterDifferencePackage = old_value;
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->monitorMetricTable_sets == 0)
+			revert_monitorMetricTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		StorageTmp->counterDifferencePackage = StorageOld->counterDifferencePackage;
+		if (--StorageTmp->monitorMetricTable_rsvs == 0)
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4604,17 +6232,17 @@ write_counterDifferencePackage(int action, u_char *var_val, u_char var_val_type,
 int
 write_counterDifferenceProceduralStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct monitorMetricTable_data *StorageTmp = NULL;
+	struct monitorMetricTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_counterDifferenceProceduralStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(monitorMetricTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->monitorMetricRowStatus) {
@@ -4644,33 +6272,73 @@ write_counterDifferenceProceduralStatus(int action, u_char *var_val, u_char var_
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			if (StorageTmp->monitorMetricTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->monitorMetricTable_old = monitorMetricTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->monitorMetricTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->counterDifferenceProceduralStatus);
+		StorageTmp->counterDifferenceProceduralStatus = string;
+		StorageTmp->counterDifferenceProceduralStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->monitorMetricTable_tsts == 0)
+				if ((ret = check_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->counterDifferenceProceduralStatus for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->counterDifferenceProceduralStatus;
-		old_length = StorageTmp->counterDifferenceProceduralStatusLen;
-		StorageTmp->counterDifferenceProceduralStatus = string;
-		StorageTmp->counterDifferenceProceduralStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->monitorMetricTable_sets == 0)
+				if ((ret = update_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
+			StorageTmp->monitorMetricTable_rsvs = 0;
+			StorageTmp->monitorMetricTable_tsts = 0;
+			StorageTmp->monitorMetricTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->counterDifferenceProceduralStatus = old_value;
-		StorageTmp->counterDifferenceProceduralStatusLen = old_length;
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->monitorMetricTable_sets == 0)
+			revert_monitorMetricTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		if (StorageOld->counterDifferenceProceduralStatus != NULL) {
+			SNMP_FREE(StorageTmp->counterDifferenceProceduralStatus);
+			StorageTmp->counterDifferenceProceduralStatus = StorageOld->counterDifferenceProceduralStatus;
+			StorageTmp->counterDifferenceProceduralStatusLen = StorageOld->counterDifferenceProceduralStatusLen;
+			StorageOld->counterDifferenceProceduralStatus = NULL;
+			StorageOld->counterDifferenceProceduralStatusLen = 0;
+		}
+		if (--StorageTmp->monitorMetricTable_rsvs == 0)
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4690,12 +6358,14 @@ write_counterDifferenceProceduralStatus(int action, u_char *var_val, u_char var_
 int
 write_counterOverflowPackage(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct monitorMetricTable_data *StorageTmp = NULL;
+	struct monitorMetricTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_counterOverflowPackage entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(monitorMetricTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -4728,22 +6398,61 @@ write_counterOverflowPackage(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to counterOverflowPackage: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			if (StorageTmp->monitorMetricTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->monitorMetricTable_old = monitorMetricTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->monitorMetricTable_rsvs++;
+		StorageTmp->counterOverflowPackage = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->monitorMetricTable_tsts == 0)
+				if ((ret = check_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->counterOverflowPackage for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->counterOverflowPackage;
-		StorageTmp->counterOverflowPackage = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->monitorMetricTable_sets == 0)
+				if ((ret = update_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
+			StorageTmp->monitorMetricTable_rsvs = 0;
+			StorageTmp->monitorMetricTable_tsts = 0;
+			StorageTmp->monitorMetricTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->counterOverflowPackage = old_value;
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->monitorMetricTable_sets == 0)
+			revert_monitorMetricTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		StorageTmp->counterOverflowPackage = StorageOld->counterOverflowPackage;
+		if (--StorageTmp->monitorMetricTable_rsvs == 0)
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4763,12 +6472,14 @@ write_counterOverflowPackage(int action, u_char *var_val, u_char var_val_type, s
 int
 write_gaugeDifferencePackage(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct monitorMetricTable_data *StorageTmp = NULL;
+	struct monitorMetricTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_gaugeDifferencePackage entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(monitorMetricTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -4801,22 +6512,61 @@ write_gaugeDifferencePackage(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to gaugeDifferencePackage: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			if (StorageTmp->monitorMetricTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->monitorMetricTable_old = monitorMetricTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->monitorMetricTable_rsvs++;
+		StorageTmp->gaugeDifferencePackage = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->monitorMetricTable_tsts == 0)
+				if ((ret = check_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gaugeDifferencePackage for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gaugeDifferencePackage;
-		StorageTmp->gaugeDifferencePackage = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->monitorMetricTable_sets == 0)
+				if ((ret = update_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
+			StorageTmp->monitorMetricTable_rsvs = 0;
+			StorageTmp->monitorMetricTable_tsts = 0;
+			StorageTmp->monitorMetricTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gaugeDifferencePackage = old_value;
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->monitorMetricTable_sets == 0)
+			revert_monitorMetricTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		StorageTmp->gaugeDifferencePackage = StorageOld->gaugeDifferencePackage;
+		if (--StorageTmp->monitorMetricTable_rsvs == 0)
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4836,12 +6586,14 @@ write_gaugeDifferencePackage(int action, u_char *var_val, u_char var_val_type, s
 int
 write_previousScanGaugeValue(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct monitorMetricTable_data *StorageTmp = NULL;
+	struct monitorMetricTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_previousScanGaugeValue entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(monitorMetricTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -4866,22 +6618,61 @@ write_previousScanGaugeValue(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to previousScanGaugeValue: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			if (StorageTmp->monitorMetricTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->monitorMetricTable_old = monitorMetricTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->monitorMetricTable_rsvs++;
+		StorageTmp->previousScanGaugeValue = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->monitorMetricTable_tsts == 0)
+				if ((ret = check_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->previousScanGaugeValue for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->previousScanGaugeValue;
-		StorageTmp->previousScanGaugeValue = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->monitorMetricTable_sets == 0)
+				if ((ret = update_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
+			StorageTmp->monitorMetricTable_rsvs = 0;
+			StorageTmp->monitorMetricTable_tsts = 0;
+			StorageTmp->monitorMetricTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->previousScanGaugeValue = old_value;
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->monitorMetricTable_sets == 0)
+			revert_monitorMetricTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		StorageTmp->previousScanGaugeValue = StorageOld->previousScanGaugeValue;
+		if (--StorageTmp->monitorMetricTable_rsvs == 0)
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4901,17 +6692,17 @@ write_previousScanGaugeValue(int action, u_char *var_val, u_char var_val_type, s
 int
 write_gaugeDirferenceProceduralStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct monitorMetricTable_data *StorageTmp = NULL;
+	struct monitorMetricTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_gaugeDirferenceProceduralStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(monitorMetricTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->monitorMetricRowStatus) {
@@ -4941,33 +6732,73 @@ write_gaugeDirferenceProceduralStatus(int action, u_char *var_val, u_char var_va
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			if (StorageTmp->monitorMetricTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->monitorMetricTable_old = monitorMetricTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->monitorMetricTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->gaugeDirferenceProceduralStatus);
+		StorageTmp->gaugeDirferenceProceduralStatus = string;
+		StorageTmp->gaugeDirferenceProceduralStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->monitorMetricTable_tsts == 0)
+				if ((ret = check_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->gaugeDirferenceProceduralStatus for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->gaugeDirferenceProceduralStatus;
-		old_length = StorageTmp->gaugeDirferenceProceduralStatusLen;
-		StorageTmp->gaugeDirferenceProceduralStatus = string;
-		StorageTmp->gaugeDirferenceProceduralStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->monitorMetricTable_sets == 0)
+				if ((ret = update_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
+			StorageTmp->monitorMetricTable_rsvs = 0;
+			StorageTmp->monitorMetricTable_tsts = 0;
+			StorageTmp->monitorMetricTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->gaugeDirferenceProceduralStatus = old_value;
-		StorageTmp->gaugeDirferenceProceduralStatusLen = old_length;
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->monitorMetricTable_sets == 0)
+			revert_monitorMetricTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		if (StorageOld->gaugeDirferenceProceduralStatus != NULL) {
+			SNMP_FREE(StorageTmp->gaugeDirferenceProceduralStatus);
+			StorageTmp->gaugeDirferenceProceduralStatus = StorageOld->gaugeDirferenceProceduralStatus;
+			StorageTmp->gaugeDirferenceProceduralStatusLen = StorageOld->gaugeDirferenceProceduralStatusLen;
+			StorageOld->gaugeDirferenceProceduralStatus = NULL;
+			StorageOld->gaugeDirferenceProceduralStatusLen = 0;
+		}
+		if (--StorageTmp->monitorMetricTable_rsvs == 0)
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4987,12 +6818,14 @@ write_gaugeDirferenceProceduralStatus(int action, u_char *var_val, u_char var_va
 int
 write_metricLowThreshold(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct monitorMetricTable_data *StorageTmp = NULL;
+	struct monitorMetricTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_metricLowThreshold entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(monitorMetricTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5017,22 +6850,61 @@ write_metricLowThreshold(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to metricLowThreshold: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			if (StorageTmp->monitorMetricTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->monitorMetricTable_old = monitorMetricTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->monitorMetricTable_rsvs++;
+		StorageTmp->metricLowThreshold = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->monitorMetricTable_tsts == 0)
+				if ((ret = check_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->metricLowThreshold for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->metricLowThreshold;
-		StorageTmp->metricLowThreshold = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->monitorMetricTable_sets == 0)
+				if ((ret = update_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
+			StorageTmp->monitorMetricTable_rsvs = 0;
+			StorageTmp->monitorMetricTable_tsts = 0;
+			StorageTmp->monitorMetricTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->metricLowThreshold = old_value;
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->monitorMetricTable_sets == 0)
+			revert_monitorMetricTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		StorageTmp->metricLowThreshold = StorageOld->metricLowThreshold;
+		if (--StorageTmp->monitorMetricTable_rsvs == 0)
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5052,12 +6924,14 @@ write_metricLowThreshold(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_metricLowNotify(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct monitorMetricTable_data *StorageTmp = NULL;
+	struct monitorMetricTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_metricLowNotify entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(monitorMetricTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5090,22 +6964,61 @@ write_metricLowNotify(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to metricLowNotify: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			if (StorageTmp->monitorMetricTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->monitorMetricTable_old = monitorMetricTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->monitorMetricTable_rsvs++;
+		StorageTmp->metricLowNotify = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->monitorMetricTable_tsts == 0)
+				if ((ret = check_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->metricLowNotify for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->metricLowNotify;
-		StorageTmp->metricLowNotify = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->monitorMetricTable_sets == 0)
+				if ((ret = update_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
+			StorageTmp->monitorMetricTable_rsvs = 0;
+			StorageTmp->monitorMetricTable_tsts = 0;
+			StorageTmp->monitorMetricTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->metricLowNotify = old_value;
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->monitorMetricTable_sets == 0)
+			revert_monitorMetricTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		StorageTmp->metricLowNotify = StorageOld->metricLowNotify;
+		if (--StorageTmp->monitorMetricTable_rsvs == 0)
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5125,12 +7038,14 @@ write_metricLowNotify(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_metricLowSeverityIndication(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct monitorMetricTable_data *StorageTmp = NULL;
+	struct monitorMetricTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_metricLowSeverityIndication entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(monitorMetricTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5167,22 +7082,61 @@ write_metricLowSeverityIndication(int action, u_char *var_val, u_char var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to metricLowSeverityIndication: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			if (StorageTmp->monitorMetricTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->monitorMetricTable_old = monitorMetricTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->monitorMetricTable_rsvs++;
+		StorageTmp->metricLowSeverityIndication = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->monitorMetricTable_tsts == 0)
+				if ((ret = check_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->metricLowSeverityIndication for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->metricLowSeverityIndication;
-		StorageTmp->metricLowSeverityIndication = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->monitorMetricTable_sets == 0)
+				if ((ret = update_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
+			StorageTmp->monitorMetricTable_rsvs = 0;
+			StorageTmp->monitorMetricTable_tsts = 0;
+			StorageTmp->monitorMetricTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->metricLowSeverityIndication = old_value;
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->monitorMetricTable_sets == 0)
+			revert_monitorMetricTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		StorageTmp->metricLowSeverityIndication = StorageOld->metricLowSeverityIndication;
+		if (--StorageTmp->monitorMetricTable_rsvs == 0)
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5202,12 +7156,14 @@ write_metricLowSeverityIndication(int action, u_char *var_val, u_char var_val_ty
 int
 write_metricHighThreshold(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct monitorMetricTable_data *StorageTmp = NULL;
+	struct monitorMetricTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_metricHighThreshold entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(monitorMetricTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5232,22 +7188,61 @@ write_metricHighThreshold(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to metricHighThreshold: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			if (StorageTmp->monitorMetricTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->monitorMetricTable_old = monitorMetricTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->monitorMetricTable_rsvs++;
+		StorageTmp->metricHighThreshold = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->monitorMetricTable_tsts == 0)
+				if ((ret = check_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->metricHighThreshold for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->metricHighThreshold;
-		StorageTmp->metricHighThreshold = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->monitorMetricTable_sets == 0)
+				if ((ret = update_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
+			StorageTmp->monitorMetricTable_rsvs = 0;
+			StorageTmp->monitorMetricTable_tsts = 0;
+			StorageTmp->monitorMetricTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->metricHighThreshold = old_value;
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->monitorMetricTable_sets == 0)
+			revert_monitorMetricTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		StorageTmp->metricHighThreshold = StorageOld->metricHighThreshold;
+		if (--StorageTmp->monitorMetricTable_rsvs == 0)
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5267,12 +7262,14 @@ write_metricHighThreshold(int action, u_char *var_val, u_char var_val_type, size
 int
 write_metricHighNotify(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct monitorMetricTable_data *StorageTmp = NULL;
+	struct monitorMetricTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_metricHighNotify entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(monitorMetricTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5305,22 +7302,61 @@ write_metricHighNotify(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to metricHighNotify: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			if (StorageTmp->monitorMetricTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->monitorMetricTable_old = monitorMetricTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->monitorMetricTable_rsvs++;
+		StorageTmp->metricHighNotify = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->monitorMetricTable_tsts == 0)
+				if ((ret = check_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->metricHighNotify for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->metricHighNotify;
-		StorageTmp->metricHighNotify = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->monitorMetricTable_sets == 0)
+				if ((ret = update_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
+			StorageTmp->monitorMetricTable_rsvs = 0;
+			StorageTmp->monitorMetricTable_tsts = 0;
+			StorageTmp->monitorMetricTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->metricHighNotify = old_value;
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->monitorMetricTable_sets == 0)
+			revert_monitorMetricTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		StorageTmp->metricHighNotify = StorageOld->metricHighNotify;
+		if (--StorageTmp->monitorMetricTable_rsvs == 0)
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5340,12 +7376,14 @@ write_metricHighNotify(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_metricHighSeverityIndication(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct monitorMetricTable_data *StorageTmp = NULL;
+	struct monitorMetricTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_metricHighSeverityIndication entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(monitorMetricTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5382,22 +7420,61 @@ write_metricHighSeverityIndication(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to metricHighSeverityIndication: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			if (StorageTmp->monitorMetricTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->monitorMetricTable_old = monitorMetricTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->monitorMetricTable_rsvs++;
+		StorageTmp->metricHighSeverityIndication = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->monitorMetricTable_tsts == 0)
+				if ((ret = check_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->metricHighSeverityIndication for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->metricHighSeverityIndication;
-		StorageTmp->metricHighSeverityIndication = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->monitorMetricTable_sets == 0)
+				if ((ret = update_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
+			StorageTmp->monitorMetricTable_rsvs = 0;
+			StorageTmp->monitorMetricTable_tsts = 0;
+			StorageTmp->monitorMetricTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->metricHighSeverityIndication = old_value;
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->monitorMetricTable_sets == 0)
+			revert_monitorMetricTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		StorageTmp->metricHighSeverityIndication = StorageOld->metricHighSeverityIndication;
+		if (--StorageTmp->monitorMetricTable_rsvs == 0)
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5417,17 +7494,17 @@ write_metricHighSeverityIndication(int action, u_char *var_val, u_char var_val_t
 int
 write_metricSpecificProblemsIndicator(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct monitorMetricTable_data *StorageTmp = NULL;
+	struct monitorMetricTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_metricSpecificProblemsIndicator entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(monitorMetricTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->monitorMetricRowStatus) {
@@ -5449,31 +7526,71 @@ write_metricSpecificProblemsIndicator(int action, u_char *var_val, u_char var_va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to metricSpecificProblemsIndicator: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			if (StorageTmp->monitorMetricTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->monitorMetricTable_old = monitorMetricTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->monitorMetricTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->metricSpecificProblemsIndicator);
+		StorageTmp->metricSpecificProblemsIndicator = objid;
+		StorageTmp->metricSpecificProblemsIndicatorLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->monitorMetricTable_tsts == 0)
+				if ((ret = check_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->metricSpecificProblemsIndicator for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->metricSpecificProblemsIndicator;
-		old_length = StorageTmp->metricSpecificProblemsIndicatorLen;
-		StorageTmp->metricSpecificProblemsIndicator = objid;
-		StorageTmp->metricSpecificProblemsIndicatorLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->monitorMetricTable_sets == 0)
+				if ((ret = update_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
+			StorageTmp->monitorMetricTable_rsvs = 0;
+			StorageTmp->monitorMetricTable_tsts = 0;
+			StorageTmp->monitorMetricTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->metricSpecificProblemsIndicator = old_value;
-		StorageTmp->metricSpecificProblemsIndicatorLen = old_length;
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->monitorMetricTable_sets == 0)
+			revert_monitorMetricTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		if (StorageOld->metricSpecificProblemsIndicator != NULL) {
+			SNMP_FREE(StorageTmp->metricSpecificProblemsIndicator);
+			StorageTmp->metricSpecificProblemsIndicator = StorageOld->metricSpecificProblemsIndicator;
+			StorageTmp->metricSpecificProblemsIndicatorLen = StorageOld->metricSpecificProblemsIndicatorLen;
+			StorageOld->metricSpecificProblemsIndicator = NULL;
+			StorageOld->metricSpecificProblemsIndicatorLen = 0;
+		}
+		if (--StorageTmp->monitorMetricTable_rsvs == 0)
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5493,17 +7610,17 @@ write_metricSpecificProblemsIndicator(int action, u_char *var_val, u_char var_va
 int
 write_derivedGaugeTimeStamp(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct monitorMetricTable_data *StorageTmp = NULL;
+	struct monitorMetricTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_derivedGaugeTimeStamp entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(monitorMetricTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->monitorMetricRowStatus) {
@@ -5526,33 +7643,73 @@ write_derivedGaugeTimeStamp(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to derivedGaugeTimeStamp: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			if (StorageTmp->monitorMetricTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->monitorMetricTable_old = monitorMetricTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->monitorMetricTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->derivedGaugeTimeStamp);
+		StorageTmp->derivedGaugeTimeStamp = string;
+		StorageTmp->derivedGaugeTimeStampLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->monitorMetricTable_tsts == 0)
+				if ((ret = check_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->derivedGaugeTimeStamp for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->derivedGaugeTimeStamp;
-		old_length = StorageTmp->derivedGaugeTimeStampLen;
-		StorageTmp->derivedGaugeTimeStamp = string;
-		StorageTmp->derivedGaugeTimeStampLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->monitorMetricTable_sets == 0)
+				if ((ret = update_monitorMetricTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->monitorMetricTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
+			StorageTmp->monitorMetricTable_rsvs = 0;
+			StorageTmp->monitorMetricTable_tsts = 0;
+			StorageTmp->monitorMetricTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->derivedGaugeTimeStamp = old_value;
-		StorageTmp->derivedGaugeTimeStampLen = old_length;
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->monitorMetricTable_sets == 0)
+			revert_monitorMetricTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+			break;
+		if (StorageOld->derivedGaugeTimeStamp != NULL) {
+			SNMP_FREE(StorageTmp->derivedGaugeTimeStamp);
+			StorageTmp->derivedGaugeTimeStamp = StorageOld->derivedGaugeTimeStamp;
+			StorageTmp->derivedGaugeTimeStampLen = StorageOld->derivedGaugeTimeStampLen;
+			StorageOld->derivedGaugeTimeStamp = NULL;
+			StorageOld->derivedGaugeTimeStampLen = 0;
+		}
+		if (--StorageTmp->monitorMetricTable_rsvs == 0)
+			monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5572,12 +7729,14 @@ write_derivedGaugeTimeStamp(int action, u_char *var_val, u_char var_val_type, si
 int
 write_movingTimePeriod(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct meanMonitorTable_data *StorageTmp = NULL;
+	struct meanMonitorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_movingTimePeriod entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(meanMonitorTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5602,22 +7761,61 @@ write_movingTimePeriod(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to movingTimePeriod: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) == NULL)
+			if (StorageTmp->meanMonitorTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->meanMonitorTable_old = meanMonitorTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->meanMonitorTable_rsvs++;
+		StorageTmp->movingTimePeriod = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->meanMonitorTable_tsts == 0)
+				if ((ret = check_meanMonitorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->meanMonitorTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->movingTimePeriod for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->movingTimePeriod;
-		StorageTmp->movingTimePeriod = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->meanMonitorTable_sets == 0)
+				if ((ret = update_meanMonitorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->meanMonitorTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) != NULL) {
+			meanMonitorTable_destroy(&StorageTmp->meanMonitorTable_old);
+			StorageTmp->meanMonitorTable_rsvs = 0;
+			StorageTmp->meanMonitorTable_tsts = 0;
+			StorageTmp->meanMonitorTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->movingTimePeriod = old_value;
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->meanMonitorTable_sets == 0)
+			revert_meanMonitorTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) == NULL)
+			break;
+		StorageTmp->movingTimePeriod = StorageOld->movingTimePeriod;
+		if (--StorageTmp->meanMonitorTable_rsvs == 0)
+			meanMonitorTable_destroy(&StorageTmp->meanMonitorTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5637,12 +7835,14 @@ write_movingTimePeriod(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_estimateOfMeanLowThreshold(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct meanMonitorTable_data *StorageTmp = NULL;
+	struct meanMonitorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_estimateOfMeanLowThreshold entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(meanMonitorTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5667,22 +7867,61 @@ write_estimateOfMeanLowThreshold(int action, u_char *var_val, u_char var_val_typ
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to estimateOfMeanLowThreshold: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) == NULL)
+			if (StorageTmp->meanMonitorTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->meanMonitorTable_old = meanMonitorTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->meanMonitorTable_rsvs++;
+		StorageTmp->estimateOfMeanLowThreshold = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->meanMonitorTable_tsts == 0)
+				if ((ret = check_meanMonitorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->meanMonitorTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->estimateOfMeanLowThreshold for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->estimateOfMeanLowThreshold;
-		StorageTmp->estimateOfMeanLowThreshold = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->meanMonitorTable_sets == 0)
+				if ((ret = update_meanMonitorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->meanMonitorTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) != NULL) {
+			meanMonitorTable_destroy(&StorageTmp->meanMonitorTable_old);
+			StorageTmp->meanMonitorTable_rsvs = 0;
+			StorageTmp->meanMonitorTable_tsts = 0;
+			StorageTmp->meanMonitorTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->estimateOfMeanLowThreshold = old_value;
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->meanMonitorTable_sets == 0)
+			revert_meanMonitorTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) == NULL)
+			break;
+		StorageTmp->estimateOfMeanLowThreshold = StorageOld->estimateOfMeanLowThreshold;
+		if (--StorageTmp->meanMonitorTable_rsvs == 0)
+			meanMonitorTable_destroy(&StorageTmp->meanMonitorTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5702,12 +7941,14 @@ write_estimateOfMeanLowThreshold(int action, u_char *var_val, u_char var_val_typ
 int
 write_estimateOfMeanLowNotify(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct meanMonitorTable_data *StorageTmp = NULL;
+	struct meanMonitorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_estimateOfMeanLowNotify entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(meanMonitorTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5740,22 +7981,61 @@ write_estimateOfMeanLowNotify(int action, u_char *var_val, u_char var_val_type, 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to estimateOfMeanLowNotify: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) == NULL)
+			if (StorageTmp->meanMonitorTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->meanMonitorTable_old = meanMonitorTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->meanMonitorTable_rsvs++;
+		StorageTmp->estimateOfMeanLowNotify = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->meanMonitorTable_tsts == 0)
+				if ((ret = check_meanMonitorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->meanMonitorTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->estimateOfMeanLowNotify for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->estimateOfMeanLowNotify;
-		StorageTmp->estimateOfMeanLowNotify = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->meanMonitorTable_sets == 0)
+				if ((ret = update_meanMonitorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->meanMonitorTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) != NULL) {
+			meanMonitorTable_destroy(&StorageTmp->meanMonitorTable_old);
+			StorageTmp->meanMonitorTable_rsvs = 0;
+			StorageTmp->meanMonitorTable_tsts = 0;
+			StorageTmp->meanMonitorTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->estimateOfMeanLowNotify = old_value;
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->meanMonitorTable_sets == 0)
+			revert_meanMonitorTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) == NULL)
+			break;
+		StorageTmp->estimateOfMeanLowNotify = StorageOld->estimateOfMeanLowNotify;
+		if (--StorageTmp->meanMonitorTable_rsvs == 0)
+			meanMonitorTable_destroy(&StorageTmp->meanMonitorTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5775,12 +8055,14 @@ write_estimateOfMeanLowNotify(int action, u_char *var_val, u_char var_val_type, 
 int
 write_estimateOfMeanLowSeverityIndication(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct meanMonitorTable_data *StorageTmp = NULL;
+	struct meanMonitorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_estimateOfMeanLowSeverityIndication entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(meanMonitorTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5817,22 +8099,61 @@ write_estimateOfMeanLowSeverityIndication(int action, u_char *var_val, u_char va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to estimateOfMeanLowSeverityIndication: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) == NULL)
+			if (StorageTmp->meanMonitorTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->meanMonitorTable_old = meanMonitorTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->meanMonitorTable_rsvs++;
+		StorageTmp->estimateOfMeanLowSeverityIndication = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->meanMonitorTable_tsts == 0)
+				if ((ret = check_meanMonitorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->meanMonitorTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->estimateOfMeanLowSeverityIndication for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->estimateOfMeanLowSeverityIndication;
-		StorageTmp->estimateOfMeanLowSeverityIndication = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->meanMonitorTable_sets == 0)
+				if ((ret = update_meanMonitorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->meanMonitorTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) != NULL) {
+			meanMonitorTable_destroy(&StorageTmp->meanMonitorTable_old);
+			StorageTmp->meanMonitorTable_rsvs = 0;
+			StorageTmp->meanMonitorTable_tsts = 0;
+			StorageTmp->meanMonitorTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->estimateOfMeanLowSeverityIndication = old_value;
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->meanMonitorTable_sets == 0)
+			revert_meanMonitorTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) == NULL)
+			break;
+		StorageTmp->estimateOfMeanLowSeverityIndication = StorageOld->estimateOfMeanLowSeverityIndication;
+		if (--StorageTmp->meanMonitorTable_rsvs == 0)
+			meanMonitorTable_destroy(&StorageTmp->meanMonitorTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5852,12 +8173,14 @@ write_estimateOfMeanLowSeverityIndication(int action, u_char *var_val, u_char va
 int
 write_estimateOfMeanHighThreshold(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct meanMonitorTable_data *StorageTmp = NULL;
+	struct meanMonitorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_estimateOfMeanHighThreshold entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(meanMonitorTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5882,22 +8205,61 @@ write_estimateOfMeanHighThreshold(int action, u_char *var_val, u_char var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to estimateOfMeanHighThreshold: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) == NULL)
+			if (StorageTmp->meanMonitorTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->meanMonitorTable_old = meanMonitorTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->meanMonitorTable_rsvs++;
+		StorageTmp->estimateOfMeanHighThreshold = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->meanMonitorTable_tsts == 0)
+				if ((ret = check_meanMonitorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->meanMonitorTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->estimateOfMeanHighThreshold for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->estimateOfMeanHighThreshold;
-		StorageTmp->estimateOfMeanHighThreshold = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->meanMonitorTable_sets == 0)
+				if ((ret = update_meanMonitorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->meanMonitorTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) != NULL) {
+			meanMonitorTable_destroy(&StorageTmp->meanMonitorTable_old);
+			StorageTmp->meanMonitorTable_rsvs = 0;
+			StorageTmp->meanMonitorTable_tsts = 0;
+			StorageTmp->meanMonitorTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->estimateOfMeanHighThreshold = old_value;
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->meanMonitorTable_sets == 0)
+			revert_meanMonitorTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) == NULL)
+			break;
+		StorageTmp->estimateOfMeanHighThreshold = StorageOld->estimateOfMeanHighThreshold;
+		if (--StorageTmp->meanMonitorTable_rsvs == 0)
+			meanMonitorTable_destroy(&StorageTmp->meanMonitorTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5917,12 +8279,14 @@ write_estimateOfMeanHighThreshold(int action, u_char *var_val, u_char var_val_ty
 int
 write_estimateOfMeanHighNotify(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct meanMonitorTable_data *StorageTmp = NULL;
+	struct meanMonitorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_estimateOfMeanHighNotify entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(meanMonitorTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5955,22 +8319,61 @@ write_estimateOfMeanHighNotify(int action, u_char *var_val, u_char var_val_type,
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to estimateOfMeanHighNotify: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) == NULL)
+			if (StorageTmp->meanMonitorTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->meanMonitorTable_old = meanMonitorTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->meanMonitorTable_rsvs++;
+		StorageTmp->estimateOfMeanHighNotify = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->meanMonitorTable_tsts == 0)
+				if ((ret = check_meanMonitorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->meanMonitorTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->estimateOfMeanHighNotify for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->estimateOfMeanHighNotify;
-		StorageTmp->estimateOfMeanHighNotify = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->meanMonitorTable_sets == 0)
+				if ((ret = update_meanMonitorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->meanMonitorTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) != NULL) {
+			meanMonitorTable_destroy(&StorageTmp->meanMonitorTable_old);
+			StorageTmp->meanMonitorTable_rsvs = 0;
+			StorageTmp->meanMonitorTable_tsts = 0;
+			StorageTmp->meanMonitorTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->estimateOfMeanHighNotify = old_value;
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->meanMonitorTable_sets == 0)
+			revert_meanMonitorTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) == NULL)
+			break;
+		StorageTmp->estimateOfMeanHighNotify = StorageOld->estimateOfMeanHighNotify;
+		if (--StorageTmp->meanMonitorTable_rsvs == 0)
+			meanMonitorTable_destroy(&StorageTmp->meanMonitorTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5990,12 +8393,14 @@ write_estimateOfMeanHighNotify(int action, u_char *var_val, u_char var_val_type,
 int
 write_estimateOfMeanHighSeverityIndication(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct meanMonitorTable_data *StorageTmp = NULL;
+	struct meanMonitorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_estimateOfMeanHighSeverityIndication entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(meanMonitorTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6032,22 +8437,61 @@ write_estimateOfMeanHighSeverityIndication(int action, u_char *var_val, u_char v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to estimateOfMeanHighSeverityIndication: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) == NULL)
+			if (StorageTmp->meanMonitorTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->meanMonitorTable_old = meanMonitorTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->meanMonitorTable_rsvs++;
+		StorageTmp->estimateOfMeanHighSeverityIndication = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->meanMonitorTable_tsts == 0)
+				if ((ret = check_meanMonitorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->meanMonitorTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->estimateOfMeanHighSeverityIndication for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->estimateOfMeanHighSeverityIndication;
-		StorageTmp->estimateOfMeanHighSeverityIndication = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->meanMonitorTable_sets == 0)
+				if ((ret = update_meanMonitorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->meanMonitorTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) != NULL) {
+			meanMonitorTable_destroy(&StorageTmp->meanMonitorTable_old);
+			StorageTmp->meanMonitorTable_rsvs = 0;
+			StorageTmp->meanMonitorTable_tsts = 0;
+			StorageTmp->meanMonitorTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->estimateOfMeanHighSeverityIndication = old_value;
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->meanMonitorTable_sets == 0)
+			revert_meanMonitorTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) == NULL)
+			break;
+		StorageTmp->estimateOfMeanHighSeverityIndication = StorageOld->estimateOfMeanHighSeverityIndication;
+		if (--StorageTmp->meanMonitorTable_rsvs == 0)
+			meanMonitorTable_destroy(&StorageTmp->meanMonitorTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6067,17 +8511,17 @@ write_estimateOfMeanHighSeverityIndication(int action, u_char *var_val, u_char v
 int
 write_estimateOfMeanSpecificProblemsIndicator(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct meanMonitorTable_data *StorageTmp = NULL;
+	struct meanMonitorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_estimateOfMeanSpecificProblemsIndicator entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(meanMonitorTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->meanMonitorRowStatus) {
@@ -6099,31 +8543,71 @@ write_estimateOfMeanSpecificProblemsIndicator(int action, u_char *var_val, u_cha
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to estimateOfMeanSpecificProblemsIndicator: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) == NULL)
+			if (StorageTmp->meanMonitorTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->meanMonitorTable_old = meanMonitorTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->meanMonitorTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->estimateOfMeanSpecificProblemsIndicator);
+		StorageTmp->estimateOfMeanSpecificProblemsIndicator = objid;
+		StorageTmp->estimateOfMeanSpecificProblemsIndicatorLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->meanMonitorTable_tsts == 0)
+				if ((ret = check_meanMonitorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->meanMonitorTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->estimateOfMeanSpecificProblemsIndicator for you to use, and you have just been asked to do something with it.  Note that 
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->estimateOfMeanSpecificProblemsIndicator;
-		old_length = StorageTmp->estimateOfMeanSpecificProblemsIndicatorLen;
-		StorageTmp->estimateOfMeanSpecificProblemsIndicator = objid;
-		StorageTmp->estimateOfMeanSpecificProblemsIndicatorLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->meanMonitorTable_sets == 0)
+				if ((ret = update_meanMonitorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->meanMonitorTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) != NULL) {
+			meanMonitorTable_destroy(&StorageTmp->meanMonitorTable_old);
+			StorageTmp->meanMonitorTable_rsvs = 0;
+			StorageTmp->meanMonitorTable_tsts = 0;
+			StorageTmp->meanMonitorTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->estimateOfMeanSpecificProblemsIndicator = old_value;
-		StorageTmp->estimateOfMeanSpecificProblemsIndicatorLen = old_length;
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->meanMonitorTable_sets == 0)
+			revert_meanMonitorTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->meanMonitorTable_old) == NULL)
+			break;
+		if (StorageOld->estimateOfMeanSpecificProblemsIndicator != NULL) {
+			SNMP_FREE(StorageTmp->estimateOfMeanSpecificProblemsIndicator);
+			StorageTmp->estimateOfMeanSpecificProblemsIndicator = StorageOld->estimateOfMeanSpecificProblemsIndicator;
+			StorageTmp->estimateOfMeanSpecificProblemsIndicatorLen = StorageOld->estimateOfMeanSpecificProblemsIndicatorLen;
+			StorageOld->estimateOfMeanSpecificProblemsIndicator = NULL;
+			StorageOld->estimateOfMeanSpecificProblemsIndicatorLen = 0;
+		}
+		if (--StorageTmp->meanMonitorTable_rsvs == 0)
+			meanMonitorTable_destroy(&StorageTmp->meanMonitorTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6143,12 +8627,14 @@ write_estimateOfMeanSpecificProblemsIndicator(int action, u_char *var_val, u_cha
 int
 write_percentileSecondMovingTimePeriod(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct meanAndPercentileMonitorTable_data *StorageTmp = NULL;
+	struct meanAndPercentileMonitorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_percentileSecondMovingTimePeriod entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(meanAndPercentileMonitorTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6173,22 +8659,61 @@ write_percentileSecondMovingTimePeriod(int action, u_char *var_val, u_char var_v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to percentileSecondMovingTimePeriod: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->meanAndPercentileMonitorTable_old) == NULL)
+			if (StorageTmp->meanAndPercentileMonitorTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->meanAndPercentileMonitorTable_old = meanAndPercentileMonitorTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->meanAndPercentileMonitorTable_rsvs++;
+		StorageTmp->percentileSecondMovingTimePeriod = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->meanAndPercentileMonitorTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->meanAndPercentileMonitorTable_tsts == 0)
+				if ((ret = check_meanAndPercentileMonitorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->meanAndPercentileMonitorTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->percentileSecondMovingTimePeriod for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->percentileSecondMovingTimePeriod;
-		StorageTmp->percentileSecondMovingTimePeriod = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->meanAndPercentileMonitorTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->meanAndPercentileMonitorTable_sets == 0)
+				if ((ret = update_meanAndPercentileMonitorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->meanAndPercentileMonitorTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->meanAndPercentileMonitorTable_old) != NULL) {
+			meanAndPercentileMonitorTable_destroy(&StorageTmp->meanAndPercentileMonitorTable_old);
+			StorageTmp->meanAndPercentileMonitorTable_rsvs = 0;
+			StorageTmp->meanAndPercentileMonitorTable_tsts = 0;
+			StorageTmp->meanAndPercentileMonitorTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->percentileSecondMovingTimePeriod = old_value;
+		if ((StorageOld = StorageTmp->meanAndPercentileMonitorTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->meanAndPercentileMonitorTable_sets == 0)
+			revert_meanAndPercentileMonitorTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->meanAndPercentileMonitorTable_old) == NULL)
+			break;
+		StorageTmp->percentileSecondMovingTimePeriod = StorageOld->percentileSecondMovingTimePeriod;
+		if (--StorageTmp->meanAndPercentileMonitorTable_rsvs == 0)
+			meanAndPercentileMonitorTable_destroy(&StorageTmp->meanAndPercentileMonitorTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6208,12 +8733,14 @@ write_percentileSecondMovingTimePeriod(int action, u_char *var_val, u_char var_v
 int
 write_numberOfReplications(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct meanAndPercentileMonitorTable_data *StorageTmp = NULL;
+	struct meanAndPercentileMonitorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_numberOfReplications entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(meanAndPercentileMonitorTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6238,22 +8765,61 @@ write_numberOfReplications(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to numberOfReplications: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->meanAndPercentileMonitorTable_old) == NULL)
+			if (StorageTmp->meanAndPercentileMonitorTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->meanAndPercentileMonitorTable_old = meanAndPercentileMonitorTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->meanAndPercentileMonitorTable_rsvs++;
+		StorageTmp->numberOfReplications = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->meanAndPercentileMonitorTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->meanAndPercentileMonitorTable_tsts == 0)
+				if ((ret = check_meanAndPercentileMonitorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->meanAndPercentileMonitorTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->numberOfReplications for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->numberOfReplications;
-		StorageTmp->numberOfReplications = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->meanAndPercentileMonitorTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->meanAndPercentileMonitorTable_sets == 0)
+				if ((ret = update_meanAndPercentileMonitorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->meanAndPercentileMonitorTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->meanAndPercentileMonitorTable_old) != NULL) {
+			meanAndPercentileMonitorTable_destroy(&StorageTmp->meanAndPercentileMonitorTable_old);
+			StorageTmp->meanAndPercentileMonitorTable_rsvs = 0;
+			StorageTmp->meanAndPercentileMonitorTable_tsts = 0;
+			StorageTmp->meanAndPercentileMonitorTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->numberOfReplications = old_value;
+		if ((StorageOld = StorageTmp->meanAndPercentileMonitorTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->meanAndPercentileMonitorTable_sets == 0)
+			revert_meanAndPercentileMonitorTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->meanAndPercentileMonitorTable_old) == NULL)
+			break;
+		StorageTmp->numberOfReplications = StorageOld->numberOfReplications;
+		if (--StorageTmp->meanAndPercentileMonitorTable_rsvs == 0)
+			meanAndPercentileMonitorTable_destroy(&StorageTmp->meanAndPercentileMonitorTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6273,12 +8839,14 @@ write_numberOfReplications(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_configurablePercentilePackage(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct meanAndPercentileMonitorTable_data *StorageTmp = NULL;
+	struct meanAndPercentileMonitorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_configurablePercentilePackage entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(meanAndPercentileMonitorTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6311,22 +8879,61 @@ write_configurablePercentilePackage(int action, u_char *var_val, u_char var_val_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to configurablePercentilePackage: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->meanAndPercentileMonitorTable_old) == NULL)
+			if (StorageTmp->meanAndPercentileMonitorTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->meanAndPercentileMonitorTable_old = meanAndPercentileMonitorTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->meanAndPercentileMonitorTable_rsvs++;
+		StorageTmp->configurablePercentilePackage = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->meanAndPercentileMonitorTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->meanAndPercentileMonitorTable_tsts == 0)
+				if ((ret = check_meanAndPercentileMonitorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->meanAndPercentileMonitorTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->configurablePercentilePackage for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->configurablePercentilePackage;
-		StorageTmp->configurablePercentilePackage = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->meanAndPercentileMonitorTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->meanAndPercentileMonitorTable_sets == 0)
+				if ((ret = update_meanAndPercentileMonitorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->meanAndPercentileMonitorTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->meanAndPercentileMonitorTable_old) != NULL) {
+			meanAndPercentileMonitorTable_destroy(&StorageTmp->meanAndPercentileMonitorTable_old);
+			StorageTmp->meanAndPercentileMonitorTable_rsvs = 0;
+			StorageTmp->meanAndPercentileMonitorTable_tsts = 0;
+			StorageTmp->meanAndPercentileMonitorTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->configurablePercentilePackage = old_value;
+		if ((StorageOld = StorageTmp->meanAndPercentileMonitorTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->meanAndPercentileMonitorTable_sets == 0)
+			revert_meanAndPercentileMonitorTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->meanAndPercentileMonitorTable_old) == NULL)
+			break;
+		StorageTmp->configurablePercentilePackage = StorageOld->configurablePercentilePackage;
+		if (--StorageTmp->meanAndPercentileMonitorTable_rsvs == 0)
+			meanAndPercentileMonitorTable_destroy(&StorageTmp->meanAndPercentileMonitorTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -6346,12 +8953,14 @@ write_configurablePercentilePackage(int action, u_char *var_val, u_char var_val_
 int
 write_varianceSecondMovingTimePeriod(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct meanAndVarianceMonitorTable_data *StorageTmp = NULL;
+	struct meanAndVarianceMonitorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("metricMIB", "write_varianceSecondMovingTimePeriod entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(meanAndVarianceMonitorTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -6376,169 +8985,302 @@ write_varianceSecondMovingTimePeriod(int action, u_char *var_val, u_char var_val
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to varianceSecondMovingTimePeriod: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->meanAndVarianceMonitorTable_old) == NULL)
+			if (StorageTmp->meanAndVarianceMonitorTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->meanAndVarianceMonitorTable_old = meanAndVarianceMonitorTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->meanAndVarianceMonitorTable_rsvs++;
+		StorageTmp->varianceSecondMovingTimePeriod = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->meanAndVarianceMonitorTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->meanAndVarianceMonitorTable_tsts == 0)
+				if ((ret = check_meanAndVarianceMonitorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->meanAndVarianceMonitorTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->varianceSecondMovingTimePeriod for you to use, and you have just been asked to do something with it.  Note that anything 
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->varianceSecondMovingTimePeriod;
-		StorageTmp->varianceSecondMovingTimePeriod = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->meanAndVarianceMonitorTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->meanAndVarianceMonitorTable_sets == 0)
+				if ((ret = update_meanAndVarianceMonitorTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->meanAndVarianceMonitorTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->meanAndVarianceMonitorTable_old) != NULL) {
+			meanAndVarianceMonitorTable_destroy(&StorageTmp->meanAndVarianceMonitorTable_old);
+			StorageTmp->meanAndVarianceMonitorTable_rsvs = 0;
+			StorageTmp->meanAndVarianceMonitorTable_tsts = 0;
+			StorageTmp->meanAndVarianceMonitorTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->varianceSecondMovingTimePeriod = old_value;
+		if ((StorageOld = StorageTmp->meanAndVarianceMonitorTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->meanAndVarianceMonitorTable_sets == 0)
+			revert_meanAndVarianceMonitorTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->meanAndVarianceMonitorTable_old) == NULL)
+			break;
+		StorageTmp->varianceSecondMovingTimePeriod = StorageOld->varianceSecondMovingTimePeriod;
+		if (--StorageTmp->meanAndVarianceMonitorTable_rsvs == 0)
+			meanAndVarianceMonitorTable_destroy(&StorageTmp->meanAndVarianceMonitorTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int scannerTable_consistent(struct scannerTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_scannerTable_row(struct scannerTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the scannerTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-scannerTable_consistent(struct scannerTable_data *thedata)
+can_act_scannerTable_row(struct scannerTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int monitorMetricTable_consistent(struct monitorMetricTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_scannerTable_row(struct scannerTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the monitorMetricTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-monitorMetricTable_consistent(struct monitorMetricTable_data *thedata)
+can_deact_scannerTable_row(struct scannerTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int meanMonitorTable_consistent(struct meanMonitorTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_monitorMetricTable_row(struct monitorMetricTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the meanMonitorTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-meanMonitorTable_consistent(struct meanMonitorTable_data *thedata)
+can_act_monitorMetricTable_row(struct monitorMetricTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int algorithmIndicatingMeanMonitorTable_consistent(struct algorithmIndicatingMeanMonitorTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_monitorMetricTable_row(struct monitorMetricTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the algorithmIndicatingMeanMonitorTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-algorithmIndicatingMeanMonitorTable_consistent(struct algorithmIndicatingMeanMonitorTable_data *thedata)
+can_deact_monitorMetricTable_row(struct monitorMetricTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int movingAverageMeanMonitorTable_consistent(struct movingAverageMeanMonitorTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_meanMonitorTable_row(struct meanMonitorTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the movingAverageMeanMonitorTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-movingAverageMeanMonitorTable_consistent(struct movingAverageMeanMonitorTable_data *thedata)
+can_act_meanMonitorTable_row(struct meanMonitorTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int meanAndPercentileMonitorTable_consistent(struct meanAndPercentileMonitorTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_meanMonitorTable_row(struct meanMonitorTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the meanAndPercentileMonitorTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-meanAndPercentileMonitorTable_consistent(struct meanAndPercentileMonitorTable_data *thedata)
+can_deact_meanMonitorTable_row(struct meanMonitorTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int meanAndVarianceMonitorTable_consistent(struct meanAndVarianceMonitorTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_movingAverageMeanMonitorTable_row(struct movingAverageMeanMonitorTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the meanAndVarianceMonitorTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-meanAndVarianceMonitorTable_consistent(struct meanAndVarianceMonitorTable_data *thedata)
+can_act_movingAverageMeanMonitorTable_row(struct movingAverageMeanMonitorTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int meanAndMinMaxMonitorTable_consistent(struct meanAndMinMaxMonitorTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_movingAverageMeanMonitorTable_row(struct movingAverageMeanMonitorTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the meanAndMinMaxMonitorTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-meanAndMinMaxMonitorTable_consistent(struct meanAndMinMaxMonitorTable_data *thedata)
+can_deact_movingAverageMeanMonitorTable_row(struct movingAverageMeanMonitorTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_meanAndPercentileMonitorTable_row(struct meanAndPercentileMonitorTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_meanAndPercentileMonitorTable_row(struct meanAndPercentileMonitorTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_meanAndPercentileMonitorTable_row(struct meanAndPercentileMonitorTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_meanAndPercentileMonitorTable_row(struct meanAndPercentileMonitorTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_meanAndVarianceMonitorTable_row(struct meanAndVarianceMonitorTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_meanAndVarianceMonitorTable_row(struct meanAndVarianceMonitorTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_meanAndVarianceMonitorTable_row(struct meanAndVarianceMonitorTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_meanAndVarianceMonitorTable_row(struct meanAndVarianceMonitorTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_meanAndMinMaxMonitorTable_row(struct meanAndMinMaxMonitorTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_meanAndMinMaxMonitorTable_row(struct meanAndMinMaxMonitorTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_meanAndMinMaxMonitorTable_row(struct meanAndMinMaxMonitorTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_meanAndMinMaxMonitorTable_row(struct meanAndMinMaxMonitorTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
@@ -6555,10 +9297,9 @@ meanAndMinMaxMonitorTable_consistent(struct meanAndMinMaxMonitorTable_data *thed
 int
 write_scannerRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct scannerTable_data *StorageTmp = NULL;
+	struct scannerTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct scannerTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -6585,40 +9326,6 @@ write_scannerRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->scannerRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->scannerTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->scannerTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* scannerId */
@@ -6643,13 +9350,44 @@ write_scannerRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->scannerTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->scannerId, vp->val.string, vp->val_len);
 			StorageNew->scannerIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&scannerTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->scannerRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->scannerTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+				if (StorageTmp->scannerTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->scannerTable_old = scannerTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->scannerTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->scannerTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -6659,78 +9397,127 @@ write_scannerRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = scannerTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_scannerTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->scannerRowStatus;
-			StorageTmp->scannerRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = scannerTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->scannerRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->scannerRowStatus != RS_ACTIVE)
+				if ((ret = can_act_scannerTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->scannerRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_scannerTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->scannerRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_scannerTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->scannerRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_scannerTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->scannerRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_scannerTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->scannerRowStatus;
-			StorageTmp->scannerRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->scannerRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_scannerTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_scannerTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->scannerRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->scannerRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->scannerRowStatus = set_value;
+			if ((StorageOld = StorageTmp->scannerTable_old) != NULL) {
+				scannerTable_destroy(&StorageTmp->scannerTable_old);
+				StorageTmp->scannerTable_rsvs = 0;
+				StorageTmp->scannerTable_tsts = 0;
+				StorageTmp->scannerTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			scannerTable_destroy(&StorageDel);
-			/* scannerTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_scannerTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->scannerRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_scannerTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->scannerRowStatus = old_value;
+			if (StorageTmp->scannerRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_scannerTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -6744,6 +9531,13 @@ write_scannerRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				scannerTable_del(StorageNew);
 				scannerTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->scannerTable_old) == NULL)
+				break;
+			if (--StorageTmp->scannerTable_rsvs == 0)
+				scannerTable_destroy(&StorageTmp->scannerTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -6770,10 +9564,9 @@ write_scannerRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_monitorMetricRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct monitorMetricTable_data *StorageTmp = NULL;
+	struct monitorMetricTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct monitorMetricTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -6800,40 +9593,6 @@ write_monitorMetricRowStatus(int action, u_char *var_val, u_char var_val_type, s
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->monitorMetricRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->monitorMetricTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->monitorMetricTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* scannerId */
@@ -6858,13 +9617,44 @@ write_monitorMetricRowStatus(int action, u_char *var_val, u_char var_val_type, s
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->monitorMetricTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->scannerId, vp->val.string, vp->val_len);
 			StorageNew->scannerIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&monitorMetricTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->monitorMetricRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->monitorMetricTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+				if (StorageTmp->monitorMetricTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->monitorMetricTable_old = monitorMetricTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->monitorMetricTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->monitorMetricTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -6874,78 +9664,127 @@ write_monitorMetricRowStatus(int action, u_char *var_val, u_char var_val_type, s
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = monitorMetricTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_monitorMetricTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->monitorMetricRowStatus;
-			StorageTmp->monitorMetricRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = monitorMetricTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->monitorMetricRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->monitorMetricRowStatus != RS_ACTIVE)
+				if ((ret = can_act_monitorMetricTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->monitorMetricRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_monitorMetricTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->monitorMetricRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_monitorMetricTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->monitorMetricRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_monitorMetricTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->monitorMetricRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_monitorMetricTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->monitorMetricRowStatus;
-			StorageTmp->monitorMetricRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->monitorMetricRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_monitorMetricTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_monitorMetricTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->monitorMetricRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->monitorMetricRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->monitorMetricRowStatus = set_value;
+			if ((StorageOld = StorageTmp->monitorMetricTable_old) != NULL) {
+				monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
+				StorageTmp->monitorMetricTable_rsvs = 0;
+				StorageTmp->monitorMetricTable_tsts = 0;
+				StorageTmp->monitorMetricTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			monitorMetricTable_destroy(&StorageDel);
-			/* monitorMetricTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_monitorMetricTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->monitorMetricRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_monitorMetricTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->monitorMetricRowStatus = old_value;
+			if (StorageTmp->monitorMetricRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_monitorMetricTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -6959,6 +9798,13 @@ write_monitorMetricRowStatus(int action, u_char *var_val, u_char var_val_type, s
 				monitorMetricTable_del(StorageNew);
 				monitorMetricTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->monitorMetricTable_old) == NULL)
+				break;
+			if (--StorageTmp->monitorMetricTable_rsvs == 0)
+				monitorMetricTable_destroy(&StorageTmp->monitorMetricTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -6985,10 +9831,9 @@ write_monitorMetricRowStatus(int action, u_char *var_val, u_char var_val_type, s
 int
 write_meanMonitorRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct meanMonitorTable_data *StorageTmp = NULL;
+	struct meanMonitorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct meanMonitorTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -7015,40 +9860,6 @@ write_meanMonitorRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->meanMonitorRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->meanMonitorTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->meanMonitorTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* scannerId */
@@ -7073,13 +9884,44 @@ write_meanMonitorRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->meanMonitorTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->scannerId, vp->val.string, vp->val_len);
 			StorageNew->scannerIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&meanMonitorTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->meanMonitorRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->meanMonitorTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->meanMonitorTable_old) == NULL)
+				if (StorageTmp->meanMonitorTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->meanMonitorTable_old = meanMonitorTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->meanMonitorTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->meanMonitorTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -7089,78 +9931,127 @@ write_meanMonitorRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = meanMonitorTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_meanMonitorTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->meanMonitorRowStatus;
-			StorageTmp->meanMonitorRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = meanMonitorTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->meanMonitorRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->meanMonitorRowStatus != RS_ACTIVE)
+				if ((ret = can_act_meanMonitorTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->meanMonitorRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_meanMonitorTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->meanMonitorRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_meanMonitorTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->meanMonitorRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_meanMonitorTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->meanMonitorRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_meanMonitorTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->meanMonitorRowStatus;
-			StorageTmp->meanMonitorRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->meanMonitorRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_meanMonitorTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_meanMonitorTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->meanMonitorRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->meanMonitorRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->meanMonitorRowStatus = set_value;
+			if ((StorageOld = StorageTmp->meanMonitorTable_old) != NULL) {
+				meanMonitorTable_destroy(&StorageTmp->meanMonitorTable_old);
+				StorageTmp->meanMonitorTable_rsvs = 0;
+				StorageTmp->meanMonitorTable_tsts = 0;
+				StorageTmp->meanMonitorTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			meanMonitorTable_destroy(&StorageDel);
-			/* meanMonitorTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_meanMonitorTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->meanMonitorRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_meanMonitorTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->meanMonitorRowStatus = old_value;
+			if (StorageTmp->meanMonitorRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_meanMonitorTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -7174,6 +10065,13 @@ write_meanMonitorRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				meanMonitorTable_del(StorageNew);
 				meanMonitorTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->meanMonitorTable_old) == NULL)
+				break;
+			if (--StorageTmp->meanMonitorTable_rsvs == 0)
+				meanMonitorTable_destroy(&StorageTmp->meanMonitorTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -7200,10 +10098,9 @@ write_meanMonitorRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_movingAverageMeanMonitorRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct movingAverageMeanMonitorTable_data *StorageTmp = NULL;
+	struct movingAverageMeanMonitorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct movingAverageMeanMonitorTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -7230,40 +10127,6 @@ write_movingAverageMeanMonitorRowStatus(int action, u_char *var_val, u_char var_
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->movingAverageMeanMonitorRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->movingAverageMeanMonitorTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->movingAverageMeanMonitorTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* scannerId */
@@ -7288,13 +10151,44 @@ write_movingAverageMeanMonitorRowStatus(int action, u_char *var_val, u_char var_
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->movingAverageMeanMonitorTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->scannerId, vp->val.string, vp->val_len);
 			StorageNew->scannerIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&movingAverageMeanMonitorTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->movingAverageMeanMonitorRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->movingAverageMeanMonitorTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->movingAverageMeanMonitorTable_old) == NULL)
+				if (StorageTmp->movingAverageMeanMonitorTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->movingAverageMeanMonitorTable_old = movingAverageMeanMonitorTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->movingAverageMeanMonitorTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->movingAverageMeanMonitorTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -7304,78 +10198,127 @@ write_movingAverageMeanMonitorRowStatus(int action, u_char *var_val, u_char var_
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = movingAverageMeanMonitorTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_movingAverageMeanMonitorTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->movingAverageMeanMonitorRowStatus;
-			StorageTmp->movingAverageMeanMonitorRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = movingAverageMeanMonitorTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->movingAverageMeanMonitorRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->movingAverageMeanMonitorRowStatus != RS_ACTIVE)
+				if ((ret = can_act_movingAverageMeanMonitorTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->movingAverageMeanMonitorRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_movingAverageMeanMonitorTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->movingAverageMeanMonitorRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_movingAverageMeanMonitorTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->movingAverageMeanMonitorRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here
+		   must be reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_movingAverageMeanMonitorTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->movingAverageMeanMonitorRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_movingAverageMeanMonitorTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->movingAverageMeanMonitorRowStatus;
-			StorageTmp->movingAverageMeanMonitorRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->movingAverageMeanMonitorRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_movingAverageMeanMonitorTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_movingAverageMeanMonitorTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->movingAverageMeanMonitorRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->movingAverageMeanMonitorRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->movingAverageMeanMonitorRowStatus = set_value;
+			if ((StorageOld = StorageTmp->movingAverageMeanMonitorTable_old) != NULL) {
+				movingAverageMeanMonitorTable_destroy(&StorageTmp->movingAverageMeanMonitorTable_old);
+				StorageTmp->movingAverageMeanMonitorTable_rsvs = 0;
+				StorageTmp->movingAverageMeanMonitorTable_tsts = 0;
+				StorageTmp->movingAverageMeanMonitorTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			movingAverageMeanMonitorTable_destroy(&StorageDel);
-			/* movingAverageMeanMonitorTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_movingAverageMeanMonitorTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->movingAverageMeanMonitorRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_movingAverageMeanMonitorTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->movingAverageMeanMonitorRowStatus = old_value;
+			if (StorageTmp->movingAverageMeanMonitorRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_movingAverageMeanMonitorTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -7389,6 +10332,13 @@ write_movingAverageMeanMonitorRowStatus(int action, u_char *var_val, u_char var_
 				movingAverageMeanMonitorTable_del(StorageNew);
 				movingAverageMeanMonitorTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->movingAverageMeanMonitorTable_old) == NULL)
+				break;
+			if (--StorageTmp->movingAverageMeanMonitorTable_rsvs == 0)
+				movingAverageMeanMonitorTable_destroy(&StorageTmp->movingAverageMeanMonitorTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -7415,10 +10365,9 @@ write_movingAverageMeanMonitorRowStatus(int action, u_char *var_val, u_char var_
 int
 write_meanAndPercentileMonitorRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct meanAndPercentileMonitorTable_data *StorageTmp = NULL;
+	struct meanAndPercentileMonitorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct meanAndPercentileMonitorTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -7445,40 +10394,6 @@ write_meanAndPercentileMonitorRowStatus(int action, u_char *var_val, u_char var_
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->meanAndPercentileMonitorRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->meanAndPercentileMonitorTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->meanAndPercentileMonitorTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* scannerId */
@@ -7503,13 +10418,44 @@ write_meanAndPercentileMonitorRowStatus(int action, u_char *var_val, u_char var_
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->meanAndPercentileMonitorTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->scannerId, vp->val.string, vp->val_len);
 			StorageNew->scannerIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&meanAndPercentileMonitorTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->meanAndPercentileMonitorRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->meanAndPercentileMonitorTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->meanAndPercentileMonitorTable_old) == NULL)
+				if (StorageTmp->meanAndPercentileMonitorTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->meanAndPercentileMonitorTable_old = meanAndPercentileMonitorTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->meanAndPercentileMonitorTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->meanAndPercentileMonitorTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -7519,78 +10465,127 @@ write_meanAndPercentileMonitorRowStatus(int action, u_char *var_val, u_char var_
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = meanAndPercentileMonitorTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_meanAndPercentileMonitorTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->meanAndPercentileMonitorRowStatus;
-			StorageTmp->meanAndPercentileMonitorRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = meanAndPercentileMonitorTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->meanAndPercentileMonitorRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->meanAndPercentileMonitorRowStatus != RS_ACTIVE)
+				if ((ret = can_act_meanAndPercentileMonitorTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->meanAndPercentileMonitorRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_meanAndPercentileMonitorTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->meanAndPercentileMonitorRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_meanAndPercentileMonitorTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->meanAndPercentileMonitorRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here
+		   must be reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_meanAndPercentileMonitorTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->meanAndPercentileMonitorRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_meanAndPercentileMonitorTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->meanAndPercentileMonitorRowStatus;
-			StorageTmp->meanAndPercentileMonitorRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->meanAndPercentileMonitorRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_meanAndPercentileMonitorTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_meanAndPercentileMonitorTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->meanAndPercentileMonitorRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->meanAndPercentileMonitorRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->meanAndPercentileMonitorRowStatus = set_value;
+			if ((StorageOld = StorageTmp->meanAndPercentileMonitorTable_old) != NULL) {
+				meanAndPercentileMonitorTable_destroy(&StorageTmp->meanAndPercentileMonitorTable_old);
+				StorageTmp->meanAndPercentileMonitorTable_rsvs = 0;
+				StorageTmp->meanAndPercentileMonitorTable_tsts = 0;
+				StorageTmp->meanAndPercentileMonitorTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			meanAndPercentileMonitorTable_destroy(&StorageDel);
-			/* meanAndPercentileMonitorTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_meanAndPercentileMonitorTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->meanAndPercentileMonitorRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_meanAndPercentileMonitorTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->meanAndPercentileMonitorRowStatus = old_value;
+			if (StorageTmp->meanAndPercentileMonitorRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_meanAndPercentileMonitorTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -7604,6 +10599,13 @@ write_meanAndPercentileMonitorRowStatus(int action, u_char *var_val, u_char var_
 				meanAndPercentileMonitorTable_del(StorageNew);
 				meanAndPercentileMonitorTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->meanAndPercentileMonitorTable_old) == NULL)
+				break;
+			if (--StorageTmp->meanAndPercentileMonitorTable_rsvs == 0)
+				meanAndPercentileMonitorTable_destroy(&StorageTmp->meanAndPercentileMonitorTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -7630,10 +10632,9 @@ write_meanAndPercentileMonitorRowStatus(int action, u_char *var_val, u_char var_
 int
 write_meanAndVarianceMonitorRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct meanAndVarianceMonitorTable_data *StorageTmp = NULL;
+	struct meanAndVarianceMonitorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct meanAndVarianceMonitorTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -7660,40 +10661,6 @@ write_meanAndVarianceMonitorRowStatus(int action, u_char *var_val, u_char var_va
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->meanAndVarianceMonitorRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->meanAndVarianceMonitorTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->meanAndVarianceMonitorTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* scannerId */
@@ -7718,13 +10685,44 @@ write_meanAndVarianceMonitorRowStatus(int action, u_char *var_val, u_char var_va
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->meanAndVarianceMonitorTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->scannerId, vp->val.string, vp->val_len);
 			StorageNew->scannerIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&meanAndVarianceMonitorTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->meanAndVarianceMonitorRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->meanAndVarianceMonitorTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->meanAndVarianceMonitorTable_old) == NULL)
+				if (StorageTmp->meanAndVarianceMonitorTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->meanAndVarianceMonitorTable_old = meanAndVarianceMonitorTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->meanAndVarianceMonitorTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->meanAndVarianceMonitorTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -7734,78 +10732,127 @@ write_meanAndVarianceMonitorRowStatus(int action, u_char *var_val, u_char var_va
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = meanAndVarianceMonitorTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_meanAndVarianceMonitorTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->meanAndVarianceMonitorRowStatus;
-			StorageTmp->meanAndVarianceMonitorRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = meanAndVarianceMonitorTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->meanAndVarianceMonitorRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->meanAndVarianceMonitorRowStatus != RS_ACTIVE)
+				if ((ret = can_act_meanAndVarianceMonitorTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->meanAndVarianceMonitorRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_meanAndVarianceMonitorTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->meanAndVarianceMonitorRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_meanAndVarianceMonitorTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->meanAndVarianceMonitorRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must 
+		   be reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_meanAndVarianceMonitorTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->meanAndVarianceMonitorRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_meanAndVarianceMonitorTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->meanAndVarianceMonitorRowStatus;
-			StorageTmp->meanAndVarianceMonitorRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->meanAndVarianceMonitorRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_meanAndVarianceMonitorTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_meanAndVarianceMonitorTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->meanAndVarianceMonitorRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->meanAndVarianceMonitorRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->meanAndVarianceMonitorRowStatus = set_value;
+			if ((StorageOld = StorageTmp->meanAndVarianceMonitorTable_old) != NULL) {
+				meanAndVarianceMonitorTable_destroy(&StorageTmp->meanAndVarianceMonitorTable_old);
+				StorageTmp->meanAndVarianceMonitorTable_rsvs = 0;
+				StorageTmp->meanAndVarianceMonitorTable_tsts = 0;
+				StorageTmp->meanAndVarianceMonitorTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			meanAndVarianceMonitorTable_destroy(&StorageDel);
-			/* meanAndVarianceMonitorTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_meanAndVarianceMonitorTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->meanAndVarianceMonitorRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_meanAndVarianceMonitorTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->meanAndVarianceMonitorRowStatus = old_value;
+			if (StorageTmp->meanAndVarianceMonitorRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_meanAndVarianceMonitorTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -7819,6 +10866,13 @@ write_meanAndVarianceMonitorRowStatus(int action, u_char *var_val, u_char var_va
 				meanAndVarianceMonitorTable_del(StorageNew);
 				meanAndVarianceMonitorTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->meanAndVarianceMonitorTable_old) == NULL)
+				break;
+			if (--StorageTmp->meanAndVarianceMonitorTable_rsvs == 0)
+				meanAndVarianceMonitorTable_destroy(&StorageTmp->meanAndVarianceMonitorTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -7845,10 +10899,9 @@ write_meanAndVarianceMonitorRowStatus(int action, u_char *var_val, u_char var_va
 int
 write_meanAndMinMaxMonitorRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct meanAndMinMaxMonitorTable_data *StorageTmp = NULL;
+	struct meanAndMinMaxMonitorTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct meanAndMinMaxMonitorTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -7875,40 +10928,6 @@ write_meanAndMinMaxMonitorRowStatus(int action, u_char *var_val, u_char var_val_
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->meanAndMinMaxMonitorRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->meanAndMinMaxMonitorTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->meanAndMinMaxMonitorTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* scannerId */
@@ -7933,13 +10952,44 @@ write_meanAndMinMaxMonitorRowStatus(int action, u_char *var_val, u_char var_val_
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->meanAndMinMaxMonitorTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->scannerId, vp->val.string, vp->val_len);
 			StorageNew->scannerIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&meanAndMinMaxMonitorTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->meanAndMinMaxMonitorRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->meanAndMinMaxMonitorTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->meanAndMinMaxMonitorTable_old) == NULL)
+				if (StorageTmp->meanAndMinMaxMonitorTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->meanAndMinMaxMonitorTable_old = meanAndMinMaxMonitorTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->meanAndMinMaxMonitorTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->meanAndMinMaxMonitorTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -7949,78 +10999,127 @@ write_meanAndMinMaxMonitorRowStatus(int action, u_char *var_val, u_char var_val_
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = meanAndMinMaxMonitorTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_meanAndMinMaxMonitorTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->meanAndMinMaxMonitorRowStatus;
-			StorageTmp->meanAndMinMaxMonitorRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = meanAndMinMaxMonitorTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->meanAndMinMaxMonitorRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->meanAndMinMaxMonitorRowStatus != RS_ACTIVE)
+				if ((ret = can_act_meanAndMinMaxMonitorTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->meanAndMinMaxMonitorRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_meanAndMinMaxMonitorTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->meanAndMinMaxMonitorRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_meanAndMinMaxMonitorTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->meanAndMinMaxMonitorRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must
+		   be reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_meanAndMinMaxMonitorTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->meanAndMinMaxMonitorRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_meanAndMinMaxMonitorTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->meanAndMinMaxMonitorRowStatus;
-			StorageTmp->meanAndMinMaxMonitorRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->meanAndMinMaxMonitorRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_meanAndMinMaxMonitorTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destruction to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_meanAndMinMaxMonitorTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->meanAndMinMaxMonitorRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->meanAndMinMaxMonitorRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->meanAndMinMaxMonitorRowStatus = set_value;
+			if ((StorageOld = StorageTmp->meanAndMinMaxMonitorTable_old) != NULL) {
+				meanAndMinMaxMonitorTable_destroy(&StorageTmp->meanAndMinMaxMonitorTable_old);
+				StorageTmp->meanAndMinMaxMonitorTable_rsvs = 0;
+				StorageTmp->meanAndMinMaxMonitorTable_tsts = 0;
+				StorageTmp->meanAndMinMaxMonitorTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			meanAndMinMaxMonitorTable_destroy(&StorageDel);
-			/* meanAndMinMaxMonitorTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_meanAndMinMaxMonitorTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->meanAndMinMaxMonitorRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_meanAndMinMaxMonitorTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->meanAndMinMaxMonitorRowStatus = old_value;
+			if (StorageTmp->meanAndMinMaxMonitorRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_meanAndMinMaxMonitorTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -8034,6 +11133,13 @@ write_meanAndMinMaxMonitorRowStatus(int action, u_char *var_val, u_char var_val_
 				meanAndMinMaxMonitorTable_del(StorageNew);
 				meanAndMinMaxMonitorTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->meanAndMinMaxMonitorTable_old) == NULL)
+				break;
+			if (--StorageTmp->meanAndMinMaxMonitorTable_rsvs == 0)
+				meanAndMinMaxMonitorTable_destroy(&StorageTmp->meanAndMinMaxMonitorTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
