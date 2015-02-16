@@ -1,0 +1,460 @@
+
+LLDP-EXT-DOT1-EVB-EXTENSIONS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ifGeneralInformationGroup
+        FROM IF-MIB
+    lldpV2Xdot1MIB
+        FROM LLDP-EXT-DOT1-V2-MIB
+    lldpV2LocPortIfIndex, lldpV2PortConfigEntry, lldpV2RemIndex, 
+    lldpV2RemLocalDestMACAddress, lldpV2RemLocalIfIndex, 
+    lldpV2RemTimeMark
+        FROM LLDP-V2-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TruthValue
+        FROM SNMPv2-TC;
+
+-- Define the MIB module
+lldpXDot1EvbExtensions MODULE-IDENTITY
+    LAST-UPDATED "201202150000Z" -- February 15, 2012 
+    ORGANIZATION 
+        "IEEE 802.1 Working Group"
+    CONTACT-INFO 
+        "WG-URL: http://www.ieee802.org/1
+         WG-EMail: STDS-802-1-L@LISTSERV.IEEE.ORG
+         
+         Contact: Tony Jeffree
+         Postal: C/O IEEE 802.1 Working Group
+                IEEE Standards Association
+                445 Hoes Lane
+                Piscataway
+                NJ 08854
+                USA
+         E-mail: STDS-802-1-L@LISTSERV.IEEE.ORG"
+    DESCRIPTION 
+        "The LLDP Management Information Base extension module for
+         IEEE 802.1 organizationally defined discovery information
+         for the EVB extension objects.
+         
+         This MIB module is rooted under the lldpXdot1StandAloneExtensions
+         OID arc, in order to allow it to be defined independently
+         of other 802.1 LLDP extension MIBs.
+         
+         Unless otherwise indicated, the references in this
+         MIB module are to IEEE Std 802.1Qbg-20XX.
+         
+         Copyright (C) IEEE (2011).  This version of this MIB module
+         is published as D.4.6 of IEEE Std 802.1Qbg-20XX;
+         see the standard itself for full legal notices."
+    REVISION    "201202150000Z" -- February 15, 2012
+    DESCRIPTION 
+        "Initial version published as part of IEEE Std. 802.1Qbg"
+-- Hang this MIB module under the stand-alone extension MIBs arc: 
+    ::= { lldpXdot1StandAloneExtensions 1 }
+
+
+-- Define the root arc for stand-alone extension MIBs in 802.1
+lldpXdot1StandAloneExtensions OBJECT IDENTIFIER
+    ::= { lldpV2Xdot1MIB 7 }
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+--
+-- Organizationally Defined Information Extension - IEEE 802.1
+-- Definitions to support the evbSet TLV set (Table D-1)
+-- for Edge Virtual Bridging
+--
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+lldpXdot1EvbMIB OBJECT IDENTIFIER
+    ::= { lldpXDot1EvbExtensions 1 }
+
+lldpXdot1EvbObjects OBJECT IDENTIFIER
+    ::= { lldpXdot1EvbMIB 1 }
+
+-- EVB 802.1 MIB Extension groups
+
+lldpXdot1EvbConfig OBJECT IDENTIFIER
+    ::= { lldpXdot1EvbObjects 1 }
+
+-------------------------------------------------------------------
+-- IEEE 802.1 - EVB Configuration
+-------------------------------------------------------------------
+
+--
+--  lldpXdot1EvbConfigEvbTable : configure the 
+--  transmission of the EVB TLV on a set of ports
+--
+
+lldpXdot1EvbConfigEvbTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpXdot1EvbConfigEvbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table that controls selection of EVB
+         TLVs to be transmitted on individual ports."
+    ::= { lldpXdot1EvbConfig 1 }
+
+lldpXdot1EvbConfigEvbEntry OBJECT-TYPE
+    SYNTAX      LldpXdot1EvbConfigEvbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "LLDP configuration information that controls the
+         transmission of IEEE 802.1 organizationally defined 
+         EVB TLV on LLDP transmission capable ports.
+         
+         This configuration object augments the lldpV2PortConfigEntry of
+         the LLDP-MIB, therefore it is only present along with the port
+         configuration defined by the associated lldpV2PortConfigEntry
+         entry.
+         
+         Each active lldpConfigEntry is restored from non-volatile
+         storage (along with the corresponding lldpV2PortConfigEntry)
+         after a re-initialization of the management system."
+    AUGMENTS    { lldpV2PortConfigEntry }
+    ::= { lldpXdot1EvbConfigEvbTable 1 }
+
+LldpXdot1EvbConfigEvbEntry ::= SEQUENCE {
+    lldpXdot1EvbConfigEvbTxEnable   TruthValue
+}
+
+lldpXdot1EvbConfigEvbTxEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The lldpXdot1EvbConfigEvbTxEnable, which is
+         defined as a truth value and configured by the network 
+         management, determines whether the IEEE 802.1 organizationally
+         defined EVB TLV transmission is allowed 
+         on a given LLDP transmission capable port.
+         
+         The value of this object is restored from non-volatile
+         storage after a re-initialization of the management system."
+    REFERENCE   
+        "D.2.13"
+    DEFVAL      { false }
+    ::= { lldpXdot1EvbConfigEvbEntry 1 }
+
+--
+--  lldpXdot1EvbConfigCdcpTable : configure the 
+--  transmission of the CDCP TLV on a set of ports
+--
+
+lldpXdot1EvbConfigCdcpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpXdot1EvbConfigCdcpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table that controls selection of EVB
+         TLVs to be transmitted on individual ports."
+    ::= { lldpXdot1EvbConfig 2 }
+
+lldpXdot1EvbConfigCdcpEntry OBJECT-TYPE
+    SYNTAX      LldpXdot1EvbConfigCdcpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "LLDP configuration information that controls the
+         transmission of IEEE 802.1 organizationally defined 
+         CDCP TLV on LLDP transmission capable ports.
+         
+         This configuration object augments the lldpV2PortConfigEntry of
+         the LLDP-MIB, therefore it is only present along with the port
+         configuration defined by the associated lldpV2PortConfigEntry
+         entry.
+         
+         Each active lldpConfigEntry is restored from non-volatile
+         storage (along with the corresponding lldpV2PortConfigEntry)
+         after a re-initialization of the management system."
+    AUGMENTS    { lldpV2PortConfigEntry }
+    ::= { lldpXdot1EvbConfigCdcpTable 1 }
+
+LldpXdot1EvbConfigCdcpEntry ::= SEQUENCE {
+    lldpXdot1EvbConfigCdcpTxEnable  TruthValue
+}
+
+lldpXdot1EvbConfigCdcpTxEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The lldpXdot1EvbConfigCdcpTxEnable, which is
+         defined as a truth value and configured by the network 
+         management, determines whether the IEEE 802.1 organizationally
+         defined CDCP TLV transmission is allowed 
+         on a given LLDP transmission capable port.
+         
+         The value of this object is restored from non-volatile
+         storage after a re-initialization of the management system."
+    REFERENCE   
+        "D.2.14"
+    DEFVAL      { false }
+    ::= { lldpXdot1EvbConfigCdcpEntry 1 }
+
+lldpXdot1EvbLocalData OBJECT IDENTIFIER
+    ::= { lldpXdot1EvbObjects 2 }
+
+------------------------------------------------------------------------
+-- IEEE 802.1 - EVB Local System Information
+------------------------------------------------------------------------
+
+---
+---
+--- lldpV2Xdot1LocEvbTlvTable: EVB TLV Information Table
+---
+---
+
+lldpV2Xdot1LocEvbTlvTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpV2Xdot1LocEvbTlvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains one row per port of EVB
+         TLV information (as a part of the LLDP 
+         802.1 organizational extension) on the local system
+         known to this agent."
+    ::= { lldpXdot1EvbLocalData 1 }
+
+lldpV2Xdot1LocEvbTlvEntry OBJECT-TYPE
+    SYNTAX      LldpV2Xdot1LocEvbTlvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "EVB TLV information about a 
+         particular port component."
+    INDEX       { lldpV2LocPortIfIndex }
+    ::= { lldpV2Xdot1LocEvbTlvTable 1 }
+
+LldpV2Xdot1LocEvbTlvEntry ::= SEQUENCE {
+    lldpV2Xdot1LocEvbTlvString  OCTET STRING
+}
+
+lldpV2Xdot1LocEvbTlvString OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..514))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This object contains the EVB TLV information string  
+         for the Port, as defined in D.2.13.
+         As the elements within the string are not individually
+         manipulated via SNMP (they are of concern only to the
+         state machines), the sub-structure of the string
+         is not visible as separate objects within the
+         local database."
+    REFERENCE   
+        "D.2.13"
+    ::= { lldpV2Xdot1LocEvbTlvEntry 1 }
+
+---
+---
+--- lldpV2Xdot1LocCdcpTlvTable: CDCP TLV Information Table
+---
+---
+
+lldpV2Xdot1LocCdcpTlvTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpV2Xdot1LocCdcpTlvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains one row per port of CDCP
+         TLV information (as a part of the LLDP 
+         802.1 organizational extension) on the local system
+         known to this agent."
+    ::= { lldpXdot1EvbLocalData 2 }
+
+lldpV2Xdot1LocCdcpTlvEntry OBJECT-TYPE
+    SYNTAX      LldpV2Xdot1LocCdcpTlvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "CDCP TLV information about a 
+         particular port component."
+    INDEX       { lldpV2LocPortIfIndex }
+    ::= { lldpV2Xdot1LocCdcpTlvTable 1 }
+
+LldpV2Xdot1LocCdcpTlvEntry ::= SEQUENCE {
+    lldpV2Xdot1LocCdcpTlvString     OCTET STRING
+}
+
+lldpV2Xdot1LocCdcpTlvString OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..514))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This object contains the CDCP TLV information string  
+         for the Port, as defined in D.2.14.
+         As the elements within the string are not individually
+         manipulated via SNMP (they are of concern only to the
+         state machines), the sub-structure of the string
+         is not visible as separate objects within the
+         local database."
+    REFERENCE   
+        "D.2.14"
+    ::= { lldpV2Xdot1LocCdcpTlvEntry 1 }
+
+lldpXdot1EvbRemoteData OBJECT IDENTIFIER
+    ::= { lldpXdot1EvbObjects 3 }
+
+------------------------------------------------------------------------
+-- IEEE 802.1 - EVB Remote System Information
+------------------------------------------------------------------------
+
+---
+---
+--- lldpV2Xdot1RemEvbTlvTable: EVB TLV Information Table
+---
+---
+
+lldpV2Xdot1RemEvbTlvTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpV2Xdot1RemEvbTlvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains one row per port of EVB
+         TLV information (as a part of the LLDP 
+         802.1 organizational extension) on the remote system
+         known to this agent."
+    ::= { lldpXdot1EvbRemoteData 1 }
+
+lldpV2Xdot1RemEvbTlvEntry OBJECT-TYPE
+    SYNTAX      LldpV2Xdot1RemEvbTlvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "EVB TLV information about a 
+         particular port component."
+    INDEX       { lldpV2RemTimeMark, lldpV2RemLocalIfIndex, 
+                  lldpV2RemLocalDestMACAddress, lldpV2RemIndex }
+    ::= { lldpV2Xdot1RemEvbTlvTable 1 }
+
+LldpV2Xdot1RemEvbTlvEntry ::= SEQUENCE {
+    lldpV2Xdot1RemEvbTlvString  OCTET STRING
+}
+
+lldpV2Xdot1RemEvbTlvString OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..514))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This object contains the EVB TLV information string  
+         for the Port, as defined in D.2.13.
+         As the elements within the string are not individually
+         manipulated via SNMP (they are of concern only to the
+         state machines), the sub-structure of the string
+         is not visible as separate objects within the
+         local database."
+    REFERENCE   
+        "D.2.13"
+    ::= { lldpV2Xdot1RemEvbTlvEntry 1 }
+
+---
+---
+--- lldpV2Xdot1RemCdcpTlvTable: CDCP TLV Information Table
+---
+---
+
+lldpV2Xdot1RemCdcpTlvTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpV2Xdot1RemCdcpTlvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains one row per port of CDCP
+         TLV information (as a part of the LLDP 
+         802.1 organizational extension) on the remote system
+         known to this agent."
+    ::= { lldpXdot1EvbRemoteData 2 }
+
+lldpV2Xdot1RemCdcpTlvEntry OBJECT-TYPE
+    SYNTAX      LldpV2Xdot1RemCdcpTlvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "CDCP TLV information about a 
+         particular port component."
+    INDEX       { lldpV2RemTimeMark, lldpV2RemLocalIfIndex, 
+                  lldpV2RemLocalDestMACAddress, lldpV2RemIndex }
+    ::= { lldpV2Xdot1RemCdcpTlvTable 1 }
+
+LldpV2Xdot1RemCdcpTlvEntry ::= SEQUENCE {
+    lldpV2Xdot1RemCdcpTlvString     OCTET STRING
+}
+
+lldpV2Xdot1RemCdcpTlvString OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..514))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This object contains the CDCP TLV information string  
+         for the Port, as defined in D.2.14.
+         As the elements within the string are not individually
+         manipulated via SNMP (they are of concern only to the
+         state machines), the sub-structure of the string
+         is not visible as separate objects within the
+         local database."
+    REFERENCE   
+        "D.2.14"
+    ::= { lldpV2Xdot1RemCdcpTlvEntry 1 }
+
+------------------------------------------------------------------------
+-- IEEE 802.1 - EVB Conformance Information
+------------------------------------------------------------------------
+
+lldpXdot1EvbConformance OBJECT IDENTIFIER
+    ::= { lldpXDot1EvbExtensions 2 }
+
+lldpXdot1EvbCompliances OBJECT IDENTIFIER
+    ::= { lldpXdot1EvbConformance 1 }
+
+lldpXdot1EvbGroups OBJECT IDENTIFIER
+    ::= { lldpXdot1EvbConformance 2 }
+
+--
+-- EVB - MIB groupings
+--
+
+lldpXdot1EvbGroup OBJECT-GROUP
+    OBJECTS     { lldpXdot1EvbConfigEvbTxEnable, 
+                  lldpXdot1EvbConfigCdcpTxEnable, 
+                  lldpV2Xdot1LocEvbTlvString, 
+                  lldpV2Xdot1LocCdcpTlvString, 
+                  lldpV2Xdot1RemEvbTlvString, 
+                  lldpV2Xdot1RemCdcpTlvString }
+    STATUS      current
+    DESCRIPTION 
+        "The collection of objects that support the
+         EVB evbSet TLV set."
+    ::= { lldpXdot1EvbGroups 1 }
+
+--
+-- EVB - Compliance Statements
+--
+
+lldpXdot1EvbCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "A compliance statement for SNMP entities that implement
+         the IEEE 802.1 organizationally defined Congestion
+         Notification LLDP extension MIB.
+         
+         This group is mandatory for agents that implement the 
+         EVB evbSet TLV set."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { lldpXdot1EvbGroup }
+
+    MODULE      IF-MIB
+
+        MANDATORY-GROUPS        { ifGeneralInformationGroup }
+
+    ::= { lldpXdot1EvbCompliances 1 }
+
+END -- end of module LLDP-EXT-DOT1-EVB-EXTENSIONS-MIB.
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=68 nocin nosi sts=4 sw=4 et
