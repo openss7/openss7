@@ -1,0 +1,737 @@
+
+IEEE8021-TPMR-MIB DEFINITIONS ::= BEGIN
+-- MIB for IEEE 802.1aj TPMR Devices
+
+IMPORTS
+    ieee8021BridgeBasePortComponentId
+        FROM IEEE8021-BRIDGE-MIB
+    IEEE8021BridgePortNumber, ieee802dot1mibs
+        FROM IEEE8021-TC-MIB
+    ifCounterDiscontinuityGroup
+        FROM IF-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Counter32, Counter64, Integer32, MODULE-IDENTITY, OBJECT-TYPE, 
+    Unsigned32
+        FROM SNMPv2-SMI
+    MacAddress, StorageType, TEXTUAL-CONVENTION, TimeInterval, 
+    TruthValue
+        FROM SNMPv2-TC;
+
+ieee8021TpmrMib MODULE-IDENTITY
+    LAST-UPDATED "201102270000Z" -- February 27, 2011
+    ORGANIZATION 
+        "IEEE 802.1 Working Group"
+    CONTACT-INFO 
+        "  WG-URL: http://grouper.ieee.org/groups/802/1/index.html
+         WG-Email: stds-802-1@ieee.org
+         
+         Contact: Brian Hassink
+          Postal: C/O IEEE 802.1 Working Group
+                  IEEE Standards Association
+                  445 Hoes Lane
+                  P.O. Box 1331
+                  Piscataway
+                  NJ 08855-1331
+                  USA
+          E-mail: STDS-802-1-L@LISTSERV.IEEE.ORG"
+    DESCRIPTION 
+        "Two-Port MAC Relay (TPMR) MIB module.
+         Unless otherwise indicated, the references in this MIB 
+         module  are to IEEE 802.1Q-2011.
+         
+         Copyright(c) IEEE
+         This MIB module is part of IEEE Std. 802.1aj; please 
+         refer to the document itself for full legal notices."
+    REVISION    "201102270000Z" -- February 27, 2011
+    DESCRIPTION 
+        "Minor edits to contact information etc. as part of 
+         2011 revision of IEEE Std 802.1Q."
+    REVISION    "200909040000Z" -- September 4, 2009
+    DESCRIPTION 
+        "Initial version as published in IEEE Std. 802.1aj"
+    ::= { ieee802dot1mibs 14 }
+
+
+IEEE8021TpmrFrameDiscardErrorReason ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "A reason code for a frame discard error."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.3.1.1.3:h"
+    SYNTAX      INTEGER { txSduSizeExceeded(1) }  -- transmissible SDU size exceeded
+
+ieee8021TpmrNotifications OBJECT IDENTIFIER
+    ::= { ieee8021TpmrMib 0 }
+
+ieee8021TpmrObjects OBJECT IDENTIFIER
+    ::= { ieee8021TpmrMib 1 }
+
+ieee8021TpmrPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021TpmrPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The TPMR port table.  Each row in the table represents a 
+         TPMR port.  By definition there are two ports per TPMR.  
+         Note that the indices of this table are equivalent to 
+         those of the ieee8021BridgeBasePortTable in the 
+         IEEE8021-BRIDGE-MIB, with ieee8021TpmrPortNumber having 
+         a more limited value range than ieee8021BridgeBasePort."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.1.2.1 and 12.19.1.2.2"
+    ::= { ieee8021TpmrObjects 1 }
+
+ieee8021TpmrPortEntry OBJECT-TYPE
+    SYNTAX      Ieee8021TpmrPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A TPMR port table entry."
+    INDEX       { ieee8021BridgeBasePortComponentId, 
+                  ieee8021TpmrPortNumber }
+    ::= { ieee8021TpmrPortTable 1 }
+
+Ieee8021TpmrPortEntry ::= SEQUENCE {
+    ieee8021TpmrPortNumber              IEEE8021BridgePortNumber,
+    ieee8021TpmrPortMgmtAddr            TruthValue,
+    ieee8021TpmrPortMgmtAddrForwarding  TruthValue
+}
+
+ieee8021TpmrPortNumber OBJECT-TYPE
+    SYNTAX      IEEE8021BridgePortNumber (1..2)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The number of this TPMR port."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.1.1.1.3:b,1"
+    ::= { ieee8021TpmrPortEntry 1 }
+
+ieee8021TpmrPortMgmtAddr OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Is 'true' if the TPMR port MAC address is the management 
+         address of the TPMR, otheriwse 'false'."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.1.1.1.3:b,3"
+    ::= { ieee8021TpmrPortEntry 2 }
+
+ieee8021TpmrPortMgmtAddrForwarding OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Is 'true' if forwarding is enabled for frames destined to the 
+         management address of the TPMR, otherwise 'false'."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.1.2.1.3:c"
+    ::= { ieee8021TpmrPortEntry 3 }
+
+ieee8021TpmrPortStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021TpmrPortStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The TPMR port statistics table.  Each row in the table 
+         represents a TPMR port.  By definition there are two 
+         ports per TPMR.
+         
+         Discontinuities in the value of counters in this table 
+         can occur at re-initialization of the management system, 
+         and at other times as indicated by the value of IF-MIB 
+         ifCounterDiscontinuityTime."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.3.1"
+    ::= { ieee8021TpmrObjects 2 }
+
+ieee8021TpmrPortStatsEntry OBJECT-TYPE
+    SYNTAX      Ieee8021TpmrPortStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A TPMR port counters table entry."
+    AUGMENTS    { ieee8021TpmrPortEntry }
+    ::= { ieee8021TpmrPortStatsTable 1 }
+
+Ieee8021TpmrPortStatsEntry ::= SEQUENCE {
+    ieee8021TpmrPortStatsRxFrames                   Counter64,
+    ieee8021TpmrPortStatsRxOctets                   Counter64,
+    ieee8021TpmrPortStatsFramesForwarded            Counter64,
+    ieee8021TpmrPortStatsFramesDiscarded            Counter64,
+    ieee8021TpmrPortStatsFramesDiscardedQueueFull   Counter64,
+    ieee8021TpmrPortStatsFramesDiscardedLifetime    Counter64,
+    ieee8021TpmrPortStatsFramesDiscardedError       Counter64
+}
+
+ieee8021TpmrPortStatsRxFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Count of all valid frames received on this port (including 
+         BPDUs, frames addressed to the TPMR as an end station, and 
+         frames that were submitted to the Forwarding Process)."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.3.1.1.3:a"
+    ::= { ieee8021TpmrPortStatsEntry 1 }
+
+ieee8021TpmrPortStatsRxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Count of the total number of octets in all valid frames 
+         received on this port (including BPDUs, frames addressed 
+         to the TPMR as an end station, and frames that were 
+         submitted to the Forwarding Process)."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.3.1.1.3:b"
+    ::= { ieee8021TpmrPortStatsEntry 2 }
+
+ieee8021TpmrPortStatsFramesForwarded OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Count of all frames that were received on this port and 
+         were forwarded to the transmission port."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.3.1.1.3:d"
+    ::= { ieee8021TpmrPortStatsEntry 3 }
+
+ieee8021TpmrPortStatsFramesDiscarded OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Count of all frames that were received on this port but 
+         were discarded by the Forwarding Process for any reason."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.3.1.1.3:c"
+    ::= { ieee8021TpmrPortStatsEntry 4 }
+
+ieee8021TpmrPortStatsFramesDiscardedQueueFull OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Count of all frames received on this port that were to 
+         be transmitted through the transmission port but were 
+         discarded due to lack of available queue space."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.3.1.1.3:e"
+    ::= { ieee8021TpmrPortStatsEntry 5 }
+
+ieee8021TpmrPortStatsFramesDiscardedLifetime OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Count of all frames received on this port that were to 
+         be transmitted through the transmission port but were 
+         discarded due to their frame lifetime having been 
+         exceeded."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.3.1.1.3:f"
+    ::= { ieee8021TpmrPortStatsEntry 6 }
+
+ieee8021TpmrPortStatsFramesDiscardedError OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Count of all frames received on this port that were to 
+         be transmitted through the transmission port but could 
+         not be transmitted (e.g., frame too large)."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.3.1.1.3:g"
+    ::= { ieee8021TpmrPortStatsEntry 7 }
+
+ieee8021TpmrPortDiscardDetailsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021TpmrPortDiscardDetailsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The TPMR frames discard details table.  Each row in 
+         the table represents a discarded frame on a TPMR port.  
+         By definition there are two ports per TPMR.  
+         This table is maintained as a FIFO.  A new entry is 
+         inserted in the first row, and existing entries are 
+         shuffled down, with the last entry being discarded.  
+         Because of the FIFO behaviour, the relationship between 
+         the index and contents will change when an entry is 
+         added to the table.  This may result in apparent 
+         duplication of row content during a table traversal."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.3.1.1.3:h"
+    ::= { ieee8021TpmrObjects 3 }
+
+ieee8021TpmrPortDiscardDetailsEntry OBJECT-TYPE
+    SYNTAX      Ieee8021TpmrPortDiscardDetailsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A TPMR frames discarded error details table entry."
+    INDEX       { ieee8021BridgeBasePortComponentId, 
+                  ieee8021TpmrPortNumber, 
+                  ieee8021TpmrPortDiscardDetailsIndex }
+    ::= { ieee8021TpmrPortDiscardDetailsTable 1 }
+
+Ieee8021TpmrPortDiscardDetailsEntry ::= SEQUENCE {
+    ieee8021TpmrPortDiscardDetailsIndex     Unsigned32,
+    ieee8021TpmrPortDiscardDetailsSource    MacAddress,
+    ieee8021TpmrPortDiscardDetailsReason    IEEE8021TpmrFrameDiscardErrorReason
+}
+
+ieee8021TpmrPortDiscardDetailsIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..16)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The second index of a TPMR frames discard details 
+         table entry."
+    ::= { ieee8021TpmrPortDiscardDetailsEntry 1 }
+
+ieee8021TpmrPortDiscardDetailsSource OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The source MAC address of the discarded frame."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.3.1.1.3:h"
+    ::= { ieee8021TpmrPortDiscardDetailsEntry 2 }
+
+ieee8021TpmrPortDiscardDetailsReason OBJECT-TYPE
+    SYNTAX      IEEE8021TpmrFrameDiscardErrorReason
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The reason why the frame was discarded."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.3.1.1.3:h"
+    ::= { ieee8021TpmrPortDiscardDetailsEntry 3 }
+
+ieee8021TpmrMspTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021TpmrMspEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The TPMR MAC status propagation performance table.  Each 
+         row in the table represents a TPMR port.  By definition 
+         there are two ports per TPMR.
+         
+         The persistence of writable objects in a conceptual row 
+         of this table is determined by the value of the 
+         ieee8021TpmrMspStorageType object."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.4.1.1 and 12.19.4.1.2"
+    ::= { ieee8021TpmrObjects 4 }
+
+ieee8021TpmrMspEntry OBJECT-TYPE
+    SYNTAX      Ieee8021TpmrMspEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A TPMR MAC status propagation performance table entry."
+    AUGMENTS    { ieee8021TpmrPortEntry }
+    ::= { ieee8021TpmrMspTable 1 }
+
+Ieee8021TpmrMspEntry ::= SEQUENCE {
+    ieee8021TpmrMspLinkNotify       TruthValue,
+    ieee8021TpmrMspLinkNotifyWait   TimeInterval,
+    ieee8021TpmrMspLinkNotifyRetry  TimeInterval,
+    ieee8021TpmrMspMacNotify        TruthValue,
+    ieee8021TpmrMspMacNotifyTime    TimeInterval,
+    ieee8021TpmrMspMacRecoverTime   TimeInterval,
+    ieee8021TpmrMspStorageType      StorageType
+}
+
+ieee8021TpmrMspLinkNotify OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The value of LinkNotify used by the MSP state machines."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.4.1.1.3:a and 12.19.4.1.2.2:b"
+    DEFVAL      { true }
+    ::= { ieee8021TpmrMspEntry 1 }
+
+ieee8021TpmrMspLinkNotifyWait OBJECT-TYPE
+    SYNTAX      TimeInterval (20..100)
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The value of LinkNotifyWait used by the MSP state machines."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.4.1.1.3:b and 12.19.4.1.2.2:c"
+    DEFVAL      { 40 }
+    ::= { ieee8021TpmrMspEntry 2 }
+
+ieee8021TpmrMspLinkNotifyRetry OBJECT-TYPE
+    SYNTAX      TimeInterval (10..100)
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The value of LinkNotifyRetry used by the MSP state machines."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.4.1.1.3:c and 12.19.4.1.2.2:d"
+    DEFVAL      { 100 }
+    ::= { ieee8021TpmrMspEntry 3 }
+
+ieee8021TpmrMspMacNotify OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The value of MacNotify used by the MSP state machines."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.4.1.1.3:d and 12.19.4.1.2.2:e"
+    DEFVAL      { true }
+    ::= { ieee8021TpmrMspEntry 4 }
+
+ieee8021TpmrMspMacNotifyTime OBJECT-TYPE
+    SYNTAX      TimeInterval (1..50)
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The value of MacNotifyTime used by the MSP state machines."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.4.1.1.3:e and 12.19.4.1.2.2:f"
+    DEFVAL      { 20 }
+    ::= { ieee8021TpmrMspEntry 5 }
+
+ieee8021TpmrMspMacRecoverTime OBJECT-TYPE
+    SYNTAX      TimeInterval (2..50)
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The value of MacRecoverTime used by the MSP state machines."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.4.1.1.3:f and 12.19.4.1.2.2:g"
+    DEFVAL      { 10 }
+    ::= { ieee8021TpmrMspEntry 6 }
+
+ieee8021TpmrMspStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The storage type for all read-write objects within this 
+         row.  Conceptual rows having the value 'permanent' need 
+         not allow write access to any columnar objects in the row.
+         
+         If this object has the value 'volatile', modifications 
+         to read-write objects in this row are not persistent 
+         across reboots or restarts.  If this object has the value 
+         'nonVolatile', modifications to objects in this row 
+         are persistent."
+    DEFVAL      { nonVolatile }
+    ::= { ieee8021TpmrMspEntry 7 }
+
+ieee8021TpmrMspStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021TpmrMspStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The TPMR MAC status propagation statistics table.  Each 
+         row in the table represents a TPMR port.  By definition 
+         there are two ports per TPMR.
+         
+         Discontinuities in the value of counters in this table 
+         can occur at re-initialization of the management system, 
+         and at other times as indicated by the value of IF-MIB 
+         ifCounterDiscontinuityTime."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.4.1.3"
+    ::= { ieee8021TpmrObjects 5 }
+
+ieee8021TpmrMspStatsEntry OBJECT-TYPE
+    SYNTAX      Ieee8021TpmrMspStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A TPMR MAC status propagation statistics table entry."
+    AUGMENTS    { ieee8021TpmrPortEntry }
+    ::= { ieee8021TpmrMspStatsTable 1 }
+
+Ieee8021TpmrMspStatsEntry ::= SEQUENCE {
+    ieee8021TpmrMspStatsTxAcks                  Counter32,
+    ieee8021TpmrMspStatsTxAddNotifications      Counter32,
+    ieee8021TpmrMspStatsTxAddConfirmations      Counter32,
+    ieee8021TpmrMspStatsTxLossNotifications     Counter32,
+    ieee8021TpmrMspStatsTxLossConfirmations     Counter32,
+    ieee8021TpmrMspStatsRxAcks                  Counter32,
+    ieee8021TpmrMspStatsRxAddNotifications      Counter32,
+    ieee8021TpmrMspStatsRxAddConfirmations      Counter32,
+    ieee8021TpmrMspStatsRxLossNotifications     Counter32,
+    ieee8021TpmrMspStatsRxLossConfirmations     Counter32,
+    ieee8021TpmrMspStatsAddEvents               Counter32,
+    ieee8021TpmrMspStatsLossEvents              Counter32,
+    ieee8021TpmrMspStatsMacStatusNotifications  Counter32
+}
+
+ieee8021TpmrMspStatsTxAcks OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "MSPDUs"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of acks transmitted by the port's Transmit 
+         Process as a consequence of txAck being set."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.4.1.3.3:a"
+    ::= { ieee8021TpmrMspStatsEntry 1 }
+
+ieee8021TpmrMspStatsTxAddNotifications OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "MSPDUs"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of adds transmitted by the port's Transmit 
+         Process as a consequence of txAdd being set."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.4.1.3.3:b"
+    ::= { ieee8021TpmrMspStatsEntry 2 }
+
+ieee8021TpmrMspStatsTxAddConfirmations OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "MSPDUs"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of add confirms transmitted by the port's 
+         Transmit Process as a consequence of txAddConfirm 
+         being set."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.4.1.3.3:c"
+    ::= { ieee8021TpmrMspStatsEntry 3 }
+
+ieee8021TpmrMspStatsTxLossNotifications OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "MSPDUs"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of losses transmitted by the port's Transmit 
+         Process as a consequence of txLoss being set."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.4.1.3.3:d"
+    ::= { ieee8021TpmrMspStatsEntry 4 }
+
+ieee8021TpmrMspStatsTxLossConfirmations OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "MSPDUs"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of loss confirms transmitted by the port's 
+         Transmit Process as a consequence of txLossConfirm 
+         being set."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.4.1.3.3:e"
+    ::= { ieee8021TpmrMspStatsEntry 5 }
+
+ieee8021TpmrMspStatsRxAcks OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "MSPDUs"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of acks received by the port's Receive 
+         Process."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.4.1.3.3:f"
+    ::= { ieee8021TpmrMspStatsEntry 6 }
+
+ieee8021TpmrMspStatsRxAddNotifications OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "MSPDUs"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of adds received by the port's Receive 
+         Process."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.4.1.3.3:g"
+    ::= { ieee8021TpmrMspStatsEntry 7 }
+
+ieee8021TpmrMspStatsRxAddConfirmations OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "MSPDUs"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of add confirms received by the port's 
+         Receive Process."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.4.1.3.3:h"
+    ::= { ieee8021TpmrMspStatsEntry 8 }
+
+ieee8021TpmrMspStatsRxLossNotifications OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "MSPDUs"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of losses received by the port's Receive 
+         Process."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.4.1.3.3:i"
+    ::= { ieee8021TpmrMspStatsEntry 9 }
+
+ieee8021TpmrMspStatsRxLossConfirmations OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "MSPDUs"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of loss confirms received by the port's 
+         Receive Process."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.4.1.3.3:j"
+    ::= { ieee8021TpmrMspStatsEntry 10 }
+
+ieee8021TpmrMspStatsAddEvents OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "MSP transitions"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of transitions to STM:ADD directly from 
+         STM:DOWN or STM:LOSS."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.4.1.3.3:k"
+    ::= { ieee8021TpmrMspStatsEntry 11 }
+
+ieee8021TpmrMspStatsLossEvents OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "MSP transitions"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of transitions to STM:LOSS directly from 
+         STM:UP or STM:ADD."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.4.1.3.3:l"
+    ::= { ieee8021TpmrMspStatsEntry 12 }
+
+ieee8021TpmrMspStatsMacStatusNotifications OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "MSP transitions"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of transitions to SNM:MAC_NOTIFICATION."
+    REFERENCE   
+        "IEEE 802.1aj 12.19.4.1.3.3:m"
+    ::= { ieee8021TpmrMspStatsEntry 13 }
+
+ieee8021TpmrConformance OBJECT IDENTIFIER
+    ::= { ieee8021TpmrMib 2 }
+
+-- IEEE 802.1aj MIB - Conformance Information
+ieee8021TpmrCompliances OBJECT IDENTIFIER
+    ::= { ieee8021TpmrConformance 1 }
+
+-- Units of conformance
+ieee8021TpmrGroups OBJECT IDENTIFIER
+    ::= { ieee8021TpmrConformance 2 }
+
+ieee8021TpmrPortGroup OBJECT-GROUP
+    OBJECTS     { ieee8021TpmrPortMgmtAddr, 
+                  ieee8021TpmrPortMgmtAddrForwarding }
+    STATUS      current
+    DESCRIPTION 
+        "TPMR port objects."
+    ::= { ieee8021TpmrGroups 1 }
+
+ieee8021TpmrPortStatsGroup OBJECT-GROUP
+    OBJECTS     { ieee8021TpmrPortStatsRxFrames, 
+                  ieee8021TpmrPortStatsRxOctets, 
+                  ieee8021TpmrPortStatsFramesForwarded, 
+                  ieee8021TpmrPortStatsFramesDiscarded, 
+                  ieee8021TpmrPortStatsFramesDiscardedQueueFull, 
+                  ieee8021TpmrPortStatsFramesDiscardedLifetime, 
+                  ieee8021TpmrPortStatsFramesDiscardedError }
+    STATUS      current
+    DESCRIPTION 
+        "TPMR port statistics objects."
+    ::= { ieee8021TpmrGroups 2 }
+
+ieee8021TpmrPortDiscardDetailsGroup OBJECT-GROUP
+    OBJECTS     { ieee8021TpmrPortDiscardDetailsSource, 
+                  ieee8021TpmrPortDiscardDetailsReason }
+    STATUS      current
+    DESCRIPTION 
+        "TPMR port discard details objects."
+    ::= { ieee8021TpmrGroups 3 }
+
+ieee8021TpmrMspGroup OBJECT-GROUP
+    OBJECTS     { ieee8021TpmrMspLinkNotify, 
+                  ieee8021TpmrMspLinkNotifyWait, 
+                  ieee8021TpmrMspLinkNotifyRetry, 
+                  ieee8021TpmrMspMacNotify, ieee8021TpmrMspMacNotifyTime, 
+                  ieee8021TpmrMspMacRecoverTime, 
+                  ieee8021TpmrMspStorageType }
+    STATUS      current
+    DESCRIPTION 
+        "TPMR port MSP objects."
+    ::= { ieee8021TpmrGroups 4 }
+
+ieee8021TpmrMspStatsGroup OBJECT-GROUP
+    OBJECTS     { ieee8021TpmrMspStatsTxAcks, 
+                  ieee8021TpmrMspStatsTxAddNotifications, 
+                  ieee8021TpmrMspStatsTxAddConfirmations, 
+                  ieee8021TpmrMspStatsTxLossNotifications, 
+                  ieee8021TpmrMspStatsTxLossConfirmations, 
+                  ieee8021TpmrMspStatsRxAcks, 
+                  ieee8021TpmrMspStatsRxAddNotifications, 
+                  ieee8021TpmrMspStatsRxAddConfirmations, 
+                  ieee8021TpmrMspStatsRxLossNotifications, 
+                  ieee8021TpmrMspStatsRxLossConfirmations, 
+                  ieee8021TpmrMspStatsAddEvents, 
+                  ieee8021TpmrMspStatsLossEvents, 
+                  ieee8021TpmrMspStatsMacStatusNotifications }
+    STATUS      current
+    DESCRIPTION 
+        "TPMR port MSP statistics objects."
+    ::= { ieee8021TpmrGroups 5 }
+
+ieee8021TpmrCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "The compliance statement for device support of TPMR."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { ieee8021TpmrPortGroup, 
+                  ieee8021TpmrPortStatsGroup, 
+                  ieee8021TpmrPortDiscardDetailsGroup, 
+                  ieee8021TpmrMspGroup, ieee8021TpmrMspStatsGroup }
+
+    MODULE      IF-MIB
+
+        MANDATORY-GROUPS        { ifCounterDiscontinuityGroup }
+
+    ::= { ieee8021TpmrCompliances 1 }
+
+END -- end of module IEEE8021-TPMR-MIB.
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=68 nocin nosi sts=4 sw=4 et

@@ -1,0 +1,1243 @@
+IEEE8021-PBB-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ieee8021BridgeBasePort, ieee8021BridgeBasePortComponentId
+        FROM IEEE8021-BRIDGE-MIB
+    IEEE8021BridgePortNumber, IEEE8021PbbComponentIdentifier, 
+    IEEE8021PbbIngressEgress, IEEE8021PbbServiceIdentifier, 
+    IEEE8021PbbServiceIdentifierOrUnassigned, IEEE8021PriorityCodePoint, 
+    IEEE8021PriorityValue, ieee802dot1mibs
+        FROM IEEE8021-TC-MIB
+    InterfaceIndex, InterfaceIndexOrZero
+        FROM IF-MIB
+    VlanId
+        FROM Q-BRIDGE-MIB
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    MacAddress, RowStatus, StorageType, TruthValue
+        FROM SNMPv2-TC;
+
+ieee8021PbbMib MODULE-IDENTITY
+    LAST-UPDATED "201102270000Z"
+    ORGANIZATION 
+        "IEEE 802.1 Working Group"
+    CONTACT-INFO 
+        "  WG-URL: http://grouper.ieee.org/groups/802/1/index.html
+         WG-EMail: stds-802-1@ieee.org
+         
+          Contact: David Levi
+           Postal: C/O IEEE 802.1 Working Group
+                   IEEE Standards Association
+                   445 Hoes Lane
+                   P.O. Box 1331
+                   Piscataway
+                   NJ 08855-1331
+                   USA
+           E-mail: STDS-802-1-L@LISTSERV.IEEE.ORG"
+    DESCRIPTION 
+        "The Provider Backbone Bridge (PBB) MIB moudle for managing 
+         devices that support PBB.
+         
+         Unless otherwise indicated, the references in this MIB module 
+         are to IEEE 802.1Q-2011.
+         
+         Copyright (C) IEEE.
+         This version of this MIB module is part of IEEE802.1Q; see the 
+         draft itself for full legal notices."
+    REVISION    "201102270000Z"
+    DESCRIPTION 
+        "Minor edits to contact information etc. as part of 2011 
+         revision of IEEE Std 802.1Q."
+    REVISION    "200811180000Z"
+    DESCRIPTION 
+        "Modified VIP table to support the enableConnectionIdentifier 
+         configuration option."
+    REVISION    "200810150000Z"
+    DESCRIPTION 
+        "Initial version published in 802.1ap."
+    ::= { ieee802dot1mibs 9 }
+
+
+ieee8021PbbNotifications OBJECT IDENTIFIER
+    ::= { ieee8021PbbMib 0 }
+
+ieee8021PbbObjects OBJECT IDENTIFIER
+    ::= { ieee8021PbbMib 1 }
+
+--
+-- 802.1ah MIB Objects
+--
+
+ieee8021PbbProviderBackboneBridge OBJECT IDENTIFIER
+    ::= { ieee8021PbbObjects 1 }
+
+-- ============================================================
+-- 12.16.1.1/2 Backbone Edge Bridge (BEB) configuration
+-- ============================================================
+--    items a), b), c), e), and g), see below
+--    d) ieee8021BridgeBaseBridgeAddress from IEEE8021-BRIDGE-MIB
+--    f) ieee8021BridgeBaseBridgeAddress from IEEE8021-BRIGDE_MIB
+--    i) and j)  ifPhysAddress from the IF-MIB, the correct instance
+--        can be found using ieee8021BridgeBasePortIfIndex
+--        from the IEEE8021-BRIDGE-MIB
+-- ============================================================
+
+ieee8021PbbBackboneEdgeBridgeObjects OBJECT IDENTIFIER
+    ::= { ieee8021PbbProviderBackboneBridge 1 }
+
+ieee8021PbbBackboneEdgeBridgeAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The MAC Address used by the BEB when it must be refered to in a 
+         unique fashion."
+    REFERENCE   
+        "12.16.1.1.3 (a)"
+    ::= { ieee8021PbbBackboneEdgeBridgeObjects 1 }
+
+ieee8021PbbBackboneEdgeBridgeName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "A text string of locally determined significance.  This value 
+         must be persistent over power up restart/reboot."
+    REFERENCE   
+        "12.16.1.1.3 (b), 12.16.1.2.2"
+    ::= { ieee8021PbbBackboneEdgeBridgeObjects 2 }
+
+ieee8021PbbNumberOfIComponents OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "THe number of I-components in this BEB."
+    REFERENCE   
+        "12.16.1.1.3 (c)"
+    ::= { ieee8021PbbBackboneEdgeBridgeObjects 3 }
+
+ieee8021PbbNumberOfBComponents OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of B-components in this BEB."
+    REFERENCE   
+        "12.16.1.1.3 (e)"
+    ::= { ieee8021PbbBackboneEdgeBridgeObjects 4 }
+
+ieee8021PbbNumberOfBebPorts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of CNPs, PIPs, CBPs, and PNPs, in this BEB."
+    REFERENCE   
+        "12.16.1.1.3 (g)"
+    ::= { ieee8021PbbBackboneEdgeBridgeObjects 5 }
+
+ieee8021PbbNextAvailablePipIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This object provides an available ifIndex value that can be 
+         used for creation of a PIP."
+    REFERENCE   
+        "12.16.4.1/2"
+    ::= { ieee8021PbbBackboneEdgeBridgeObjects 6 }
+
+-- ============================================================
+-- 12.16.3.1/2 Virtual Instance Port (VIP) configuration table
+-- ============================================================
+
+ieee8021PbbVipTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021PbbVipEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table lists the additional PBB parameters for each VIP.  
+         Entries in this table must be persistent over power up 
+         restart/reboot."
+    REFERENCE   
+        "12.16.3.1/2"
+    ::= { ieee8021PbbProviderBackboneBridge 2 }
+
+ieee8021PbbVipEntry OBJECT-TYPE
+    SYNTAX      Ieee8021PbbVipEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry consists of the name string, I-SID, Default 
+         Destination MAC, Service Type, and possible B-MAC."
+    INDEX       { ieee8021BridgeBasePortComponentId, 
+                  ieee8021BridgeBasePort }
+    ::= { ieee8021PbbVipTable 1 }
+
+Ieee8021PbbVipEntry ::= SEQUENCE {
+    ieee8021PbbVipPipIfIndex            InterfaceIndexOrZero,
+    ieee8021PbbVipISid                  IEEE8021PbbServiceIdentifierOrUnassigned,
+    ieee8021PbbVipDefaultDstBMAC        MacAddress,
+    ieee8021PbbVipType                  IEEE8021PbbIngressEgress,
+    ieee8021PbbVipRowStatus             RowStatus,
+    ieee8021PbbVipEnableConnectionId    TruthValue
+}
+
+ieee8021PbbVipPipIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Identifies the PIP associated with this VIP within the BEB.  A 
+         value of zero indicates the VIP is not currently associated 
+         with any PIP.
+         
+         The value of this object must be persistent across 
+         reinitialization of the management system."
+    DEFVAL      { 0 }
+    ::= { ieee8021PbbVipEntry 1 }
+
+ieee8021PbbVipISid OBJECT-TYPE
+    SYNTAX      IEEE8021PbbServiceIdentifierOrUnassigned
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The I-SID for this VIP.
+         
+         Within an I-Component, an VIP can only be serviced by one 
+         I-SID.  And the I-SID is a configurable parameter of the VIP.
+         
+         The value of this object must be persistent across 
+         reinitializations of the management system."
+    DEFVAL      { 1 }
+    ::= { ieee8021PbbVipEntry 2 }
+
+ieee8021PbbVipDefaultDstBMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The Default Desination B-MAC for this VIP."
+    DEFVAL      { '001eff000001'H }
+    ::= { ieee8021PbbVipEntry 3 }
+
+ieee8021PbbVipType OBJECT-TYPE
+    SYNTAX      IEEE8021PbbIngressEgress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "THis feature is used to support asymetric VLANs.
+         
+         The value of this object must be persistent across 
+         reinitialization of the management system."
+    DEFVAL      { {ingress, egress} }
+    ::= { ieee8021PbbVipEntry 4 }
+
+ieee8021PbbVipRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This indicates the status of an entry in this table, and is 
+         used to create/delete entries.
+         
+         It is an implementation specific decision as to whether any 
+         column in this table may be set while the corresponding 
+         instance of this object is valid(1).
+         
+         The value of this object must be persistent across 
+         reinitializations of the management system."
+    ::= { ieee8021PbbVipEntry 5 }
+
+ieee8021PbbVipEnableConnectionId OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This indicates if the connection identifier parameter is 
+         allowed to learn associations between a backbone MAC address 
+         and a customer MAC address.  The default value is true, 
+         indicating that such learning is allowed.  This parameter 
+         should be configured to false at the root node of a 
+         Point-to-mulltipoint TE service instance."
+    DEFVAL      { true }
+    ::= { ieee8021PbbVipEntry 6 }
+
+-- ============================================================
+-- 12.16.3.1/2 I-SID to VIP cross-reference table
+-- ============================================================
+
+ieee8021PbbISidToVipTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021PbbISidToVipEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains a cross-reference of I-SID values to the 
+         VIPs with which they are associated.  THis allows VIPs to be 
+         located easily by htier associated I-SID."
+    REFERENCE   
+        "12.16.3.1/2"
+    ::= { ieee8021PbbProviderBackboneBridge 3 }
+
+ieee8021PbbISidToVipEntry OBJECT-TYPE
+    SYNTAX      Ieee8021PbbISidToVipEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A mapping from an I-SID to the VIP with which it is associated.  
+         An entry will exist for each entry to the ieee8021PbbVipTable."
+    INDEX       { ieee8021PbbISidToVipISid }
+    ::= { ieee8021PbbISidToVipTable 1 }
+
+Ieee8021PbbISidToVipEntry ::= SEQUENCE {
+    ieee8021PbbISidToVipISid            IEEE8021PbbServiceIdentifier,
+    ieee8021PbbISidToVipComponentId     IEEE8021PbbComponentIdentifier,
+    ieee8021PbbISidToVipPort            IEEE8021BridgePortNumber
+}
+
+ieee8021PbbISidToVipISid OBJECT-TYPE
+    SYNTAX      IEEE8021PbbServiceIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The I-SID of a VIP."
+    ::= { ieee8021PbbISidToVipEntry 1 }
+
+ieee8021PbbISidToVipComponentId OBJECT-TYPE
+    SYNTAX      IEEE8021PbbComponentIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The component identifier of the VIP to which this I-SID is 
+         associated."
+    ::= { ieee8021PbbISidToVipEntry 2 }
+
+ieee8021PbbISidToVipPort OBJECT-TYPE
+    SYNTAX      IEEE8021BridgePortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The port number of the VIP to which this I-SID is associated."
+    ::= { ieee8021PbbISidToVipEntry 3 }
+
+-- ============================================================
+-- 12.16.4.1/2 Provider Instance Port (PIP) configuration table
+-- ============================================================
+
+ieee8021PbbPipTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021PbbPipEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains the parameters for each PIP, and can be 
+         used to configure the PIP port names.  Entries in this table 
+         must be persistent over power up restart/reboot."
+    REFERENCE   
+        "12.16.4.1/2"
+    ::= { ieee8021PbbProviderBackboneBridge 4 }
+
+ieee8021PbbPipEntry OBJECT-TYPE
+    SYNTAX      Ieee8021PbbPipEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The parameters for a PIP."
+    INDEX       { ieee8021PbbPipIfIndex }
+    ::= { ieee8021PbbPipTable 1 }
+
+Ieee8021PbbPipEntry ::= SEQUENCE {
+    ieee8021PbbPipIfIndex       InterfaceIndex,
+    ieee8021PbbPipBMACAddress   MacAddress,
+    ieee8021PbbPipName          SnmpAdminString,
+    ieee8021PbbPipComponentId   IEEE8021PbbComponentIdentifier,
+    ieee8021PbbPipVipMap        OCTET STRING,
+    ieee8021PbbPipVipMap1       OCTET STRING,
+    ieee8021PbbPipVipMap2       OCTET STRING,
+    ieee8021PbbPipVipMap3       OCTET STRING,
+    ieee8021PbbPipVipMap4       OCTET STRING,
+    ieee8021PbbPipRowStatus     RowStatus
+}
+
+ieee8021PbbPipIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "THe number identifying the PIP."
+    ::= { ieee8021PbbPipEntry 1 }
+
+ieee8021PbbPipBMACAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The B-MAC used by this PIP for the B-SA."
+    ::= { ieee8021PbbPipEntry 2 }
+
+ieee8021PbbPipName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A text string of local significance which identifies the PIP 
+         within a BEB."
+    DEFVAL      { "" }
+    ::= { ieee8021PbbPipEntry 3 }
+
+ieee8021PbbPipComponentId OBJECT-TYPE
+    SYNTAX      IEEE8021PbbComponentIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Idenifies the I-component ssociated with this PIP."
+    ::= { ieee8021PbbPipEntry 4 }
+
+ieee8021PbbPipVipMap OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..512))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object contains a bitmap indicating all the VIPs in the 
+         range 1 through 4094 that are associated with this PIP.  The 
+         bits correspond to bridge port numbers in the range 1 through 
+         4094.  The high order bit of the first octet corresponds to 
+         port number 1, and subsequent bits of the octet string 
+         correspond to subsequent port numbers.  The following formula 
+         can be used to find the bit corresponding to a particular port 
+         number B:
+            octet[(B-1)/8] & (1 >> ((B-1)%8))
+         If the bit for a particular port number is 1, that VIP is 
+         associated with this PIP.
+         
+         The value of this object may be truncated to remove trialing 
+         octets of all zeros."
+    DEFVAL      { "" }
+    ::= { ieee8021PbbPipEntry 5 }
+
+ieee8021PbbPipVipMap1 OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..2049))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object contains a bitmap indicating all the VIPs in the 
+         range 4095 to 20478 that are associated with this PIP.  The 
+         bits correspond to bridge port numbers in the range 4095 
+         through 20478.  Thie high-order bit of the first octet 
+         corresponds to port number 1, and subsequent bots of the octet 
+         string correspond to subsequent port numbers.  The following 
+         formula can be used to find the bit corresponding to a 
+         paritcular port number B:
+            octet[(B-4095)/8] & (1 >> ((B-4095)%8))
+         If the bit for a particular port number is 1, that VIP is 
+         associated with this PIP.
+         
+         Note that port numbers greateer than 4094 cannot be used with 
+         xSTP.
+         
+         The value of this object may be truncated to remove trailing 
+         octets of all zeroes."
+    DEFVAL      { "" }
+    ::= { ieee8021PbbPipEntry 6 }
+
+ieee8021PbbPipVipMap2 OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..2048))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object contains a bitmap indicating all the VIPs in the 
+         range 20479 through 36861 that are associated with this PIP.  
+         The bits correspond to bridge port number in the range 20479 
+         through 36861.  The high-order bit of the first octet 
+         corresponds to port number 1, and subsequent bits of the octet 
+         string correspond to subsequent port numbers.  The following 
+         formula can be used to find the bit corresponding to a 
+         particular port number B:
+             octet[(B-20479)/8] & (1 >> ((B-20479)%8))
+         If the bit for a particular port number is 1, that VIP is 
+         associated with this PIP.
+         
+         Note that port numbers greater than 4094 cannot be used with 
+         xSTP.
+         
+         The value of this object may be truncated to remove trailing 
+         octets of all zeroes."
+    DEFVAL      { "" }
+    ::= { ieee8021PbbPipEntry 7 }
+
+ieee8021PbbPipVipMap3 OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..2048))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object contains a bitmap indicating all the VIPs in the 
+         range 36862 through 53245 that are associated with this PIP.  
+         The bits correspond to bridge port numbers in the range 36862 
+         through 53245.  The high-order bit of the first octet 
+         corresponds to port number 1, and subsequent bits of the octet 
+         string correspond to subsequent port numbers.  The following 
+         formula can be used to find the bit corresponding to a 
+         particular port number B:
+             octet[(B-36862)/8] & (1 >> ((B-36862)%8))
+         If the bit for a particular port number is 1, that VIP is 
+         associated with this PIP.
+         
+         Note that port numbers greater than 4094 cannot be used with 
+         xSTP.
+         
+         The value of this object may be truncated to remove trailing 
+         octets of all zeroes."
+    DEFVAL      { "" }
+    ::= { ieee8021PbbPipEntry 8 }
+
+ieee8021PbbPipVipMap4 OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..1537))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object contains a bitmap indicating all the VIPs in the 
+         range 53246 through 65535 that are associated with the PIP.  
+         The bits correspond to bridge port numbers in the range 53246 
+         through 65535.  The high-order bit of the first octet 
+         corresponds to port number 1, and subsequent bits of the octet 
+         string correspond to subsequent port numbers.  The following 
+         formula can be used to find the bit corresponding to a 
+         particular port number B:
+             octet[(B-53246)/8] & (1 >> ((B-53246)%8)
+         If the bit for a particular port number is 1, that VIP is 
+         associated with this PIP.
+         
+         Note that port numbers greater than 4094 cannot be used with 
+         xSTP.
+         
+         The value of this object may be truncated to remove trailing 
+         octets of all zeroes."
+    DEFVAL      { "" }
+    ::= { ieee8021PbbPipEntry 9 }
+
+ieee8021PbbPipRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the status of an entry in this table, and is used to 
+         create/delete entries.
+         
+         The object ieee8021PbbPipBMACAddress must be set before this 
+         object can be made active(1).
+         
+         The value of ieee8021PbbPipBMACAddress cannot be modified while 
+         this object is active(1)."
+    ::= { ieee8021PbbPipEntry 10 }
+
+-- ============================================================
+-- 12.16.4.1 Provider Instance Port (PIP) Priority Table
+-- ============================================================
+
+ieee8021PbbPipPriorityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021PbbPipPriorityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table that contains information about every PIP that is 
+         associated with this PBB."
+    REFERENCE   
+        "12.16.4.1"
+    ::= { ieee8021PbbProviderBackboneBridge 5 }
+
+ieee8021PbbPipPriorityEntry OBJECT-TYPE
+    SYNTAX      Ieee8021PbbPipPriorityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A list of Default User Priorities for each PIP of a PBB.  This 
+         is indexed by ieee8021PbbPipIfIndex."
+    AUGMENTS    { ieee8021PbbPipEntry }
+    ::= { ieee8021PbbPipPriorityTable 1 }
+
+Ieee8021PbbPipPriorityEntry ::= SEQUENCE {
+    ieee8021PbbPipPriorityCodePointSelection    IEEE8021PriorityCodePoint,
+    ieee8021PbbPipUseDEI                        TruthValue,
+    ieee8021PbbPipRequireDropEncoding           TruthValue
+}
+
+ieee8021PbbPipPriorityCodePointSelection OBJECT-TYPE
+    SYNTAX      IEEE8021PriorityCodePoint
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This object identifies the rows in the PCP encoding and 
+         decoding tables that are used to remark frames on this PIP if 
+         this remarking is enabled."
+    REFERENCE   
+        "12.16.4.5, 12.16.4.6"
+    ::= { ieee8021PbbPipPriorityEntry 1 }
+
+ieee8021PbbPipUseDEI OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "If the Use_DEI is set to true(1) for the PIP then the 
+         drop_eligible parameter is encoded in the DEI of transmitted 
+         frames, and the drop_eligible parameter shall be true(1) for a 
+         received frame if the DEI is set in the VLAN tag or the 
+         Priority Code Point Decoding Table indicates drop_eligible True 
+         for the received PCP value.  If the Use_DEI parameter is 
+         false(2), the DEI shall be transmitted as zero and ignored on 
+         receipt.  The default value of the Use_DEI parameter is 
+         false(2)."
+    REFERENCE   
+        "12.16.4.11, 12.16.4.12"
+    ::= { ieee8021PbbPipPriorityEntry 2 }
+
+ieee8021PbbPipRequireDropEncoding OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "If a Bridge supports encoding or decoding of drop_eligible from 
+         the PCP field of a VLAN tag (6.7.3) on any of its PIPs, then it 
+         shall implement a Boolean parameter Require Drop Encoding on 
+         each of its PIPs with default value false(2).  If Require Drop 
+         Encoding is True and the PIP cannot encode particular 
+         priorities with drop_eligible, then frames queued with those 
+         priorities and drop_eligible true(1) shall be discarded and not 
+         transmitted."
+    REFERENCE   
+        "12.16.4.13, 12.16.4.14"
+    DEFVAL      { false }
+    ::= { ieee8021PbbPipPriorityEntry 3 }
+
+-- ============================================================
+-- 12.6.4.7/8 Provider Instance Port (PIP)
+--            Priority Code Point (PCP) Decoding Table
+-- ============================================================
+
+ieee8021PbbPipDecodingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021PbbPipDecodingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table that contains information about Priority Code Point 
+         Decoding Table for a PIP of a provider bridge.  Alternative 
+         values for each table are specified as rows in Table 6-4 
+         (6.7.3), with each alternative labeled by the number of 
+         distinct priorities that can be communicated, and the number of 
+         these for which drop precedence can be communicated.  All 
+         writable objects in this table must be persistent over power up 
+         restart/reboot."
+    REFERENCE   
+        "12.16.4.7, 12.16.4.8"
+    ::= { ieee8021PbbProviderBackboneBridge 6 }
+
+ieee8021PbbPipDecodingEntry OBJECT-TYPE
+    SYNTAX      Ieee8021PbbPipDecodingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A list of objects containing Priority Code Point Decoding 
+         information for a PIP of a provider bridge."
+    INDEX       { ieee8021PbbPipIfIndex, 
+                  ieee8021PbbPipDecodingPriorityCodePointRow, 
+                  ieee8021PbbPipDecodingPriorityCodePoint }
+    ::= { ieee8021PbbPipDecodingTable 1 }
+
+Ieee8021PbbPipDecodingEntry ::= SEQUENCE {
+    ieee8021PbbPipDecodingPriorityCodePointRow  IEEE8021PriorityCodePoint,
+    ieee8021PbbPipDecodingPriorityCodePoint     Integer32,
+    ieee8021PbbPipDecodingPriority              IEEE8021PriorityValue,
+    ieee8021PbbPipDecodingDropEligible          TruthValue
+}
+
+ieee8021PbbPipDecodingPriorityCodePointRow OBJECT-TYPE
+    SYNTAX      IEEE8021PriorityCodePoint
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The specific row in Table 6-3 (6.7.3) indicating the PCP."
+    ::= { ieee8021PbbPipDecodingEntry 1 }
+
+ieee8021PbbPipDecodingPriorityCodePoint OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The specific PCP value in Table 6-3 (6.7.3)."
+    ::= { ieee8021PbbPipDecodingEntry 2 }
+
+ieee8021PbbPipDecodingPriority OBJECT-TYPE
+    SYNTAX      IEEE8021PriorityValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The specific priority value in Table 6-3 (6.7.3)."
+    REFERENCE   
+        "12.6.2.8, 12.6.2.9"
+    ::= { ieee8021PbbPipDecodingEntry 3 }
+
+ieee8021PbbPipDecodingDropEligible OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The drop eligibility value in Table 6-3 (6.7.3)."
+    REFERENCE   
+        "12.6.2.8, 12.6.2.9"
+    ::= { ieee8021PbbPipDecodingEntry 4 }
+
+-- ============================================================
+-- 12.6.4.9/10 Provider Instance Port (PIP)
+--             Priority Code Point (PCP) Encoing Table
+-- ============================================================
+
+ieee8021PbbPipEncodingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021PbbPipEncodingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table that contains information about Priority Code Point 
+         Encoding Table for a PIP of a provider bridge.  Alternative 
+         values for each table are specified as rows in Table 6-3 
+         (6.7.3), with each alternative labeled by the number of 
+         distinct priorities that can be communicated, and the number of 
+         these for which drop precedence can be communicated.  All 
+         writable objects in this table must be persistent over power up 
+         restart/reboot."
+    REFERENCE   
+        "12.16.4.9, 12.16.4.10"
+    ::= { ieee8021PbbProviderBackboneBridge 7 }
+
+ieee8021PbbPipEncodingEntry OBJECT-TYPE
+    SYNTAX      Ieee8021PbbPipEncodingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A list of objects containing Priority Code Point Encoding 
+         information for a PIP of a provider bridge."
+    INDEX       { ieee8021PbbPipIfIndex, 
+                  ieee8021PbbPipEncodingPriorityCodePointRow, 
+                  ieee8021PbbPipEncodingPriorityCodePoint, 
+                  ieee8021PbbPipEncodingDropEligible }
+    ::= { ieee8021PbbPipEncodingTable 1 }
+
+Ieee8021PbbPipEncodingEntry ::= SEQUENCE {
+    ieee8021PbbPipEncodingPriorityCodePointRow  IEEE8021PriorityCodePoint,
+    ieee8021PbbPipEncodingPriorityCodePoint     Integer32,
+    ieee8021PbbPipEncodingDropEligible          TruthValue,
+    ieee8021PbbPipEncodingPriority              IEEE8021PriorityValue
+}
+
+ieee8021PbbPipEncodingPriorityCodePointRow OBJECT-TYPE
+    SYNTAX      IEEE8021PriorityCodePoint
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The specific row in Table 6-3 (6.7.3) indicating the PCP row.  
+         (i.e. 8P0D, 7P1D, 6P2D, 5P3D)"
+    ::= { ieee8021PbbPipEncodingEntry 1 }
+
+ieee8021PbbPipEncodingPriorityCodePoint OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The specific row in Table 6-3 (6.7.3) indicating the PCP.  
+         (i.e., 0,1,2,3,4,5,6,7)."
+    ::= { ieee8021PbbPipEncodingEntry 2 }
+
+ieee8021PbbPipEncodingDropEligible OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The specific row in Table 6-3 (6.7.3) indicating the drop 
+         eligibility.  A value of true(1) means eligible for drop."
+    ::= { ieee8021PbbPipEncodingEntry 3 }
+
+ieee8021PbbPipEncodingPriority OBJECT-TYPE
+    SYNTAX      IEEE8021PriorityValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The encoding priority in Table 6-3 (6.7.3)."
+    REFERENCE   
+        "12.6.2.10, 12.6.2.11"
+    ::= { ieee8021PbbPipEncodingEntry 4 }
+
+-- ============================================================
+-- 12.16.4.3/4 Virtual Instance Port (VIP) to Provider
+--             Instance Port (PIP) mapping table
+-- ============================================================
+
+ieee8021PbbVipToPipMappingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021PbbVipToPipMappingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table lists VIPs and the PIP to which each is associated, 
+         and allows the PIP associated with each VIP to be configured.  
+         Entries in this table must be persistent over power up 
+         restart/reboot."
+    REFERENCE   
+        "12.16.4.3/4"
+    ::= { ieee8021PbbProviderBackboneBridge 8 }
+
+ieee8021PbbVipToPipMappingEntry OBJECT-TYPE
+    SYNTAX      Ieee8021PbbVipToPipMappingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The PIP is identified by the value of the 
+         ieee8021PbbVipToPipNumber.  This value may be used to index the 
+         ieee8021PbbPipTable to set or retrieve the PIP's configuration 
+         information."
+    INDEX       { ieee8021BridgeBasePortComponentId, 
+                  ieee8021BridgeBasePort }
+    ::= { ieee8021PbbVipToPipMappingTable 1 }
+
+Ieee8021PbbVipToPipMappingEntry ::= SEQUENCE {
+    ieee8021PbbVipToPipMappingPipIfIndex    InterfaceIndex,
+    ieee8021PbbVipToPipMappingStorageType   StorageType,
+    ieee8021PbbVipToPipMappingRowStatus     RowStatus
+}
+
+ieee8021PbbVipToPipMappingPipIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The PIP's interface number."
+    ::= { ieee8021PbbVipToPipMappingEntry 1 }
+
+ieee8021PbbVipToPipMappingStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the storage type of this entry.  An entry whose 
+         storage type is permanent(4) need net allow write access to 
+         other columns in that entry."
+    ::= { ieee8021PbbVipToPipMappingEntry 2 }
+
+ieee8021PbbVipToPipMappingRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the status of an entry in this table, and is used to 
+         create/delete entries.
+         
+         The corresponding instance of 
+         ieee8021PbbVipToPipMappingPipIfIndex must be set before this 
+         object can be made active(1).
+         
+         The corresponding instance of 
+         ieee8021PbbVipToPipMappingPipIfIndex may not be changed while 
+         this object is active(1)."
+    ::= { ieee8021PbbVipToPipMappingEntry 3 }
+
+-- ============================================================
+-- 12.16.5.1/2  Service Mapping configuration table
+-- ============================================================
+
+ieee8021PbbCBPServiceMappingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021PbbCBPServiceMappingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The CBP table of I-SID values (6.11).  The contents of this 
+         table are not persistent over power up restart/reboot."
+    REFERENCE   
+        "12.16.5.1/2"
+    ::= { ieee8021PbbProviderBackboneBridge 9 }
+
+ieee8021PbbCBPServiceMappingEntry OBJECT-TYPE
+    SYNTAX      Ieee8021PbbCBPServiceMappingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry includes the B-VID to carry and optionally an I-SID 
+         for mapping I-SIDs normally used at a Peer E-NNI (6.11, 
+         26.6.2).  The table is indexed by the component ID of the 
+         relevant B-Component of the PBB, the Bridge port number of the 
+         CBP on that B-Component, and the I-SID for the service."
+    INDEX       { ieee8021BridgeBasePortComponentId, 
+                  ieee8021BridgeBasePort, 
+                  ieee8021PbbCBPServiceMappingBackboneSid }
+    ::= { ieee8021PbbCBPServiceMappingTable 1 }
+
+Ieee8021PbbCBPServiceMappingEntry ::= SEQUENCE {
+    ieee8021PbbCBPServiceMappingBackboneSid             IEEE8021PbbServiceIdentifier,
+    ieee8021PbbCBPServiceMappingBVid                    VlanId,
+    ieee8021PbbCBPServiceMappingDefaultBackboneDest     MacAddress,
+    ieee8021PbbCBPServiceMappingType                    IEEE8021PbbIngressEgress,
+    ieee8021PbbCBPServiceMappingLocalSid                IEEE8021PbbServiceIdentifierOrUnassigned,
+    ieee8021PbbCBPServiceMappingRowStatus               RowStatus
+}
+
+ieee8021PbbCBPServiceMappingBackboneSid OBJECT-TYPE
+    SYNTAX      IEEE8021PbbServiceIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The I-SID which will be transmitted over the PBBN."
+    ::= { ieee8021PbbCBPServiceMappingEntry 1 }
+
+ieee8021PbbCBPServiceMappingBVid OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The B-VID which will cary this service instance."
+    ::= { ieee8021PbbCBPServiceMappingEntry 2 }
+
+ieee8021PbbCBPServiceMappingDefaultBackboneDest OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The default destination B-MAC for the CBP to use."
+    ::= { ieee8021PbbCBPServiceMappingEntry 3 }
+
+ieee8021PbbCBPServiceMappingType OBJECT-TYPE
+    SYNTAX      IEEE8021PbbIngressEgress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Use for Pt-MPt service where ingress or egress limiting is 
+         desired."
+    ::= { ieee8021PbbCBPServiceMappingEntry 4 }
+
+ieee8021PbbCBPServiceMappingLocalSid OBJECT-TYPE
+    SYNTAX      IEEE8021PbbServiceIdentifierOrUnassigned
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The I-SID value used in frames transmitted and received through 
+         thies Customer Backbone Port."
+    DEFVAL      { 1 }
+    ::= { ieee8021PbbCBPServiceMappingEntry 5 }
+
+ieee8021PbbCBPServiceMappingRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the status of an entry in this table, and is used to 
+         create/delete entries.
+         
+         The corresponding instances of the following objects must be 
+         set before this object can be made active(1):
+             ieee8021PbbCBPServiceMappingBVid
+             ieee8021PbbCBPServiceMappingDefaultBackboneDest
+             ieee8021PbbCBPServiceMappingType
+         
+         The corresponding instances of the following objects may not be 
+         changed while this object is active(1):
+             ieee8021PbbCBPServiceMappingSVid
+             ieee8021PbbCBPServiceMappingDefaultBackboneDest
+             ieee8021PbbCBPServiceMappingType
+             ieee8021PbbCBPServiceMappingLocalSid"
+    ::= { ieee8021PbbCBPServiceMappingEntry 6 }
+
+-- ============================================================
+-- CBP port creation/deletion table
+-- ============================================================
+
+ieee8021PbbCbpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021PbbCbpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table is used to dynamically create/delete Customer 
+         Backbone Ports in a PBB.
+         
+         Entries in this table must be persistent across 
+         reinitializations of the management system."
+    REFERENCE   
+        "17.5.3.4"
+    ::= { ieee8021PbbProviderBackboneBridge 10 }
+
+ieee8021PbbCbpEntry OBJECT-TYPE
+    SYNTAX      Ieee8021PbbCbpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry representing a dynamically create CBP in a PBB."
+    INDEX       { ieee8021BridgeBasePortComponentId, 
+                  ieee8021BridgeBasePort }
+    ::= { ieee8021PbbCbpTable 1 }
+
+Ieee8021PbbCbpEntry ::= SEQUENCE {
+    ieee8021PbbCbpRowStatus     RowStatus
+}
+
+ieee8021PbbCbpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object is used for creation/deletion of entries in this 
+         table."
+    ::= { ieee8021PbbCbpEntry 1 }
+
+-- ============================================================
+-- Conformance Information
+-- ============================================================
+
+ieee8021PbbConformance OBJECT IDENTIFIER
+    ::= { ieee8021PbbMib 2 }
+
+ieee8021PbbGroups OBJECT IDENTIFIER
+    ::= { ieee8021PbbConformance 1 }
+
+ieee8021PbbCompliances OBJECT IDENTIFIER
+    ::= { ieee8021PbbConformance 2 }
+
+-- ============================================================
+-- Units of conformance
+-- ============================================================
+
+ieee8021PbbBackboneEdgeBridgeGroup OBJECT-GROUP
+    OBJECTS     { ieee8021PbbBackboneEdgeBridgeAddress, 
+                  ieee8021PbbBackboneEdgeBridgeName, 
+                  ieee8021PbbNumberOfIComponents, 
+                  ieee8021PbbNumberOfBComponents, 
+                  ieee8021PbbNumberOfBebPorts }
+    STATUS      current
+    DESCRIPTION 
+        "The collection of objects used to represent a Backbone Edge 
+         Bridge."
+    ::= { ieee8021PbbGroups 1 }
+
+ieee8021PbbVipGroup OBJECT-GROUP
+    OBJECTS     { ieee8021PbbVipPipIfIndex, ieee8021PbbVipISid, 
+                  ieee8021PbbVipDefaultDstBMAC, ieee8021PbbVipType, 
+                  ieee8021PbbVipRowStatus, 
+                  ieee8021PbbISidToVipComponentId, 
+                  ieee8021PbbISidToVipPort }
+    STATUS      current
+    DESCRIPTION 
+        "The collection of objects used to represent a Virtual Instance 
+         Port (VIP)."
+    ::= { ieee8021PbbGroups 2 }
+
+ieee8021PbbPipGroup OBJECT-GROUP
+    OBJECTS     { ieee8021PbbNextAvailablePipIfIndex, 
+                  ieee8021PbbPipBMACAddress, ieee8021PbbPipName, 
+                  ieee8021PbbPipComponentId, ieee8021PbbPipVipMap, 
+                  ieee8021PbbPipVipMap1, ieee8021PbbPipVipMap2, 
+                  ieee8021PbbPipVipMap3, ieee8021PbbPipVipMap4, 
+                  ieee8021PbbPipRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "The collection of objects used to represent a Provider Instance 
+         Port (PIP)."
+    ::= { ieee8021PbbGroups 3 }
+
+ieee8021PbbDefaultPriorityGroup OBJECT-GROUP
+    OBJECTS     { ieee8021PbbPipPriorityCodePointSelection, 
+                  ieee8021PbbPipUseDEI, 
+                  ieee8021PbbPipRequireDropEncoding }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects defining the User Priority applicable 
+         to each port for media that do not support native User 
+         Priority."
+    ::= { ieee8021PbbGroups 4 }
+
+ieee8021PbbPipDecodingGroup OBJECT-GROUP
+    OBJECTS     { ieee8021PbbPipDecodingPriority, 
+                  ieee8021PbbPipDecodingDropEligible }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects providing statistics counters for 
+         decoding priority and drop eligibility for bridge ports."
+    ::= { ieee8021PbbGroups 5 }
+
+ieee8021PbbPipEncodingGroup OBJECT-GROUP
+    OBJECTS     { ieee8021PbbPipEncodingPriority }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects providing statistics counters for 
+         encoding priority and drop eligibility for bridge ports."
+    ::= { ieee8021PbbGroups 6 }
+
+ieee8021PbbVipToPipMappingGroup OBJECT-GROUP
+    OBJECTS     { ieee8021PbbVipToPipMappingPipIfIndex, 
+                  ieee8021PbbVipToPipMappingStorageType, 
+                  ieee8021PbbVipToPipMappingRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "The collection of objects used to represent the mapping of a 
+         VIP to a PIP."
+    ::= { ieee8021PbbGroups 7 }
+
+ieee8021PbbCBPServiceMappingGroup OBJECT-GROUP
+    OBJECTS     { ieee8021PbbCBPServiceMappingBVid, 
+                  ieee8021PbbCBPServiceMappingDefaultBackboneDest, 
+                  ieee8021PbbCBPServiceMappingType, 
+                  ieee8021PbbCBPServiceMappingLocalSid, 
+                  ieee8021PbbCBPServiceMappingRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "The collection of objects used to represent a service 
+         instance."
+    ::= { ieee8021PbbGroups 8 }
+
+ieee8021PbbDynamicCbpGroup OBJECT-GROUP
+    OBJECTS     { ieee8021PbbCbpRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "The collection of objects used to dynamically create/delete 
+         CBPs in a PBB."
+    ::= { ieee8021PbbGroups 9 }
+
+ieee8021PbbVipPbbTeGroup OBJECT-GROUP
+    OBJECTS     { ieee8021PbbVipEnableConnectionId }
+    STATUS      current
+    DESCRIPTION 
+        "The collection of objects specific to PBB bridges operating in 
+         a PBB-TE aware manner."
+    ::= { ieee8021PbbGroups 10 }
+
+-- ============================================================
+-- Compliance statements
+-- ============================================================
+
+ieee8021PbbCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "The compliance statement for devices supporting Provider 
+         Backbone Bridging as defined in IEEE 802.1ab."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { ieee8021PbbBackboneEdgeBridgeGroup, 
+                  ieee8021PbbVipGroup, ieee8021PbbPipGroup, 
+                  ieee8021PbbVipToPipMappingGroup, 
+                  ieee8021PbbCBPServiceMappingGroup, 
+                  ieee8021PbbDynamicCbpGroup }
+
+        GROUP   ieee8021PbbDefaultPriorityGroup
+        DESCRIPTION   
+              "This group is mandatory only for devices supporting the 
+               priority forwarding operations defined by the extended bridge 
+               services with media types, such as Ethernet, that do not 
+               support native User Priority."
+
+        GROUP   ieee8021PbbPipDecodingGroup
+        DESCRIPTION   
+              "This group is optional and supports Priority Code Point 
+               Decoding Table for a PIP of a provider bridge."
+
+        GROUP   ieee8021PbbPipEncodingGroup
+        DESCRIPTION   
+              "This group is optional and supports Priority Code Point 
+               Encoding Table for a PIP of a provider bridge."
+
+        OBJECT  ieee8021PbbPipName
+        MIN-ACCESS  read-only
+        DESCRIPTION   
+              "Read-write access for this object is not required."
+
+        OBJECT  ieee8021PbbPipVipMap
+        MIN-ACCESS  read-only
+        DESCRIPTION   
+              "Read-write access for this object is not required."
+
+        OBJECT  ieee8021PbbVipToPipMappingPipIfIndex
+        MIN-ACCESS  read-only
+        DESCRIPTION   
+              "Read-write access for this object is not required."
+
+        OBJECT  ieee8021PbbCBPServiceMappingBVid
+        MIN-ACCESS  not-accessible
+        DESCRIPTION   
+              "Read-only and read-write access for this object are optional."
+
+        OBJECT  ieee8021PbbCBPServiceMappingDefaultBackboneDest
+        MIN-ACCESS  not-accessible
+        DESCRIPTION   
+              "Read-only and read-write access for this object are optional."
+
+        OBJECT  ieee8021PbbCBPServiceMappingLocalSid
+        MIN-ACCESS  not-accessible
+        DESCRIPTION   
+              "Read-only and read-write access for this object are optional."
+
+    ::= { ieee8021PbbCompliances 1 }
+
+ieee8021PbbWIthPbbTeCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "The compliance statement for devices supporting Provider 
+         Backbone Bridging with traffic engineering as defined in IEEE 
+         802.1ah and IEEE 802.1Qay."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { ieee8021PbbBackboneEdgeBridgeGroup, 
+                  ieee8021PbbVipGroup, ieee8021PbbPipGroup, 
+                  ieee8021PbbVipToPipMappingGroup, 
+                  ieee8021PbbCBPServiceMappingGroup, 
+                  ieee8021PbbDynamicCbpGroup, ieee8021PbbVipPbbTeGroup }
+
+        GROUP   ieee8021PbbDefaultPriorityGroup
+        DESCRIPTION   
+              "This group is mandatory only for devices supporting the 
+               priority forwarding operations defined by the extended bridge 
+               services with media types, such as Ethernet, that do not 
+               support native User Priority."
+
+        GROUP   ieee8021PbbPipDecodingGroup
+        DESCRIPTION   
+              "This group is optional and supports Priority Code Point 
+               Decoding Table for a PIP of a provider bridge."
+
+        GROUP   ieee8021PbbPipEncodingGroup
+        DESCRIPTION   
+              "This group is optional and supports Priority Code Point 
+               Encoding Table for a PIP of a provider bridge."
+
+        OBJECT  ieee8021PbbPipName
+        MIN-ACCESS  read-only
+        DESCRIPTION   
+              "Read-write access for this object is not required."
+
+        OBJECT  ieee8021PbbPipVipMap
+        MIN-ACCESS  read-only
+        DESCRIPTION   
+              "Read-write access for this object is not required."
+
+        OBJECT  ieee8021PbbVipToPipMappingPipIfIndex
+        MIN-ACCESS  read-only
+        DESCRIPTION   
+              "Read-write access for this object is not required."
+
+        OBJECT  ieee8021PbbCBPServiceMappingBVid
+        MIN-ACCESS  not-accessible
+        DESCRIPTION   
+              "Read-only and read-write access for this object are optional."
+
+        OBJECT  ieee8021PbbCBPServiceMappingDefaultBackboneDest
+        MIN-ACCESS  not-accessible
+        DESCRIPTION   
+              "Read-only and read-write access for this object are optional."
+
+        OBJECT  ieee8021PbbCBPServiceMappingLocalSid
+        MIN-ACCESS  not-accessible
+        DESCRIPTION   
+              "Read-only and read-write access for this object are optional."
+
+    ::= { ieee8021PbbCompliances 2 }
+
+END -- end of module IEEE8021-PBB-MIB.
+
+-- ============================================================
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4

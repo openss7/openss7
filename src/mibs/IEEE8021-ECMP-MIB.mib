@@ -1,0 +1,429 @@
+-- ===================================================================
+--  IEEE 802.1 Equal Cost Multiple Paths (ECMP) MIB
+-- ===================================================================
+
+IEEE8021-ECMP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ieee8021BridgeBasePort, ieee8021BridgeBasePortComponentId
+        FROM IEEE8021-BRIDGE-MIB
+    ieee8021QBridgePortVlanStatisticsEntry, ieee8021QBridgeTpFdbEntry
+        FROM IEEE8021-Q-BRIDGE-MIB
+    IEEE8021SpbBridgePriority, ieee8021SpbTopIx, ieee8021SpbmTopSrvEntry
+        FROM IEEE8021-SPB-MIB
+    ieee802dot1mibs
+        FROM IEEE8021-TC-MIB
+    PortList, VlanId
+        FROM Q-BRIDGE-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Counter64, Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    RowStatus, TruthValue
+        FROM SNMPv2-TC;
+
+ieee8021EcmpMib MODULE-IDENTITY
+    LAST-UPDATED "201305130000Z"  -- May 13, 2013
+    ORGANIZATION 
+        "IEEE 802.1 Working Group"
+    CONTACT-INFO 
+        "WG-URL:   http://grouper.ieee.org/groups/802/1/index.html
+         WG-EMail: stds-802-1@ieee.org
+         
+          Contact: Ben Mack-Crane
+           Postal: C/O IEEE 802.1 Working Group
+                   IEEE Standards Association
+                   445 Hoes Lane
+                   P.O. Box 1331
+                   Piscataway
+                   NJ 08855-1331
+                   USA
+           E-mail: STDS-802-1-L@LISTSERV.IEEE.ORG"
+    DESCRIPTION 
+        "802.1 ECMP MIB"
+    REVISION    "201305130000Z"  -- May 13, 2013
+    DESCRIPTION 
+        "802.1 Equal Cost Multiple Paths MIB Initial Version"
+    ::= { ieee802dot1mibs 28 }
+
+
+ieee8021EcmpNotifications OBJECT IDENTIFIER
+    ::= { ieee8021EcmpMib 0 }
+
+ieee8021EcmpObjects OBJECT IDENTIFIER
+    ::= { ieee8021EcmpMib 1 }
+
+-- ===================================================================
+--  OBJECT DEFINITIONS
+-- ===================================================================
+
+-- =============================================================
+--  ECMP FDB object for Individual Addresses
+-- =============================================================
+
+ieee8021QBridgeEcmpFdbTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021QBridgeEcmpFdbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table that contains information about unicast entries
+         for which the device has forwarding and/or filtering
+         information.  This information is used by the
+         ECMP next hop selection function in determining how to
+         propagate a received frame."
+    REFERENCE   
+        "12.7.7.3, 8.8.3:c"
+    ::= { ieee8021EcmpObjects 1 }
+
+ieee8021QBridgeEcmpFdbEntry OBJECT-TYPE
+    SYNTAX      Ieee8021QBridgeEcmpFdbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Information about a specific unicast MAC address for
+         which the device has some forwarding and/or filtering
+         information."
+    AUGMENTS    { ieee8021QBridgeTpFdbEntry }
+    ::= { ieee8021QBridgeEcmpFdbTable 1 }
+
+Ieee8021QBridgeEcmpFdbEntry ::= SEQUENCE {
+    ieee8021QBridgeEcmpFdbPortList  PortList
+}
+
+ieee8021QBridgeEcmpFdbPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The complete set of ports, in this FID, to which
+         frames destined for this individual MAC address may be
+         forwarded."
+    ::= { ieee8021QBridgeEcmpFdbEntry 1 }
+
+-- =============================================================
+--  Flow Filtering Control Table
+-- =============================================================
+
+ieee8021EcmpFlowFilterCtlTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021EcmpFlowFilterCtlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table flow filtering control informmation for ports
+         in a Bridge supporting F-Tag processing."
+    REFERENCE   
+        "12.16.5.4, 12.16.5.5"
+    ::= { ieee8021EcmpObjects 2 }
+
+ieee8021EcmpFlowFilterCtlEntry OBJECT-TYPE
+    SYNTAX      Ieee8021EcmpFlowFilterCtlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in the Flow Filtering Control Table for a
+         port (CPB or PNP)."
+    INDEX       { ieee8021BridgeBasePortComponentId, 
+                  ieee8021BridgeBasePort, ieee8021EcmpFlowFilterCtlVid }
+    ::= { ieee8021EcmpFlowFilterCtlTable 1 }
+
+Ieee8021EcmpFlowFilterCtlEntry ::= SEQUENCE {
+    ieee8021EcmpFlowFilterCtlVid        VlanId,
+    ieee8021EcmpFlowFilterCtlEnabled    TruthValue,
+    ieee8021EcmpFlowFilterCtlHashGen    TruthValue,
+    ieee8021EcmpFlowFilterCtlTtl        Integer32
+}
+
+ieee8021EcmpFlowFilterCtlVid OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A B-vID registered on the port."
+    ::= { ieee8021EcmpFlowFilterCtlEntry 1 }
+
+ieee8021EcmpFlowFilterCtlEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates whether or not flow filtering behavior
+         is enabled on the port for the VID
+         (true(1) is enabled, false(2) is disabled)."
+    ::= { ieee8021EcmpFlowFilterCtlEntry 2 }
+
+ieee8021EcmpFlowFilterCtlHashGen OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "indicates whether or not flow hash generation
+         is enabled on the port for the VID
+         (true(1) is enabled, false(2) is disabled)."
+    ::= { ieee8021EcmpFlowFilterCtlEntry 3 }
+
+ieee8021EcmpFlowFilterCtlTtl OBJECT-TYPE
+    SYNTAX      Integer32 (0..63)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "the initial TTL value for frames entering
+         the flow filtering SPT Domain.
+         Valid values are 1..63, zero indicates the
+         value has not been set.
+         This object is persistent."
+    ::= { ieee8021EcmpFlowFilterCtlEntry 4 }
+
+-- ===================================================================
+--  ECMP ECT Static Entry Table
+-- ===================================================================
+
+ieee8021EcmpEctStaticTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021EcmpEctStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Table containing alternate Bridge priorities for tie-breaker
+         masks used in selecting shared tree root bridges.
+         The table is indexed by
+         - ieee8021SpbTopIx from ieee8021SpbMtidStaticTable
+             indicating the ISIS-SPB topology instance into
+             which the bridge priority will be advertised, and
+         - ieee8021EcmpEctStaticEntryTieBreakMask
+             the associated tie-break mask value."
+    REFERENCE   
+        "12.25.14"
+    ::= { ieee8021EcmpObjects 3 }
+
+ieee8021EcmpEctStaticEntry OBJECT-TYPE
+    SYNTAX      Ieee8021EcmpEctStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This entry contains information about backbone services
+         configured on this system to be advertised by ISIS-SPB."
+    REFERENCE   
+        "12.25.8"
+    INDEX       { ieee8021SpbTopIx, 
+                  ieee8021EcmpEctStaticEntryTieBreakMask }
+    ::= { ieee8021EcmpEctStaticTable 1 }
+
+Ieee8021EcmpEctStaticEntry ::= SEQUENCE {
+    ieee8021EcmpEctStaticEntryTieBreakMask      Integer32,
+    ieee8021EcmpEctStaticEntryBridgePriority    IEEE8021SpbBridgePriority,
+    ieee8021EcmpEctStaticEntryRowStatus         RowStatus
+}
+
+ieee8021EcmpEctStaticEntryTieBreakMask OBJECT-TYPE
+    SYNTAX      Integer32 (0..15)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The value used to create the Tie-Break Mask
+         for selecting a shared tree root bridge."
+    ::= { ieee8021EcmpEctStaticEntry 1 }
+
+ieee8021EcmpEctStaticEntryBridgePriority OBJECT-TYPE
+    SYNTAX      IEEE8021SpbBridgePriority
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A Bridge Priority value to be used
+         for selecting a shared tree root bridge,
+         i.e. the four most significant bits of the
+         Bridge Identifier.
+         This object is persistent."
+    ::= { ieee8021EcmpEctStaticEntry 2 }
+
+ieee8021EcmpEctStaticEntryRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column holds the status for this row.
+         
+         When the status is active, no columns of this table may be
+         modified.  All columns must have a valid value before the row
+         can be activated.
+         This object is persistent."
+    ::= { ieee8021EcmpEctStaticEntry 3 }
+
+-- ===================================================================
+--  ECMP extensions to ieee8021SpbmTopSrvTable
+-- ===================================================================
+
+ieee8021EcmpTopSrvTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021EcmpTopSrvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Added info for SPBM PBB encapsulated services in this network."
+    REFERENCE   
+        "12.25.8"
+    ::= { ieee8021EcmpObjects 4 }
+
+ieee8021EcmpTopSrvEntry OBJECT-TYPE
+    SYNTAX      Ieee8021EcmpTopSrvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains additional information about backbone
+         services configured on this system to be advertised by
+         ISIS-SPB."
+    REFERENCE   
+        "12.25.8"
+    AUGMENTS    { ieee8021SpbmTopSrvEntry }
+    ::= { ieee8021EcmpTopSrvTable 1 }
+
+Ieee8021EcmpTopSrvEntry ::= SEQUENCE {
+    ieee8021EcmpTopSrvEntryTsBit            TruthValue,
+    ieee8021EcmpTopSrvEntryTieBreakMask     Integer32
+}
+
+ieee8021EcmpTopSrvEntryTsBit OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "If true(1), indicates the BSI transmits multicast
+         frames on a shared tree from this CBP."
+    ::= { ieee8021EcmpTopSrvEntry 1 }
+
+ieee8021EcmpTopSrvEntryTieBreakMask OBJECT-TYPE
+    SYNTAX      Integer32 (0..15)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The value used to create the Tie-Break Mask
+         for calculating multicast trees."
+    ::= { ieee8021EcmpTopSrvEntry 2 }
+
+-- =============================================================
+--  Per port VLAN TTL Statistics Table
+-- =============================================================
+
+ieee8021QBridgePortVlanTtlStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021QBridgePortVlanTtlStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table containing per-port, per-VID TTL discard statistics."
+    ::= { ieee8021EcmpObjects 5 }
+
+ieee8021QBridgePortVlanTtlStatisticsEntry OBJECT-TYPE
+    SYNTAX      Ieee8021QBridgePortVlanTtlStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "TTL discard statistics for a VID on an interface."
+    AUGMENTS    { ieee8021QBridgePortVlanStatisticsEntry }
+    ::= { ieee8021QBridgePortVlanTtlStatisticsTable 1 }
+
+Ieee8021QBridgePortVlanTtlStatisticsEntry ::= SEQUENCE {
+    ieee8021QBridgeTpVlanPortTtlDiscards    Counter64
+}
+
+ieee8021QBridgeTpVlanPortTtlDiscards OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of valid frames received by this port from
+         its segment that were classified as belonging to this
+         VLAN and that were discarded due to TTL expiry.
+         Discontinuities in the value of the counter can occur
+         at re-initialization of the management system, and at
+         other times as indicated by the value of
+         ifCounterDiscontinuityTime object of the associated
+         interface (if any)."
+    REFERENCE   
+        "12.6.1.1.3"
+    ::= { ieee8021QBridgePortVlanTtlStatisticsEntry 1 }
+
+-- ===================================================================
+--  Conformance Information
+-- ===================================================================
+
+ieee8021EcmpConformance OBJECT IDENTIFIER
+    ::= { ieee8021EcmpMib 2 }
+
+ieee8021EcmpGroups OBJECT IDENTIFIER
+    ::= { ieee8021EcmpConformance 1 }
+
+ieee8021EcmpCompliances OBJECT IDENTIFIER
+    ::= { ieee8021EcmpConformance 2 }
+
+-- ===================================================================
+--  Units of conformance
+-- ===================================================================
+
+ieee8021QBridgeEcmpFdbGroup OBJECT-GROUP
+    OBJECTS     { ieee8021QBridgeEcmpFdbPortList }
+    STATUS      current
+    DESCRIPTION 
+        "FDB Port Map for ECMP Individual address"
+    ::= { ieee8021EcmpGroups 1 }
+
+ieee8021EcmpFlowFilterCtlGroup OBJECT-GROUP
+    OBJECTS     { ieee8021EcmpFlowFilterCtlEnabled, 
+                  ieee8021EcmpFlowFilterCtlHashGen, 
+                  ieee8021EcmpFlowFilterCtlTtl }
+    STATUS      current
+    DESCRIPTION 
+        "Flow filtering control parameters on a CBP or PNP"
+    ::= { ieee8021EcmpGroups 2 }
+
+ieee8021EcmpEctStaticGroup OBJECT-GROUP
+    OBJECTS     { ieee8021EcmpEctStaticEntryBridgePriority, 
+                  ieee8021EcmpEctStaticEntryRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "Optional Bridge Priority for selecting shared tree root"
+    ::= { ieee8021EcmpGroups 3 }
+
+ieee8021EcmpTopSrvGroup OBJECT-GROUP
+    OBJECTS     { ieee8021EcmpTopSrvEntryTsBit, 
+                  ieee8021EcmpTopSrvEntryTieBreakMask }
+    STATUS      current
+    DESCRIPTION 
+        "Advertised I-SID parameters controlling multicast routing"
+    ::= { ieee8021EcmpGroups 4 }
+
+ieee8021QBridgePortVlanTtlStatisticsGroup OBJECT-GROUP
+    OBJECTS     { ieee8021QBridgeTpVlanPortTtlDiscards }
+    STATUS      current
+    DESCRIPTION 
+        "TTL discard statistics"
+    ::= { ieee8021EcmpGroups 5 }
+
+-- ===================================================================
+-- Compliance statements
+-- ===================================================================
+
+ieee8021EcmpCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "Compliance to IEEE 802.1 SPBM ECMP"
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { ieee8021QBridgeEcmpFdbGroup, 
+                  ieee8021EcmpEctStaticGroup, ieee8021EcmpTopSrvGroup }
+
+    ::= { ieee8021EcmpCompliances 1 }
+
+ieee8021EcmpFlowFilteringCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "Compliance to IEEE 802.1 SPBM ECMP with flow filtering"
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { ieee8021EcmpFlowFilterCtlGroup, 
+                  ieee8021QBridgePortVlanTtlStatisticsGroup }
+
+    ::= { ieee8021EcmpCompliances 2 }
+
+END -- end of module IEEE8021-ECMP-MIB.
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=68 nocin nosi sts=4 sw=4 et

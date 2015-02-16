@@ -1,0 +1,970 @@
+
+IEEE8021-DDCFM-MIB DEFINITIONS ::= BEGIN
+-- IEEE802.1Qaw DDCFM MIB
+
+IMPORTS
+    Dot1agCfmMDLevel, Dot1agCfmMpDirection
+        FROM IEEE8021-CFM-MIB
+    ieee802dot1mibs
+        FROM IEEE8021-TC-MIB
+    InterfaceIndex
+        FROM IF-MIB -- [RFC2863]
+    VlanIdOrNone
+        FROM Q-BRIDGE-MIB  -- [RFC4363]
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF -- [RFC2580]
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI -- [RFC2578]
+    MacAddress, RowStatus, TruthValue
+        FROM SNMPv2-TC; -- [RFC2579]
+
+ieee8021DdcfmMIB MODULE-IDENTITY
+    LAST-UPDATED "201102270000Z" -- February 27, 2011
+    ORGANIZATION 
+        "IEEE 802.1 Working Group"
+    CONTACT-INFO 
+        "WG-URL: http://grouper.ieee.org/groups/802/1/index.html
+         WG-EMail: stds-802-1@ieee.org
+         Contact: Linda Dunbar
+          Postal: C/O IEEE 802.1 Working Group
+                  IEEE Standards Association
+                  445 Hoes Lane
+                  P.O. Box 1331
+                  Piscataway
+                  NJ 08855-1331
+                  USA
+          E-mail: STDS-802-1-L@LISTSERV.IEEE.ORG"
+    DESCRIPTION 
+        "Management.
+         Unless otherwise indicated, the references in this MIB 
+         module are to IEEE 802.1Q-2011.
+         
+         Copyright (C) IEEE.
+         This version of this MIB module is part of IEEE802.1Q; 
+         see the draft itself for full legal notices."
+    REVISION    "201102270000Z" -- February 27, 2011
+    DESCRIPTION 
+        "Minor edits to contact information etc. as part of 
+         2011 revision of IEEE Std 802.1Q."
+    REVISION    "200904060000Z" -- 04/06/2009 00:00GMT
+    DESCRIPTION 
+        "Included in IEEE802.1Qaw D5.0         Copyright (c) IEEE"
+    ::= { ieee802dot1mibs 11 }
+
+
+ieee8021MIBObjects OBJECT IDENTIFIER
+    ::= { ieee8021DdcfmMIB 1 }
+
+-- Groups in the DDCFM MIB Module
+ieee8021DdcfmStack OBJECT IDENTIFIER
+    ::= { ieee8021MIBObjects 1 }
+
+-- The DDCFM Stack Table
+ieee8021DdcfmStackTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021DdcfmStackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The DDCFM Stack MIB object table. This table is for operator to 
+         retrieve all the DDCFM entities defined on a specified interface.  
+         This table is created by default."
+    REFERENCE   
+        "clauses 12.18.1"
+    ::= { ieee8021DdcfmStack 1 }
+
+ieee8021DdcfmStackEntry OBJECT-TYPE
+    SYNTAX      Ieee8021DdcfmStackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The DDCFM Stack Table. "
+    INDEX       { ieee8021DdcfmStackIfIndex }
+    ::= { ieee8021DdcfmStackTable 1 }
+
+Ieee8021DdcfmStackEntry ::= SEQUENCE {
+    ieee8021DdcfmStackIfIndex                       InterfaceIndex,
+    ieee8021DdcfmStackRrMdLevel                     Dot1agCfmMDLevel,
+    ieee8021DdcfmStackRrDirection                   Dot1agCfmMpDirection,
+    ieee8021DdcfmStackRFMreceiverMdLevel            Dot1agCfmMDLevel,
+    ieee8021DdcfmStackDrMdLevel                     Dot1agCfmMDLevel,
+    ieee8021DdcfmStackDrVlanIdOrNone                VlanIdOrNone,
+    ieee8021DdcfmStackSFMOriginatorMdLevel          Dot1agCfmMDLevel,
+    ieee8021DdcfmStackSFMOriginatorVlanIdOrNone     VlanIdOrNone,
+    ieee8021DdcfmStackSFMOriginatorDirection        Dot1agCfmMpDirection
+}
+
+ieee8021DdcfmStackIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This object is the interface index of the interface either a 
+         bridge port, or an aggregated IEEE802.3 port within a Bridge 
+         Port. When the ifIndex value corresponds to the ifIndex of a 
+         Bridge Port, the value in this column must match the value in the 
+         ieee8021BridgeBasePortIfIndex column for the bridge port."
+    REFERENCE   
+        "clause 12.18.1.1.2 a.1"
+    ::= { ieee8021DdcfmStackEntry 1 }
+
+ieee8021DdcfmStackRrMdLevel OBJECT-TYPE
+    SYNTAX      Dot1agCfmMDLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "MD level of the Reflection Responder managed object."
+    REFERENCE   
+        "clause 12.18.1.1.3 b.1"
+    ::= { ieee8021DdcfmStackEntry 2 }
+
+ieee8021DdcfmStackRrDirection OBJECT-TYPE
+    SYNTAX      Dot1agCfmMpDirection
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The direction in which the RR faces."
+    REFERENCE   
+        "clause 12.18.1.1.3 b1"
+    ::= { ieee8021DdcfmStackEntry 3 }
+
+ieee8021DdcfmStackRFMreceiverMdLevel OBJECT-TYPE
+    SYNTAX      Dot1agCfmMDLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "MD level of the RFM Receiver MO configured on the interface."
+    REFERENCE   
+        "clause 12.18.1.1.3 b.2"
+    ::= { ieee8021DdcfmStackEntry 4 }
+
+ieee8021DdcfmStackDrMdLevel OBJECT-TYPE
+    SYNTAX      Dot1agCfmMDLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "MD level of the Deflection Responder managed object."
+    REFERENCE   
+        "clause 12.18.1.1.3 b.3"
+    ::= { ieee8021DdcfmStackEntry 5 }
+
+ieee8021DdcfmStackDrVlanIdOrNone OBJECT-TYPE
+    SYNTAX      VlanIdOrNone
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The MA of the DR configured on the interface."
+    REFERENCE   
+        "clause 12.18.1.1.3 b.3"
+    ::= { ieee8021DdcfmStackEntry 6 }
+
+ieee8021DdcfmStackSFMOriginatorMdLevel OBJECT-TYPE
+    SYNTAX      Dot1agCfmMDLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "MD level of the SFM Originator MO configured on the interface."
+    REFERENCE   
+        "clause 12.18.1.1.3 b.4"
+    ::= { ieee8021DdcfmStackEntry 7 }
+
+ieee8021DdcfmStackSFMOriginatorVlanIdOrNone OBJECT-TYPE
+    SYNTAX      VlanIdOrNone
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The MA of the SFM Originator configured on the interface."
+    REFERENCE   
+        "clause 12.18.1.1.3 b.4"
+    ::= { ieee8021DdcfmStackEntry 8 }
+
+ieee8021DdcfmStackSFMOriginatorDirection OBJECT-TYPE
+    SYNTAX      Dot1agCfmMpDirection
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The direction of which the SFM Originator is facing."
+    REFERENCE   
+        "clause 12.18.1.1.3 b.4"
+    ::= { ieee8021DdcfmStackEntry 9 }
+
+ieee8021DdcfmRr OBJECT IDENTIFIER
+    ::= { ieee8021MIBObjects 2 }
+
+-- The Reflection Responder Table
+ieee8021DdcfmRrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021DdcfmRrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The Reflection Responder MIB object table. Each row in the table 
+         represents a different Reflection Responder. All rows in this 
+         the value of the ActivationStatus column will be false."
+    REFERENCE   
+        "clauses 12.18.2"
+    ::= { ieee8021DdcfmRr 1 }
+
+ieee8021DdcfmRrEntry OBJECT-TYPE
+    SYNTAX      Ieee8021DdcfmRrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The Reflection Responder. Each entry associated with a Reflection 
+         Responder."
+    INDEX       { ieee8021DdcfmRrIfIndex, ieee8021DdcfmRrMdIndex, 
+                  ieee8021DdcfmRrDirection }
+    ::= { ieee8021DdcfmRrTable 1 }
+
+Ieee8021DdcfmRrEntry ::= SEQUENCE {
+    ieee8021DdcfmRrIfIndex              InterfaceIndex,
+    ieee8021DdcfmRrMdIndex              Dot1agCfmMDLevel,
+    ieee8021DdcfmRrDirection            Dot1agCfmMpDirection,
+    ieee8021DdcfmRrPrimaryVlanIdOrNone  VlanIdOrNone,
+    ieee8021DdcfmRrFilter               OCTET STRING,
+    ieee8021DdcfmRrSamplingInterval     Unsigned32,
+    ieee8021DdcfmRrTargetAddress        MacAddress,
+    ieee8021DdcfmRrContinueFlag         TruthValue,
+    ieee8021DdcfmRrDuration             Unsigned32,
+    ieee8021DdcfmRrDurationInTimeFlag   TruthValue,
+    ieee8021DdcfmRrVlanPriority         Integer32,
+    ieee8021DdcfmRrVlanDropEligible     TruthValue,
+    ieee8021DdcfmRrFloodingFlag         TruthValue,
+    ieee8021DdcfmRrTruncationFlag       TruthValue,
+    ieee8021DdcfmRrActivationStatus     TruthValue,
+    ieee8021DdcfmRrRemainDuration       Unsigned32,
+    ieee8021DdcfmRrNextRfmTransID       Unsigned32,
+    ieee8021DdcfmRrRowStatus            RowStatus
+}
+
+ieee8021DdcfmRrIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This object is the interface index of the interface either a 
+         bridge port, or an aggregated IEEE802.3 port within a Bridge 
+         Port, on which Reflection Responder is defined.  
+         When the ifIndex value corresponds to the ifIndex of a 
+         Bridge Port, the value in this column must match the value in the 
+         ieee8021BridgeBasePortIfIndex column for the bridge port."
+    REFERENCE   
+        "clause 12.18.2.1.2 a.1"
+    ::= { ieee8021DdcfmRrEntry 1 }
+
+ieee8021DdcfmRrMdIndex OBJECT-TYPE
+    SYNTAX      Dot1agCfmMDLevel
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "MD level of the Reflection Responder managed object."
+    REFERENCE   
+        "clause 12.18.2.1.2 a.2"
+    ::= { ieee8021DdcfmRrEntry 2 }
+
+ieee8021DdcfmRrDirection OBJECT-TYPE
+    SYNTAX      Dot1agCfmMpDirection
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The direction in which the RR faces."
+    REFERENCE   
+        "clause 12.18.2.1.2 a.3"
+    ::= { ieee8021DdcfmRrEntry 3 }
+
+ieee8021DdcfmRrPrimaryVlanIdOrNone OBJECT-TYPE
+    SYNTAX      VlanIdOrNone
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The VID to be used on RFM frames."
+    REFERENCE   
+        "clause 12.18.2.2.2 b.1"
+    DEFVAL      { 0 }
+    ::= { ieee8021DdcfmRrEntry 4 }
+
+ieee8021DdcfmRrFilter OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..1500))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A pattern string specifies what data frames are selected to be 
+         reflected. Below are the primary Reflection Filters all 
+         Implementers should support. Multiple primary filters can be 
+         combined together by 
+         && (and), || (or), or !(negation).
+          1) All;
+          2) VID= vid;
+          3) I-SID = x;
+          4) DA = xx.xx.xx.xx.xx.xx;
+          5) SA = xx.xx.xx.xx.xx.xx;
+          6) EtherType =xx.
+         For the reason that this management object allows a max size of 
+         1500, messages carrying this object may be fragmented on some 
+         segments."
+    REFERENCE   
+        "clause 12.18.2.2.2 b.2"
+    ::= { ieee8021DdcfmRrEntry 5 }
+
+ieee8021DdcfmRrSamplingInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "miliseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Indicates a time interval in which only the first frame matching 
+         the filter conditions is refected."
+    REFERENCE   
+        "clause 12.18.2.2.2 b.3"
+    ::= { ieee8021DdcfmRrEntry 6 }
+
+ieee8021DdcfmRrTargetAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The Reflection Target Address, which is a MAC address to which the 
+         reflected frames are targeted. Only individual address is allowed 
+         for the Reflection Target Address.  
+         If not specified, the source_address of the selected data frame is 
+         used for Reflection Target Address."
+    REFERENCE   
+        "clause 12.18.2.2.2 b.4"
+    ::= { ieee8021DdcfmRrEntry 7 }
+
+ieee8021DdcfmRrContinueFlag OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "True indicates that the selected data frames are to be continued 
+         towards the DA specified in the frame header.  
+         False indicates that the selected data frames are terminated."
+    REFERENCE   
+        "clause 12.18.2.2.2 b.5"
+    DEFVAL      { true }
+    ::= { ieee8021DdcfmRrEntry 8 }
+
+ieee8021DdcfmRrDuration OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Duration of time in the unit of seconds or the number 
+         of frames to be reflected, for Reflection Responder to 
+         remain active after activation; Minimum 2 octets (65536 
+         seconds) are needed for the duration of time;"
+    REFERENCE   
+        "clause 12.18.2.2.2 b.7"
+    ::= { ieee8021DdcfmRrEntry 9 }
+
+ieee8021DdcfmRrDurationInTimeFlag OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "True indicates that duration is in seconds;
+         reflected."
+    REFERENCE   
+        "clause 12.18.2.2.2 b.6"
+    DEFVAL      { true }
+    ::= { ieee8021DdcfmRrEntry 10 }
+
+ieee8021DdcfmRrVlanPriority OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Priority, 3 bit value to be used in the VLAN tag, to be used in the 
+         transmitted encapsulated frames. The default value is the highest 
+         priority."
+    REFERENCE   
+        "clause 12.18.2.2.2 b.9"
+    DEFVAL      { 7 }
+    ::= { ieee8021DdcfmRrEntry 11 }
+
+ieee8021DdcfmRrVlanDropEligible OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "It indicates that drop_eligible bit value to be used in 
+         the VLAN tag which to be used in the transmitted encapsulated 
+         frames is set as True or False accordingly."
+    REFERENCE   
+        "clause 12.18.2.2.2 b.9"
+    DEFVAL      { false }
+    ::= { ieee8021DdcfmRrEntry 12 }
+
+ieee8021DdcfmRrFloodingFlag OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "True indicates that flooding is allowed if Egress port can't be 
+         identified for RFM by the Filtering Database, False otherwise."
+    REFERENCE   
+        "clause 12.18.2.2.2 b.10"
+    DEFVAL      { true }
+    ::= { ieee8021DdcfmRrEntry 13 }
+
+ieee8021DdcfmRrTruncationFlag OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "True indicates that the received data frame will be truncated to 
+         keep the contructed RFM size not exceeding the egress port's 
+         Maximum Service Data Unit Size, False otherwise."
+    REFERENCE   
+        "clause 12.18.2.2.2 b.11"
+    DEFVAL      { true }
+    ::= { ieee8021DdcfmRrEntry 14 }
+
+ieee8021DdcfmRrActivationStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "True When receiving a request to activate a Reflection Responder, 
+         False When receiving a request to stop Reflection Responder or 
+         its timer expires."
+    REFERENCE   
+        "clause 12.18.2.3.3 b.12"
+    DEFVAL      { false }
+    ::= { ieee8021DdcfmRrEntry 15 }
+
+ieee8021DdcfmRrRemainDuration OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The value indicates the time, in the unit of seconds, or count 
+         left for Reflection Responder to be active."
+    REFERENCE   
+        "clause 12.18.2.3.3 b.13"
+    ::= { ieee8021DdcfmRrEntry 16 }
+
+ieee8021DdcfmRrNextRfmTransID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "It indicates the value of RFM Transaction Identifier field of the 
+         next RFM transmitted. It is incremented by 1 with each 
+         transmission of RFM."
+    REFERENCE   
+        "clause 12.18.2.3.3 b.14"
+    ::= { ieee8021DdcfmRrEntry 17 }
+
+ieee8021DdcfmRrRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The status of the row.
+         The writable columns in a row can not be changed if the row is 
+         active."
+    ::= { ieee8021DdcfmRrEntry 18 }
+
+ieee8021DdcfmRFMReceiver OBJECT IDENTIFIER
+    ::= { ieee8021MIBObjects 3 }
+
+ieee8021DdcfmRFMReceiverTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021DdcfmRFMReceiverEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The RFM Receiver MIB object table. Each row in the table 
+         represents a different RFM Receiver.  
+         All rows associated with this table persist across system restart."
+    REFERENCE   
+        "clauses 12.18.3"
+    ::= { ieee8021DdcfmRFMReceiver 1 }
+
+ieee8021DdcfmRFMReceiverEntry OBJECT-TYPE
+    SYNTAX      Ieee8021DdcfmRFMReceiverEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The DDCFM RFM Receiver. Each entry associated with a DDCFM RFM 
+         Receiver that reference to a MP."
+    INDEX       { ieee8021DdcfmRfmReceiverIfIndex, 
+                  ieee8021DdcfmRfmReceiverMdIndex }
+    ::= { ieee8021DdcfmRFMReceiverTable 1 }
+
+Ieee8021DdcfmRFMReceiverEntry ::= SEQUENCE {
+    ieee8021DdcfmRfmReceiverIfIndex     InterfaceIndex,
+    ieee8021DdcfmRfmReceiverMdIndex     Dot1agCfmMDLevel,
+    ieee8021DdcfmRFMRowStatus           RowStatus
+}
+
+ieee8021DdcfmRfmReceiverIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The interface index of the interface either a 
+         bridge port, or an aggregated IEEE802.3 port within a Bridge 
+         Port, on which the RFM Receiver is created.  
+         When the ifIndex value corresponds to the ifIndex of a 
+         Bridge Port, the value in this column must match the value in the 
+         ieee8021BridgeBasePortIfIndex column for the bridge port."
+    REFERENCE   
+        "clause 12.18.3.1.2 a.2 "
+    ::= { ieee8021DdcfmRFMReceiverEntry 1 }
+
+ieee8021DdcfmRfmReceiverMdIndex OBJECT-TYPE
+    SYNTAX      Dot1agCfmMDLevel
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "MD level of the RFM Receiver managed object."
+    REFERENCE   
+        "clause 12.18.3.1.2 a.2"
+    ::= { ieee8021DdcfmRFMReceiverEntry 2 }
+
+ieee8021DdcfmRFMRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The status of the row.
+         The writable columns in a row can not be changed if the row is 
+         active."
+    ::= { ieee8021DdcfmRFMReceiverEntry 3 }
+
+ieee8021DdcfmDr OBJECT IDENTIFIER
+    ::= { ieee8021MIBObjects 4 }
+
+-- The Decapsulator Responder Table
+ieee8021DdcfmDrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021DdcfmDrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The DDCFM Decapsulator Responder MIB object table. Each row in the 
+         table represents a different DDCFM Decapsulator Responder. All rows 
+         in this table persist across a system restart; however after such 
+         a restart, the value of the ActivationStatus column will be false."
+    REFERENCE   
+        "clauses 12.18.4"
+    ::= { ieee8021DdcfmDr 1 }
+
+ieee8021DdcfmDrEntry OBJECT-TYPE
+    SYNTAX      Ieee8021DdcfmDrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The DDCFM Decapsulator Responder. Each entry associated with a 
+         DDCFM RFM Receiver which reference to a MP."
+    INDEX       { ieee8021DdcfmDrIfIndex, ieee8021DdcfmDrMdIndex, 
+                  ieee8021DdcfmDrVlanIdOrNone }
+    ::= { ieee8021DdcfmDrTable 1 }
+
+Ieee8021DdcfmDrEntry ::= SEQUENCE {
+    ieee8021DdcfmDrIfIndex                  InterfaceIndex,
+    ieee8021DdcfmDrMdIndex                  Dot1agCfmMDLevel,
+    ieee8021DdcfmDrVlanIdOrNone             VlanIdOrNone,
+    ieee8021DdcfmDrSfmOriginator            MacAddress,
+    ieee8021DdcfmDrSourceAddressStayFlag    TruthValue,
+    ieee8021DdcfmDrFloodingFlag             TruthValue,
+    ieee8021DdcfmDrDuration                 Unsigned32,
+    ieee8021DdcfmDrActivationStatus         TruthValue,
+    ieee8021DdcfmDrRemainDuration           Unsigned32,
+    ieee8021DdcfmDrSFMsequenceErrors        Unsigned32,
+    ieee8021DdcfmDrRowStatus                RowStatus
+}
+
+ieee8021DdcfmDrIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The interface index of the interface either a Bridge 
+         Port, or an aggregated IEEE802.3 port within a Bridge 
+         Port, on which the Decapsulator Responder is created.  
+         When the ifIndex value corresponds to the ifIndex of a 
+         Bridge Port, the value in this column must match the value in the 
+         ieee8021BridgeBasePortIfIndex column for the bridge port."
+    REFERENCE   
+        "clause 12.18.4.1.2 a.2 "
+    ::= { ieee8021DdcfmDrEntry 1 }
+
+ieee8021DdcfmDrMdIndex OBJECT-TYPE
+    SYNTAX      Dot1agCfmMDLevel
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "MD level of the Decapsulator Responder managed object."
+    REFERENCE   
+        "clause 12.18.4.1.2 a.2"
+    ::= { ieee8021DdcfmDrEntry 2 }
+
+ieee8021DdcfmDrVlanIdOrNone OBJECT-TYPE
+    SYNTAX      VlanIdOrNone
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An integer indicating the VID expected from the Send Frame Message 
+         frames."
+    REFERENCE   
+        "clause 12.18.4.1.2 a.2"
+    ::= { ieee8021DdcfmDrEntry 3 }
+
+ieee8021DdcfmDrSfmOriginator OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "MAC address reference to the corresponding Send Frame Message 
+         Originator."
+    REFERENCE   
+        "clause 12.18.4.2.3 b.2"
+    ::= { ieee8021DdcfmDrEntry 4 }
+
+ieee8021DdcfmDrSourceAddressStayFlag OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "True indicates that Decapsulator Responder does not replace the 
+         source_address field of the decapsulated frame with the 
+         Decapsulator Responder's own MAC address, False otherwise."
+    REFERENCE   
+        "clause 12.18.4.2.3 b.3"
+    DEFVAL      { true }
+    ::= { ieee8021DdcfmDrEntry 5 }
+
+ieee8021DdcfmDrFloodingFlag OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "True indicates that broadcast is allowed if Egress port can't be 
+         identified by the Filtering Database, False otherwise."
+    REFERENCE   
+        "clause 12.18.4.3.2 b.3"
+    DEFVAL      { true }
+    ::= { ieee8021DdcfmDrEntry 6 }
+
+ieee8021DdcfmDrDuration OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The time that the Decapsulator Responder can stay active after 
+         its activation in the unit of seconds."
+    REFERENCE   
+        "clause 12.18.4.3.2 b.4"
+    ::= { ieee8021DdcfmDrEntry 7 }
+
+ieee8021DdcfmDrActivationStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "True When receiving a request to activate a Decapsulator 
+         Responder, false When receiving a request to stop the Decapsulator 
+         Responder or its timer expires."
+    REFERENCE   
+        "clause 12.18.4.2.3 b.6"
+    DEFVAL      { false }
+    ::= { ieee8021DdcfmDrEntry 8 }
+
+ieee8021DdcfmDrRemainDuration OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The value indicates the time left for Decapsulator Responder keep 
+         active. Its granularity is in seconds."
+    REFERENCE   
+        "clause 12.18.4.2.3 b.7"
+    ::= { ieee8021DdcfmDrEntry 9 }
+
+ieee8021DdcfmDrSFMsequenceErrors OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "integer"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The value indicates the total number of out-of-sequence SFMs."
+    REFERENCE   
+        "clause 12.18.4.2.3 b.8"
+    ::= { ieee8021DdcfmDrEntry 10 }
+
+ieee8021DdcfmDrRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The status of the row.
+         The writable columns in a row can not be changed if the row is 
+         active."
+    ::= { ieee8021DdcfmDrEntry 11 }
+
+ieee8021DdcfmSFMOriginator OBJECT IDENTIFIER
+    ::= { ieee8021MIBObjects 5 }
+
+ieee8021DdcfmSoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021DdcfmSoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The DDCFM Send Frame Message Originator MIB object table. Each row 
+         in the table represents a different DDCFM Send Frame Message 
+         Originator. All rows in this table persist across a system restart; 
+         however after such a restart, the value of the ActivationStatus 
+         column will be false."
+    REFERENCE   
+        "clauses 12.18.5"
+    ::= { ieee8021DdcfmSFMOriginator 1 }
+
+ieee8021DdcfmSoEntry OBJECT-TYPE
+    SYNTAX      Ieee8021DdcfmSoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry associated with a Send Frame Message Originator."
+    INDEX       { ieee8021DdcfmSfmIfIndex, ieee8021DdcfmSoMdIndex, 
+                  ieee8021DdcfmSoVlanIdOrNone, ieee8021DdcfmSoDirection }
+    ::= { ieee8021DdcfmSoTable 1 }
+
+Ieee8021DdcfmSoEntry ::= SEQUENCE {
+    ieee8021DdcfmSfmIfIndex             InterfaceIndex,
+    ieee8021DdcfmSoMdIndex              Dot1agCfmMDLevel,
+    ieee8021DdcfmSoVlanIdOrNone         VlanIdOrNone,
+    ieee8021DdcfmSoDirection            Dot1agCfmMpDirection,
+    ieee8021DdcfmSoDrMacAddress         MacAddress,
+    ieee8021DdcfmSoDuration             Unsigned32,
+    ieee8021DdcfmSoActivationStatus     TruthValue,
+    ieee8021DdcfmSoRemainDuration       Unsigned32,
+    ieee8021DdcfmSoRowStatus            RowStatus
+}
+
+ieee8021DdcfmSfmIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The interface index of the interface either a bridge 
+         port, or an aggregated IEEE802.3 port within a bridge 
+         port, on which Send Frame Message Originator is created.  
+         When the ifIndex value corresponds to the ifIndex of a 
+         Bridge Port, the value in this column must match the value in the 
+         ieee8021BridgeBasePortIfIndex column for the bridge port."
+    REFERENCE   
+        "clause 12.18.5.1.2 a.2"
+    ::= { ieee8021DdcfmSoEntry 1 }
+
+ieee8021DdcfmSoMdIndex OBJECT-TYPE
+    SYNTAX      Dot1agCfmMDLevel
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "MD level of the Send Frame Message Originator managed object."
+    REFERENCE   
+        "clause 12.18.5.1.2 a.2"
+    ::= { ieee8021DdcfmSoEntry 2 }
+
+ieee8021DdcfmSoVlanIdOrNone OBJECT-TYPE
+    SYNTAX      VlanIdOrNone
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An integer indicating the VID to be used on Send Frame Message 
+         frames."
+    REFERENCE   
+        "clause 12.18.5.1.2 a.2"
+    ::= { ieee8021DdcfmSoEntry 3 }
+
+ieee8021DdcfmSoDirection OBJECT-TYPE
+    SYNTAX      Dot1agCfmMpDirection
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The direction in which the SFM Originator faces."
+    REFERENCE   
+        "clause 12.18.5.1.2 a.2"
+    ::= { ieee8021DdcfmSoEntry 4 }
+
+ieee8021DdcfmSoDrMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "MAC Address of the corresponding Decapsulator Responder."
+    REFERENCE   
+        "clause 12.18.5.4.2 b"
+    ::= { ieee8021DdcfmSoEntry 5 }
+
+ieee8021DdcfmSoDuration OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Duration, in the unit of seconds, of Send Frame Message Originator 
+         staying active once activated."
+    REFERENCE   
+        "clause 12.18.5.4.2 c"
+    ::= { ieee8021DdcfmSoEntry 6 }
+
+ieee8021DdcfmSoActivationStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "True When receiving a request to activate a Send Frame Message 
+         Originator, false When receiving a request to stop the Send Frame 
+         Message Originator or its timer expires."
+    REFERENCE   
+        "clause 12.18.5.2.3 b.4"
+    DEFVAL      { false }
+    ::= { ieee8021DdcfmSoEntry 7 }
+
+ieee8021DdcfmSoRemainDuration OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The value indicates the time left for Send Frame Message 
+         Originator keep active. Its granularity is in seconds."
+    REFERENCE   
+        "clause 12.18.5.2.3 b.5"
+    ::= { ieee8021DdcfmSoEntry 8 }
+
+ieee8021DdcfmSoRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The status of the row.
+         The writable columns in a row can not be changed if the row is 
+         active."
+    ::= { ieee8021DdcfmSoEntry 9 }
+
+-- IEEE802.1Qaw MIB Module - Conformance Information
+ieee8021DdcfmConformance OBJECT IDENTIFIER
+    ::= { ieee8021DdcfmMIB 2 }
+
+ieee8021DdcfmCompliances OBJECT IDENTIFIER
+    ::= { ieee8021DdcfmConformance 1 }
+
+-- Units of conformance
+ieee8021DdcfmGroups OBJECT IDENTIFIER
+    ::= { ieee8021DdcfmConformance 2 }
+
+ieee8021DdcfmStackGroup OBJECT-GROUP
+    OBJECTS     { ieee8021DdcfmStackRrMdLevel, 
+                  ieee8021DdcfmStackRrDirection, 
+                  ieee8021DdcfmStackRFMreceiverMdLevel, 
+                  ieee8021DdcfmStackDrMdLevel, 
+                  ieee8021DdcfmStackDrVlanIdOrNone, 
+                  ieee8021DdcfmStackSFMOriginatorMdLevel, 
+                  ieee8021DdcfmStackSFMOriginatorVlanIdOrNone, 
+                  ieee8021DdcfmStackSFMOriginatorDirection }
+    STATUS      current
+    DESCRIPTION 
+        "Objects for the DDCFM Stack group."
+    ::= { ieee8021DdcfmGroups 1 }
+
+ieee8021DdcfmRrGroup OBJECT-GROUP
+    OBJECTS     { ieee8021DdcfmRrPrimaryVlanIdOrNone, 
+                  ieee8021DdcfmRrFilter, ieee8021DdcfmRrSamplingInterval, 
+                  ieee8021DdcfmRrTargetAddress, 
+                  ieee8021DdcfmRrContinueFlag, ieee8021DdcfmRrDuration, 
+                  ieee8021DdcfmRrDurationInTimeFlag, 
+                  ieee8021DdcfmRrVlanPriority, 
+                  ieee8021DdcfmRrVlanDropEligible, 
+                  ieee8021DdcfmRrFloodingFlag, 
+                  ieee8021DdcfmRrTruncationFlag, 
+                  ieee8021DdcfmRrActivationStatus, 
+                  ieee8021DdcfmRrRemainDuration, 
+                  ieee8021DdcfmRrNextRfmTransID, 
+                  ieee8021DdcfmRrRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "Objects for the Reflection Responder group."
+    ::= { ieee8021DdcfmGroups 2 }
+
+ieee8021DdcfmRFMReceiverGroup OBJECT-GROUP
+    OBJECTS     { ieee8021DdcfmRFMRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "Objects for the RFM Receiver group."
+    ::= { ieee8021DdcfmGroups 3 }
+
+ieee8021DdcfmDrGroup OBJECT-GROUP
+    OBJECTS     { ieee8021DdcfmDrSourceAddressStayFlag, 
+                  ieee8021DdcfmDrSfmOriginator, 
+                  ieee8021DdcfmDrFloodingFlag, ieee8021DdcfmDrDuration, 
+                  ieee8021DdcfmDrActivationStatus, 
+                  ieee8021DdcfmDrRemainDuration, 
+                  ieee8021DdcfmDrSFMsequenceErrors, 
+                  ieee8021DdcfmDrRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "Objects for the Decapsulator Responder group."
+    ::= { ieee8021DdcfmGroups 4 }
+
+ieee8021DdcfmSoGroup OBJECT-GROUP
+    OBJECTS     { ieee8021DdcfmSoDrMacAddress, ieee8021DdcfmSoDuration, 
+                  ieee8021DdcfmSoActivationStatus, 
+                  ieee8021DdcfmSoRemainDuration, 
+                  ieee8021DdcfmSoRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "Objects for the Send Frame Message Originator group."
+    ::= { ieee8021DdcfmGroups 5 }
+
+--*****************************************************************
+-- MIB Module Compliance statements
+--*****************************************************************
+ieee8021DdcfmCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "The compliance statement for support of the DDCFM MIB module."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { ieee8021DdcfmStackGroup, 
+                  ieee8021DdcfmRrGroup, ieee8021DdcfmRFMReceiverGroup, 
+                  ieee8021DdcfmDrGroup, ieee8021DdcfmSoGroup }
+
+        OBJECT  ieee8021DdcfmRrRowStatus
+        SYNTAX  RowStatus { active(1), notInService(2) }
+        WRITE-SYNTAX    RowStatus { notInService(2), createAndGo(4), 
+                    destroy(6) }
+        DESCRIPTION   
+              "Support for createAndWait is not required."
+
+        OBJECT  ieee8021DdcfmRFMRowStatus
+        SYNTAX  RowStatus { active(1), notInService(2) }
+        WRITE-SYNTAX    RowStatus { notInService(2), createAndGo(4), 
+                    destroy(6) }
+        DESCRIPTION   
+              "Support for createAndWait is not required."
+
+        OBJECT  ieee8021DdcfmDrRowStatus
+        SYNTAX  RowStatus { active(1), notInService(2) }
+        WRITE-SYNTAX    RowStatus { notInService(2), createAndGo(4), 
+                    destroy(6) }
+        DESCRIPTION   
+              "Support for createAndWait is not required."
+
+        OBJECT  ieee8021DdcfmSoRowStatus
+        SYNTAX  RowStatus { active(1), notInService(2) }
+        WRITE-SYNTAX    RowStatus { notInService(2), createAndGo(4), 
+                    destroy(6) }
+        DESCRIPTION   
+              "Support for createAndWait is not required."
+
+    ::= { ieee8021DdcfmCompliances 1 }
+
+END -- end of module IEEE8021-DDCFM-MIB.
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=68 nocin nosi sts=4 sw=4 et

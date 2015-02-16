@@ -1,0 +1,519 @@
+
+IEEE8021-FQTSS-MIB DEFINITIONS ::= BEGIN
+-- for Time Sensitive Streams (FQTSS) in 802.1Q Bridges.
+
+IMPORTS
+    ieee8021BridgeBaseComponentId, ieee8021BridgeBasePort
+        FROM IEEE8021-BRIDGE-MIB
+    IEEE8021PriorityValue, ieee802dot1mibs
+        FROM IEEE8021-TC-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
+
+ieee8021FqtssMib MODULE-IDENTITY
+    LAST-UPDATED "201102270000Z" -- February 27, 2011
+    ORGANIZATION 
+        "IEEE 802.1 Working Group"
+    CONTACT-INFO 
+        "  WG-URL: http://grouper.ieee.org/groups/802/1/index.html
+         WG-EMail: stds-802-1@ieee.org
+         
+         Contact: Tony Jeffree
+          Postal: C/O IEEE 802.1 Working Group
+                  IEEE Standards Association
+                  445 Hoes Lane
+                  P.O. Box 1331
+                  Piscataway
+                  NJ 08855-1331
+                  USA
+          E-mail: STDS-802-1-L@LISTSERV.IEEE.ORG"
+    DESCRIPTION 
+        "The Bridge MIB module for managing devices that support 
+         the Forwarding and Queuing Enhancements 
+         for Time Sensitive Streams.  
+         Unless otherwise indicated, the references in this MIB 
+         module are to IEEE Std 802.1Q-2011.
+         
+         Copyright (C) IEEE.
+         This version of this MIB module is part of IEEE802.1Q; 
+         see the draft itself for full legal notices."
+    REVISION    "201102270000Z" -- February 27, 2011
+    DESCRIPTION 
+        "Minor edits to contact information etc. as part of 
+         2011 revision of IEEE Std 802.1Q."
+    REVISION    "200910010000Z" -- October 1, 2009
+    DESCRIPTION 
+        "Initial revision, included in IEEE 802.1Qav."
+    ::= { ieee802dot1mibs 16 }
+
+
+IEEE8021FqtssTrafficClassValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "An 802.1 FQTSS traffic class value.  
+         This is the numerical value associated with a traffic 
+         class in a Bridge. Larger values are associated with 
+         higher priority traffic classes."
+    REFERENCE   
+        "12.21"
+    SYNTAX      Unsigned32 (0..7)
+
+IEEE8021FqtssDeltaBandwidthValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "An 802.1 FQTSS delta bandwidth percentage, 
+         represented as a fixed point number scaled by 
+         1,000,000."
+    REFERENCE   
+        "12.21, 34.4"
+    SYNTAX      Unsigned32 (0..100000000)
+
+IEEE8021FtqssTxSelectionAlgorithmIDValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "An 802.1 transmission selection algorithm identifier 
+         value. This is an integer, with the following 
+         interpretation placed on the value:
+         
+         0: Strict priority algorithm,
+         1: Credit-based shaper algorithm,
+         2-255: Reserved for future standardization,
+         256-4294967295: Vendor-specific transmission selection 
+                         algorithm identifiers, consisting of a 
+                         four-octet integer, where the 3 most 
+                         significant octets hold an OUI value, 
+                         and the least significant octet holds 
+                         an integer value in the range 0-255 
+                         assigned by the owner of the OUI."
+    REFERENCE   
+        "8.6.8, 12.21"
+    SYNTAX      Unsigned32
+
+-- subtrees in the FQTSS MIB
+ieee8021FqtssNotifications OBJECT IDENTIFIER
+    ::= { ieee8021FqtssMib 0 }
+
+ieee8021FqtssObjects OBJECT IDENTIFIER
+    ::= { ieee8021FqtssMib 1 }
+
+ieee8021FqtssBap OBJECT IDENTIFIER
+    ::= { ieee8021FqtssObjects 1 }
+
+-- The ieee8021FqtssBap subtree
+-- This subtree defines the objects necessary for the management
+-- of bandwidth allocation for queues that support FQTSS.
+
+ieee8021FqtssBapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021FqtssBapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table containing a set of bandwidth availability 
+         parameters for each traffic class that supports the 
+         credit-based shaper algorithm.  
+         All writable objects in this table must be 
+         persistent over power up restart/reboot."
+    REFERENCE   
+        "12.21.1"
+    ::= { ieee8021FqtssBap 1 }
+
+ieee8021FqtssBapEntry OBJECT-TYPE
+    SYNTAX      Ieee8021FqtssBapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A list of objects containing bandwidth allocation 
+         information for each traffic class that supports the 
+         credit-based shaper algorithm. Rows in the table are 
+         automatically created and deleted as a result of the 
+         operation of the algorithm described in 34.5. "
+    INDEX       { ieee8021BridgeBaseComponentId, ieee8021BridgeBasePort, 
+                  ieee8021FqtssBAPTrafficClass }
+    ::= { ieee8021FqtssBapTable 1 }
+
+Ieee8021FqtssBapEntry ::= SEQUENCE {
+    ieee8021FqtssBAPTrafficClass    IEEE8021FqtssTrafficClassValue,
+    ieee8021FqtssDeltaBandwidth     IEEE8021FqtssDeltaBandwidthValue,
+    ieee8021FqtssOperIdleSlopeMs    Unsigned32,
+    ieee8021FqtssOperIdleSlopeLs    Unsigned32,
+    ieee8021FqtssAdminIdleSlopeMs   Unsigned32,
+    ieee8021FqtssAdminIdleSlopeLs   Unsigned32,
+    ieee8021FqtssBapRowStatus       RowStatus
+}
+
+ieee8021FqtssBAPTrafficClass OBJECT-TYPE
+    SYNTAX      IEEE8021FqtssTrafficClassValue
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The traffic class number associated with the row of 
+         the table.
+         A row in this table is created for each traffic class 
+         that supports the credit-based shaper algrithm. The 
+         recommended mappings of priorities to traffic classes 
+         for support of the credit-based shaper algorithm are 
+         described in 34.5."
+    REFERENCE   
+        "12.21.1, 34.3, 34.5"
+    ::= { ieee8021FqtssBapEntry 1 }
+
+ieee8021FqtssDeltaBandwidth OBJECT-TYPE
+    SYNTAX      IEEE8021FqtssDeltaBandwidthValue
+    UNITS       "percent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The value of the deltaBandwidth parameter 
+         for the traffic class.  
+         This value is represented as a fixed point number 
+         scaled by a factor of 1,000,000; i.e., 100,000,000 
+         (the maximum value) represents 100%.
+         
+         The default value of the deltaBandwidth parameter 
+         for the highest numbered traffic class that supports 
+         the credit-based shaper algorithm is 75%; for all 
+         lower numbered traffic classes that support the 
+         credit-based shaper algorithm the default value is 0%.  
+         The value of this object MUST be retained across 
+         reinitializations of the management system."
+    REFERENCE   
+        "12.21.1, 34.3"
+    ::= { ieee8021FqtssBapEntry 2 }
+
+ieee8021FqtssOperIdleSlopeMs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bits per second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The most significant 32 bits of the bandwidth, 
+         in bits per second, that is currently allocated to the 
+         traffic class (idleSlope(N)). This object MUST be read 
+         at the same time as ieee8021FqtssOperIdleSlopeLs, 
+         which represents the LS 32 bits of the value, in order 
+         for the read operation to succeed.  
+         If SRP is supported and in operation, then the reserved 
+         bandwidth is determined by the operation of SRP; otherwise, 
+         the value of ieee8021FqtssOperIdleSlopeMs is equal to 
+         the value of ieee8021FqtssAdminIdleSlopeMs.
+         
+         The value of this object MUST be retained across 
+         reinitializations of the management system."
+    REFERENCE   
+        "12.21.1, 34.3"
+    ::= { ieee8021FqtssBapEntry 3 }
+
+ieee8021FqtssOperIdleSlopeLs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bits per second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The least significant 32 bits of the bandwidth, 
+         in bits per second, that is currently allocated to the 
+         traffic class (idleSlope(N)). This object MUST be read 
+         at the same time as ieee8021FqtssOperIdleSlopeMs, 
+         which represents the LS 32 bits of the value, in order 
+         for the read operation to succeed.
+         
+         If SRP is supported and in operation, then the reserved 
+         bandwidth is determined by the operation of SRP; otherwise, 
+         the value of ieee8021FqtssOperIdleSlopeLs is equal to 
+         the value of ieee8021FqtssAdminIdleSlopeMs.
+         
+         The value of this object MUST be retained across 
+         reinitializations of the management system."
+    REFERENCE   
+        "12.21.1, 34.3"
+    ::= { ieee8021FqtssBapEntry 4 }
+
+ieee8021FqtssAdminIdleSlopeMs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bits per second"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The most significant 32 bits of the bandwidth, 
+         in bits per second, that the manager desires to allocate 
+         to the traffic class as  idleSlope(N). This object MUST be 
+         read or written at the same time as 
+         ieee8021FqtssAdminIdleSlopeLs, 
+         which represents the LS 32 bits of the value, in order 
+         for the read or write operation to succeed.  
+         If SRP is supported and in operation, then the reserved 
+         bandwidth is determined by the operation of SRP, and any 
+         changes to the value of this object have no effect on the 
+         operational value of idleSlope(N).
+         
+         The value of this object MUST be retained across 
+         reinitializations of the management system."
+    REFERENCE   
+        "12.21.1, 34.3"
+    DEFVAL      { 0 }
+    ::= { ieee8021FqtssBapEntry 5 }
+
+ieee8021FqtssAdminIdleSlopeLs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bits per second"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The least significant 32 bits of the bandwidth, 
+         in bits per second, that the manager desires to allocate 
+         to the traffic class as  idleSlope(N). This object MUST be 
+         read or written at the same time as 
+         ieee8021FqtssAdminIdleSlopeMs, 
+         which represents the LS 32 bits of the value, in order 
+         for the read or write operation to succeed.  
+         If SRP is supported and in operation, then the reserved 
+         bandwidth is determined by the operation of SRP, and any 
+         changes to the value of this object have no effect on the 
+         operational value of idleSlope(N).
+         
+         The value of this object MUST be retained across 
+         reinitializations of the management system."
+    REFERENCE   
+        "12.21.1, 34.3"
+    DEFVAL      { 0 }
+    ::= { ieee8021FqtssBapEntry 6 }
+
+ieee8021FqtssBapRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the status of an entry (row) in this table, and is 
+         used to create/delete entries.  
+         The corresponding instances of the following objects 
+         must be set before this object can be made active(1):
+         
+            ieee8021FqtssBAPTrafficClass
+            ieee8021FqtssDeltaBandwidth
+            ieee8021FqtssOperIdleSlopeMs
+            ieee8021FqtssOperIdleSlopeLs
+            ieee8021FqtssAdminIdleSlopeMs
+            ieee8021FqtssAdminIdleSlopeLs
+         
+         The corresponding instances of the following objects 
+         may not be changed while this object is active(1):
+         
+            ieee8021FqtssBAPTrafficClass"
+    ::= { ieee8021FqtssBapEntry 7 }
+
+ieee8021FqtssMappings OBJECT IDENTIFIER
+    ::= { ieee8021FqtssObjects 2 }
+
+-- The ieee8021FqtssMappings subtree
+-- This subtree defines the objects necessary for the assignment
+-- of transmission selection algorithms to traffic classes,
+-- and definition of regeneration table override values.
+ieee8021FqtssTxSelectionAlgorithmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021FqtssTxSelectionAlgorithmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table containing the assignment of transmission 
+         selection algorithms to traffic classes for the Port.  
+         This table provides management of the Transmission 
+         Selection Algorithm Table defined in 8.6.8.  
+         For a given Port, a row in the table exists for each 
+         traffic class that is supported by the Port.
+         
+         The default assignments of transmission selection 
+         algorithms to traffic classes in the table are made 
+         on instantiation of the table, in accordance 
+         with the defaults defined in 8.6.8 and 34.5.
+         
+         All writable objects in this table must be 
+         persistent over power up restart/reboot."
+    REFERENCE   
+        "8.6.8, 12.21.2, 34.5"
+    ::= { ieee8021FqtssMappings 1 }
+
+ieee8021FqtssTxSelectionAlgorithmEntry OBJECT-TYPE
+    SYNTAX      Ieee8021FqtssTxSelectionAlgorithmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A list of objects that contain the mapping of a 
+         traffic class value to a transmission selection algorithm 
+         value."
+    INDEX       { ieee8021BridgeBaseComponentId, ieee8021BridgeBasePort, 
+                  ieee8021FqtssTrafficClass }
+    ::= { ieee8021FqtssTxSelectionAlgorithmTable 1 }
+
+Ieee8021FqtssTxSelectionAlgorithmEntry ::= SEQUENCE {
+    ieee8021FqtssTrafficClass               IEEE8021FqtssTrafficClassValue,
+    ieee8021FqtssTxSelectionAlgorithmID     IEEE8021FtqssTxSelectionAlgorithmIDValue
+}
+
+ieee8021FqtssTrafficClass OBJECT-TYPE
+    SYNTAX      IEEE8021FqtssTrafficClassValue
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The traffic class to which the transmission selection 
+         algorithm is assigned.  
+         The value of this object MUST be retained across 
+         reinitializations of the management system."
+    REFERENCE   
+        "8.6.8, 12.21.2, 34.5"
+    ::= { ieee8021FqtssTxSelectionAlgorithmEntry 1 }
+
+ieee8021FqtssTxSelectionAlgorithmID OBJECT-TYPE
+    SYNTAX      IEEE8021FtqssTxSelectionAlgorithmIDValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The identifier of the transmission selection algorithm 
+         assigned to the traffic class.
+         
+         The value of this object MUST be retained across 
+         reinitializations of the management system."
+    REFERENCE   
+        "8.6.8, 12.21.2, 34.5"
+    ::= { ieee8021FqtssTxSelectionAlgorithmEntry 2 }
+
+ieee8021FqtssSrpRegenOverrideTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021FqtssSrpRegenOverrideEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table containing the set of priority regeneration 
+         table override values for the Port.  
+         The recommended default values of priorities 
+         associated with SR classes, and the corresponding 
+         override values, are defined in 6.9.4. 
+         All writable objects in this table must be 
+         persistent over power up restart/reboot."
+    REFERENCE   
+        "12.21.3, 6.6.4, 6.9.4"
+    ::= { ieee8021FqtssMappings 2 }
+
+ieee8021FqtssSrpRegenOverrideEntry OBJECT-TYPE
+    SYNTAX      Ieee8021FqtssSrpRegenOverrideEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A list of objects that contain the mapping of a 
+         priority value to a priority regeneration override 
+         value, and a boundary port indication.  
+         Rows in the table exist for all priorities that are 
+         associated with SR classes."
+    INDEX       { ieee8021BridgeBaseComponentId, ieee8021BridgeBasePort, 
+                  ieee8021FqtssSrClassPriority }
+    ::= { ieee8021FqtssSrpRegenOverrideTable 1 }
+
+Ieee8021FqtssSrpRegenOverrideEntry ::= SEQUENCE {
+    ieee8021FqtssSrClassPriority        IEEE8021PriorityValue,
+    ieee8021FqtssPriorityRegenOverride  IEEE8021PriorityValue,
+    ieee8021FqtssSrpBoundaryPort        TruthValue
+}
+
+ieee8021FqtssSrClassPriority OBJECT-TYPE
+    SYNTAX      IEEE8021PriorityValue
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The priority value that is overridden at the 
+         SRP domain boundary. "
+    REFERENCE   
+        "12.21.3, 6.6.4, 6.9.4"
+    ::= { ieee8021FqtssSrpRegenOverrideEntry 1 }
+
+ieee8021FqtssPriorityRegenOverride OBJECT-TYPE
+    SYNTAX      IEEE8021PriorityValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The priority value that is used to override the 
+         priority regeneration table entry at the SRP 
+         domain boundary.  
+         The value of this object MUST be retained across 
+         reinitializations of the management system."
+    REFERENCE   
+        "12.21.3, 6.6.4, 6.9.4"
+    ::= { ieee8021FqtssSrpRegenOverrideEntry 2 }
+
+ieee8021FqtssSrpBoundaryPort OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The value of the SRPdomainBoundaryPort parameter 
+         (6.6.4) for the priority. "
+    REFERENCE   
+        "12.21.3, 6.6.4, 6.9.4"
+    ::= { ieee8021FqtssSrpRegenOverrideEntry 3 }
+
+-- IEEE8021 FQTSS MIB - Conformance Information
+ieee8021FqtssConformance OBJECT IDENTIFIER
+    ::= { ieee8021FqtssMib 2 }
+
+ieee8021FqtssCompliances OBJECT IDENTIFIER
+    ::= { ieee8021FqtssConformance 1 }
+
+ieee8021FqtssGroups OBJECT IDENTIFIER
+    ::= { ieee8021FqtssConformance 2 }
+
+-- units of conformance
+-- the ieee8021FqtssBap group
+ieee8021FqtssBapGroup OBJECT-GROUP
+    OBJECTS     { ieee8021FqtssDeltaBandwidth, 
+                  ieee8021FqtssOperIdleSlopeMs, 
+                  ieee8021FqtssOperIdleSlopeLs, 
+                  ieee8021FqtssAdminIdleSlopeMs, 
+                  ieee8021FqtssAdminIdleSlopeLs, 
+                  ieee8021FqtssBapRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "Objects that define bandwidth allocation for FQTSS."
+    ::= { ieee8021FqtssGroups 1 }
+
+-- the ieee8021FqtssTxSelectionAlgorithm group
+ieee8021FqtssTxSelectionAlgorithmGroup OBJECT-GROUP
+    OBJECTS     { ieee8021FqtssTxSelectionAlgorithmID }
+    STATUS      current
+    DESCRIPTION 
+        "Objects that define transmission selection 
+         mappings for FQTSS."
+    ::= { ieee8021FqtssGroups 2 }
+
+-- the ieee8021FqtssBoundaryPort group
+ieee8021FqtssBoundaryPortGroup OBJECT-GROUP
+    OBJECTS     { ieee8021FqtssPriorityRegenOverride, 
+                  ieee8021FqtssSrpBoundaryPort }
+    STATUS      current
+    DESCRIPTION 
+        "Objects that define boundary port priority override 
+         mappings for FQTSS."
+    ::= { ieee8021FqtssGroups 3 }
+
+ieee8021FqtssCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "The compliance statement for devices supporting 
+         forwarding and queuing for time sensitive streams. 
+         Support of the objects defined in the IEEE8021-FQTSS MIB 
+         also requires support of the IEEE8021-BRIDGE-MIB; the 
+         provisions of 17.3.2 apply to implementations claiming 
+         support of the IEEE8021-FQTSS MIB. "
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { ieee8021FqtssBapGroup, 
+                  ieee8021FqtssTxSelectionAlgorithmGroup, 
+                  ieee8021FqtssBoundaryPortGroup }
+
+    ::= { ieee8021FqtssCompliances 1 }
+
+END -- end of module IEEE8021-FQTSS-MIB.
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=68 nocin nosi sts=4 sw=4 et

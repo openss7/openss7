@@ -1,0 +1,1027 @@
+
+IEEE8021-CN-MIB DEFINITIONS ::= BEGIN
+-- IEEE Std 802.1Qau(TM) Congestion Management MIB
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,    Integer32,
+    Counter32,    Counter64,
+    Unsigned32               FROM SNMPv2-SMI    -- [RFC2578]    TEXTUAL-CONVENTION,
+    TimeInterval,    RowStatus,
+    TruthValue,    MacAddress               FROM SNMPv2-TC     -- [RFC2579]
+    MODULE-COMPLIANCE,    OBJECT-GROUP             FROM SNMPv2-CONF   -- [RFC2580]
+    InterfaceIndex,    ifGeneralInformationGroup
+                             FROM IF-MIB        -- [RFC2863]    IEEE8021PriorityValue,
+    IEEE8021PbbComponentIdentifier                             FROM IEEE8021-TC-MIB -- [IEEE 802.1ap]
+    LldpV2DestAddressTableIndex                             FROM LLDP-V2-TC-MIB
+    systemGroup              FROM SNMPv2-MIB    -- [RFC3418]   ;
+
+ieee8021CnMib MODULE-IDENTITY
+    LAST-UPDATED "201102270000Z" -- February 27, 2011
+    ORGANIZATION "IEEE 802.1 Working Group"    CONTACT-INFO
+          "WG-URL: http://grouper.ieee.org/groups/802/1/index.html         WG-EMail: stds-802-1@ieee.org 
+
+          Contact: Norman Finn           Postal: C/O IEEE 802.1 Working Group
+                   IEEE Standards Association                   445 Hoes Lane
+                   P.O. Box 1331                   Piscataway
+                   NJ 08855-1331                   USA
+           E-mail: STDS-802-1-L@LISTSERV.IEEE.ORG       "
+   DESCRIPTION      "Congestion notification module.
+      Unless otherwise indicated, the references in this MIB      module are to IEEE Std 802.1Q-2011.
+      Copyright (C) IEEE.      This version of this MIB module is part of IEEE802.1Q;
+      see the draft itself for full legal notices."   REVISION     "201102270000Z" -- February 27, 2011
+   DESCRIPTION     "Minor edits to contact information etc. as part of 
+    2011 revision of IEEE Std 802.1Q."
+   REVISION       "200912180000Z"    -- 12/18/2009 00:00GMT   DESCRIPTION 
+      "Included in IEEE 802.1Qau-2010
+        Copyright (C) IEEE."    ::= { iso(1) org(3) ieee(111)
+         standards-association-numbers-series-standards (2)         lan-man-stds (802) ieee802dot1 (1) ieee802dot1mibs (1) 18 }
+
+ieee8021CnMIBObjects      OBJECT IDENTIFIER ::= { ieee8021CnMib 1 }ieee8021CnConformance     OBJECT IDENTIFIER ::= { ieee8021CnMib 2 }
+
+Ieee8021CnControlChoice ::= TEXTUAL-CONVENTION    STATUS  current
+    DESCRIPTION       "This controls what other object selects the CND defense mode and
+        the Congestion Notification Priority Value (CNPV) alternate        priority for a CNPV in an end station or bridge component, or
+        for a CNPV on a particular Port in an end station or bridge        component.  It can take the following values:
+
+        cpcAdmin(1) The CND defense mode and alternate priority are                    controlled by the administrative variables in the
+                    same table entry as this object.        cpcAuto(2)  This Port or all Ports' CND defense modes are
+                    controlled automatically, as indicated by                    ieee8021CnPortPriAutoDefenseMode, and the
+                    alternate priority by ieee8021CnComPriAutoAltPri.        cpcComp(3)  This CND defense mode and alternate priority are
+                    both controlled by ieee8021CnPortPriTable.       "
+    REFERENCE       "IEEE 802.1Qau clauses 32.3.1, 32.4.1, Table 32-2"
+    SYNTAX  INTEGER {        cpcAdmin    (1),
+        cpcAuto     (2),        cpcComp     (3)
+    }
+Ieee8021CnDefenseMode ::= TEXTUAL-CONVENTION    STATUS  current
+    DESCRIPTION       "For a given Congestion Notification Priority Value (CNPV), a
+        port can operate in one of four CND defense modes.  The CND        defense mode determines whether congestion notification is
+        enabled or not, and if enabled, whether the port translates the        CNPV to a non-CNPV value on input, and whether the port removes
+        CN-TAGs on output.
+        cptDisabled(1)      The congestion notification capability is                            administratively disabled for this priority
+                            value and port. This priority is not a CNPV.                            The priority regeneration table controls the
+                            remapping of input frames on this port for                            this priority. CN-TAGs are neither added by
+                            an end station nor stripped by a bridge.        cptInterior(2)      On this port and for this CNPV, the priority
+                            parameters of input frames are not remapped,                            regardless of the priority regeneration
+                            table. CN-TAGs are not added by an end                            station, and are removed from frames before
+                            being output by a bridge.        cptInteriorReady(3) On this port and for this CNPV, the priority
+                            parameters of input frames are not remapped,                            regardless of the priority regeneration
+                            table. CN-TAGs can be added by an end                            station, and are not removed from frames by
+                            a bridge.        cptEdge(4)          On this port and for this CNPV, the priority
+                            parameters of input frames are remapped to                            an alternate (non-CNPV) value, regardless of
+                            the priority regeneration table. CN-TAGs are                            not added by an end station, and are removed
+                            from frames before being output by a bridge.                            This mode is optional for an end station.
+       "    REFERENCE
+       "IEEE 802.1Qau clause 32.1.1, 32.3.4, 32.4.2, 32.4.3, Table 32-2"    SYNTAX  INTEGER {
+        cptDisabled      (1),        cptInterior      (2),
+        cptInteriorReady (3),        cptEdge          (4)
+    }
+Ieee8021CnLldpChoice ::= TEXTUAL-CONVENTION    STATUS current
+    DESCRIPTION       "Specifies how to determine what index value is to be used as
+        the index to lldpDestAddressTable, the table of destination MAC        addresses, for both the destination addresses on transmitted
+        LLDPDUs and on received LLDPDUs, found in the LLDP-MIB, either:
+            cnlNone(1)      No LLDP Congestion Notification TLV is to                            carry Per-priority CNPV indicators or
+                            Per-priority Ready indicators on this Port                            for this priority (or all Ports and all
+                            priorities, as appropriate to the managed                            object).
+            cnlAdmin(2)     The administrative LLDP instance selector                            in the same table entry as this object
+                            governs which LLDP instance will carry the                            Per-priority CNPV indicators and
+                            Per-priority Ready indicators for this                            priority in its Congestion Notification TLV
+                            on this Port (or all Ports and all
+                            priorities, as appropriate to the managed                            object).
+            cnlComponent(3) ieee8021CnComPriLldpInstanceSelector governs                            LLDP instance selection for this Port and
+                            priority.       "
+    REFERENCE       "IEEE 802.1Qau clause 32.3.6, 32.4.4, Table 32-1"
+    SYNTAX  INTEGER {        cnlNone         (1),
+        cnlAdmin        (2),        cnlComponent    (3)
+    }
+
+-- The Global Table. This group will contain the MIB objects that-- apply to the whole bridge component or end station.
+ieee8021CnGlobalTable OBJECT-TYPE    SYNTAX      SEQUENCE OF Ieee8021CnGlobalEntry
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "A table containing the global variables for each component of
+        a bridge or for an end station.  A value of 1 is used in a        bridge or end station that does not have multiple components.
+
+        The contents of this table SHALL be maintained across a restart        of the system.
+       "    REFERENCE
+       "802.1Qau clause 12.21.1"    ::= { ieee8021CnMIBObjects 1 }
+
+ieee8021CnGlobalEntry OBJECT-TYPE    SYNTAX      Ieee8021CnGlobalEntry
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "A list of objects pertaining to a whole bridge component or
+        end station.       "
+    INDEX { ieee8021CnGlobalComponentId }    ::= { ieee8021CnGlobalTable 1 }
+
+Ieee8021CnGlobalEntry ::= SEQUENCE {        ieee8021CnGlobalComponentId  IEEE8021PbbComponentIdentifier,
+        ieee8021CnGlobalMasterEnable            TruthValue,        ieee8021CnGlobalCnmTransmitPriority     IEEE8021PriorityValue,
+        ieee8021CnGlobalDiscardedFrames         Counter64    }
+
+    SYNTAX      IEEE8021PbbComponentIdentifier    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION       "The bridge component within the system to which the information
+        in this ieee8021CnGlobalEntry applies.  If the system is not        a Bridge, or if only one component is present in the Bridge,
+        then this variable (index) MUST be equal to 1.       "
+    ::= { ieee8021CnGlobalEntry 1 }
+ieee8021CnGlobalMasterEnable OBJECT-TYPE    SYNTAX      TruthValue
+    MAX-ACCESS  read-write    STATUS      current
+    DESCRIPTION       "The state of the congestion notification feature on this bridge
+        component or system.  If true, Congestion notification is        enabled, and if false, congestion notification is disabled.
+       "    REFERENCE
+       "802.1Qau clause 32.2.1"    ::= { ieee8021CnGlobalEntry 2 }
+
+    SYNTAX      IEEE8021PriorityValue    MAX-ACCESS  read-write
+    STATUS      current    DESCRIPTION
+       "The priority to use for all Congestion Notification Messages        transmitted by this bridge component or end station.
+       "    REFERENCE
+       "802.1Qau clause 32.2.2"    ::= { ieee8021CnGlobalEntry 3 }
+
+ieee8021CnGlobalDiscardedFrames OBJECT-TYPE    SYNTAX      Counter64
+    UNITS       "frames"    MAX-ACCESS  read-only
+    STATUS      current    DESCRIPTION
+       "The number of frames discarded from full CP queues, in spite        of the efforts of congestion notification to avoid discards.
+
+        This object is incremented whenever any of the        ieee8021CnCpDiscardedFrames objects on any Port or priority in
+        this same component are incremented.
+        Discontinuities in the value of this counter can occur        at re-initialization of the management system, and at
+        other times as indicated by the value of        ifCounterDiscontinuityTime object of the associated
+        interface (if any).       "
+    REFERENCE       "802.1Qau clause 32.2.3"
+    ::= { ieee8021CnGlobalEntry 4 }
+-- The CCF Errored Port Table.  One per bridge component or end station.-- Scanning this table reveals which Interfaces at which priorities
+-- have an Alternate Priority value that is a-- Congestion Notification Priority Value.
+
+ieee8021CnErroredPortTable OBJECT-TYPE    SYNTAX      SEQUENCE OF Ieee8021CnErroredPortEntry
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "There is one Errored Port Table per bridge component or end
+        station. It permits the retrieval of information about which        interfaces have congestion notification configuration errors,
+        namely, those specifying an alternate priority that is a CNPV.       "
+    REFERENCE       "802.1Qau clause 32.2.4"
+    ::= { ieee8021CnMIBObjects 2 }
+ieee8021CnErroredPortEntry OBJECT-TYPE    SYNTAX      Ieee8021CnErroredPortEntry
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "A list of interfaces whose ieee8021CnComPriAlternatePriority
+        and/or ieee8021CnPortPriAlternatePriority specify a priority        value that is a Congestion Notification Priority Value.
+       "    REFERENCE
+       "802.1Qau clause 32.2.4"    INDEX { ieee8021CnEpComponentId,
+            ieee8021CnEpPriority,            ieee8021CnEpIfIndex}
+    ::= { ieee8021CnErroredPortTable 1 }
+Ieee8021CnErroredPortEntry ::= SEQUENCE {        ieee8021CnEpComponentId     IEEE8021PbbComponentIdentifier,
+        ieee8021CnEpPriority        IEEE8021PriorityValue,        ieee8021CnEpIfIndex         InterfaceIndex
+    }
+ieee8021CnEpComponentId OBJECT-TYPE    SYNTAX      IEEE8021PbbComponentIdentifier
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "The bridge component within the system to which the information
+        in this ieee8021CnErroredPortEntry applies.  If the system is        not a Bridge, or if only one component is present in the
+        Bridge, then this variable (index) MUST be equal to 1.       "
+    REFERENCE       "802.1Qau clause 32.2.4"
+    ::= { ieee8021CnErroredPortEntry 1 }
+ieee8021CnEpPriority OBJECT-TYPE    SYNTAX      IEEE8021PriorityValue
+    MAX-ACCESS  not-accessible
+    STATUS      current    DESCRIPTION
+       "The priority value whose alternate priority is misconfigured.       "
+    REFERENCE       "802.1Qau clause 32.2.4"
+    ::= { ieee8021CnErroredPortEntry 2 }
+ieee8021CnEpIfIndex OBJECT-TYPE    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only    STATUS      current
+    DESCRIPTION       "This object represents the Bridge Port or aggregated port
+        on which the congestion notification alternate priority is        misconfigured.
+        Upon a restart of the system, the system SHALL, if necessary,        change the value of this variable so that it references the row
+        in the ifXTable with the same value of ifAlias that it        referenced before the system restart.  If no such row exists,
+        then the system SHALL delete this row in the        ieee8021CnErroredPortTable.
+       "    REFERENCE
+       "802.1Qau clause 32.2.4"    ::= { ieee8021CnErroredPortEntry 3 }
+
+-- The CCF Per-component per-priority table.  One table per bridge-- component or end station, one entry per
+-- Congestion Notification Priority Value
+
+ieee8021CnCompntPriTable OBJECT-TYPE    SYNTAX      SEQUENCE OF Ieee8021CnCompntPriEntry
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "Each row in this table supplies default values for one
+        Congestion Notification Priority Value for a whole bridge         component or end station.
+
+        Creating a row in this table makes the priority value of        ieee8021CnComPriPriority a
+        Congestion Notification Priority Value.        Deleting a row in this table makes the value in the deleted
+        ieee8021CnComPriPriority no longer a        Congestion Notification Priority Value.
+
+        A  system SHALL NOT allow eight rows in this table        to be created with the same value of
+        ieee8021CnComPriComponentId; see the description of        ieee8021CnComPriRowStatus.
+
+        The contents of this table SHALL be maintained across a restart        of the system.
+       "    REFERENCE
+       "802.1Qau clause 12.21.2, 12.21.2.1, 12.21.2.2"    ::= { ieee8021CnMIBObjects 3 }
+ieee8021CnCompntPriEntry OBJECT-TYPE    SYNTAX      Ieee8021CnCompntPriEntry
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "One entry per Congestion Notification Priority Value per
+        bridge component or end station.       "
+    REFERENCE       "802.1Qau clause 12.21.2, 12.21.2.1, 12.21.2.2"
+    INDEX { ieee8021CnComPriComponentId,            ieee8021CnComPriPriority }
+    ::= { ieee8021CnCompntPriTable 1 }
+Ieee8021CnCompntPriEntry ::= SEQUENCE {    ieee8021CnComPriComponentId       IEEE8021PbbComponentIdentifier,
+    ieee8021CnComPriPriority          IEEE8021PriorityValue,    ieee8021CnComPriDefModeChoice     Ieee8021CnControlChoice,
+    ieee8021CnComPriAlternatePriority IEEE8021PriorityValue,    ieee8021CnComPriAutoAltPri        IEEE8021PriorityValue,
+    ieee8021CnComPriAdminDefenseMode  Ieee8021CnDefenseMode,    ieee8021CnComPriCreation          INTEGER,
+    ieee8021CnComPriLldpInstanceChoice    Ieee8021CnLldpChoice,    ieee8021CnComPriLldpInstanceSelector  LldpV2DestAddressTableIndex,
+    ieee8021CnComPriRowStatus         RowStatus    }
+
+    SYNTAX      IEEE8021PbbComponentIdentifier    MAX-ACCESS  not-accessible
+    STATUS      current    DESCRIPTION
+       "The bridge component within the system to which the information        in this ieee8021CnCompntPriEntry applies.  If the system is
+        not a Bridge, or if only one component is present in the        Bridge, then this variable (index) MUST be equal to 1.
+       "    REFERENCE
+       "802.1Qau clause 12.21.2, 12.21.2.1, 12.21.2.2"    ::= { ieee8021CnCompntPriEntry 1 }
+
+ieee8021CnComPriPriority OBJECT-TYPE    SYNTAX      IEEE8021PriorityValue
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "The Congestion Notification Priority Value for which this
+        row supplies default values.       "
+    REFERENCE       "802.1Qau clauses 12.21.2"
+    ::= { ieee8021CnCompntPriEntry 2 }
+ieee8021CnComPriDefModeChoice OBJECT-TYPE    SYNTAX      Ieee8021CnControlChoice {
+                    cpcAdmin    (1),
+                    cpcAuto     (2)                }
+    MAX-ACCESS  read-create    STATUS      current
+    DESCRIPTION       "Specifies how the default CND defense mode and alternate
+        priority for this Congestion Notification Priority Value on all        ports on this bridge component or end station are to be chosen,
+        either:
+            cpcAdmin(1) Default CND defense mode is chosen by                        ieee8021CnComPriAdminDefenseMode, and alternate
+                        priority by ieee8021CnComPriAlternatePriority.            cpcAuto(2)  Default CND defense mode is chosen by
+                        ieee8021CnPortPriAutoDefenseMode, and alternate                        priority by ieee8021CnComPriAutoAltPri.
+
+        This variable can be overridden by        ieee8021CnPortPriDefModeChoice.
+       "    REFERENCE
+       "802.1Qau clause 32.1.3, 32.3.1"    DEFVAL { cpcAuto }
+    ::= { ieee8021CnCompntPriEntry 3 }
+ieee8021CnComPriAlternatePriority OBJECT-TYPE    SYNTAX      IEEE8021PriorityValue
+    MAX-ACCESS  read-create    STATUS      current
+    DESCRIPTION       "The Congestion Notification Priority Value to which an
+        incoming frame is to be mapped, in spite of what the        Priority Regereration Table says, if 1) Congestion
+        Notification is enabled and 2) the CND defense mode of the        port is cptEdge.
+
+        Deleting a row in this table does not alter the value of any        other row's ieee8021CnComPriAlternatePriority.
+       "    REFERENCE
+       "802.1Qau clauses 32.3.2"    DEFVAL { 0 }
+    ::= { ieee8021CnCompntPriEntry 4 }
+ieee8021CnComPriAutoAltPri OBJECT-TYPE    SYNTAX      IEEE8021PriorityValue
+    MAX-ACCESS  read-only    STATUS      current
+    DESCRIPTION       "The Congestion Notification Priority Value to which an
+        incoming frame can be mapped, in spite of what the        Priority Regereration Table says, if 1) Congestion
+        Notification is enabled, 2) the CND defense mode of the        port is cptEdge, and 3) ieee8021CnComPriDefModeChoice
+        contains the value cpcAuto (2).
+        The value of this object is the next lower priority value        than this row's ieee8021CnComPriPriority that is not a CNPV,
+        or the next higher non-CNPV, if all lower values are CNPVs.
+        The value of this object, and any consequent priority        regeneration, is automatically updated by the managed system
+        whenever a row in the ieee8021CnCompntPriTable is created or        deleted.  The value of this object is not dependent upon
+        whether congestion notification is enabled or disabled for any        priority or for the whole bridge component or end station; it
+        depends only upon whether the ieee8021CnCompntPriTable row        exists.
+       "    REFERENCE
+       "802.1Qau clauses 32.3.3"    ::= { ieee8021CnCompntPriEntry 5 }
+
+ieee8021CnComPriAdminDefenseMode OBJECT-TYPE    SYNTAX      Ieee8021CnDefenseMode
+    MAX-ACCESS  read-create    STATUS      current
+    DESCRIPTION       "The default CND defense mode for this
+        Congestion Notification Priority Value on all ports on this        bridge component or end station.
+
+        This variable can be overridden by        ieee8021CnPortPriAdminDefenseMode.
+       "    REFERENCE
+       "802.1Qau clause 32.1.3, 32.3.4"    DEFVAL { cptInterior }
+    ::= { ieee8021CnCompntPriEntry 6 }
+ieee8021CnComPriCreation OBJECT-TYPE    SYNTAX      INTEGER {
+                    cncpAutoEnable   (1),                    cncpAutoDisable  (2)
+                }    MAX-ACCESS  read-create
+    STATUS      current    DESCRIPTION
+       "The default value for ieee8021CnComPriDefModeChoice for        newly-created entries in the ieee8021CnPortPriTable:
+
+            cncpAutoEnable (1)  Newly-created                                ieee8021CnPortPriDefModeChoice
+                                objects take the value cpcComp (3).            cncpAutoDisable(2)  Newly-created
+                                ieee8021CnPortPriDefModeChoice                                objects take the value cpcAdmin (1).
+       "    REFERENCE
+       "802.1Qau clause 32.3.5"    DEFVAL { cncpAutoEnable }
+    ::= { ieee8021CnCompntPriEntry 7 }
+ieee8021CnComPriLldpInstanceChoice OBJECT-TYPE    SYNTAX      Ieee8021CnLldpChoice {
+                      cnlNone  (1),                      cnlAdmin (2)
+                }
+    MAX-ACCESS  read-create    STATUS      current
+    DESCRIPTION       "Specifies whether or not the default value for all Ports is to
+        send and receive the Congestion Notification TLV in LLDPDUs,        either:
+            cnlNone(1)  Do not send Congestion Notification TLVs, and                        ignore them on receipt.
+            cnlAdmin(2) Use the LLDP instance selected by                        ieee8021CnComPriLldpInstanceSelector to send and
+                        receive the Congestion Notification TLV.
+        This object can be overridden by        ieee8021CnPortPriLldpInstanceChoice.
+       "    REFERENCE
+       "802.1Qau clause 32.1.3, 32.3.6"    DEFVAL { cnlAdmin }
+    ::= { ieee8021CnCompntPriEntry 8 }
+ieee8021CnComPriLldpInstanceSelector OBJECT-TYPE    SYNTAX      LldpV2DestAddressTableIndex
+    MAX-ACCESS  read-create    STATUS      current
+    DESCRIPTION       "Specifies a default value for which LLDP instance is to be
+        used to provide the information for automatic configuration        of ports' CND defense modes (ieee8021CnPortPriAutoDefenseMode).
+
+        This object is ignored by the managed system if        ieee8021CnComPriLldpInstanceChoice contains the value cnlNone
+        (1).
+        This object can be overridden by         ieee8021CnPortPriLldpInstanceChoice and
+        ieee8021CnPortPriLldpInstanceChoice.       "
+    REFERENCE       "802.1Qau clause 32.1.3, 32.3.7"
+    DEFVAL { 1 }    ::= { ieee8021CnCompntPriEntry 9 }
+
+ieee8021CnComPriRowStatus OBJECT-TYPE    SYNTAX      RowStatus
+    MAX-ACCESS  read-create    STATUS      current
+    DESCRIPTION       "This object indicates the status of an entry, and is used
+        to create/delete entries.
+        A system SHALL NOT permit eight ieee8021CnComPriRowStatus        objects, all with the same value of ieee8021CnComPriComponentId,
+        to have the value active(1).  An attempt to create or activate        a row when there are already seven active rows SHALL result in
+        that eighth row's ieee8021CnComPriRowStatus having the value        notReady(3), and the return of an inconsistentValue error.
+       "    REFERENCE
+       "802.1Qau clause 30.4"
+    ::= { ieee8021CnCompntPriEntry 10 }
+-- The CCF Per-component per-interface per-priority table.  One table-- per end station or bridge component.  One entry per interface per
+-- priority value, but only for priority values that are-- Congestion Notification Priority Values (CNPVs).  Controls
+-- a CNPV on a specific port when the default values in
+
+ieee8021CnPortPriTable OBJECT-TYPE    SYNTAX      SEQUENCE OF Ieee8021CnPortPriEntry
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "Each row in this table supplies values for one port's
+        Congestion Notification Priority Value (CNPV).
+        Creating an entry in ieee8021CnCompntPriTable creates this        entry, with the default values, on all ports in the bridge
+        component or end station.  Deleting an entry in        ieee8021CnCompntPriTable deletes this ieee8021CnCompntPriEntry
+        on all ports in the bridge component or end station.
+        The contents of this table SHALL be maintained across a restart        of the system, except as noted in the description of
+        ieee8021CnPortPriIfIndex.       "
+    REFERENCE       "802.1Qau clause 12.21.3"
+    ::= { ieee8021CnMIBObjects 4 }
+ieee8021CnPortPriEntry OBJECT-TYPE    SYNTAX      Ieee8021CnPortPriEntry
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "One entry per port per Congestion Notification Priority Value
+        per bridge component or end station.       "
+    REFERENCE       "802.1Qau clause 12.21.3"
+    INDEX { ieee8021CnPortPriComponentId,            ieee8021CnPortPriority,
+            ieee8021CnPortPriIfIndex }    ::= { ieee8021CnPortPriTable 1 }
+
+Ieee8021CnPortPriEntry ::= SEQUENCE {        ieee8021CnPortPriComponentId    IEEE8021PbbComponentIdentifier,
+        ieee8021CnPortPriority               IEEE8021PriorityValue,        ieee8021CnPortPriIfIndex             InterfaceIndex,
+        ieee8021CnPortPriDefModeChoice       Ieee8021CnControlChoice,        ieee8021CnPortPriAdminDefenseMode    Ieee8021CnDefenseMode,
+        ieee8021CnPortPriAutoDefenseMode     Ieee8021CnDefenseMode,        ieee8021CnPortPriLldpInstanceChoice  Ieee8021CnLldpChoice,
+        ieee8021CnPortPriLldpInstanceSelector                                   LldpV2DestAddressTableIndex,
+        ieee8021CnPortPriAlternatePriority   IEEE8021PriorityValue    }
+ieee8021CnPortPriComponentId OBJECT-TYPE    SYNTAX      IEEE8021PbbComponentIdentifier
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "The bridge component within the system to which the information
+        in this ieee8021CnPortPriEntry applies.  If the system is        not a Bridge, or if only one component is present in the
+        Bridge, then this variable (index) MUST be equal to 1.       "
+    REFERENCE       "802.1Qau clause 12.21.3"
+    ::= { ieee8021CnPortPriEntry 1 }
+ieee8021CnPortPriority OBJECT-TYPE    SYNTAX      IEEE8021PriorityValue
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "The Congestion Notification Priority Value for which
+        this row supplies default values.       "
+    REFERENCE       "802.1Qau clauses 12.21.3"
+    ::= { ieee8021CnPortPriEntry 2 }
+ieee8021CnPortPriIfIndex OBJECT-TYPE    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "This object represents the port or aggregated port
+        to which the entry applies.
+        Upon a restart of the system, the system SHALL, if necessary,        change the value of this object, and rearrange the order of the
+        ieee8021CnPortPriTable, so that the value in        ieee8021CnPortPriIfIndex references the row in the ifXTable
+        with the same value for ifAlias that it referenced before the        system restart.  If no such entry exists in the ifXTable, then
+        the system SHALL delete the row in the ieee8021CnPortPriTable.       "
+    REFERENCE       "802.1Qau clause 12.21.3"
+    ::= { ieee8021CnPortPriEntry 3 }
+ieee8021CnPortPriDefModeChoice OBJECT-TYPE    SYNTAX  Ieee8021CnControlChoice
+    MAX-ACCESS  read-write    STATUS current
+    DESCRIPTION       "This object determines how the CND defense mode and alternate
+        priority value of this port for this CNPV is to be selected,        either:
+
+            cpcAdmin(1) CND defense mode is controlled by
+                        ieee8021CnPortPriAdminDefenseMode, and alternate                        priority by ieee8021CnPortPriAlternatePriority.
+            cpcAuto(2)  CND defense mode is controlled by                        ieee8021CnPortPriAutoDefenseMode and alternate
+                        priority by ieee8021CnComPriAlternatePriority.            cpcComp(3)  CND defense mode and alternate priority are
+                        controlled by                        ieee8021CnComPriDefModeChoice.
+
+        This variable can override ieee8021CnComPriDefModeChoice.       "
+    REFERENCE       "IEEE 802.1Qau clause 32.1.3, 32.4.1"
+    DEFVAL { cpcComp }    ::= { ieee8021CnPortPriEntry 4 }
+
+ieee8021CnPortPriAdminDefenseMode OBJECT-TYPE    SYNTAX  Ieee8021CnDefenseMode
+    MAX-ACCESS  read-write    STATUS current
+    DESCRIPTION       "This object indicates the operator's choice for the CND defense
+        mode in which this port is to operate for this CNPV whenever        ieee8021CnPortPriDefModeChoice has the value cpcAdmin(1).
+
+        This variable can override ieee8021CnComPriDefModeChoice.       "
+    REFERENCE       "IEEE 802.1Qau clause 32.1.3, 32.4.1"
+    DEFVAL { cptDisabled }    ::= { ieee8021CnPortPriEntry 5 }
+
+ieee8021CnPortPriAutoDefenseMode OBJECT-TYPE    SYNTAX  Ieee8021CnDefenseMode {
+                cptInterior      (2),                cptInteriorReady (3),
+                cptEdge          (4)            }
+    MAX-ACCESS read-only    STATUS current
+    DESCRIPTION       "This object indicates in which the CND defense mode this port
+        would operate for this CNPV as determined by the LLDP        Congestion Notification TLV.
+       "    REFERENCE
+       "IEEE 802.1Qau clause 32.4.3"    ::= { ieee8021CnPortPriEntry 6 }
+
+    SYNTAX      Ieee8021CnLldpChoice    MAX-ACCESS  read-write
+    STATUS      current    DESCRIPTION
+       "Specifies how to determine the LLDP instance to be used for the        Congestion Notification TLV, either:
+            cnlNone(1)      No LLDP Congestion Notification TLV is to                            carry Per-priority CNPV indicators or
+                            Per-priority Ready indicators on this Port                            for this priority.
+            cnlAdmin(2)     ieee8021CnPortPriLldpInstanceSelector                            governs which LLDP instance is to carry
+                            Per-priority CNPV indicators and                            Per-priority Ready indicators for this
+                            priority in its Congestion Notification TLV                            on this Port
+            cnlComponent(3) ieee8021CnComPriLldpInstanceChoice                            governs LLDP instance selection for this
+                            Port and priority.
+        This object can override ieee8021CnComPriLldpInstanceChoice.       "
+    REFERENCE       "802.1Qau clause 32.1.3, 32.4.4"
+    DEFVAL { cnlComponent }    ::= { ieee8021CnPortPriEntry 7 }
+
+ieee8021CnPortPriLldpInstanceSelector OBJECT-TYPE    SYNTAX      LldpV2DestAddressTableIndex
+    MAX-ACCESS  read-write    STATUS      current
+    DESCRIPTION       "This object determines which LLDP instance selector, if any,
+        is used for automatic determination of the CND defense mode for        this port and CNPV.
+
+        This object can override ieee8021CnComPriLldpInstanceSelector.       "
+    REFERENCE       "802.1Qau clause 32.1.3, 32.4.5"
+    DEFVAL { 3 }    ::= { ieee8021CnPortPriEntry 8 }
+
+ieee8021CnPortPriAlternatePriority OBJECT-TYPE    SYNTAX      IEEE8021PriorityValue
+    MAX-ACCESS  read-write    STATUS      current
+    DESCRIPTION       "The Congestion Notification Priority Value to which an
+        incoming frame is to be mapped, in spite of what the        Priority Regereration Table says, if 1) Congestion
+        Notification is enabled and 2) the port is acting in the        cptEdge (4) CND defense mode.
+
+        This object is ignored unless ieee8021CnPortPriDefModeChoice        contains the value cpcAdmin (1).
+       "    REFERENCE
+       "802.1Qau clause 32.4.6"    DEFVAL { 0 }
+    ::= { ieee8021CnPortPriEntry 9 }
+
+-- The CCF per-CP table.  One table per end station or bridge component.-- One entry per Congestion Point.  An entry in this table controls one
+-- Congestion Point (CP).
+ieee8021CnCpTable OBJECT-TYPE    SYNTAX      SEQUENCE OF Ieee8021CnCpEntry
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "Each row in this table supplies values for one
+        Congestion Point (CP).
+        This table is indexed by component, port (interface), and        an arbitrary CP index.  This arbitrary CP index is not
+        necessarily the Congestion Point Identifier (CPID) carried in        Congestion Notification Messages (CNMs).
+
+        Creating an entry in ieee8021CnCompntPriTable can create an        entry in this table, with the default values, on all ports in
+        the bridge component or end station.  Because more than one        Congestion Notification Priority Value (CNPV) can flow
+        through a single CP, the creation of an entry in        ieee8021CnCompntPriTable does not necessarily create a new
+        entry in this table.  An end station can have more than one        CP for the same CNPV, so creating an entry in
+        ieee8021CnCompntPriTable can create multiple entries in this        table.
+
+        Because each port in a bridge component or end station can have        a different relationship between CNPVs and CPs, the entries
+        created or deleted on each port can be different.
+        Deleting the last entry in ieee8021CnCompntPriTable for a        CNPV passing through the CP controlled by this entry deletes
+        the entry on some or all of the ports in the bridge component        or end station.
+
+        Because each port in a bridge component or end station can have        a different relationship between CNPVs and CPs, the entries
+        created or deleted on each port can be different.
+        The relationship between ieee8021CnCpIndex        values and CPs is an implementation dependent matter.
+
+        The contents of this table SHALL be maintained across a restart        of the system, except as noted in the description of
+        ieee8021CnCpIfIndex.       "
+    REFERENCE       "802.1Qau clause 12.21.4"
+    ::= { ieee8021CnMIBObjects 5 }
+ieee8021CnCpEntry OBJECT-TYPE    SYNTAX      Ieee8021CnCpEntry
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "An entry in the Congestion Point table controls a single
+        Congestion Point on a port in a bridge component or end station.       "
+    REFERENCE       "802.1Qau clause 12.21.4"
+    INDEX { ieee8021CnCpComponentId,            ieee8021CnCpIfIndex,
+            ieee8021CnCpIndex }    ::= { ieee8021CnCpTable 1 }
+
+Ieee8021CnCpEntry ::= SEQUENCE {        ieee8021CnCpComponentId      IEEE8021PbbComponentIdentifier,
+        ieee8021CnCpIfIndex              InterfaceIndex,        ieee8021CnCpIndex                Unsigned32,
+        ieee8021CnCpPriority             IEEE8021PriorityValue,        ieee8021CnCpMacAddress           MacAddress,
+        ieee8021CnCpIdentifier           OCTET STRING,        ieee8021CnCpQueueSizeSetPoint    Unsigned32,
+        ieee8021CnCpFeedbackWeight       Integer32,        ieee8021CnCpMinSampleBase        Unsigned32,
+        ieee8021CnCpDiscardedFrames      Counter64,        ieee8021CnCpTransmittedFrames    Counter64,
+        ieee8021CnCpTransmittedCnms      Counter64,        ieee8021CnCpMinHeaderOctets      Unsigned32
+    }
+ieee8021CnCpComponentId OBJECT-TYPE    SYNTAX      IEEE8021PbbComponentIdentifier
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "The bridge component within the system to which the information
+        in this ieee8021CnCpEntry applies.  If the system is        not a Bridge, or if only one component is present in the
+        Bridge, then this variable (index) MUST be equal to 1.       "
+    REFERENCE       "802.1Qau clause 12.21.4"
+    ::= { ieee8021CnCpEntry 1 }
+ieee8021CnCpIfIndex OBJECT-TYPE    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "This object represents the port or aggregated port
+        to which the entry applies.
+        Upon a restart of the system, the system SHALL, if necessary,        change the value of this object, and rearrange the order of the
+        ieee8021CnCpTable, so that the value in ieee8021CnCpIfIndex        references the row in the ifXTable with the same value for
+        ifAlias that it referenced before the system restart.  If no        such entry exists in the ifXTable, then the system SHALL delete
+        the row in the ieee8021CnCpTable.       "
+    REFERENCE       "802.1Qau clause 12.21.4"
+    ::= { ieee8021CnCpEntry 2 }
+ieee8021CnCpIndex OBJECT-TYPE    SYNTAX      Unsigned32 (1..4096)
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "This object is an arbitrary integer indexing the entries in
+        this table among the entries for the same component and        interface.  In a system that supports no more than one
+        Congestion Point per priority per interface, ieee8021CnCpIndex        SHALL be equal to the lowest numerical
+        Congestion Notification Priority Value served by this        Congestion Point.  Otherwise, it SHOULD be a small integer
+        value.       "
+    REFERENCE       "802.1Qau clause 12.21.4"
+    ::= { ieee8021CnCpEntry 3 }
+ieee8021CnCpPriority OBJECT-TYPE    SYNTAX      IEEE8021PriorityValue
+    MAX-ACCESS  read-only    STATUS      current
+    DESCRIPTION       "This object indicates the lowest numerical
+        Congestion Notification Priority Value that this entry's        Congestion Point serves.
+       "    REFERENCE
+       "802.1Qau clause 12.21.4"    ::= { ieee8021CnCpEntry 4 }
+
+ieee8021CnCpMacAddress OBJECT-TYPE    SYNTAX      MacAddress
+    MAX-ACCESS  read-only    STATUS      current
+    DESCRIPTION       "This object indicates the MAC address used as the source
+        address in Congestion Notification Message transmitted        by this Congestion Point.
+       "    REFERENCE
+       "802.1Qau clause 32.8.1"    ::= { ieee8021CnCpEntry 5 }
+
+ieee8021CnCpIdentifier OBJECT-TYPE    SYNTAX      OCTET STRING (SIZE(8))
+    MAX-ACCESS  read-only    STATUS      current
+    DESCRIPTION       "This object indicates the Congestion Point Identifier (CPID)
+        transmitted in Congestion Notification Message by this        Congestion Point.
+
+        It is not specified whether the CPID reported in a CNM by a CP        that serves multiple CNPVs does or does not have the same value
+        for its different CNPVs.       "
+    REFERENCE       "802.1Qau clause 32.8.2"
+    ::= { ieee8021CnCpEntry 6 }
+ieee8021CnCpQueueSizeSetPoint OBJECT-TYPE    SYNTAX      Unsigned32 (100..4294967295)
+    UNITS       "octets"    MAX-ACCESS  read-write
+    STATUS      current    DESCRIPTION
+       "This object is the set point for the queue managed by this        Congestion Point (CP).  Congestion Notification Messages are
+        transmitted to the sources of frames queued in this CP's        queue in order to keep the total number of octets stored in
+        the queue at this set point.       "
+    REFERENCE       "802.1Qau clause 30.2, 32.8.3"
+    DEFVAL { 26000 }    ::= { ieee8021CnCpEntry 7 }
+
+ieee8021CnCpFeedbackWeight OBJECT-TYPE    SYNTAX      Integer32 (-10..10)
+    MAX-ACCESS  read-write    STATUS      current
+    DESCRIPTION       "This object controls the weight (cpW) change in queue length
+        in the calculation of cpFb when the Congestion Point is        generating a Congestion Notification Message.
+
+        The weight cpW is equal to two to the power of this object.        Thus, if this object contains a -1, cpW = 1/2.
+       "    REFERENCE
+       "802.1Qau clause 32.8.6"    DEFVAL { 1 }
+    ::= { ieee8021CnCpEntry 8 }
+ieee8021CnCpMinSampleBase OBJECT-TYPE    SYNTAX      Unsigned32 (10000..4294967295)
+    UNITS       "octets"    MAX-ACCESS  read-write
+    STATUS      current    DESCRIPTION
+       "This object determines the minimum number of octets to        enqueue in the Congestion Point's queue between transmissions
+        of Congestion Notification Messages.       "
+    REFERENCE       "802.1Qau clause 32.8.11"
+    DEFVAL { 150000 }    ::= { ieee8021CnCpEntry 9 }
+
+    SYNTAX      Counter64    UNITS       "frames"
+    MAX-ACCESS  read-only    STATUS      current
+    DESCRIPTION       "The number of data frames discarded by the queue controlled
+        by this Congestion Point due to queue congestion.
+        Discontinuities in the value of this counter can occur
+        at re-initialization of the management system, and at        other times as indicated by the value of
+        ifCounterDiscontinuityTime object of the associated        interface (if any).
+       "    REFERENCE
+       "802.1Qau clause 32.8.12"    ::= { ieee8021CnCpEntry 10 }
+
+ieee8021CnCpTransmittedFrames OBJECT-TYPE    SYNTAX      Counter64
+    UNITS       "frames"    MAX-ACCESS  read-only
+    STATUS      current    DESCRIPTION
+       "The number of data frames passed on to the queue controlled by        this Congestion Point that were not discarded due to queue
+        congestion.
+        Discontinuities in the value of this counter can occur        at re-initialization of the management system, and at
+        other times as indicated by the value of        ifCounterDiscontinuityTime object of the associated
+        interface (if any).       "
+    REFERENCE       "802.1Qau clause 32.8.13"
+    ::= { ieee8021CnCpEntry 11 }
+
+    SYNTAX      Counter64    UNITS       "frames"
+    MAX-ACCESS  read-only    STATUS      current
+    DESCRIPTION       "The number of Congestion Notification Message transmitted
+        by this Congestion Point.
+        Discontinuities in the value of this counter can occur        at re-initialization of the management system, and at
+        other times as indicated by the value of        ifCounterDiscontinuityTime object of the associated
+        interface (if any).       "
+    REFERENCE       "802.1Qau clause 32.8.14"
+    ::= { ieee8021CnCpEntry 12 }
+
+    SYNTAX      Unsigned32 (0..64)    UNITS       "octets"
+    MAX-ACCESS  read-write    STATUS      current
+    DESCRIPTION       "Specifies the minimum number of octets to be returned in a
+        Congestion Notification Message from the mac_service_data_unit        of the data frame that triggered transmission of the CNM.  If
+        the mac_service_data_unit has fewer octets than the value of        this object, then all of the mac_service_data_unit is returned
+        in the CNM.       "
+    REFERENCE       "802.1Qau clause 32.8.15, 32.9.4 k)"
+    DEFVAL { 0 }    ::= { ieee8021CnCpEntry 13 }
+
+-- The CPID to {Interface, CP index} table.  One table per system.-- One entry per CPID.
+ieee8021CnCpidToInterfaceTable OBJECT-TYPE    SYNTAX      SEQUENCE OF Ieee8021CnCpidToInterfaceEntry
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "This table allows the network manager to obtain the
+        interface index and CP index needed to access an entry in        the ieee8021CnCpTable, given a Congestion Point Identifier
+        (CPID) received a Congestion Notification Messages (CNMs).
+        Upon a restart of the system, the system SHALL, if necessary,        update this table to be consistent with the ieee8021CnCpTable.
+       "    REFERENCE
+       "802.1Qau clause 17.2.13, 12.21.4, 32.8.2"    ::= { ieee8021CnMIBObjects 6 }
+
+ieee8021CnCpidToInterfaceEntry OBJECT-TYPE    SYNTAX      Ieee8021CnCpidToInterfaceEntry
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "An entry in the ieee8021CnCpidToInterfaceTable.  Translates
+        a Congestion Point Identifier to a component identifier,        interface index, and CP index
+       "    REFERENCE
+       "802.1Qau clause 17.2.13"    INDEX { ieee8021CnCpidToIfCpid }
+    ::= { ieee8021CnCpidToInterfaceTable 1 }
+Ieee8021CnCpidToInterfaceEntry ::= SEQUENCE {        ieee8021CnCpidToIfCpid           OCTET STRING,
+        ieee8021CnCpidToIfComponentId    IEEE8021PbbComponentIdentifier,        ieee8021CnCpidToIfIfIndex        InterfaceIndex,
+        ieee8021CnCpidToIfCpIndex        Unsigned32    }
+
+ieee8021CnCpidToIfCpid OBJECT-TYPE    SYNTAX      OCTET STRING (SIZE(8))
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "This object is the Congestion Point Identifier (CPID)
+        transmitted in Congestion Notification Message by a
+        Congestion Point residing in this bridge component or        end station.
+       "    REFERENCE
+       "802.1Qau clause 17.2.13, 32.8.2"    ::= { ieee8021CnCpidToInterfaceEntry 1 }
+
+ieee8021CnCpidToIfComponentId OBJECT-TYPE    SYNTAX      IEEE8021PbbComponentIdentifier
+    MAX-ACCESS  read-only    STATUS      current
+    DESCRIPTION       "The bridge component within the system to which the information
+        in this ieee8021CnCpidToInterfaceEntry applies.  If the system        is not a Bridge, or if only one component is present in the
+        Bridge, then this variable (index) MUST be equal to 1.       "
+    REFERENCE       "802.1Qau clause 17.2.13"
+    ::= { ieee8021CnCpidToInterfaceEntry 2 }
+ieee8021CnCpidToIfIfIndex OBJECT-TYPE    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only    STATUS      current
+    DESCRIPTION       "This object indicates the interface on which the selected
+        Congestion Point resides.  This value can be used, along        with ieee8021CnCpidToIfCpIndex, to find the Congestion Point
+        in the ieee8021CnCpTable.       "
+    REFERENCE       "802.1Qau clause 17.2.13"
+    ::= { ieee8021CnCpidToInterfaceEntry 3 }
+ieee8021CnCpidToIfCpIndex OBJECT-TYPE    SYNTAX      Unsigned32 (1..4096)
+    MAX-ACCESS  read-only    STATUS      current
+    DESCRIPTION       "This object indicates the Congestion Point's index on the
+        interface on which the selected Congestion Point resides.        This value can be used, along with ieee8021CnCpidToIfIfIndex,
+        to find the Congestion Point in the ieee8021CnCpTable.       "
+    REFERENCE       "802.1Qau clause 17.2.13"
+    ::= { ieee8021CnCpidToInterfaceEntry 4 }
+
+-- The Reaction Point Port table.  One table per end station.  One-- entry per Port per CNPV.
+ieee8021CnRpPortPriTable OBJECT-TYPE    SYNTAX      SEQUENCE OF Ieee8021CnRpPortPriEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current    DESCRIPTION
+       "Each row in this table supplies values for all of the        Reaction Points (RPs) on one Port and one priority of an end
+        station or bridge component.  This table is indexed by        component, port (interface), and priority.
+
+        Creating an entry in ieee8021CnCompntPriTable can create an        entry in this table, with the default values, on all ports
+        in the end station.
+        Deleting the an entry in ieee8021CnCompntPriTable for a        CNPV passing through the RP controlled by this entry deletes
+        entries on some or all of the ports in the end station.
+        The contents of this table SHALL be maintained across a restart        of the system, except as noted in the description of
+        ieee8021CnRpPortPriIfIndex.       "
+    REFERENCE       "802.1Qau clause 12.21.5"
+    ::= { ieee8021CnMIBObjects 7 }
+ieee8021CnRpPortPriEntry OBJECT-TYPE    SYNTAX      Ieee8021CnRpPortPriEntry
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "An entry in the Reaction Point table controls all of the
+        Reaction Points on a port in an end station that share the same        priority value.
+       "    REFERENCE
+       "802.1Qau clause 12.21.5"    INDEX { ieee8021CnRpPortPriComponentId, ieee8021CnRpPortPriPriority,
+            ieee8021CnRpPortPriIfIndex          }
+    ::= { ieee8021CnRpPortPriTable 1 }
+Ieee8021CnRpPortPriEntry ::= SEQUENCE {        ieee8021CnRpPortPriComponentId   IEEE8021PbbComponentIdentifier,
+        ieee8021CnRpPortPriPriority      IEEE8021PriorityValue,        ieee8021CnRpPortPriIfIndex       InterfaceIndex,
+        ieee8021CnRpPortPriMaxRps        Unsigned32,        ieee8021CnRpPortPriCreatedRps    Counter32,
+        ieee8021CnRpPortPriCentiseconds  Counter64    }
+
+ieee8021CnRpPortPriComponentId OBJECT-TYPE    SYNTAX      IEEE8021PbbComponentIdentifier
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "The bridge component within the system to which the information
+        in this ieee8021CnRpGroupEntry applies.  If the system is        not a Bridge, or if only one component is present in the
+        Bridge, then this variable (index) MUST be equal to 1.       "
+    ::= { ieee8021CnRpPortPriEntry 1 }
+    SYNTAX      IEEE8021PriorityValue    MAX-ACCESS  not-accessible
+    STATUS      current    DESCRIPTION
+       "This object indicates the lowest numerical        Congestion Notification Priority Value that this entry's
+        Reaction Point serves.       "
+    REFERENCE       "802.1Qau clause 12.21.5"
+    ::= { ieee8021CnRpPortPriEntry 2 }
+ieee8021CnRpPortPriIfIndex OBJECT-TYPE    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "This object indicates the interface on which the selected
+        Reaction Points reside.
+        Upon a restart of the system, the system SHALL, if necessary,        change the value of this object, and rearrange the order of the
+        ieee8021CnRpPortPriTable, so that the value in        ieee8021CnRpPortPriIfIndex references the row in the ifXTable
+        with the same value for ifAlias that it referenced before the        system restart.  If no such entry exists in the ifXTable, then
+        the system SHALL delete the row in the        ieee8021CnRpPortPriTable.
+       "    REFERENCE
+       "802.1Qau clause 12.21.5"    ::= { ieee8021CnRpPortPriEntry 3 }
+
+ieee8021CnRpPortPriMaxRps OBJECT-TYPE    SYNTAX      Unsigned32 (1..100)
+    MAX-ACCESS  read-write    STATUS      current
+    DESCRIPTION       "An integer controlling the maximum number of Reaction Points
+        allowed for this CNPV on this Port. An end station SHALL        not create more than this many Reaction Point on this Port,
+        but it MAY create fewer.       "
+    REFERENCE       "802.1Qau clause 32.10.1"
+    DEFVAL { 1 }    ::= { ieee8021CnRpPortPriEntry 4 }
+
+ieee8021CnRpPortPriCreatedRps OBJECT-TYPE    SYNTAX      Counter32
+    MAX-ACCESS  read-only    STATUS      current
+    DESCRIPTION       "This object returns the number of times any of the
+        Reaction Points (RPs) controlled by this entry has had        its rpEnabled variable set TRUE by the reception of a
+        Congestion Notification Message.
+        Dividing the change in ieee8021CnRpPortPriCentiseconds by the        change in this object over a time interval yields the average
+        lifetime of an active RP during that interval.       "
+    REFERENCE       "802.1Qau clause 32.10.2, 32.10.3, 32.13.1"
+    ::= { ieee8021CnRpPortPriEntry 5 }
+ieee8021CnRpPortPriCentiseconds OBJECT-TYPE    SYNTAX      Counter64
+    UNITS       "centiseconds"    MAX-ACCESS  read-only
+    STATUS      current    DESCRIPTION
+       "This object returns the total number of centi-seconds that        any of the Reaction Points (RPs) controlled by this entry
+        has had its rpEnabled variable in the TRUE state.  That is,        once each centi-second, this counter is incremented by the
+        number of RPs this entry controls that are actively rate        limiting output frames.
+
+        Dividing the change in this object over a time interval by the        length of the interval yields the average number of RPs active
+        over that interval.  Dividing the change in this object by the        change in ieee8021CnRpPortPriCreatedRps over that same time
+        interval yields the average lifetime of an active RP during that        interval.
+       "    REFERENCE
+       "802.1Qau clause 32.10.3, 32.13.1"    ::= { ieee8021CnRpPortPriEntry 6 }
+
+-- The Reaction Point Group table.  One table per end station.-- One entry per Reaction Point.
+ieee8021CnRpGroupTable OBJECT-TYPE    SYNTAX      SEQUENCE OF Ieee8021CnRpGroupEntry
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "Each row in this table supplies values for one or more
+        Reaction Points (RPs).  This table is indexed by component,        port (interface), and an arbitrary RP index.
+
+        Creating an entry in ieee8021CnCompntPriTable can create an        entry in this table, with the default values, on all ports
+        in the end station.  An end station can have more than one        RP for the same Congestion Notification Priority Value
+        (CNPV), so creating an entry in ieee8021CnCompntPriTable can        create multiple entries in this table.
+
+        Because each port in a bridge component or end station can have        a different relationship between CNPVs and RPs, the entries
+        created or deleted on each port can be different.
+        Deleting the an entry in ieee8021CnCompntPriTable for a        CNPV passing through the RP controlled by this entry deletes
+        entries on some or all of the ports in the end station.
+        Because each port in an end station can have a        different relationship between CNPVs and RPs, the entries
+        created or deleted on each port can be different.
+        The relationship between ieee8021CnRpgIdentifier        values and RPs is an implementation dependent matter.
+
+        The contents of this table SHALL be maintained across a restart        of the system, except as noted in the description of
+        ieee8021CnRpgIfIndex.       "
+    REFERENCE       "802.1Qau clause 12.21.6"
+    ::= { ieee8021CnMIBObjects 8 }
+ieee8021CnRpGroupEntry OBJECT-TYPE    SYNTAX      Ieee8021CnRpGroupEntry
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "An entry in the Reaction Point table controls a group of
+        Reaction Points, on a port in an end station.  All of the        Reaction Point controlled by this entry serve the same
+        Congestion Notification Priority Value.       "
+    INDEX { ieee8021CnRpgComponentId, ieee8021CnRpgPriority,            ieee8021CnRpgIfIndex, ieee8021CnRpgIdentifier }
+    ::= { ieee8021CnRpGroupTable 1 }
+Ieee8021CnRpGroupEntry ::= SEQUENCE {        ieee8021CnRpgComponentId    IEEE8021PbbComponentIdentifier,
+        ieee8021CnRpgPriority       IEEE8021PriorityValue,        ieee8021CnRpgIfIndex        InterfaceIndex,
+        ieee8021CnRpgIdentifier     Unsigned32,        ieee8021CnRpgEnable         TruthValue,
+        ieee8021CnRpgTimeReset      TimeInterval,        ieee8021CnRpgByteReset      Unsigned32,
+        ieee8021CnRpgThreshold      Unsigned32,        ieee8021CnRpgMaxRate        Unsigned32,
+        ieee8021CnRpgAiRate         Unsigned32,        ieee8021CnRpgHaiRate        Unsigned32,
+        ieee8021CnRpgGd             Integer32,        ieee8021CnRpgMinDecFac      Unsigned32,
+        ieee8021CnRpgMinRate        Unsigned32    }
+
+ieee8021CnRpgComponentId OBJECT-TYPE    SYNTAX      IEEE8021PbbComponentIdentifier
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "The bridge component within the system to which the information
+        in this ieee8021CnRpGroupEntry applies.  If the system is        not a Bridge, or if only one component is present in the
+        Bridge, then this variable (index) MUST be equal to 1.       "
+    ::= { ieee8021CnRpGroupEntry 1 }
+ieee8021CnRpgPriority OBJECT-TYPE    SYNTAX      IEEE8021PriorityValue
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "This object indicates the lowest numerical
+        Congestion Notification Priority Value that this entry's        Reaction Point serves.
+       "    REFERENCE
+       "802.1Qau clause 12.21.5"    ::= { ieee8021CnRpGroupEntry 2 }
+
+ieee8021CnRpgIfIndex OBJECT-TYPE    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "This object indicates the interface on which the group of
+        Reaction Points reside.
+        Upon a restart of the system, the system SHALL, if necessary,        change the value of this object, and rearrange the order of the
+        ieee8021CnRpGroupTable, so that the value in        ieee8021CnRpgIfIndex references the row in the ifXTable with
+        the same value for ifAlias that it referenced before the system        restart.  If no such entry exists in the ifXTable, then the
+        system SHALL delete the row in the ieee8021CnRpGroupTable.       "
+    REFERENCE       "802.1Qau clause 12.21.5"
+    ::= { ieee8021CnRpGroupEntry 3 }
+ieee8021CnRpgIdentifier OBJECT-TYPE    SYNTAX      Unsigned32 (1..4096)
+    MAX-ACCESS  not-accessible    STATUS      current
+    DESCRIPTION       "This object is an arbitrary integer indexing the entries in
+        this table among the entries for the same interface.  This        index SHOULD, where possible, be equal to the
+        Congestion Notification Priority Value served by this        Reaction Point.
+       "    REFERENCE
+       "802.1Qau clause 12.21.6"    ::= { ieee8021CnRpGroupEntry 4 }
+
+ieee8021CnRpgEnable OBJECT-TYPE    SYNTAX      TruthValue
+    MAX-ACCESS  read-write    STATUS      current
+    DESCRIPTION       "Controls the rpEnabled variable of the Reaction Point state
+        machines of the Reaction Points (RPs) controlled by this
+        entry as follows:            true(1)     The rpEnabled variable for the RPs controlled by
+                        this object are not held in the FALSE state,                        thus enabling them to pay attention to received
+                        CNMs.            false(2)    The rpEnabled variable for the RPs controlled by
+                        this object are held in the FALSE state, thus                        disabling them from paying attention to received
+                        CNMs.       "
+    REFERENCE       "802.1Qau clause 32.11.1, 32.13.1"
+    DEFVAL { true }    ::= { ieee8021CnRpGroupEntry 5 }
+
+ieee8021CnRpgTimeReset OBJECT-TYPE    SYNTAX      TimeInterval
+    UNITS       "milliseconds"    MAX-ACCESS  read-write
+    STATUS      current    DESCRIPTION
+       "This object controls the value for all of the state machine        variables, rpgTimeReset, used to reset the timers RpWhile.
+       "    REFERENCE
+       "802.1Qau clause 32.11.2"    DEFVAL { 15 }
+    ::= { ieee8021CnRpGroupEntry 6 }
+ieee8021CnRpgByteReset OBJECT-TYPE    SYNTAX      Unsigned32
+    UNITS       "octets"    MAX-ACCESS  read-write
+    STATUS      current    DESCRIPTION
+       "This object controls the value for all of the state machine        variables, rpgByteReset, used to reset the counters
+        rpByteCount.       "
+    REFERENCE       "802.1Qau clause 32.11.3"
+    DEFVAL { 150000 }    ::= { ieee8021CnRpGroupEntry 7 }
+
+ieee8021CnRpgThreshold OBJECT-TYPE    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write    STATUS      current
+    DESCRIPTION       "This object controls the number of times rpByteStage or
+        rpTimeStage can count before the        RP rate control state machine advances states.
+       "    REFERENCE
+       "802.1Qau clause 32.11.4"    DEFVAL { 5 }
+    ::= { ieee8021CnRpGroupEntry 8 }
+ieee8021CnRpgMaxRate OBJECT-TYPE
+    SYNTAX      Unsigned32    UNITS       "Mbit/s"
+    MAX-ACCESS  read-write    STATUS      current
+    DESCRIPTION       "This object controls the maximum rate, in multiples of 1 Mbit/s,
+        at which an RP can transmit. Default value is the speed of the        port. A system SHALL support a minimim  value for this object
+        that is no larger than 5 Mbits/s (object value 5). This rate        includes all bits consequent to transmitting the frame on the
+        LAN, including preamble, inter-frame gap, etc.       "
+    REFERENCE       "802.1Qau clause 32.11.5"
+    ::= { ieee8021CnRpGroupEntry 9 }
+ieee8021CnRpgAiRate OBJECT-TYPE    SYNTAX      Unsigned32
+    UNITS       "Mbit/s"    MAX-ACCESS  read-write
+    STATUS      current    DESCRIPTION
+       "This object controls the transmission rate increment in the        RPR_ACTIVE_INCREASE state (rpgAiRate) in multiples of 1 Mbit/s.
+        This rate includes all bits consequent to transmitting the        frame on the LAN, including preamble, inter-frame gap, etc.
+       "    REFERENCE
+       "802.1Qau clause 32.11.6"    DEFVAL { 5 }
+    ::= { ieee8021CnRpGroupEntry 10 }
+ieee8021CnRpgHaiRate OBJECT-TYPE    SYNTAX      Unsigned32
+    UNITS       "Mbit/s"    MAX-ACCESS  read-write
+    STATUS      current    DESCRIPTION
+       "This object controls the transmission rate increment in the        RPR_HYPER_INCREASE state (rpgHaiRate) in multiples of 1 Mbit/s.
+        This rate includes all bits consequent to transmitting the        frame on the LAN, including preamble, inter-frame gap, etc.
+       "    REFERENCE
+       "802.1Qau clause 32.11.7"    DEFVAL { 50 }
+    ::= { ieee8021CnRpGroupEntry 11 }
+ieee8021CnRpgGd OBJECT-TYPE    SYNTAX      Integer32
+    MAX-ACCESS  read-write    STATUS      current
+    DESCRIPTION       "This object controls the number of bits that the value of the
+        Quantized Feedback field received in a CNM PDU is shifted to        the right to decrease rpTargetRate. rpgGd is thus 2 to the
+        negative power of this object, e.g., 7 means rpgGd = 1/128.       "
+    REFERENCE
+       "802.1Qau clause 32.11.8"    DEFVAL { 7 }
+    ::= { ieee8021CnRpGroupEntry 12 }
+ieee8021CnRpgMinDecFac OBJECT-TYPE    SYNTAX      Unsigned32 (1..100)
+    UNITS       "percent"    MAX-ACCESS  read-write
+    STATUS      current    DESCRIPTION
+       "This object controls the minimum factor by which the current        RP transmit rate rpCurrentRate can be changed by reception
+        of a Congestion Notification Message.  Its integer value        represents a percentage, from 1% to 100%.
+       "    REFERENCE
+       "802.1Qau clause 32.11.9"    DEFVAL { 50 }
+    ::= { ieee8021CnRpGroupEntry 13 }
+ieee8021CnRpgMinRate OBJECT-TYPE    SYNTAX      Unsigned32
+    UNITS       "Mbit/s"    MAX-ACCESS  read-write
+    STATUS      current    DESCRIPTION
+       "This object controls the minimum transmission rate (rpgMinRate)        in multiples of 1 Mbit/s.  A system SHALL support a value for
+        this object that is no larger than 5 Mbit/s per second.        This rate includes all bits consequent to transmitting the
+        frame on the LAN, including preamble, inter-frame gap, etc.       "
+    REFERENCE       "802.1Qau clause 32.11.10"
+    DEFVAL { 5 }    ::= { ieee8021CnRpGroupEntry 14 }
+
+-- IEEE 802.1Qau MIB Module - Conformance Information
+ieee8021CnCompliances OBJECT IDENTIFIER ::= { ieee8021CnConformance 1 }ieee8021CnGroups      OBJECT IDENTIFIER ::= { ieee8021CnConformance 2 }
+
+-- Units of conformance
+ieee8021CnGlobalReqdGroup OBJECT-GROUP    OBJECTS {
+      ieee8021CnGlobalMasterEnable,      ieee8021CnComPriLldpInstanceChoice,
+      ieee8021CnComPriLldpInstanceSelector    }
+    STATUS      current    DESCRIPTION
+       "Objects in the global required group."
+    ::= { ieee8021CnGroups 1 }
+ieee8021CnCpGlobalGroup OBJECT-GROUP    OBJECTS {
+      ieee8021CnGlobalCnmTransmitPriority,      ieee8021CnGlobalDiscardedFrames
+    }    STATUS      current
+    DESCRIPTION       "Objects in the Congestion Point global group."
+    ::= { ieee8021CnGroups 2 }
+ieee8021CnCpidTranslateGroup OBJECT-GROUP    OBJECTS {
+      ieee8021CnCpidToIfComponentId,      ieee8021CnCpidToIfIfIndex,
+      ieee8021CnCpidToIfCpIndex    }
+    STATUS      current    DESCRIPTION
+       "Objects in the CPID translate group."    ::= { ieee8021CnGroups 3 }
+
+    OBJECTS {      ieee8021CnEpIfIndex
+    }    STATUS      current
+    DESCRIPTION       "Objects for the Errored Ports Table group."
+    ::= { ieee8021CnGroups 4 }
+ieee8021CnComPriGroup OBJECT-GROUP    OBJECTS {
+      ieee8021CnComPriDefModeChoice,      ieee8021CnComPriAdminDefenseMode,
+      ieee8021CnComPriCreation,      ieee8021CnComPriRowStatus
+    }    STATUS      current
+    DESCRIPTION       "Objects for the global per-priority group."
+    ::= { ieee8021CnGroups 5 }
+ieee8021CnCpPriGroup OBJECT-GROUP    OBJECTS {
+      ieee8021CnComPriAlternatePriority,      ieee8021CnComPriAutoAltPri
+    }    STATUS      current
+    DESCRIPTION       "Objects for the Congestion Point per-priority group."
+    ::= { ieee8021CnGroups 6 }
+ieee8021CnGlobalPriPortGroup OBJECT-GROUP    OBJECTS {
+      ieee8021CnPortPriDefModeChoice,      ieee8021CnPortPriAdminDefenseMode,
+      ieee8021CnPortPriAutoDefenseMode,
+      ieee8021CnPortPriLldpInstanceChoice,      ieee8021CnPortPriLldpInstanceSelector
+    }    STATUS      current
+    DESCRIPTION       "Objects for the global per-priority per-port group."
+    ::= { ieee8021CnGroups 7 }
+ieee8021CnCpPriPortGroup OBJECT-GROUP    OBJECTS {
+      ieee8021CnPortPriAlternatePriority    }
+    STATUS      current    DESCRIPTION
+       "Objects for the Congestion Point per-priority per-port        group.
+       "    ::= { ieee8021CnGroups 8 }
+
+ieee8021CnCpGroup OBJECT-GROUP    OBJECTS {
+      ieee8021CnCpPriority,      ieee8021CnCpMacAddress,
+      ieee8021CnCpIdentifier,      ieee8021CnCpQueueSizeSetPoint,
+      ieee8021CnCpFeedbackWeight,      ieee8021CnCpMinSampleBase,
+      ieee8021CnCpDiscardedFrames,      ieee8021CnCpTransmittedFrames,
+      ieee8021CnCpTransmittedCnms,      ieee8021CnCpMinHeaderOctets
+    }    STATUS      current
+    DESCRIPTION       "Objects for the Congestion Point group."
+    ::= { ieee8021CnGroups 9 }
+ieee8021CnRpppGroup OBJECT-GROUP    OBJECTS {
+      ieee8021CnRpPortPriMaxRps,      ieee8021CnRpPortPriCreatedRps,
+      ieee8021CnRpPortPriCentiseconds    }
+    STATUS      current    DESCRIPTION
+       "Objects for the Reaction Point per-Port per-priority group."    ::= { ieee8021CnGroups 10 }
+
+ieee8021CnRpGroup OBJECT-GROUP    OBJECTS {
+      ieee8021CnRpgEnable,      ieee8021CnRpgTimeReset,
+      ieee8021CnRpgByteReset,      ieee8021CnRpgThreshold,
+      ieee8021CnRpgMaxRate,      ieee8021CnRpgAiRate,
+      ieee8021CnRpgHaiRate,      ieee8021CnRpgGd,
+      ieee8021CnRpgMinDecFac,
+      ieee8021CnRpgMinRate    }
+    STATUS      current    DESCRIPTION
+       "Objects for the Reaction Point group."    ::= { ieee8021CnGroups 11 }
+
+-- MIB Module Compliance statements
+ieee8021CnBridgeCompliance MODULE-COMPLIANCE    STATUS      current
+    DESCRIPTION       "The compliance statement for support by a bridge of
+        the IEEE8021-CN-MIB module."
+    MODULE SNMPv2-MIB -- The SNMPv2-MIB, RFC 3418        MANDATORY-GROUPS {
+            systemGroup        }
+
+    MODULE IF-MIB -- The interfaces MIB, RFC 2863        MANDATORY-GROUPS {
+            ifGeneralInformationGroup        }
+
+    MODULE        MANDATORY-GROUPS {
+            ieee8021CnGlobalReqdGroup,            ieee8021CnCpGlobalGroup,
+            ieee8021CnCpidTranslateGroup,            ieee8021CnEplGroup,
+            ieee8021CnComPriGroup,            ieee8021CnCpPriGroup,
+            ieee8021CnGlobalPriPortGroup,            ieee8021CnCpPriPortGroup,
+            ieee8021CnCpGroup         }
+
+    OBJECT ieee8021CnComPriRowStatus      SYNTAX       RowStatus { active(1), notInService(2),
+                               notReady(3) }      WRITE-SYNTAX RowStatus { notInService(2), createAndGo(4),
+                               destroy(6) }      DESCRIPTION "Support for createAndWait is not required."
+
+    ::= { ieee8021CnCompliances 1 }
+    STATUS      current    DESCRIPTION
+       "The compliance statement for support by an end station of        the IEEE8021-CN-MIB module."
+
+    MODULE SNMPv2-MIB -- The SNMPv2-MIB, RFC 3418        MANDATORY-GROUPS {
+            systemGroup
+        }
+    MODULE IF-MIB -- The interfaces MIB, RFC 2863        MANDATORY-GROUPS {
+            ifGeneralInformationGroup        }
+
+    MODULE        MANDATORY-GROUPS {
+            ieee8021CnGlobalReqdGroup,            ieee8021CnComPriGroup,
+            ieee8021CnGlobalPriPortGroup,            ieee8021CnRpppGroup,
+            ieee8021CnRpGroup         }
+
+    GROUP ieee8021CnCpGlobalGroup        DESCRIPTION
+           "This group is optional and supports end stations that            choose to implement Congestion Points."
+
+    GROUP ieee8021CnCpidTranslateGroup        DESCRIPTION
+           "This group is optional and supports end stations that            choose to implement Congestion Points."
+
+    GROUP ieee8021CnEplGroup        DESCRIPTION
+           "This group is optional and supports end stations that            choose to implement Congestion Points."
+
+    GROUP ieee8021CnCpPriGroup        DESCRIPTION
+           "This group is optional and supports end stations that            choose to implement Congestion Points."
+
+    GROUP ieee8021CnCpPriPortGroup        DESCRIPTION
+           "This group is optional and supports end stations that            choose to implement Congestion Points."
+
+    GROUP ieee8021CnCpGroup        DESCRIPTION
+           "This group is optional and supports end stations that            choose to implement Congestion Points."
+
+    ::= { ieee8021CnCompliances 2 }
+    END
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=68 nocin nosi sts=4 sw=4 et
