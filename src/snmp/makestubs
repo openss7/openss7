@@ -57,9 +57,9 @@ export MIBS
 export MIBDIRS
 export MIBFILES
 
-#SMIPATH=../mibs:/usr/share/snmp/mibs:/usr/share/mibs/iana:/usr/share/mibs/ietf:/usr/share/mib/netsnmp
+SMIPATH=../mibs:/usr/share/snmp/mibs:/usr/share/mibs/iana:/usr/share/mibs/ietf:/usr/share/mib/netsnmp
 
-#export SMIPATH
+export SMIPATH
 
 #all: simple storage openss7 master
 all: lint dump tree openss7 master
