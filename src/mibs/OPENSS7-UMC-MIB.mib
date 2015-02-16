@@ -857,7 +857,7 @@ controlObjectReportingTriggersEvent OBJECT-TYPE
     REFERENCE   
         "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 ASN.1 
                ReportingEvent."
-    DEFVAL      { }
+    -- DEFVAL      { }
     ::= { usageMeteringControlObjectEntry 6 }
 
 controlObjectReportingTriggersSimulus OBJECT-TYPE

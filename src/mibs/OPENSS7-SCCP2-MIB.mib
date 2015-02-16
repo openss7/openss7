@@ -58,11 +58,13 @@
 OPENSS7-SCCP2-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    MODULE-IDENTITY, OBJECT-TYPE, TEXTUAL-CONVENTION, enterprises
+    MODULE-IDENTITY, OBJECT-TYPE, enterprises, Unsigned32
 	FROM SNMPv2-SMI
-    MODULE-COMPLIANCE, RowStatus, RowPointer, AutonomousType, 
-    TimeInterval, DisplayString, TruthValue
+    RowStatus, RowPointer, AutonomousType, 
+    TimeInterval, DisplayString, TruthValue, TEXTUAL-CONVENTION
 	FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+	FROM SNMPv2-CONF
     CommonLanguageName
 	FROM OPENSS7-TC
     AdministrativeState, OperationalState, ProceduralStatus, 
@@ -75,6 +77,8 @@ IMPORTS
     mtpMsId, MtpSapAddress, MtpUserPart, MtpUserPartStatus, 
     MtpCongestedState, MtpCongestionLevel
 	FROM OPENSS7-MTP-MIB
+    SubSystemNumber, PointCodeList
+	FROM OPENSS7-SCCP-MIB
     openss7, openss7Q, openss7Q751
 	FROM OPENSS7-SMI;
 
@@ -232,6 +236,107 @@ SccpSubsystemEntry ::=
 	sccpSubsystemRowStatus			RowStatus
     }
 
+-- sap2 attributes
+sccpSubsystemSapId OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"..."
+    ::= { sccpSubsystemEntry 1 }
+
+sccpSubsystemAlarmStatus OBJECT-TYPE
+    SYNTAX	AlarmStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"..."
+    ::= { sccpSubsystemEntry 2 }
+
+sccpSubsystemSap2Address OBJECT-TYPE
+    SYNTAX	SubSystemNumber
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"..."
+    ::= { sccpSubsystemEntry 3 }
+
+sccpSubsystemUserEntityNames OBJECT-TYPE
+    SYNTAX	OCTET STRING
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"..."
+    ::= { sccpSubsystemEntry 4 }
+
+sccpSubsystemProviderEntityNames OBJECT-TYPE
+    SYNTAX	PointCodeList
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"..."
+    ::= { sccpSubsystemEntry 5 }
+
+-- nSAP attributes: (none)
+-- sccpAccessPoint attributes
+sccpSubsystemAvailabilityStatus OBJECT-TYPE
+    SYNTAX	AvailabilityStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"..."
+    ::= { sccpSubsystemEntry 6 }
+
+sccpSubsystemConcernedAreaPointer OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"..."
+    ::= { sccpSubsystemEntry 7 }
+
+sccpSubsystemLinkagePointer OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"..."
+    ::= { sccpSubsystemEntry 8 }
+
+-- ssAvailableAfterRestartPackage
+sccpSubsystemSsAvailableAfterRestart OBJECT-TYPE
+    SYNTAX	TruthValue
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"..."
+    ::= { sccpSubsystemEntry 9 }
+
+sccpSubsystemAsaProfilePointer OBJECT-TYPE
+    SYNTAX	RowPointer
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"..."
+    ::= { sccpSubsystemEntry 10 }
+
+sccpSubsystemName OBJECT-TYPE
+    SYNTAX	CommonLanguageName
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"..."
+    ::= { sccpSubsystemEntry 11 }
+
+sccpSubsystemRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"..."
+    ::= { sccpSubsystemEntry 12 }
+
+
 -- =============================================================================
 
 -- This is a remote SCCP subsystem or SCCP-SAP.  It corresponds to the
@@ -282,6 +387,107 @@ SccpRemoteSubsystemEntry ::=
 	sccpRemoteSubsystemName			CommonLanguageName,
 	sccpRemoteSubsystemRowStatus		RowStatus
     }
+
+-- sap2 attributes
+sccpRemoteSubsystemSapId OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"..."
+    ::= { sccpRemoteSubsystemEntry 1 }
+
+sccpRemoteSubsystemAlarmStatus OBJECT-TYPE
+    SYNTAX	AlarmStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"..."
+    ::= { sccpRemoteSubsystemEntry 2 }
+
+sccpRemoteSubsystemSap2Address OBJECT-TYPE
+    SYNTAX	SubSystemNumber
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"..."
+    ::= { sccpRemoteSubsystemEntry 3 }
+
+sccpRemoteSubsystemUserEntityNames OBJECT-TYPE
+    SYNTAX	OCTET STRING
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"..."
+    ::= { sccpRemoteSubsystemEntry 4 }
+
+sccpRemoteSubsystemProviderEntityNames OBJECT-TYPE
+    SYNTAX	PointCodeList
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"..."
+    ::= { sccpRemoteSubsystemEntry 5 }
+
+-- nSAP attributes: (none)
+-- sccpAccessPoint attributes
+sccpRemoteSubsystemAvailabilityStatus OBJECT-TYPE
+    SYNTAX	AvailabilityStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"..."
+    ::= { sccpRemoteSubsystemEntry 6 }
+
+sccpRemoteSubsystemConcernedAreaPointer OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"..."
+    ::= { sccpRemoteSubsystemEntry 7 }
+
+sccpRemoteSubsystemLinkagePointer OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"..."
+    ::= { sccpRemoteSubsystemEntry 8 }
+
+-- ssAvailableAfterRestartPackage
+sccpRemoteSubsystemSsAvailableAfterRestart OBJECT-TYPE
+    SYNTAX	TruthValue
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"..."
+    ::= { sccpRemoteSubsystemEntry 9 }
+
+sccpRemoteSubsystemAsaProfilePointer OBJECT-TYPE
+    SYNTAX	RowPointer
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"..."
+    ::= { sccpRemoteSubsystemEntry 10 }
+
+sccpRemoteSubsystemName OBJECT-TYPE
+    SYNTAX	CommonLanguageName
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"..."
+    ::= { sccpRemoteSubsystemEntry 11 }
+
+sccpRemoteSubsystemRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION	
+	"..."
+    ::= { sccpRemoteSubsystemEntry 12 }
+
 
 -- =============================================================================
 

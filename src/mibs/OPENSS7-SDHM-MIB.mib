@@ -73,7 +73,7 @@ IMPORTS
     MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
 	FROM SNMPv2-CONF
     Gauge32, Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, 
-    OBJECT-IDENTITY, OBJECT-TYPE, Unsigned32, zeroDotZero
+    OBJECT-IDENTITY, OBJECT-TYPE, Unsigned32, zeroDotZero, Opaque
 	FROM SNMPv2-SMI
     AutonomousType, RowPointer, RowStatus, TEXTUAL-CONVENTION, 
     TimeInterval, TruthValue
@@ -398,7 +398,7 @@ SdhNeEntry ::= SEQUENCE {
     sdhNeId
 	Unsigned32,
     sdhNeSystemTitle
-	Opaque,
+	SnmpAdminString,
     sdhNeAlarmStatus
 	AlarmStatus,
     sdhNeAdministrativeState
@@ -690,6 +690,7 @@ sdhTpEntry OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. M.3100 (2005) : terminationPoint MO."
+    INDEX { sdhTpId }
     ::= { sdhTpTable 1 }
 
 SdhTpEntry ::= SEQUENCE {
@@ -712,7 +713,7 @@ SdhTpEntry ::= SEQUENCE {
 	RowPointer,
     -- characteristicInformationPackage
     sdhTpCharatersiticInfo
-	CharacteristicInfo,
+	OCTET STRING, -- CharacteristicInfo
     -- networkLevelPackage
     sdhTpNetworkLevelPointer
 	RowPointer,
@@ -774,7 +775,7 @@ sdhTpFabric OBJECT-TYPE
 	 responsible for its connection."
     REFERENCE
 	""
-    DEFVAL { { zeroDotZero } }
+    DEFVAL { zeroDotZero }
     ::= { sdhTpEntry 3 }
 
 sdhTpCrossConnect OBJECT-TYPE
@@ -793,7 +794,7 @@ sdhTpCrossConnect OBJECT-TYPE
 	 responsible for its connection."
     REFERENCE
 	""
-    DEFVAL { { zeroDotZero } }
+    DEFVAL { zeroDotZero }
     ::= { sdhTpEntry 4 }
 
 sdhTpDownstreamFabric OBJECT-TYPE
@@ -813,7 +814,7 @@ sdhTpDownstreamFabric OBJECT-TYPE
 	 responsible for its connection."
     REFERENCE
 	""
-    DEFVAL { { zeroDotZero } }
+    DEFVAL { zeroDotZero }
     ::= { sdhTpEntry 5 }
 
 sdhTpDownstreamCrossConect OBJECT-TYPE
@@ -832,7 +833,7 @@ sdhTpDownstreamCrossConect OBJECT-TYPE
 	 responsible for its connection."
     REFERENCE
 	""
-    DEFVAL { { zeroDotZero } }
+    DEFVAL { zeroDotZero }
     ::= { sdhTpEntry 6 }
 
 sdhTpUpstreamFabric OBJECT-TYPE
@@ -852,7 +853,7 @@ sdhTpUpstreamFabric OBJECT-TYPE
 	 responsible for its connection."
     REFERENCE
 	""
-    DEFVAL { { zeroDotZero } }
+    DEFVAL { zeroDotZero }
     ::= { sdhTpEntry 7 }
 
 sdhTpUpstreamCrossConnect OBJECT-TYPE
@@ -871,11 +872,11 @@ sdhTpUpstreamCrossConnect OBJECT-TYPE
 	 responsible for its connection."
     REFERENCE
 	""
-    DEFVAL { { zeroDotZero } }
+    DEFVAL { zeroDotZero }
     ::= { sdhTpEntry 8 }
 
 sdhTpCharatersiticInfo OBJECT-TYPE
-    SYNTAX CharacteristicInfo
+    SYNTAX OCTET STRING -- CharacteristicInfo
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -904,7 +905,7 @@ sdhTpNetworkLevelPointer OBJECT-TYPE
 	 by the managing system."
     REFERENCE
 	""
-    DEFVAL { { zeroDotZero } }
+    DEFVAL { zeroDotZero }
     ::= { sdhTpEntry 10 }
 
 sdhTpAlarmStatus OBJECT-TYPE
@@ -949,7 +950,7 @@ sdhTpAlarmStatus OBJECT-TYPE
 
 sdhTpAsaProfilePointer OBJECT-TYPE
     SYNTAX RowPointer
-    MAX-ACCESS read-create
+    MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
 	"Provides a pointer to an alarm severity assignment profile to 
@@ -957,7 +958,7 @@ sdhTpAsaProfilePointer OBJECT-TYPE
 	 zeroDotZero."
     REFERENCE
 	""
-    DEFVAL { { zeroDotZero } }
+    DEFVAL { zeroDotZero }
     ::= { sdhTpEntry 12 }
 
 -- =====================================================================
@@ -1019,10 +1020,10 @@ SdhTtpSinkEntry ::= SEQUENCE {
 	OperationalState,
     sdhTtpSinkUpstreamConnectivity
 	RowPointer,
-    sdhTtpSinkAdministativeState
+    sdhTtpSinkAdministrativeState
 	AdministrativeState,
     sdhTtpSinkSupportableClientList
-	SupportableClientList,
+	OCTET STRING, -- SupportableClientList,
     sdhTtpSinkTtpId
 	SimpleNameType
 }
@@ -1059,7 +1060,7 @@ sdhTtpSinkAdministrativeState OBJECT-TYPE
 
 
 sdhTtpSinkSupportableClientList OBJECT-TYPE
-    SYNTAX SupportableClientList
+    SYNTAX OCTET STRING -- SupportableClientList
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
@@ -1145,11 +1146,11 @@ SdhTtpSrceEntry ::= SEQUENCE {
 	OperationalState,
     sdhTtpSrceDownstreamConnectivity
 	RowPointer,
-    sdhTtpSinkAdministrativeState
+    sdhTtpSrceAdministrativeState
 	AdministrativeState,
-    sdhTtpSinkSupportableClientList
-	SupportableClientList,
-    sdhTtpSinkTtpId
+    sdhTtpSrceSupportableClientList
+	OCTET STRING, -- SupportableClientList,
+    sdhTtpSrceTtpId
 	SimpleNameType
 }
 
@@ -1173,7 +1174,7 @@ sdhTtpSrceDownstreamConnectivity OBJECT-TYPE
 	""
     ::= { sdhTtpSrceEntry 2 }
 
-sdhTtpSinkAdministrativeState OBJECT-TYPE
+sdhTtpSrceAdministrativeState OBJECT-TYPE
     SYNTAX AdministrativeState
     MAX-ACCESS read-write
     STATUS current
@@ -1183,8 +1184,8 @@ sdhTtpSinkAdministrativeState OBJECT-TYPE
 	""
     ::= { sdhTtpSrceEntry 3 }
 
-sdhTtpSinkSupportableClientList OBJECT-TYPE
-    SYNTAX SupportableClientList
+sdhTtpSrceSupportableClientList OBJECT-TYPE
+    SYNTAX OCTET STRING -- SupportableClientList
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
@@ -1197,7 +1198,7 @@ sdhTtpSinkSupportableClientList OBJECT-TYPE
 	""
     ::= { sdhTtpSrceEntry 4 }
 
-sdhTtpSinkTtpId OBJECT-TYPE
+sdhTtpSrceTtpId OBJECT-TYPE
     SYNTAX SimpleNameType
     MAX-ACCESS read-write
     STATUS current
@@ -1220,7 +1221,7 @@ sdhTtpBidiTable OBJECT-TYPE
     ::= { sdhTtpBidi 1 }
 
 sdhTtpBidiEntry OBJECT-TYPE
-    SYNTAX SEQUENCE OF SdhTtpBidiEntry
+    SYNTAX SdhTtpBidiEntry
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
@@ -1289,7 +1290,7 @@ sdhTtpConcatTable OBJECT-TYPE
     ::= { sdhTtpConcat 1 }
 
 sdhTtpConcatEntry OBJECT-TYPE
-    SYNTAX SEQUENCE OF SdhTtpConcatEntry
+    SYNTAX SdhTtpConcatEntry
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
@@ -1305,7 +1306,7 @@ sdhTtpConcatEntry OBJECT-TYPE
 SdhTtpConcatEntry ::= SEQUENCE {
     sdhTtpConcatIndex
 	Unsigned32,
-    sdhTtpConnectivity
+    sdhTtpConcatConnectivity
 	RowPointer,
     sdhTtpConcatRowStatus
 	RowStatus

@@ -267,7 +267,7 @@ MedGwyGatewayConfigEntry ::= SEQUENCE {
 
 medGwyGatewayId OBJECT-TYPE
     SYNTAX      MediaGatewayId
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION 
         "The unique Media Gateway Id which identifies this 
@@ -502,7 +502,7 @@ MedGwyGatewayControllerEntry ::= SEQUENCE {
 
 medGwyGatewayControllerId OBJECT-TYPE
     SYNTAX      Unsigned32 (1..2147483647)
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION 
         "An unique identification number that is assigned to 
@@ -856,7 +856,7 @@ MedGwyTerminationsEntry ::= SEQUENCE {
 
 medGwyTerminationId OBJECT-TYPE
     SYNTAX      MediaGatewayTermId
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION 
         "An unique identification number that is assigned to 

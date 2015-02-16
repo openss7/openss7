@@ -59,7 +59,8 @@ PNNI-MIB DEFINITIONS ::= BEGIN
 
         IMPORTS
                 MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY,
-                Counter32, Gauge32, Integer32, enterprises
+                Counter32, Gauge32, Integer32, enterprises,
+		Unsigned32
                         FROM SNMPv2-SMI
                 TEXTUAL-CONVENTION, RowStatus, DisplayString,
                 TimeStamp, TruthValue
@@ -67,7 +68,7 @@ PNNI-MIB DEFINITIONS ::= BEGIN
                 InterfaceIndex, ifIndex
                         FROM IF-MIB
                 AtmTrafficDescrParamIndex
-                        FROM ATM-MIB
+                        FROM ATM-TC-MIB
                 MODULE-COMPLIANCE, OBJECT-GROUP
                         FROM SNMPv2-CONF;
 
@@ -102,18 +103,6 @@ atmfPnni        OBJECT IDENTIFIER ::= { atmForumNetworkManagement 4 }
 
 
 pnniMIBObjects OBJECT IDENTIFIER ::= { pnniMIB 1 }
-
-
-    Unsigned32 ::= TEXTUAL-CONVENTION
-        STATUS        current
-        DESCRIPTION
-            "This definition, which is in compliance with RFC 1902, is a
-             temporary inclusion in the PNNI MIB until such time as MIB
-             compilers are upgraded and thereby can accept references to
-             the new definitions in RFC 1902."
-        REFERENCE
-            "RFC 1902"
-        SYNTAX        Gauge32
 
 
     PnniAtmAddr ::= TEXTUAL-CONVENTION
@@ -2381,7 +2370,7 @@ PnniSvccRccEntry ::=
                 }
 
 pnniSvccRccIndex OBJECT-TYPE
-        SYNTAX        PnniSvccRccIndex
+        SYNTAX        PnniSvccRccIndex (1..1073741824)
         MAX-ACCESS    not-accessible
         STATUS        current
         DESCRIPTION

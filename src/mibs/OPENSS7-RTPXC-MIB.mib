@@ -216,7 +216,7 @@ RtpAudioMediaSubtype ::= TEXTUAL-CONVENTION
          - g729e(20), audio/G729E, 8000, RFC 3551, RFC 4856;
          - gsmEfr(21), audio/GSM-EFR, 8000, RFC 3551, RFC 4856;
          - l8(22), audio/L8, RFC 3551, RFC 4956;
-         - red(23), audio/RED, RFC 2198, RFC 3555;
+         - red(23), audio/RED, RFC 2198, RFC 3555, RFC 4103;
          - rtx(24), audio/rtx, RFC 4588;
          - vdvi(25), audio/VDVI, RFC 3551, RFC 4856;
          - l20(26), audio/L20, RFC 3190;
@@ -240,10 +240,7 @@ RtpAudioMediaSubtype ::= TEXTUAL-CONVENTION
          - lpc(44), audio/LPC, RFC 4856;
          - pcma(45), audio/PCMA, RFC 4856;
          - pcmu(46), audio/PCMU, RFC 4856;
-         - parityfec(47), audio/parityfec, RFC 3009;
-         - red(48), audio/red, 1000, RFC 4103;
-         - rtx(49), audio/rtx, RFC 4588;
-         - t140(50), audio/t140, 1000, RFC 4103."
+         - t140(47), audio/t140, 1000, RFC 4103."
     REFERENCE
         "RFC 2198, RTP Payload Format for Redundant Audio Data.
          RFC 3009, Registration of parityfec MIME types.
@@ -294,12 +291,12 @@ RtpAudioMediaSubtype ::= TEXTUAL-CONVENTION
              evrcwb1(13), g7221(14), g72616(15), g72624(16), 
              g72632(17), g72640(18), g729d(19), g729e(20), 
              gsmEfr(21), l8(22), red(23), rtx(24), vdvi(25), 
-             l20(26), l24(27), mp4aLatm(28), mpaRobust(27), 
-             parityfec(28), smv(29), smv0(30), t140c(31), 
-             t38(32), telephoneEvent(33), tone(34), dvi4(35), 
-             g722(36), g723(37), g728(38), g729(39), gsm(40), 
-             l16(41), lpc(42), pcma(43), pcmu(44), 
-             parityfec(45), red(46), rtx(47), t140(48) }
+             l20(26), l24(27), mp4aLatm(28), mpaRobust(29), 
+             parityfec(30), smv(31), smv0(32), t140c(33), 
+             t38(34), telephoneEvent(35), tone(36), dvi4(37), 
+             g722(38), g723(39), g728(40), g729(41), gsm(42), 
+             l16(43), lpc(44), pcma(45), pcmu(46), 
+             t140(47) }
 
 
 RtcpPacketType ::= TEXTUAL-CONVENTION
@@ -380,8 +377,8 @@ RtpHeaderValidityFailure ::= TEXTUAL-CONVENTION
                 incorrectXbit(4), incorrectLength(5) }
 
 RtpLossRate ::= TEXTUAL-CONVENTION
-    DISPLAY-HINT    "1d"
-    UNITS           "2.56ths of a percent"
+--  DISPLAY-HINT    "1d"
+--  UNITS           "2.56ths of a percent"
     STATUS      current
     DESCRIPTION
         "The fraction of RTP data packets from the source lost 
@@ -405,8 +402,8 @@ RtpLossRate ::= TEXTUAL-CONVENTION
     SYNTAX      INTEGER (0..255)
 
 RtpDiscardRate ::= TEXTUAL-CONVENTION
-    DISPLAY-HINT    "1d"
-    UNITS           "2.56ths of a percent"
+--  DISPLAY-HINT    "1d"
+--  UNITS           "2.56ths of a percent"
     STATUS          current
     DESCRIPTION
         "The fraction of RTP data packages from the source that 
@@ -425,8 +422,8 @@ RtpDiscardRate ::= TEXTUAL-CONVENTION
     SYNTAX      INTEGER (0..255)
 
 RtpBurstDensity ::= TEXTUAL-CONVENTION
-    DISPLAY-HINT    "1d"
-    UNITS           "2.56ths of a percent"
+--  DISPLAY-HINT    "1d"
+--  UNITS           "2.56ths of a percent"
     STATUS          current
     DESCRIPTION
         "The fraction of RTP data packets within burst periods 
@@ -447,8 +444,8 @@ RtpBurstDensity ::= TEXTUAL-CONVENTION
     SYNTAX      INTEGER (0..255)
 
 RtpGapDensity ::= TEXTUAL-CONVENTION
-    DISPLAY-HINT    "1d"
-    UNITS           "2.56ths of a percent"
+--  DISPLAY-HINT    "1d"
+--  UNITS           "2.56ths of a percent"
     STATUS          current
     DESCRIPTION
         "The fraction of RTP data packets within inter-burst 
@@ -467,8 +464,8 @@ RtpGapDensity ::= TEXTUAL-CONVENTION
 
 
 RtpBurstDuration ::= TEXTUAL-CONVENTION
-    DISPLAY-HINT    "1d"
-    UNITS           "milliseconds"
+--  DISPLAY-HINT    "1d"
+--  UNITS           "milliseconds"
     STATUS          current
     DESCRIPTION
         "The mean duration, expressed in milliseconds, of the 
@@ -486,8 +483,8 @@ RtpBurstDuration ::= TEXTUAL-CONVENTION
     SYNTAX      INTEGER (0..65535)
 
 RtpGapDuration ::= TEXTUAL-CONVENTION
-    DISPLAY-HINT    "1d"
-    UNITS           "milliseconds"
+--  DISPLAY-HINT    "1d"
+--  UNITS           "milliseconds"
     STATUS          current
     DESCRIPTION
         "The mean duration, expressed in milliseconds, of the 
@@ -513,8 +510,9 @@ RtpGapDuration ::= TEXTUAL-CONVENTION
     SYNTAX      INTEGER (0..65535)
 
 RtpRoundTripDelay ::= TEXTUAL-CONVENTION
-    DISPLAY-HINT    "1d"
-    UNITS           "milliseconds"
+--  DISPLAY-HINT    "1d"
+--  UNITS           "milliseconds"
+    STATUS      current
     DESCRIPTION
         "The most recently calculated round trip time between 
          RTP interfaces, expressed in milliseconds.  This value 
@@ -536,8 +534,9 @@ RtpRoundTripDelay ::= TEXTUAL-CONVENTION
 
 
 RtpEndSystemDelay ::= TEXTUAL-CONVENTION
-    DISPLAY-HINT    "1d"
-    UNITS           "milliseconds"
+--  DISPLAY-HINT    "1d"
+--  UNITS           "milliseconds"
+    STATUS      current
     DESCRIPTION
         "The most recently estimated end system delay, expressed 
          in milliseconds.  End system delay is defined as the 
@@ -554,7 +553,8 @@ RtpEndSystemDelay ::= TEXTUAL-CONVENTION
 
 
 RtpSignalLevel ::= TEXTUAL-CONVENTION
-    DISPLAY-HINT    "1d"
+--  DISPLAY-HINT    "1d"
+    STATUS      current
     DESCRIPTION
         "The voice signal relative level is defined as the ratio 
          of the signal level to a 0 dBm0 reference [10], 
@@ -579,7 +579,8 @@ RtpSignalLevel ::= TEXTUAL-CONVENTION
     SYNTAX      INTEGER (0..255)
 
 RtpNoiseLevel ::= TEXTUAL-CONVENTION
-    DISPLAY-HINT    "1d"
+--  DISPLAY-HINT    "1d"
+    STATUS      current
     DESCRIPTION
         "The noise level is defined as the ratio of the silent 
          period background noise level to a 0 dBm0 reference, 
@@ -599,7 +600,8 @@ RtpNoiseLevel ::= TEXTUAL-CONVENTION
     SYNTAX      INTEGER (0..255)
 
 RtpRedidualEchoReturnLoss ::= TEXTUAL-CONVENTION
-    DISPLAY-HINT    "1d"
+--  DISPLAY-HINT    "1d"
+    STATUS      current
     DESCRIPTION
         "The residual echo return loss value may be measured 
          directly by the VoIP end system's echo canceller or may 
@@ -666,7 +668,7 @@ RtpRedidualEchoReturnLoss ::= TEXTUAL-CONVENTION
          -  IP Phone with handset: typically 45 dB.
          
          -  PC softphone or speakerphone: extremely variable, 
-            consider reporting "undefined" (127).
+            consider reporting 'undefined' (127).
          
          -  IP gateway with line echo canceller: typically has 
             ERL and ERLE available.
@@ -680,8 +682,8 @@ RtpRedidualEchoReturnLoss ::= TEXTUAL-CONVENTION
     SYNTAX      INTEGER (0..255)
 
 RtpRFactor ::= TEXTUAL-CONVENTION
-    DISPLAY-HINT    "1d"
-    UNITS           "percent"
+--  DISPLAY-HINT    "1d"
+--  UNITS           "percent"
     STATUS          current
     DESCRIPTION
         "The R factor is a voice quality metric describing the 
@@ -720,8 +722,8 @@ RtpRFactor ::= TEXTUAL-CONVENTION
     SYNTAX      INTEGER (0..100 | 127)
 
 RtpExternalRFactor ::= TEXTUAL-CONVENTION
-    DISPLAY-HINT    "1d"
-    UNITS           "percent"
+--  DISPLAY-HINT    "1d"
+--  UNITS           "percent"
     STATUS          current
     DESCRIPTION
         "The external R factor is a voice quality metric 
@@ -762,7 +764,7 @@ RtpExternalRFactor ::= TEXTUAL-CONVENTION
     SYNTAX      INTEGER (0..100 | 127)
 
 RtpMosLq ::= TEXTUAL-CONVENTION
-    DISPLAY-HINT    "1d"
+--  DISPLAY-HINT    "1d"
     STATUS      current
     DESCRIPTION
         "The estimated mean opinion score for listening quality 
@@ -786,7 +788,7 @@ RtpMosLq ::= TEXTUAL-CONVENTION
     SYNTAX      INTEGER (1..5 | 127)
 
 RtpMosCq ::= TEXTUAL-CONVENTION
-    DISPLAY-HINT    "1d"
+--  DISPLAY-HINT    "1d"
     STATUS      current
     DESCRIPTION
         "The estimated mean opinion score for conversational 
@@ -810,7 +812,7 @@ RtpMosCq ::= TEXTUAL-CONVENTION
     SYNTAX      INTEGER (10..50 | 127)
 
 RtpGmin ::= TEXTUAL-CONVENTION
-    DISPLAY-HINT    "1d"
+--  DISPLAY-HINT    "1d"
     STATUS      current
     DESCRIPTION
         "The gap threshold.  This field contains the value used 
@@ -877,7 +879,7 @@ RtpJitterBufferAdaptive ::= TEXTUAL-CONVENTION
          MUST be specified."
     REFERENCE
         "RFC 3611, Section 4.7.6."
-    SYNTAX      INTEGER { unknown(0), reserved(1), nonAdaptive(2), Adaptive(3) }
+    SYNTAX      INTEGER { unknown(0), reserved(1), nonAdaptive(2), adaptive(3) }
 
 RtpJitterBufferRate ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -901,9 +903,9 @@ RtpJitterBufferRate ::= TEXTUAL-CONVENTION
     SYNTAX      INTEGER (0..15)
 
 RtpJitterBufferNominalDelay ::= TEXTUAL-CONVENTION
+--  DISPLAY-HINT    "1d"
+--  UNITS           "milliseconds"
     STATUS      current
-    DISPLAY-HINT    "1d"
-    UNITS           "milliseconds"
     DESCRIPTION
         "This is the current nominal jitter buffer delay in 
          milliseconds, which corresponds to the nominal jitter 
@@ -915,9 +917,9 @@ RtpJitterBufferNominalDelay ::= TEXTUAL-CONVENTION
     SYNTAX      INTEGER (0..65535)
 
 RtpJitterBufferMaximumDelay ::= TEXTUAL-CONVENTION
+--  DISPLAY-HINT    "1d"
+--  UNITS           "milliseconds"
     STATUS      current
-    DISPLAY-HINT    "1d"
-    UNITS           "milliseconds"
     DESCRIPTION
         "This is the current maximum jitter buffer delay in 
          milliseconds which corresponds to the earliest arriving 
@@ -932,9 +934,9 @@ RtpJitterBufferMaximumDelay ::= TEXTUAL-CONVENTION
     SYNTAX      INTEGER (0..65535)
 
 RtpJitterBufferAbsoluteMaximumDelay ::= TEXTUAL-CONVENTION
+--  DISPLAY-HINT    "1d"
+--  UNITS           "milliseconds"
     STATUS      current
-    DISPLAY-HINT    "1d"
-    UNITS           "milliseconds"
     DESCRIPTION
         "This is the absolute maximum delay in milliseconds that 
          the adaptive jitter buffer can reach under worst case 

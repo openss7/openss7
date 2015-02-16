@@ -57,6 +57,40 @@
 
 nlmMIB MODULE-IDENTITY
 
+SystemType ::= TEXTUAL-CONVENTION
+    STATUS	current
+    DESCRIPTION
+	"The system role in which an instance of CLNS is operating.  
+	 This can be one of the following values:
+	 
+	 eS(1), End-System;
+	 
+	 iS(2), Intermediate-System."
+    REFERENCE
+	"ITU-T Rec. X.283 (1997) | ISO/IEC 10733 : 1998, NLM.SystemType"
+    SYNTAX	INTEGER { eS(1), iS(2) }
+
+SupportedProtocols ::= TEXTUAL-CONVENTION
+    STATUS	current
+    DESCRIPTION
+	"The set of Connectionless Network protocols supported by this 
+	 instance of the CLNS protocol machine.  The operation of a 
+	 particular protocol over a particular linkage is determined by 
+	 the linkage OperationalProtocols attribute.  The value of the 
+	 object with this textual convention as its syntax is determined 
+	 by the implementation.  It is set-valued and can contain one or 
+	 more of the following members:
+	 
+	 protocol8473(0), ITU-T Rec. X.233 | ISO/IEC 8473-1 : 1992
+	 
+	 protocol9542ES(1), ISO/IEC 9542 : 1994 (ES) End System
+	 
+	 protocol9542IS(2), ISO/IEC 9542 : 1994 (IS) Intermediate System
+	 "
+    REFERENCE
+	"ITU-T Rec. X.283 (1997) | ISO/IEC 10733 : 1998, NLM.SupportedProtocols"
+    SYNTAX	BITS { protocol8473(0), protocol9542ES(1), protocol9542IS(2) }
+
 nlmNotifications OBJECT IDENTIFIER
     ::= { nlmMIB 0 }
 
@@ -180,75 +214,257 @@ cLNSEntry OBJECT-TYPE
         ""
     REFERENCE
         "ITU-T Rec. X.283 | ISO/IEC 10733 cLNS MO."
-    INDEX       { clProtocolMachineId }
+    INDEX       { communicationsEntityId, clProtocolMachineId }
     ::= { cLNSTable 1 }
 
 CLNSEntry ::= SEQUENCE {
-    cLNSAdministrativeState         AdministrativeState,
-    cLNSOperationalState            OperationalState,  -- also part of coProtocolMachine
-    cLNSActivationAction            ActivationAction,
-    octetsSentCounter               Counter64,
-    octetsReceivedCounter           Counter64,
-    operationalSystemType           SystemType,
-    supportedProtocols              Counter64,
-    segmentsReceived                Counter64,
-    segmentsDiscarded               Counter64,
-    assemblingSegmentsDiscarded     Counter64,
-    errorReportsReceived            Counter64,
-    pDUDiscards                     Counter64,
-    congestionDiscards              Counter64,
-    maximumLifetime                 Counter64,
-    enableChecksum                  TruthValue,
+    cLNSAdministrativeState			AdministrativeState,
+    cLNSOperationalState			OperationalState,  -- also part of coProtocolMachine
+    cLNSActivationAction			ActivationAction,
 
-    version
-    iSType
-    systemId
-    maximumPathSplits
-    minimumLSPTransmissionInterval
-    maximumLSPGenerationInterval
-    minimumBroadcastLSPTransmissionInterval
-    completeSNPInterval
-    originatingL1LSPBufferSize
-    manualAreaAddresses
-    maximumAreaAddresses
-    minimumLSPGenerationInterval
-    pollESHelloRate
-    partialSNPInterval
-    waitingTime
-    dRISISHelloTimer
-    l1State
-    areaAddresses
-    corruptedLSPsDetected
-    lSPL1DatabaseOverloads
-    manualAddressesDroppedFromArea
-    attemptsToExceedMaximumSequenceNumber
-    sequenceNumberSkips
-    ownLSPPurges
-    iDFieldLengthMismatches
-    maximumAreaAddressesMismatches
-    originatingLSPBufferSizeMismatches
-    lSPTooLargeToPropagate
+-- cLNS8473-P PACKAGE
+    cLNSOctetsSentCounter			Counter64,
+    cLNSOctetsReceivedCounter			Counter64,
+    cLNSOperationalSystemType			SystemType,
+    supportedProtocols				SupportedProtocols,
+    segmentsReceived				Counter64,
+    segmentsSent				Counter64,
+    segmentsDiscarded				Counter64,
+    assemblingSegmentsDiscarded			Counter64,
+    errorReportsReceived			Counter64,
+    pDUDiscards					Counter64,
+    congestionDiscards				Counter64,
+    maximumLifetime				MilliSeconds,
 
-    areaTransmitPassword
-    areaReceivePasswords
-    authenticationFailures
+-- cLNSChecksum-P PACKAGE
+    enableChecksum				TruthValue,
 
-    maximumVirtualAdjacencies
-    partitionAreaAddresses
-    partitionDesignatedL2IntermediateSystem
-    partitionVirtualLinkChanges
+-- cLNSISISBasic-P PACKAGE
+-- For intermediate systems only.
+    version					GraphicString,
+    iSType					INTEGER,
+    systemId					OCTET STRING,
+    maximumPathSplits				Integer32,
+    minimumLSPTransmissionInterval		MilliSeconds,
+    maximumLSPGenerationInterval		MilliSeconds,
+    minimumBroadcastLSPTransmissionInterval	MilliSeconds,
+    completeSNPInterval				MilliSeconds,
+    originatingL1LSPBufferSize			Integer32,
+    manualAreaAddresses				OCTET STRING,
+    maximumAreaAddresses			Integer32,
+    minimumLSPGenerationInterval		MilliSeconds,
+    pollESHelloRate				MilliSeconds,
+    partialSNPInterval				MilliSeconds,
+    waitingTime					MilliSeconds,
+    dRISISHelloTimer				MilliSeconds,
+    l1State					INTEGER,
+    areaAddresses				OCTET STRING,
+    corruptedLSPsDetected			Counter64,
+    lSPL1DatabaseOverloads			Counter64,
+    manualAddressesDroppedFromArea		Counter64,
+    attemptsToExceedMaximumSequenceNumber	Counter64,
+    sequenceNumberSkips				Counter64,
+    ownLSPPurges				Counter64,
+    iDFieldLengthMismatches			Counter64,
+    maximumAreaAddressesMismatches		Counter64,
+    originatingLSPBufferSizeMismatches		Counter64,
+    lSPTooLargeToPropagate			Counter64,
 
-    originatingL2LSPBufferSize
-    l2State
-    lSPL2DatabaseOverloads
+-- cLNSISISAuthentication-P PACKAGE
+-- For intermediate systems only with authentication.
+    areaTransmitPassword			OCTET STRING,
+    areaReceivePasswords			OCTET STRING,
+    authenticationFailures			Counter64,
 
-    domainTransmitPassword
-    domainReceivePasswords
+-- cLNSISISPartitionRepair-P PACKAGE
+-- Level 2 IS with partition repair procedure
+    maximumVirtualAdjacencies			Integer32,
+    partitionAreaAddresses			OCTET STRING,
+    partitionDesignatedL2IntermediateSystem	OCTET STRING,
+    partitionVirtualLinkChanges			Counter64,
+
+-- cLNSISISLevel2-P PACKAGE
+-- Level 2 IS
+    originatingL2LSPBufferSize			Integer32,
+    l2State					INTEGER,
+    lSPL2DatabaseOverloads			Counter64,
+
+-- cLNSISISLevel2Authentication-P PACKAGE
+-- Level 2 IS and the authentication procedures are implemented.
+    domainTransmitPassword			OCTET STRING,
+    domainReceivePasswords			OCTET STRING,
 
 -- cLNS-networkEntity-Management NAME BINDING CREATE; DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 -- cLNS-networkEntity-Automatic NAME BINDING
-    cLNSRowStatus       RowStatus
+    cLNSRowStatus				RowStatus
 }
+
+cLNSAdministrativeState OBJECT-TYPE
+    SYNTAX	AdministrativeState
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { cLNSEntry xx }
+
+cLNSOperationalState OBJECT-TYPE
+    SYNTAX	OperationalState
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { cLNSEntry xx }
+
+cLNSActivationAction OBJECT-TYPE
+    SYNTAX	ActivationAction
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { cLNSEntry xx }
+
+cLNSOctetsSentCounter OBJECT-TYPE
+    SYNTAX	Counter64
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"Rec. X.721 | ISO/IEC 10165-2 : 1992, octetsSentCounter"
+    ::= { cLNSEntry xx }
+
+cLNSOctetsReceivedCounter OBJECT-TYPE
+    SYNTAX	Counter64
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"Rec. X.721 | ISO/IEC 10165-2 : 1992, octetsReceivedCounter"
+    ::= { cLNSEntry xx }
+
+cLNSOperationalSystemType OBJECT-TYPE
+    SYNTAX	current
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"If this conceptual row is created by management operation 
+	 (using the cLNSRowStatus object), the initial value of this 
+	 object shall be specified on creation.  Otherwise, the value 
+	 shall be determined in an implementation specific manner.  The 
+	 value shall be one of those present in the 
+	 networkEntitySystemTypes object in the superior 
+	 networkEntityEntry.  A value of eS(1) indicates that the system 
+	 shall perform no 8473 forwarding operations upon non-local CLNP 
+	 PDUs.  A value of iS(2) indicates that the system is permitted 
+	 to perform forwarding operations, but the decision to forward 
+	 individual PDUs, or not to forward them, shall be taken on the 
+	 basis of the available routing information."
+    REFERENCE
+	"ITU-T Rec. X.283 (1997) | ISO/IEC 10733 : 1998, cLNS:operationalSystemType"
+    ::= { cLNSEntry xx }
+
+cLNSSupportedProtocols OBJECT-TYPE
+    SYNTAX	SupportedProtocols
+    MAX-ACCESS	read-only
+    STATUS	current
+
+cLNSSegmentsReceived OBJECT-TYPE
+    SYNTAX	Counter64
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { cLNSEntry xx }
+
+cLNSSegmentsSent OBJECT-TYPE
+    SYNTAX	Counter64
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { cLNSEntry xx }
+
+cLNSSegmentsDiscarded OBJECT-TYPE
+    SYNTAX	Counter64
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { cLNSEntry xx }
+
+
+cLNSAssemblingSegmentsDiscarded OBJECT-TYPE
+    SYNTAX	Counter64
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { cLNSEntry xx }
+
+cLNSErrorReportsReceived OBJECT-TYPE
+    SYNTAX	Counter64
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { cLNSEntry xx }
+
+cLNSPDUDiscards OBJECT-TYPE
+    SYNTAX	Counter64
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { cLNSEntry xx }
+
+cLNSCongestionDiscards OBJECT-TYPE
+    SYNTAX	Counter64
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { cLNSEntry xx }
+
+cLNSMaximumLifetime OBJECT-TYPE
+    SYNTAX	MilliSeconds
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { cLNSEntry xx }
+
+cLNSEnableChecksum OBJECT-TYPE
+    SYNTAX	TruthValue
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { cLNSEntry xx }
 
 linkage OBJECT IDENTIFIER
     ::= { nlmTables 5 }
@@ -635,8 +851,8 @@ areaMismatch OBJECT-IDENTITY
          occurrence of this event is counted by the 
          initialisationFailures counter."
     REFERENCE
-        "ISO/IEC 10689, ISIS.areaMismatch"
-    ::= { isisOids 0) }
+        "ISO/IEC 10589, ISIS.areaMismatch"
+    ::= { nlmOids 0 }
 
 attemptToExceedMaximumSequenceNumber OBJECT-IDENTITY
     STATUS      current
@@ -656,8 +872,8 @@ attemptToExceedMaximumSequenceNumber OBJECT-IDENTITY
          occurrence of this event is counted by the 
          attemptsToExceedMaximumSequenceNumber counter."
     REFERENCE
-        "ISO/IEC 10689, ISIS.attemptToExceedMaximumSequenceNumber"
-    ::= { isisOids 1) }
+        "ISO/IEC 10589, ISIS.attemptToExceedMaximumSequenceNumber"
+    ::= { nlmOids 1 }
 
 authenticationFailure OBJECT-IDENTITY
     STATUS      current
@@ -682,8 +898,8 @@ authenticationFailure OBJECT-IDENTITY
          field. The occurrence of this event is counted by the 
          authenticationFailures counter."
     REFERENCE
-        "ISO/IEC 10689, ISIS.authenticationFailure"
-    ::= { isisOids 2) }
+        "ISO/IEC 10589, ISIS.authenticationFailure"
+    ::= { nlmOids 2 }
 
 corruptedLSPDetected OBJECT-IDENTITY
     STATUS      current
@@ -700,8 +916,8 @@ corruptedLSPDetected OBJECT-IDENTITY
          occurrence of this event is counted by the 
          corruptedLSPsDetected counter."
     REFERENCE
-        "ISO/IEC 10689, ISIS.corruptedLSPsDetected"
-    ::= { isisOids 3) }
+        "ISO/IEC 10589, ISIS.corruptedLSPsDetected"
+    ::= { nlmOids 3 }
 
 iDFieldLengthMismatch OBJECT-IDENTITY
     STATUS      current
@@ -727,8 +943,8 @@ iDFieldLengthMismatch OBJECT-IDENTITY
          occurence of this event is counted by the 
          iDFieldLengthMismatches counter."
     REFERENCE
-        "ISO/IEC 10689, ISIS.iDFieldLengthMismatch"
-    ::= { isisOids 4) }
+        "ISO/IEC 10589, ISIS.iDFieldLengthMismatch"
+    ::= { nlmOids 4 }
 
 lanL1DesignatedIntermediateSystemChange OBJECT-IDENTITY
     STATUS      current
@@ -747,8 +963,8 @@ lanL1DesignatedIntermediateSystemChange OBJECT-IDENTITY
          occurrence of this event is counted by the 
          lanL1DesignatedIntermediateSystemChanges counter."
     REFERENCE
-        "ISO/IEC 10689, ISIS.lanL1DesignatedIntermediateSystemChange"
-    ::= { isisOids 5) }
+        "ISO/IEC 10589, ISIS.lanL1DesignatedIntermediateSystemChange"
+    ::= { nlmOids 5 }
 
 lSPL1DatabaseOverload OBJECT-IDENTITY
     STATUS      current
@@ -776,8 +992,8 @@ lSPL1DatabaseOverload OBJECT-IDENTITY
          field. The occurrence of this event shall be counted by 
          the lSPL1DatabaseOverloads counter."
     REFERENCE
-        "ISO/IEC 10689, ISIS.lSPL1DatabaseOverload"
-    ::= { isisOids 6) }
+        "ISO/IEC 10589, ISIS.lSPL1DatabaseOverload"
+    ::= { nlmOids 6 }
 
 lSPL2DatabaseOverload OBJECT-IDENTITY
     STATUS      current
@@ -805,8 +1021,8 @@ lSPL2DatabaseOverload OBJECT-IDENTITY
          field. The occurence of this event shall be counted by 
          the lSPL2DatabaseOverloads counter."
     REFERENCE
-        "ISO/IEC 10689, ISIS.lSPL2DatabaseOverload"
-    ::= { isisOids 7) }
+        "ISO/IEC 10589, ISIS.lSPL2DatabaseOverload"
+    ::= { nlmOids 7 }
 
 manualAddressDroppedFromArea OBJECT-IDENTITY
     STATUS      current
@@ -840,8 +1056,8 @@ manualAddressDroppedFromArea OBJECT-IDENTITY
          occurrence of this event shall be counted by the 
          manualAddressDroppedFromAreas counter."
     REFERENCE
-        "ISO/IEC 10689, ISIS.manualAddressDroppedFromArea"
-    ::= { isisOids 8) }
+        "ISO/IEC 10589, ISIS.manualAddressDroppedFromArea"
+    ::= { nlmOids 8 }
 
 maximumAreaAddressesMismatch OBJECT-IDENTITY
     STATUS      current
@@ -869,8 +1085,8 @@ maximumAreaAddressesMismatch OBJECT-IDENTITY
          occurence of this event is counted by the 
          MaximumAreaAddressesMismatches counter."
     REFERENCE
-        "ISO/IEC 10689, ISIS.maximumAreaAddressesMismatch"
-    ::= { isisOids 9) }
+        "ISO/IEC 10589, ISIS.maximumAreaAddressesMismatch"
+    ::= { nlmOids 9 }
 
 ownLSPPurge OBJECT-IDENTITY
     STATUS      current
@@ -889,8 +1105,8 @@ ownLSPPurge OBJECT-IDENTITY
          field. The occurrence of this event is counted by the 
          ownLSPPurges counter."
     REFERENCE
-        "ISO/IEC 10689, ISIS.ownLSPPurge"
-    ::= { isisOids 10) }
+        "ISO/IEC 10589, ISIS.ownLSPPurge"
+    ::= { nlmOids 10 }
 
 partitionVirtualLinkChange OBJECT-IDENTITY
     STATUS      current
@@ -910,8 +1126,8 @@ partitionVirtualLinkChange OBJECT-IDENTITY
          Link must be preserved. The occurrence of this event is 
          counted by the partitionVirtualLinkChanges counter."
     REFERENCE
-        "ISO/IEC 10689, ISIS.partitionVirtualLinkChange"
-    ::= { isisOids 11) }
+        "ISO/IEC 10589, ISIS.partitionVirtualLinkChange"
+    ::= { nlmOids 11 }
 
 rejectedAdjacency OBJECT-IDENTITY
     STATUS      current
@@ -931,8 +1147,8 @@ rejectedAdjacency OBJECT-IDENTITY
          occurrence of this event is counted by the 
          rejectedAdjacencies counter."
     REFERENCE
-        "ISO/IEC 10689, ISIS.rejectedAdjacency"
-    ::= { isisOids 12) }
+        "ISO/IEC 10589, ISIS.rejectedAdjacency"
+    ::= { nlmOids 12 }
 
 sequenceNumberSkip OBJECT-IDENTITY
     STATUS      current
@@ -946,8 +1162,8 @@ sequenceNumberSkip OBJECT-IDENTITY
          of this event is counted by the sequenceNumberSkips 
          counter."
     REFERENCE
-        "ISO/IEC 10689, ISIS.sequenceNumberSkip"
-    ::= { isisOids 13) }
+        "ISO/IEC 10589, ISIS.sequenceNumberSkip"
+    ::= { nlmOids 13 }
 
 versionSkew OBJECT-IDENTITY
     STATUS      current
@@ -973,8 +1189,8 @@ versionSkew OBJECT-IDENTITY
          event is counted by the initialisationFailures 
          counter."
     REFERENCE
-        "ISO/IEC 10689, ISIS.versionSkew"
-    ::= { isisOids 14) }
+        "ISO/IEC 10589, ISIS.versionSkew"
+    ::= { nlmOids 14 }
 
 originatingLSPBufferSizeMismatch OBJECT-IDENTITY
     STATUS      current
@@ -1006,9 +1222,8 @@ originatingLSPBufferSizeMismatch OBJECT-IDENTITY
          field. The occurrence of this event is counted by the 
          originatingLSPBufferSizeMismatches counter."
     REFERENCE
-        "ISO/IEC 10689, ISIS.originatingLSPBufferSizeMismatch"
-    ::= { isisOids 15) }
-
+        "ISO/IEC 10589, ISIS.originatingLSPBufferSizeMismatch"
+    ::= { nlmOids 15 }
 
 nlmConformance OBJECT IDENTIFIER
     ::= { nlmMIB 3 }
@@ -1066,9 +1281,9 @@ nlmCLNSPackage OBJECT-GROUP
 
 nlmCLNS8473Package OBJECT-GROUP
     OBJECTS     {
-        octetsSentCounter,
-        octetsReceivedCounter,
-        operationalSystemType,
+        cLNSOctetsSentCounter,
+        cLNSOctetsReceivedCounter,
+        cLNSOperationalSystemType,
         supportedProtocols,
         segmentsReceived,
         segmentsDiscarded,

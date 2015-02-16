@@ -43,6 +43,9 @@ isdnMib MODULE-IDENTITY
         DESCRIPTION
             "The MIB module to describe the
              management of ISDN interfaces."
+        REVISION    "9609231642Z" -- Sep 23, 1996
+	DESCRIPTION
+	    "Initial version of this mib."
         ::= { transmission 20 }
 
 -- The ISDN hardware interface (BRI or PRI) is represented

@@ -55,7 +55,7 @@
 --
 -- =============================================================================
 
-OPENSS7-X25-PLP-MIB DEFINITIONS ::= BEGIN
+OPENSS7-X25-PLP-2-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     openss7Modules

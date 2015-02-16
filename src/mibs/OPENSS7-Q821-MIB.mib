@@ -58,10 +58,10 @@
 OPENSS7-Q821-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Opaque
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Opaque, IpAddress
         FROM SNMPv2-SMI
-    DateAndTime, IpAddress, RowPointer, RowStatus, StorageType, 
-    TimeInterval, TimeStamp
+    DateAndTime, RowPointer, RowStatus, StorageType, 
+    TimeInterval, TimeStamp, TEXTUAL-CONVENTION
         FROM SNMPv2-TC
     AdministrativeState, OperationalState, GnmAlarmStatus
         FROM OPENSS7-SMI-MIB
@@ -118,6 +118,9 @@ q821MIB MODULE-IDENTITY
          enterprise object identifier arc: 1.3.6.1.4.1.29591.  
          Modifications must be made only within an object identifier arc 
          under your control."
+    REVISION "200901210056Z"
+    DESCRIPTION
+	"Initial version of this mib."
     ::= { openss7Q 821 }
 
 AlarmStatusList ::= TEXTUAL-CONVENTION

@@ -27,6 +27,9 @@ rs232 MODULE-IDENTITY
          E-mail: rlstewart@eng.xyplex.com"
     DESCRIPTION 
         "The MIB module for RS-232-like hardware devices."
+    REVISION "199405261700Z"
+    DESCRIPTION
+	"Inital version of this mib."
     ::= { transmission 33 }
 
 

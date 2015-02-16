@@ -30,6 +30,9 @@ ds0Bundle MODULE-IDENTITY
     DESCRIPTION
 	 "The MIB module to describe
 	  DS0 Bundle interfaces objects."
+    REVISION "9807161630Z"
+    DESCRIPTION
+	 "Current revision."
     REVISION "9805242010Z"
     DESCRIPTION
 	 "Initial version of the DS0BUNDLE-MIB."

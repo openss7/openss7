@@ -60,8 +60,14 @@ OPENSS7-SL-MUX-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE
         FROM SNMPv2-SMI
-    RowStatus
+    RowStatus, TEXTUAL-CONVENTION, RowPointer
         FROM SNMPv2-TC
+    OperationalState, UsageState, AdministrativeState, 
+    AlarmStatus, ProceduralStatus, AvailabilityStatus, 
+    ControlStatus, UnknownStatus
+        FROM OPENSS7-SMI-MIB
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
     openss7, openss7Modules
         FROM OPENSS7-SMI;
 

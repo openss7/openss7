@@ -62,11 +62,13 @@ IMPORTS
 	FROM OPENSS7-SMI
     AdministrativeState, OperationalState, SimpleNameType
 	FROM OPENSS7-SMI-MIB
+    MilliSeconds
+	FROM OPENSS7-TC
     MODULE-COMPLIANCE, OBJECT-GROUP
 	FROM SNMPv2-CONF
-    MODULE-IDENTITY, OBJECT-TYPE
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32
 	FROM SNMPv2-SMI
-    RowStatus, TEXTUAL-CONVENTION
+    RowStatus, TEXTUAL-CONVENTION, TruthValue
 	FROM SNMPv2-TC;
 
 snare-MIB MODULE-IDENTITY
@@ -159,18 +161,28 @@ snareEntry OBJECT-TYPE
 	""
     REFERENCE
 	"ISO/IEC 10030 | ITU-T Rec. X.116"
+    INDEX { snareId }
     ::= { snareTable 1 }
 
 SnareEntry ::= SEQUENCE {
-    snareProtocolVersionsSupported	BITS,
+    snareId SimpleNameType,
+    snareProtocolVersionsSupported	BITS
 }
+
+snareId OBJECT-TYPE
+    SYNTAX	SimpleNameType
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"..."
+    ::= { snareEntry 1 }
 
 snareProtocolVersionsSupported OBJECT-TYPE
     SYNTAX	BITS {
 		    iso10030(1),
-		    x116(2),
+		    x116(2)
 		}
-    MAX-ACCESS	read-create
+    MAX-ACCESS	read-write
     STATUS	current
     DESCRIPTION
 	"Provides a mask of protocol version supported.  Currently 
@@ -183,7 +195,7 @@ snareProtocolVersionsSupported OBJECT-TYPE
 	 unsupported version is clear."
     REFERENCE
 	"ISO/IEC 10030 | ITU-T Rec. X.116"
-    ::= { snareTable 1 }
+    ::= { snareEntry 2 }
 
 
 snareAddressDiscoveryTable OBJECT-TYPE
@@ -204,10 +216,21 @@ snareAddressDiscoveryEntry OBJECT-TYPE
 	""
     REFERENCE
 	"ISO/IEC 10030 | ITU-T Rec. X.116"
+    INDEX { snareAddressDiscoveryId }
     ::= { snareAddressDiscoveryTable 1 }
 
 SnareAddressDiscoveryEntry ::= SEQUENCE {
+    snareAddressDiscoveryId
+	SimpleNameType
 }
+
+snareAddressDiscoveryId OBJECT-TYPE
+    SYNTAX	SimpleNameType
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"..."
+    ::= { snareAddressDiscoveryEntry 1 }
 
 
 snareConfigSubsetTable OBJECT-TYPE
@@ -228,16 +251,17 @@ snareConfigSubsetEntry OBJECT-TYPE
 	""
     REFERENCE
 	"ISO/IEC 10030 | ITU-T Rec. X.116"
+    INDEX { snareId }
     ::= { snareConfigSubsetTable 1 }
 
 SnareConfigSubsetEntry ::= SEQUENCE {
-    snareCSRequestTime			Integer32,
+    snareCSRequestTime			Integer32
 }
 
 snareCSRequestTime OBJECT-TYPE
     SYNTAX	Integer32(0..255)
     UNITS	"seconds"
-    MAX-ACCESS	read-create
+    MAX-ACCESS	read-write
     STATUS	current
     DESCRIPTION
 	"The Request Time parameter indicates the time that the SNARE 
@@ -282,15 +306,66 @@ snareNetEntry OBJECT-TYPE
 	""
     REFERENCE
 	"ISO/IEC 10030 | ITU-T Rec. X.116"
+    INDEX { snareNetId }
     ::= { snareNetTable 1 }
 
 SnareNetEntry ::= SEQUENCE {
-    snareNetHoldingTime
-    snareNetQueryLimit
-    snareNetRequestTime
-    snareNetNotificationRequired
-    snareNetAddressHodingTime
+    snareNetId SimpleNameType,
+    snareNetHoldingTime MilliSeconds,
+    snareNetQueryLimit MilliSeconds,
+    snareNetRequestTime MilliSeconds,
+    snareNetNotificationRequired TruthValue,
+    snareNetAddressHoldingTime MilliSeconds
 }
+
+snareNetId OBJECT-TYPE
+    SYNTAX	SimpleNameType
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION	
+	"..."
+    ::= { snareNetEntry 1 }
+
+snareNetHoldingTime OBJECT-TYPE
+    SYNTAX	MilliSeconds
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION	
+	"..."
+    ::= { snareNetEntry 2 }
+
+snareNetQueryLimit OBJECT-TYPE
+    SYNTAX	MilliSeconds
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION	
+	"..."
+    ::= { snareNetEntry 3 }
+
+snareNetRequestTime OBJECT-TYPE
+    SYNTAX	MilliSeconds
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION	
+	"..."
+    ::= { snareNetEntry 4 }
+
+snareNetNotificationRequired OBJECT-TYPE
+    SYNTAX	TruthValue
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION	
+	"..."
+    ::= { snareNetEntry 5 }
+
+snareNetAddressHoldingTime OBJECT-TYPE
+    SYNTAX	MilliSeconds
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION	
+	"..."
+    ::= { snareNetEntry 6 }
+
 
 END
 

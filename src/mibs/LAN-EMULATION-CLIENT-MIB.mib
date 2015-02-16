@@ -73,7 +73,7 @@ IMPORTS
 
     MODULE-COMPLIANCE, OBJECT-GROUP        FROM SNMPv2-CONF
 
-    ifIndex                                FROM RFC1213-MIB
+    ifEntry                                FROM RFC1213-MIB
 
     OwnerString                            FROM RFC1271-MIB;
 
@@ -94,15 +94,6 @@ IMPORTS
 -- ------------------------------------------------------------ --
 
 
--- The object identifier subtree for ATM Forum LAN Emulation MIBs
-atmfLanEmulation  OBJECT IDENTIFIER ::= {
-			    enterprises
-			       atmForum(353)
-				  atmForumNetworkManagement(5)
-				     3
-		  }
-
-
 leClientMIB MODULE-IDENTITY
     LAST-UPDATED "9505100000Z"
     ORGANIZATION "ATM Forum LAN Emulation Sub-Working Group"
@@ -120,7 +111,19 @@ leClientMIB MODULE-IDENTITY
 	 Client nodes.  It is meant to be used in connection with
 	 the AToM MIB and MIB-II / RFC 1573 'ifTable' entries
 	 for each LEC / emulated 802.x network interface."
+    REVISION	"9505100000Z"
+    DESCRIPTION
+	"Initial version of this mib."
     ::= { atmfLanEmulation 1 }
+
+-- The object identifier subtree for ATM Forum LAN Emulation MIBs
+atmfLanEmulation  OBJECT IDENTIFIER ::= {
+			    enterprises
+			       atmForum(353)
+				  atmForumNetworkManagement(5)
+				     3
+		  }
+
 
 
 leClientMIBObjects  OBJECT IDENTIFIER ::= { leClientMIB 1 }
@@ -1268,7 +1271,7 @@ lecMappingEntry OBJECT-TYPE
     STATUS       current
     DESCRIPTION
 	    "Each row describes one ifIndex --> lecIndex mapping."
-    INDEX   { ifIndex }
+    AUGMENTS { ifEntry }
     ::= { lecMappingTable 1 }
 
 LecMappingEntry ::=

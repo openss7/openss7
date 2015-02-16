@@ -58,10 +58,12 @@
 OPENSS7-TMN-SMI DEFINITIONS ::= BEGIN
 
 IMPORTS
-    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, OBJECT-IDENTITY
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, OBJECT-IDENTITY,
+    Unsigned32, Integer32, Gauge32
         FROM SNMPv2-SMI
 
-    DateAndTime, RowPointer, RowStatus, TimeStamp, StorageType
+    DateAndTime, RowPointer, RowStatus, TimeStamp, StorageType,
+    TruthValue, TimeInterval, TEXTUAL-CONVENTION
         FROM SNMPv2-TC
 
     AdditionalInformation, AdditionalText, AdministrativeState, 
@@ -81,7 +83,7 @@ IMPORTS
     SecurityAlarmCause, SecurityAlarmDetector, 
     SecurityAlarmSeverity, ServiceProvider, ServiceUser, 
     SimpleNameType, SourceIndicator, SpecificProblems, 
-    StandbyStatus, ThresholdInfo, Time24, Time24, 
+    StandbyStatus, ThresholdInfo, Time24, 
     TrendIndication, UnknownStatus, UsageState, WeekMask
         FROM OPENSS7-SMI-MIB
 
@@ -1088,7 +1090,8 @@ communicationsInformation NOTIFICATION-TYPE
 -- =====================================================================
 
 smi2Notification OBJECT IDENTIFIER ::=
-{ joint-iso-ccitt(2) ms(9) smi(3) part2(2) notification(10) }
+{ 2 9 3 2 10 }
+-- { joint-iso-ccitt(2) ms(9) smi(3) part2(2) notification(10) }
 
 attributeValueChangeType OBJECT-IDENTITY
     STATUS current
@@ -1261,7 +1264,8 @@ communicationsInformationType OBJECT-IDENTITY
 -- =====================================================================
 
 arfProbableCause OBJECT IDENTIFIER ::=
-{ joint-iso-ccitt(2) ms(9) smi(3) part2(2) standardSpecificExtensions(0) arf(0) }
+{ 2 9 3 2 0 0 }
+-- { joint-iso-ccitt(2) ms(9) smi(3) part2(2) standardSpecificExtensions(0) arf(0) }
 
 adapterError OBJECT-IDENTITY
     STATUS current
@@ -2152,7 +2156,8 @@ versionMismatch OBJECT-IDENTITY
 -- ProposedRepairActions values
 
 arfProposedRepairAction OBJECT IDENTIFIER ::= -- { smiOids 3 }
-{ joint-iso-ccitt(2) ms(9) smi(3) part2(2) standardSpecificExtensions(0) arfpra(2) }
+{ 2 9 3 2 0 2 }
+-- { joint-iso-ccitt(2) ms(9) smi(3) part2(2) standardSpecificExtensions(0) arfpra(2) }
 
 noActionRequired OBJECT-IDENTITY
     STATUS current
@@ -2196,7 +2201,8 @@ repairActionRequired OBJECT-IDENTITY
 --
 
 gnmProbableCause OBJECT IDENTIFIER ::=
-{ ccitt(0) recommendation(0) m(13) gmn(3100) informationModel(0) standardSpecificExtension(0) probableCauses(1) }
+{ 0 0 13 3100 0 0 1 }
+-- { ccitt(0) recommendation(0) m(13) gmn(3100) informationModel(0) standardSpecificExtension(0) probableCauses(1) }
 
 --
 -- Probable Causes from M.3100 for use with communicationsAlarm
@@ -2925,7 +2931,8 @@ sfwrDownloadFailure OBJECT-IDENTITY
 -- =====================================================================
 
 arfSecurityAlarmCause OBJECT IDENTIFIER ::=
-{ joint-iso-ccitt(2) ms(9) smi(3) part2(2) standardSpecificExtensions(0) sarf(1) }
+{ 2 9 3 2 0 1 }
+-- { joint-iso-ccitt(2) ms(9) smi(3) part2(2) standardSpecificExtensions(0) sarf(1) }
 
 authenticationFailure OBJECT-IDENTITY
     STATUS current
@@ -3246,7 +3253,7 @@ tmnProbableCause OBJECT-TYPE
     ::= { tmnSeverityMappingEntry 1 }
 
 tmnSpecificProblem OBJECT-TYPE
-    SYNTAX SpecificProblem
+    SYNTAX SpecificProblems
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
@@ -3336,7 +3343,7 @@ TmnAlarmSummaryEntry ::=
         tmnAlarmSummaryProbableCause
             ProbableCause,
         tmnAlarmSummarySpecificProblem
-            SpecificProblem,
+            SpecificProblems,
         tmnAlarmSummaryObjectInstance
             RowPointer
     }
@@ -3395,7 +3402,7 @@ tmnAlarmSummaryProbableCause OBJECT-TYPE
     ::= { tmnAlarmSummaryEntry 4 }
 
 tmnAlarmSummarySpecificProblem OBJECT-TYPE
-    SYNTAX SpecificProblem
+    SYNTAX SpecificProblems
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION

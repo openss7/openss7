@@ -41,6 +41,9 @@ dialControlMib MODULE-IDENTITY
         DESCRIPTION
             "The MIB module to describe peer information for
              demand access and possibly other kinds of interfaces."
+        REVISION    "9609231544Z" -- Sep 23, 1996
+	DESCRIPTION
+	    "Initial version of this mib."
         ::= { transmission 21 }
 
 AbsoluteCounter32 ::= TEXTUAL-CONVENTION

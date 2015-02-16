@@ -29,6 +29,9 @@ ds0 MODULE-IDENTITY
     DESCRIPTION
 	 "The MIB module to describe
 	  DS0 interfaces objects."
+    REVISION "9807161630Z"
+    DESCRIPTION
+	 "Current revision of this mib."
     REVISION "9805242010Z"
     DESCRIPTION
 	 "Initial version of the DS0-MIB."

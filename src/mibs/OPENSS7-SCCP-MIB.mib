@@ -575,7 +575,7 @@ SccpNetworkEntityEntry ::= SEQUENCE {
 
 sccpNetworkEntityId OBJECT-TYPE
     SYNTAX      SimpleNameType
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION 
         "Provides a identifier of the Network Entity.  Each network 

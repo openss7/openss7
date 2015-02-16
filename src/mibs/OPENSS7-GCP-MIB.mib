@@ -256,6 +256,18 @@ MegacoAuthentication ::= TEXTUAL-CONVENTION
          formed."
     SYNTAX      INTEGER { none(0), interim(1), tls(2), ah(3), esp(4) }
 
+MegacoTerminationId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "..."
+    SYNTAX      OCTET STRING (SIZE(0..32))
+
+MegacoTerminationPath ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "..."
+    SYNTAX      OCTET STRING (SIZE(0..32))
+
 gcpNotifications OBJECT IDENTIFIER
     ::= { gcpMIB 0 }
 

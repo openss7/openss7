@@ -1613,7 +1613,8 @@ metricCompliance OBJECT IDENTIFIER
 -- mean algorithm object identifiers
 
 moaAlgorithmIdentifiers OBJECT IDENTIFIER
-    ::= { joint-iso-ccitt ms(9) function(2) part11(11) standardSpecificExtension(0) 1 }
+    ::= { 2 9 2 11 0 1 }
+--  ::= { joint-iso-ccitt ms(9) function(2) part11(11) standardSpecificExtension(0) 1 }
 
 ewmaAlgorithm OBJECT-IDENTITY
     STATUS      current
@@ -1624,7 +1625,8 @@ ewmaAlgorithm OBJECT-IDENTITY
     REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                MetricModule.ewmaAlgoritm, Annex B.2."
-    ::= { joint-iso-ccitt ms(9) function(2) part11(11) standardSpecificExtension(0) algorithm(1) 0 }
+    ::= { 2 9 2 11 0 1 0 }
+--  ::= { joint-iso-ccitt ms(9) function(2) part11(11) standardSpecificExtension(0) algorithm(1) 0 }
 
 uwmaAlgorithm OBJECT-IDENTITY
     STATUS      current
@@ -1635,7 +1637,8 @@ uwmaAlgorithm OBJECT-IDENTITY
     REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                MetricModule.uwmaAlgoritm, Annex C.2."
-    ::= { joint-iso-ccitt ms(9) function(2) part11(11) standardSpecificExtension(0) algorithm(1) 1 }
+    ::= { 2 9 2 11 0 1 1 }
+--  ::= { joint-iso-ccitt ms(9) function(2) part11(11) standardSpecificExtension(0) algorithm(1) 1 }
 
 metricObjectGroup OBJECT-GROUP
     OBJECTS     { scannerAdministrativeState, granularityPeriod, 
